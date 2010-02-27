@@ -269,11 +269,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							}
 							if (DeviceSelectionDialog.this.application.getActiveDevice() != null) {
 								DeviceSerialPort serialPort = DeviceSelectionDialog.this.application.getActiveDevice().getSerialPort();
-								if (serialPort != null && !serialPort.isConnected()) DeviceSelectionDialog.this.application.getActiveDevice().getSerialPort().open();
+								if (serialPort != null && !serialPort.isConnected()) DeviceSelectionDialog.this.application.getActiveDevice().openCloseSerialPort();
 							}
-							if (DeviceSelectionDialog.this.settings.isAutoOpenToolBox()) {
-								DeviceSelectionDialog.this.application.openDeviceDialog();
-							}
+						}
+						if (DeviceSelectionDialog.this.settings.isAutoOpenToolBox()) {
+							DeviceSelectionDialog.this.application.openDeviceDialog();
 						}
 					}
 					catch (Exception e) {
@@ -299,6 +299,26 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				{
 					this.settingsTabFolder = new CTabFolder(this.composite1, SWT.BORDER);
 					this.settingsTabFolder.setSimple(false);
+					this.settingsTabFolder.addPaintListener(new PaintListener() {
+						@Override
+						public void paintControl(PaintEvent evt) {
+							DeviceSelectionDialog.log.log(Level.FINEST, "settingsTabFolder.paintControl, event=" + evt); //$NON-NLS-1$
+							
+							if (DeviceSelectionDialog.this.deviceSelectCombo.getSelectionIndex() < 0 && DeviceSelectionDialog.this.deviceSelectCombo.getItemCount() > 0) {
+								updateDialogEntries();
+							}
+							
+							if (DeviceSelectionDialog.this.settings.isGlobalSerialPort()  
+									|| !DeviceSelectionDialog.this.serialPortSelectionGroup.getEnabled()) {
+								DeviceSelectionDialog.this.portDescription.setEnabled(false);
+								DeviceSelectionDialog.this.portSelectCombo.setEnabled(false);
+							}
+							else {
+								DeviceSelectionDialog.this.portDescription.setEnabled(true);
+								DeviceSelectionDialog.this.portSelectCombo.setEnabled(true);
+							}
+						}
+					});
 					{
 						this.cTabItem1 = new CTabItem(this.settingsTabFolder, SWT.NONE);
 						this.cTabItem1.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -312,14 +332,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								this.deviceSelectionGroup.setLayout(null);
 								this.deviceSelectionGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0155));
 								this.deviceSelectionGroup.setBounds(12, 9, 524, 250);
-								this.deviceSelectionGroup.addPaintListener(new PaintListener() {
-									public void paintControl(PaintEvent evt) {
-										DeviceSelectionDialog.log.log(Level.FINEST, "deviceSelectionGroup.widgetSelected, event=" + evt); //$NON-NLS-1$
-										if (DeviceSelectionDialog.this.deviceSelectCombo.getSelectionIndex() < 0 && DeviceSelectionDialog.this.deviceSelectCombo.getItemCount() > 0) {
-											updateDialogEntries();
-										}
-									}
-								});
 								{
 									this.deviceSelectCombo = new CCombo(this.deviceSelectionGroup, SWT.BORDER);
 									this.deviceSelectCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -493,20 +505,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								this.serialPortSelectionGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.serialPortSelectionGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0163));
 								this.serialPortSelectionGroup.setBounds(12, 265, 524, 58);
-								this.serialPortSelectionGroup.addPaintListener(new PaintListener() {
-									public void paintControl(PaintEvent evt) {
-										DeviceSelectionDialog.log.log(Level.FINEST, "serialPortSelectionGroup.paintControl, event=" + evt); //$NON-NLS-1$
-										if (DeviceSelectionDialog.this.settings.isGlobalSerialPort()  
-												|| !DeviceSelectionDialog.this.serialPortSelectionGroup.getEnabled()) {
-											DeviceSelectionDialog.this.portDescription.setEnabled(false);
-											DeviceSelectionDialog.this.portSelectCombo.setEnabled(false);
-										}
-										else {
-											DeviceSelectionDialog.this.portDescription.setEnabled(true);
-											DeviceSelectionDialog.this.portSelectCombo.setEnabled(true);
-										}
-									}
-								});
 								{
 									this.portDescription = new Label(this.serialPortSelectionGroup, SWT.NONE);
 									this.portDescription.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -558,8 +556,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											DeviceSelectionDialog.this.stopBitsSelectLabel.setEnabled(true);
 											DeviceSelectionDialog.this.paritySelectLabel.setEnabled(true);
 											DeviceSelectionDialog.this.flowControlSelectLabel.setEnabled(true);
-											//DeviceSelectionDialog.this.dtrCheckBox.setVisible(true);
-											//DeviceSelectionDialog.this.rtsCheckBox.setVisible(true);
 										}
 										else {
 											DeviceSelectionDialog.this.baudeDescription.setEnabled(false);
@@ -575,8 +571,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											DeviceSelectionDialog.this.stopBitsSelectLabel.setEnabled(false);
 											DeviceSelectionDialog.this.paritySelectLabel.setEnabled(false);
 											DeviceSelectionDialog.this.flowControlSelectLabel.setEnabled(false);
-											//DeviceSelectionDialog.this.dtrCheckBox.setVisible(false);
-											//DeviceSelectionDialog.this.rtsCheckBox.setVisible(false);
 										}
 								}
 								});
@@ -631,35 +625,28 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 								{
 									this.baudeSelectLabel = new Label(this.portSettingsGroup, SWT.RIGHT);
-									//FillLayout cLabel1Layout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 									this.baudeSelectLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									//this.baudeSelectLabel.setLayout(cLabel1Layout);
 									this.baudeSelectLabel.setBounds(115, OSDE.IS_MAC_COCOA ? 13 : 23, 90, 19);
-									//this.baudeSelectLabel.setEnabled(false);
 								}
 								{
 									this.stopBitsSelectLabel = new Label(this.portSettingsGroup, SWT.RIGHT);
 									this.stopBitsSelectLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.stopBitsSelectLabel.setBounds(115, OSDE.IS_MAC_COCOA ? 57 : 67, 90, 19);
-									//this.stopBitsSelectLabel.setEnabled(false);
 								}
 								{
 									this.paritySelectLabel = new Label(this.portSettingsGroup, SWT.RIGHT);
 									this.paritySelectLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.paritySelectLabel.setBounds(115, OSDE.IS_MAC_COCOA ? 79 : 89, 90, 19);
-									//this.paritySelectLabel.setEnabled(false);
 								}
 								{
 									this.dataBitsSelectLabel = new Label(this.portSettingsGroup, SWT.RIGHT);
 									this.dataBitsSelectLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.dataBitsSelectLabel.setBounds(115, OSDE.IS_MAC_COCOA ? 35 : 45, 90, 19);
-									//this.dataBitsSelectLabel.setEnabled(false);
 								}
 								{
 									this.flowControlSelectLabel = new Label(this.portSettingsGroup, SWT.LEFT);
 									this.flowControlSelectLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.flowControlSelectLabel.setBounds(372, OSDE.IS_MAC_COCOA ? 11 : 21, 90, 19);
-									//this.flowControlSelectLabel.setEnabled(false);
 								}
 								{
 									this.dtrCheckBox = new Button(this.portSettingsGroup, SWT.CHECK | SWT.LEFT);
@@ -683,23 +670,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								this.desktopTabsGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.desktopTabsGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0176));
 								this.desktopTabsGroup.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0177));
-								this.desktopTabsGroup.addPaintListener(new PaintListener() {
-									public void paintControl(PaintEvent evt) {
-										DeviceSelectionDialog.log.log(Level.FINEST, "desktopTabsGroup.paintControl, event=" + evt); //$NON-NLS-1$
-										if (DeviceSelectionDialog.this.selectedActiveDeviceConfig != null) {
-											DeviceSelectionDialog.this.tableTabButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isTableTabRequested());
-											DeviceSelectionDialog.this.digitalTabButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isDigitalTabRequested());
-											DeviceSelectionDialog.this.analogTabButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isAnalogTabRequested());
-											DeviceSelectionDialog.this.voltagePerCellButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isVoltagePerCellTabRequested());
-										}
-//										else {
-//											DeviceSelectionDialog.this.tableTabButton.setSelection(false);
-//											DeviceSelectionDialog.this.digitalTabButton.setSelection(false);
-//											DeviceSelectionDialog.this.analogTabButton.setSelection(false);
-//											DeviceSelectionDialog.this.voltagePerCellButton.setSelection(false);
-//										}
-									}
-								});
 								{
 									this.tableTabButton = new Button(this.desktopTabsGroup, SWT.CHECK | SWT.LEFT);
 									this.tableTabButton.setBounds(12, OSDE.IS_MAC_COCOA ? 20 : 30, 105, 25);
@@ -865,7 +835,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.pack();
 			this.dialogShell.setSize(566, 644);
 			this.dialogShell.setText(Messages.getString(MessageIds.OSDE_MSGT0189));
-			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
+			this.dialogShell.setLocation(getParent().toDisplay(100, 10));
 			this.dialogShell.open();
 			Display display = this.dialogShell.getDisplay();
 			while (!this.dialogShell.isDisposed()) {
@@ -1017,12 +987,17 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						this.dtrCheckBox.setSelection(false);
 						this.rtsCheckBox.setSelection(false);
 					}
+
+					DeviceSelectionDialog.this.tableTabButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isTableTabRequested());
+					DeviceSelectionDialog.this.digitalTabButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isDigitalTabRequested());
+					DeviceSelectionDialog.this.analogTabButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isAnalogTabRequested());
+					DeviceSelectionDialog.this.voltagePerCellButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isVoltagePerCellTabRequested());
+
 					this.application.updateTitleBar(this.application.getObjectKey(), this.selectedActiveDeviceConfig.getName(), this.selectedActiveDeviceConfig.getPort());
-					//			this.serialPortSelectionGroup.redraw();
-					//			this.portSettingsGroup.redraw();
+					
+					setupDevice();
 				}
 			}
-			this.desktopTabsGroup.redraw();
 		}
 	}
 

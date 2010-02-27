@@ -64,24 +64,26 @@ public class LogLevelSelectionContextMenu {
 				LogLevelSelectionContextMenu.this.levelFiner.setSelection(false);
 				LogLevelSelectionContextMenu.this.levelFinest.setSelection(false);
 
-				String logLevel = Settings.classbasedLogger.getProperty(LogLevelSelectionContextMenu.this.loggerName);
-				if (LogLevelSelectionContextMenu.this.strWarning.equalsIgnoreCase(logLevel)) {
-					LogLevelSelectionContextMenu.this.levelWarning.setSelection(true);
-				}
-				else if (LogLevelSelectionContextMenu.this.strTime.equalsIgnoreCase(logLevel)) {
-					LogLevelSelectionContextMenu.this.levelTime.setSelection(true);
-				}
-				else if (LogLevelSelectionContextMenu.this.strInfo.equalsIgnoreCase(logLevel)) {
-					LogLevelSelectionContextMenu.this.levelInfo.setSelection(true);
-				}
-				else if (LogLevelSelectionContextMenu.this.strFine.equalsIgnoreCase(logLevel)) {
-					LogLevelSelectionContextMenu.this.levelFine.setSelection(true);
-				}
-				else if (LogLevelSelectionContextMenu.this.strFiner.equalsIgnoreCase(logLevel)) {
-					LogLevelSelectionContextMenu.this.levelFiner.setSelection(true);
-				}
-				else if (LogLevelSelectionContextMenu.this.strFinest.equalsIgnoreCase(logLevel)) {
-					LogLevelSelectionContextMenu.this.levelFinest.setSelection(true);
+				if (LogLevelSelectionContextMenu.this.loggerName != null) {
+					String logLevel = Settings.classbasedLogger.getProperty(LogLevelSelectionContextMenu.this.loggerName);
+					if (LogLevelSelectionContextMenu.this.strWarning.equalsIgnoreCase(logLevel)) {
+						LogLevelSelectionContextMenu.this.levelWarning.setSelection(true);
+					}
+					else if (LogLevelSelectionContextMenu.this.strTime.equalsIgnoreCase(logLevel)) {
+						LogLevelSelectionContextMenu.this.levelTime.setSelection(true);
+					}
+					else if (LogLevelSelectionContextMenu.this.strInfo.equalsIgnoreCase(logLevel)) {
+						LogLevelSelectionContextMenu.this.levelInfo.setSelection(true);
+					}
+					else if (LogLevelSelectionContextMenu.this.strFine.equalsIgnoreCase(logLevel)) {
+						LogLevelSelectionContextMenu.this.levelFine.setSelection(true);
+					}
+					else if (LogLevelSelectionContextMenu.this.strFiner.equalsIgnoreCase(logLevel)) {
+						LogLevelSelectionContextMenu.this.levelFiner.setSelection(true);
+					}
+					else if (LogLevelSelectionContextMenu.this.strFinest.equalsIgnoreCase(logLevel)) {
+						LogLevelSelectionContextMenu.this.levelFinest.setSelection(true);
+					}
 				}
 
 			}
