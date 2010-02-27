@@ -17,7 +17,6 @@
 package osde.device.smmodellbau;
 
 import java.util.Locale;
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -33,8 +32,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -50,6 +47,7 @@ import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.device.DeviceDialog;
 import osde.device.smmodellbau.lipowatch.MessageIds;
+import osde.log.Level;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
@@ -274,23 +272,6 @@ public class LiPoWatchDialog extends DeviceDialog {
 							this.configMainComosite.setLayout(null);
 							this.configMainComosite.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1609));
 							this.configMainComosite.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
-							this.configMainComosite.addPaintListener(new PaintListener() {
-								@Override
-								public void paintControl(PaintEvent evt) {
-									LiPoWatchDialog.log.log(Level.FINEST, "configMainComosite.addPaintListener, event=" + evt); //$NON-NLS-1$
-									LiPoWatchDialog.this.snLabel.setText(LiPoWatchDialog.this.serialNumber);
-									LiPoWatchDialog.this.firmwareVersionLabel.setText(LiPoWatchDialog.this.lipoWatchVersion);
-									LiPoWatchDialog.this.memUsagePercent.setText(LiPoWatchDialog.this.memoryUsedPercent);
-									LiPoWatchDialog.this.timeIntervalCombo.select(LiPoWatchDialog.this.timeIntervalPosition);
-									LiPoWatchDialog.this.measurementModusCombo.select(LiPoWatchDialog.this.measurementModus);
-									LiPoWatchDialog.this.voltageDropTriggerButton.setSelection(LiPoWatchDialog.this.isAutoStartVoltageDrop);
-									LiPoWatchDialog.this.timeTriggerButton.setSelection(LiPoWatchDialog.this.isAutoStartTime);
-									LiPoWatchDialog.this.impulseTriggerButton.setSelection(LiPoWatchDialog.this.isAutStartRx);
-									LiPoWatchDialog.this.regulationTypeCombo.select(LiPoWatchDialog.this.impulsReductionType);
-									LiPoWatchDialog.this.voltageLevelRegulationCombo.select(LiPoWatchDialog.this.voltageLevelRegulationLimit);
-									LiPoWatchDialog.this.cellTypeCombo.select(LiPoWatchDialog.this.cellType);
-								}
-							});
 							{
 								this.statusGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.statusGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -302,45 +283,45 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.serialNumberText = new CLabel(this.statusGroup, SWT.NONE);
 									this.serialNumberText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.serialNumberText.setText(Messages.getString(MessageIds.OSDE_MSGT1611));
-									this.serialNumberText.setBounds(6, 17, 40, 22);
+									this.serialNumberText.setBounds(6, OSDE.IS_MAC_COCOA ? 5 : 17, 40, 22);
 									this.serialNumberText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1612));
 								}
 								{
 									this.snLabel = new CLabel(this.statusGroup, SWT.CENTER | SWT.EMBEDDED);
 									this.snLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.snLabel.setBounds(46, 17, 65, 22);
+									this.snLabel.setBounds(46, OSDE.IS_MAC_COCOA ? 5 : 17, 65, 22);
 									this.snLabel.setText(this.serialNumber);
 								}
 								{
 									this.firmwareText = new CLabel(this.statusGroup, SWT.NONE);
 									this.firmwareText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.firmwareText.setText(Messages.getString(MessageIds.OSDE_MSGT1613));
-									this.firmwareText.setBounds(115, 17, 70, 22);
+									this.firmwareText.setBounds(115, OSDE.IS_MAC_COCOA ? 5 : 17, 70, 22);
 									this.firmwareText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1614));
 								}
 								{
 									this.firmwareVersionLabel = new CLabel(this.statusGroup, SWT.NONE);
 									this.firmwareVersionLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.firmwareVersionLabel.setBounds(185, 17, 69, 22);
+									this.firmwareVersionLabel.setBounds(185, OSDE.IS_MAC_COCOA ? 5 : 17, 69, 22);
 									this.firmwareVersionLabel.setText(this.lipoWatchVersion);
 								}
 								{
 									this.memoryUsageText = new CLabel(this.statusGroup, SWT.NONE);
 									this.memoryUsageText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.memoryUsageText.setText(Messages.getString(MessageIds.OSDE_MSGT1615));
-									this.memoryUsageText.setBounds(255, 17, 124, 22);
+									this.memoryUsageText.setBounds(255, OSDE.IS_MAC_COCOA ? 5 : 17, 124, 22);
 								}
 								{
 									this.memUsagePercent = new CLabel(this.statusGroup, SWT.RIGHT);
 									this.memUsagePercent.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.memUsagePercent.setBounds(380, 17, 59, 22);
+									this.memUsagePercent.setBounds(380, OSDE.IS_MAC_COCOA ? 5 : 17, 59, 22);
 									this.memUsagePercent.setText(this.memoryUsedPercent);
 								}
 								{
 									this.memUsageUnit = new CLabel(this.statusGroup, SWT.NONE);
 									this.memUsageUnit.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.memUsageUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1616));
-									this.memUsageUnit.setBounds(442, 17, 26, 22);
+									this.memUsageUnit.setBounds(442, OSDE.IS_MAC_COCOA ? 5 : 17, 26, 22);
 								}
 							} // end status group
 
@@ -356,7 +337,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.voltageDropTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1618));
 									this.voltageDropTriggerButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1619));
 									this.voltageDropTriggerButton.setSelection(this.isAutoStartVoltageDrop);
-									this.voltageDropTriggerButton.setBounds(16, 24, 139, 20);
+									this.voltageDropTriggerButton.setBounds(16, OSDE.IS_MAC_COCOA ? 12 : 24, 139, 20);
 									this.voltageDropTriggerButton.addSelectionListener(new SelectionAdapter() {
 
 										@Override
@@ -377,7 +358,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.timeTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1620));
 									this.timeTriggerButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1621));
 									this.timeTriggerButton.setSelection(this.isAutStartRx);
-									this.timeTriggerButton.setBounds(16, 52, 139, 20);
+									this.timeTriggerButton.setBounds(16, OSDE.IS_MAC_COCOA ? 40 : 52, 139, 20);
 									this.timeTriggerButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -394,7 +375,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								{
 									this.timeTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.timeTriggerCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.timeTriggerCombo.setBounds(159, 52, 59, OSDE.IS_LINUX ? 22 : 20);
+									this.timeTriggerCombo.setBounds(159, OSDE.IS_MAC_COCOA ? 40 : 52, 59, OSDE.IS_LINUX ? 22 : 20);
 									this.timeTriggerCombo.setItems(new String[] { " 15", " 20", " 25", " 30", " 60", " 90" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 									this.timeTriggerCombo.select(3);
 									this.timeTriggerCombo.setEditable(true);
@@ -433,7 +414,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.impulseTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1622));
 									this.impulseTriggerButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1623));
 									this.impulseTriggerButton.setSelection(this.isAutoStartTime);
-									this.impulseTriggerButton.setBounds(16, 78, 139, 20);
+									this.impulseTriggerButton.setBounds(16, OSDE.IS_MAC_COCOA ? 66 : 78, 139, 20);
 									this.impulseTriggerButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -450,7 +431,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								{
 									this.impulseTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.impulseTriggerCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.impulseTriggerCombo.setBounds(159, 78, 59, OSDE.IS_LINUX ? 22 : 20);
+									this.impulseTriggerCombo.setBounds(159, OSDE.IS_MAC_COCOA ? 66 : 78, 59, OSDE.IS_LINUX ? 22 : 20);
 									this.impulseTriggerCombo.setEditable(false);
 									this.impulseTriggerCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
 									this.impulseTriggerCombo.setItems(LiPoWatchDialog.RX_AUTO_START_MS);
@@ -476,7 +457,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.timeIntervalCombo = new CCombo(this.dataRateGroup, SWT.BORDER);
 									this.timeIntervalCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.timeIntervalCombo.setItems(LiPoWatchDialog.TIME_INTERVAL);
-									this.timeIntervalCombo.setBounds(49, 17, 133, OSDE.IS_LINUX ? 22 : 20);
+									this.timeIntervalCombo.setBounds(49, OSDE.IS_MAC_COCOA ? 5 : 17, 133, OSDE.IS_LINUX ? 22 : 20);
 									this.timeIntervalCombo.select(1);
 									this.timeIntervalCombo.setEditable(false);
 									this.timeIntervalCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
@@ -550,27 +531,27 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.regulationTypeLabel = new CLabel(this.impuleRegulationGroup, SWT.RIGHT);
 									this.regulationTypeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.regulationTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1632));
-									this.regulationTypeLabel.setBounds(14, 21, 110, 20);
+									this.regulationTypeLabel.setBounds(14, OSDE.IS_MAC_COCOA ? 9 : 21, 110, 20);
 									this.regulationTypeLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1633));
 								}
 								{
 									this.voltageLimitLabel = new CLabel(this.impuleRegulationGroup, SWT.RIGHT);
 									this.voltageLimitLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.voltageLimitLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1634));
-									this.voltageLimitLabel.setBounds(14, 49, 110, 20);
+									this.voltageLimitLabel.setBounds(14, OSDE.IS_MAC_COCOA ? 37 : 49, 110, 20);
 									this.voltageLimitLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1635));
 								}
 								{
 									this.cellTypeLabel = new CLabel(this.impuleRegulationGroup, SWT.RIGHT);
 									this.cellTypeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.cellTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1636));
-									this.cellTypeLabel.setBounds(14, 75, 110, 20);
+									this.cellTypeLabel.setBounds(14, OSDE.IS_MAC_COCOA ? 63 : 75, 110, 20);
 								}
 								{
 									this.regulationTypeCombo = new CCombo(this.impuleRegulationGroup, SWT.BORDER | SWT.CENTER);
 									this.regulationTypeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.regulationTypeCombo.setItems(Messages.getString(MessageIds.OSDE_MSGT1637).split(OSDE.STRING_SEMICOLON));
-									this.regulationTypeCombo.setBounds(134, 23, 69, OSDE.IS_LINUX ? 22 : 20);
+									this.regulationTypeCombo.setBounds(134, OSDE.IS_MAC_COCOA ? 10 : 23, 69, OSDE.IS_LINUX ? 22 : 20);
 									this.regulationTypeCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -584,7 +565,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.voltageLevelRegulationCombo = new CCombo(this.impuleRegulationGroup, SWT.BORDER);
 									this.voltageLevelRegulationCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.voltageLevelRegulationCombo.setItems(LiPoWatchDialog.CELL_VOLTAGE_LIMITS);
-									this.voltageLevelRegulationCombo.setBounds(134, 51, 69, OSDE.IS_LINUX ? 22 : 20);
+									this.voltageLevelRegulationCombo.setBounds(134, OSDE.IS_MAC_COCOA ? 39 : 51, 69, OSDE.IS_LINUX ? 22 : 20);
 									this.voltageLevelRegulationCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -597,7 +578,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								{
 									this.cellTypeCombo = new CCombo(this.impuleRegulationGroup, SWT.BORDER);
 									this.cellTypeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.cellTypeCombo.setBounds(134, 77, 69, OSDE.IS_LINUX ? 22 : 20);
+									this.cellTypeCombo.setBounds(134, OSDE.IS_MAC_COCOA ? 65 : 77, 69, OSDE.IS_LINUX ? 22 : 20);
 									this.cellTypeCombo.setItems(Messages.getString(MessageIds.OSDE_MSGT1640).split(OSDE.STRING_SEMICOLON));
 									this.cellTypeCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -621,13 +602,13 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.measurementModusLabel = new CLabel(this.measurementTypeGroup, SWT.RIGHT);
 									this.measurementModusLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.measurementModusLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1644));
-									this.measurementModusLabel.setBounds(14, 17, 72, 20);
+									this.measurementModusLabel.setBounds(14, OSDE.IS_MAC_COCOA ? 5 : 17, 72, 20);
 									this.measurementModusLabel.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1643));
 								}
 								{
 									this.measurementModusCombo = new CCombo(this.measurementTypeGroup, SWT.BORDER);
 									this.measurementModusCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.measurementModusCombo.setBounds(96, 17, 104, OSDE.IS_LINUX ? 22 : 20);
+									this.measurementModusCombo.setBounds(96, OSDE.IS_MAC_COCOA ? 5 : 17, 104, OSDE.IS_LINUX ? 22 : 20);
 									this.measurementModusCombo.setItems(Messages.getString(MessageIds.OSDE_MSGT1646).split(OSDE.STRING_SEMICOLON));
 									this.measurementModusCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -690,61 +671,61 @@ public class LiPoWatchDialog extends DeviceDialog {
 									{
 										this.dataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.dataSetLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.dataSetLabel.setBounds(5, 74, 165, 20);
+										this.dataSetLabel.setBounds(5, OSDE.IS_MAC_COCOA ? 62 : 74, 165, 20);
 										this.dataSetLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1653));
 									}
 									{
 										this.redDataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.redDataSetLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.redDataSetLabel.setBounds(175, 74, 55, 20);
+										this.redDataSetLabel.setBounds(175, OSDE.IS_MAC_COCOA ? 62 : 74, 55, 20);
 										this.redDataSetLabel.setText("0"); //$NON-NLS-1$
 									}
 									{
 										this.actualDataSetNumberLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.actualDataSetNumberLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.actualDataSetNumberLabel.setBounds(5, 96, 190, 20);
+										this.actualDataSetNumberLabel.setBounds(5, OSDE.IS_MAC_COCOA ? 84 : 96, 190, 20);
 										this.actualDataSetNumberLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1654));
 									}
 									{
 										this.actualDataSetNumber = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.actualDataSetNumber.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.actualDataSetNumber.setBounds(200, 96, 30, 20);
+										this.actualDataSetNumber.setBounds(200, OSDE.IS_MAC_COCOA ? 84 : 96, 30, 20);
 										this.actualDataSetNumber.setText("0"); //$NON-NLS-1$
 									}
 									{
 										this.readDataErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.readDataErrorLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.readDataErrorLabel.setBounds(5, 118, 190, 20);
+										this.readDataErrorLabel.setBounds(5, OSDE.IS_MAC_COCOA ? 106 : 118, 190, 20);
 										this.readDataErrorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1655));
 									}
 									{
 										this.numberReadErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.numberReadErrorLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.numberReadErrorLabel.setBounds(200, 118, 30, 20);
+										this.numberReadErrorLabel.setBounds(200, OSDE.IS_MAC_COCOA ? 106 : 118, 30, 20);
 										this.numberReadErrorLabel.setText("0"); //$NON-NLS-1$
 									}
 									{
 										this.readLess4Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.readLess4Label.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.readLess4Label.setBounds(5, 140, 190, 20);
+										this.readLess4Label.setBounds(5, OSDE.IS_MAC_COCOA ? 128 : 140, 190, 20);
 										this.readLess4Label.setText(Messages.getString(MessageIds.OSDE_MSGT1659));
 									}
 									{
 										this.numberLess4Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
 										this.numberLess4Label.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.numberLess4Label.setBounds(200, 140, 30, 20);
+										this.numberLess4Label.setBounds(200, OSDE.IS_MAC_COCOA ? 128 : 140, 30, 20);
 										this.numberLess4Label.setText("0"); //$NON-NLS-1$
 									}
 									{
 										this.readDataProgressBar = new ProgressBar(this.dataReadGroup, SWT.NONE);
-										this.readDataProgressBar.setBounds(11, 183, 218, 20);
+										this.readDataProgressBar.setBounds(11, OSDE.IS_MAC_COCOA ? 171 : 183, 218, 20);
 										this.readDataProgressBar.setMinimum(0);
 										this.readDataProgressBar.setMaximum(100);
 									}
 									{
 										this.stopReadDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 										this.stopReadDataButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.stopReadDataButton.setBounds(11, 222, 218, 30);
+										this.stopReadDataButton.setBounds(11, OSDE.IS_MAC_COCOA ? 210 : 222, 218, 30);
 										this.stopReadDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0278));
 										this.stopReadDataButton.setEnabled(false);
 										this.stopReadDataButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1656));
@@ -770,7 +751,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.startLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 										this.startLiveGatherButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.startLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1658));
-										this.startLiveGatherButton.setBounds(12, 24, 202, 30);
+										this.startLiveGatherButton.setBounds(12, OSDE.IS_MAC_COCOA ? 12 : 24, 202, 30);
 										this.startLiveGatherButton.setEnabled(true);
 										this.startLiveGatherButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1658));
 										this.startLiveGatherButton.addSelectionListener(new SelectionAdapter() {
@@ -817,7 +798,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 												this.startLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
 												this.startLoggingButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 												this.startLoggingButton.setText(Messages.getString(MessageIds.OSDE_MSGT1661));
-												this.startLoggingButton.setBounds(12, 21, 70, 30);
+												this.startLoggingButton.setBounds(12, OSDE.IS_MAC_COCOA ? 9 : 21, 70, 30);
 												this.startLoggingButton.setEnabled(true);
 												this.startLoggingButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1662));
 												this.startLoggingButton.addSelectionListener(new SelectionAdapter() {
@@ -842,7 +823,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 												this.stopLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
 												this.stopLoggingButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 												this.stopLoggingButton.setText(Messages.getString(MessageIds.OSDE_MSGT1663));
-												this.stopLoggingButton.setBounds(94, 21, 82, 30);
+												this.stopLoggingButton.setBounds(94, OSDE.IS_MAC_COCOA ? 9 : 21, 82, 30);
 												this.stopLoggingButton.setEnabled(false);
 												this.stopLoggingButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1664));
 												this.stopLoggingButton.addSelectionListener(new SelectionAdapter() {
@@ -871,7 +852,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									{
 										this.stopLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 										this.stopLiveGatherButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.stopLiveGatherButton.setBounds(12, 126, 202, 30);
+										this.stopLiveGatherButton.setBounds(12, OSDE.IS_MAC_COCOA ? 114 : 126, 202, 30);
 										this.stopLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1665));
 										this.stopLiveGatherButton.setEnabled(false);
 										this.stopLiveGatherButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1666));
@@ -916,7 +897,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.clearMemoryButton = new Button(this.clearMemoryGroup, SWT.PUSH | SWT.CENTER);
 										this.clearMemoryButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.clearMemoryButton.setText(Messages.getString(MessageIds.OSDE_MSGT1668));
-										this.clearMemoryButton.setBounds(12, 56, 202, 31);
+										this.clearMemoryButton.setBounds(12, OSDE.IS_MAC_COCOA ? 44 : 56, 202, 31);
 										this.clearMemoryButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1603));
 										this.clearMemoryButton.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -940,7 +921,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.clearMemoryLabel = new CLabel(this.clearMemoryGroup, SWT.CENTER | SWT.EMBEDDED);
 										this.clearMemoryLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.clearMemoryLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1604));
-										this.clearMemoryLabel.setBounds(12, 16, 202, 40);
+										this.clearMemoryLabel.setBounds(12, OSDE.IS_MAC_COCOA ? 4 : 16, 202, 40);
 									}
 								}
 
@@ -964,6 +945,8 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 					this.mainTabFolder.setBounds(0, 0, 501, 312);
 					this.mainTabFolder.setSelection(0);
+					
+					initialize();
 				}
 				this.dialogShell.open();
 			}
@@ -1323,4 +1306,20 @@ public class LiPoWatchDialog extends DeviceDialog {
 		});
 	}
 
+	/**
+	 * initialize buttons settings
+	 */
+	private void initialize() {
+		LiPoWatchDialog.this.snLabel.setText(LiPoWatchDialog.this.serialNumber);
+		LiPoWatchDialog.this.firmwareVersionLabel.setText(LiPoWatchDialog.this.lipoWatchVersion);
+		LiPoWatchDialog.this.memUsagePercent.setText(LiPoWatchDialog.this.memoryUsedPercent);
+		LiPoWatchDialog.this.timeIntervalCombo.select(LiPoWatchDialog.this.timeIntervalPosition);
+		LiPoWatchDialog.this.measurementModusCombo.select(LiPoWatchDialog.this.measurementModus);
+		LiPoWatchDialog.this.voltageDropTriggerButton.setSelection(LiPoWatchDialog.this.isAutoStartVoltageDrop);
+		LiPoWatchDialog.this.timeTriggerButton.setSelection(LiPoWatchDialog.this.isAutoStartTime);
+		LiPoWatchDialog.this.impulseTriggerButton.setSelection(LiPoWatchDialog.this.isAutStartRx);
+		LiPoWatchDialog.this.regulationTypeCombo.select(LiPoWatchDialog.this.impulsReductionType);
+		LiPoWatchDialog.this.voltageLevelRegulationCombo.select(LiPoWatchDialog.this.voltageLevelRegulationLimit);
+		LiPoWatchDialog.this.cellTypeCombo.select(LiPoWatchDialog.this.cellType);
+	}
 }
