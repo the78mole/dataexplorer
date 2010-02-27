@@ -38,20 +38,20 @@ public class BuildCompleteHelpHtml {
 			"<HTML>\n" +
 			"<HEAD>\n" +
 			"<META HTTP-EQUIV=\"CONTENT-TYPE\" CONTENT=\"text/html; charset=utf-8\">\n" +
-			"<TITLE>OpenSerialDataExplorer - Information und Hilfe</TITLE>\n" +
+			"<TITLE>OpenSerialDataExplorer - Benuterhandbuch</TITLE>\n" +
 			"<META NAME=\"AUTHOR\" CONTENT=\"Winfried Brügmann\">\n" +
 			"</HEAD>\n" +
 			"<BODY LANG=\"de-DE\" DIR=\"LTR\">\n" +
-			"<H0>OpenSerialDataExplorer - Information und Hilfe</H0>\n";
+			"<H0>OpenSerialDataExplorer - Benuterhandbuch</H0>\n";
 	static String header_en = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2//EN\">\n" +
 			"<HTML>\n" +
 			"<HEAD>\n" +
 			"<META HTTP-EQUIV=\"CONTENT-TYPE\" CONTENT=\"text/html; charset=utf-8\">\n" +
-			"<TITLE>OpenSerialDataExplorer - Information and Help</TITLE>\n" +
+			"<TITLE>OpenSerialDataExplorer - Users Guide</TITLE>\n" +
 			"<META NAME=\"AUTHOR\" CONTENT=\"Winfried Brügmann\">\n" +
 			"</HEAD>\n" +
 			"<BODY LANG=\"en-US\" DIR=\"LTR\">\n" +
-			"<H0>OpenSerialDataExplorer - Information and Help</H0>\n";
+			"<H0>OpenSerialDataExplorer - Users Guide</H0>\n";
 	static String footer = "</BODY>\n" + "</HTML>";
 	
 	static String supprtedDevices_de = "Aktuell unterstützte Geräte";
@@ -124,7 +124,7 @@ public class BuildCompleteHelpHtml {
 					}
 				}
 
-				writer.write("<H0>" + SUPPORTED_LANGUAGE_DEVICES[i] + "</H0>\n");
+				writer.write("<H1>" + SUPPORTED_LANGUAGE_DEVICES[i] + "</H1>\n");
 				URL[] urls = ((URLClassLoader)OSDE.getClassLoader()).getURLs();
 				
 				for (int j = 0; j < urls.length; ++j) {
@@ -142,7 +142,7 @@ public class BuildCompleteHelpHtml {
 
 								String deviceName = pluginBaseFilePath.substring(0, pluginBaseFilePath.indexOf("/src/help"));
 								deviceName = deviceName.substring(deviceName.lastIndexOf('/')+1);
-								writer.write("<H1>" + deviceName + "</H1>\n");
+								writer.write("<H2>" + deviceName + "</H2>\n");
 
 								reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8")); //$NON-NLS-1$
 								while ((line = reader.readLine()) != null) {
