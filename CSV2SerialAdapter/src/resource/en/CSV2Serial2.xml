@@ -19,16 +19,16 @@
         <preferredFileExtention>*.csv</preferredFileExtention>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="Datenaufzeichnung"/>
+        <property description="" type="Integer" value="01" name="data record"/>
     </State>
-    <Channel type="TYPE_CONFIG" name="Thermik">
+    <Channel type="TYPE_CONFIG" name="Thermal">
         <Measurement>
             <name>Voltage</name>
             <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property description="Faktor * input value" type="Double" value="0.001" name="factor"/>
+            <property description="Factor * input value" type="Double" value="0.001" name="factor"/>
         </Measurement>
     </Channel>
     <Desktop>

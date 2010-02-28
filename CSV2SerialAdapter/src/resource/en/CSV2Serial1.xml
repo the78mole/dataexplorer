@@ -19,9 +19,9 @@
         <preferredFileExtention>*.csv</preferredFileExtention>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="Datenaufzeichnung"/>
+        <property description="" type="Integer" value="01" name="data record"/>
     </State>
-    <Channel type="TYPE_CONFIG" name="Thermik">
+    <Channel type="TYPE_CONFIG" name="Thermal">
         <Measurement>
             <name>RecVoltage</name>
             <symbol>Ur</symbol>
@@ -35,15 +35,15 @@
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
-            <statistics ratioText="verbrauchte Akkukapazität/Höhenmeter" ratioRefOrdinal="4" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sumTriggerText="Erreicht Motorhöhe" sumByTriggerRefOrdinal="2" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+            <statistics ratioText="Used capacity/height" ratioRefOrdinal="4" countTriggerText="Number climbs" countByTrigger="true" sumTriggerText="Reached motor height" sumByTriggerRefOrdinal="2" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>MotorCurrent</name>
             <symbol>I</symbol>
             <unit>A</unit>
             <active>true</active>
-            <statistics sumTriggerTimeText="Motorlaufzeit" sigma="false" avg="false" max="true" min="true">
-                <trigger comment="Trigger: MotorStrom &gt; 3 A; &gt; 5 sek." minTimeSec="5" isGreater="true" level="3000"/>
+            <statistics sumTriggerTimeText="Motor runtime" sigma="false" avg="false" max="true" min="true">
+                <trigger comment="Trigger: Motor current &gt; 3 A; &gt; 5 sek." minTimeSec="5" isGreater="true" level="3000"/>
             </statistics>
         </Measurement>
         <Measurement>
@@ -59,7 +59,7 @@
             <symbol>C</symbol>
             <unit>mAh</unit>
             <active>true</active>
-            <statistics ratioRefOrdinal="1" sumTriggerText="Verbrauchte Motorakkukapazität" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
+            <statistics ratioRefOrdinal="1" sumTriggerText="Used battery capacity" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
         </Measurement>
         <Measurement>
             <name>Velocity</name>
