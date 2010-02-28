@@ -83,10 +83,10 @@
             <unit>1/min</unit>
             <active>false</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property description="(LogView conform" type="Double" value="0.0" name="offset"/>
-            <property description="(LogView conform" type="Double" value="1.0" name="factor"/>
-            <property description="Number motors ? (LogView conform" type="Integer" value="1" name="number_motor"/>
-            <property description="Revolution factor ? (LogView conform" type="Double" value="1.0" name="revolution_factor"/>
+            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
+            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
+            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
+            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
         </Measurement>
         <Measurement>
             <name>Efficience</name>
@@ -193,10 +193,10 @@
             <unit>1/min</unit>
             <active>false</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property description="(LogView conform" type="Double" value="0.0" name="offset"/>
-            <property description="(LogView conform" type="Double" value="1.0" name="factor"/>
-            <property description="Number motos ? (LogView conform" type="Integer" value="1" name="number_motor"/>
-            <property description="Revolution factor ? (LogView conform" type="Double" value="1.0" name="revolution_factor"/>
+            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
+            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
+            <property description="Number motos ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
+            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
         </Measurement>
         <Measurement>
             <name>Efficience</name>
@@ -305,10 +305,10 @@
             <unit>1/min</unit>
             <active>true</active>
             <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="false"/>
-            <property description="(LogView conform" type="Double" value="0.0" name="offset"/>
-            <property description="(LogView conform" type="Double" value="1.0" name="factor"/>
-            <property description="Number motors ? (LogView conform" type="Integer" value="1" name="number_motor"/>
-            <property description="Revolution factor ? (LogView conform" type="Double" value="1.0" name="revolution_factor"/>
+            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
+            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
+            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
+            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
         </Measurement>
         <Measurement>
             <name>Efficience</name>
@@ -322,7 +322,7 @@
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
-            <statistics ratioText="Energy/Motoheight" ratioRefOrdinal="5" sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+            <statistics ratioText="capacity/height" ratioRefOrdinal="4" sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Climb</name>
@@ -417,10 +417,10 @@
             <unit>1/min</unit>
             <active>true</active>
             <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="false"/>
-            <property description="(LogView conform" type="Double" value="0.0" name="offset"/>
-            <property description="(LogView conform" type="Double" value="1.0" name="factor"/>
-            <property description="Number motors ? (LogView conform" type="Integer" value="1" name="number_motor"/>
-            <property description="Revolution factor ? (LogView conform" type="Double" value="1.0" name="revolution_factor"/>
+            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
+            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
+            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
+            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
         </Measurement>
         <Measurement>
             <name>Efficience</name>
@@ -434,7 +434,7 @@
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
-            <statistics ratioText="Energy/Motoheight" ratioRefOrdinal="5" sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+            <statistics ratioText="capacity/height" ratioRefOrdinal="4" sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Climb</name>

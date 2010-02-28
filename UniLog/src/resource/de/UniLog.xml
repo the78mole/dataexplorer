@@ -322,7 +322,7 @@
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
-            <statistics ratioText="Energie/Motorhöhe" ratioRefOrdinal="5" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+            <statistics ratioText="Kapazität/Motorhöhe" ratioRefOrdinal="4" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Steigrate</name>
@@ -434,7 +434,7 @@
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
-            <statistics ratioText="Energie/Motorhöhe" ratioRefOrdinal="5" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+            <statistics ratioText="Kapazität/Motorhöhe" ratioRefOrdinal="4" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Steigrate</name>
