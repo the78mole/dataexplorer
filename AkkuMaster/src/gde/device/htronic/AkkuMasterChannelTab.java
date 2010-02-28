@@ -188,13 +188,13 @@ public class AkkuMasterChannelTab {
 						this.captureOnlyText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.captureOnlyText.setText(Messages.getString(MessageIds.OSDE_MSGT1173));
 						this.captureOnlyText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-						this.captureOnlyText.setBounds(51, OSDE.IS_MAC_COCOA ? 28 : 40, 315, 37);
+						this.captureOnlyText.setBounds(51, OSDE.IS_MAC_COCOA ? 25 : 40, 315, 37);
 					}
 					{
 						this.captureOnlyButton = new Button(this.captureOnlyGroup, SWT.RADIO | SWT.LEFT);
 						this.captureOnlyButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
 						this.captureOnlyButton.setText(Messages.getString(MessageIds.OSDE_MSGT1174)); 
-						this.captureOnlyButton.setBounds(12, OSDE.IS_MAC_COCOA ? 3 : 15, 310, 22);
+						this.captureOnlyButton.setBounds(12, OSDE.IS_MAC_COCOA ? 0 : 15, 310, 22);
 						this.captureOnlyButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -234,7 +234,7 @@ public class AkkuMasterChannelTab {
 					{
 						this.programmButton = new Button(this.programGroup, SWT.RADIO | SWT.LEFT);
 						this.programmButton.setText(Messages.getString(MessageIds.OSDE_MSGT1175));
-						this.programmButton.setBounds(12, 15, 295, 21);
+						this.programmButton.setBounds(12, OSDE.IS_MAC_COCOA ? 0 : 15, 295, 21);
 						this.programmButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
 						this.programmButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -264,7 +264,7 @@ public class AkkuMasterChannelTab {
 						this.akkuGroup.setLayout(null);
 						this.akkuGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.akkuGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1176));
-						this.akkuGroup.setBounds(15, OSDE.IS_MAC_COCOA ? 28 : 40, 369, 67);
+						this.akkuGroup.setBounds(15, OSDE.IS_MAC_COCOA ? 25 : 40, 369, 67);
 						this.akkuGroup.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
 								log.log(Level.FINEST, "akkuGroup.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -276,7 +276,7 @@ public class AkkuMasterChannelTab {
 						{
 							this.capacityText = new Text(this.akkuGroup, SWT.NONE);
 							this.capacityText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.capacityText.setBounds(12, OSDE.IS_MAC_COCOA ? 8 : 20, 105, 18);
+							this.capacityText.setBounds(12, OSDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
 							this.capacityText.setText(Messages.getString(MessageIds.OSDE_MSGT1177));
 							this.capacityText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
 							this.capacityText.setEditable(false);
@@ -286,7 +286,7 @@ public class AkkuMasterChannelTab {
 							this.capacityMilliAh.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.capacityMilliAh.setItems(this.aCapacity);
 							this.capacityMilliAh.setText(this.aCapacity[5]);
-							this.capacityMilliAh.setBounds(12, OSDE.IS_MAC_COCOA ? 28 : 40, 105, OSDE.IS_LINUX ? 22 : 20);
+							this.capacityMilliAh.setBounds(12, OSDE.IS_MAC_COCOA ? 25 : 40, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.capacityMilliAh.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -299,14 +299,14 @@ public class AkkuMasterChannelTab {
 							this.countCellsText = new Text(this.akkuGroup, SWT.NONE);
 							this.countCellsText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.countCellsText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.countCellsText.setBounds(130, OSDE.IS_MAC_COCOA ? 8 : 20, 105, 18);
+							this.countCellsText.setBounds(130, OSDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
 							this.countCellsText.setText(Messages.getString(MessageIds.OSDE_MSGT1178));
 							this.countCellsText.setEditable(false);
 						}
 						{
 							this.countCells = new CCombo(this.akkuGroup, SWT.BORDER);
 							this.countCells.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.countCells.setBounds(130, OSDE.IS_MAC_COCOA ? 28 : 40, 105, OSDE.IS_LINUX ? 22 : 20);
+							this.countCells.setBounds(130, OSDE.IS_MAC_COCOA ? 25 : 40, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.countCells.setItems(this.aCellCount);
 							this.countCells.setText(this.aCellCount[3]);
 							this.countCells.setEditable(false);
@@ -323,7 +323,7 @@ public class AkkuMasterChannelTab {
 							this.akkuTypeText = new Text(this.akkuGroup, SWT.NONE);
 							this.akkuTypeText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.akkuTypeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.akkuTypeText.setBounds(255, OSDE.IS_MAC_COCOA ? 8 : 20, 105, 18);
+							this.akkuTypeText.setBounds(255, OSDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
 							this.akkuTypeText.setText(Messages.getString(MessageIds.OSDE_MSGT1179));
 							this.akkuTypeText.setDoubleClickEnabled(false);
 							this.akkuTypeText.setDragDetect(false);
@@ -332,7 +332,7 @@ public class AkkuMasterChannelTab {
 						{
 							this.akkuType = new CCombo(this.akkuGroup, SWT.BORDER);
 							this.akkuType.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.akkuType.setBounds(255, OSDE.IS_MAC_COCOA ? 28 : 40, 105, OSDE.IS_LINUX ? 22 : 20);
+							this.akkuType.setBounds(255, OSDE.IS_MAC_COCOA ? 25 : 40, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.akkuType.setItems(this.aAkkuTyp);
 							this.akkuType.setText(this.aAkkuTyp[0]);
 							this.akkuType.setEditable(false);
@@ -349,7 +349,7 @@ public class AkkuMasterChannelTab {
 					{
 						this.programTypeGroup = new Group(this.programGroup, SWT.NONE);
 						this.programTypeGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.programTypeGroup.setBounds(15, OSDE.IS_MAC_COCOA ? 98 : 110, 369, 123);
+						this.programTypeGroup.setBounds(15, OSDE.IS_MAC_COCOA ? 95 : 110, 369, 123);
 						this.programTypeGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1180));
 						this.programTypeGroup.setLayout(null);
 						this.programTypeGroup.addPaintListener(new PaintListener() {
@@ -365,13 +365,13 @@ public class AkkuMasterChannelTab {
 							this.programText = new Text(this.programTypeGroup, SWT.NONE);
 							this.programText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.programText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.programText.setBounds(130, OSDE.IS_MAC_COCOA ? 8 : 20, 105, 18);
+							this.programText.setBounds(130, OSDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
 							this.programText.setText(Messages.getString(MessageIds.OSDE_MSGT1181)); 
 						}
 						{
 							this.program = new CCombo(this.programTypeGroup, SWT.BORDER);
 							this.program.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.program.setBounds(12, OSDE.IS_MAC_COCOA ? 28 : 40, 347, OSDE.IS_LINUX ? 22 : 20);
+							this.program.setBounds(12, OSDE.IS_MAC_COCOA ? 25 : 40, 347, OSDE.IS_LINUX ? 22 : 20);
 							this.program.setItems(this.aProgramm);
 							this.program.select(2);
 							this.program.setEditable(false);
@@ -387,14 +387,14 @@ public class AkkuMasterChannelTab {
 							this.chargeCurrentText = new Text(this.programTypeGroup, SWT.NONE);
 							this.chargeCurrentText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.chargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.chargeCurrentText.setBounds(12, OSDE.IS_MAC_COCOA ? 58 : 70, 105, 18);
+							this.chargeCurrentText.setBounds(12, OSDE.IS_MAC_COCOA ? 55 : 70, 105, 18);
 							this.chargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1182));
 							this.chargeCurrentText.setEditable(false);
 						}
 						{
 							this.chargeCurrent = new CCombo(this.programTypeGroup, SWT.BORDER);
 							this.chargeCurrent.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.chargeCurrent.setBounds(12, OSDE.IS_MAC_COCOA ? 81 : 93, 105, OSDE.IS_LINUX ? 22 : 20);
+							this.chargeCurrent.setBounds(12, OSDE.IS_MAC_COCOA ? 79 : 93, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.chargeCurrent.setItems(this.aChargeCurrent_mA);
 							this.chargeCurrent.setText(this.aChargeCurrent_mA[5]);
 							this.chargeCurrent.addSelectionListener(new SelectionAdapter() {
@@ -408,7 +408,7 @@ public class AkkuMasterChannelTab {
 							this.dischargeCurrentText = new Text(this.programTypeGroup, SWT.NONE);
 							this.dischargeCurrentText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.dischargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.dischargeCurrentText.setBounds(130, OSDE.IS_MAC_COCOA ? 58 : 70, 105, 18);
+							this.dischargeCurrentText.setBounds(130, OSDE.IS_MAC_COCOA ? 55 : 70, 105, 18);
 							this.dischargeCurrentText.setDragDetect(false);
 							this.dischargeCurrentText.setDoubleClickEnabled(false);
 							this.dischargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1183));
@@ -417,7 +417,7 @@ public class AkkuMasterChannelTab {
 						{
 							this.dischargeCurrent = new CCombo(this.programTypeGroup, SWT.BORDER);
 							this.dischargeCurrent.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.dischargeCurrent.setBounds(130, OSDE.IS_MAC_COCOA ? 81 : 93, 105, OSDE.IS_LINUX ? 22 : 20);
+							this.dischargeCurrent.setBounds(130, OSDE.IS_MAC_COCOA ? 79 : 93, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.dischargeCurrent.setItems(this.aDischargeCurrent_mA);
 							this.dischargeCurrent.setText(this.aDischargeCurrent_mA[5]);
 							this.dischargeCurrent.addSelectionListener(new SelectionAdapter() {
@@ -431,14 +431,14 @@ public class AkkuMasterChannelTab {
 							this.memoryNumberText = new Text(this.programTypeGroup, SWT.NONE);
 							this.memoryNumberText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.memoryNumberText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.memoryNumberText.setBounds(255, OSDE.IS_MAC_COCOA ? 58 : 70, 105, 18);
+							this.memoryNumberText.setBounds(255, OSDE.IS_MAC_COCOA ? 55 : 70, 105, 18);
 							this.memoryNumberText.setText(Messages.getString(MessageIds.OSDE_MSGT1184)); 
 							this.memoryNumberText.setEditable(false);
 						}
 						{
 							this.memoryNumberCombo = new CCombo(this.programTypeGroup, SWT.BORDER);
 							this.memoryNumberCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.memoryNumberCombo.setBounds(255, OSDE.IS_MAC_COCOA ? 81 : 93, 105, OSDE.IS_LINUX ? 22 : 20);
+							this.memoryNumberCombo.setBounds(255, OSDE.IS_MAC_COCOA ? 79 : 93, 105, OSDE.IS_LINUX ? 22 : 20);
 							this.memoryNumberCombo.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 							this.memoryNumberCombo.select(1);
 							this.memoryNumberCombo.setEditable(false);
