@@ -79,7 +79,7 @@ public class CellVoltageDisplay extends Composite {
 	final int lowerLimitColorRed;
 	final int upperLimitColorRed; 		
 	final int lowerLimitColorGreen; 	
-	final int deltaSpreadVoltage = 100;
+	final int deltaSpreadVoltage = 50;
 	final int beginSpreadVoltage; 		
 	final int upperLimitVoltage; 		
 	final int lowerLimitVoltage;
