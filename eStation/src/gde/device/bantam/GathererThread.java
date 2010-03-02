@@ -299,6 +299,9 @@ public class GathererThread extends Thread {
 			this.device.makeInActiveDisplayable(tmpRecordSet);
 			this.application.updateStatisticsData();
 			this.application.updateDataTable(this.recordSetKey);
+			
+			this.device.setAverageTimeStep_ms(tmpRecordSet.getAverageTimeStep_ms());
+			log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms());
 		}
 	}
 

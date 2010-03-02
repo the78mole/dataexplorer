@@ -168,7 +168,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 			}
-			recordSet.setTimeStep_ms(1478); // no average time available, use a hard coded one
+			
+			recordSet.setTimeStep_ms(this.getAverageTimeStep_ms() != null ? this.getAverageTimeStep_ms() : 1478); // no average time available, use a hard coded one
 		}
 		else { // none constant time steps
 			byte[] sizeBuffer = new byte[4];
