@@ -177,10 +177,9 @@ public class Settings extends Properties {
 	public final static String		GRID_COMPARE_WINDOW_VER_COLOR	= "grid_compare_vertical_color"; //$NON-NLS-1$
 
 	public final static String		DEVICE_PROPERTIES_DIR_NAME		= "Devices"; //$NON-NLS-1$
-	public final static String		DEVICE_PROPERTIES_XSD_VERSION	= "_V08"; //$NON-NLS-1$
-	public final static String		DEVICE_PROPERTIES_XSD_NAME		= "DeviceProperties" + DEVICE_PROPERTIES_XSD_VERSION + ".xsd"; //$NON-NLS-1$
+	public final static String		DEVICE_PROPERTIES_XSD_NAME		= "DeviceProperties" + OSDE.DEVICE_PROPERTIES_XSD_VERSION + OSDE.FILE_ENDING_DOT_XSD; //$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_DIR_NAME		= "GraphicsTemplates"; //$NON-NLS-1$
-	public final static String		GRAPHICS_TEMPLATES_XSD_NAME		= "GraphicsTemplates_V04.xsd"; //$NON-NLS-1$
+	public final static String		GRAPHICS_TEMPLATES_XSD_NAME		= "GraphicsTemplates" + OSDE.GRAPHICS_TEMPLATES_XSD_VERSION + OSDE.FILE_ENDING_DOT_XSD; //$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_EXTENSION	= OSDE.FILE_ENDING_STAR_XML;
 
 	private static Settings	instance											= null;	// singelton

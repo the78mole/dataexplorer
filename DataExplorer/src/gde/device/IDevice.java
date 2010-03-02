@@ -170,9 +170,19 @@ public interface IDevice {
 	public double getTimeStep_ms();
 	
 	/**
-	 * set new time step in ms
+	 * set new average time step in ms
 	 */
 	public void setTimeStep_ms(double newTimeStep_ms);
+
+	/**
+	 * @return average time step in ms (this is an optional element, keep this in mind to have a workaround if it does not exist)
+	 */
+	public Double getAverageTimeStep_ms();
+	
+	/**
+	 * set new time step in ms
+	 */
+	public void setAverageTimeStep_ms(double newTimeStep_ms);
 	
 	/**
 	 * @return the serial port type, optional configure for the device

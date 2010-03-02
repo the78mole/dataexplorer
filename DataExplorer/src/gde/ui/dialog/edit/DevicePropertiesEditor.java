@@ -386,7 +386,7 @@ public class DevicePropertiesEditor extends Composite {
 										if (FileUtils
 												.extract(
 														this.getClass(),
-														"DeviceSample_" + DevicePropertiesEditor.this.settings.getLocale() + Settings.DEVICE_PROPERTIES_XSD_VERSION + OSDE.FILE_ENDING_DOT_XML, DevicePropertiesEditor.this.devicePropertiesFileName,//$NON-NLS-1$
+														"DeviceSample_" + DevicePropertiesEditor.this.settings.getLocale() + OSDE.FILE_ENDING_DOT_XML, DevicePropertiesEditor.this.devicePropertiesFileName,//$NON-NLS-1$
 														"resource/", getDevicesPath(), "555")) { //$NON-NLS-1$ //$NON-NLS-2$
 											DevicePropertiesEditor.this.deviceConfig = new DeviceConfiguration(getDevicesPath() + OSDE.FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.devicePropertiesFileName);
 										}

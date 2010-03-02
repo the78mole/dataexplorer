@@ -336,13 +336,34 @@ public class DeviceConfiguration {
 		this.device.setGroup(name);
 	}
 
+	/**
+	 * @return time step in ms
+	 */
 	public double getTimeStep_ms() {
 		return this.timeBase.getTimeStep();
 	}
 
+	/**
+	 * set new average time step in ms
+	 */
 	public void setTimeStep_ms(double newTimeStep_ms) {
 		this.isChangePropery = true;
 		this.timeBase.setTimeStep(newTimeStep_ms);
+	}
+
+	/**
+	 * @return average time step in ms (this is an optional element, keep this in mind to have a workaround if it does not exist)
+	 */
+	public Double getAverageTimeStep_ms() {
+		return this.timeBase.getAvarageTimeStep();
+	}
+
+	/**
+	 * set new time step in ms
+	 */
+	public void setAverageTimeStep_ms(double newAverageTimeStep_ms) {
+		this.isChangePropery = true;
+		this.timeBase.setAvarageTimeStep(newAverageTimeStep_ms);
 	}
 
 	/**
