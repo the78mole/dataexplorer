@@ -28,8 +28,6 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -129,6 +127,7 @@ public class ChannelTypeTabItem extends CTabItem {
 		((MeasurementTypeTabItem) this.measurementsTabFolder.getSelection()).enableContextMenu(true);
 		//MeasurementType end
 
+		initialize();
 		this.channelConfigInnerTabFolder.setSelection(0);
 	}
 
@@ -207,20 +206,6 @@ public class ChannelTypeTabItem extends CTabItem {
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "channelConfigComposite.helpRequested " + evt); //$NON-NLS-1$
 						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_channelConfig"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				});
-				this.channelConfigComposite.addPaintListener(new PaintListener() {
-					@Override
-					public void paintControl(PaintEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "channelConfigComposite.paintControl, event=" + evt); //$NON-NLS-1$
-						if (ChannelTypeTabItem.this.channelConfigComposite.isVisible()) {
-							if (ChannelTypeTabItem.this.channelType != null) {
-								ChannelTypeTabItem.this.channelConfigType = ChannelTypeTabItem.this.channelType.getType();
-								ChannelTypeTabItem.this.channelConfigTypeCombo.select(ChannelTypeTabItem.this.channelConfigType.ordinal());
-								ChannelTypeTabItem.this.channelConfigName = ChannelTypeTabItem.this.channelType.getName();
-								ChannelTypeTabItem.this.channelConfigText.setText(ChannelTypeTabItem.this.channelConfigName);
-							}
-						}
 					}
 				});
 				{
@@ -351,9 +336,22 @@ public class ChannelTypeTabItem extends CTabItem {
 					});
 				}
 			}
+			initialize();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * initialize states of widgests
+	 */
+	private void initialize() {
+		if (ChannelTypeTabItem.this.channelType != null) {
+			ChannelTypeTabItem.this.channelConfigType = ChannelTypeTabItem.this.channelType.getType();
+			ChannelTypeTabItem.this.channelConfigTypeCombo.select(ChannelTypeTabItem.this.channelConfigType.ordinal());
+			ChannelTypeTabItem.this.channelConfigName = ChannelTypeTabItem.this.channelType.getName();
+			ChannelTypeTabItem.this.channelConfigText.setText(ChannelTypeTabItem.this.channelConfigName);
 		}
 	}
 }

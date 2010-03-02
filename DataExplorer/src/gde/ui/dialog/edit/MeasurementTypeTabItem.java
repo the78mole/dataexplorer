@@ -29,8 +29,6 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -253,6 +251,7 @@ public class MeasurementTypeTabItem extends CTabItem {
 			this.measurementPropertiesTabFolder.setSelection(0);
 		}
 		//end properties
+		initialize();
 	}
 
 	public MeasurementTypeTabItem(CTabFolder parent, int style, int index, MeasurementType useMeasurementType) {
@@ -285,20 +284,6 @@ public class MeasurementTypeTabItem extends CTabItem {
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "measurementsComposite.helpRequested " + evt); //$NON-NLS-1$
 						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_measurement"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				});
-				this.measurementsComposite.addPaintListener(new PaintListener() {
-					@Override
-					public void paintControl(PaintEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "channelConfigComposite.paintControl, event=" + evt); //$NON-NLS-1$
-						if (MeasurementTypeTabItem.this.measurementsComposite.isVisible()) {
-							if (MeasurementTypeTabItem.this.measurementType != null) {
-								MeasurementTypeTabItem.this.measurementNameText.setText(MeasurementTypeTabItem.this.measurementName);
-								MeasurementTypeTabItem.this.measurementSymbolText.setText(MeasurementTypeTabItem.this.measurementSymbol);
-								MeasurementTypeTabItem.this.measurementUnitText.setText(MeasurementTypeTabItem.this.measurementUnit);
-								MeasurementTypeTabItem.this.measurementActiveButton.setSelection(MeasurementTypeTabItem.this.isMeasurementActive);
-							}
-						}
 					}
 				});
 				{
@@ -476,6 +461,7 @@ public class MeasurementTypeTabItem extends CTabItem {
 					});
 				}
 				this.measurementsComposite.layout();
+				initialize();
 			}
 		}
 		catch (Exception e) {
@@ -636,5 +622,17 @@ public class MeasurementTypeTabItem extends CTabItem {
 			this.channelConfigMeasurementPropertiesTabFolder.setSelection(tmpStatisticsTypeTabItem);
 		}
 		return tmpStatisticsTypeTabItem;
+	}
+
+	/**
+	 * initialize widgets states
+	 */
+	private void initialize() {
+		if (MeasurementTypeTabItem.this.measurementType != null) {
+			MeasurementTypeTabItem.this.measurementNameText.setText(MeasurementTypeTabItem.this.measurementName);
+			MeasurementTypeTabItem.this.measurementSymbolText.setText(MeasurementTypeTabItem.this.measurementSymbol);
+			MeasurementTypeTabItem.this.measurementUnitText.setText(MeasurementTypeTabItem.this.measurementUnit);
+			MeasurementTypeTabItem.this.measurementActiveButton.setSelection(MeasurementTypeTabItem.this.isMeasurementActive);
+		}
 	}
 }

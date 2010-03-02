@@ -28,8 +28,6 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
@@ -183,6 +181,7 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.valueText.setEnabled(enableEditValue);
 			this.valueText.setEditable(enableEditValue);
 		}
+		initialize();
 	}
 
 	/**
@@ -239,49 +238,6 @@ public class PropertyTypeTabItem extends CTabItem {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "propertyTypeComposite.helpRequested " + evt); //$NON-NLS-1$
 					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			});
-			this.propertyTypeComposite.addPaintListener(new PaintListener() {
-				@Override
-				public void paintControl(PaintEvent evt) {
-					log.log(java.util.logging.Level.FINEST, "this.paintControl, event=" + evt); //$NON-NLS-1$
-					if (PropertyTypeTabItem.this.propertyTypeComposite.isVisible()) {
-						if (PropertyTypeTabItem.this.propertyType != null) {
-							if (PropertyTypeTabItem.this.nameText.isVisible()) {
-								PropertyTypeTabItem.this.nameText.setText(PropertyTypeTabItem.this.propertyType.getName());
-							}
-							else if (PropertyTypeTabItem.this.nameCombo.isVisible()) {
-								PropertyTypeTabItem.this.nameCombo.select(PropertyTypeTabItem.this.propertyType == null ? 0 : MeasurementPropertyTypes.fromValue(PropertyTypeTabItem.this.propertyType.getName())
-										.ordinal());
-							}
-
-							if (PropertyTypeTabItem.this.propertyType.getType() != null) {
-								PropertyTypeTabItem.this.typeCombo.select(PropertyTypeTabItem.this.propertyType.getType().ordinal());
-								if (PropertyTypeTabItem.this.propertyType.getType() == DataTypes.BOOLEAN) {
-									PropertyTypeTabItem.this.valueText.setVisible(false);
-									PropertyTypeTabItem.this.valueCombo.setVisible(true);
-									int selectionIndex = PropertyTypeTabItem.this.propertyType.getValue().equals(PropertyTypeTabItem.this.valueCombo.getItems()[0]) ? 0 : 1;
-									PropertyTypeTabItem.this.valueCombo.select(selectionIndex);
-								}
-								else {
-									PropertyTypeTabItem.this.valueText.setVisible(true);
-									PropertyTypeTabItem.this.valueCombo.setVisible(false);
-									PropertyTypeTabItem.this.valueText.setText(StringHelper.verifyTypedString(PropertyTypeTabItem.this.propertyType.getType(), PropertyTypeTabItem.this.propertyType.getValue()));
-								}
-							}
-							else {
-								PropertyTypeTabItem.this.typeCombo.select(0);
-							}
-							PropertyTypeTabItem.this.descriptionText.setText(PropertyTypeTabItem.this.propertyType.getDescription());
-						}
-						else {
-							PropertyTypeTabItem.this.nameText.setText(OSDE.STRING_EMPTY);
-							PropertyTypeTabItem.this.nameCombo.setText(OSDE.STRING_EMPTY);
-							PropertyTypeTabItem.this.descriptionText.setText(OSDE.STRING_EMPTY);
-
-						}
-						PropertyTypeTabItem.this.enableContextMenu(true);
-					}
 				}
 			});
 			{
@@ -450,6 +406,7 @@ public class PropertyTypeTabItem extends CTabItem {
 				});
 			}
 			this.propertyTypeComposite.layout();
+			initialize();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -461,5 +418,46 @@ public class PropertyTypeTabItem extends CTabItem {
 	 */
 	public PropertyType getProperty() {
 		return this.propertyType;
+	}
+
+	/**
+	 * 
+	 */
+	private void initialize() {
+		if (PropertyTypeTabItem.this.propertyType != null) {
+			if (PropertyTypeTabItem.this.nameText.isVisible()) {
+				PropertyTypeTabItem.this.nameText.setText(PropertyTypeTabItem.this.propertyType.getName());
+			}
+			else if (PropertyTypeTabItem.this.nameCombo.isVisible()) {
+				PropertyTypeTabItem.this.nameCombo.select(PropertyTypeTabItem.this.propertyType == null ? 0 : MeasurementPropertyTypes.fromValue(PropertyTypeTabItem.this.propertyType.getName())
+						.ordinal());
+			}
+
+			if (PropertyTypeTabItem.this.propertyType.getType() != null) {
+				PropertyTypeTabItem.this.typeCombo.select(PropertyTypeTabItem.this.propertyType.getType().ordinal());
+				if (PropertyTypeTabItem.this.propertyType.getType() == DataTypes.BOOLEAN) {
+					PropertyTypeTabItem.this.valueText.setVisible(false);
+					PropertyTypeTabItem.this.valueCombo.setVisible(true);
+					int selectionIndex = PropertyTypeTabItem.this.propertyType.getValue().equals(PropertyTypeTabItem.this.valueCombo.getItems()[0]) ? 0 : 1;
+					PropertyTypeTabItem.this.valueCombo.select(selectionIndex);
+				}
+				else {
+					PropertyTypeTabItem.this.valueText.setVisible(true);
+					PropertyTypeTabItem.this.valueCombo.setVisible(false);
+					PropertyTypeTabItem.this.valueText.setText(StringHelper.verifyTypedString(PropertyTypeTabItem.this.propertyType.getType(), PropertyTypeTabItem.this.propertyType.getValue()));
+				}
+			}
+			else {
+				PropertyTypeTabItem.this.typeCombo.select(0);
+			}
+			PropertyTypeTabItem.this.descriptionText.setText(PropertyTypeTabItem.this.propertyType.getDescription());
+		}
+		else {
+			PropertyTypeTabItem.this.nameText.setText(OSDE.STRING_EMPTY);
+			PropertyTypeTabItem.this.nameCombo.setText(OSDE.STRING_EMPTY);
+			PropertyTypeTabItem.this.descriptionText.setText(OSDE.STRING_EMPTY);
+
+		}
+		PropertyTypeTabItem.this.enableContextMenu(true);
 	}
 }

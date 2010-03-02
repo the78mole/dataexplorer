@@ -30,8 +30,6 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
@@ -124,20 +122,6 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "serialPortComposite.helpRequested " + evt); //$NON-NLS-1$
 						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_serial_port"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				});
-				this.serialPortComposite.addPaintListener(new PaintListener() {
-					@Override
-					public void paintControl(PaintEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "serialPortComposite.paintControl, event=" + evt); //$NON-NLS-1$
-						SeriaPortTypeTabItem.this.portNameText.setText(SeriaPortTypeTabItem.this.portName);
-						SeriaPortTypeTabItem.this.baudeRateCombo.select(SeriaPortTypeTabItem.this.baudeRateIndex);
-						SeriaPortTypeTabItem.this.dataBitsCombo.select(SeriaPortTypeTabItem.this.dataBitsIndex);
-						SeriaPortTypeTabItem.this.stopBitsCombo.select(SeriaPortTypeTabItem.this.stopBitsIndex);
-						SeriaPortTypeTabItem.this.parityCombo.select(SeriaPortTypeTabItem.this.parityIndex);
-						SeriaPortTypeTabItem.this.flowControlCombo.select(SeriaPortTypeTabItem.this.flowControlIndex);
-						SeriaPortTypeTabItem.this.isRTSButton.setSelection(SeriaPortTypeTabItem.this.isRTS);
-						SeriaPortTypeTabItem.this.isDTRButton.setSelection(SeriaPortTypeTabItem.this.isDTR);
 					}
 				});
 				this.serialPortComposite.addFocusListener(new FocusAdapter() {
@@ -333,38 +317,6 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					this.timeOutComposite = new Composite(this.serialPortComposite, SWT.BORDER);
 					this.timeOutComposite.setLayout(null);
 					this.timeOutComposite.setBounds(355, 80, 250, 220);
-					this.timeOutComposite.addPaintListener(new PaintListener() {
-						@Override
-						public void paintControl(PaintEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "dialogShell.paintControl, event=" + evt); //$NON-NLS-1$
-							SeriaPortTypeTabItem.this._RTOCharDelayTimeText.setText(OSDE.STRING_EMPTY + SeriaPortTypeTabItem.this.RTOCharDelayTime);
-							SeriaPortTypeTabItem.this._RTOExtraDelayTimeText.setText(OSDE.STRING_EMPTY + SeriaPortTypeTabItem.this.RTOExtraDelayTime);
-							SeriaPortTypeTabItem.this._WTOCharDelayTimeText.setText(OSDE.STRING_EMPTY + SeriaPortTypeTabItem.this.WTOCharDelayTime);
-							SeriaPortTypeTabItem.this._WTOExtraDelayTimeText.setText(OSDE.STRING_EMPTY + SeriaPortTypeTabItem.this.WTOExtraDelayTime);
-
-							SeriaPortTypeTabItem.this.timeOutButton.setSelection(SeriaPortTypeTabItem.this.useTimeOut);
-							if (SeriaPortTypeTabItem.this.timeOutButton.getSelection()) {
-								SeriaPortTypeTabItem.this._RTOCharDelayTimeLabel.setEnabled(true);
-								SeriaPortTypeTabItem.this._RTOCharDelayTimeText.setEnabled(true);
-								SeriaPortTypeTabItem.this._RTOExtraDelayTimeLabel.setEnabled(true);
-								SeriaPortTypeTabItem.this._RTOExtraDelayTimeText.setEnabled(true);
-								SeriaPortTypeTabItem.this._WTOCharDelayTimeLabel.setEnabled(true);
-								SeriaPortTypeTabItem.this._WTOCharDelayTimeText.setEnabled(true);
-								SeriaPortTypeTabItem.this._WTOExtraDelayTimeLabel.setEnabled(true);
-								SeriaPortTypeTabItem.this._WTOExtraDelayTimeText.setEnabled(true);
-							}
-							else {
-								SeriaPortTypeTabItem.this._RTOCharDelayTimeLabel.setEnabled(false);
-								SeriaPortTypeTabItem.this._RTOCharDelayTimeText.setEnabled(false);
-								SeriaPortTypeTabItem.this._RTOExtraDelayTimeLabel.setEnabled(false);
-								SeriaPortTypeTabItem.this._RTOExtraDelayTimeText.setEnabled(false);
-								SeriaPortTypeTabItem.this._WTOCharDelayTimeLabel.setEnabled(false);
-								SeriaPortTypeTabItem.this._WTOCharDelayTimeText.setEnabled(false);
-								SeriaPortTypeTabItem.this._WTOExtraDelayTimeLabel.setEnabled(false);
-								SeriaPortTypeTabItem.this._WTOExtraDelayTimeText.setEnabled(false);
-							}
-						}
-					});
 					{
 						this.timeOutDescriptionLabel = new Label(this.timeOutComposite, SWT.WRAP);
 						this.timeOutDescriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0591));
@@ -532,6 +484,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					}
 				}
 			}
+			initialize();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -603,8 +556,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 		this.WTOExtraDelayTime = deviceConfig.getWTOExtraDelayTime();
 		this.timeOutComposite.redraw();
 
-		this.serialPortComposite.redraw();
-
+		initialize();
 	}
 
 	/**
@@ -620,5 +572,46 @@ public class SeriaPortTypeTabItem extends CTabItem {
 			++searchIndex;
 		}
 		return searchIndex;
+	}
+
+	/**
+	 * initialize widget states
+	 */
+	private void initialize() {
+		SeriaPortTypeTabItem.this.portNameText.setText(SeriaPortTypeTabItem.this.portName);
+		SeriaPortTypeTabItem.this.baudeRateCombo.select(SeriaPortTypeTabItem.this.baudeRateIndex);
+		SeriaPortTypeTabItem.this.dataBitsCombo.select(SeriaPortTypeTabItem.this.dataBitsIndex);
+		SeriaPortTypeTabItem.this.stopBitsCombo.select(SeriaPortTypeTabItem.this.stopBitsIndex);
+		SeriaPortTypeTabItem.this.parityCombo.select(SeriaPortTypeTabItem.this.parityIndex);
+		SeriaPortTypeTabItem.this.flowControlCombo.select(SeriaPortTypeTabItem.this.flowControlIndex);
+		SeriaPortTypeTabItem.this.isRTSButton.setSelection(SeriaPortTypeTabItem.this.isRTS);
+		SeriaPortTypeTabItem.this.isDTRButton.setSelection(SeriaPortTypeTabItem.this.isDTR);
+		
+		SeriaPortTypeTabItem.this._RTOCharDelayTimeText.setText(OSDE.STRING_EMPTY + SeriaPortTypeTabItem.this.RTOCharDelayTime);
+		SeriaPortTypeTabItem.this._RTOExtraDelayTimeText.setText(OSDE.STRING_EMPTY + SeriaPortTypeTabItem.this.RTOExtraDelayTime);
+		SeriaPortTypeTabItem.this._WTOCharDelayTimeText.setText(OSDE.STRING_EMPTY + SeriaPortTypeTabItem.this.WTOCharDelayTime);
+		SeriaPortTypeTabItem.this._WTOExtraDelayTimeText.setText(OSDE.STRING_EMPTY + SeriaPortTypeTabItem.this.WTOExtraDelayTime);
+
+		SeriaPortTypeTabItem.this.timeOutButton.setSelection(SeriaPortTypeTabItem.this.useTimeOut);
+		if (SeriaPortTypeTabItem.this.timeOutButton.getSelection()) {
+			SeriaPortTypeTabItem.this._RTOCharDelayTimeLabel.setEnabled(true);
+			SeriaPortTypeTabItem.this._RTOCharDelayTimeText.setEnabled(true);
+			SeriaPortTypeTabItem.this._RTOExtraDelayTimeLabel.setEnabled(true);
+			SeriaPortTypeTabItem.this._RTOExtraDelayTimeText.setEnabled(true);
+			SeriaPortTypeTabItem.this._WTOCharDelayTimeLabel.setEnabled(true);
+			SeriaPortTypeTabItem.this._WTOCharDelayTimeText.setEnabled(true);
+			SeriaPortTypeTabItem.this._WTOExtraDelayTimeLabel.setEnabled(true);
+			SeriaPortTypeTabItem.this._WTOExtraDelayTimeText.setEnabled(true);
+		}
+		else {
+			SeriaPortTypeTabItem.this._RTOCharDelayTimeLabel.setEnabled(false);
+			SeriaPortTypeTabItem.this._RTOCharDelayTimeText.setEnabled(false);
+			SeriaPortTypeTabItem.this._RTOExtraDelayTimeLabel.setEnabled(false);
+			SeriaPortTypeTabItem.this._RTOExtraDelayTimeText.setEnabled(false);
+			SeriaPortTypeTabItem.this._WTOCharDelayTimeLabel.setEnabled(false);
+			SeriaPortTypeTabItem.this._WTOCharDelayTimeText.setEnabled(false);
+			SeriaPortTypeTabItem.this._WTOExtraDelayTimeLabel.setEnabled(false);
+			SeriaPortTypeTabItem.this._WTOExtraDelayTimeText.setEnabled(false);
+		}
 	}
 }

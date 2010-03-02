@@ -29,8 +29,6 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
@@ -192,6 +190,7 @@ public class StatisticsTypeTabItem extends CTabItem {
 			mb.setText(Messages.getString(MessageIds.OSDE_MSGW0540));
 			mb.setMessage(Messages.getString(MessageIds.OSDE_MSGW0542));
 		}
+		initialize();
 	}
 
 	/**
@@ -407,53 +406,6 @@ public class StatisticsTypeTabItem extends CTabItem {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "statisticsComposite.helpRequested " + evt); //$NON-NLS-1$
 					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_statistics"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			});
-			this.statisticsComposite.addPaintListener(new PaintListener() {
-				@Override
-				public void paintControl(PaintEvent evt) {
-					log.log(java.util.logging.Level.FINEST, "statisticsComposite.paintControl, event=" + evt); //$NON-NLS-1$
-					if (StatisticsTypeTabItem.this.statisticsComposite.isVisible()) {
-						StatisticsTypeTabItem.this.statisticsMinButton.setSelection(StatisticsTypeTabItem.this.statisticsMin == null ? StatisticsTypeTabItem.this.statisticsMin = false
-								: StatisticsTypeTabItem.this.statisticsMin);
-						StatisticsTypeTabItem.this.statisticsAvgButton.setSelection(StatisticsTypeTabItem.this.statisticsAvg == null ? StatisticsTypeTabItem.this.statisticsAvg = false
-								: StatisticsTypeTabItem.this.statisticsAvg);
-						StatisticsTypeTabItem.this.statisticsMaxButton.setSelection(StatisticsTypeTabItem.this.statisticsMax == null ? StatisticsTypeTabItem.this.statisticsMax = false
-								: StatisticsTypeTabItem.this.statisticsMax);
-						StatisticsTypeTabItem.this.statisticsSigmaButton.setSelection(StatisticsTypeTabItem.this.statisticsSigma == null ? StatisticsTypeTabItem.this.statisticsSigma = false
-								: StatisticsTypeTabItem.this.statisticsSigma);
-
-						if (StatisticsTypeTabItem.this.statisticsType != null) {
-							StatisticsTypeTabItem.this.updateTriggerDependent(StatisticsTypeTabItem.this.isSomeTriggerDefined = StatisticsTypeTabItem.this.isSomeTriggerDefined());
-						}
-						if (StatisticsTypeTabItem.this.triggerLevel != null) {
-							StatisticsTypeTabItem.this.triggerLevelButton.setSelection(StatisticsTypeTabItem.this.triggerLevel != null);
-							StatisticsTypeTabItem.this.triggerLevelCombo.select(StatisticsTypeTabItem.this.triggerLevel == null ? 0 : StatisticsTypeTabItem.this.triggerLevel);
-							StatisticsTypeTabItem.this.triggerCommentText.setText(StatisticsTypeTabItem.this.triggerComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.triggerComment);
-							StatisticsTypeTabItem.this.isGreaterButton
-									.setSelection(StatisticsTypeTabItem.this.isGreater == null ? StatisticsTypeTabItem.this.isGreater = true : StatisticsTypeTabItem.this.isGreater);
-							StatisticsTypeTabItem.this.minTimeSecCombo
-									.select((StatisticsTypeTabItem.this.minTimeSec == null ? StatisticsTypeTabItem.this.minTimeSec = 1 : StatisticsTypeTabItem.this.minTimeSec) - 1);
-						}
-						StatisticsTypeTabItem.this.sumTriggerTimeButton.setSelection(StatisticsTypeTabItem.this.isSumTriggerTime == null ? false : StatisticsTypeTabItem.this.isSumTriggerTime);
-						StatisticsTypeTabItem.this.sumTriggerTimeText.setText(StatisticsTypeTabItem.this.sumTriggerTimeComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.sumTriggerTimeComment);
-						StatisticsTypeTabItem.this.countByTriggerButton.setSelection(StatisticsTypeTabItem.this.isCountByTrigger == null ? false : StatisticsTypeTabItem.this.isCountByTrigger);
-						StatisticsTypeTabItem.this.countByTriggerText.setText(StatisticsTypeTabItem.this.countByTriggerComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.countByTriggerComment);
-						StatisticsTypeTabItem.this.triggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.triggerRefOrdinal != null);
-						StatisticsTypeTabItem.this.triggerRefOrdinalCombo.select(StatisticsTypeTabItem.this.triggerRefOrdinal == null ? StatisticsTypeTabItem.this.getTriggerReferenceOrdinal()
-								: StatisticsTypeTabItem.this.triggerRefOrdinal);
-						StatisticsTypeTabItem.this.triggerRefOrdinalText.setText(StatisticsTypeTabItem.this.triggerRefOrdinalComment != null ? StatisticsTypeTabItem.this.triggerRefOrdinalComment
-								: OSDE.STRING_EMPTY);
-						StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal != null);
-						StatisticsTypeTabItem.this.sumByTriggerRefOrdinalCombo.select(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal == null ? StatisticsTypeTabItem.this.getTriggerReferenceOrdinal()
-								: StatisticsTypeTabItem.this.sumByTriggerRefOrdinal);
-						StatisticsTypeTabItem.this.sumTriggerText.setText(StatisticsTypeTabItem.this.sumTriggerComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.sumTriggerComment);
-						StatisticsTypeTabItem.this.isRatioRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.ratioRefOrdinal != null);
-						StatisticsTypeTabItem.this.ratioRefOrdinalCombo.select(StatisticsTypeTabItem.this.ratioRefOrdinal == null ? 0 : StatisticsTypeTabItem.this.ratioRefOrdinal);
-						StatisticsTypeTabItem.this.ratioText.setText(StatisticsTypeTabItem.this.ratioComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.ratioComment);
-
-						StatisticsTypeTabItem.this.enableContextMenu(true);
-					}
 				}
 			});
 			{
@@ -984,7 +936,8 @@ public class StatisticsTypeTabItem extends CTabItem {
 			this.scrolledComposite.setContent(this.statisticsComposite);
 			this.statisticsComposite.setSize(700, 185);
 			this.statisticsComposite.layout();
-
+			
+			initialize();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -1044,6 +997,51 @@ public class StatisticsTypeTabItem extends CTabItem {
 				StatisticsTypeTabItem.this.statisticsType.setTriggerRefOrdinal(StatisticsTypeTabItem.this.triggerRefOrdinal = null);
 			}
 		}
+	}
+
+	/**
+	 * initialize widget states
+	 */
+	private void initialize() {
+		StatisticsTypeTabItem.this.statisticsMinButton.setSelection(StatisticsTypeTabItem.this.statisticsMin == null ? StatisticsTypeTabItem.this.statisticsMin = false
+				: StatisticsTypeTabItem.this.statisticsMin);
+		StatisticsTypeTabItem.this.statisticsAvgButton.setSelection(StatisticsTypeTabItem.this.statisticsAvg == null ? StatisticsTypeTabItem.this.statisticsAvg = false
+				: StatisticsTypeTabItem.this.statisticsAvg);
+		StatisticsTypeTabItem.this.statisticsMaxButton.setSelection(StatisticsTypeTabItem.this.statisticsMax == null ? StatisticsTypeTabItem.this.statisticsMax = false
+				: StatisticsTypeTabItem.this.statisticsMax);
+		StatisticsTypeTabItem.this.statisticsSigmaButton.setSelection(StatisticsTypeTabItem.this.statisticsSigma == null ? StatisticsTypeTabItem.this.statisticsSigma = false
+				: StatisticsTypeTabItem.this.statisticsSigma);
+
+		if (StatisticsTypeTabItem.this.statisticsType != null) {
+			StatisticsTypeTabItem.this.updateTriggerDependent(StatisticsTypeTabItem.this.isSomeTriggerDefined = StatisticsTypeTabItem.this.isSomeTriggerDefined());
+		}
+		if (StatisticsTypeTabItem.this.triggerLevel != null) {
+			StatisticsTypeTabItem.this.triggerLevelButton.setSelection(StatisticsTypeTabItem.this.triggerLevel != null);
+			StatisticsTypeTabItem.this.triggerLevelCombo.select(StatisticsTypeTabItem.this.triggerLevel == null ? 0 : StatisticsTypeTabItem.this.triggerLevel);
+			StatisticsTypeTabItem.this.triggerCommentText.setText(StatisticsTypeTabItem.this.triggerComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.triggerComment);
+			StatisticsTypeTabItem.this.isGreaterButton
+					.setSelection(StatisticsTypeTabItem.this.isGreater == null ? StatisticsTypeTabItem.this.isGreater = true : StatisticsTypeTabItem.this.isGreater);
+			StatisticsTypeTabItem.this.minTimeSecCombo
+					.select((StatisticsTypeTabItem.this.minTimeSec == null ? StatisticsTypeTabItem.this.minTimeSec = 1 : StatisticsTypeTabItem.this.minTimeSec) - 1);
+		}
+		StatisticsTypeTabItem.this.sumTriggerTimeButton.setSelection(StatisticsTypeTabItem.this.isSumTriggerTime == null ? false : StatisticsTypeTabItem.this.isSumTriggerTime);
+		StatisticsTypeTabItem.this.sumTriggerTimeText.setText(StatisticsTypeTabItem.this.sumTriggerTimeComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.sumTriggerTimeComment);
+		StatisticsTypeTabItem.this.countByTriggerButton.setSelection(StatisticsTypeTabItem.this.isCountByTrigger == null ? false : StatisticsTypeTabItem.this.isCountByTrigger);
+		StatisticsTypeTabItem.this.countByTriggerText.setText(StatisticsTypeTabItem.this.countByTriggerComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.countByTriggerComment);
+		StatisticsTypeTabItem.this.triggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.triggerRefOrdinal != null);
+		StatisticsTypeTabItem.this.triggerRefOrdinalCombo.select(StatisticsTypeTabItem.this.triggerRefOrdinal == null ? StatisticsTypeTabItem.this.getTriggerReferenceOrdinal()
+				: StatisticsTypeTabItem.this.triggerRefOrdinal);
+		StatisticsTypeTabItem.this.triggerRefOrdinalText.setText(StatisticsTypeTabItem.this.triggerRefOrdinalComment != null ? StatisticsTypeTabItem.this.triggerRefOrdinalComment
+				: OSDE.STRING_EMPTY);
+		StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal != null);
+		StatisticsTypeTabItem.this.sumByTriggerRefOrdinalCombo.select(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal == null ? StatisticsTypeTabItem.this.getTriggerReferenceOrdinal()
+				: StatisticsTypeTabItem.this.sumByTriggerRefOrdinal);
+		StatisticsTypeTabItem.this.sumTriggerText.setText(StatisticsTypeTabItem.this.sumTriggerComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.sumTriggerComment);
+		StatisticsTypeTabItem.this.isRatioRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.ratioRefOrdinal != null);
+		StatisticsTypeTabItem.this.ratioRefOrdinalCombo.select(StatisticsTypeTabItem.this.ratioRefOrdinal == null ? 0 : StatisticsTypeTabItem.this.ratioRefOrdinal);
+		StatisticsTypeTabItem.this.ratioText.setText(StatisticsTypeTabItem.this.ratioComment == null ? OSDE.STRING_EMPTY : StatisticsTypeTabItem.this.ratioComment);
+
+		StatisticsTypeTabItem.this.enableContextMenu(true);
 	}
 
 }
