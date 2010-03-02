@@ -26,7 +26,7 @@ The program is NLS enabled, available messages are English and German, this is a
 
 * Code
 ** Dependencies:
-    runtime: eclipse SWT and RXTXcomm package
+    runtime: eclipse SWT and RXTXcomm package (the RXTXcomm jar was modified by me to extract required JNI libs on the fly to avoid complicated java extension installation, this is the same as it is done by the swt package)
 	build time: SUN JDK, launch4j where the Windows launcher executaable gets build, Microsoft Windows SDK where some native libraries are build
 
 ** Configuration & compilation:
@@ -78,3 +78,5 @@ The program is NLS enabled, available messages are English and German, this is a
   This makes development turnaround slow. 
   My hopes making this software open source is that more intrested developers join this project implements devices I do not own, help tranlsate documentation into more languages
   (correct my spelling and grammar).
+  
+  From the beginning I used a CVS repository where I was able to reproduce bugs on tag base, I did not use branches so far.
