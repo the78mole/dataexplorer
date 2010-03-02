@@ -153,7 +153,7 @@ public class PropertyTypeTabItem extends CTabItem {
 		this.isStateType = enableEditName && nameSelectionItems != null && typeSelectionItems != null && !enableEditValue; //1000
 		this.isValueOnlyEnabledType = !enableEditName && nameSelectionItems != null && typeSelectionItems != null && enableEditValue; //0001
 		this.isNameSelectionEnabledType = !enableEditName && nameSelectionItems != null && nameSelectionItems.length > 1; //01**
-		this.isTypeSelectionEnabledType = typeSelectionItems != null && typeSelectionItems.length > 1; //**1*
+		this.isTypeSelectionEnabledType = !this.isStateType && typeSelectionItems != null && typeSelectionItems.length > 1; //**1*
 
 		this.setText(this.tabName = this.propertyType.getName());
 
@@ -165,6 +165,7 @@ public class PropertyTypeTabItem extends CTabItem {
 		else {
 			this.nameText.setVisible(true);
 			this.nameText.setEditable(enableEditName);
+			this.nameText.setEnabled(enableEditName);
 			this.nameCombo.setVisible(false);
 		}
 
@@ -425,10 +426,9 @@ public class PropertyTypeTabItem extends CTabItem {
 	 */
 	private void initialize() {
 		if (PropertyTypeTabItem.this.propertyType != null) {
-			if (PropertyTypeTabItem.this.nameText.isVisible()) {
-				PropertyTypeTabItem.this.nameText.setText(PropertyTypeTabItem.this.propertyType.getName());
-			}
-			else if (PropertyTypeTabItem.this.nameCombo.isVisible()) {
+			PropertyTypeTabItem.this.nameText.setText(PropertyTypeTabItem.this.propertyType.getName());
+			
+			if (PropertyTypeTabItem.this.nameCombo.isVisible()) {
 				PropertyTypeTabItem.this.nameCombo.select(PropertyTypeTabItem.this.propertyType == null ? 0 : MeasurementPropertyTypes.fromValue(PropertyTypeTabItem.this.propertyType.getName())
 						.ordinal());
 			}
