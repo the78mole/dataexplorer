@@ -145,8 +145,10 @@ public class CSVSerialDataReaderWriter {
 								application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0040));
 
 							}
-							else
+							else {
 								recordSet.checkAllDisplayable(); // raw import needs calculation of passive records
+								if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+							}
 						}
 						//prepare new record set now
 						lastRecordNumber = data.recordNumber;
@@ -191,17 +193,22 @@ public class CSVSerialDataReaderWriter {
 			application.openMessageDialog(e.getMessage());
 		}
 		catch (Exception e) {
+			// check if previous records are available and needs to be displayed
+			if (activeChannel != null && activeChannel.size() > 0) {
+				String recordSetName = activeChannel.getFirstRecordSetName();
+				activeChannel.setActiveRecordSet(recordSetName);
+				device.updateVisibilityStatus(activeChannel.get(recordSetName));
+				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
+				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+			}
+			// now display the error message
 			String msg = Messages.getString(MessageIds.OSDE_MSGE0045, new Object[] {e.getMessage(), lineNumber});
 			log.log(Level.WARNING, msg, e);
 			application.openMessageDialog(msg);
 		}
 		finally {
 			if (application.getStatusBar() != null) {
-				if (device.isTableTabRequested())
-					application.setProgress(10, sThreadId);
-				else
-					application.setProgress(100, sThreadId);
-				
+				application.setProgress(100, sThreadId);
 				application.setStatusMessage(OSDE.STRING_EMPTY);
 			}
 		}
