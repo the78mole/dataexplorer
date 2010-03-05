@@ -154,7 +154,6 @@ public class GathererThread extends Thread {
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
 						recordSet = this.channel.get(this.recordSetKey);
-						recordSet.setTableDisplayable(false); // suppress table calc + display 
 						recordSet.setAllDisplayable();
 						Record record = recordSet.get(recordSet.getFirstRecordName());
 						record.setUnit(m_unit);
@@ -245,11 +244,10 @@ public class GathererThread extends Thread {
 
 		RecordSet tmpRecordSet = this.channel.get(this.recordSetKey);
 		if (tmpRecordSet != null) {
-			tmpRecordSet.setTableDisplayable(true); // enable table display after calculation
 			this.device.updateVisibilityStatus(tmpRecordSet);
 			this.device.makeInActiveDisplayable(tmpRecordSet);
 			this.application.updateStatisticsData();
-			this.application.updateDataTable(this.recordSetKey);
+			this.application.updateDataTable(this.recordSetKey, false);
 		}
 	}
 
@@ -263,7 +261,7 @@ public class GathererThread extends Thread {
 			if (Thread.currentThread().getId() == this.application.getThreadId()) {
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 				this.application.updateStatisticsData();
-				this.application.updateDataTable(this.recordSetKey);
+				this.application.updateDataTable(this.recordSetKey, true);
 				this.device.getDialog().resetButtons();
 			}
 			else {
@@ -272,7 +270,7 @@ public class GathererThread extends Thread {
 					public void run() {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						GathererThread.this.application.updateStatisticsData();
-						GathererThread.this.application.updateDataTable(useRecordSetKey);
+						GathererThread.this.application.updateDataTable(useRecordSetKey, true);
 						GathererThread.this.device.getDialog().resetButtons();
 					}
 				});
