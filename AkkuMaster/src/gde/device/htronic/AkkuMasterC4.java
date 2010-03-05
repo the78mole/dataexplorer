@@ -20,7 +20,6 @@ import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -33,6 +32,7 @@ import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
 import osde.exception.DataInconsitsentException;
+import osde.log.Level;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
 import osde.ui.OpenSerialDataExplorer;
@@ -232,26 +232,25 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * function to prepare complete data table of record set while translating avalable measurement values
-	 * @return pointer to filled data table with formated "%.3f" values
+	 * function to prepare a data table row of record set while translating available measurement values
+	 * @return pointer to filled data table row with formated values
 	 */
-	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+	public int[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
+		int[] dataTableRow = new int[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
-			String[] recordNames = recordSet.getRecordNames();	// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
-			int numberRecords = recordNames.length;
-			int recordEntries = recordSet.getRecordDataSize(true);
+			String[] recordNames = recordSet.getRecordNames();  // 0=Spannung, 1=Höhe, 2=Steigung
+			int numberRecords = recordNames.length;			
 
+			dataTableRow[0] = (int)recordSet.getTime_ms(rowIndex);
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
-				for (int i = 0; i < recordEntries; i++) {
-					dataTable[i][j+1] = record.get(i);
-				}
+				dataTableRow[j+1] = record.get(rowIndex);
 			}
 		}
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTable;
+		return dataTableRow;		
 	}
 
 	/**

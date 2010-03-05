@@ -547,7 +547,6 @@ public class AkkuMasterChannelTab {
 															log.log(Level.FINE, AkkuMasterChannelTab.this.recordSetKey + " created for channel " + AkkuMasterChannelTab.this.channel.getName()); //$NON-NLS-1$
 															if (AkkuMasterChannelTab.this.channel.getActiveRecordSet() == null) AkkuMasterChannelTab.this.channel.setActiveRecordSet(AkkuMasterChannelTab.this.recordSetKey);
 															AkkuMasterChannelTab.this.recordSet = AkkuMasterChannelTab.this.channel.get(AkkuMasterChannelTab.this.recordSetKey);
-															AkkuMasterChannelTab.this.recordSet.setTableDisplayable(false); // suppress table calc + display 
 															AkkuMasterChannelTab.this.recordSet.setAllDisplayable();
 															AkkuMasterChannelTab.this.channel.applyTemplate(AkkuMasterChannelTab.this.recordSetKey, false);
 															// switch the active record set if the current record set is child of active channel
@@ -583,7 +582,7 @@ public class AkkuMasterChannelTab {
 																public void run() {
 																	AkkuMasterChannelTab.this.application.updateGraphicsWindow();
 																	AkkuMasterChannelTab.this.application.updateStatisticsData();
-																	AkkuMasterChannelTab.this.application.updateDataTable(AkkuMasterChannelTab.this.recordSetKey);
+																	AkkuMasterChannelTab.this.application.updateDataTable(AkkuMasterChannelTab.this.recordSetKey, false);
 																	AkkuMasterChannelTab.this.application.updateDigitalWindowChilds();
 																	AkkuMasterChannelTab.this.application.updateAnalogWindowChilds();
 																	//AkkuMasterChannelTab.this.application.updateCellVoltageChilds();
@@ -670,7 +669,6 @@ public class AkkuMasterChannelTab {
 							stopTimer();
 							// hope this is the right record set
 							AkkuMasterChannelTab.this.recordSet = AkkuMasterChannelTab.this.channels.getActiveChannel().get(AkkuMasterChannelTab.this.recordSetKey);
-							if (AkkuMasterChannelTab.this.recordSet != null) AkkuMasterChannelTab.this.recordSet.setTableDisplayable(true); // enable table display after calculation
 							AkkuMasterChannelTab.this.application.updateStatisticsData();
 							//AkkuMasterChannelTab.this.application.updateDataTable(AkkuMasterChannelTab.this.recordSet.getName());
 						}
