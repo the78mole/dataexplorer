@@ -110,7 +110,6 @@ public class LiPoWatchLiveGatherer extends Thread {
 		final RecordSet recordSet = this.channel.get(recordSetKey);
 		this.device.updateInitialRecordSetComment(recordSet);
 		recordSet.setTimeStep_ms(this.timeStep_ms);
-		recordSet.setTableDisplayable(false); // suppress table display during live data gathering
 		updateActiveState(recordSet);
 		final int[] points = new int[recordSet.size()];
 		final LiPoWatch usedDevice = this.device;
@@ -157,7 +156,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 								public void run() {
 									LiPoWatchLiveGatherer.this.application.updateGraphicsWindow();
 									LiPoWatchLiveGatherer.this.application.updateStatisticsData();
-									LiPoWatchLiveGatherer.this.application.updateDataTable(recordSetKey);
+									LiPoWatchLiveGatherer.this.application.updateDataTable(recordSetKey, false);
 									LiPoWatchLiveGatherer.this.application.updateDigitalWindowChilds();
 									LiPoWatchLiveGatherer.this.application.updateAnalogWindowChilds();
 									LiPoWatchLiveGatherer.this.application.updateCellVoltageChilds();
@@ -220,12 +219,11 @@ public class LiPoWatchLiveGatherer extends Thread {
 		if (this.isPortOpenedByLiveGatherer) this.serialPort.close();
 
 		RecordSet recordSet = this.channel.get(recordSetKey);
-		recordSet.setTableDisplayable(true); // enable table display after calculation
 		this.device.updateVisibilityStatus(recordSet);
 		this.device.makeInActiveDisplayable(recordSet);
 		this.channel.applyTemplate(recordSetKey, true);
 		this.application.updateStatisticsData();
-		this.application.updateDataTable(recordSetKey);
+		this.application.updateDataTable(recordSetKey, false);
 	}
 
 	/**
@@ -251,7 +249,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		this.channel.remove(recordSetKey);
 		this.application.getMenuToolBar().updateRecordSetSelectCombo();
 		this.application.updateStatisticsData();
-		this.application.updateDataTable(recordSetKey);
+		this.application.updateDataTable(recordSetKey, true);
 		this.application.openMessageDialog(this.dialog.getDialogShell(), message);
 		this.device.getDialog().resetButtons();
 		log.log(Level.SEVERE, e.getMessage(), e);

@@ -276,38 +276,34 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * function to prepare complete data table of record set while translating avalable measurement values
-	 * @return pointer to filled data table with formated "%.3f" values
+	 * function to prepare a data table row of record set while translating available measurement values
+	 * @return pointer to filled data table row with formated values
 	 */
-	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+	public int[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
+		int[] dataTableRow = new int[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
-			// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
-			String[] recordNames = recordSet.getRecordNames();
-			int numberRecords = recordNames.length;
-			int recordEntries = recordSet.getRecordDataSize(true);
+			String[] recordNames = recordSet.getRecordNames();	// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
+			int numberRecords = recordNames.length;			
 
+			dataTableRow[0] = (int)recordSet.getTime_ms(rowIndex);
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				switch (j) {
 				case 3: //3=temperature analog outlet
 					double offset = record.getOffset(); // != 0 if curve has an defined offset
 					double factor = record.getFactor(); // != 1 if a unit translation is required
-					for (int i = 0; i < recordEntries; i++) {
-						dataTable[i][j + 1] = Double.valueOf(((offset + record.get(i) / 1000.0) * factor) * 1000.0).intValue();
-					}
+					dataTableRow[j + 1] = Double.valueOf(((offset + record.get(rowIndex) / 1000.0) * factor) * 1000.0).intValue();
 					break;
 				default:
-					for (int i = 0; i < recordEntries; i++) {
-						dataTable[i][j + 1] = record.get(i);
-					}
+					dataTableRow[j + 1] = record.get(rowIndex);
 					break;
 				}
 			}
 		}
 		catch (RuntimeException e) {
-			LiPoWatch.log.log(Level.SEVERE, e.getMessage(), e);
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTable;
+		return dataTableRow;		
 	}
 
 	/**
@@ -361,6 +357,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet) {
 		String[] recordKeys = recordSet.getRecordNames();
+		int displayableCounter = 0;
 
 		for (int i = 0; i < recordKeys.length; ++i) {
 			Record record = recordSet.get(recordKeys[i]);
@@ -368,9 +365,11 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 			//record.setVisible(record.isActive() && hasReasonableData);
 			//log.log(Level.FINER, record.getName() + ".setVisible = " + hasReasonableData);
 			record.setDisplayable(hasReasonableData);
+			if (hasReasonableData) ++displayableCounter;
 			LiPoWatch.log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + (hasReasonableData)); //$NON-NLS-1$
 		}
 		recordSet.isSyncableDisplayableRecords(true);
+		recordSet.setConfiguredDisplayable(displayableCounter);
 
 		if (LiPoWatch.log.isLoggable(Level.FINE)) {
 			for (String recordKey : recordKeys) {
