@@ -79,13 +79,6 @@ public class RecordSet extends HashMap<String, Record> {
 	int														xScaleStep										= 0; 																						// steps in x direction to draw the curves, normally 1
 	Rectangle											drawAreaBounds;																																// draw area in display pixel
 
-	// data table
-	Thread												waitAllDisplayableThread;
-	Thread												dataTableCalcThread;
-	int[][]												dataTable;
-	boolean												isTableDataCalculated					= false;																				//value to manage only one time calculation
-	boolean												isTableDisplayable						= true;																					//value to suppress table data calculation(live view)
-
 	// sync enabled records
 	Vector<String>								potentialSyncableRecords			= new Vector<String>();													//collection of record keys where scales might be synchronized
 	Vector<String>								syncableRecords								= new Vector<String>();													//collection of potential syncable and displayable record keys
@@ -282,10 +275,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isFromFile = recordSet.isFromFile;
 		this.drawAreaBounds = recordSet.drawAreaBounds;
 
-		this.dataTable = null;
-		this.isTableDataCalculated = false;
-		this.isTableDisplayable = recordSet.isTableDisplayable;
-
 		this.isCompareSet = recordSet.isCompareSet;
 
 //		this.maxSize = recordSet.maxSize;
@@ -365,10 +354,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.isRaw = recordSet.isRaw;
 		this.isFromFile = recordSet.isFromFile;
 		this.drawAreaBounds = recordSet.drawAreaBounds;
-
-		this.dataTable = null; // table calculation will create array
-		this.isTableDataCalculated = false;
-		this.isTableDisplayable = true;
 
 		this.isCompareSet = recordSet.isCompareSet;
 
@@ -530,63 +515,17 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * add a row to the data table where all values are integers multiplied with 1000 to enable 3 decimals
-	 * @param dataTableRow
-	 */
-	public void addDataTableRow(int[] dataTableRow) {
-		int numCols = this.size()+1;
-		if (numCols == dataTableRow.length) {
-			int numRows = getRecordDataSize(true);
-			int[][] tmpDataTable = new int[numRows + 1][numCols]; // [existing rows + 1][size+time]
-			for (int i = 0; i < numRows; i++) {
-				System.arraycopy(this.dataTable[i], 0, tmpDataTable[i], 0, numCols);
-			}
-			System.arraycopy(this.dataTable[numRows], 0, dataTableRow, 0, numCols);
-		}
-		else {
-			log.log(Level.WARNING, "no data table row added -> numCols != dataTableRow.length"); //$NON-NLS-1$
-		}
-	}
-
-	/**
-	 * query the number of calculated rows of the data table
-	 * @return number of rows of the data table
-	 */
-	public int getNumberDataTableRows() {
-		return this.dataTable.length;
-	}
-
-	/**
-	 * query the record index by given string, if -1 is returned the given name is not found as record name
-	 * better use the ordinal of an record
-	 * @param recordName
-	 * @return record number if valid, else -1
-	 */
-	@Deprecated 
-	public int getRecordIndex(String recordName) {
-		int searchedNumber = -1;
-		for (int i = 0; i < this.recordNames.length; ++i) {
-			if (this.recordNames[i].equals(recordName)) {
-				searchedNumber = i;
-				break;
-			}
-		}
-		return searchedNumber;
-	}
-
-	/**
 	 * get all calculated and formated data table points of a given index, decimal format is "0.000"
 	 * @param index of the data points
-	 * @return string array including time
+	 * @return formatted values as string array including time
 	 */
 	public String[] getDataTableRow(int index) {
-		int[] tmpValues = this.dataTable[index];
+		int[] tmpValues = this.device.prepareDataTableRow(this, index);
 		String[] strValues = new String[tmpValues.length];
 		for (int i = 0; i < strValues.length; i++) {
 			strValues[i] = this.df.format(tmpValues[i] / 1000.0);
 		}
 		return strValues;
-		//return this.dataTable[index];
 	}
 
 	/**
@@ -634,27 +573,6 @@ public class RecordSet extends HashMap<String, Record> {
 		return this.timeStep_ms == null ? 0.0 : this.timeStep_ms.isConstant ? this.timeStep_ms.getMaxTime_ms() * (this.get(0).realSize()-1) : this.timeStep_ms.getMaxTime_ms();
 	}
 
-	/**
-	 * Find the indexes in this time vector where the given time value is placed
-	 * In case of the given time in in between two available measurement points both bounding indexes are returned, 
-	 * only in case where the given time matches an existing entry both indexes are equal.
-	 * In cases where the returned indexes are not equal the related point x/y has to be interpolated.
-	 * @param time_ms
-	 * @return two indexes around the given time
-	 */
-	public int[] findBoundingIndexes(double time_ms) {
-		return this.timeStep_ms.findBoundingIndexes(time_ms);
-	}
-
-	/**
-	 * find the index closest to given time in msec
-	 * @param time_ms
-	 * @return index closest to the given time
-	 */
-	public int findBestIndex(double time_ms) {
-		return this.timeStep_ms.findBestIndex(time_ms);
-	}
-	
 	/**
 	 * method to get the sorted record names as array
 	 * sorted according list in the device configuration (XML) file
@@ -1058,14 +976,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 * check if all records from this record set are displayable, starts calculation if required by calling makeInActiveDisplayable()
 	 */
 	public void checkAllDisplayable() {
-//		for (String recordName : this.keySet()) {
-//			Record record = this.get(recordName);
-//			record.zoomOffset = 0;
-//			record.zoomTimeOffset = 0.0;
-//			record.drawTimeWidth = this.getMaxTime_ms();
-//			record.minZoomScaleValue	= record.minScaleValue;
-//			record.maxZoomScaleValue	= record.maxScaleValue;
-//		}
 		this.application.getActiveDevice().makeInActiveDisplayable(this);
 		this.isRecalculation = false;
 		
@@ -1531,35 +1441,6 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * @return the boolean value true if all table data are calculated and table can be displayed
-	 */
-	public boolean isTableDataCalculated() {
-		return this.isTableDataCalculated;
-	}
-
-	/**
-	 * @param newValue - boolean value if the table need to be calculated before it can be displayed
-	 */
-	public void setTableDataCalculated(boolean newValue) {
-		if (!newValue) this.dataTable = null;
-		this.isTableDataCalculated = newValue;
-	}
-
-	/**
-	 * @return the boolean value if table can be displayed or displaying is suppressed
-	 */
-	public boolean isTableDisplayable() {
-		return this.isTableDisplayable;
-	}
-
-	/**
-	 * @param newValue the boolean value if table can be displayed or displaying is suppressed (live view)
-	 */
-	public void setTableDisplayable(boolean newValue) {
-		this.isTableDisplayable = newValue;
-	}
-
-	/**
 	 * @return the horizontalGridType
 	 */
 	public int getHorizontalGridType() {
@@ -1652,70 +1533,6 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * starts a thread executing the dataTable entries
-	 */
-	public void calculateDataTable() {
-
-		this.dataTableCalcThread = new Thread() {
-			final String[]	recordKeys	= getRecordNames();
-			final String		sThreadId		= String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-
-			public void run() {
-				log.log(Level.FINE, "entry data table calculation, threadId = " + this.sThreadId); //$NON-NLS-1$
-				//RecordSet.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0133));
-
-				int numberRecords = this.recordKeys.length; //getRecordNamesLength();
-				int recordEntries = getRecordDataSize(true);
-
-				int maxWaitCounter = 10;
-				int sleepTime = numberRecords * recordEntries / 200;
-				while (!checkAllRecordsDisplayable() && maxWaitCounter > 0) {
-					try {
-						log.log(Level.FINE, "waiting for all records displayable"); //$NON-NLS-1$
-						Thread.sleep(sleepTime);
-						--maxWaitCounter;
-						if (maxWaitCounter == 0) return;
-					}
-					catch (InterruptedException e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
-					}
-				}
-				log.log(Level.FINE, "all records displayable now, create table, threadId = " + this.sThreadId); //$NON-NLS-1$
-
-				// calculate record set internal data table
-				if (log.isLoggable(Level.FINE)) printRecordNames("calculateDataTable", this.recordKeys); //$NON-NLS-1$
-				if (!isTableDataCalculated()) {
-					log.log(Level.FINE, "start build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
-
-					long startTime = System.currentTimeMillis();
-					RecordSet.this.dataTable = new int[recordEntries][numberRecords+1];
-					//RecordSet.this.dataTable = new String[recordEntries][numberRecords+1];
-					for (int i = 0; i < recordEntries; i++) {
-						RecordSet.this.dataTable[i][0] = (int)RecordSet.this.timeStep_ms.getTime_ms(i);					
-						//RecordSet.this.dataTable[i][0] = String.format(Locale.ENGLISH, "%.3f", (getTimeStep_ms() * i));
-					}
-					RecordSet.this.device.prepareDataTable(RecordSet.this, RecordSet.this.dataTable);
-					log.log(Level.TIME, "table calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-					
-					setTableDataCalculated(true);
-					log.log(Level.FINE, "end build table entries, threadId = " + this.sThreadId); //$NON-NLS-1$
-				}
-
-				// recall the table update function all prerequisites are checked
-				RecordSet.this.application.updateDataTable(RecordSet.this.getName());
-			}
-		};
-		if (!this.dataTableCalcThread.isAlive() && !this.isTableDataCalculated) {
-			try {
-				this.dataTableCalcThread.start();
-			}
-			catch (RuntimeException e) {
-				log.log(Level.WARNING, e.getMessage(), e);
-			}
-		}
-	}
-
-	/**
 	 * @return the isRecalculation
 	 */
 	public boolean isRecalculation() {
@@ -1736,7 +1553,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setRecalculationRequired() {
 		this.isRecalculation = true;
-		this.setTableDataCalculated(false);
 		for (int i = 0; i < this.device.getMeasurementNames(this.parent.number).length && i < this.getRecordNames().length; ++i) {
 			if (this.device.getMeasurement(this.parent.number, i).isCalculation()) {
 				this.get(i).resetMinMax();

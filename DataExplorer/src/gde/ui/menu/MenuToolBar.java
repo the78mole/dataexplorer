@@ -463,12 +463,6 @@ public class MenuToolBar {
 						this.objectSelectCombo.setSize(this.objectSelectSize);
 						this.objectSelectComposite.setSize(this.objectSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
 						this.objectSelectCombo.setLocation(leadFill, OSDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
-						if (log.isLoggable(Level.INFO)) {
-							log.log(Level.INFO, "objectSelectComposite.setSize = " + this.objectSelectComposite.getSize().toString());
-							log.log(Level.INFO, "objectSelectComposite.clinetArea = " + this.objectSelectComposite.getClientArea().toString());
-							log.log(Level.INFO, "objectSelectCombo.setLocation = " + leadFill + "," + ((this.toolButtonHeight - this.objectSelectSize.y) / 2));
-							log.log(Level.INFO, "SWT.PLATFORM = " + SWT.getPlatform() + ", " + "OSDE.IS_MAC_CARBON = " + OSDE.IS_MAC_CARBON);
-						}
 					}
 					objectSelectComboSep.setWidth(this.objectSelectComposite.getSize().x);
 					objectSelectComboSep.setControl(this.objectSelectComposite);
@@ -908,7 +902,7 @@ public class MenuToolBar {
 										MenuToolBar.this.application.cleanHeaderAndCommentInGraphicsWindow();
 										MenuToolBar.this.application.updateGraphicsWindow();
 										MenuToolBar.this.application.updateStatisticsData();
-										MenuToolBar.this.application.updateDataTable(OSDE.STRING_EMPTY);
+										MenuToolBar.this.application.updateDataTable(OSDE.STRING_EMPTY, true);
 										MenuToolBar.this.application.updateDigitalWindow();
 										MenuToolBar.this.application.updateAnalogWindow();
 										MenuToolBar.this.application.updateCellVoltageWindow();

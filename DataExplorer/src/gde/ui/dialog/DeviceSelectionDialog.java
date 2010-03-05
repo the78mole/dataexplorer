@@ -169,6 +169,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		//wait until schema is setup
 		while (this.settings.isXsdThreadAlive()) {
 			try {
+				System.out.println("waiting for XSD thread");
 				Thread.sleep(5);
 			}
 			catch (InterruptedException e) {
@@ -1110,6 +1111,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 			channels.switchChannel(1, OSDE.STRING_EMPTY); // set " 1 : Ausgang" as default after device switch and update
 		}
+		this.application.setProgress(0, null);
 		this.application.updateGraphicsWindow();
 	}
 

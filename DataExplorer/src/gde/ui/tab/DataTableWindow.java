@@ -16,7 +16,6 @@
 ****************************************************************************************/
 package osde.ui.tab;
 
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -27,6 +26,8 @@ import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -38,11 +39,11 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.device.MeasurementType;
+import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 import osde.ui.SWTResourceManager;
-import osde.utils.StringHelper;
 
 /**
  * Table display class, displays the data in table form
@@ -69,7 +70,7 @@ public class DataTableWindow extends CTabItem {
 	}
 
 	public void create() {
-		this.dataTable = new Table(this.tabFolder, SWT.BORDER);
+		this.dataTable = new Table(this.tabFolder, SWT.VIRTUAL | SWT.BORDER);
 		this.setControl(this.dataTable);
 		this.dataTable.setLinesVisible(true);
 		this.dataTable.setHeaderVisible(true);
@@ -78,6 +79,21 @@ public class DataTableWindow extends CTabItem {
 			public void helpRequested(HelpEvent evt) {
 				log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
 				OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_6.html"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		});
+		this.dataTable.addListener(SWT.SetData, new Listener() {
+			public void handleEvent(Event event) {
+				Channel activeChannel = channels.getActiveChannel();
+				if (activeChannel != null) {
+					RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+					if (activeRecordSet != null) {
+						TableItem item = (TableItem) event.item;
+						int index = DataTableWindow.this.dataTable.indexOf(item);
+						item.setText("Item " + index);
+						item.setText(activeRecordSet.getDataTableRow(index));
+						//System.out.println(item.getText());
+					}
+				}
 			}
 		});
 	}
@@ -138,53 +154,15 @@ public class DataTableWindow extends CTabItem {
 	}
 
 	/**
-	 * method to update the data table pain with actual record data 
+	 * @param recordEntries
 	 */
-	public void updateDataTable(final RecordSet recordSet) {
-
-		if (recordSet.isTableDisplayable() && recordSet.isTableDataCalculated()) {
-			log.log(Level.FINE, "entry data table update"); //$NON-NLS-1$
-			this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0235));
-			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-			String threadId = String.format("%06d", Thread.currentThread().getId());
-			this.application.setProgress(0, threadId);
-
-			this.dataTable.setRedraw(false);
-			// cleanup old data table
-			this.dataTable.removeAll();
-
-			// display data table
-			try {
-				int recordEntries = recordSet.getNumberDataTableRows();
-				double progressInterval = 100.0 / recordEntries * 20;
-				TableItem item;
-				
-				long startTime = System.currentTimeMillis();
-				for (int i = 0; i < recordEntries; i++) {
-					if (i % 20 == 0) this.application.setProgress(Double.valueOf(i * progressInterval).intValue(), threadId);
-					item = new TableItem(this.dataTable, SWT.RIGHT);
-					item.setText(recordSet.getDataTableRow(i));
-				}
-				log.log(Level.TIME, "table refresh time = " + StringHelper.getFormatedTime("ss:SSS", (System.currentTimeMillis() - startTime)));
-			}
-			catch (RuntimeException e) {
-				log.log(Level.WARNING, e.getMessage(), e);
-			}
-
-			this.dataTable.setRedraw(true);
-			this.application.setProgress(100, threadId);
-			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-			this.application.setStatusMessage(OSDE.STRING_BLANK);
-			log.log(Level.FINE, "exit data table update"); //$NON-NLS-1$
-		}
+	public void setRowCount(int count) {
+		this.dataTable.setItemCount (count);
 	}
 	
-	public void cleanTable(boolean isDisabled) {
-		this.dataTable.removeAll();
-		if (isDisabled) {
-			TableItem item = new TableItem(this.dataTable, SWT.RIGHT);
-			item.setText(Messages.getString(MessageIds.OSDE_MSGT0230).split(OSDE.STRING_BLANK));
-		}
+	public void cleanTable() {
+		if (this.dataTable != null && !this.dataTable.isDisposed())
+			this.dataTable.removeAll();
 	}
 	
 	/**

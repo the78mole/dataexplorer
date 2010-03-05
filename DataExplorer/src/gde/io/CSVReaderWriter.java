@@ -337,11 +337,7 @@ public class CSVReaderWriter {
 		}
 		finally {
 			if (application.getStatusBar() != null) {
-				if (device.isTableTabRequested())
-					application.setProgress(10, sThreadId);
-				else
-					application.setProgress(100, sThreadId);
-				
+				application.setProgress(10, sThreadId);
 				application.setStatusMessage(OSDE.STRING_EMPTY);
 			}
 		}

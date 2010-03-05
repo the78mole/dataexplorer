@@ -279,7 +279,6 @@ public class Settings extends Properties {
 				}
 			}
 		};
-		xsdThread.start();
 		
 		this.load();
 
@@ -291,9 +290,11 @@ public class Settings extends Properties {
 			updateDeviceProperties(devicePropertiesTargetpath + OSDE.FILE_SEPARATOR_UNIX, true);
 			this.isDevicePropertiesUpdated = true;
 		}
-		else {	// execute every time application starts to enable update from added plugin
+		else {	// execute every time application starts to enable update from added plug-in
 			updateDeviceProperties(devicePropertiesTargetpath + OSDE.FILE_SEPARATOR_UNIX, true);
 		}
+		xsdThread.start(); // wait to start the thread until the device XMLs are getting updated
+
 		// locale settings has been changed, replacement of device property files required
 		if (this.getLocaleChanged() && !this.isDevicePropertiesUpdated) {
 			updateDeviceProperties(devicePropertiesTargetpath + OSDE.FILE_SEPARATOR_UNIX, false);
@@ -1752,6 +1753,6 @@ public class Settings extends Properties {
 	 * @return true if the xsdThread is alive
 	 */
 	public boolean isXsdThreadAlive() {
-		return xsdThread != null ? xsdThread.isAlive() : true ;
+		return xsdThread != null ? xsdThread.isAlive() : false ;
 	}
 }
