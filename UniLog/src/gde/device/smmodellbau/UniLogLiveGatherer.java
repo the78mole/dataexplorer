@@ -120,7 +120,6 @@ public class UniLogLiveGatherer extends Thread {
 		final RecordSet recordSet = this.channel.get(recordSetKey);
 		this.device.updateInitialRecordSetComment(recordSet);
 		recordSet.setTimeStep_ms(this.timeStep_ms);
-		recordSet.setTableDisplayable(false); // suppress table display during live data gathering
 		updateActiveState(recordSet);
 		final int[] points = new int[recordSet.size()];
 		final UniLog usedDevice = this.device;
@@ -166,7 +165,7 @@ public class UniLogLiveGatherer extends Thread {
 									public void run() {
 										UniLogLiveGatherer.this.application.updateGraphicsWindow();
 										UniLogLiveGatherer.this.application.updateStatisticsData();
-										//UniLogLiveGatherer.this.application.updateDataTable(recordSetKey);
+										UniLogLiveGatherer.this.application.updateDataTable(recordSetKey, false);
 										UniLogLiveGatherer.this.application.updateDigitalWindowChilds();
 										UniLogLiveGatherer.this.application.updateAnalogWindowChilds();
 										//LiveGathererThread.this.application.updateCellVoltageChilds();
@@ -235,12 +234,11 @@ public class UniLogLiveGatherer extends Thread {
 		if (this.isPortOpenedByLiveGatherer) this.serialPort.close();
 
 		RecordSet recordSet = this.channel.get(recordSetKey);
-		recordSet.setTableDisplayable(true); // enable table display after calculation
 		this.device.updateVisibilityStatus(recordSet);
 		this.device.makeInActiveDisplayable(recordSet);
 		this.channel.applyTemplate(recordSetKey, true);
 		this.application.updateStatisticsData();
-		this.application.updateDataTable(recordSetKey);
+		this.application.updateDataTable(recordSetKey, false);
 	}
 
 	/**
@@ -271,7 +269,7 @@ public class UniLogLiveGatherer extends Thread {
 		this.channel.remove(recordSetKey);
 		this.application.getMenuToolBar().updateRecordSetSelectCombo();
 		this.application.updateStatisticsData();
-		this.application.updateDataTable(recordSetKey);
+		this.application.updateDataTable(recordSetKey, true);
 		this.device.getDialog().resetButtons();
 		if (message != null && message.length() > 5 && isErrorState) {
 			this.application.openMessageDialog(this.dialog.getDialogShell(), message);

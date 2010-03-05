@@ -519,16 +519,17 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * function to prepare complete data table of record set while translating avalable measurement values
-	 * @return pointer to filled data table with formated "%.3f" values
+	 * function to prepare a data table row of record set while translating available measurement values
+	 * @return pointer to filled data table row with formated values
 	 */
-	public int[][] prepareDataTable(RecordSet recordSet, int[][] dataTable) {
+	public int[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
+		int[] dataTableRow = new int[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 			String[] recordNames = recordSet.getRecordNames();	
-			int numberRecords = recordNames.length;
-			int recordEntries = recordSet.getRecordDataSize(true);
+			int numberRecords = recordNames.length;			
 
+			dataTableRow[0] = (int)recordSet.getTime_ms(rowIndex);
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
@@ -572,15 +573,13 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					break;
 				}
 				
-				for (int i = 0; i < recordEntries; i++) {
-					dataTable[i][j+1] = Double.valueOf((offset + (((record.get(i)/1000.0 + currentOffset) * rpmFactor / numberMotor) - reduction) * factor) * 1000.0).intValue();				
-				}
+				dataTableRow[j+1] = Double.valueOf((offset + (((record.get(rowIndex)/1000.0 + currentOffset) * rpmFactor / numberMotor) - reduction) * factor) * 1000.0).intValue();				
 			}
 		}
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTable;
+		return dataTableRow;		
 	}
 
 	/**
