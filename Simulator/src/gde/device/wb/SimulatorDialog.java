@@ -392,7 +392,6 @@ public class SimulatorDialog extends DeviceDialog {
 											log.log(Level.FINE, this.recordSetKey + " created for channel " + SimulatorDialog.this.channel.getName()); //$NON-NLS-1$
 											if (SimulatorDialog.this.channel.getActiveRecordSet() == null) Channels.getInstance().getActiveChannel().setActiveRecordSet(this.recordSetKey);
 											recordSet = SimulatorDialog.this.channel.get(this.recordSetKey);
-											recordSet.setTableDisplayable(false); // suppress table display during live data gathering
 											recordSet.setTimeStep_ms(SimulatorDialog.this.device.getTimeStep_ms());
 											recordSet.setAllDisplayable();
 											SimulatorDialog.this.channel.applyTemplate(this.recordSetKey, false);
@@ -428,8 +427,10 @@ public class SimulatorDialog extends DeviceDialog {
 										}
 
 										SimulatorDialog.this.application.updateGraphicsWindow();
+										SimulatorDialog.this.application.updateDataTable(this.recordSetKey, false);
 										SimulatorDialog.this.application.updateDigitalWindowChilds();
 										SimulatorDialog.this.application.updateAnalogWindowChilds();
+										SimulatorDialog.this.application.updateCellVoltageChilds();
 									}
 									catch (DataInconsitsentException e) {
 										if (SimulatorDialog.this.timerTask != null) SimulatorDialog.this.timerTask.cancel();
@@ -465,9 +466,8 @@ public class SimulatorDialog extends DeviceDialog {
 							SimulatorDialog.this.isCollectDataStopped = true;
 							SimulatorDialog.this.startButton.setEnabled(true);
 							SimulatorDialog.this.stopButton.setEnabled(false);
-							SimulatorDialog.this.channels.getActiveChannel().getActiveRecordSet().setTableDisplayable(true); // enable table display after calculation
 							SimulatorDialog.this.application.updateStatisticsData();
-							SimulatorDialog.this.application.updateDataTable(SimulatorDialog.this.channels.getActiveChannel().getActiveRecordSet().getName());
+							SimulatorDialog.this.application.updateDataTable(SimulatorDialog.this.channels.getActiveChannel().getActiveRecordSet().getName(), false);
 						}
 					});
 				}
