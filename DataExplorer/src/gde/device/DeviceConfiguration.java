@@ -742,7 +742,7 @@ public class DeviceConfiguration {
 	}
 	
 	public CheckSumTypes getDataBlockCheckSumType() {
-		return this.dataBlock != null && this.dataBlock.getCheckSum() != null ?this.dataBlock.getCheckSum().getType(): CheckSumTypes.XOR; 
+		return this.dataBlock != null && this.dataBlock.getCheckSum() != null ? this.dataBlock.getCheckSum().getType(): null; 
 	}
 
 	public void setDataBlockCheckSumType(CheckSumTypes value) {
