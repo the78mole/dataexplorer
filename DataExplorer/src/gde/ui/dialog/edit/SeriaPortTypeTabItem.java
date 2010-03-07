@@ -22,8 +22,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
@@ -104,15 +102,6 @@ public class SeriaPortTypeTabItem extends CTabItem {
 			SWTResourceManager.registerResourceUser(this);
 			this.setText(Messages.getString(MessageIds.OSDE_MSGT0510));
 			this.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-			this.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent evt) {
-					log.log(java.util.logging.Level.FINEST, "this.widgetDisposed, event=" + evt); //$NON-NLS-1$
-					if (SeriaPortTypeTabItem.this.deviceConfig != null) {
-						SeriaPortTypeTabItem.this.deviceConfig.removeSerialPortType();
-					}
-				}
-			});
 			{
 				this.serialPortComposite = new Composite(this.tabFolder, SWT.NONE);
 				this.serialPortComposite.setLayout(null);
