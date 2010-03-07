@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V09.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V10.xsd">
     <Device>
         <name>LiPoWatch</name>
         <manufacturer>SM-Modellbau</manufacturer>
@@ -21,7 +21,7 @@
     <TimeBase>
         <name>Zeit</name>
         <symbol>t</symbol>
-        <unit>ms</unit>
+        <unit>msec</unit>
         <timeStep>500</timeStep>
     </TimeBase>
     <DataBlock>
