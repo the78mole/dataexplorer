@@ -149,7 +149,10 @@ public class DataBlockType {
      *     
      */
     public TimeUnitTypes getTimeUnit() {
-        return timeUnit;
+      if (timeUnit == null) {
+        return TimeUnitTypes.MSEC;
+      } 
+      return timeUnit;
     }
 
     /**
@@ -173,7 +176,10 @@ public class DataBlockType {
      *     
      */
     public CommaSeparatorTypes getSeparator() {
-        return separator;
+      if (separator == null) {
+        return CommaSeparatorTypes.SEMICOLON;
+      }
+      return separator;
     }
 
     /**
@@ -197,7 +203,10 @@ public class DataBlockType {
      *     
      */
     public String getLeader() {
-        return leader;
+      if (leader == null) {
+        return "$";
+      }
+      return leader;
     }
 
     /**
@@ -221,7 +230,10 @@ public class DataBlockType {
      *     
      */
     public byte[] getTrailer() {
-        return trailer;
+      if (trailer == null) {
+        return new HexBinaryAdapter().unmarshal("0D0A");
+      }
+      return trailer;
     }
 
     /**
@@ -408,7 +420,10 @@ public class DataBlockType {
          *     
          */
         public FormatTypes getType() {
-            return type;
+          if (type == null) {
+            return FormatTypes.BINARY;
+          }
+          return type;
         }
 
         /**

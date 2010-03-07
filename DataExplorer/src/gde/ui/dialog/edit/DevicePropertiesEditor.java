@@ -1629,7 +1629,6 @@ public class DevicePropertiesEditor extends Composite {
 							DevicePropertiesEditor.this.dataBlockTimeUnit = DevicePropertiesEditor.this.deviceConfig.getDataBlockTimeUnit();
 							DevicePropertiesEditor.this.dataBlockLeader = DevicePropertiesEditor.this.deviceConfig.getDataBlockLeader();
 							DevicePropertiesEditor.this.dataBlockEnding = DevicePropertiesEditor.this.deviceConfig.getDataBlockEndingLineEndingType();
-							DevicePropertiesEditor.this.dataBlockRequiredGroup.redraw();
 
 							DevicePropertiesEditor.this.dataBlockcheckSumFormat = DevicePropertiesEditor.this.deviceConfig.getDataBlockCheckSumFormat();
 							DevicePropertiesEditor.this.isDataBlockOptionalChecksumEnabled = DevicePropertiesEditor.this.deviceConfig.isDataBlockCheckSumDefined();

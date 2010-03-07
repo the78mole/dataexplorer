@@ -31,6 +31,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -722,7 +723,7 @@ public class DeviceConfiguration {
 	}
 	
 	public FormatTypes getDataBlockFormat() {
-		return this.dataBlock.getFormat() == null ? null : this.dataBlock.getFormat().getType();
+		return this.dataBlock != null ? this.dataBlock.getFormat().getType() : FormatTypes.BINARY;
 	}
 	
 	public void setDataBlockFormat(FormatTypes value) {
@@ -737,17 +738,11 @@ public class DeviceConfiguration {
 	}
 
 	public boolean isDataBlockCheckSumDefined() {
-		if(this.dataBlock == null) {
-			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
-		}
-		return this.dataBlock.getCheckSum() != null && (this.dataBlock.getCheckSum() != null && this.dataBlock.getCheckSum().getFormat() != null);
+		return this.dataBlock != null && this.dataBlock.getCheckSum() != null && (this.dataBlock.getCheckSum() != null && this.dataBlock.getCheckSum().getFormat() != null);
 	}
 	
 	public CheckSumTypes getDataBlockCheckSumType() {
-		if(this.dataBlock == null) {
-			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
-		}
-		return this.dataBlock.getCheckSum() == null ? null : this.dataBlock.getCheckSum().getType(); 
+		return this.dataBlock != null && this.dataBlock.getCheckSum() != null ?this.dataBlock.getCheckSum().getType(): CheckSumTypes.XOR; 
 	}
 
 	public void setDataBlockCheckSumType(CheckSumTypes value) {
@@ -764,10 +759,7 @@ public class DeviceConfiguration {
 	}
 	
 	public FormatTypes getDataBlockCheckSumFormat() {
-		if(this.dataBlock == null) {
-			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
-		}
-		return this.dataBlock.getCheckSum() == null ? null : this.dataBlock.getCheckSum().getFormat();
+		return this.dataBlock != null && this.dataBlock.getCheckSum() != null ? this.dataBlock.getCheckSum().getFormat() : FormatTypes.BINARY;
 	}
 	
 	public void setDataBlockCheckSumFormat(FormatTypes value) {
@@ -784,10 +776,7 @@ public class DeviceConfiguration {
 	}
 	
 	public String getDataBlockLeader() {
-		if(this.dataBlock == null) {
-			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
-		}
-		return this.dataBlock.getLeader();
+		return this.dataBlock != null ? this.dataBlock.getLeader() : "$";
 	}
 
 	public void setDataBlockLeader(String value) {
@@ -798,20 +787,19 @@ public class DeviceConfiguration {
 			this.dataBlock.setLeader(value);
 	}
 	
-	public boolean isDataBlockEndingDefined() {
-		return this.dataBlock.getTrailer() != null;
-	}
-
 	public byte[] getDataBlockEnding() {
-		return this.dataBlock.getTrailer();
+		return this.dataBlock != null ? this.dataBlock.getTrailer() : new HexBinaryAdapter().unmarshal("0D0A");
 	}
 
 	public String getDataBlockEndingLineEndingType() {
-		return LineEndingTypes.valueFrom(this.dataBlock.getTrailer());
+		return this.dataBlock != null ? LineEndingTypes.valueFrom(this.dataBlock.getTrailer()) : LineEndingTypes.CRLF.value();
 	}
 
 	public void setDataBlockEnding(String value) {
 		this.isChangePropery = true;
+		if(this.dataBlock == null) {
+			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
+		}
 		if (value == null)
 			this.dataBlock.setTrailer(null);
 		else
@@ -819,24 +807,30 @@ public class DeviceConfiguration {
 	}
 
 	public TimeUnitTypes getDataBlockTimeUnit() {
-		return this.dataBlock.getTimeUnit();
+		return this.dataBlock != null ? this.dataBlock.getTimeUnit() : TimeUnitTypes.MSEC;
 	}
 
 	public void setDataBlockTimeUnit(TimeUnitTypes value) {
 		this.isChangePropery = true;
+		if(this.dataBlock == null) {
+			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
+		}
 		this.dataBlock.setTimeUnit(value);
 	}
 
 	public int getDataBlockTimeUnitFactor() {
-		return this.dataBlock.getTimeUnit() == null ? 1000 : this.dataBlock.getTimeUnit().equals(TimeUnitTypes.MSEC) ? 1 : 1000;
+		return this.dataBlock != null && this.dataBlock.getTimeUnit() == null ? 1000 : this.dataBlock.getTimeUnit().equals(TimeUnitTypes.MSEC) ? 1 : 1000;
 	}
 
 	public CommaSeparatorTypes getDataBlockSeparator() {
-		return this.dataBlock.getSeparator();
+		return this.dataBlock != null && this.dataBlock.getSeparator() != null ? this.dataBlock.getSeparator() : CommaSeparatorTypes.SEMICOLON;
 	}
 
 	public void setDataBlockSeparator(CommaSeparatorTypes value) {
 		this.isChangePropery = true;
+		if(this.dataBlock == null) {
+			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
+		}
 		this.dataBlock.setSeparator(value);
 	}
 	
@@ -846,6 +840,9 @@ public class DeviceConfiguration {
 
 	public void setDataBlockPreferredDataLocation(String value) {
 		this.isChangePropery = true;
+		if(this.dataBlock == null) {
+			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
+		}
 		this.dataBlock.setPreferredDataLocation(value != null ? value.trim() : value);
 	}
 	
@@ -859,6 +856,9 @@ public class DeviceConfiguration {
 
 	public void setDataBlockPreferredFileExtention(String value) {
 		boolean isValidExt = this.isChangePropery = true;
+		if(this.dataBlock == null) {
+			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
+		}
 		if (value != null) {
 			isValidExt = (value = value.replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_STAR, OSDE.STRING_EMPTY).replace(OSDE.STRING_DOT, OSDE.STRING_EMPTY).trim()).length() >= 1;
 			if (!isValidExt) {
