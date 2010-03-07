@@ -34,10 +34,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;attribute name="type" use="required" type="{}format_types" />
  *                 &lt;attribute name="size" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" />
- *                 &lt;attribute name="timeUnit" type="{}time_unit_types" default="msec" />
- *                 &lt;attribute name="separator" type="{}comma_separator_types" default="semicolon" />
- *                 &lt;attribute name="leader" type="{http://www.w3.org/2001/XMLSchema}string" default="$" />
- *                 &lt;attribute name="trailer" type="{http://www.w3.org/2001/XMLSchema}hexBinary" default="0D0A" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
@@ -52,6 +48,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
+ *         &lt;element name="timeUnit" type="{}time_unit_types" minOccurs="0"/>
+ *         &lt;element name="separator" type="{}comma_separator_types" minOccurs="0"/>
+ *         &lt;element name="leader" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="trailer" type="{http://www.w3.org/2001/XMLSchema}hexBinary" minOccurs="0"/>
  *         &lt;element name="preferredDataLocation" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="preferredFileExtention" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
@@ -66,6 +66,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlType(name = "DataBlockType", propOrder = {
     "format",
     "checkSum",
+    "timeUnit",
+    "separator",
+    "leader",
+    "trailer",
     "preferredDataLocation",
     "preferredFileExtention"
 })
@@ -74,6 +78,16 @@ public class DataBlockType {
     @XmlElement(required = true)
     protected DataBlockType.Format format;
     protected DataBlockType.CheckSum checkSum;
+    @XmlElement(defaultValue = "msec")
+    protected TimeUnitTypes timeUnit;
+    @XmlElement(defaultValue = "semicolon")
+    protected CommaSeparatorTypes separator;
+    @XmlElement(defaultValue = "$")
+    protected String leader;
+    @XmlElement(type = String.class, defaultValue = "0D0A")
+    @XmlJavaTypeAdapter(HexBinaryAdapter.class)
+    @XmlSchemaType(name = "hexBinary")
+    protected byte[] trailer;
     protected String preferredDataLocation;
     @XmlElement(defaultValue = "*.csv")
     protected String preferredFileExtention;
@@ -124,6 +138,102 @@ public class DataBlockType {
      */
     public void setCheckSum(DataBlockType.CheckSum value) {
         this.checkSum = value;
+    }
+
+    /**
+     * Gets the value of the timeUnit property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link TimeUnitTypes }
+     *     
+     */
+    public TimeUnitTypes getTimeUnit() {
+        return timeUnit;
+    }
+
+    /**
+     * Sets the value of the timeUnit property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link TimeUnitTypes }
+     *     
+     */
+    public void setTimeUnit(TimeUnitTypes value) {
+        this.timeUnit = value;
+    }
+
+    /**
+     * Gets the value of the separator property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link CommaSeparatorTypes }
+     *     
+     */
+    public CommaSeparatorTypes getSeparator() {
+        return separator;
+    }
+
+    /**
+     * Sets the value of the separator property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link CommaSeparatorTypes }
+     *     
+     */
+    public void setSeparator(CommaSeparatorTypes value) {
+        this.separator = value;
+    }
+
+    /**
+     * Gets the value of the leader property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getLeader() {
+        return leader;
+    }
+
+    /**
+     * Sets the value of the leader property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setLeader(String value) {
+        this.leader = value;
+    }
+
+    /**
+     * Gets the value of the trailer property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public byte[] getTrailer() {
+        return trailer;
+    }
+
+    /**
+     * Sets the value of the trailer property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTrailer(byte[] value) {
+        this.trailer = value;
     }
 
     /**
@@ -273,10 +383,6 @@ public class DataBlockType {
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;attribute name="type" use="required" type="{}format_types" />
      *       &lt;attribute name="size" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" />
-     *       &lt;attribute name="timeUnit" type="{}time_unit_types" default="msec" />
-     *       &lt;attribute name="separator" type="{}comma_separator_types" default="semicolon" />
-     *       &lt;attribute name="leader" type="{http://www.w3.org/2001/XMLSchema}string" default="$" />
-     *       &lt;attribute name="trailer" type="{http://www.w3.org/2001/XMLSchema}hexBinary" default="0D0A" />
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
@@ -292,16 +398,6 @@ public class DataBlockType {
         protected FormatTypes type;
         @XmlAttribute(required = true)
         protected Integer size;
-        @XmlAttribute(required = true)
-        protected TimeUnitTypes timeUnit;
-        @XmlAttribute
-        protected CommaSeparatorTypes separator;
-        @XmlAttribute
-        protected String leader;
-        @XmlAttribute
-        @XmlJavaTypeAdapter(HexBinaryAdapter.class)
-        @XmlSchemaType(name = "hexBinary")
-        protected byte[] trailer;
 
         /**
          * Gets the value of the type property.
@@ -350,115 +446,5 @@ public class DataBlockType {
         public void setSize(Integer value) {
             this.size = value;
         }
-
-        /**
-         * Gets the value of the timeUnit property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link TimeUnitTypes }
-         *     
-         */
-        public TimeUnitTypes getTimeUnit() {
-            if (timeUnit == null) {
-                return TimeUnitTypes.MSEC;
-            } 
-            return timeUnit;
-        }
-
-        /**
-         * Sets the value of the timeUnit property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link TimeUnitTypes }
-         *     
-         */
-        public void setTimeUnit(TimeUnitTypes value) {
-            this.timeUnit = value;
-        }
-
-        /**
-         * Gets the value of the separator property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link CommaSeparatorTypes }
-         *     
-         */
-        public CommaSeparatorTypes getSeparator() {
-            if (separator == null) {
-                return CommaSeparatorTypes.SEMICOLON;
-            }
-            return separator;
-        }
-
-        /**
-         * Sets the value of the separator property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link CommaSeparatorTypes }
-         *     
-         */
-        public void setSeparator(CommaSeparatorTypes value) {
-            this.separator = value;
-        }
-
-        /**
-         * Gets the value of the leader property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getLeader() {
-            if (leader == null) {
-                return "$";
-            }
-            return leader;
-        }
-
-        /**
-         * Sets the value of the leader property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setLeader(String value) {
-            this.leader = value;
-        }
-
-        /**
-         * Gets the value of the trailer property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public byte[] getTrailer() {
-            if (trailer == null) {
-                return new HexBinaryAdapter().unmarshal("0D0A");
-            }
-            return trailer;
-        }
-
-        /**
-         * Sets the value of the trailer property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setTrailer(byte[] value) {
-            this.trailer = value;
-        }
-
     }
-
 }

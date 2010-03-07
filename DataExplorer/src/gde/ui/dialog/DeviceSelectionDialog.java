@@ -169,7 +169,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		//wait until schema is setup
 		while (this.settings.isXsdThreadAlive()) {
 			try {
-				System.out.println("waiting for XSD thread");
+				log.log(Level.INFO, "waiting for XSD thread");
 				Thread.sleep(5);
 			}
 			catch (InterruptedException e) {
@@ -300,26 +300,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				{
 					this.settingsTabFolder = new CTabFolder(this.composite1, SWT.BORDER);
 					this.settingsTabFolder.setSimple(false);
-					this.settingsTabFolder.addPaintListener(new PaintListener() {
-						@Override
-						public void paintControl(PaintEvent evt) {
-							DeviceSelectionDialog.log.log(Level.FINEST, "settingsTabFolder.paintControl, event=" + evt); //$NON-NLS-1$
-							
-							if (DeviceSelectionDialog.this.deviceSelectCombo.getSelectionIndex() < 0 && DeviceSelectionDialog.this.deviceSelectCombo.getItemCount() > 0) {
-								updateDialogEntries();
-							}
-							
-							if (DeviceSelectionDialog.this.settings.isGlobalSerialPort()  
-									|| !DeviceSelectionDialog.this.serialPortSelectionGroup.getEnabled()) {
-								DeviceSelectionDialog.this.portDescription.setEnabled(false);
-								DeviceSelectionDialog.this.portSelectCombo.setEnabled(false);
-							}
-							else {
-								DeviceSelectionDialog.this.portDescription.setEnabled(true);
-								DeviceSelectionDialog.this.portSelectCombo.setEnabled(true);
-							}
-						}
-					});
 					{
 						this.cTabItem1 = new CTabItem(this.settingsTabFolder, SWT.NONE);
 						this.cTabItem1.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -830,7 +810,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 				});
 			}
-			updateDialogEntries(); // update all the entries according active device configuration			
+			initializeUI(); // update all the entries according active device configuration			
 			updateAvailablePorts();
 			this.dialogShell.layout();
 			this.dialogShell.pack();
@@ -1285,5 +1265,24 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 */
 	public boolean isDisposed() {
 		return dialogShell != null && dialogShell.isDisposed();
+	}
+
+	/**
+	 * initialize button states etc. of the dialog UI
+	 */
+	private void initializeUI() {
+		if (DeviceSelectionDialog.this.deviceSelectCombo.getSelectionIndex() < 0 && DeviceSelectionDialog.this.deviceSelectCombo.getItemCount() > 0) {
+			updateDialogEntries();
+		}
+		
+		if (DeviceSelectionDialog.this.settings.isGlobalSerialPort()  
+				|| !DeviceSelectionDialog.this.serialPortSelectionGroup.getEnabled()) {
+			DeviceSelectionDialog.this.portDescription.setEnabled(false);
+			DeviceSelectionDialog.this.portSelectCombo.setEnabled(false);
+		}
+		else {
+			DeviceSelectionDialog.this.portDescription.setEnabled(true);
+			DeviceSelectionDialog.this.portSelectCombo.setEnabled(true);
+		}
 	}
 }

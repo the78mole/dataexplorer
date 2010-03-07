@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
-import osde.log.Level;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
@@ -37,6 +36,7 @@ import javax.xml.validation.SchemaFactory;
 
 import osde.OSDE;
 import osde.config.Settings;
+import osde.log.Level;
 import osde.log.LogFormatter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
@@ -117,7 +117,7 @@ public class DeviceConfiguration {
 			// store back manipulated XML
 			Marshaller marshaller = jc.createMarshaller();
 	    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,  Boolean.valueOf(true));
-	    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,  Settings.DEVICE_PROPERTIES_XSD_NAME);
+	    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, Settings.DEVICE_PROPERTIES_XSD_NAME);
 
 	    marshaller.marshal(elememt,
 	    	   new FileOutputStream(basePath + "jaxbOutput.xml")); //$NON-NLS-1$
@@ -787,57 +787,57 @@ public class DeviceConfiguration {
 		if(this.dataBlock == null) {
 			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
 		}
-		return this.dataBlock.getFormat().getLeader();
+		return this.dataBlock.getLeader();
 	}
 
 	public void setDataBlockLeader(String value) {
 		this.isChangePropery = true;
 		if (value == null)
-			this.dataBlock.getFormat().setLeader(null);
+			this.dataBlock.setLeader(null);
 		else
-			this.dataBlock.getFormat().setLeader(value);
+			this.dataBlock.setLeader(value);
 	}
 	
 	public boolean isDataBlockEndingDefined() {
-		return this.dataBlock.getFormat().trailer != null;
+		return this.dataBlock.getTrailer() != null;
 	}
 
 	public byte[] getDataBlockEnding() {
-		return this.dataBlock.getFormat().getTrailer();
+		return this.dataBlock.getTrailer();
 	}
 
 	public String getDataBlockEndingLineEndingType() {
-		return LineEndingTypes.valueFrom(this.dataBlock.getFormat().getTrailer());
+		return LineEndingTypes.valueFrom(this.dataBlock.getTrailer());
 	}
 
 	public void setDataBlockEnding(String value) {
 		this.isChangePropery = true;
 		if (value == null)
-			this.dataBlock.getFormat().setTrailer(null);
+			this.dataBlock.setTrailer(null);
 		else
-			this.dataBlock.getFormat().setTrailer(LineEndingTypes.bytesFromValue(value));
+			this.dataBlock.setTrailer(LineEndingTypes.bytesFromValue(value));
 	}
 
 	public TimeUnitTypes getDataBlockTimeUnit() {
-		return this.dataBlock.getFormat().getTimeUnit();
+		return this.dataBlock.getTimeUnit();
 	}
 
 	public void setDataBlockTimeUnit(TimeUnitTypes value) {
 		this.isChangePropery = true;
-		this.dataBlock.getFormat().setTimeUnit(value);
+		this.dataBlock.setTimeUnit(value);
 	}
 
 	public int getDataBlockTimeUnitFactor() {
-		return this.dataBlock.getFormat().getTimeUnit() == null ? 1000 : this.dataBlock.getFormat().getTimeUnit().equals(TimeUnitTypes.MSEC) ? 1 : 1000;
+		return this.dataBlock.getTimeUnit() == null ? 1000 : this.dataBlock.getTimeUnit().equals(TimeUnitTypes.MSEC) ? 1 : 1000;
 	}
 
 	public CommaSeparatorTypes getDataBlockSeparator() {
-		return this.dataBlock.getFormat().getSeparator();
+		return this.dataBlock.getSeparator();
 	}
 
 	public void setDataBlockSeparator(CommaSeparatorTypes value) {
 		this.isChangePropery = true;
-		this.dataBlock.getFormat().setSeparator(value);
+		this.dataBlock.setSeparator(value);
 	}
 	
 	public String getDataBlockPreferredDataLocation() {
