@@ -218,7 +218,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.name = recordSet.name;
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
-		this.parent = recordSet.parent;
+		this.parent = this.channels.get(channelConfigurationNumber);
 
 		// check if there is a miss match of measurement names and correction required
 		String[] oldRecordNames = recordSet.recordNames;
