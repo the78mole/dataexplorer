@@ -227,7 +227,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 												}
 											}
 										}
-										CSV2SerialAdapterDialog.this.device.updateVisibilityStatus(activeRecordSet);
+										CSV2SerialAdapterDialog.this.application.updateCurveSelectorTable();
 									}
 								}
 							}
