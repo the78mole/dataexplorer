@@ -49,7 +49,7 @@ public class MeasurementContextmenu {
 	MenuItem											addStatisticsTypeMenuItem, addPropertyTypeMenuItem;
 	Menu													addPropertyTypeMenu;
 	MenuItem											defaultPropertyMenuItem;
-	MenuItem											offsetPropertyMenuItem, factorPropertyMenuItem, reductionPropertyMenuItem;
+	MenuItem											offsetPropertyMenuItem, factorPropertyMenuItem, reductionPropertyMenuItem, doSubtractFirstPropertyMenuItem, doSubtractLastPropertyMenuItem;
 	MenuItem											regressionIntervalPropertyMenuItem, regressionTypeCurvePropertyMenuItem, regressionTypeLinearPropertyMenuItem;
 	MenuItem											numberMotorPropertyMenuItem, revolutionFactorPropertyMenuItem, prop100WPropertyMenuItem;
 	MenuItem											numberCellsPropertyMenuItem, invertCurrentPropertyMenuItem;
@@ -103,6 +103,8 @@ public class MeasurementContextmenu {
 				MeasurementContextmenu.this.offsetPropertyMenuItem.setEnabled(true);
 				MeasurementContextmenu.this.factorPropertyMenuItem.setEnabled(true);
 				MeasurementContextmenu.this.reductionPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.doSubtractFirstPropertyMenuItem.setEnabled(true);
+				MeasurementContextmenu.this.doSubtractLastPropertyMenuItem.setEnabled(true);
 				MeasurementContextmenu.this.regressionIntervalPropertyMenuItem.setEnabled(true);
 				MeasurementContextmenu.this.regressionTypeCurvePropertyMenuItem.setEnabled(true);
 				MeasurementContextmenu.this.regressionTypeLinearPropertyMenuItem.setEnabled(true);
@@ -123,6 +125,12 @@ public class MeasurementContextmenu {
 								break;
 							case REDUCTION:
 								MeasurementContextmenu.this.reductionPropertyMenuItem.setEnabled(false);
+								break;
+							case DO_SUBTRACT_FIRST:
+								MeasurementContextmenu.this.doSubtractFirstPropertyMenuItem.setEnabled(false);
+								break;
+							case DO_SUBTRACT_LAST:
+								MeasurementContextmenu.this.doSubtractLastPropertyMenuItem.setEnabled(false);
 								break;
 							case REGRESSION_INTERVAL_SEC:
 								MeasurementContextmenu.this.regressionIntervalPropertyMenuItem.setEnabled(false);
@@ -201,6 +209,24 @@ public class MeasurementContextmenu {
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "reductionPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REDUCTION.value());
+			}
+		});
+		this.doSubtractFirstPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
+		this.doSubtractFirstPropertyMenuItem.setText(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
+		this.doSubtractFirstPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				log.log(java.util.logging.Level.FINEST, "doSubtractFirstPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
+			}
+		});
+		this.doSubtractLastPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
+		this.doSubtractLastPropertyMenuItem.setText(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
+		this.doSubtractLastPropertyMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				log.log(java.util.logging.Level.FINEST, "doSubtractLastPropertyMenuItem action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
 			}
 		});
 		this.regressionIntervalPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);

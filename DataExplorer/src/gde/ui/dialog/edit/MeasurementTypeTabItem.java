@@ -543,6 +543,18 @@ public class MeasurementTypeTabItem extends CTabItem {
 				tmpPropertyType.setDescription(Messages.getString(MessageIds.OSDE_MSGT0537));
 				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.DOUBLE.value() }, true);
 				break;
+			case DO_SUBTRACT_FIRST:
+				tmpPropertyType.setType(DataTypes.BOOLEAN);
+				tmpPropertyType.setValue(true);
+				tmpPropertyType.setDescription(Messages.getString(MessageIds.OSDE_MSGT0596));
+				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.BOOLEAN.value() }, true);
+				break;
+			case DO_SUBTRACT_LAST:
+				tmpPropertyType.setType(DataTypes.BOOLEAN);
+				tmpPropertyType.setValue(true);
+				tmpPropertyType.setDescription(Messages.getString(MessageIds.OSDE_MSGT0597));
+				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.BOOLEAN.value() }, true);
+				break;
 			case REGRESSION_INTERVAL_SEC:
 				tmpPropertyType.setType(DataTypes.INTEGER);
 				tmpPropertyType.setValue(15);

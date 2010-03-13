@@ -26,6 +26,8 @@ import osde.OSDE;
  *     &lt;enumeration value="offset"/>
  *     &lt;enumeration value="factor"/>
  *     &lt;enumeration value="reduction"/>
+ *     &lt;enumeration value="do_subtract_first"/>
+ *     &lt;enumeration value="do_subtract_last"/>
  *     &lt;enumeration value="regression_type"/>
  *     &lt;enumeration value="regression_type_curve"/>
  *     &lt;enumeration value="regression_type_linear"/>
@@ -51,6 +53,10 @@ public enum MeasurementPropertyTypes {
     FACTOR("factor"),
     @XmlEnumValue("reduction")
     REDUCTION("reduction"),
+    @XmlEnumValue("do_subtract_first")
+    DO_SUBTRACT_FIRST("do_subtract_first"),
+    @XmlEnumValue("do_subtract_last")
+    DO_SUBTRACT_LAST("do_subtract_last"),
     @XmlEnumValue("regression_type")
     REGRESSION_TYPE("regression_type"),
     @XmlEnumValue("regression_type_curve")
