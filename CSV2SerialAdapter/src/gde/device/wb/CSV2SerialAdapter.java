@@ -33,7 +33,9 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
+import osde.device.MeasurementPropertyTypes;
 import osde.device.MeasurementType;
+import osde.device.PropertyType;
 import osde.exception.DataInconsitsentException;
 import osde.io.CSVSerialDataReaderWriter;
 import osde.io.DataParser;
@@ -283,6 +285,23 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
+		
+		PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
+		boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+		property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
+		boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+
+		try {
+			if (subtractFirst) {
+				reduction = record.getFirst().intValue() / 1000.0;
+			}
+			else if (subtractLast) {
+				reduction = record.getLast().intValue() / 1000.0;
+			}
+		}
+		catch (Throwable e) {
+			reduction = 0;
+		}
 
 		double newValue = (value - reduction) * factor + offset;
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -298,6 +317,23 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
+
+		PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
+		boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+		property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
+		boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+
+		try {
+			if (subtractFirst) {
+				reduction = record.getFirst().intValue() / 1000.0;
+			}
+			else if (subtractLast) {
+				reduction = record.getLast().intValue() / 1000.0;
+			}
+		}
+		catch (Throwable e) {
+			reduction = 0;
+		}
 
 		double newValue = (value - offset) / factor + reduction;
 		log.log(Level.FINER, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
