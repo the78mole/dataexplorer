@@ -990,7 +990,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.isUpdateSerialPorts = enable;	
 		this.serialPortSelectionGroup.setEnabled(enable);
 		this.portSettingsGroup.setEnabled(enable);
-		this.serialPortSelectionGroup.redraw();
 		this.portSettingsGroup.redraw();
 	}
 
