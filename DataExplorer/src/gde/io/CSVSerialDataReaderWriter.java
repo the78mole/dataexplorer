@@ -24,10 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
-import osde.log.Level;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-
+import java.text.SimpleDateFormat;
 import java.util.logging.Logger;
 
 import osde.OSDE;
@@ -40,6 +37,9 @@ import osde.exception.DataTypeException;
 import osde.exception.DevicePropertiesInconsistenceException;
 import osde.exception.MissMatchDeviceException;
 import osde.exception.NotSupportedFileFormatException;
+import osde.log.Level;
+import osde.messages.MessageIds;
+import osde.messages.Messages;
 import osde.ui.OpenSerialDataExplorer;
 
 /**
@@ -156,6 +156,8 @@ public class CSVSerialDataReaderWriter {
 
 						recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), isRaw, true);
 						recordSetName = recordSet.getName(); // cut/correct length
+						recordSet.setRecordSetDescription(device.getName() + OSDE.STRING_MESSAGE_CONCAT
+								+ Messages.getString(MessageIds.OSDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()));
 
 						// make all records displayable while absolute data
 						String[] recordNames = device.getMeasurementNames(activeChannel.getNumber());
