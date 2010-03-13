@@ -1361,6 +1361,7 @@ public class UniLogDialog extends DeviceDialog {
 											if (newActiveRecordSet != null) {
 												UniLogDialog.this.device.updateVisibilityStatus(newActiveRecordSet);
 												UniLogDialog.this.device.makeInActiveDisplayable(newActiveRecordSet);
+												UniLogDialog.this.application.updateCurveSelectorTable();
 											}
 										}
 									}
