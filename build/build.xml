@@ -521,9 +521,9 @@
 		</zip>
 	</target>
 
-	<target name="backupDataFilesWindows">
+	<target name="backupDataFilesWindows" description="pack personal data files">
 		<tar destfile="F:/OpenSerialData.tar.gz" compression="gzip">
-			<tarfileset dir="D:/Documents" casesensitive="true" >
+			<tarfileset dir="D:/Documents/Person" casesensitive="true" >
 				<include name="OpenSerialDataExplorer/**"/>
 				<exclude name="OpenSerialDataExplorer/OSDE_*"/>
 				<exclude name="OpenSerialDataExplorer/**/*.zip"/>
@@ -541,4 +541,40 @@
 			</tarfileset>
 		</tar>
 	</target>
+	
+	<target name="source_package" depends="init" description="builds the source distribution package to run configure and make">
+		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_source.zip">
+			<zipfileset dir="${basedir}" casesensitive="true" prefix="SerialDataExplorer">
+				<include name="**/src/**"/>
+				<exclude name="**/CVS/**"/>
+				<include name="build/lib/**"/>
+				<include name="build/misc/**"/>
+				<exclude name="WindowsHelper/**"/>
+				<exclude name="build/misc/configure"/>
+				<exclude name="build/misc/Makefile"/>
+				<exclude name="build/misc/COPYING"/>
+				<exclude name="build/misc/READ*"/>
+				<exclude name="build/misc/GNU*"/>
+				<exclude name="build/misc/maintain*"/>
+				<exclude name="build/misc/*.LICENSE"/>
+				<exclude name="build/misc/*.pdf"/>
+				<exclude name="build/misc/Url*"/>
+				<exclude name="**/Thumbs.db"/>
+				<exclude name="SWT*/**"/>
+				<exclude name="JAXB*/**"/>
+				<exclude name="launch4j/**"/>
+				<exclude name="Port*/**"/>
+				<exclude name="Print*/**"/>
+				<exclude name="OSDE_*/**"/>
+			</zipfileset>
+			<zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="SerialDataExplorer">
+				<include name="COPYING" />
+				<include name="READ*"/>
+				<include name="*.LICENSE"/>
+				<include name="configure"/>
+				<include name="Makefile"/>
+			</zipfileset>
+		</zip>
+	</target>
+			
 </project>
