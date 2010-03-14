@@ -3,7 +3,7 @@
 Der OpenSerialDataExplorer (OSDE) wird ohne jegliche Gew�hrleistung, daf�r aber kostenfrei und ohne Spende zur Verf�gung gestellt. 
 Durch die Implementierung in Java auf der Basis von der freien Bibliothek RXTXcomm und dem freien Eclipse SWT ist die Ausf�hrung
 des Programms auf Windows, Linux und anderen Plattformen m�glich. Voraussetzung ist eine Java Version 1.6 oder h�her. 
-Getestet und gebaut wird zu Zeit nur die Version f�r Windows und Linux in 32 und 64 Bit. Die Version f�r Mac OS sollte prinzipiell
+Getestet und gebaut wird zu Zeit nur die Version f�r Windows und GNU/Linux in 32 und 64 Bit. Die Version f�r Mac OS sollte prinzipiell
 laufen kann aber mangels Mac OS nicht getestet werden.
 Der OpenSerialDataExplorer nimmt Daten von seriell angeschlossenen Ger�ten entgegen, zeigt diese f�r weiteres Auswerten an. 
 Zur Zeit sind folgende Ger�te eingebunden: 
@@ -22,19 +22,20 @@ Weitere Ger�te sind in Arbeit. Hilfe bei der Einbindung von zus�tzlichen Ger
 
 Eine Installation ist nicht n�tig, das im Archiv enthaltene Verzeichnis "OpenSerialDataExplorer" mit den darunter liegenden Dateien
 einfach an einen Ort entpacken, wo Ausf�hrungsrechte vorliegen. 
-F�r Windowsbenutzer w�re das z.B. %ProgramFiles% f�r Linuxbenutzer "/opt" oder "/usr".
+F�r Windowsbenutzer w�re das z.B. %ProgramFiles% f�r Linuxbenutzer "/opt" oder "/usr". Mac OS installieren unter /Applications
 
 F�r den ersten Start des Programms �ber ein Kommando-Fenster(Windows) Shell(Linux) in das OpenSerialDataExplorer Verzeichnis 
-wechseln und unter Windows, OpenSerialDataExplorer.exe oder Unix, OpenSerialDataExplorer, ausf�hren. 
+wechseln und unter Windows, OpenSerialDataExplorer.exe oder Unix, OpenSerialDataExplorer, ausf�hren. Mac OS Benutzer finden das Startskript 
+unter /Applicatons/OpenSerialDataExplorer.app(Contents/MacOS/OpenSerialDataExplorerMac32.
 
 Unten dem OpenSerialDataExplorer Programmverzeichnis liegt folgende Verzeichnisstruktur:
 OpenSerialDataExplorer.exe (Windows)
 DevicePropertiesEditor.exe (Windows)
-OpenSerialDataExplorer (Linux)
-DevicePropertiesEditor (Linux)
-OpenSerialDataExplorer.xpm (Linux)
-OpenSerialDataExplorer.desktop (Linux)
-OpenSerialDataExplorer.desktop (Linux)
+OpenSerialDataExplorer (GNU/Linux)
+DevicePropertiesEditor (GNU/Linux)
+OpenSerialDataExplorer.xpm (GNU/Linux)
+OpenSerialDataExplorer.desktop (GNU/Linux)
+OpenSerialDataExplorer.desktop (NU/Linux)
 OpenSerialDataExplorerMac32 (Mac OS)
 DevicePropertiesEditorMac32 (Mac OS)
 OpenSerialDataExplorer.icns (Mac OS)

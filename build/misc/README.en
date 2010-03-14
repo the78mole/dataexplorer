@@ -3,7 +3,7 @@
 The OpenSerialDataExplorer (OSDE) are available total free of cost, but without any warranty. Since the implementation is based
 on Java using the free available libraries RXTXcomm and SWT the execution of this program is possible under a number of popular
 operating systems like 32/64 Bit Windows and Linux and Mac OS. Prerequisite is an installed Java version 1.6 or higher.
-Since I have no access to a Mac OS it is only tested under Windows and several Linux distributions.
+Since I have no access to a Mac OS it is only tested on different Windows versions and several GNU/Linux distributions.
 
 The OSDE gathers data from serial connected devices and display this data for further analysis.
 At the moment the following devices are enabled: 
@@ -22,19 +22,20 @@ More device are under construction. Help doing this is very welcome.
 
 An installation is not required. Only unpack the containing OpenSerialDataExplorer directory with its sub directories to a place 
 where execution right exist.
-For Windows user a proper place is %ProgramFiles% for Linux user "/opt" or "/usr".
+For Windows user a proper place is %ProgramFiles% for GNU/Linux user "/opt" or "/usr", Mac OS /Applications.
 
-For the first execution use a command window (Windows), shell (Linux) and change into the just created OpenSerialDataExplorer
-directory and execute running Windows, OpenSerialDataExplorer.exe, running Unix, OpenSerialDataExplorer.
+For the first execution use a command window (Windows), shell (GNU/Linux) and change into the just created OpenSerialDataExplorer
+directory and execute running Windows, OpenSerialDataExplorer.exe, running GNU/Linux, OpenSerialDataExplorer. For Mac OS the start
+script is located /Applications/OpenSerialDataExplorer.app/Contents/MacOS/OpenSerialDataExplorerMac32.
 
 As overview the following files are under the OpenSerialDataExplorer program resource directory:
 OpenSerialDataExplorer.exe (Windows)
 DevicePropertiesEditor.exe (Windows)
-OpenSerialDataExplorer (Linux)
-DevicePropertiesEditor (Linux)
-OpenSerialDataExplorer.xpm (Linux)
-OpenSerialDataExplorer.desktop (Linux)
-OpenSerialDataExplorer.desktop (Linux)
+OpenSerialDataExplorer (GNU/Linux)
+DevicePropertiesEditor (GNU/Linux)
+OpenSerialDataExplorer.xpm (GNU/Linux)
+OpenSerialDataExplorer.desktop (GNU/Linux)
+OpenSerialDataExplorer.desktop (GNU/Linux)
 OpenSerialDataExplorerMac32 (Mac OS)
 DevicePropertiesEditorMac32 (Mac OS)
 OpenSerialDataExplorer.icns (Mac OS)

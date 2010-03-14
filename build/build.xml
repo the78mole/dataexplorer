@@ -545,10 +545,12 @@
 	<target name="source_package" depends="init" description="builds the source distribution package to run configure and make">
 		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_source.zip">
 			<zipfileset dir="${basedir}" casesensitive="true" prefix="SerialDataExplorer">
-				<include name="**/src/**"/>
+                <include name="**/src/**"/>
+                <include name="**/build.xml"/>
 				<exclude name="**/CVS/**"/>
 				<include name="build/lib/**"/>
-				<include name="build/misc/**"/>
+                <include name="build/misc/**"/>
+                <include name="build/build.properties"/>
 				<exclude name="WindowsHelper/**"/>
 				<exclude name="build/misc/configure"/>
 				<exclude name="build/misc/Makefile"/>
@@ -565,14 +567,20 @@
 				<exclude name="launch4j/**"/>
 				<exclude name="Port*/**"/>
 				<exclude name="Print*/**"/>
-				<exclude name="OSDE_*/**"/>
+                <exclude name="OSDE_*/**"/>
+                <exclude name="RXTXcomm*/**"/>
 			</zipfileset>
 			<zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="SerialDataExplorer">
 				<include name="COPYING" />
 				<include name="READ*"/>
 				<include name="*.LICENSE"/>
 				<include name="configure"/>
-				<include name="Makefile"/>
+				<include name="Makefile.in"/>
+				<include name="AUTHORS"/>
+				<include name="Changelog"/>
+				<include name="NEWS"/>
+				<include name="BACKLOG"/>
+				<include name="PROBLEMS"/>
 			</zipfileset>
 		</zip>
 	</target>

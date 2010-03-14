@@ -1,0 +1,397 @@
+Development history / change log, please read from bottom up
+
+
+
+use time stamp of file while importing date from CSV file
+fix height unit calculation by adding property DataVario
+enable reduce by first/last measurement point by property CSV2SerialAdapter
+fix display update problem moving record set to other configuration CSV2SerialAdapter
+fix bug removing SerialPortType while closing the editor
+update XSD to V10 to make openJDK capable
+fix port selection drop down box problem for Mac OS 
+fix problem not showing SaxParserExceptions which as result disable its describing device
+fix not displaying data in CSV2SerialAdapter while reasonable data are red before an read data error occurs
+update data table to virtual with lazy write, no more cache is required
+
+Version 2.10		02 Mar 2010
+
+fix bugs in device properties editor property type - set name field visible
+fix bugs in device properties editor state type - disable type selection, set name field visible
+harmony with MacOS runtime behavior
+fix bug auto open port to call IDevice.openClosePort()
+fix bug auto open device tool box
+update documentation and online-help
+fix class base level detection menu (TIME)
+fix eStation problem reset time in cycle mode
+update junit tests
+fix problems while importing lov data
+fix bug no asking for really close app while record data are changed
+
+Version 2.00		26 Jan 2010
+
+add Level.TIME to enable time measurements without other logging
+add WStech DataVario support
+add CVS2SerialAdapter device (something similar to LVs OpenFormat)
+enable curves with none constant time step between data points
+add device properties editor to edit / update device properties XML files
+update device properties XML style sheet to V09
+correct behavior to enable statistics countByTrigger at measurements with a triggerReference as it was initial designed 
+show device properties parser exceptions in message box
+fix problem if object key contains blank on Unix
+add reverse operation of object link file creation to enable easy movement of osd files to different system 
+eStation change time step calculation to use nanoTime since currentMillis reports sometimes wrong values
+update serial library for MacOS
+consolidate combo sizes cross dialogs
+adapt to Mac cocoa/carbon 32 Bit
+fix some bugs for Mac OS
+fix bug while removing last selected devices in device dialog
+fix switching object key while switching channel
+update DeviceProperties XSD to V08 (enable serial port less device (LogView OpenFormat))  
+update AkkuMasterC4 plug-in
+fix potential problem exceeding windows path length in WindowsHelper DLL while resolving link path
+fix problem while opening message box and device dialog disposed
+fix minor problem not updating the display of charge/discharge current
+add update of analog modus measurements during live data capture
+fix error for very small measurement sizes LiPoWatch
+enable LiPoWatch live data capturing
+fix bug not updating color after closing the color dialog
+add context menu to all tab windows
+add device name in standard record set comment
+make graphics header to file description + record set name
+move file description to Channel class
+fix minor problem in object scanner
+fix minor problems gambling with known or unknown object keys
+
+Version 1.90		27 September 2009
+
+enhance object key scanner
+implement printing capability
+fix problem always starting device oriented
+implement statistics to clipboard functionality
+implement graphics to clipboard functionality
+fix UniLog A1 modus problem (ArrayIndexOutOfBoundsException: 15)
+rework UniLog life data gathering thread
+UniLog/LiPoWatch add message field to display reading data sets < 2 measurements
+fix bug while dragging a file of none active device
+update LogView device mapping
+reactivate port avilability check in settings dialog
+minor fix using records decimal format
+
+Version 1.81		12 September 2009
+
+implement Windows port enumerator and work around bluetooth problems
+enhance making comments auto persistent (record and file comment)
+fix bug while no device is selected (plain installation)
+fix problem while cutting edges
+correct LiPoWatch config XML
+workaround LiPoWatch problem signal wrong number of cells first measurements 
+
+Version 1.80		08 September 2009
+
+use system property to set "gnu.io.rxtx.SerialPorts" to avoid slow down enumerate serial ports while active Bluetooth radio
+enhance editing in black/white list
+enhance editing file and record comment
+refine context help association
+revert update SWT to version 3.5 due to Linux file open dialog problem, stay on 3.4
+enhance calculation of scale values
+add simple input validation test to black/white port list
+implement LiPoWatch - SM Modellbau
+introduce Pichler charger devices
+fix problems with compare window
+fix bug editing record comment in second row
+fix problem horizontal grid not aligned while records are displayed with a synced scaled
+expand IDevice interface to enable device specific display values in cell voltage tab
+fix bug adding properties to first record of potential sysncable
+implement LiPoWatch device
+
+Version 1.71		15 August 2009
+
+fix minor problem with scale displaying delta scale value very small
+prevent possible user error end value dialog
+fix problem during open serial port operation
+
+Version 1.70		10 August 2009
+
+update documentation (online help, off-line help, javadoc)
+enhance port selection in setting and device selection dialog
+add serial port black list to enable exclusion of problematic ports and white list to select specific ports only
+fix problem serial DLL crash while closing device selection dialog while auto open check boxes selected
+documentation update (UniLog/Object/misc) 
+add hint in read me pointing to uucp group for Linux users
+update UniLog to match firmware 1.10 features
+prevent message dialogs covered by active device dialogs
+fix problem switching ports in title bar while global serial port is selected
+fix error displaying ODSE_MSGT006 in save file dialog
+change RecordSet.addPoints interface and change all plug-in updates calls to Display asynchronous calls
+update graphics window implementation as image due to complex update problems on Windows OS
+fix problem auto scale values or rounded in combination with zero
+fix problem with horizontal grid while mixing languages application versus loaded data
+make rounding algorithm value delta and scale dependent
+fix problem missing update while committing axis end values dialog
+enhance cell voltage limits capability while adding NiMh/NiCd values
+fix problem windows link file first line
+fix error selecting 1000 point scope mode
+fix problem while loading graphics template with syncable records
+fix problem missing update after cell voltage limits are individually changed
+make fonts application 	homogeneous and some OS independent
+remove device switch query, since this is user driven and checked for unsaved data
+fix problem loading default graphics template where records with no reasonable data set to visible which prevent syncplaceholder record stayed visible all time
+fix error while cutting edge of record set with potential syncable
+implement object key file scanner and link creation (windows)
+implement object oriented behavior without duplicating data directories nor duplicating files
+
+Version 1.60		23. May. 2009
+
+Windows7 function testing
+help documentation update
+64 Bit support Linux, Windows
+operating system shell integration using MIME type
+pipe all initialization log into bootstrap.log
+deliver basic/sample GraphicsTemplate files
+
+Version 1.51		14. Apr. 2009
+
+update to support permanently changing LogView format (Bantam devices with time stamp per entry to enable varialble time step)
+add dispose listener check data saved before closing application
+add curve validation while importing LogView data files  
+correct some typos in Info/Help documentation
+fix error loading help pages on Linux
+
+Version 1.50		5. Apr. 2009
+
+update help pages (menu)
+fix wrong warning message if eStation do not receive data
+fix error while refreshing a already synced record set
+utility which generates semi automatic the help documentation to shorten update cycle
+update help pages (menu)
+add menu entry to load default graphics template
+fix minor zoom problem
+fix problem not displaying syncable records after import from file
+implement zoom to last measurement points during data gathering (scope view)
+update help pages regarding CSV import/export
+modify create record set method signature as preparation for universal device
+rework CSV import/export
+extend junit test for CSV import/export 
+
+Version 1.4			23. Feb. 2009
+
+implement junit test for file I/O
+update main help documentation (statistics window)
+fix problem missing graphics update while loading graphics template with nearly equal properties as actual displayed (scale on different side)
+fix possible save data problem for data using Channels.TYPE_CONFIG
+fix error while creating OSDE properties with null as log level entries
+update RxTxcomm driver to support 64 bit for Windows and Linux 
+cleanup using record ordinals only
+implement multimeter VC820/VC840 as device plug-in
+
+Version 1.31		30. Jan. 2009
+
+enable class based log level setting
+fix problem getting property while copying to curve compare 
+
+Version 1.3			25. Jan. 2009
+
+make device plugins self sufficient: package device help files into jar and extract helpfiles before loading
+fix problem calculating min/max for trigger range 
+fix problem UniLog update property values after config switch
+fix UniLog table calculation active && displayable -> check all displayale
+performance update data table calculation
+add preset and adjustable values for the cell voltage bar graph to fit different Lithium type cells
+enable background data loading, enhance IDevice interface to enable calculation thread access
+make eStation time step self adjusting by individual device given data rate 
+change file load behavior, to load data only if required by user (switch record set)
+update tool bar while switching outlet/configuration of type outlet, since each outlet, if loaded from file, is different 
+change behavior selecting the first available serial port while selecting device while this configured port is not available (USB)
+fix time scale update not cleaning full number width
+fix problem while statistics calculation while starting data gathering
+add ratio in statistics definition
+change log interface to a more effective one log.log(Level.XXX, ...)
+implement support for synchronized scales for measurements with identical unit
+enable statistics data update for data gathering cycle (eStation, AkkuMaster, Unilog)
+change update behavior for data gather threads, only update gathering record set when it is displayed
+make time line/scale more accurate, change from time format to millliseconds calculation
+
+Version 1.2 	06. Dec 2008
+
+extract device properties files direct from jar
+load device thumbnails direct from device plugin jar
+fine tune statistics table resizing (scroll bars, ..)
+update build process as prerequisite for self-sufficient device plug-ins
+implement workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ????
+make channel search more tolerant (number or word match) easy NLS switch
+add attribute to display a trigger based time sum in time row of statistics table
+update Picolario device properties XML configuration name and to use sophisticated trigger based statistics on "motor" configuration only
+fix data table update problem while requesting new updates in short sequence
+fix problem multiple progress bar user processes 
+fix problem while calculating data table by better process serialization
+update java source documentation
+add statistics overview tab page (modify device property XSD to enable statistics configuration, NLS support, ....)
+enhance RTF parsing capability of lov import filter
+adapt file input filter to LV stream version 5
+
+Version 1.1 25. Sep 2008
+
+make scales adaptive to available display points of screen
+limit default dialog font size to 10
+add total voltage and capacity to cell voltage tab to make this view more complete
+add drawing of connecting line while in delta measurement mode
+change default value of object key usage in settings to false until it is supported
+fix problem with numCells/prop100W editable values in UniLog dialog
+enable writing Windows program links (OpenSerialDataExplorer.lnk) via JNI to use OLE functions
+fix problem edit record set comment deletes the comment
+disable menu disruptive actions while loading data from file (big files)
+fix problem not displaying active record set data while loading dialog (Picolario, UniLog)
+fix a lot of typos in message files
+fix problem selected settings dialog alpha blending value not taken for device dialogs 
+
+Version 1.0a 13. Aug 2008
+fix problem not creating desktop shortcut on Windows with SteadyState installed
+
+Version 1.0  10. Aug 2008
+
+enable NLS support (de, en)
+tune slope regression calculation (result in only a small difference between curve and linear)
+fix data save error, zoomed -> save, not all data are copied 
+fix slope calculation error linear to curve
+closing device dialog erases status message
+cycle update serial port scan while device selection open
+enable alpha blending of device dialogs for supported platforms
+fix problem UniLog a* selection invalidates power group selected items
+refine serial communication methods away from event handling
+fix problem close blocked device dialogs
+fix problem updating UniLog A1-A3 names via selection buttons
+UniLog disable name and configuration change while life gathering
+refine redraw method to update graphics window
+move open/close serial port to IDevice interface to enable device specific impl
+implement eStation charger support
+add record set unsaved hints to Picolario and UniLog configuration tabs
+
+Version 0.9a  22. Jun 2008
+
+add support for Mozilla xulrunner as help browser 
+fix problem in compare window
+fix double check for saved flag while open new data
+update sample and simulator plugin code sample
+enable UniLog current offset capability and invert capability
+fix problem with UniLog analog channels offset calculation and display
+fix problem file history entries not in sequence
+
+Version 0.9  18. Jun 2008
+
+fix cool bar positioning problem
+fix problems in settings with not obvious logging setting
+enable selection in settings dialog for port availability check during port scan (for slow systems)
+reorg serial port search mechanism by enumeration to make it OS independent, no amount limitation
+fix problem displaying old UniLog dialog data due to missing resource update (SWT.CR), espally Linux
+fix empty record set problem for UniLog life data gathering
+add method in UnilLog serial port impl to wait for life data to make this more relayable
+check record set modification conditions / give hints for changed properties, like graphics adjustment, calculation base, record names, ...
+add drag support for OpenSerialData files and LogView files
+UniLog Firmware-Version + S/N as extra comment / device configuration property ?
+enable suggestion of actual date and object key as leader of file name in save (as) dialog
+implement reading of LogView file formats 1.13 to 1.15, 1.5 PreBeta to 2.0 BETA2, 2.0
+display active file name in title bar
+fix problem applying template which disables some measurements before life gatherer starts
+add apply basics template after loading UniLog data 
+fix problem UniLog time step selection
+fix time step problem in UniLog live gatherer for time steps >= 1 sec.
+fix problem not deleating previous record set data before loading new while loading data from file
+fix problem of nervous analog display by drawing only required display area
+
+Version 0.8  10. Mai 2008
+
+enable a graphics heading within graphics window
+integrate record set comment/description into main graphics window 
+make all message dialoges application modal
+add function to add record set for channel configuration not part of device properties XML
+implement file history functionality
+fix problem switching tab windows using menu
+enhance file comment window displaying all the record comments
+enable direct graphic update while configuration change for UniLog device
+fix problem recalculating slope data (Picolario)
+fix problem using multiple linear regression cycles
+enable on the fly UniLog configuration change
+fix errors in UniLog switching data to other configurations
+implement OpenSerialData file format version 1 as plain binary
+enhance IDevice interface (enable file format properties parsing, split make inactive displayable from visual properties)
+
+Version 0.7  11. Apr 2008
+
+fix minor problem zoom -> measure -> zoom again
+enable recalculation of dependent data if configuration is changed (UniLog/Picolario)
+fix problem during zoom in compare window (curves with different time line length)
+fix analog display does not display actual measurement during data gathering
+use file name as record name during CSV import
+add CellVoltageWindow to display LiPo cell voltage
+fix table data calculation error for very small values
+enable/update main help documentation
+fix error revolution display value during life gathering UniLog
+refine curve selector context menu
+fix display and measurement error in compare window
+enable curve selector width scaling to display full record name
+disable tabs and its calculation if not required or disabled
+enable analog displays for live measurements
+enable different configurations using one record set selection and support config, as well as record set switching (Picolario/UniLog)
+enable/update dialog help info for UniLog
+enable/update dialog help info for Picolario
+add check unsaved data during application close
+fix cleanup help browser during application close
+enable dialog close button, enable check for close allowed
+workaround close serial port problem, close function will stick and makes measurements unusable
+fix error not saving slope calculation data in UniLog dialog
+change behavior of PicolarioDialog to open serial port if required
+enable two configurations for Picolario (p.e. subtract first, subtract last)
+Picolario make adaptable slope calculation
+enable configurable application modal device dialogs
+refine device selection functions and error handling if no device selected
+fix problem not displaying status messages
+fix problem do not inform the user about schema changes with follow up directory backup copy
+fix problem not saving active device properties XML after change using device selection dialog
+fix problem in UniLog dialog removing modifications by paint event (Linux)
+refine drawing the grid lines, order to prevent over draw of data curves
+fix error instantiation new device dialog each time the device selection dialog is closed
+
+Version 0.6  24. Feb 2008
+
+enable application and device dialog help 
+make slope calculation adjustable (at least for UniLog enabled)
+enable grid in compare window
+fix error new when compare window is visible 
+implement horizontal/vertical grid
+fix error trying to delete none existing record 
+fix error setting log levels
+refine data table performance
+implement UniLog with double layer filter displaying curves
+fix problem x-offset vertical grid lines
+fix problem reset window if zoom mode requested after pan mode
+enhance XML device property usage, updating to DeviceProperties_v03.xsd
+fix error updating channel and record combo boxes
+
+Version 0.5  20. Jan 2008
+
+Picolario - display actual data set number
+add check mechanism for update installation
+implement pan function
+implement zoom function
+enable progress bar action for table calculation and other
+move active device and port to title bar
+fix error none updating template after manual load
+
+Version 0.45  8. Jan 2008
+
+prepare zooming
+implement measurement
+refine cool item bar
+remove unit while export raw data, make tolerant for import
+enable update selection after Picolario data gather finished
+refine resource manager
+refine data table view and calculation
+refine scale calculation
+fix error applying graphics template in background
+absolute data can now exported as raw
+fix error timer thread not stopped after device switch AkkuMaster
+add warnings for unsaved record sets
+
+first external available version: 29. Dec 2007  Version 0.4
+
+development begin: 3. Oct. 2007

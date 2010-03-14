@@ -1,0 +1,17 @@
+This is manual created Makefile.in March 16 2010
+AUTOMAKE_OPTIONS = foreign
+
+all: build/target/install/OpenSerialDataExplorer_2.20_linux_x86_32.tar.gz, 
+    build/target/install/OpenSerialDataExplorer_2.20_linux_x86_64.tar.gz
+
+build/target/install/OpenSerialDataExplorer_2.20_linux_x86_32.tar.gz:
+    ant -f build/build.xml clean dist
+
+build/target/install/OpenSerialDataExplorer_2.20_linux_x86_64.tar.gz:
+    ant -f build/build.xml clean dist
+
+clean:
+	ant -f build/build.xml clean
+
+install: all
+	ant -f build/build.xml install
