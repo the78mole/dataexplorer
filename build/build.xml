@@ -120,7 +120,7 @@
 	</target>
 
 	<!-- cleanup -->
-	<target name="clean" depends="init">
+	<target name="clean" >
 		<delete dir="${output.dir}" />
 
 		<ant antfile="build.xml" target="clean" dir="OpenSerialDataExplorer" />
@@ -136,7 +136,7 @@
 	</target>
 
 	<!-- install target -->
-	<target name="install" depends="dist">
+	<target name="install" depends="zip_package">
 		<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
 		<condition property="isLinux">
@@ -163,47 +163,22 @@
 	</target>
 
 	<target name="Windows" if="isWindows" >
-		<property name="install.dir" location="C:/Program Files/OpenSerialDataExplorer" />
+		<property name="install.dir" location="C:/Program Files" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-		<if>
-			<equals arg1="${sun.arch.data.model}" arg2="32" />
-			<then>
-				<copy todir="${install.dir}" flatten="no">
-					<fileset dir="${output.windows32}/OpenSerialDataExplorer" />
-				</copy>
-			</then>
-			<else>
-				<copy todir="${install.dir}" flatten="no">
-					<fileset dir="${output.windows64}/OpenSerialDataExplorer" />
-				</copy>
-			</else>
-		</if>
+        <unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_linux_x86_${sun.arch.data.model}.zip" dest="${install.dir}"/>
 	</target>
 
-	<target name="Linux" if="isLinux" >
-		<property name="install.dir" location="/opt/OpenSerialDataExplorer" />
+	<target name="Linux" if="isLinux">
+		<property name="install.dir" location="/opt" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-		<copy todir="${install.dir}" flatten="no">
-			<fileset dir="${output.linux}/OpenSerialDataExplorer" />
-		</copy>
+		<exec command="tar -xzf ${build.target.dir}/OpenSerialDataExplorer_${version.num}_linux_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir}"/>
+		<!-- untar removes permissions?? -->
 	</target>
 
-	<target name="MAC" if="isMAC" >
-		<property name="install.dir" location="/opt/OpenSerialDataExplorer" />
+	<target name="MAC" if="isMAC">
+		<property name="install.dir" location="/Application" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-		<if>
-			<equals arg1="${sun.arch.data.model}" arg2="32" />
-			<then>
-				<copy todir="${install.dir}" flatten="no">
-					<fileset dir="${output.mac32.cocoa}/OpenSerialDataExplorer" />
-				</copy>
-			</then>
-			<else>
-				<copy todir="${install.dir}" flatten="no">
-					<fileset dir="${output.mac32.carbon}/OpenSerialDataExplorer" />
-				</copy>
-			</else>
-		</if>
+        <unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_${sun.arch.data.model}_cocoa.zip" dest="${install.dir}"/>
 	</target>
 
 	<!-- Package -->
@@ -254,7 +229,7 @@
 		</copy>
 		<copy todir="${output.windows32.program.devices}" flatten="yes" >
 			<fileset dir="${basedir}" >
-			  <patternset refid="OSDE_PLUGIN_JARS"/>
+				<patternset refid="OSDE_PLUGIN_JARS"/>
 			</fileset>
 		</copy>
 
@@ -269,7 +244,7 @@
 		</copy>
 		<copy todir="${output.windows64.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
-			  <patternset refid="OSDE_PLUGIN_JARS"/>
+				<patternset refid="OSDE_PLUGIN_JARS"/>
 			</fileset>
 		</copy>
 
@@ -285,7 +260,7 @@
 		</copy>
 		<copy todir="${output.linux32.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
-			  <patternset refid="OSDE_PLUGIN_JARS"/>
+				<patternset refid="OSDE_PLUGIN_JARS"/>
 			</fileset>
 		</copy>
 
@@ -301,7 +276,7 @@
 		</copy>
 		<copy todir="${output.linux64.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
-			  <patternset refid="OSDE_PLUGIN_JARS"/>
+				<patternset refid="OSDE_PLUGIN_JARS"/>
 			</fileset>
 		</copy>
 
@@ -323,7 +298,7 @@
 		</copy>
 		<copy todir="${output.mac32.carbon.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
-			  <patternset refid="OSDE_PLUGIN_JARS"/>
+				<patternset refid="OSDE_PLUGIN_JARS"/>
 			</fileset>
 		</copy>
 
@@ -345,7 +320,7 @@
 		</copy>
 		<copy todir="${output.mac32.cocoa.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
-			  <patternset refid="OSDE_PLUGIN_JARS"/>
+				<patternset refid="OSDE_PLUGIN_JARS"/>
 			</fileset>
 		</copy>
 
@@ -367,7 +342,7 @@
 		</copy>
 		<copy todir="${output.mac64.cocoa.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
-			  <patternset refid="OSDE_PLUGIN_JARS"/>
+				<patternset refid="OSDE_PLUGIN_JARS"/>
 			</fileset>
 		</copy>
 
@@ -456,7 +431,7 @@
 				<include name="*/OpenSerialDataExplorer.desktop"/>
 				<include name="*/DevicePropertiesEditor.desktop"/>
 			</tarfileset>
-			<tarfileset dir="${output.linux32}" casesensitive="true" >
+			<tarfileset dir="${output.linux32}" casesensitive="true" mode="644" >
 				<include name="**"/>
 				<exclude name="*/OpenSerialDataExplorer"/>
 				<exclude name="*/DevicePropertiesEditor"/>
@@ -541,16 +516,20 @@
 			</tarfileset>
 		</tar>
 	</target>
+
+	<target name="clean_source">
+		<delete file="${build.target.dir}/OpenSerialDataExplorer_${version.num}_source.zip"/>
+	</target>
 	
-	<target name="source_package" depends="init" description="builds the source distribution package to run configure and make">
-		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_source.zip">
-			<zipfileset dir="${basedir}" casesensitive="true" prefix="SerialDataExplorer">
-                <include name="**/src/**"/>
-                <include name="**/build.xml"/>
+	<target name="source_package" depends="clean, clean_source, init" description="builds the source distribution package to run configure and make">
+		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_source.zip" >
+			<zipfileset dir="${basedir}" casesensitive="true" prefix="SerialDataExplorer" filemode="644">
+				<include name="**/src/**"/>
+				<include name="**/build.xml"/>
 				<exclude name="**/CVS/**"/>
 				<include name="build/lib/**"/>
-                <include name="build/misc/**"/>
-                <include name="build/build.properties"/>
+				<include name="build/misc/**"/>
+				<include name="build/build.properties"/>
 				<exclude name="WindowsHelper/**"/>
 				<exclude name="build/misc/configure"/>
 				<exclude name="build/misc/Makefile"/>
@@ -567,22 +546,25 @@
 				<exclude name="launch4j/**"/>
 				<exclude name="Port*/**"/>
 				<exclude name="Print*/**"/>
-                <exclude name="OSDE_*/**"/>
-                <exclude name="RXTXcomm*/**"/>
+				<exclude name="OSDE_*/**"/>
+				<exclude name="RXTXcomm*/**"/>
 			</zipfileset>
-			<zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="SerialDataExplorer">
+			<zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="SerialDataExplorer" filemode="644">
 				<include name="COPYING" />
 				<include name="READ*"/>
 				<include name="*.LICENSE"/>
-				<include name="configure"/>
 				<include name="Makefile.in"/>
 				<include name="AUTHORS"/>
 				<include name="Changelog"/>
 				<include name="NEWS"/>
-				<include name="BACKLOG"/>
+				<include name="Backlog"/>
 				<include name="PROBLEMS"/>
+				<include name="install-sh"/>
+			</zipfileset>
+			<zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="SerialDataExplorer" filemode="744">
+				<include name="configure"/>
 			</zipfileset>
 		</zip>
 	</target>
-			
+
 </project>
