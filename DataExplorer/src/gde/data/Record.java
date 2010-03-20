@@ -1157,10 +1157,10 @@ public class Record extends Vector<Integer> {
 		double timeOffset_ms = 0;
 		if (this.parent.isScopeMode) {
 			if ((this.timeStep_ms != null && this.timeStep_ms.isConstant) || this.parent.timeStep_ms.isConstant) {
-				timeOffset_ms = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * (this.elementCount-1-this.parent.scopeModeSize) / 10.0;
+				timeOffset_ms = (this.timeStep_ms != null ? this.timeStep_ms.get(0) : this.parent.timeStep_ms.get(0)) * (this.elementCount-this.parent.scopeModeSize) / 10.0;
 			}
 			else {
-				timeOffset_ms = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(this.elementCount-1-this.parent.scopeModeSize) : this.parent.timeStep_ms.getTime_ms(this.elementCount-1-this.parent.scopeModeSize);
+				timeOffset_ms = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(this.elementCount-this.parent.scopeModeSize) : this.parent.timeStep_ms.getTime_ms(this.elementCount-this.parent.scopeModeSize);
 			}
 		}
 		else if(this.parent.isZoomMode) {
@@ -1336,7 +1336,11 @@ public class Record extends Vector<Integer> {
 	 */
 	public String getVerticalDisplayPointAsFormattedScaleValue(int yPos, Rectangle drawAreaBounds) {
 		String displayPointValue;
-		if(this.parent.isZoomMode)
+		if (this.parent.isSyncRequested) {
+			Record syncRecord = this.parent.getSyncRecord();
+				displayPointValue = syncRecord.df.format(new Double(syncRecord.minDisplayValue +  ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+		}	
+		else if(this.parent.isZoomMode)
 			displayPointValue = this.df.format(new Double(this.minZoomScaleValue +  ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
 		else
 			displayPointValue = this.df.format(new Double(this.minScaleValue +  ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));

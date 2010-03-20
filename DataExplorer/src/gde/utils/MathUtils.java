@@ -17,6 +17,8 @@
 package osde.utils;
 
 import osde.log.Level;
+
+import java.util.Locale;
 import java.util.logging.Logger;
 
 /**
@@ -801,7 +803,7 @@ public class MathUtils {
 				}
 			}
 		}
-		return new Object[] {newMinValue, newMaxValue, newNumberTicks, newNumberMiniTicks, new Object()};
+		return new Object[] {Double.parseDouble(String.format(Locale.ENGLISH, "%.3f", newMinValue)), Double.parseDouble(String.format(Locale.ENGLISH, "%.3f", newMaxValue)), newNumberTicks, newNumberMiniTicks, new Object()};
 	}
 
 	private static Object[] evaluateNumTicks(double tmpMinValue, double tmpMaxValue, int maxNumberTicks, double raise) {
@@ -989,6 +991,6 @@ public class MathUtils {
 				}
 			}
 		}
-		return new Object[] {newMinValue, newMaxValue, newNumberTicks, newNumberMiniTicks, new Object()};
+		return new Object[] {Double.parseDouble(String.format(Locale.ENGLISH, "%.3f", newMinValue)), Double.parseDouble(String.format(Locale.ENGLISH, "%.3f", newMaxValue)), newNumberTicks, newNumberMiniTicks, new Object()};
 	}
 }

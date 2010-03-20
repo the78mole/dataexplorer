@@ -1920,6 +1920,13 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 	
 	/**
+	 * @return the sync place holder record, null if no syncable records exist
+	 */
+	Record getSyncRecord() {
+		return this.get(this.getSyncableName());
+	}
+	
+	/**
 	 * query if the given record key is one of syncable records
 	 * @param queryRecordKey the record key to be used for the query
 	 * @return true if syncable records contains queryRecordKey
