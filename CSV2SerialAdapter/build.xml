@@ -2,6 +2,7 @@
 
 <project name="CSV2SerialAdapter" default="compile">
 
+    <import file="../build/initBuildOS.xml"/>
 	<property name="build.properties" location="../build/build.properties" />
 
 	<property file="${build.properties}" />
@@ -10,14 +11,13 @@
 	<available property="build.properties.exists" file="${build.properties}" />
 	<echo message="Building using ${build.properties}" />
 	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
-	<echo message="using build.os.shortname = ${build.os.shortname}" />
 
 	<property name="module.output" location="build/classes"/>
 
 	<path id="compile.classpath">
 		<pathelement location="../OpenSerialDataExplorer/build/OpenSerialDataExplorer.jar" />
 		<pathelement location="../build/lib/RXTXcomm.jar" />
-		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
+		<pathelement location="../build/lib/${os.name}/${sun.arch.data.model}/swt.jar" />
 	</path>
 
 	<target name="compile" description="compile the project">
