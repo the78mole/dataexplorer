@@ -2,6 +2,7 @@
 
 <project name="Simulator" default="compile">
 
+    <import file="../build/initBuildOS.xml"/>
 	<property name="build.properties" location="../build/build.properties" />
 
 	<property file="${build.properties}" />
@@ -10,7 +11,6 @@
 	<available property="build.properties.exists" file="${build.properties}" />
 	<echo message="Building using ${build.properties}" />
 	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
-	<echo message="using build.os.shortname = ${build.os.shortname}" />
 
 	<property name="module.output" location="build/classes"/>
 
