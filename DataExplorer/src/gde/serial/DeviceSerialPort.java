@@ -188,7 +188,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 			// Windows COM1, COM2 -> COM20
-			// Linux /dev/ttyS0, /dev/ttyS1, /dev/ttyUSB0, /dev/ttyUSB1
+			// GNU/Linux /dev/ttyS0, /dev/ttyS1, /dev/ttyUSB0, /dev/ttyUSB1
 			availablePorts.trimToSize();
 		}
 		catch (Throwable t) {
