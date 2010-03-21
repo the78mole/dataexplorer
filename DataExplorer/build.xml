@@ -2,6 +2,7 @@
 
 <project name="OpenSerialDataExplorer" default="package">
 
+    <import file="../build/initBuildOS.xml"/>
 	<property name="build.properties" location="../build/build.properties" />
 
 	<property file="${build.properties}" />
@@ -9,8 +10,7 @@
 	<!-- this is to have nice message about used build.properties file -->
 	<available property="build.properties.exists" file="${build.properties}" />
 	<echo message="Building using ${build.properties}" />
-	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
-	<echo message="using build.os.shortname = ${build.os.shortname}" />
+	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}, OS short name = ${build.os.shortname}" />
 
 	<property name="module.output" location="build/classes"/>
 
@@ -19,7 +19,7 @@
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
 	</path>
 
-	<target name="compile" description="compile the project">
+	<target name="compile" depends="init_OS" description="compile the project">
 		<property name="include.debug.info" value="no" />
 		<mkdir dir="${module.output}" />
 		<javac destdir="${module.output}" classpathref="compile.classpath" compiler="javac1.6" encoding="UTF-8" debug="false">
