@@ -2,15 +2,10 @@
 
 <project name="OpenSerialDataExplorer" default="dist" basedir="..">
 
+	<import file="initBuildOS.xml"/>
+	
 	<!-- Check that ant-contrib-0.6.jar is in $ANT_HOME/lib -->
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
-	<!-- Check that antelopetasks-3.2.10.jar is in $ANT_HOME/lib
-	<taskdef name="stringutil" classname="ise.antelope.tasks.StringUtilTask"/>
-	<taskdef name="grep" classname="ise.antelope.tasks.Find"/>
-	<taskdef name="switch" classname="ise.antelope.tasks.SwitchTask"/>
-	<taskdef name="case" classname="ise.antelope.tasks.Case"/>
-	<typedef name="startswith" classname="ise.antelope.tasks.condition.StartsWith"/>
-	-->
 
 	<target name="echo:build.properties" if="build.properties.exists">
 		<echo message="Building using ${build.properties}" />
@@ -135,33 +130,35 @@
 		<!-- add new device here -->
 	</target>
 
-	<!-- install target -->
-	<target name="install" depends="zip_package">
-		<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
+    <!-- install target -->
+    <target name="install" depends="zip_package">
+        <echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
-		<condition property="isLinux">
-			<os name="Linux"/>
-		</condition>
-		<antcall target="Linux"/>
-		<condition property="isWindows">
-			<os name="Windows XP"/>
-		</condition>
-		<condition property="isWindows">
-			<os name="Windows VISTA"/>
-		</condition>
-		<condition property="isWindows">
-			<os name="Windows 2003"/>
-		</condition>
-		<antcall target="Windows"/>
-		<condition property="isMAC">
-			<os name="Mac OS"/>
-		</condition>
-		<condition property="isMAC">
-			<os name="Mac OS X"/>
-		</condition>
-		<antcall target="MAC"/>
-	</target>
-
+        <condition property="isLinux">
+            <os name="Linux"/>
+        </condition>
+        <antcall target="Linux"/>
+        <condition property="isWindows">
+            <os name="Windows XP"/>
+        </condition>
+        <condition property="isWindows">
+            <os name="Windows VISTA"/>
+        </condition>
+        <condition property="isWindows">
+            <os name="Windows 2003"/>
+        </condition>
+        <antcall target="Windows"/>
+        <condition property="isMAC">
+            <os name="Mac OS"/>
+        </condition>
+        <condition property="isMAC">
+            <os name="Mac OS X"/>
+        </condition>
+        <antcall target="MAC"/>
+        
+        <echo message="OS short name = ${build.os.shortname}"/>
+    </target>
+        
 	<target name="Windows" if="isWindows" >
 		<property name="install.dir" location="C:/Program Files" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
@@ -182,8 +179,8 @@
 	</target>
 
 	<!-- Package -->
-	<target name="package" depends="init">
-		<ant antfile="build.xml" target="package" dir="OpenSerialDataExplorer" />
+	<target name="package" depends="init_OS,init">
+		<ant antfile="build.xml" target="package" dir="OpenSerialDataExplorer"/>
 		<ant antfile="build.xml" target="package" dir="Picolario" />
 		<ant antfile="build.xml" target="package" dir="AkkuMaster" />
 		<ant antfile="build.xml" target="package" dir="Simulator" />
@@ -525,16 +522,24 @@
 		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_source.zip" >
 			<zipfileset dir="${basedir}" casesensitive="true" prefix="SerialDataExplorer" filemode="644">
 				<include name="**/src/**"/>
-				<include name="**/build.xml"/>
+                <include name="**/build.xml"/>
+                <include name="**/initBuildOS.xml"/>
 				<exclude name="**/CVS/**"/>
 				<include name="build/lib/**"/>
 				<include name="build/misc/**"/>
 				<include name="build/build.properties"/>
 				<exclude name="WindowsHelper/**"/>
-				<exclude name="build/misc/configure"/>
-				<exclude name="build/misc/Makefile"/>
-				<exclude name="build/misc/COPYING"/>
-				<exclude name="build/misc/READ*"/>
+                <exclude name="COPYING" />
+                <exclude name="READ*"/>
+                <exclude name="*.LICENSE"/>
+                <exclude name="AUTHORS"/>
+                <exclude name="Changelog"/>
+                <exclude name="NEWS"/>
+                <exclude name="Backlog"/>
+                <exclude name="PROBLEMS"/>
+                <exclude name="Makefile.in"/>
+                <exclude name="configure"/>
+                <exclude name="install-sh"/>
 				<exclude name="build/misc/GNU*"/>
 				<exclude name="build/misc/maintain*"/>
 				<exclude name="build/misc/*.LICENSE"/>
@@ -549,20 +554,20 @@
 				<exclude name="OSDE_*/**"/>
 				<exclude name="RXTXcomm*/**"/>
 			</zipfileset>
-			<zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="SerialDataExplorer" filemode="644">
+			<zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="SerialDataExplorer" filemode="444">
 				<include name="COPYING" />
 				<include name="READ*"/>
 				<include name="*.LICENSE"/>
-				<include name="Makefile.in"/>
 				<include name="AUTHORS"/>
 				<include name="Changelog"/>
 				<include name="NEWS"/>
 				<include name="Backlog"/>
 				<include name="PROBLEMS"/>
-				<include name="install-sh"/>
+                <include name="Makefile.in"/>
 			</zipfileset>
 			<zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="SerialDataExplorer" filemode="744">
 				<include name="configure"/>
+                <include name="install-sh"/>
 			</zipfileset>
 		</zip>
 	</target>
