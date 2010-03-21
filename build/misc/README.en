@@ -2,7 +2,7 @@
 
 The OpenSerialDataExplorer (OSDE) are available total free of cost, but without any warranty. Since the implementation is based
 on Java using the free available libraries RXTXcomm and SWT the execution of this program is possible under a number of popular
-operating systems like 32/64 Bit Windows and Linux and Mac OS. Prerequisite is an installed Java version 1.6 or higher.
+operating systems like 32/64 Bit Windows and GNU/Linux and Mac OS. Prerequisite is an installed Java version 1.6 or higher.
 Since I have no access to a Mac OS it is only tested on different Windows versions and several GNU/Linux distributions.
 
 The OSDE gathers data from serial connected devices and display this data for further analysis.
@@ -50,7 +50,7 @@ Extensions for the Java runtime RXTXcomm and SWT:
 ../java/ext/*.jar
 ../java/ext/*.LICENSE
 
-Hint for Linux user: RxTxcomm is using the uucp locking mechanism, to enable this the user must be part of the "uucp" group. Without being part 
+Hint for GNU/Linux user: RxTxcomm is using the uucp locking mechanism, to enable this the user must be part of the "uucp" group. Without being part 
 of this group open an serial port might be impossible. This depends on the used distribution.
 
 During the first execution of the program the application configuration directories are created 

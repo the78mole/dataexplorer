@@ -92,7 +92,7 @@ use system property to set "gnu.io.rxtx.SerialPorts" to avoid slow down enumerat
 enhance editing in black/white list
 enhance editing file and record comment
 refine context help association
-revert update SWT to version 3.5 due to Linux file open dialog problem, stay on 3.4
+revert update SWT to version 3.5 due to GNU/Linux file open dialog problem, stay on 3.4
 enhance calculation of scale values
 add simple input validation test to black/white port list
 implement LiPoWatch - SM Modellbau
@@ -117,7 +117,7 @@ enhance port selection in setting and device selection dialog
 add serial port black list to enable exclusion of problematic ports and white list to select specific ports only
 fix problem serial DLL crash while closing device selection dialog while auto open check boxes selected
 documentation update (UniLog/Object/misc) 
-add hint in read me pointing to uucp group for Linux users
+add hint in read me pointing to uucp group for GNU/Linux users
 update UniLog to match firmware 1.10 features
 prevent message dialogs covered by active device dialogs
 fix problem switching ports in title bar while global serial port is selected
@@ -144,7 +144,7 @@ Version 1.60		23. May. 2009
 
 Windows7 function testing
 help documentation update
-64 Bit support Linux, Windows
+64 Bit support GNU/Linux, Windows
 operating system shell integration using MIME type
 pipe all initialization log into bootstrap.log
 deliver basic/sample GraphicsTemplate files
@@ -155,7 +155,7 @@ update to support permanently changing LogView format (Bantam devices with time 
 add dispose listener check data saved before closing application
 add curve validation while importing LogView data files  
 correct some typos in Info/Help documentation
-fix error loading help pages on Linux
+fix error loading help pages on GNU/Linux
 
 Version 1.50		5. Apr. 2009
 
@@ -180,7 +180,7 @@ update main help documentation (statistics window)
 fix problem missing graphics update while loading graphics template with nearly equal properties as actual displayed (scale on different side)
 fix possible save data problem for data using Channels.TYPE_CONFIG
 fix error while creating OSDE properties with null as log level entries
-update RxTxcomm driver to support 64 bit for Windows and Linux 
+update RxTxcomm driver to support 64 bit for Windows and GNU/Linux 
 cleanup using record ordinals only
 implement multimeter VC820/VC840 as device plug-in
 
@@ -282,7 +282,7 @@ fix cool bar positioning problem
 fix problems in settings with not obvious logging setting
 enable selection in settings dialog for port availability check during port scan (for slow systems)
 reorg serial port search mechanism by enumeration to make it OS independent, no amount limitation
-fix problem displaying old UniLog dialog data due to missing resource update (SWT.CR), espally Linux
+fix problem displaying old UniLog dialog data due to missing resource update (SWT.CR), espally GNU/Linux
 fix empty record set problem for UniLog life data gathering
 add method in UnilLog serial port impl to wait for life data to make this more relayable
 check record set modification conditions / give hints for changed properties, like graphics adjustment, calculation base, record names, ...

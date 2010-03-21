@@ -2,7 +2,7 @@
 
 Der OpenSerialDataExplorer (OSDE) wird ohne jegliche Gew�hrleistung, daf�r aber kostenfrei und ohne Spende zur Verf�gung gestellt. 
 Durch die Implementierung in Java auf der Basis von der freien Bibliothek RXTXcomm und dem freien Eclipse SWT ist die Ausf�hrung
-des Programms auf Windows, Linux und anderen Plattformen m�glich. Voraussetzung ist eine Java Version 1.6 oder h�her. 
+des Programms auf Windows, GNU/Linux und anderen Plattformen m�glich. Voraussetzung ist eine Java Version 1.6 oder h�her. 
 Getestet und gebaut wird zu Zeit nur die Version f�r Windows und GNU/Linux in 32 und 64 Bit. Die Version f�r Mac OS sollte prinzipiell
 laufen kann aber mangels Mac OS nicht getestet werden.
 Der OpenSerialDataExplorer nimmt Daten von seriell angeschlossenen Ger�ten entgegen, zeigt diese f�r weiteres Auswerten an. 
@@ -22,7 +22,7 @@ Weitere Ger�te sind in Arbeit. Hilfe bei der Einbindung von zus�tzlichen Ger
 
 Eine Installation ist nicht n�tig, das im Archiv enthaltene Verzeichnis "OpenSerialDataExplorer" mit den darunter liegenden Dateien
 einfach an einen Ort entpacken, wo Ausf�hrungsrechte vorliegen. 
-F�r Windowsbenutzer w�re das z.B. %ProgramFiles% f�r Linuxbenutzer "/opt" oder "/usr". Mac OS installieren unter /Applications
+F�r Windowsbenutzer w�re das z.B. %ProgramFiles% f�r GNU/Linux-Benutzer "/opt" oder "/usr". Mac OS installieren unter /Applications
 
 F�r den ersten Start des Programms �ber ein Kommando-Fenster(Windows) Shell(Linux) in das OpenSerialDataExplorer Verzeichnis 
 wechseln und unter Windows, OpenSerialDataExplorer.exe oder Unix, OpenSerialDataExplorer, ausf�hren. Mac OS Benutzer finden das Startskript 
@@ -50,7 +50,7 @@ Erweiterung der Java Laufzeitumgebung f�r RXTXcomm und SWT:
 ../java/ext/*.jar
 ../java/ext/*.LICENSE
 
-Hinweis f�r Linux- und Mac-Benutzer: RxTxcomm ist verwendet den uucp locking Mechanismus, hierzu muss der Benutzer der Gruppe "uucp" angeh�ren. In Abh�ngigkeit
+Hinweis f�r GNU/Linux- und Mac-Benutzer: RxTxcomm ist verwendet den uucp locking Mechanismus, hierzu muss der Benutzer der Gruppe "uucp" angeh�ren. In Abh�ngigkeit
 der verwendeten Distribution kann evtl. kein serieller Port ge�ffnet werden.
 
 Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter:
