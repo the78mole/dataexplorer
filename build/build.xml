@@ -2,9 +2,6 @@
 
 <project name="OpenSerialDataExplorer" default="dist" basedir="..">
 
-	<!-- Check that ant-contrib-0.6.jar is in $ANT_HOME/lib -->
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
-
 	<target name="echo:build.properties" if="build.properties.exists">
 		<echo message="Building using ${build.properties}" />
 	</target>
