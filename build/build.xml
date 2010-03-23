@@ -185,13 +185,13 @@
 	<target name="Windows" if="isWindows" >
 		<property name="install.dir" location="C:/Program Files" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-        <unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_${os.arch}_${sun.arch.data.model}.zip" dest="${install.dir}" overwrite="true"/>
+        <unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir}" overwrite="true"/>
 	</target>
 
 	<target name="Linux" if="isLinux">
 		<property name="install.dir" location="/opt" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-		<untar src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_${os.arch}_${sun.arch.data.model}.tar.gz" dest="${install.dir}" compression="gzip" overwrite="true"/>
+		<untar src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dest="${install.dir}" compression="gzip" overwrite="true"/>
 	</target>
 
 	<target name="MAC" if="isMAC">
