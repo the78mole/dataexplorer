@@ -16,7 +16,7 @@
 	<path id="compile.classpath">
 		<pathelement location="../OpenSerialDataExplorer/build/OpenSerialDataExplorer.jar" />
 		<pathelement location="../build/lib/RXTXcomm.jar" />
-		<pathelement location="../build/lib/${os.name}/${sun.arch.data.model}/swt.jar" />
+		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
 	</path>
 
 	<target name="compile" description="compile the project">
