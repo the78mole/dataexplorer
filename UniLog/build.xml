@@ -2,7 +2,6 @@
 
 <project name="UniLog" default="compile">
 
-    <import file="../build/initBuildOS.xml"/>
 	<property name="build.properties" location="../build/build.properties" />
 
 	<property file="${build.properties}" />
