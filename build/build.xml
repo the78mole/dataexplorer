@@ -2,8 +2,6 @@
 
 <project name="OpenSerialDataExplorer" default="dist" basedir="..">
 
-	<import file="initBuildOS.xml"/>
-	
 	<!-- Check that ant-contrib-0.6.jar is in $ANT_HOME/lib -->
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 
@@ -17,8 +15,36 @@
 		<echo message="Building using Java ${java.version}" />
 	</target>
 
+	<!-- initialize build OS name which set the lib path to swt.jar --> 
+    <target name="init_OS" >
+        <echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
+
+        <condition property="build.os.shortname" value="Linux">
+            <os name="Linux"/>
+        </condition>
+
+    	<condition property="build.os.shortname" value="Windows">
+            <os name="Windows XP"/>
+        </condition>
+        <condition property="build.os.shortname" value="Windows">
+            <os name="Windows VISTA"/>
+        </condition>
+        <condition property="build.os.shortname" value="Windows">
+            <os name="Windows 2003"/>
+        </condition>
+
+    	<condition property="build.os.shortname" value="MAC">
+            <os name="Mac OS"/>
+        </condition>
+        <condition property="build.os.shortname" value="MAC">
+            <os name="Mac OS X"/>
+        </condition>
+         
+        <echo message="OS short name = ${build.os.shortname}"/>
+    </target>
+        	
 	<!-- init -->
-	<target name="init">
+	<target name="init" depends="init_OS">
 		<property name="build.properties" location="build/build.properties" />
 
 		<property file="${build.properties}" />
@@ -118,15 +144,15 @@
 	<target name="clean" >
 		<delete dir="${output.dir}" />
 
-		<ant antfile="build.xml" target="clean" dir="OpenSerialDataExplorer" />
-		<ant antfile="build.xml" target="clean" dir="Picolario" />
-		<ant antfile="build.xml" target="clean" dir="AkkuMaster" />
-		<ant antfile="build.xml" target="clean" dir="Simulator" />
-		<ant antfile="build.xml" target="clean" dir="UniLog" />
-		<ant antfile="build.xml" target="clean" dir="eStation" />
-		<ant antfile="build.xml" target="clean" dir="VC800" />
-		<ant antfile="build.xml" target="clean" dir="LiPoWatch" />
-		<ant antfile="build.xml" target="clean" dir="CSV2SerialAdapter" />
+		<ant antfile="build.xml" target="clean" dir="OpenSerialDataExplorer" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="Picolario" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="AkkuMaster" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="Simulator" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="UniLog" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="eStation" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="VC800" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="LiPoWatch" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="CSV2SerialAdapter" inheritall="true"/>
 		<!-- add new device here -->
 	</target>
 
@@ -162,33 +188,32 @@
 	<target name="Windows" if="isWindows" >
 		<property name="install.dir" location="C:/Program Files" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-        <unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_linux_x86_${sun.arch.data.model}.zip" dest="${install.dir}"/>
+        <unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_${os.arch}_${sun.arch.data.model}.zip" dest="${install.dir}" overwrite="true"/>
 	</target>
 
 	<target name="Linux" if="isLinux">
 		<property name="install.dir" location="/opt" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-		<exec command="tar -xzf ${build.target.dir}/OpenSerialDataExplorer_${version.num}_linux_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir}"/>
-		<!-- untar removes permissions?? -->
+		<untar src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_${os.arch}_${sun.arch.data.model}.tar.gz" dest="${install.dir}" compression="gzip" overwrite="true"/>
 	</target>
 
 	<target name="MAC" if="isMAC">
 		<property name="install.dir" location="/Application" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-        <unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_${sun.arch.data.model}_cocoa.zip" dest="${install.dir}"/>
+        <unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${install.dir}" overwrite="true"/>
 	</target>
 
 	<!-- Package -->
-	<target name="package" depends="init_OS,init">
-		<ant antfile="build.xml" target="package" dir="OpenSerialDataExplorer"/>
-		<ant antfile="build.xml" target="package" dir="Picolario" />
-		<ant antfile="build.xml" target="package" dir="AkkuMaster" />
-		<ant antfile="build.xml" target="package" dir="Simulator" />
-		<ant antfile="build.xml" target="package" dir="UniLog" />
-		<ant antfile="build.xml" target="package" dir="eStation" />
-		<ant antfile="build.xml" target="package" dir="VC800" />
-		<ant antfile="build.xml" target="package" dir="LiPoWatch" />
-		<ant antfile="build.xml" target="package" dir="CSV2SerialAdapter" />
+	<target name="package" depends="init">
+		<ant antfile="build.xml" target="package" dir="OpenSerialDataExplorer" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="Picolario" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="AkkuMaster" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="Simulator" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="UniLog" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="eStation" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="VC800" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="LiPoWatch" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="CSV2SerialAdapter" inheritall="true"/>
 		<!-- add new device here -->
 	</target>
 
@@ -409,17 +434,17 @@
 	<target name="zip_package" depends="copy-files">
 
 		<echo message="zip Windows 32 bit files" />
-		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_windows_x86_32.zip">
+		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_Windows_x86_32.zip">
 			<zipfileset dir="${output.windows32}" casesensitive="true" />
 		</zip>
 
 		<echo message="zip Windows 64 bit files" />
-		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_windows_x86_64.zip">
+		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_Windows_x86_64.zip">
 			<zipfileset dir="${output.windows64}" casesensitive="true" />
 		</zip>
 
 		<echo message="tar Linux 32 bit files" />
-		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_linux_x86_32.tar.gz" compression="gzip">
+		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_Linux_x86_32.tar.gz" compression="gzip">
 			<tarfileset dir="${output.linux32}" casesensitive="true" mode="755" >
 				<include name="*/OpenSerialDataExplorer"/>
 				<include name="*/DevicePropertiesEditor"/>
@@ -438,7 +463,7 @@
 		</tar>
 
 		<echo message="tar Linux 64 bit files" />
-		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_linux_x86_64.tar.gz" compression="gzip">
+		<tar destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_Linux_x86_64.tar.gz" compression="gzip">
 			<tarfileset dir="${output.linux64}" casesensitive="true" mode="755" >
 				<include name="*/OpenSerialDataExplorer"/>
 				<include name="*/DevicePropertiesEditor"/>
@@ -457,7 +482,7 @@
 		</tar>
 
 		<echo message="zip Mac 32 carbon application bundle" />
-		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_32_carbon.zip">
+		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_Mac_32_carbon.zip">
 			<zipfileset dir="${output.mac32.carbon}" casesensitive="true" filemode="755" >
 				<include name="**/OpenSerialDataExplorerMac32"/>
 				<include name="**/DevicePropertiesEditorMac32"/>
@@ -469,7 +494,7 @@
 		</zip>
 
 		<echo message="zip Mac 32 cocoa application bundle" />
-		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_32_cocoa.zip">
+		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_Mac_32_cocoa.zip">
 			<zipfileset dir="${output.mac32.cocoa}" casesensitive="true" filemode="755" >
 				<include name="**/OpenSerialDataExplorerMac32"/>
 				<include name="**/DevicePropertiesEditorMac32"/>
@@ -481,7 +506,7 @@
 		</zip>
 
 		<echo message="zip Mac 64 cocoa application bundle" />
-		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_mac_64_cocoa.zip">
+		<zip destfile="${build.target.dir}/OpenSerialDataExplorer_${version.num}_Mac_64_cocoa.zip">
 			<zipfileset dir="${output.mac64.cocoa}" casesensitive="true" filemode="755" >
 				<include name="**/OpenSerialDataExplorerMac64"/>
 				<include name="**/DevicePropertiesEditorMac64"/>
