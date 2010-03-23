@@ -191,7 +191,8 @@
 	<target name="Linux" if="isLinux">
 		<property name="install.dir" location="/opt" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-		<untar src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dest="${install.dir}" compression="gzip" overwrite="true"/>
+		<exec command="tar -xzf ${build.target.dir}/OpenSerialDataExplorer_${version.num}_linux_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir}"/>
+		<!-- untar removes permissions?? -->
 	</target>
 
 	<target name="MAC" if="isMAC">
