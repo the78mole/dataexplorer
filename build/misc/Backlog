@@ -1,0 +1,21 @@
+﻿Development backlog: loose collection of open work items to be done in future
+ 
+documentation: How to create a device plug-in 
+ 
+create a preferences property where a UNIX based system user gets a reminder enabling uucp lock for RXTXcomm
+ 
+enable plug-in to create it own tabulator based view 
+ 
+create more junit tests 
+ 
+ongoing update help content
+
+XML file format, compressed
+
+performance inspection/update
+
+memory analysis/optimization
+
+universal device
+
+refine adding association for existing key MRUList, RegisteryHelper.cpp
