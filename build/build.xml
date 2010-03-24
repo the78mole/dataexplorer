@@ -183,22 +183,22 @@
     </target>
         
 	<target name="Windows" if="isWindows" >
-		<property name="install.dir" location="C:/Program Files" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-        <unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir}" overwrite="true"/>
+		<echo message="installing to ${install.dir.windows}" />
+		<unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir.windows}" overwrite="true"/>
 	</target>
 
 	<target name="Linux" if="isLinux">
-		<property name="install.dir" location="/opt" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-		<exec command="tar -xzf ${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir}"/>
+		<echo message="installing to ${install.dir.linux}" />
+		<exec command="tar -xzf ${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.linux}"/>
 		<!-- untar removes permissions?? -->
 	</target>
 
 	<target name="MAC" if="isMAC">
-		<property name="install.dir" location="/Application" />
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-        <unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${install.dir}" overwrite="true"/>
+		<echo message="installing to ${install.dir.mac}" />
+		<unzip src="${build.target.dir}/OpenSerialDataExplorer_${version.num}_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${install.dir.mac}" overwrite="true"/>
 	</target>
 
 	<!-- Package -->

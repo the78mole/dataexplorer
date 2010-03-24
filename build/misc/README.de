@@ -1,32 +1,35 @@
-******** OpenSerialDataExplorer README ***********  18 Apr 2009 WB
+******** SerialDataExplorer README ***********  24 März 2010 WB
 
-Der OpenSerialDataExplorer (OSDE) wird ohne jegliche Gewï¿½hrleistung, dafï¿½r aber kostenfrei und ohne Spende zur Verfï¿½gung gestellt. 
-Durch die Implementierung in Java auf der Basis von der freien Bibliothek RXTXcomm und dem freien Eclipse SWT ist die Ausfï¿½hrung
-des Programms auf Windows, GNU/Linux und anderen Plattformen mï¿½glich. Voraussetzung ist eine Java Version 1.6 oder hï¿½her. 
-Getestet und gebaut wird zu Zeit nur die Version fï¿½r Windows und GNU/Linux in 32 und 64 Bit. Die Version fï¿½r Mac OS sollte prinzipiell
-laufen kann aber mangels Mac OS nicht getestet werden.
-Der OpenSerialDataExplorer nimmt Daten von seriell angeschlossenen Gerï¿½ten entgegen, zeigt diese fï¿½r weiteres Auswerten an. 
-Zur Zeit sind folgende Gerï¿½te eingebunden: 
-											 - AkkuMasterC4 (Htronic)
-											 - Picolario (Renschler)
-											 - UniLog (SM-Modellbau)
-											 - LiPoWatch (SM-Modellbau)
-											 - eStation BC6, BC610, BC8, 902 (Bantam)
-											 - Pichler P6 , P60 (Pichler)
-											 - VC820, VC840 (Conrad/VoltCraft)
-											 - CSV2SerialAdapter, ermöglicht CVS als serielle Daten zu importieren
-											 - DataVario, DataVarioDuo (WStech) 
-											 - Simulator
+Der SerialDataExplorer (SDE) wird ohne jegliche Gewährleistung, dafür aber kostenfrei und ohne Spende zur Verfügung gestellt. 
+Durch die Implementierung in Java auf der Basis von der freien Bibliothek RXTXcomm und dem freien Eclipse SWT ist die Ausführung
+des Programms auf vilen populären Betriebssystemplattformen in 32 oder 64 Bit wie Windows, GNU/Linux und Mac OS möglich. Voraussetzung 
+ist lediglich eine installierte Java Laufzeitumgebung der Version 1.6 oder höher. 
+
+Der OpenSerialDataExplorer nimmt Daten von seriell angeschlossenen Geräten entgegen, zeigt diese für verschiedene Auswertungen an. 
+Zur Zeit sind folgende Geräte eingebunden: 
+											 - AkkuMasterC4 (Htronic) Lade-/Entlade-gerät
+											 - Picolario (Renschler) Variometer
+											 - UniLog (SM-Modellbau) Mulitmessgerät
+											 - LiPoWatch (SM-Modellbau) LiPo-Saver
+											 - eStation BC6, BC610, BC8, 902 (Bantam) Lade-/Entlade-gerät
+											 - Pichler P6 , P60 (Pichler) Lade-/Entlade-gerät
+											 - VC820, VC840 (Conrad/VoltCraft) Multimeter
+											 - CSV2SerialAdapter, ermöglicht CVS als simulierte serielle Daten zu importieren
+											 - DataVario, DataVarioDuo (WStech) Variometer, GPS, Mulitmessgerät
+											 - Simulator Test Plug-in
 											 
-Weitere Gerï¿½te sind in Arbeit. Hilfe bei der Einbindung von zusï¿½tzlichen Gerï¿½ten ist herzlich willkommen.
+Weitere Geräte sind in Arbeit. Hilfe bei der Einbindung von zusätzlichen Geräten ist herzlich willkommen.
 
-Eine Installation ist nicht nï¿½tig, das im Archiv enthaltene Verzeichnis "OpenSerialDataExplorer" mit den darunter liegenden Dateien
-einfach an einen Ort entpacken, wo Ausfï¿½hrungsrechte vorliegen. 
-Fï¿½r Windowsbenutzer wï¿½re das z.B. %ProgramFiles% fï¿½r GNU/Linux-Benutzer "/opt" oder "/usr". Mac OS installieren unter /Applications
+Eine Geräte API (IDevice) wird zur Verfügung gestellt, die ein relativ einfaches Einbinden eigener Geräte ermöglichen soll. Eine
+Dokumentation hierzu ist in Arbeit.
 
-Fï¿½r den ersten Start des Programms ï¿½ber ein Kommando-Fenster(Windows) Shell(Linux) in das OpenSerialDataExplorer Verzeichnis 
-wechseln und unter Windows, OpenSerialDataExplorer.exe oder Unix, OpenSerialDataExplorer, ausfï¿½hren. Mac OS Benutzer finden das Startskript 
-unter /Applicatons/OpenSerialDataExplorer.app(Contents/MacOS/OpenSerialDataExplorerMac32.
+Eine Installation ist nicht nötig, das im Archiv enthaltene Verzeichnis "SerialDataExplorer" mit den darunter liegenden Dateien
+einfach an einen Ort entpacken, wo Ausführungsrechte vorliegen. 
+Für Windowsbenutzer wäre das z.B. %ProgramFiles% für GNU/Linux-Benutzer "/opt" oder "/usr". Mac OS entpacken unter /Applications
+
+Für den ersten Start des Programms über ein Kommando-Fenster(Windows), Shell(Linux) in das SerialDataExplorer Verzeichnis 
+wechseln und unter Windows, OpenSerialDataExplorer.exe oder Unix, OpenSerialDataExplorer, ausführen. Mac OS Benutzer finden das Startskript 
+unter /Applicatons/OpenSerialDataExplorer.app(Contents/MacOS/OpenSerialDataExplorerMac32, falls der Icon nicht funktioniert.
 
 Unten dem OpenSerialDataExplorer Programmverzeichnis liegt folgende Verzeichnisstruktur:
 OpenSerialDataExplorer.exe (Windows)
@@ -46,7 +49,7 @@ Andere Programmresourcen sind:
 ../Devices/*.jar
 ../README.*
 
-Erweiterung der Java Laufzeitumgebung fï¿½r RXTXcomm und SWT:
+Erweiterung der Java Laufzeitumgebung für RXTXcomm und SWT:
 ../java/ext/*.jar
 ../java/ext/*.LICENSE
 
@@ -59,13 +62,16 @@ Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeich
 /User/<Benutzer>/Library/Application Support/OpenSerialDataExplorer (Mac OS)
 angelegt. Hierunter werden auch Anwendungkonfiguration und Tracelogdaten abgelegt.
 
-Fï¿½r das Verzeichnis der Nutzerdaten (Logdateien) ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms
+Für das Verzeichnis der Nutzerdaten (Logdateien) ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms
 in den Anwendungkonfigurationsdatei (OpenSerialDataExplorer.properties) hinterlegt.
 
-Hinweis: Erscheint nach der Ausfï¿½hrung von OpenSerialDataExplorer.exe/OpenSerialDataExplorer folgende oder ï¿½hnliche Fehlermeldung 
+Hinweis: Erscheint nach der Ausführung von SerialDataExplorer.exe/SerialDataExplorer folgende oder ähnliche Fehlermeldung 
 "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (osde/OSDE) bad major Version at offset=6"
 ist die installierte Java Version (java -version) zu alt und muss gegen eine aktuelle Version > 1.6 ausgetauscht werden.
-Fï¿½r Windowsanwender: Je nach verwendeter Windows Version und Patchlevel kann es nï¿½tig sein das System mit dem 
-"Microsoft Visual C++ 2008 Redistributable Package" von www.microsoft.com/downloads nachzurï¿½sten (Desktopicon, Objektlink).
+Für Windowsanwender: Je nach verwendeter Windows Version und Patchlevel kann es nötig sein das System mit dem 
+"Microsoft Visual C++ 2008 Redistributable Package" von www.microsoft.com/downloads nachzurüsten (Desktopicon, Objektlink).
+Füt GNU/Linux Anwender: RXTXcomm locked den seriellen Port über die Gruppe "uucp", welcher der Anwendungsnutzer angehören sollte
+Für Mac OS Anwender: Hier gilt prinzipiell das Gleiche wie für GNU/Linux, nur dass das Verzeichnis /var/lock erst angelegt werden muss, siehe
+RXTX_Post-Install_MacOS.txt
 
 Um Fehler oder Anregungen zu melden, bitte eine e-Mail an die Adresse auf der Downloadseite.

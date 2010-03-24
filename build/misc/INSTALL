@@ -1,16 +1,21 @@
-SerialDataExplorer is used to be build andinstalled using the GNU 
-standard way  calling 
+SerialDataExplorer is used to be build and installed using the GNU 
+standard way calling 
 
 ./configure && make && make install
 
-Since this is a Java based program there are several tools required 
-where Java based programs build and execution relies on
+Since SereilDataExplorer is a Java based program there are several 
+tools required where Java based programs build and execution relies 
+on
 
-	Java SDK
-	ant
+	Java SDK 	which is required to set JAVA_HOME
+	ant 		which is required to set ANT_HOME
 
-The default install directory is /opt/SerialDataExplorer
-First time startup is required usage of the start script in the
-installation director. Afterwards the application gives the 
-capability to maintain desktop shortcuts as well as start menu
-entries. During runtime online help is available.
+The default install directory is 
+on GNU/Linux /opt/SerialDataExplorer,
+on Windows(cygwin) C:/Program Files/SerialDataExplorer, 
+on Mac /Applications/SerialDataExplorer
+First time startup requires usage of the start script in the
+installation director, for Windows the executable. 
+Afterwards the application gives the capability to 
+maintain desktop shortcuts as well as start menu
+entries. During runtime a online help is available.
