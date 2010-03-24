@@ -1,10 +1,10 @@
-﻿******** SerialDataExplorer README ***********  24 Mar 2010 WB
+﻿******** OpenSerialDataExplorer README ***********  24 Mar 2010 WB
 
-The SerialDataExplorer (OSDE) are available total free of cost, but without any warranty. Since the implementation is based
+The OpenSerialDataExplorer (OSDE) are available total free of cost, but without any warranty. Since the implementation is based
 on Java using the free available libraries RXTXcomm and SWT the execution of this program is possible under a number of popular
 operating systems like 32/64 Bit Windows and GNU/Linux and Mac OS. Prerequisite is an installed Java version 1.6 or higher.
 
-The SerialDataExplorer gathers data from serial connected devices and display this data for a various of further analysis.
+The OpenSerialDataExplorer gathers data from serial connected devices and display this data for a various of further analysis.
 At the moment the following devices are enabled: 
 											 - AkkuMasterC4 (Htronic) 4 outlet battery charger/discharger
 											 - Picolario (Renschler) variometer
@@ -22,7 +22,7 @@ More device are under construction. Help doing this is very welcome.
 A device API (IDevice) is defined to enable a relative simple adaptation of a new device to work together with the base application.
 Documentation how to proceed doing this is under construction.									 
 
-Installation of the binary distribution is an unpack of the containing SerialDataExplorer directory with its sub directories to a place 
+Installation of the binary distribution is an unpack of the containing OpenSerialDataExplorer directory with its sub directories to a place 
 where execution right exist.
 For Windows user a proper place is %ProgramFiles% for GNU/Linux user "/opt" or "/usr", Mac OS /Applications.
 

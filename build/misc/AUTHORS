@@ -1,6 +1,6 @@
 This is AUTHORS Thus Mar 16 2010
 
-The SerialDataExplorer is written, starting October 2008, to 
+The OpenSerialDataExplorer is written, starting October 2008, to 
 remove frustration by similar available not cross platform 
 usable tools. It gives the capability to display serial 
 captured data in a number of different view for measurement
@@ -13,7 +13,7 @@ PARTICULAR PURPOSE.
 
 This package is not the result of one persons time. No coding but
 evaluation and testing takes place by several peoples not directly
-named.
+named here.
 
 Maintainer: Winfried Brügmann <winffried@bruegmaenner.de>
 
