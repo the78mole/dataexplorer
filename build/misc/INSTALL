@@ -10,7 +10,7 @@ on
 	Java SDK 	which is required to set JAVA_HOME
 	ant 		which is required to set ANT_HOME and PATH to ant executable
 
-The default install directory is 
+The default install directory (refer to build.properties) is 
 on GNU/Linux /opt/SerialDataExplorer,
 on Windows(cygwin) C:/Program Files/SerialDataExplorer, 
 on Mac /Applications/SerialDataExplorer
