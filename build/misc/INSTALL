@@ -8,7 +8,7 @@ tools required where Java based programs build and execution relies
 on
 
 	Java SDK 	which is required to set JAVA_HOME
-	ant 		which is required to set ANT_HOME
+	ant 		which is required to set ANT_HOME and PATH to ant executable
 
 The default install directory is 
 on GNU/Linux /opt/SerialDataExplorer,
