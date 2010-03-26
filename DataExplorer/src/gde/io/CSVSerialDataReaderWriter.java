@@ -156,8 +156,17 @@ public class CSVSerialDataReaderWriter {
 
 						recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), isRaw, true);
 						recordSetName = recordSet.getName(); // cut/correct length
-						recordSet.setRecordSetDescription(device.getName() + OSDE.STRING_MESSAGE_CONCAT
-								+ Messages.getString(MessageIds.OSDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()));
+						String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified());
+						boolean isOutdated = false;
+						try {
+							isOutdated = Integer.parseInt(dateTime.split(OSDE.STRING_DASH)[0]) <= 2000;
+						}
+						catch (Exception e) {
+							// ignore and state as not outdated
+						}
+						if (!dateTime.startsWith("2000-01-01") || !isOutdated) {
+							recordSet.setRecordSetDescription(device.getName() + OSDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.OSDE_MSGT0129) + dateTime);
+						}
 
 						// make all records displayable while absolute data
 						String[] recordNames = device.getMeasurementNames(activeChannel.getNumber());
