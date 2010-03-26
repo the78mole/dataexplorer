@@ -929,20 +929,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					this.deviceTypeText.setText(this.selectedActiveDeviceConfig.getDeviceGroup().name());
 					String link = this.selectedActiveDeviceConfig.getManufacturerURL() != null ? this.selectedActiveDeviceConfig.getManufacturerURL() : Messages.getString(MessageIds.OSDE_MSGT0191);
 					this.internetLinkText.setText(link);
-					if (this.availablePorts != null && this.availablePorts.size() > 0) {
-						this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(this.availablePorts));
-						int index = DeviceSelectionDialog.this.availablePorts.indexOf(this.selectedActiveDeviceConfig.getPort());
-						if (index > -1) {
-							this.portSelectCombo.select(index);
-						}
-						else {
-							this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0197));
-						}
-					}
-					else {
-						this.portSelectCombo.setItems(new String[0]);
-						this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
-					}
 					if (this.deviceConfigurations.get(activeDeviceName).getSerialPortType() != null) {
 						if (!this.serialPortSelectionGroup.getEnabled() || !this.portSettingsGroup.getEnabled()) {
 							enableSerialPortEntries(true);
@@ -968,6 +954,20 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						this.dtrCheckBox.setSelection(false);
 						this.rtsCheckBox.setSelection(false);
 					}
+					if (this.availablePorts != null && this.availablePorts.size() > 0) {
+						this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(this.availablePorts));
+						int index = DeviceSelectionDialog.this.availablePorts.indexOf(this.selectedActiveDeviceConfig.getPort());
+						if (index > -1) {
+							this.portSelectCombo.select(index);
+						}
+						else {
+							this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0197));
+						}
+					}
+					else {
+						this.portSelectCombo.setItems(new String[0]);
+						this.portSelectCombo.setText(Messages.getString(MessageIds.OSDE_MSGT0199));
+					}
 
 					DeviceSelectionDialog.this.tableTabButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isTableTabRequested());
 					DeviceSelectionDialog.this.digitalTabButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isDigitalTabRequested());
@@ -989,6 +989,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	private void enableSerialPortEntries(boolean enable) {
 		this.isUpdateSerialPorts = enable;	
 		this.serialPortSelectionGroup.setEnabled(enable);
+		this.portDescription.setEnabled(enable);
+		this.portSelectCombo.setEnabled(enable);
 		this.portSettingsGroup.setEnabled(enable);
 		this.portSettingsGroup.redraw();
 	}
