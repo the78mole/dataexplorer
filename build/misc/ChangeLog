@@ -1,8 +1,8 @@
 Development history / change log, please read from bottom up
 
-
-
-use time stamp of file while importing date from CSV file
+add one-time hint message for Mac OS and GNU/Linux user to care about RXTXcomm requirements
+update statistics properties of DataVario's to use height instead of GPS-height for height sum calculation
+use time stamp of file while importing date from CSV file, if not 2000.01.01
 fix height unit calculation by adding property DataVario
 enable reduce by first/last measurement point by property CSV2SerialAdapter
 fix display update problem moving record set to other configuration CSV2SerialAdapter
