@@ -138,7 +138,7 @@
 	</target>
 
 	<!-- cleanup -->
-	<target name="clean" >
+	<target name="clean" depends="init">
 		<delete dir="${output.dir}" />
 
 		<ant antfile="build.xml" target="clean" dir="OpenSerialDataExplorer" inheritall="true"/>
