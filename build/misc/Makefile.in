@@ -1,5 +1,6 @@
-#This is manual created Makefile.in March 16 2010
+#This is manual created Makefile.in March 16 2010 WB
 AUTOMAKE_OPTIONS = foreign
+prefix = @prefix@
 
 all: build/target/install/OpenSerialDataExplorer_2.20_Linux_x86_32.tar.gz build/target/install/OpenSerialDataExplorer_2.20_Linux_x86_64.tar.gz
 
@@ -8,9 +9,9 @@ build/target/install/OpenSerialDataExplorer_2.20_Linux_x86_32.tar.gz:
 
 build/target/install/OpenSerialDataExplorer_2.20_Linux_x86_64.tar.gz:
 	ant -f build/build.xml dist
-
+    
 clean:
 	ant -f build/build.xml clean
-
+    
 install: 
-	ant -f build/build.xml install
+	ant -Dprefix=${prefix} -f build/build.xml install
