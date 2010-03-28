@@ -1,10 +1,11 @@
 ﻿******** OpenSerialDataExplorer README ***********  24 Mar 2010 WB
 
-The OpenSerialDataExplorer (OSDE) are available total free of cost, but without any warranty. Since the implementation is based
-on Java using the free available libraries RXTXcomm and SWT the execution of this program is possible under a number of popular
-operating systems like 32/64 Bit Windows and GNU/Linux and Mac OS. Prerequisite is an installed Java version 1.6 or higher.
+The OpenSerialDataExplorer (OSDE) is free software, please see http://www.gnu.org/philosophy/free-sw.html. It is also available at no
+cost, but without any warranty. Since the implementation is based on Java using the free available libraries RXTXcomm and SWT
+the execution of this program is possible under a number of popular operating systems like 32/64 Bit Windows and GNU/Linux 
+and Mac OS. To execute the only prerequisite is an installed Java runtime with version 1.6 or higher.
 
-The OpenSerialDataExplorer gathers data from serial connected devices and display this data for a various of further analysis.
+The OpenSerialDataExplorer gathers data from connected devices and display this data for a various of further analysis.
 At the moment the following devices are enabled: 
 											 - AkkuMasterC4 (Htronic) 4 outlet battery charger/discharger
 											 - Picolario (Renschler) variometer
@@ -49,8 +50,11 @@ Main program files are:
 ../README.*
 
 Extensions for the Java runtime RXTXcomm and SWT:
-../java/ext/*.jar
+../java/ext/*.jar 
 ../java/ext/*.LICENSE
+SWT downloaded from eclipse.org/swt as swt-3.4.4.8-<platform>-<architecture>.zip and swt.jar extracted, Mac OS the latest 
+available since there are application relevant bugs reported which are not fixed.
+RXTXcomm created from rxtx-pre2 source distribution, refer to thirdparty directory in osde source distribution archive.
 
 Hint for GNU/Linux user: RxTxcomm is using the uucp locking mechanism, to enable this the user must be part of the "uucp" group. Without being part 
 of this group open an serial port might be impossible. This depends on the used distribution.

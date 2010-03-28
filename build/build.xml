@@ -623,6 +623,14 @@
                 <include name="configure"/>
                 <include name="install-sh"/>
             </zipfileset>
+            <zipfileset dir="${basedir}/OpenSerialDataExplorer/doc" casesensitive="true" prefix="osde-${version.num}" filemode="444">
+                <include name="OpenSerialDataExplorer*.txt"/>
+            </zipfileset>
+            <zipfileset dir="${basedir}/RXTXcomm" casesensitive="true" prefix="osde-${version.num}/thirdparty/rxtx-2.2pre2" filemode="444">
+            	<include name="**/**"/>
+                <exclude name="**/CVS/**"/>
+                <exclude name="**/bin/**"/>
+            </zipfileset>
         </zip>
     </target>
 

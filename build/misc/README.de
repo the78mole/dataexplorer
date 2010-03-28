@@ -1,9 +1,9 @@
 ******** OpenSerialDataExplorer README ***********  24 März 2010 WB
 
-Der OpenSerialDataExplorer (OSDE) wird ohne jegliche Gewährleistung, dafür aber kostenfrei und ohne Spende zur Verfügung gestellt. 
-Durch die Implementierung in Java auf der Basis von der freien Bibliothek RXTXcomm und dem freien Eclipse SWT ist die Ausführung
-des Programms auf vilen populären Betriebssystemplattformen in 32 oder 64 Bit wie Windows, GNU/Linux und Mac OS möglich. Voraussetzung 
-ist lediglich eine installierte Java Laufzeitumgebung der Version 1.6 oder höher. 
+Der OpenSerialDataExplorer (OSDE) ist freie Software, siehe http://www.gnu.org/philosophy/free-sw.html. Sie wird kostenfrei und ohne Spende 
+zur Verfügung gestellt. Es gibt aber auch keinerlei Gewährleistung. Durch die Implementierung in Java auf der Basis von der freien Bibliotheken 
+RXTXcomm und eclipse SWT ist die Ausführung des Programms auf vielen populären Betriebssystemplattformen in 32 oder 64 Bit wie Windows, GNU/Linux 
+und Mac OS möglich. Voraussetzung ist lediglich eine installierte Java Laufzeitumgebung der Version 1.6 oder höher. 
 
 Der OpenSerialDataExplorer nimmt Daten von seriell angeschlossenen Geräten entgegen, zeigt diese für verschiedene Auswertungen an. 
 Zur Zeit sind folgende Geräte eingebunden: 
@@ -52,6 +52,9 @@ Andere Programmresourcen sind:
 Erweiterung der Java Laufzeitumgebung für RXTXcomm und SWT:
 ../java/ext/*.jar
 ../java/ext/*.LICENSE
+SWT heruntergeladen von eclipse.org/swt als swt-3.4.4.8-<platform>-<architecture>.zip und swt.jar extrhiert füt Windows und Linux, für Mac OS wurde die aktuellste 
+verfügbare Version verwendet, da hier anwendungsrelevante Fehler reportet sind, die aber noch nicht gelöst sind.
+RXTXcomm wurde aus dem rxtx-pre2 Quellarchiv erstellt, siehe thirdparty Verzeichnis in dem osde Quellarchiv.
 
 Hinweis fï¿½r GNU/Linux- und Mac-Benutzer: RxTxcomm ist verwendet den uucp locking Mechanismus, hierzu muss der Benutzer der Gruppe "uucp" angehï¿½ren. In Abhï¿½ngigkeit
 der verwendeten Distribution kann evtl. kein serieller Port geï¿½ffnet werden.
