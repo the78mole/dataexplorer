@@ -1576,7 +1576,6 @@ public class DevicePropertiesEditor extends Composite {
 	 */
 	@Override
 	public void update() {
-		DevicePropertiesEditor.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 		//SWTResourceManager.listResourceStatus();
 		//DeviceType begin
 		this.deviceName = this.deviceConfig.getName();
@@ -1594,6 +1593,8 @@ public class DevicePropertiesEditor extends Composite {
 			@Override
 			public void run() {
 				try {
+					DevicePropertiesEditor.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+
 					//SerialPortType begin
 					if (DevicePropertiesEditor.this.deviceConfig.getSerialPortType() == null && DevicePropertiesEditor.this.serialPortTabItem != null && !DevicePropertiesEditor.this.serialPortTabItem.isDisposed()) {
 						DevicePropertiesEditor.this.serialPortTabItem.dispose();
