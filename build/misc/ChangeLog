@@ -1,5 +1,6 @@
 Development history / change log, please read from bottom up
 
+Version 2.20		30 Mar 2010
 
 fix problem switching enable/disable of port selection within device selection dialog 
 add one-time hint message for Mac OS and GNU/Linux user to care about RXTXcomm requirements
