@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.dialog;
 
@@ -30,10 +30,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.OSDE;
+import osde.DE;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -49,7 +49,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 	Label infoText;
 	Label version;
 	
-	final OpenSerialDataExplorer application;
+	final DataExplorer application;
 
 	/**
 	* Auto-generated main method to display this 
@@ -68,14 +68,14 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 
 	public AboutDialog(Shell parent, int style) {
 		super(parent, style);
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 	}
 
 	public void open() {
 		try {
 			Shell parent = getParent();
 			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
-			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.jpg")); //$NON-NLS-1$
+			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/DataExplorer.jpg")); //$NON-NLS-1$
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			this.dialogShell.setLayout(new FormLayout());
 			this.dialogShell.layout();
@@ -96,9 +96,9 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0148)  //$NON-NLS-1$ 
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0149)  //$NON-NLS-1$
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0150)); //$NON-NLS-1$
-				this.infoText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+				this.infoText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				//this.infoText.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-				//this.infoText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+				//this.infoText.setForeground(DataExplorer.COLOR_BLACK);
 			}
 			{
 				FormData versionLData = new FormData();
@@ -110,8 +110,8 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.version = new Label(this.dialogShell, SWT.CENTER);
 				this.version.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 				this.version.setLayoutData(versionLData);
-				this.version.setText(OSDE.OSDE_VERSION);
-				this.version.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+				this.version.setText(DE.OSDE_VERSION);
+				this.version.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 			}
 			{
 				FormData okLData = new FormData();
@@ -142,8 +142,8 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.aboutText.setLayoutData(aboutTextLData);
 				this.aboutText.setFont(SWTResourceManager.getFont(this.application, 18, 2));
 				this.aboutText.setText("Open Serial Data Explorer"); //$NON-NLS-1$
-				this.aboutText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-				this.aboutText.setText(OpenSerialDataExplorer.getInstance().getClass().getSimpleName());
+				this.aboutText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+				this.aboutText.setText(DataExplorer.getInstance().getClass().getSimpleName());
 			}
 			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
 			this.dialogShell.open();

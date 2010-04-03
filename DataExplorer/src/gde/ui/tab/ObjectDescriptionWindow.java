@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
 
@@ -63,14 +63,14 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.ObjectData;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.ObjectImageContextMenu;
 import osde.ui.menu.TabAreaContextMenu;
@@ -94,7 +94,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 	ToolItem											fontSelect;
 	Composite											fontSizeSelectComposite;
 	CCombo												fontSizeSelectCombo;
-	Point													fontSizeSelectSize	= new Point((OSDE.IS_LINUX ? 60 : 40), (OSDE.IS_LINUX ? 22 : 20));
+	Point													fontSizeSelectSize	= new Point((DE.IS_LINUX ? 60 : 40), (DE.IS_LINUX ? 22 : 20));
 	ToolItem											strikeoutButton;
 	ToolItem											underlineButton;
 	ToolItem											italicButton;
@@ -122,7 +122,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 
 	final CTabFolder							tabFolder;
 	//static CTabFolder cTabFolder1;
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final Settings								settings;
 	final Channels								channels;
 	
@@ -143,7 +143,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 	public ObjectDescriptionWindow(CTabFolder currentDisplayTab, int style) {
 		super(currentDisplayTab, style);
 		SWTResourceManager.registerResourceUser(this);
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.tabFolder = currentDisplayTab;
 		this.settings = Settings.getInstance();
 		this.channels = Channels.getInstance();
@@ -171,7 +171,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		checkSaveObjectData();
 
 		this.activeObjectKey = this.application.getMenuToolBar().getActiveObjectKey();
-		this.objectFilePath = this.settings.getDataFilePath() + OSDE.FILE_SEPARATOR_UNIX + this.activeObjectKey + OSDE.FILE_SEPARATOR_UNIX + this.activeObjectKey + OSDE.FILE_ENDING_DOT_ZIP;
+		this.objectFilePath = this.settings.getDataFilePath() + DE.FILE_SEPARATOR_UNIX + this.activeObjectKey + DE.FILE_SEPARATOR_UNIX + this.activeObjectKey + DE.FILE_ENDING_DOT_ZIP;
 		this.object = new ObjectData(this.objectFilePath);
 
 		// check if object data can be load from file
@@ -196,7 +196,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		this.styledText.setStyleRanges(this.object.getStyleRanges().clone());
 		int index = 0;
 		for (String fontSize : this.fontSizeSelectCombo.getItems()) {
-			if (fontSize.equals(OSDE.STRING_EMPTY + fd.getHeight())) {
+			if (fontSize.equals(DE.STRING_EMPTY + fd.getHeight())) {
 				this.fontSizeSelectCombo.select(index);
 				break;
 			}
@@ -295,7 +295,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				typeCompositeLData.verticalAlignment = GridData.BEGINNING;
 				typeCompositeLData.grabExcessHorizontalSpace = true;
 				typeCompositeLData.horizontalAlignment = GridData.BEGINNING;
-				typeCompositeLData.heightHint = OSDE.IS_LINUX ? 32 : 28;
+				typeCompositeLData.heightHint = DE.IS_LINUX ? 32 : 28;
 				this.objectTypeComposite.setLayoutData(typeCompositeLData);
 				this.objectTypeComposite.setBackground(this.surroundingBackground);
 				this.objectTypeComposite.setMenu(this.popupmenu);
@@ -303,7 +303,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.objectTypeLabel = new CLabel(this.objectTypeComposite, SWT.NONE);
 					this.objectTypeLabel.setBackground(this.surroundingBackground);
 					this.objectTypeLabel.setMenu(this.popupmenu);
-					this.objectTypeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.objectTypeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.objectTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0425));
 					RowData cLabel1LData1 = new RowData();
 					cLabel1LData1.width = 140;
@@ -315,7 +315,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.objectTypeText = new Text(this.objectTypeComposite, SWT.BORDER);
 					this.objectTypeText.setBackground(this.innerAreaBackground);
 					this.objectTypeText.setMenu(this.popupmenu);
-					this.objectTypeText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.objectTypeText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.objectTypeText.setEditable(true);
 					RowData cLabel2LData = new RowData();
 					cLabel2LData.width = 240;
@@ -339,14 +339,14 @@ public class ObjectDescriptionWindow extends CTabItem {
 				dateCompositeLData.grabExcessHorizontalSpace = true;
 				dateCompositeLData.verticalAlignment = GridData.BEGINNING;
 				dateCompositeLData.horizontalAlignment = GridData.BEGINNING;
-				dateCompositeLData.heightHint = OSDE.IS_LINUX ? 32 : 28;
+				dateCompositeLData.heightHint = DE.IS_LINUX ? 32 : 28;
 				this.dateComposite.setLayoutData(dateCompositeLData);
 				this.dateComposite.setBackground(this.surroundingBackground);
 				this.dateComposite.setMenu(this.popupmenu);
 				{
 					this.dateLabel = new CLabel(this.dateComposite, SWT.NONE);
 					this.dateLabel.setMenu(this.popupmenu);
-					this.dateLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.dateLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData dateLabelLData = new RowData();
 					dateLabelLData.width = 140;
 					dateLabelLData.height = 22;
@@ -358,9 +358,9 @@ public class ObjectDescriptionWindow extends CTabItem {
 				}
 				{
 					this.dateText = new Text(this.dateComposite, SWT.BORDER);
-					this.dateText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.dateText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData dateTextLData = new RowData();
-					dateTextLData.width = OSDE.IS_LINUX ? 116 : 118;
+					dateTextLData.width = DE.IS_LINUX ? 116 : 118;
 					dateTextLData.height = 18;
 					this.dateText.setLayoutData(dateTextLData);
 					this.dateText.setBackground(this.innerAreaBackground);
@@ -384,7 +384,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				statusCompositeLData.grabExcessHorizontalSpace = true;
 				statusCompositeLData.verticalAlignment = GridData.BEGINNING;
 				statusCompositeLData.horizontalAlignment = GridData.BEGINNING;
-				statusCompositeLData.heightHint = OSDE.IS_LINUX ? 32 : 28;
+				statusCompositeLData.heightHint = DE.IS_LINUX ? 32 : 28;
 				this.statusComposite.setLayoutData(statusCompositeLData);
 				this.statusComposite.setBackground(this.surroundingBackground);
 				this.statusComposite.setMenu(this.popupmenu);
@@ -392,7 +392,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.statusLabel = new CLabel(this.statusComposite, SWT.NONE);
 					this.statusLabel.setBackground(this.surroundingBackground);
 					this.statusLabel.setMenu(this.popupmenu);
-					this.statusLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.statusLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData statusLabelLData = new RowData();
 					statusLabelLData.width = 140;
 					statusLabelLData.height = 22;
@@ -402,16 +402,16 @@ public class ObjectDescriptionWindow extends CTabItem {
 				}
 				{
 					this.statusText = new CCombo(this.statusComposite, SWT.BORDER);
-					this.statusText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.statusText.setItems(Messages.getString(MessageIds.OSDE_MSGT0412).split(OSDE.STRING_SEMICOLON));
+					this.statusText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.statusText.setItems(Messages.getString(MessageIds.OSDE_MSGT0412).split(DE.STRING_SEMICOLON));
 					this.statusText.setBackground(this.innerAreaBackground);
 					this.statusText.setMenu(this.popupmenu);
 					this.statusText.select(0);
 					RowData group1LData = new RowData();
 					group1LData.width = 120;
-					group1LData.height = OSDE.IS_LINUX ? 22 : 20;
+					group1LData.height = DE.IS_LINUX ? 22 : 20;
 					this.statusText.setLayoutData(group1LData);
-					this.statusText.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+					this.statusText.setBackground(DataExplorer.COLOR_WHITE);
 					this.statusText.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0411));
 					this.statusText.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -519,12 +519,12 @@ public class ObjectDescriptionWindow extends CTabItem {
 								this.fontSizeSelectComposite = new Composite(this.fontSelectToolBar, SWT.FLAT);
 								this.fontSizeSelectComposite.setBackground(this.surroundingBackground);
 								this.fontSizeSelectCombo = new CCombo(this.fontSizeSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-								this.fontSizeSelectCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.fontSizeSelectCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.fontSizeSelectCombo.setItems(new String[] { "6", "7", "8", "9", "10", "12", "14", "16", "18" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 								this.fontSizeSelectCombo.select(3);
 								this.fontSizeSelectCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0201));
 								this.fontSizeSelectCombo.setEditable(false);
-								this.fontSizeSelectCombo.setBackground(OpenSerialDataExplorer.COLOR_WHITE);
+								this.fontSizeSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
 								this.fontSizeSelectCombo.setVisibleItemCount(5);
 								this.fontSizeSelectCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -706,7 +706,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					FormLayout styledTextLayout = new FormLayout();
 					this.styledText.setLayout(styledTextLayout);
 					this.styledText.setEditable(true);
-					this.styledText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.styledText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.styledText.setHorizontalIndex(2);
 					this.styledText.setTopIndex(1);
 					FormData styledTextLData = new FormData();
@@ -936,7 +936,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		if(this.isDisposed()) SWT.error(SWT.ERROR_WIDGET_DISPOSED);
 		
 		Rectangle bounds = this.tabFolder.getClientArea();
-		Image objectImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		Image objectImage = new Image(DataExplorer.display, bounds.width, bounds.height);
 		GC imageGC = new GC(objectImage);
 		this.tabComposite.print(imageGC);
 		imageGC.dispose();

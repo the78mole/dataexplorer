@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
-import osde.OSDE;
+import osde.DE;
 
 
 /**
@@ -60,8 +60,8 @@ public enum DecimalSeparatorTypes {
   	public static String[] valuesAsStingArray() {
   		StringBuilder sb = new StringBuilder();
   		for (DecimalSeparatorTypes element : DecimalSeparatorTypes.values()) {
-  			sb.append("  ").append(element.value).append(OSDE.STRING_DASH);  //$NON-NLS-1$
+  			sb.append("  ").append(element.value).append(DE.STRING_DASH);  //$NON-NLS-1$
   		}
-  		return sb.toString().split(OSDE.STRING_DASH);
+  		return sb.toString().split(DE.STRING_DASH);
   	}
 }

@@ -11,7 +11,7 @@ package osde.device;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
-import osde.OSDE;
+import osde.DE;
 
 
 /**
@@ -51,8 +51,8 @@ public enum DataBitsTypes {
   	public static String[] valuesAsStingArray() {
   		StringBuilder sb = new StringBuilder();
   		for (DataBitsTypes element : DataBitsTypes.values()) {
-  			sb.append(element).append(OSDE.STRING_DASH);
+  			sb.append(element).append(DE.STRING_DASH);
   		}
-  		return sb.toString().split(OSDE.STRING_DASH);
+  		return sb.toString().split(DE.STRING_DASH);
   	}
 }

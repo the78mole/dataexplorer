@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
 
@@ -44,14 +44,14 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.TabAreaContextMenu;
 
@@ -73,7 +73,7 @@ public class FileCommentWindow extends CTabItem {
 	Color													innerAreaBackground;
 	Color													surroundingBackground;
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final Channels								channels;
 	final CTabFolder							displayTab;
 	final Menu										popupmenu;
@@ -86,7 +86,7 @@ public class FileCommentWindow extends CTabItem {
 	public FileCommentWindow(CTabFolder currentDisplayTab, int style) {
 		super(currentDisplayTab, style);
 		this.displayTab = currentDisplayTab;
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		SWTResourceManager.registerResourceUser(this);
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
@@ -116,7 +116,7 @@ public class FileCommentWindow extends CTabItem {
 		this.commentMainComposite.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
 				log.log(Level.FINER, "commentMainComposite.helpRequested " + evt); //$NON-NLS-1$
-				OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		{
@@ -136,16 +136,16 @@ public class FileCommentWindow extends CTabItem {
 		}
 		{
 			this.fileCommentText = new Text(this.commentMainComposite, SWT.WRAP | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-			this.fileCommentText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.fileCommentText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.fileCommentText.setBackground(this.innerAreaBackground);
 			this.fileCommentText.setText(Messages.getString(MessageIds.OSDE_MSGT0241));
 			this.fileCommentText.setBounds(50, 40, 500, 100);
-			this.fileCommentText.setText(this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getFileDescription() : OSDE.STRING_EMPTY);
+			this.fileCommentText.setText(this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getFileDescription() : DE.STRING_EMPTY);
 			this.fileCommentText.setMenu(this.popupmenu);
 			this.fileCommentText.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "fileCommentText.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.fileCommentText.addKeyListener(new KeyAdapter() {
@@ -170,7 +170,7 @@ public class FileCommentWindow extends CTabItem {
 		}
 		{
 			this.recordCommentTable = new Table(this.commentMainComposite, SWT.BORDER | SWT.V_SCROLL);
-			this.recordCommentTable.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.recordCommentTable.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.recordCommentTable.setBounds(50, 200, 500, 100);
 			//this.table.setControl(this.dataTable);
 			this.recordCommentTable.setLinesVisible(true);
@@ -180,7 +180,7 @@ public class FileCommentWindow extends CTabItem {
 			this.recordCommentTable.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "recordCommentTable.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 
@@ -254,7 +254,7 @@ public class FileCommentWindow extends CTabItem {
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.commentMainComposite.getClientArea();
-		Image tabContentImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		Image tabContentImage = new Image(DataExplorer.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.commentMainComposite.print(imageGC);
 		imageGC.dispose();

@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui;
 
@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 
-import osde.OSDE;
+import osde.DE;
 
 /**
  * user interface status bar class, device, serial port, port activity, progress bar, messages
@@ -90,36 +90,36 @@ public class StatusBar {
 				{
 					this.portButton = new CLabel(this.comComposite, SWT.NONE);
 					this.portButton.setBounds(2,2, 50, 20);
-					this.portButton.setForeground(OpenSerialDataExplorer.COLOR_DARK_GREEN);
+					this.portButton.setForeground(DataExplorer.COLOR_DARK_GREEN);
 					this.portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.conText = new Label(this.comComposite, SWT.LEFT);
 					this.conText.setText("CON"); //$NON-NLS-1$
 					this.conText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), 8, SWT.NORMAL)); //$NON-NLS-1$
-					this.conText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.conText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
 					this.rxButton = new CLabel(this.comComposite, SWT.CENTER);
 					this.rxButton.setBounds(2,2, 50, 20);
-					this.rxButton.setForeground(OpenSerialDataExplorer.COLOR_DARK_GREEN);
+					this.rxButton.setForeground(DataExplorer.COLOR_DARK_GREEN);
 					this.rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.rxText = new Label(this.comComposite, SWT.LEFT);
-					this.rxText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.rxText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					this.rxText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), 8, SWT.NORMAL)); //$NON-NLS-1$
 					this.rxText.setText("RX"); //$NON-NLS-1$
 				}
 				{
 					this.txButton = new CLabel(this.comComposite, SWT.CENTER);
 					this.txButton.setBounds(2,2, 50, 20);
-					this.txButton.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.txButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					this.txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.txText = new Label(this.comComposite, SWT.LEFT);
-					this.txText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.txText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					this.txText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), 8, SWT.NORMAL)); //$NON-NLS-1$
 					this.txText.setText("TX"); //$NON-NLS-1$
 				}
@@ -137,7 +137,7 @@ public class StatusBar {
 			}
 			{
 				this.msgLabel = new Label(this.statusComposite, SWT.LEFT | SWT.SINGLE);
-				this.msgLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.msgLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			}
 		}
 	}

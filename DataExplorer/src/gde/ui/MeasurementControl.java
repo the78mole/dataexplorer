@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui;
 
@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import osde.OSDE;
+import osde.DE;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
@@ -52,7 +52,7 @@ public class MeasurementControl extends Composite {
 	Label													measurementSymbolLabel;
 
 	final IDevice									device;																										// get device specific things, get serial port, ...
-	final OpenSerialDataExplorer	application;																								// interaction with application instance
+	final DataExplorer	application;																								// interaction with application instance
 	final Channels								channels;																									// interaction with channels, source of all records
 	final DeviceDialog						dialog;
 	final MeasurementType					measurementType;
@@ -64,7 +64,7 @@ public class MeasurementControl extends Composite {
 		this.ordinal = useOrdinal;
 		this.measurementType = useMeasurementType;
 		this.device = useDevice;
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 
 		RowLayout thisLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -80,7 +80,7 @@ public class MeasurementControl extends Composite {
 			measurementLData.width = 180;
 			measurementLData.height = 20;
 			this.measurement.setLayoutData(measurementLData);
-			this.measurement.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.measurement.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.measurement.setText(this.measurementType.getName());
 			this.measurement.setSelection(this.measurementType.isActive());
 			this.measurement.addSelectionListener(new SelectionAdapter() {
@@ -111,7 +111,7 @@ public class MeasurementControl extends Composite {
 			measurementSymbolLabelLData.width = 50;
 			measurementSymbolLabelLData.height = 20;
 			this.measurementSymbolLabel.setLayoutData(measurementSymbolLabelLData);
-			this.measurementSymbolLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.measurementSymbolLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.measurementSymbolLabel.setText(this.measurementType.getSymbol());
 		}
 		{
@@ -120,8 +120,8 @@ public class MeasurementControl extends Composite {
 			measurementUnitLabelLData.width = 50;
 			measurementUnitLabelLData.height = 20;
 			this.measurementUnitLabel.setLayoutData(measurementUnitLabelLData);
-			this.measurementUnitLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-			this.measurementUnitLabel.setText(OSDE.STRING_LEFT_BRACKET + this.measurementType.getUnit() + OSDE.STRING_RIGHT_BRACKET);
+			this.measurementUnitLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.measurementUnitLabel.setText(DE.STRING_LEFT_BRACKET + this.measurementType.getUnit() + DE.STRING_RIGHT_BRACKET);
 		}
 
 	}

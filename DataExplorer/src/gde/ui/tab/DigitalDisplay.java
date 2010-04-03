@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
 
@@ -39,7 +39,7 @@ import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.TabAreaContextMenu;
 
@@ -54,7 +54,7 @@ public class DigitalDisplay extends Composite {
 	CLabel					actualDigitalLabel, maxDigitalLabel, minDigitalLabel;
 	Composite				minMaxComposite;
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final Channels								channels;
 	final String									recordKey;
 	final IDevice									device;
@@ -63,7 +63,7 @@ public class DigitalDisplay extends Composite {
 	final Menu										popupmenu;
 	final TabAreaContextMenu			contextMenu;
 
-	public DigitalDisplay(OpenSerialDataExplorer currentApplication, Composite digitalWindow, String currentRecordKey, IDevice currentDevice) {
+	public DigitalDisplay(DataExplorer currentApplication, Composite digitalWindow, String currentRecordKey, IDevice currentDevice) {
 		super(digitalWindow, SWT.BORDER);
 		FillLayout digitalComposite1Layout = new FillLayout(SWT.VERTICAL);
 		this.setLayout(digitalComposite1Layout);
@@ -109,7 +109,7 @@ public class DigitalDisplay extends Composite {
 			this.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_7.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_7.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.textDigitalLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);

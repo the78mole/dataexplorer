@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
 
@@ -52,7 +52,7 @@ import osde.data.RecordSet;
 import osde.device.IDevice;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.CellVoltageValuesDialog;
 import osde.ui.menu.TabAreaContextMenu;
@@ -79,7 +79,7 @@ public class CellVoltageWindow extends CTabItem {
 	Button											niMhButton;
 	Button											individualButton;
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final Channels								channels;
 	final CTabFolder							displayTab;
 	final CellVoltageValuesDialog	lithiumValuesDialog;
@@ -139,7 +139,7 @@ public class CellVoltageWindow extends CTabItem {
 		super(currentDisplayTab, style, position);
 		SWTResourceManager.registerResourceUser(this);
 		this.displayTab = currentDisplayTab;
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.OSDE_MSGT0232));
@@ -160,7 +160,7 @@ public class CellVoltageWindow extends CTabItem {
 			this.cellVoltageMainComposite.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "cellVoltageMainComposite.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.cellVoltageMainComposite.addPaintListener(new PaintListener() {
@@ -181,7 +181,7 @@ public class CellVoltageWindow extends CTabItem {
 			this.voltageLimitsSelection.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "voltageLimitsSelection.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.voltageLimitsSelection.addPaintListener(new PaintListener() {
@@ -326,7 +326,7 @@ public class CellVoltageWindow extends CTabItem {
 						CellVoltageWindow.this.liIoButton.setSelection(false);
 						CellVoltageWindow.this.liFeButton.setSelection(false);
 						CellVoltageWindow.this.niMhButton.setSelection(false);
-						CellVoltageValues.setVoltageLimits(new CellVoltageValuesDialog(OpenSerialDataExplorer.getInstance(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL).open());
+						CellVoltageValues.setVoltageLimits(new CellVoltageValuesDialog(DataExplorer.getInstance(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL).open());
 						Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
 						RecordSet recordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 						if (recordSet != null) recordSet.setVoltageLimits();
@@ -592,7 +592,7 @@ public class CellVoltageWindow extends CTabItem {
 	 */
 	void updateVoltageAndCapacity() {
 		Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
-		IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
+		IDevice device = DataExplorer.getInstance().getActiveDevice();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
@@ -652,7 +652,7 @@ public class CellVoltageWindow extends CTabItem {
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.cellVoltageMainComposite.getClientArea();
-		Image tabContentImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		Image tabContentImage = new Image(DataExplorer.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.cellVoltageMainComposite.print(imageGC);
 		imageGC.dispose();

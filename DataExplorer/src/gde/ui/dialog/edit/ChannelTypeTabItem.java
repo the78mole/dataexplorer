@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.dialog.edit;
 
@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import osde.OSDE;
+import osde.DE;
 import osde.device.ChannelType;
 import osde.device.ChannelTypes;
 import osde.device.DeviceConfiguration;
@@ -47,7 +47,7 @@ import osde.device.ObjectFactory;
 import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
 
@@ -79,7 +79,7 @@ public class ChannelTypeTabItem extends CTabItem {
 		super(parent, style);
 		this.channelConfigInnerTabFolder = parent;
 		this.propsEditor = DevicePropertiesEditor.getInstance();
-		this.tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
+		this.tabName = DE.STRING_BLANK + (index + 1) + DE.STRING_BLANK;
 		log.log(java.util.logging.Level.FINE, "ChannelTypeTabItem " + this.tabName); //$NON-NLS-1$
 		initGUI();
 	}
@@ -94,7 +94,7 @@ public class ChannelTypeTabItem extends CTabItem {
 		this.channelType = useChannelType;
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.channelConfigComposite.redraw();
-		this.setText(OSDE.STRING_BLANK + ChannelTypeTabItem.this.channelConfigNumber + OSDE.STRING_BLANK + this.channelType.getName());
+		this.setText(DE.STRING_BLANK + ChannelTypeTabItem.this.channelConfigNumber + DE.STRING_BLANK + this.channelType.getName());
 
 		//MeasurementType begin
 		int measurementTypeCount = this.channelType.getMeasurement().size();
@@ -135,7 +135,7 @@ public class ChannelTypeTabItem extends CTabItem {
 		super(parent, style);
 		this.channelConfigInnerTabFolder = parent;
 		this.propsEditor = DevicePropertiesEditor.getInstance();
-		this.tabName = OSDE.STRING_BLANK + (index + 1) + OSDE.STRING_BLANK;
+		this.tabName = DE.STRING_BLANK + (index + 1) + DE.STRING_BLANK;
 		this.channelType = useChannelType;
 		initGUI();
 	}
@@ -160,7 +160,7 @@ public class ChannelTypeTabItem extends CTabItem {
 		this.channelConfigName = copyFrom.channelConfigName;
 		this.channelType.setName(this.channelConfigType == ChannelTypes.TYPE_OUTLET ? this.channelConfigName : Messages.getString(MessageIds.OSDE_MSGT0507));
 		this.channelType.setType(this.channelConfigType);
-		this.tabName = OSDE.STRING_BLANK + this.channelConfigNumber + OSDE.STRING_BLANK + (this.deviceConfig != null ? this.channelType.getName() : OSDE.STRING_EMPTY);
+		this.tabName = DE.STRING_BLANK + this.channelConfigNumber + DE.STRING_BLANK + (this.deviceConfig != null ? this.channelType.getName() : DE.STRING_EMPTY);
 		initGUI();
 
 		//MeasurementType begin - fix number tab items
@@ -195,7 +195,7 @@ public class ChannelTypeTabItem extends CTabItem {
 		try {
 			SWTResourceManager.registerResourceUser(this);
 			this.setText(this.tabName);
-			this.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			FormData fd;
 			{
 				this.channelConfigComposite = new Composite(this.channelConfigInnerTabFolder, SWT.NONE);
@@ -205,12 +205,12 @@ public class ChannelTypeTabItem extends CTabItem {
 					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "channelConfigComposite.helpRequested " + evt); //$NON-NLS-1$
-						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_channelConfig"); //$NON-NLS-1$ //$NON-NLS-2$
+						DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_channelConfig"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				{
 					this.channelConfigTypeCombo = new CCombo(this.channelConfigComposite, SWT.BORDER);
-					this.channelConfigTypeCombo.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.channelConfigTypeCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					//this.channelConfigTypeCombo.setBounds(6, 9, 121, 20);
 					fd = new FormData();
 					fd.left = new FormAttachment(0, 1000, 9);
@@ -235,7 +235,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				{
 					this.channelConfigText = new Text(this.channelConfigComposite, SWT.BORDER | SWT.LEFT);
 					this.channelConfigText.setText(Messages.getString(MessageIds.OSDE_MSGT0527));
-					this.channelConfigText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.channelConfigText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					//this.channelConfigText.setBounds(147, 9, 128, 20);
 					fd = new FormData();
 					fd.left = new FormAttachment(0, 1000, 150);
@@ -252,7 +252,7 @@ public class ChannelTypeTabItem extends CTabItem {
 								ChannelTypeTabItem.this.channelType.setName(ChannelTypeTabItem.this.channelConfigName);
 								ChannelTypeTabItem.this.deviceConfig.setChangePropery(true);
 								ChannelTypeTabItem.this.propsEditor.enableSaveButton(true);
-								ChannelTypeTabItem.this.setText(OSDE.STRING_BLANK + ChannelTypeTabItem.this.channelConfigNumber + OSDE.STRING_BLANK + ChannelTypeTabItem.this.channelConfigName);
+								ChannelTypeTabItem.this.setText(DE.STRING_BLANK + ChannelTypeTabItem.this.channelConfigNumber + DE.STRING_BLANK + ChannelTypeTabItem.this.channelConfigName);
 							}
 						}
 					});
@@ -260,7 +260,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				{
 					this.channelConfigLabel = new Label(this.channelConfigComposite, SWT.CENTER);
 					this.channelConfigLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0528));
-					this.channelConfigLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.channelConfigLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					//this.channelConfigLabel.setBounds(289, 9, 279, 20);
 					fd = new FormData();
 					fd.top = new FormAttachment(0, 1000, 9);
@@ -315,8 +315,8 @@ public class ChannelTypeTabItem extends CTabItem {
 				}
 				{
 					this.channelConfigAddButton = new Button(this.channelConfigComposite, SWT.PUSH | SWT.CENTER);
-					this.channelConfigAddButton.setText(OSDE.STRING_PLUS);
-					this.channelConfigAddButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.channelConfigAddButton.setText(DE.STRING_PLUS);
+					this.channelConfigAddButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.channelConfigAddButton.setBounds(574, 9, 42, 19);
 					fd = new FormData();
 					fd.top = new FormAttachment(0, 1000, 7);

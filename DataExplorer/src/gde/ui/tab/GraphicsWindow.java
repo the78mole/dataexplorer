@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
 
@@ -32,7 +32,7 @@ import osde.config.Settings;
 import osde.data.Channels;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.TimeLine;
 
@@ -59,7 +59,7 @@ public class GraphicsWindow extends CTabItem {
 	// drawing canvas
 	GraphicsComposite							graphicsComposite;
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final Channels								channels;
 	final Settings								settings;
 	final String									tabName;
@@ -69,7 +69,7 @@ public class GraphicsWindow extends CTabItem {
 	public GraphicsWindow(CTabFolder currentDisplayTab, int style, int currentType, String useTabName, int index) {
 		super(currentDisplayTab, style, index);
 		SWTResourceManager.registerResourceUser(this);
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.tabFolder = currentDisplayTab;
 		this.windowType = currentType;
 		this.tabName = useTabName;
@@ -112,7 +112,7 @@ public class GraphicsWindow extends CTabItem {
 			this.curveSelectorComposite.doUpdateCurveSelectorTable();
 		}
 		else {
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			DataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
 					GraphicsWindow.this.graphicsComposite.doRedrawGraphics();
 					GraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
@@ -129,7 +129,7 @@ public class GraphicsWindow extends CTabItem {
 			this.curveSelectorComposite.doUpdateCurveSelectorTable();
 		}
 		else {
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			DataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
 					GraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 				}
@@ -250,7 +250,7 @@ public class GraphicsWindow extends CTabItem {
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.graphicSashForm.getClientArea();
-		Image tabContentImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		Image tabContentImage = new Image(DataExplorer.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.graphicSashForm.print(imageGC);
 		imageGC.dispose();

@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
 
@@ -48,7 +48,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
@@ -56,7 +56,7 @@ import osde.data.Record;
 import osde.data.RecordSet;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.TabAreaContextMenu;
 import osde.utils.CurveUtils;
@@ -80,7 +80,7 @@ public class GraphicsComposite extends Composite {
 	public final static int				MODE_CUT_RIGHT					= 7;
 	public final static int				MODE_SCOPE							= 8;
 
-	final	OpenSerialDataExplorer	application 						= OpenSerialDataExplorer.getInstance();
+	final	DataExplorer	application 						= DataExplorer.getInstance();
 	final Settings								settings								= Settings.getInstance();
 	final Channels								channels								= Channels.getInstance();
 	final TimeLine								timeLine								= new TimeLine();
@@ -233,7 +233,7 @@ public class GraphicsComposite extends Composite {
 							else if (tmpDescription.contains("\n")) {
 								tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\n"));
 							}
-							String tmpHeader = tmpDescription + OSDE.STRING_MESSAGE_CONCAT + recordSet.getName();
+							String tmpHeader = tmpDescription + DE.STRING_MESSAGE_CONCAT + recordSet.getName();
 							if (GraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(GraphicsComposite.this.graphicsHeaderText)) {
 								GraphicsComposite.this.graphicsHeader.setText(GraphicsComposite.this.graphicsHeaderText = tmpHeader);
 							}
@@ -299,7 +299,7 @@ public class GraphicsComposite extends Composite {
 		}
 		{
 			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT);
-			this.recordSetComment.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+			this.recordSetComment.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 			this.recordSetComment.setBackground(this.surroundingBackground); 
 			this.recordSetComment.setMenu(this.popupmenu);
 			this.recordSetComment.addPaintListener(new PaintListener() {
@@ -317,7 +317,7 @@ public class GraphicsComposite extends Composite {
 			this.recordSetComment.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "recordSetCommentText.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.recordSetComment.addKeyListener( new KeyAdapter() {
@@ -356,7 +356,7 @@ public class GraphicsComposite extends Composite {
 		this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
 		this.canvasImageGC.setBackground(this.surroundingBackground);
 		this.canvasImageGC.fillRectangle(this.canvasBounds);
-		this.canvasImageGC.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		this.canvasImageGC.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		//get gc for other drawing operations
 		this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
 
@@ -503,7 +503,7 @@ public class GraphicsComposite extends Composite {
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
 		log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + (int)totalDisplayDeltaTime_ms + " endTime = " + endTimeFormated);
-		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (int)totalDisplayDeltaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
+		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (int)totalDisplayDeltaTime_ms, DataExplorer.COLOR_BLACK);
 
 		// draw draw area bounding 
 		gc.setForeground(this.curveAreaBorderColor);
@@ -614,7 +614,7 @@ public class GraphicsComposite extends Composite {
 			doRedrawGraphics();
 		}
 		else {
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			DataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
 					doRedrawGraphics();
 				}
@@ -629,7 +629,7 @@ public class GraphicsComposite extends Composite {
 		this.graphicsHeader.redraw();
 		this.recordSetComment.redraw();
 		
-		if (OSDE.IS_WINDOWS) {
+		if (DE.IS_WINDOWS) {
 			Point size = this.graphicCanvas.getSize();
 			this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update
 			this.graphicCanvas.redraw(size.x-5,5,5,5,true);
@@ -960,7 +960,7 @@ public class GraphicsComposite extends Composite {
 			this.isLeftCutMode = false;
 			this.isRightCutMode = false;
 			this.isScopeMode	= false;
-			this.application.setStatusMessage(OSDE.STRING_EMPTY);
+			this.application.setStatusMessage(DE.STRING_EMPTY);
 			this.xPosCut = -1;
 			this.xLast = 0;
 			this.yLast = 0;
@@ -1377,8 +1377,8 @@ public class GraphicsComposite extends Composite {
 		if (GraphicsComposite.this.channels.getActiveChannel() != null) {
 			RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
 			if (recordSet == null) {
-				GraphicsComposite.this.recordSetComment.setText(OSDE.STRING_EMPTY);
-				GraphicsComposite.this.graphicsHeader.setText(OSDE.STRING_EMPTY);
+				GraphicsComposite.this.recordSetComment.setText(DE.STRING_EMPTY);
+				GraphicsComposite.this.graphicsHeader.setText(DE.STRING_EMPTY);
 				GraphicsComposite.this.graphicsHeaderText = null;
 				GraphicsComposite.this.recordSetCommentText = null;
 			}
@@ -1432,10 +1432,10 @@ public class GraphicsComposite extends Composite {
 	 */
 	public Image getGraphicsPrintImage() {	
 		boolean isCompareSet = this.windowType == GraphicsWindow.TYPE_COMPARE;
-		RecordSet compareRecordSet = OpenSerialDataExplorer.getInstance().getCompareSet();
+		RecordSet compareRecordSet = DataExplorer.getInstance().getCompareSet();
 		String[] compareSetNames = compareRecordSet.getRecordNames();
 		int graphicsHeight = isCompareSet ? 30+this.canvasBounds.height+10+compareSetNames.length*20 : 30+this.canvasBounds.height+40;
-		Image graphicsImage = new Image(OpenSerialDataExplorer.display, this.canvasBounds.width, graphicsHeight);
+		Image graphicsImage = new Image(DataExplorer.display, this.canvasBounds.width, graphicsHeight);
 		// decide if normal graphics window or compare window should be copied
 		if (this.windowType == GraphicsWindow.TYPE_COMPARE) {
 				GC graphicsGC = new GC(graphicsImage);
@@ -1470,7 +1470,7 @@ public class GraphicsComposite extends Composite {
 					this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
 					this.canvasImageGC.setBackground(this.surroundingBackground);
 					this.canvasImageGC.fillRectangle(this.canvasBounds);
-					this.canvasImageGC.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.canvasImageGC.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
 					drawCurves(activeRecordSet, this.canvasBounds, this.canvasImageGC);
 
@@ -1494,7 +1494,7 @@ public class GraphicsComposite extends Composite {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			String fileComment = this.graphicsHeader.getText();
-			fileComment = fileComment.substring(0, fileComment.indexOf(OSDE.STRING_MESSAGE_CONCAT));
+			fileComment = fileComment.substring(0, fileComment.indexOf(DE.STRING_MESSAGE_CONCAT));
 			activeChannel.setFileDescription(fileComment);
 			activeChannel.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 		}

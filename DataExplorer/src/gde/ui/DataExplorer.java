@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui;
 
@@ -102,7 +102,7 @@ import osde.utils.StringHelper;
 import osde.utils.WebBrowser;
 
 /**
- * Main application class of OpenSerialDataExplorer
+ * Main application class of DataExplorer
  * @author Winfried Brügmann
  */
 public class DataExplorer extends Composite {
@@ -111,7 +111,7 @@ public class DataExplorer extends Composite {
 	
 	final HashMap<String, String>	extensionFilterMap								= new HashMap<String, String>();
 
-	public final static String		APPLICATION_NAME									= "OpenSerialDataExplorer"; //$NON-NLS-1$
+	public final static String		APPLICATION_NAME									= "DataExplorer"; //$NON-NLS-1$
 	public final static String		RECORD_NAME												= "recordName"; //$NON-NLS-1$
 	public final static String		CURVE_SELECTION_ITEM							= "curveSelectedItem"; //$NON-NLS-1$
 	public final static String		OLD_STATE													= "oldState"; //$NON-NLS-1$
@@ -213,7 +213,7 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * get the instance of singleton OpenSerialDataExplorer
+	 * get the instance of singleton DataExplorer
 	 */
 	public static DataExplorer getInstance() {
 		if (DataExplorer.application == null) {
@@ -337,7 +337,7 @@ public class DataExplorer extends Composite {
 			this.compareSet = new RecordSet(null, DE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1);
 
 			shell.setLayout(new FillLayout());
-			shell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.jpg")); //$NON-NLS-1$
+			shell.setImage(SWTResourceManager.getImage("osde/resource/DataExplorer.jpg")); //$NON-NLS-1$
 			shell.setText(APPLICATION_NAME);
 
 			shell.layout();
@@ -767,7 +767,7 @@ public class DataExplorer extends Composite {
 					DataExplorer.display.asyncExec(new Runnable() {
 						public void run() {
 							if (DataExplorer.this.dataTableTabItem != null) {
-							//OpenSerialDataExplorer.this.dataTableTabItem.setHeader();
+							//DataExplorer.this.dataTableTabItem.setHeader();
 							DataExplorer.this.dataTableTabItem.cleanTable();
 							}
 						}

@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.menu;
 
@@ -26,11 +26,11 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 /**
  * @author Winfried Brügmann
@@ -44,10 +44,10 @@ public class ObjectImageContextMenu {
 
 	Menu													menu;
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 
 	public ObjectImageContextMenu() {
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 	}
 
 	public void createMenu(Menu popupMenu) {
@@ -57,13 +57,13 @@ public class ObjectImageContextMenu {
 		newItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ObjectImageContextMenu.log.log(Level.FINEST, "newItem action performed! " + e); //$NON-NLS-1$
-				FileDialog imgFileDialog = ObjectImageContextMenu.this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT0431), new String[] { OSDE.FILE_ENDING_STAR_JPG, OSDE.FILE_ENDING_STAR_PNG,
-						OSDE.FILE_ENDING_STAR_GIF }, Settings.getInstance().getDataFilePath());
+				FileDialog imgFileDialog = ObjectImageContextMenu.this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT0431), new String[] { DE.FILE_ENDING_STAR_JPG, DE.FILE_ENDING_STAR_PNG,
+						DE.FILE_ENDING_STAR_GIF }, Settings.getInstance().getDataFilePath());
 				String imgFilePath = imgFileDialog.getFilterPath();
 				ObjectImageContextMenu.log.log(Level.FINE, "imgFilePath = " + imgFilePath); //$NON-NLS-1$
 				if (imgFileDialog.getFileName().length() > 4) {
 					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED, true);
-					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, imgFilePath + OSDE.FILE_SEPARATOR_UNIX + imgFileDialog.getFileName());
+					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, imgFilePath + DE.FILE_SEPARATOR_UNIX + imgFileDialog.getFileName());
 					ObjectImageContextMenu.this.application.updateObjectImage();
 				}
 			}

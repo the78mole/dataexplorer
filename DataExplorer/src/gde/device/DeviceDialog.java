@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device;
 
@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 import osde.config.Settings;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 /**
  * DeviceDialog is the abstract class as parent for device dialog implementations
@@ -51,7 +51,7 @@ public abstract class DeviceDialog extends Dialog {
 	protected boolean 	isClosePossible = true; // use this variable to manage if dialog can be disposed 
 	protected String 		disposeDisabledMessage = Messages.getString(MessageIds.OSDE_MSGW0007);
 	
-	protected final OpenSerialDataExplorer application;
+	protected final DataExplorer application;
 	
 	public MouseTrackAdapter mouseTrackerEnterFadeOut = new MouseTrackAdapter() {
 		public void mouseEnter(MouseEvent evt) {
@@ -72,7 +72,7 @@ public abstract class DeviceDialog extends Dialog {
 	 */
 	public DeviceDialog(Shell parent) {
 		super(parent, SWT.NONE);
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
 		this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 	}
@@ -128,7 +128,7 @@ public abstract class DeviceDialog extends Dialog {
 	 * @return the dialogShell
 	 */
 	public Shell getDialogShell() {
-		Shell shell = OpenSerialDataExplorer.shell;
+		Shell shell = DataExplorer.shell;
 		try {
 			shell = this.dialogShell != null && !this.dialogShell.isDisposed() ? this.dialogShell : shell;
 		}

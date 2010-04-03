@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
 
@@ -35,14 +35,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.TabAreaContextMenu;
 
@@ -60,7 +60,7 @@ public class AnalogWindow extends CTabItem {
 
 	Color														surroundingBackground;
 
-	final OpenSerialDataExplorer		application;
+	final DataExplorer		application;
 	final Channels									channels;
 	final CTabFolder								displayTab;
 	final Menu											popupmenu;
@@ -73,7 +73,7 @@ public class AnalogWindow extends CTabItem {
 		super(currentDisplayTab, style, position);
 		SWTResourceManager.registerResourceUser(this);
 		this.displayTab = currentDisplayTab;
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.OSDE_MSGT0231));
@@ -99,7 +99,7 @@ public class AnalogWindow extends CTabItem {
 			this.analogMainComposite.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "analogMainComposite.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_8.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_8.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.analogMainComposite.addPaintListener(new PaintListener() {
@@ -138,7 +138,7 @@ public class AnalogWindow extends CTabItem {
 	public synchronized void update(boolean forceUpdate) {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null && this.analogMainComposite.isVisible()) {
-			log.log(Level.FINE, OSDE.STRING_BLANK);
+			log.log(Level.FINE, DE.STRING_BLANK);
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isAnalogTabRequested()) {
@@ -162,7 +162,7 @@ public class AnalogWindow extends CTabItem {
 					}
 					// add new displays
 					for (String recordKey : recordSet.getActiveAndVisibleRecordNames()) {
-						AnalogDisplay display = new AnalogDisplay(this.analogMainComposite, recordKey, OpenSerialDataExplorer.getInstance().getActiveDevice());
+						AnalogDisplay display = new AnalogDisplay(this.analogMainComposite, recordKey, DataExplorer.getInstance().getActiveDevice());
 						display.create();
 						log.log(Level.FINE, "created analog display for " + recordKey); //$NON-NLS-1$
 						this.displays.put(recordKey, display);
@@ -192,7 +192,7 @@ public class AnalogWindow extends CTabItem {
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.analogMainComposite.getClientArea();
-		Image tabContentImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		Image tabContentImage = new Image(DataExplorer.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.analogMainComposite.print(imageGC);
 		imageGC.dispose();

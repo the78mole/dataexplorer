@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.menu;
 
@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.tab.GraphicsWindow;
 
@@ -46,7 +46,7 @@ public class TabAreaContextMenu {
 	public final static int				TYPE_SIMPLE = 2;
 	public final static int				TYPE_TABLE = 3;
 	
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 
 	MenuItem											curveSelectionItem;
 	MenuItem											displayGraphicsHeaderItem;
@@ -61,7 +61,7 @@ public class TabAreaContextMenu {
 	boolean												isCreated = false;
 
 	public TabAreaContextMenu() {
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 	}
 
 	public void createMenu(Menu popupMenu, int type) {

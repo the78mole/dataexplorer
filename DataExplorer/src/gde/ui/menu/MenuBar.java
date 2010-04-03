@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.menu;
 
@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.GraphicsTemplate;
 import osde.config.Settings;
 import osde.data.Channel;
@@ -45,7 +45,7 @@ import osde.io.FileHandler;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.DeviceSelectionDialog;
 import osde.ui.dialog.PrintSelectionDialog;
@@ -53,7 +53,7 @@ import osde.ui.dialog.edit.DevicePropertiesEditor;
 import osde.ui.tab.GraphicsComposite;
 
 /**
- * menu bar implementation class for the OpenSerialDataExplorer
+ * menu bar implementation class for the DataExplorer
  * @author Winfried Brügmann
  */
 public class MenuBar {	
@@ -101,11 +101,11 @@ public class MenuBar {
 	int														iconSet = DeviceSerialPort.ICON_SET_OPEN_CLOSE; 
 	
 	final Menu										parent;
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final Channels								channels;
 	final FileHandler							fileHandler;
 
-	public MenuBar(OpenSerialDataExplorer currentApplication, Menu menuParent) {
+	public MenuBar(DataExplorer currentApplication, Menu menuParent) {
 		this.application = currentApplication;
 		this.parent = menuParent;
 		this.channels = Channels.getInstance();
@@ -122,7 +122,7 @@ public class MenuBar {
 			this.fileMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "fileMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
+					MenuBar.this.application.openHelpDialog(DE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -130,7 +130,7 @@ public class MenuBar {
 				this.fileMenu.addMenuListener(new MenuListener() {
 					public void menuShown(MenuEvent evt) {
 						MenuBar.log.log(Level.FINEST, "fileMenu.handleEvent, event=" + evt); //$NON-NLS-1$
-						MenuBar.this.updateSubHistoryMenuItem(OSDE.STRING_EMPTY); //$NON-NLS-1$
+						MenuBar.this.updateSubHistoryMenuItem(DE.STRING_EMPTY); //$NON-NLS-1$
 					}
 					public void menuHidden(MenuEvent evt) {
 						log.log(Level.FINEST, "fileMenu.menuHidden " + evt); //$NON-NLS-1$
@@ -170,7 +170,7 @@ public class MenuBar {
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
-									MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.STRING_EMPTY);  //$NON-NLS-2$
+									MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), DE.STRING_EMPTY);  //$NON-NLS-2$
 								else
 									MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0007), activeChannel.getFileName()); 
 							}
@@ -184,7 +184,7 @@ public class MenuBar {
 					this.saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "saveAsFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), OSDE.STRING_EMPTY); //$NON-NLS-1$
+							MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.OSDE_MSGT0006), DE.STRING_EMPTY); //$NON-NLS-1$
 						}
 					});
 				}
@@ -269,7 +269,7 @@ public class MenuBar {
 							DeviceDialog deviceDialog = MenuBar.this.application.getDeviceDialog();
 							if (deviceDialog == null || deviceDialog.isDisposed()) {
 								MenuBar.this.application.openSettingsDialog();
-								MenuBar.this.application.setStatusMessage(OSDE.STRING_EMPTY); //$NON-NLS-1$
+								MenuBar.this.application.setStatusMessage(DE.STRING_EMPTY); //$NON-NLS-1$
 							}
 							else
 								MenuBar.this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI0001), SWT.COLOR_RED); 
@@ -286,7 +286,7 @@ public class MenuBar {
 					this.printMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							new PrintSelectionDialog(OpenSerialDataExplorer.shell, SWT.NULL).open();
+							new PrintSelectionDialog(DataExplorer.shell, SWT.NULL).open();
 						}
 					});
 				}
@@ -315,7 +315,7 @@ public class MenuBar {
 			this.editMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "editMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_31.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(DE.STRING_EMPTY, "HelpInfo_31.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			{
@@ -406,7 +406,7 @@ public class MenuBar {
 			this.deviceMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "deviceMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_32.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(DE.STRING_EMPTY, "HelpInfo_32.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			{
@@ -544,7 +544,7 @@ public class MenuBar {
 			this.graphicsMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "graphicsMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_33.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					MenuBar.this.application.openHelpDialog(DE.STRING_EMPTY, "HelpInfo_33.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			{
@@ -625,7 +625,7 @@ public class MenuBar {
 			this.viewMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "viewMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
+					MenuBar.this.application.openHelpDialog(DE.STRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -697,7 +697,7 @@ public class MenuBar {
 			this.helpMenuItem.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					MenuBar.log.log(Level.FINE, "helpMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
+					MenuBar.this.application.openHelpDialog(DE.STRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
 				}
 			});
 			{
@@ -708,7 +708,7 @@ public class MenuBar {
 					this.contentsMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "contentsMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.openHelpDialog(OSDE.STRING_EMPTY, "HelpInfo.html");  //$NON-NLS-1$
+							MenuBar.this.application.openHelpDialog(DE.STRING_EMPTY, "HelpInfo.html");  //$NON-NLS-1$
 						}
 					});
 				}
@@ -744,7 +744,7 @@ public class MenuBar {
 	public void updateSubHistoryMenuItem(String fullQualifiedFileName) {
 		List<String> refFileHistory = Settings.getInstance().getFileHistory();
 		if (fullQualifiedFileName != null && fullQualifiedFileName.length() > 4) {
-			final String newhistoryEntry = fullQualifiedFileName.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+			final String newhistoryEntry = fullQualifiedFileName.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
 
 			if (refFileHistory.indexOf(newhistoryEntry) > -1) { // fileName already exist
 				refFileHistory.remove(newhistoryEntry);
@@ -770,10 +770,10 @@ public class MenuBar {
 					String fileType = fileName.substring(fileName.lastIndexOf('.') + 1);
 					if (fileType != null && fileType.length() > 2) {
 						MenuBar.log.log(Level.FINE, "opening file = " + fileName);//$NON-NLS-1$
-						if (fileType.equalsIgnoreCase(OSDE.FILE_ENDING_OSD)) { 
+						if (fileType.equalsIgnoreCase(DE.FILE_ENDING_OSD)) { 
 							MenuBar.this.fileHandler.openOsdFile(fileName);
 						}
-						else if (fileType.equalsIgnoreCase(OSDE.FILE_ENDING_LOV)) { 
+						else if (fileType.equalsIgnoreCase(DE.FILE_ENDING_LOV)) { 
 							MenuBar.this.fileHandler.openLovFile(fileName);
 						}
 						else {

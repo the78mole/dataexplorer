@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
 
@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import osde.OSDE;
+import osde.DE;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
@@ -42,7 +42,7 @@ import osde.device.MeasurementType;
 import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -55,7 +55,7 @@ public class DataTableWindow extends CTabItem {
 	Table													dataTable;
 	TableColumn										timeColumn;
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final Channels								channels;
 	final CTabFolder							tabFolder;
 
@@ -63,7 +63,7 @@ public class DataTableWindow extends CTabItem {
 		super(dataTab, style, position);
 		SWTResourceManager.registerResourceUser(this);
 		this.tabFolder = dataTab;
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.OSDE_MSGT0233));
@@ -74,11 +74,11 @@ public class DataTableWindow extends CTabItem {
 		this.setControl(this.dataTable);
 		this.dataTable.setLinesVisible(true);
 		this.dataTable.setHeaderVisible(true);
-		this.dataTable.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		this.dataTable.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.dataTable.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
 				log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
-				OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_6.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_6.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		this.dataTable.addListener(SWT.SetData, new Listener() {
@@ -124,7 +124,7 @@ public class DataTableWindow extends CTabItem {
 				for (int i = 0; i < recordNames.length; i++) {
 					Record record = activeRecordSet.get(recordNames[i]);
 					StringBuilder sb = new StringBuilder();
-					sb.append(record.getName()).append(OSDE.STRING_BLANK).append(OSDE.STRING_LEFT_BRACKET).append(record.getUnit()).append(OSDE.STRING_RIGHT_BRACKET);
+					sb.append(record.getName()).append(DE.STRING_BLANK).append(DE.STRING_LEFT_BRACKET).append(record.getUnit()).append(DE.STRING_RIGHT_BRACKET);
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 					column.setWidth(sb.length() * extentFactor);
 					column.setText(sb.toString());
@@ -140,7 +140,7 @@ public class DataTableWindow extends CTabItem {
 				for (int i = 0; i < measurements.length; i++) {
 					MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
 					StringBuilder sb = new StringBuilder();
-					sb.append(measurement.getName()).append(OSDE.STRING_BLANK).append(OSDE.STRING_LEFT_BRACKET).append(measurement.getUnit()).append(OSDE.STRING_RIGHT_BRACKET);
+					sb.append(measurement.getName()).append(DE.STRING_BLANK).append(DE.STRING_LEFT_BRACKET).append(measurement.getUnit()).append(DE.STRING_RIGHT_BRACKET);
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 					column.setWidth(sb.length() * extentFactor);
 					column.setText(sb.toString());
@@ -171,7 +171,7 @@ public class DataTableWindow extends CTabItem {
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.dataTable.getClientArea();
-		Image tabContentImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		Image tabContentImage = new Image(DataExplorer.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.dataTable.print(imageGC);
 		imageGC.dispose();

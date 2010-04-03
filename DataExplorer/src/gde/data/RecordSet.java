@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.data;
 
@@ -28,7 +28,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.device.DataTypes;
 import osde.device.DeviceConfiguration;
@@ -42,7 +42,7 @@ import osde.io.LogViewReader;
 import osde.io.OsdReaderWriter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.tab.GraphicsWindow;
 import osde.utils.CalculationThread;
@@ -67,7 +67,7 @@ public class RecordSet extends HashMap<String, Record> {
 	String												header												= null;
 	String[]											recordNames;																																	//Spannung, Strom, ..
 	String[]											noneCalculationRecords 				= new String[0];																//records/measurements which are active or inactive
-	String												description										= OSDE.STRING_EMPTY;
+	String												description										= DE.STRING_EMPTY;
 	boolean												isSaved												= false;																				//indicates if the record set is saved to file
 	boolean												isRaw													= false;																				//indicates imported file with raw data, no translation at all
 	boolean												isFromFile										= false;																				//indicates that this record set was created by loading data from file
@@ -120,7 +120,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public static final int				TIME_GRID_MOD60								= 2;																						// each mod60 tickmark
 	int														timeGridType									= TIME_GRID_NONE;
 	Vector<Integer>								timeGrid											= new Vector<Integer>();												// contains the time grid position, updated from TimeLine.drawTickMarks
-	Color													timeGridColor									= OpenSerialDataExplorer.COLOR_GREY;
+	Color													timeGridColor									= DataExplorer.COLOR_GREY;
 	int														timeGridLineStyle							= SWT.LINE_DOT;
 
 	@Deprecated
@@ -134,7 +134,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public static final int				HORIZONTAL_GRID_SECOND				= 2;																						// each main tickmark
 	int														horizontalGridType						= HORIZONTAL_GRID_NONE;
 	Vector<Integer>								horizontalGrid								= new Vector<Integer>();												// contains the time grid position, updated from TimeLine.drawTickMarks
-	Color													horizontalGridColor						= OpenSerialDataExplorer.COLOR_GREY;
+	Color													horizontalGridColor						= DataExplorer.COLOR_GREY;
 	int														horizontalGridLineStyle				= SWT.LINE_DASH;
 	int														horizontalGridRecordOrdinal		= -1;																						// recordNames[horizontalGridRecord]
 
@@ -155,7 +155,7 @@ public class RecordSet extends HashMap<String, Record> {
 	Vector<String>								unsaveReasons									= new Vector<String>();
 	int														changeCounter									= 0;																						// indicates change in general
 
-	final OpenSerialDataExplorer	application;																																	// pointer to main application
+	final DataExplorer	application;																																	// pointer to main application
 	final Channels								channels;																																			// start point of data hierarchy
 	final IDevice									device;
 
@@ -177,10 +177,10 @@ public class RecordSet extends HashMap<String, Record> {
 		this.name = newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 		this.recordNames = measurementNames.clone();
 		//this.timeStep_ms = new TimeSteps(this.get(0), newTimeStep_ms);
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
-		this.description = (this.device != null ? this.device.getName()+OSDE.STRING_MESSAGE_CONCAT : OSDE.STRING_EMPTY) 
+		this.description = (this.device != null ? this.device.getName()+DE.STRING_MESSAGE_CONCAT : DE.STRING_EMPTY) 
 			+ DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
 	}
 
@@ -194,7 +194,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms) {
 		super();
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.channels = null;
 		this.device = useDevice;
 		this.parent = null;
@@ -319,7 +319,7 @@ public class RecordSet extends HashMap<String, Record> {
 		super(recordSet);
 
 		this.device = recordSet.device; // this is a reference
-		this.name = recordSet.name.length() < MAX_NAME_LENGTH ? recordSet.name + OSDE.STRING_UNDER_BAR : recordSet.name.substring(0, MAX_NAME_LENGTH - 1) + OSDE.STRING_UNDER_BAR;
+		this.name = recordSet.name.length() < MAX_NAME_LENGTH ? recordSet.name + DE.STRING_UNDER_BAR : recordSet.name.substring(0, MAX_NAME_LENGTH - 1) + DE.STRING_UNDER_BAR;
 		this.application = recordSet.application;
 		this.channels = recordSet.channels;
 		this.parent = recordSet.parent;
@@ -456,7 +456,7 @@ public class RecordSet extends HashMap<String, Record> {
 			if (log.isLoggable(Level.FINEST)) {
 				StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < points.length; i++) {
-					sb.append(points[i]).append(OSDE.STRING_BLANK);
+					sb.append(points[i]).append(DE.STRING_BLANK);
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
@@ -492,7 +492,7 @@ public class RecordSet extends HashMap<String, Record> {
 			if (log.isLoggable(Level.FINEST)) {
 				StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < points.length; i++) {
-					sb.append(points[i]).append(OSDE.STRING_BLANK);
+					sb.append(points[i]).append(DE.STRING_BLANK);
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
@@ -795,7 +795,7 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 		
 		// check and update object key
-		OpenSerialDataExplorer application = OpenSerialDataExplorer.getInstance();
+		DataExplorer application = DataExplorer.getInstance();
 		if (application != null && application.isObjectoriented()) {
 			Channel activeChannel = Channels.getInstance().getActiveChannel();
 			if (activeChannel != null && !activeChannel.getObjectKey().equals(Settings.getInstance().getActiveObject())) {
@@ -813,7 +813,7 @@ public class RecordSet extends HashMap<String, Record> {
 	static void printRecordNames(String methodName, String[] recordNames) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < recordNames.length; ++i) {
-			sb.append(recordNames[i]).append(OSDE.STRING_MESSAGE_CONCAT);
+			sb.append(recordNames[i]).append(DE.STRING_MESSAGE_CONCAT);
 		}
 		sb.delete(sb.length() - 3, sb.length());
 		log.logp(Level.FINE, $CLASS_NAME, methodName, sb.toString());
@@ -1503,9 +1503,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public String getHorizontalGridRecordName(boolean isSyncRecordIncluded) {
 		String gridRecordName = this.horizontalGridRecordOrdinal == -1 || this.horizontalGridRecordOrdinal > this.getRecordNames().length-1
-		? OSDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
+		? DE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
 		if (this.isCompareSet) {
-			gridRecordName = this.realSize() == 0 ? OSDE.STRING_DASH : this.getFirstRecordName();
+			gridRecordName = this.realSize() == 0 ? DE.STRING_DASH : this.getFirstRecordName();
 			log.log(Level.FINE, "gridRecordName = " + gridRecordName);
 		}
 		if (this.isSyncRequested && isSyncRecordIncluded) {
@@ -1575,24 +1575,24 @@ public class RecordSet extends HashMap<String, Record> {
 	public String getSerializeProperties() {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(TIME_STEP_MS).append(OSDE.STRING_EQUAL).append(this.timeStep_ms.isConstant ? this.getAverageTimeStep_ms() : -1).append(Record.DELIMITER);
+		sb.append(TIME_STEP_MS).append(DE.STRING_EQUAL).append(this.timeStep_ms.isConstant ? this.getAverageTimeStep_ms() : -1).append(Record.DELIMITER);
 
-		sb.append(TIME_GRID_TYPE).append(OSDE.STRING_EQUAL).append(this.timeGridType).append(Record.DELIMITER);
-		sb.append(TIME_GRID_LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.timeGridLineStyle).append(Record.DELIMITER);
-		sb.append(TIME_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.timeGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.timeGridColor.getGreen()).append(OSDE.STRING_COMMA).append(
+		sb.append(TIME_GRID_TYPE).append(DE.STRING_EQUAL).append(this.timeGridType).append(Record.DELIMITER);
+		sb.append(TIME_GRID_LINE_STYLE).append(DE.STRING_EQUAL).append(this.timeGridLineStyle).append(Record.DELIMITER);
+		sb.append(TIME_GRID_COLOR).append(DE.STRING_EQUAL).append(this.timeGridColor.getRed()).append(DE.STRING_COMMA).append(this.timeGridColor.getGreen()).append(DE.STRING_COMMA).append(
 				this.timeGridColor.getBlue()).append(Record.DELIMITER);
 
-		sb.append(HORIZONTAL_GRID_RECORD_ORDINAL).append(OSDE.STRING_EQUAL).append(this.horizontalGridRecordOrdinal).append(Record.DELIMITER);
-		sb.append(HORIZONTAL_GRID_TYPE).append(OSDE.STRING_EQUAL).append(this.horizontalGridType).append(Record.DELIMITER);
-		sb.append(HORIZONTAL_GRID_LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.horizontalGridLineStyle).append(Record.DELIMITER);
-		sb.append(HORIZONTAL_GRID_COLOR).append(OSDE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getGreen())
-				.append(OSDE.STRING_COMMA).append(this.horizontalGridColor.getBlue()).append(Record.DELIMITER);
+		sb.append(HORIZONTAL_GRID_RECORD_ORDINAL).append(DE.STRING_EQUAL).append(this.horizontalGridRecordOrdinal).append(Record.DELIMITER);
+		sb.append(HORIZONTAL_GRID_TYPE).append(DE.STRING_EQUAL).append(this.horizontalGridType).append(Record.DELIMITER);
+		sb.append(HORIZONTAL_GRID_LINE_STYLE).append(DE.STRING_EQUAL).append(this.horizontalGridLineStyle).append(Record.DELIMITER);
+		sb.append(HORIZONTAL_GRID_COLOR).append(DE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(DE.STRING_COMMA).append(this.horizontalGridColor.getGreen())
+				.append(DE.STRING_COMMA).append(this.horizontalGridColor.getBlue()).append(Record.DELIMITER);
 		
-		sb.append(SYNC_RECORD_SELECTED).append(OSDE.STRING_EQUAL).append(this.isSyncRecordSelected).append(Record.DELIMITER);
+		sb.append(SYNC_RECORD_SELECTED).append(DE.STRING_EQUAL).append(this.isSyncRecordSelected).append(Record.DELIMITER);
 
-		sb.append(VOLTAGE_LIMITS).append(OSDE.STRING_EQUAL);
+		sb.append(VOLTAGE_LIMITS).append(DE.STRING_EQUAL);
 		for (int value : this.voltageLimits) {
-			sb.append(value).append(OSDE.STRING_COMMA);
+			sb.append(value).append(DE.STRING_COMMA);
 		}	
 		sb.deleteCharAt(sb.length()-1);
 
@@ -1616,8 +1616,8 @@ public class RecordSet extends HashMap<String, Record> {
 			if (tmpValue != null && tmpValue.length() > 0) this.timeGridLineStyle = new Integer(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(TIME_GRID_COLOR);
 			if (tmpValue != null && tmpValue.length() > 5)
-				this.timeGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue
-						.split(OSDE.STRING_COMMA)[2]));
+				this.timeGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(DE.STRING_COMMA)[0]), new Integer(tmpValue.split(DE.STRING_COMMA)[1]), new Integer(tmpValue
+						.split(DE.STRING_COMMA)[2]));
 
 			// begin depreciated
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD);
@@ -1645,15 +1645,15 @@ public class RecordSet extends HashMap<String, Record> {
 			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridLineStyle = new Integer(tmpValue.trim()).intValue();
 			tmpValue = recordSetProps.get(HORIZONTAL_GRID_COLOR);
 			if (tmpValue != null && tmpValue.length() > 5)
-				this.horizontalGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue
-						.split(OSDE.STRING_COMMA)[2]));
+				this.horizontalGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(DE.STRING_COMMA)[0]), new Integer(tmpValue.split(DE.STRING_COMMA)[1]), new Integer(tmpValue
+						.split(DE.STRING_COMMA)[2]));
 				
 			tmpValue = recordSetProps.get(SYNC_RECORD_SELECTED);
 			if (tmpValue != null && tmpValue.length() > 0) this.isSyncRecordSelected = Boolean.valueOf(tmpValue.trim());
 			
 			tmpValue = recordSetProps.get(VOLTAGE_LIMITS);
 			if (tmpValue != null && tmpValue.length() > 0) {
-				String[] strVoltageValues = tmpValue.trim().split(OSDE.STRING_COMMA);
+				String[] strVoltageValues = tmpValue.trim().split(DE.STRING_COMMA);
 				for (int i = 0; i < strVoltageValues.length && i < this.voltageLimits.length; i++) {
 					this.voltageLimits[i] = new Integer(strVoltageValues[i].trim());
 				}
@@ -1661,7 +1661,7 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
-			this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGE0002) + OSDE.STRING_NEW_LINE + e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGE0002) + DE.STRING_NEW_LINE + e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}
 
@@ -1782,7 +1782,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return syncable record name stem or empty sting
 	 */
 	public String getSyncableName() {
-		return this.syncableRecords.isEmpty() ? OSDE.STRING_EMPTY : this.syncableRecords.firstElement() + ".." + this.syncableRecords.lastElement().split(OSDE.STRING_BLANK)[1]; //$NON-NLS-1$
+		return this.syncableRecords.isEmpty() ? DE.STRING_EMPTY : this.syncableRecords.firstElement() + ".." + this.syncableRecords.lastElement().split(DE.STRING_BLANK)[1]; //$NON-NLS-1$
 	}
 
 	public void syncScaleOfSyncableRecords() {
@@ -1988,13 +1988,13 @@ public class RecordSet extends HashMap<String, Record> {
 	public void loadFileData(String fullQualifiedFileName, boolean doShowProgress) {
 		try {
 			if (this.fileDataSize != 0 && this.fileDataPointer != 0) {
-				if 			(fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_OSD)) OsdReaderWriter.readRecordSetsData(this, fullQualifiedFileName, doShowProgress);
-				else if (fullQualifiedFileName.endsWith(OSDE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(this, fullQualifiedFileName, doShowProgress);
+				if 			(fullQualifiedFileName.endsWith(DE.FILE_ENDING_OSD)) OsdReaderWriter.readRecordSetsData(this, fullQualifiedFileName, doShowProgress);
+				else if (fullQualifiedFileName.endsWith(DE.FILE_ENDING_LOV)) LogViewReader.readRecordSetsData(this, fullQualifiedFileName, doShowProgress);
 			}
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(),e);
-			this.application.openMessageDialog(e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage()); 
+			this.application.openMessageDialog(e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage()); 
 		}
 	}
 

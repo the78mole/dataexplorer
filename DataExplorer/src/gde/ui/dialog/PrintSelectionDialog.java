@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.dialog;
 
@@ -52,14 +52,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
 
@@ -83,7 +83,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Group													orientationGroup;
 	Button												landscapeButton;
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	private Button								headerButton;
 
 	/**
@@ -104,7 +104,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 	public PrintSelectionDialog(Shell parent, int style) {
 		super(parent, style);
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 	}
 
 	public void open() {
@@ -358,7 +358,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 				//prepare the page layout
 				PrintRequestAttributeSet printAttrSet = new HashPrintRequestAttributeSet();
-				printAttrSet.add(new JobName(OSDE.OSDE_NAME_LONG, Settings.getInstance().getLocale()));
+				printAttrSet.add(new JobName(DE.OSDE_NAME_LONG, Settings.getInstance().getLocale()));
 				switch (orientation) {
 				case PageFormat.LANDSCAPE:
 					printAttrSet.add(OrientationRequested.LANDSCAPE);
@@ -385,10 +385,10 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					Channel activeChannel = Channels.getInstance().getActiveChannel();
 					if (activeChannel != null) {
 						fileName = activeChannel.getFileName();
-						fileName = fileName == null ? OSDE.OSDE_NAME_LONG + OSDE.STRING_MESSAGE_CONCAT : fileName + OSDE.STRING_MESSAGE_CONCAT;
+						fileName = fileName == null ? DE.OSDE_NAME_LONG + DE.STRING_MESSAGE_CONCAT : fileName + DE.STRING_MESSAGE_CONCAT;
 					}
 					else {
-						fileName = OSDE.OSDE_NAME_LONG + OSDE.STRING_MESSAGE_CONCAT;
+						fileName = DE.OSDE_NAME_LONG + DE.STRING_MESSAGE_CONCAT;
 					}
 
 
@@ -464,7 +464,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 					catch (Exception e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						PrintSelectionDialog.this.application.openMessageDialog(OpenSerialDataExplorer.shell, e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage());
+						PrintSelectionDialog.this.application.openMessageDialog(DataExplorer.shell, e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage());
 					}
 				}
 			}
@@ -619,7 +619,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 	//////// backup from pure SWT printing where color problems exist while printing jpeg images (Blaustich) //////////
 	//	// Show the Choose Printer dialog
-	//	PrintDialog dialog = new PrintDialog(OpenSerialDataExplorer.shell, SWT.NULL);
+	//	PrintDialog dialog = new PrintDialog(DataExplorer.shell, SWT.NULL);
 	//	PrinterData printerData = dialog.open();
 	//
 	//	if (printerData != null) {

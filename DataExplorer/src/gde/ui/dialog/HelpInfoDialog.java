@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.dialog;
 
@@ -28,11 +28,11 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.FileUtils;
 
@@ -68,8 +68,8 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell = new Shell(new Shell(Display.getDefault()), SWT.SHELL_TRIM);
 			FillLayout dialogShellLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.dialogShell.setLayout(dialogShellLayout);
-			this.dialogShell.setText(OSDE.OSDE_NAME_LONG + Messages.getString(MessageIds.OSDE_MSGT0192));
-			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/OpenSerialDataExplorer.jpg")); //$NON-NLS-1$
+			this.dialogShell.setText(DE.OSDE_NAME_LONG + Messages.getString(MessageIds.OSDE_MSGT0192));
+			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/DataExplorer.jpg")); //$NON-NLS-1$
 
 			this.textBrowser = new Browser(this.dialogShell, style);
 			openURL(deviceName, fileName, style);
@@ -99,14 +99,14 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 	 */
 	private void openURL(String deviceName, String fileName, int style) {
 		String jarBasePath = FileUtils.getOsdeJarBasePath() + "/";
-		String jarName = "OpenSerialDataExplorer.jar";
-		String helpDir = "help" + OSDE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + OSDE.FILE_SEPARATOR;
-		String targetDir = OSDE.JAVA_IO_TMPDIR + (OSDE.IS_WINDOWS ? "" : OSDE.FILE_SEPARATOR) + "OSDE" + OSDE.FILE_SEPARATOR;
+		String jarName = "DataExplorer.jar";
+		String helpDir = "help" + DE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + DE.FILE_SEPARATOR;
+		String targetDir = DE.JAVA_IO_TMPDIR + (DE.IS_WINDOWS ? "" : DE.FILE_SEPARATOR) + "OSDE" + DE.FILE_SEPARATOR;
 		
 		if (deviceName.length() >= 1) { // devices/<deviceName>.jar
-			jarBasePath = jarBasePath + "devices" + OSDE.FILE_SEPARATOR;
+			jarBasePath = jarBasePath + "devices" + DE.FILE_SEPARATOR;
 			jarName = deviceName + ".jar";
-			targetDir = targetDir + deviceName + OSDE.FILE_SEPARATOR;
+			targetDir = targetDir + deviceName + DE.FILE_SEPARATOR;
 		}
 		
 		log.log(Level.FINE, "jarBasePath = " + jarBasePath + " jarName = " + jarName + " helpDir = " + helpDir); //$NON-NLS-1$
@@ -125,7 +125,7 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 		}
 		catch (IOException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
-			OpenSerialDataExplorer.getInstance().openMessageDialog(this.dialogShell, 
+			DataExplorer.getInstance().openMessageDialog(this.dialogShell, 
 					Messages.getString(MessageIds.OSDE_MSGE0018, new Object[] { e.getLocalizedMessage() } )); //$NON-NLS-1$
 		}
 	}

@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.utils;
 
@@ -54,7 +54,7 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.device.DeviceConfiguration;
 import osde.device.IDevice;
@@ -62,7 +62,7 @@ import osde.exception.ApplicationConfigurationException;
 import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.dialog.edit.DevicePropertiesEditor;
 
 /**
@@ -108,12 +108,12 @@ public class FileUtils {
 			throw new ApplicationConfigurationException(Messages.getString(MessageIds.OSDE_MSGE0017, new Object[] { srcDir }));
 		}
 		for (String srcFile : files) {
-			if (OSDE.IS_WINDOWS) {
-				srcFile = srcFile.replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK); //$NON-NLS-1$ //$NON-NLS-2$
+			if (DE.IS_WINDOWS) {
+				srcFile = srcFile.replace(DE.STRING_URL_BLANK, DE.STRING_BLANK); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			File src = new File(srcDir + OSDE.FILE_SEPARATOR_UNIX + srcFile);
+			File src = new File(srcDir + DE.FILE_SEPARATOR_UNIX + srcFile);
 			if (!src.isDirectory()) {
-				File tgt = new File(tgtDir + OSDE.FILE_SEPARATOR_UNIX + srcFile);
+				File tgt = new File(tgtDir + DE.FILE_SEPARATOR_UNIX + srcFile);
 				log.log(Level.FINE, "copy " + src.toString() + " to " + tgt.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 				FileUtils.copyFile(src, tgt);
 			}
@@ -149,7 +149,7 @@ public class FileUtils {
 			dir.mkdir();
 		}
 		else {
-			File file = new File(directory + OSDE.FILE_SEPARATOR_UNIX + versionFileName);
+			File file = new File(directory + DE.FILE_SEPARATOR_UNIX + versionFileName);
 			if (!file.exists()) {
 					exist = false;
 					String oldVersion = String.format("%02d", new Integer(versionFileName.substring(versionFileName.length()-6, versionFileName.length()-4)) - 1); //$NON-NLS-1$
@@ -218,7 +218,7 @@ public class FileUtils {
 		if (checkFileExist(filePath)) {
 			File file = new File(filePath);
 			if (file.canWrite()) {
-				file.renameTo(new File(filePath.substring(0, filePath.lastIndexOf(OSDE.STRING_DOT)+1) + extension)); //$NON-NLS-1$
+				file.renameTo(new File(filePath.substring(0, filePath.lastIndexOf(DE.STRING_DOT)+1) + extension)); //$NON-NLS-1$
 			}
 			else {
 				log.log(Level.WARNING, "no write permission on " + file.getAbsolutePath()); //$NON-NLS-1$
@@ -244,10 +244,10 @@ public class FileUtils {
 	 * delete a file list, if exist
 	 */
 	public static void cleanFiles(String fileBasePath, String[] fileNames) {
-		fileBasePath = fileBasePath.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? fileBasePath : fileBasePath + OSDE.FILE_SEPARATOR_UNIX;
+		fileBasePath = fileBasePath.endsWith(DE.FILE_SEPARATOR_UNIX) ? fileBasePath : fileBasePath + DE.FILE_SEPARATOR_UNIX;
 		Vector<String> fileNamesWildCard = new Vector<String>();
 		for (String fileName : fileNames) {
-			if (fileName.length() > 4 && !fileName.contains(OSDE.STRING_STAR)) { // "a.csv"
+			if (fileName.length() > 4 && !fileName.contains(DE.STRING_STAR)) { // "a.csv"
 				FileUtils.cleanFile(fileBasePath + fileName);
 			}
 			else {
@@ -256,8 +256,8 @@ public class FileUtils {
 		}
 		if (fileNamesWildCard.size() > 0) {
 			for (String fileName : fileNamesWildCard) {
-				String startSignature = fileName.substring(0, fileName.indexOf(OSDE.STRING_STAR));
-				String endingSignature = fileName.substring(fileName.lastIndexOf(OSDE.STRING_STAR)+1);
+				String startSignature = fileName.substring(0, fileName.indexOf(DE.STRING_STAR));
+				String endingSignature = fileName.substring(fileName.lastIndexOf(DE.STRING_STAR)+1);
 				try {
 					List<File> fileList = FileUtils.getFileListingNoSort(new File(fileBasePath));
 					for (File file : fileList) {
@@ -320,7 +320,7 @@ public class FileUtils {
 				line = sb.toString();
 			}
 			log.log(Level.FINE, line);
-			writer.write(line+OSDE.LINE_SEPARATOR);
+			writer.write(line+DE.LINE_SEPARATOR);
 		}
 		reader.close();
 		writer.flush();
@@ -342,8 +342,8 @@ public class FileUtils {
 		BufferedReader reader;
 		BufferedWriter writer;
 		String line;
-		reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFilePath), OSDE.STRING_UTF_8)); 
-		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFilePath), OSDE.STRING_UTF_8)); 
+		reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFilePath), DE.STRING_UTF_8)); 
+		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFilePath), DE.STRING_UTF_8)); 
 		while ((line = reader.readLine()) != null) {
 			log.log(Level.FINE, line);
 			if (line.indexOf(placeHolderKey) > -1) {
@@ -354,7 +354,7 @@ public class FileUtils {
 					line = sb.toString();
 			}
 			
-			line = line.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK)  + OSDE.LINE_SEPARATOR;
+			line = line.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX).replace(DE.STRING_URL_BLANK, DE.STRING_BLANK)  + DE.LINE_SEPARATOR;
 			
 			log.log(Level.FINE, line);
 			writer.write(line);
@@ -375,10 +375,10 @@ public class FileUtils {
 	public static boolean extract(Class<?> runtimeInstance, String fileName, String jarInternalSourceDirectory, String targetDirectory, String permissionsUNIX) {
 		boolean isExtracted = false;
 		// normalize input directorys
-		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory + OSDE.FILE_SEPARATOR_UNIX;
-		targetDirectory = targetDirectory.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-		targetDirectory = targetDirectory.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory + OSDE.FILE_SEPARATOR_UNIX; 
+		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(DE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory + DE.FILE_SEPARATOR_UNIX;
+		targetDirectory = targetDirectory.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+		targetDirectory = targetDirectory.endsWith(DE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory + DE.FILE_SEPARATOR_UNIX; 
 
 		FileOutputStream os = null;
 		InputStream is = null;
@@ -421,7 +421,7 @@ public class FileUtils {
 	 */
 	public static InputStream getFileInputStream(JarFile jarFile, String jarInternalFilePath) throws IOException {
 		// normalize input file path
-		jarInternalFilePath = jarInternalFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
+		jarInternalFilePath = jarInternalFilePath.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
 		
 		ZipEntry ze = jarFile.getEntry(jarInternalFilePath);
 
@@ -442,10 +442,10 @@ public class FileUtils {
 	 */
 	public static boolean extract(Class<?> runtimeInstance, String sourceFileName, String targetFileName, String jarInternalSourceDirectory, String targetDirectory, String unixPermissions) {
 		boolean isRenamed = false;
-		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory.length() > 1 ? jarInternalSourceDirectory + OSDE.FILE_SEPARATOR_UNIX : jarInternalSourceDirectory;
-		targetDirectory = targetDirectory.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-		targetDirectory = targetDirectory.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory.length() > 1 ? targetDirectory + OSDE.FILE_SEPARATOR_UNIX : targetDirectory;
+		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(DE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory.length() > 1 ? jarInternalSourceDirectory + DE.FILE_SEPARATOR_UNIX : jarInternalSourceDirectory;
+		targetDirectory = targetDirectory.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+		targetDirectory = targetDirectory.endsWith(DE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory.length() > 1 ? targetDirectory + DE.FILE_SEPARATOR_UNIX : targetDirectory;
 		FileUtils.extract(runtimeInstance, sourceFileName, jarInternalSourceDirectory, targetDirectory, unixPermissions);
 		File sourceFile = new File(targetDirectory + sourceFileName);
 		if(new File(targetDirectory + targetFileName).exists()) {
@@ -472,12 +472,12 @@ public class FileUtils {
 	 */
 	public static void extract(JarFile jarFile, String fileName, String jarSourceDirectory, String targetDirectory, String unixPermissions) {
 		// normalize input directorys
-		fileName = fileName.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-		fileName = fileName.startsWith(OSDE.FILE_SEPARATOR_UNIX) ? fileName.substring(1) : fileName;
-		jarSourceDirectory = jarSourceDirectory.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-		jarSourceDirectory = jarSourceDirectory.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? jarSourceDirectory : jarSourceDirectory.length() > 1 ? jarSourceDirectory + OSDE.FILE_SEPARATOR_UNIX : jarSourceDirectory;
-		targetDirectory = targetDirectory.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-		targetDirectory = targetDirectory.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory.length() > 1 ? targetDirectory + OSDE.FILE_SEPARATOR_UNIX : targetDirectory;
+		fileName = fileName.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+		fileName = fileName.startsWith(DE.FILE_SEPARATOR_UNIX) ? fileName.substring(1) : fileName;
+		jarSourceDirectory = jarSourceDirectory.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+		jarSourceDirectory = jarSourceDirectory.endsWith(DE.FILE_SEPARATOR_UNIX) ? jarSourceDirectory : jarSourceDirectory.length() > 1 ? jarSourceDirectory + DE.FILE_SEPARATOR_UNIX : jarSourceDirectory;
+		targetDirectory = targetDirectory.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+		targetDirectory = targetDirectory.endsWith(DE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory.length() > 1 ? targetDirectory + DE.FILE_SEPARATOR_UNIX : targetDirectory;
 		
 		ZipEntry ze = jarFile.getEntry(jarSourceDirectory + fileName);
 
@@ -524,10 +524,10 @@ public class FileUtils {
 	 */
 	public static void extractDir(JarFile jarFile, String jarInternalSourceDirectory, String targetDirectory, String permissionsUNIX) {
 		// normalize input directorys
-		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory + OSDE.FILE_SEPARATOR_UNIX;
-		targetDirectory = targetDirectory.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-		targetDirectory = targetDirectory.endsWith(OSDE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory + OSDE.FILE_SEPARATOR_UNIX;
+		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(DE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory + DE.FILE_SEPARATOR_UNIX;
+		targetDirectory = targetDirectory.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+		targetDirectory = targetDirectory.endsWith(DE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory + DE.FILE_SEPARATOR_UNIX;
 		
 		int read;
 		byte[] buffer = new byte[4096];
@@ -540,9 +540,9 @@ public class FileUtils {
 		while (enties.hasMoreElements()) {
 			JarEntry jarEntry = enties.nextElement();
 			String entryName = jarEntry.getName();
-			if ((entryName.startsWith(jarInternalSourceDirectory) || entryName.endsWith(".css")) && entryName.contains(OSDE.STRING_DOT) && !FileUtils.checkFileExist(targetDirectory + entryName)) { //$NON-NLS-1$ //$NON-NLS-2$
+			if ((entryName.startsWith(jarInternalSourceDirectory) || entryName.endsWith(".css")) && entryName.contains(DE.STRING_DOT) && !FileUtils.checkFileExist(targetDirectory + entryName)) { //$NON-NLS-1$ //$NON-NLS-2$
 				ZipEntry ze = jarFile.getEntry(entryName);
-				FileUtils.checkDirectoryAndCreate(targetDirectory + entryName.substring(0, entryName.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)));
+				FileUtils.checkDirectoryAndCreate(targetDirectory + entryName.substring(0, entryName.lastIndexOf(DE.FILE_SEPARATOR_UNIX)));
 				try {
 					is = jarFile.getInputStream(ze);
 					os = new FileOutputStream(targetDirectory + entryName);
@@ -578,7 +578,7 @@ public class FileUtils {
 	 */
 	public static void updateImageInDeviceJar(DeviceConfiguration deviceConfig, String imageFileName, Image deviceImage) {
 		try {
-			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(OSDE.FILE_SEPARATOR_UNIX);
+			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(DE.FILE_SEPARATOR_UNIX);
 			if (isStartedWithinEclipse) {
 				log.log(Level.INFO, "started within Eclipse"); //$NON-NLS-1$
 				String fullQualifiedImageTargetName = findDeviceProjectDirectoryPath(deviceConfig) + "/src/resource/" + imageFileName; //$NON-NLS-1$
@@ -594,13 +594,13 @@ public class FileUtils {
 			}
 			else 
 			{
-				if (OpenSerialDataExplorer.application != null) { // started within OSDE
-					log.log(Level.INFO, "started within OpenSerialDataExplorer"); //$NON-NLS-1$
+				if (DataExplorer.application != null) { // started within OSDE
+					log.log(Level.INFO, "started within DataExplorer"); //$NON-NLS-1$
 				}
 				else { // started outside OSDE
-					log.log(Level.INFO, "started outside OpenSerialDataExplorer"); //$NON-NLS-1$
+					log.log(Level.INFO, "started outside DataExplorer"); //$NON-NLS-1$
 					try {
-						Thread.currentThread().setContextClassLoader(OSDE.getClassLoader());
+						Thread.currentThread().setContextClassLoader(DE.getClassLoader());
 					}
 					catch (Throwable e) {
 						log.log(Level.WARNING, e.getMessage(), e);
@@ -611,11 +611,11 @@ public class FileUtils {
 
 				// remove comment to test within eclipse, comment out the isStartedWithinEclipe block above
 //				if (isStartedWithinEclipse) {
-//					deviceJarPath = "c:\\Program Files\\OpenSerialDataExplorer\\devices\\Simulator.jar";
+//					deviceJarPath = "c:\\Program Files\\DataExplorer\\devices\\Simulator.jar";
 //				}
 
-				String tmpDeviceJarPath = deviceJarPath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-				tmpDeviceJarPath = OSDE.JAVA_IO_TMPDIR.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX) + tmpDeviceJarPath.substring(tmpDeviceJarPath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX)+1, tmpDeviceJarPath.length());
+				String tmpDeviceJarPath = deviceJarPath.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+				tmpDeviceJarPath = DE.JAVA_IO_TMPDIR.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX) + tmpDeviceJarPath.substring(tmpDeviceJarPath.lastIndexOf(DE.FILE_SEPARATOR_UNIX)+1, tmpDeviceJarPath.length());
 				log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
 
 				FileUtils.updateJarContent(deviceJarPath, tmpDeviceJarPath, addJarEntryName, deviceImage, DevicePropertiesEditor.dialogShell);
@@ -638,14 +638,14 @@ public class FileUtils {
 	public static void updateJarContent(String deviceJarPath, String tmpDeviceJarPath, String addJarEntryName, Image deviceImage, Shell messageBoxShell) throws IOException, FileNotFoundException {
 		if (FileUtils.checkFileExist(tmpDeviceJarPath)) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
-			mBox.setText(OSDE.OSDE_NAME_LONG);
+			mBox.setText(DE.OSDE_NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0043, new String[] {tmpDeviceJarPath}));
 			int ret = mBox.open();
 			if (SWT.CANCEL == ret)
 				return;
 			else if (SWT.NO == ret) {
-				FileUtils.renameFile(tmpDeviceJarPath, OSDE.FILE_ENDING_BAK);
-				deviceJarPath = tmpDeviceJarPath.substring(0, tmpDeviceJarPath.lastIndexOf(OSDE.STRING_DOT)+1) + OSDE.FILE_ENDING_BAK;
+				FileUtils.renameFile(tmpDeviceJarPath, DE.FILE_ENDING_BAK);
+				deviceJarPath = tmpDeviceJarPath.substring(0, tmpDeviceJarPath.lastIndexOf(DE.STRING_DOT)+1) + DE.FILE_ENDING_BAK;
 			}
 		}
 		
@@ -682,7 +682,7 @@ public class FileUtils {
 		File tmpFile = new File(tmpDeviceJarPath);
 		if (tmpFile.exists()) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
-			mBox.setText(OSDE.OSDE_NAME_LONG);
+			mBox.setText(DE.OSDE_NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0044, new String[] {tmpDeviceJarPath})); 
 			mBox.open();
 		}
@@ -695,29 +695,29 @@ public class FileUtils {
 	 */
 	public static void updateFileInDeviceJar(DeviceConfiguration deviceConfig, String devicePropsFileName) {
 		String deviceJarPath = null;
-		String devicePropsFileNameResource = devicePropsFileName = devicePropsFileName.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-		if (devicePropsFileNameResource.contains(OSDE.FILE_SEPARATOR_UNIX)) { //seams full qualified, strip directory
-			devicePropsFileNameResource = devicePropsFileNameResource.substring(devicePropsFileNameResource.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX), devicePropsFileNameResource.length());
+		String devicePropsFileNameResource = devicePropsFileName = devicePropsFileName.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+		if (devicePropsFileNameResource.contains(DE.FILE_SEPARATOR_UNIX)) { //seams full qualified, strip directory
+			devicePropsFileNameResource = devicePropsFileNameResource.substring(devicePropsFileNameResource.lastIndexOf(DE.FILE_SEPARATOR_UNIX), devicePropsFileNameResource.length());
 		}
 
 		try {
-			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(OSDE.FILE_SEPARATOR_UNIX);
+			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(DE.FILE_SEPARATOR_UNIX);
 			if (isStartedWithinEclipse) {
 				log.log(Level.INFO, "started within Eclipse"); //$NON-NLS-1$
 				String fullQualifiedPropertiesTargetFileName = findDeviceProjectDirectoryPath(deviceConfig)
-						+ "/src/resource/" + Settings.getInstance().getLocale() + OSDE.FILE_SEPARATOR_UNIX + devicePropsFileName; //$NON-NLS-1$
+						+ "/src/resource/" + Settings.getInstance().getLocale() + DE.FILE_SEPARATOR_UNIX + devicePropsFileName; //$NON-NLS-1$
 				log.log(Level.INFO, "fullQualifiedImageTargetFileName = " + fullQualifiedPropertiesTargetFileName); //$NON-NLS-1$
 				deviceConfig.storeDeviceProperties(fullQualifiedPropertiesTargetFileName);
 			}
 			else 
 			{
-				if (OpenSerialDataExplorer.application != null) { // started within OSDE
-					log.log(Level.INFO, "started within OpenSerialDataExplorer"); //$NON-NLS-1$
+				if (DataExplorer.application != null) { // started within OSDE
+					log.log(Level.INFO, "started within DataExplorer"); //$NON-NLS-1$
 				}
 				else { // started outside OSDE
-					log.log(Level.INFO, "started outside OpenSerialDataExplorer"); //$NON-NLS-1$
+					log.log(Level.INFO, "started outside DataExplorer"); //$NON-NLS-1$
 					try {
-						Thread.currentThread().setContextClassLoader(OSDE.getClassLoader());
+						Thread.currentThread().setContextClassLoader(DE.getClassLoader());
 					}
 					catch (Throwable e) {
 						log.log(Level.WARNING, e.getMessage(), e);
@@ -729,11 +729,11 @@ public class FileUtils {
 
 				// remove comment to test within eclipse, comment out the isStartedWithinEclipe block above
 //				if (isStartedWithinEclipse) {
-//					deviceJarPath = "c:\\Program Files\\OpenSerialDataExplorer\\devices\\Simulator.jar";
+//					deviceJarPath = "c:\\Program Files\\DataExplorer\\devices\\Simulator.jar";
 //				}
 
-				tmpDeviceJarPath = deviceJarPath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX);
-				tmpDeviceJarPath = OSDE.JAVA_IO_TMPDIR + tmpDeviceJarPath.substring(tmpDeviceJarPath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX) + 1, tmpDeviceJarPath.length());
+				tmpDeviceJarPath = deviceJarPath.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+				tmpDeviceJarPath = DE.JAVA_IO_TMPDIR + tmpDeviceJarPath.substring(tmpDeviceJarPath.lastIndexOf(DE.FILE_SEPARATOR_UNIX) + 1, tmpDeviceJarPath.length());
 				log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
 
 				FileUtils.updateJarContent(deviceJarPath, tmpDeviceJarPath, addJarEntryName, devicePropsFileName, DevicePropertiesEditor.dialogShell);
@@ -756,11 +756,11 @@ public class FileUtils {
 	@SuppressWarnings("rawtypes")
 	public static String findDeviceProjectDirectoryPath(DeviceConfiguration deviceConfig) throws MalformedURLException, URISyntaxException, ApplicationConfigurationException,
 			ClassNotFoundException {
-		String deviceImplName = deviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
-		String className = deviceImplName.contains(OSDE.STRING_DOT) ? deviceImplName  // full qualified
-				: "osde.device." + deviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + OSDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
+		String deviceImplName = deviceConfig.getDeviceImplName().replace(DE.STRING_BLANK, DE.STRING_EMPTY).replace(DE.STRING_DASH, DE.STRING_EMPTY);
+		String className = deviceImplName.contains(DE.STRING_DOT) ? deviceImplName  // full qualified
+				: "osde.device." + deviceConfig.getManufacturer().toLowerCase().replace(DE.STRING_BLANK, DE.STRING_EMPTY).replace(DE.STRING_DASH, DE.STRING_EMPTY) + DE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
 		log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
-		Thread.currentThread().setContextClassLoader(OSDE.getClassLoader());
+		Thread.currentThread().setContextClassLoader(DE.getClassLoader());
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Class c = loader.loadClass(className);
 		String basPath = c.getProtectionDomain().getCodeSource().getLocation().getPath();
@@ -782,10 +782,10 @@ public class FileUtils {
 	public static String getJarFileNameOfDevice(DeviceConfiguration deviceConfig) throws ClassNotFoundException, NoSuchMethodException,
 			InstantiationException, IllegalAccessException, InvocationTargetException, NoClassDefFoundError {
 		String deviceJarPath = null;
-		String deviceImplName = deviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
+		String deviceImplName = deviceConfig.getDeviceImplName().replace(DE.STRING_BLANK, DE.STRING_EMPTY).replace(DE.STRING_DASH, DE.STRING_EMPTY);
 		IDevice newInst = null;
-		String className = deviceImplName.contains(OSDE.STRING_DOT) ? deviceImplName  // full qualified
-				: "osde.device." + deviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + OSDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
+		String className = deviceImplName.contains(DE.STRING_DOT) ? deviceImplName  // full qualified
+				: "osde.device." + deviceConfig.getManufacturer().toLowerCase().replace(DE.STRING_BLANK, DE.STRING_EMPTY).replace(DE.STRING_DASH, DE.STRING_EMPTY) + DE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
 		log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Class c = loader.loadClass(className);
@@ -793,7 +793,7 @@ public class FileUtils {
 		log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (constructor != null) {
 			newInst = (IDevice) constructor.newInstance(new Object[] { deviceConfig });
-			deviceJarPath = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK);
+			deviceJarPath = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(DE.STRING_URL_BLANK, DE.STRING_BLANK);
 		}
 		else
 			throw new NoClassDefFoundError(Messages.getString(MessageIds.OSDE_MSGE0016));
@@ -814,14 +814,14 @@ public class FileUtils {
 	public static void updateJarContent(String deviceJarPath, String tmpDeviceJarPath, String addJarEntryName, String addJarFileName, Shell messageBoxShell) throws IOException, FileNotFoundException {
 		if (FileUtils.checkFileExist(tmpDeviceJarPath)) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
-			mBox.setText(OSDE.OSDE_NAME_LONG);
+			mBox.setText(DE.OSDE_NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0043, new String[] {tmpDeviceJarPath}));
 			int ret = mBox.open();
 			if (SWT.CANCEL == ret)
 				return;
 			else if (SWT.NO == ret) {
-				FileUtils.renameFile(tmpDeviceJarPath, OSDE.FILE_ENDING_BAK);
-				deviceJarPath = tmpDeviceJarPath.substring(0, tmpDeviceJarPath.lastIndexOf(OSDE.STRING_DOT)+1) + OSDE.FILE_ENDING_BAK;
+				FileUtils.renameFile(tmpDeviceJarPath, DE.FILE_ENDING_BAK);
+				deviceJarPath = tmpDeviceJarPath.substring(0, tmpDeviceJarPath.lastIndexOf(DE.STRING_DOT)+1) + DE.FILE_ENDING_BAK;
 			}
 		}
 		
@@ -861,7 +861,7 @@ public class FileUtils {
 		File tmpFile = new File(tmpDeviceJarPath);
 		if (tmpFile.exists()) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
-			mBox.setText(OSDE.OSDE_NAME_LONG);
+			mBox.setText(DE.OSDE_NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0044, new String[] {tmpDeviceJarPath})); 
 			mBox.open();
 		}
@@ -879,12 +879,12 @@ public class FileUtils {
 							String deviceJarPath = job.split("2")[0]; //$NON-NLS-1$
 							String tmpDeviceJarPath = job.split("2")[1]; //$NON-NLS-1$
 							try {
-								String javaexec = System.getProperty("java.home").replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX) + "/bin/java"; //$NON-NLS-1$ //$NON-NLS-2$
-								String classpath = OperatingSystemHelper.getClasspathAsString().replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK);
+								String javaexec = System.getProperty("java.home").replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX) + "/bin/java"; //$NON-NLS-1$ //$NON-NLS-2$
+								String classpath = OperatingSystemHelper.getClasspathAsString().replace(DE.STRING_URL_BLANK, DE.STRING_BLANK);
 								String command = javaexec + " -classpath '" + classpath + "' osde.utils.FileUtils '" + deviceJarPath + "' '" + tmpDeviceJarPath + "'";  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 								log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 
-								//new ProcessBuilder(java -classpath OpenSerialDataExplorer.jar osde.utils.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName")
+								//new ProcessBuilder(java -classpath DataExplorer.jar osde.utils.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName")
 								new ProcessBuilder(javaexec, "-classpath", classpath, "osde.utils.FileUtils", deviceJarPath, tmpDeviceJarPath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 							}
 							catch (Throwable e) {
@@ -904,10 +904,10 @@ public class FileUtils {
 	public static void main(String[] args) {
 		try {
 			if (args.length < 2 || args[0].equals(args[1])) {
-				System.out.println("Usage: java -classpath OpenSerialDataExplorer.jar osde.util.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName"); //$NON-NLS-1$
+				System.out.println("Usage: java -classpath DataExplorer.jar osde.util.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName"); //$NON-NLS-1$
 			}
 			Thread.sleep(1000);
-			rename(args[0].replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX), args[1].replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX));
+			rename(args[0].replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX), args[1].replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -933,7 +933,7 @@ public class FileUtils {
 	 * @param unixPermissions
 	 */
 	private static void setAccessPermission(String fullQualifiedFilePath, String unixPermissions) {
-		if (!OSDE.IS_WINDOWS) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (!DE.IS_WINDOWS) { //$NON-NLS-1$ //$NON-NLS-2$
 			try {
 				unixPermissions = unixPermissions.trim();
 				try {
@@ -954,20 +954,20 @@ public class FileUtils {
 	 */
 	public static String getOsdeJarBasePath() {
 		String basePath;
-		URL url = OpenSerialDataExplorer.class.getProtectionDomain().getCodeSource().getLocation();
+		URL url = DataExplorer.class.getProtectionDomain().getCodeSource().getLocation();
 		log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
 		if (url.getPath().endsWith("/")) { // running inside Eclipse //$NON-NLS-1$
 			log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$
 			String bitmode = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
 			bitmode = bitmode != null && bitmode.length() == 2 ? bitmode : System.getProperty("com.ibm.vm.bitmode"); //$NON-NLS-1$
-			basePath = url.getFile().substring(OSDE.IS_WINDOWS ? 1 : 0, url.getPath().indexOf(OpenSerialDataExplorer.class.getSimpleName()));
-			basePath = basePath + "build" + "/target/" + System.getProperty("os.name").split(OSDE.STRING_BLANK)[0] + OSDE.STRING_UNDER_BAR + bitmode + "/OpenSerialDataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			basePath = url.getFile().substring(DE.IS_WINDOWS ? 1 : 0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
+			basePath = basePath + "build" + "/target/" + System.getProperty("os.name").split(DE.STRING_BLANK)[0] + DE.STRING_UNDER_BAR + bitmode + "/DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		}
 		else { // started outside java -jar *.jar
 			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf("/") + 1); //$NON-NLS-1$
-			if (OSDE.IS_WINDOWS) { //$NON-NLS-1$
-				basePath = basePath.replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK);  //$NON-NLS-1$//$NON-NLS-2$
+			if (DE.IS_WINDOWS) { //$NON-NLS-1$
+				basePath = basePath.replace(DE.STRING_URL_BLANK, DE.STRING_BLANK);  //$NON-NLS-1$//$NON-NLS-2$
 			}
 		}
 		log.log(Level.FINE, "OSDE base path = " + basePath); //$NON-NLS-1$
@@ -981,16 +981,16 @@ public class FileUtils {
 	public static String getDevicePluginJarBasePath() {
 		String basePath;
 		String jarPath = null;
-		URL url = OpenSerialDataExplorer.class.getProtectionDomain().getCodeSource().getLocation();
+		URL url = DataExplorer.class.getProtectionDomain().getCodeSource().getLocation();
 		log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
 		if (url.getPath().endsWith("/")) { // running inside Eclipse //$NON-NLS-1$
 			log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$
-			basePath = url.getFile().substring(0, url.getPath().indexOf(OpenSerialDataExplorer.class.getSimpleName()));
+			basePath = url.getFile().substring(0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
 			log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
 				//jarPath = basePath + "build" + OSDE.FILE_SEPARATOR_UNIX + "target" + OSDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME; //$NON-NLS-1$ //$NON-NLS-2$
 				//targetDirectory this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
-				jarPath = basePath + "build" + "/target/" + System.getProperty("os.name").split(OSDE.STRING_BLANK)[0] + OSDE.STRING_UNDER_BAR + OSDE.BIT_MODE + "/OpenSerialDataExplorer/devices"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				jarPath = basePath + "build" + "/target/" + System.getProperty("os.name").split(DE.STRING_BLANK)[0] + DE.STRING_UNDER_BAR + DE.BIT_MODE + "/DataExplorer/devices"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			catch (Exception e) {
 				e.printStackTrace(System.err);
@@ -999,8 +999,8 @@ public class FileUtils {
 		else { // started outside java -jar *.jar
 			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf("/") + 1); //$NON-NLS-1$
-			if (OSDE.IS_WINDOWS) { //$NON-NLS-1$
-				basePath = basePath.replace(OSDE.STRING_URL_BLANK, OSDE.STRING_BLANK);
+			if (DE.IS_WINDOWS) { //$NON-NLS-1$
+				basePath = basePath.replace(DE.STRING_URL_BLANK, DE.STRING_BLANK);
 			}
 			log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {

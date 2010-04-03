@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.serial;
 
@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.device.DeviceConfiguration;
 import osde.exception.ApplicationConfigurationException;
@@ -45,7 +45,7 @@ import osde.exception.SerialPortException;
 import osde.exception.TimeOutException;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.utils.WindowsHelper;
 
 /**
@@ -60,12 +60,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	final static TreeMap<Integer, String> windowsPorts = new TreeMap<Integer, String>();
 	
 	protected final DeviceConfiguration			deviceConfig;
-	protected final OpenSerialDataExplorer 	application;
+	protected final DataExplorer 	application;
 	protected SerialPort										serialPort 				= null;
 	protected int														xferErrors 				= 0;
 	
 	boolean																	isConnected				= false;
-	String																	serialPortStr			= OSDE.STRING_EMPTY;
+	String																	serialPortStr			= DE.STRING_EMPTY;
 	Thread																	closeThread;
 	
 	CommPortIdentifier											portId;
@@ -108,7 +108,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	public static final int ICON_SET_IMPORT_CLOSE = 2;
 
 
-	public DeviceSerialPort(DeviceConfiguration currentDeviceConfig, OpenSerialDataExplorer currentApplication) {
+	public DeviceSerialPort(DeviceConfiguration currentDeviceConfig, DataExplorer currentApplication) {
 		this.deviceConfig = currentDeviceConfig;
 		this.application = currentApplication;
 	}
@@ -124,7 +124,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		final String $METHOD_NAME = "listConfiguredSerialPorts"; //$NON-NLS-1$
 		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 
-		if (OSDE.IS_WINDOWS) {
+		if (DE.IS_WINDOWS) {
 			try {
 				WindowsHelper.registerSerialPorts();
 			}
@@ -143,7 +143,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
 								if (doAvialabilityCheck) {
-									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
+									((SerialPort) commPortIdentifier.open("DataExplorer", 10000)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
 								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
@@ -168,7 +168,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
 								if (doAvialabilityCheck) {
-									((SerialPort) commPortIdentifier.open("OpenSerialDataExplorer", 10000)).close(); //$NON-NLS-1$
+									((SerialPort) commPortIdentifier.open("DataExplorer", 10000)).close(); //$NON-NLS-1$
 								}
 								availablePorts.add(serialPortStr);
 								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
@@ -232,12 +232,12 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			// check if a serial port is selected to be opened
 			if(availablePorts.size() == 0 || (this.serialPortStr != null && !availablePorts.contains(this.serialPortStr))) {
 				listConfiguredSerialPorts(false, 
-						settings.isSerialPortBlackListEnabled() ? settings.getSerialPortBlackList() : OSDE.STRING_EMPTY, 
+						settings.isSerialPortBlackListEnabled() ? settings.getSerialPortBlackList() : DE.STRING_EMPTY, 
 						settings.isSerialPortWhiteListEnabled() ? settings.getSerialPortWhiteList() : new Vector<String>());
 			}
 			if (this.serialPortStr == null || this.serialPortStr.length() < 4 || !isMatchAvailablePorts(this.serialPortStr, availablePorts)) {
 				if (availablePorts.size() == 1 && (this.serialPortStr != null && !isMatchAvailablePorts(this.serialPortStr, availablePorts))) {
-					if (SWT.YES == this.application.openYesNoMessageDialogSync(Messages.getString(MessageIds.OSDE_MSGE0010) + OSDE.LINE_SEPARATOR + Messages.getString(MessageIds.OSDE_MSGT0194, new String[] {this.serialPortStr = availablePorts.firstElement()}))) {
+					if (SWT.YES == this.application.openYesNoMessageDialogSync(Messages.getString(MessageIds.OSDE_MSGE0010) + DE.LINE_SEPARATOR + Messages.getString(MessageIds.OSDE_MSGT0194, new String[] {this.serialPortStr = availablePorts.firstElement()}))) {
 						this.serialPortStr = availablePorts.firstElement();
 						if (settings.isGlobalSerialPort())
 							settings.setSerialPort(this.serialPortStr);
@@ -258,7 +258,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, String.format("serialPortString = %s; baudeRate = %d; dataBits = %s; stopBits = %s; parity = %s; flowControlMode = %s; RTS = %s; DTR = %s", this.serialPortStr, this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity(), this.deviceConfig.getFlowCtrlMode(), this.deviceConfig.isRTS(), this.deviceConfig.isDTR())); //$NON-NLS-1$
 			
 			portId = CommPortIdentifier.getPortIdentifier(this.serialPortStr);
-			this.serialPort = (SerialPort) portId.open("OpenSerialDataExplorer", 10000); //$NON-NLS-1$
+			this.serialPort = (SerialPort) portId.open("DataExplorer", 10000); //$NON-NLS-1$
 			// set port parameters
 			this.serialPort.setInputBufferSize(2048);
 			this.serialPort.setOutputBufferSize(2048);

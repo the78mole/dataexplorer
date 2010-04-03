@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.dialog;
 
@@ -39,10 +39,10 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.OSDE;
+import osde.DE;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -62,7 +62,7 @@ public class AxisEndValuesDialog extends Dialog {
 	boolean 	isInit = false;
 	double[]	newValues	= new double[2];
 	String[]	initialValues = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "10", "25", "50", "100" };//$NON-NLS-$
-	final OpenSerialDataExplorer application;
+	final DataExplorer application;
 
 	/**
 	* Auto-generated main method to display this 
@@ -84,7 +84,7 @@ public class AxisEndValuesDialog extends Dialog {
 
 	public AxisEndValuesDialog(Shell parent, int style) {
 		super(parent, style);
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 	}
 
 	public double[] open(final double[] oldMinMax) {
@@ -138,7 +138,7 @@ public class AxisEndValuesDialog extends Dialog {
 				okBbuttonLData.left = new FormAttachment(0, 1000, 17);
 				okBbuttonLData.top = new FormAttachment(0, 1000, 99);
 				this.okBbutton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-				this.okBbutton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.okBbutton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.okBbutton.setLayoutData(okBbuttonLData);
 				this.okBbutton.setText("OK"); //$NON-NLS-1$
 				this.okBbutton.addSelectionListener(new SelectionAdapter() {
@@ -168,17 +168,17 @@ public class AxisEndValuesDialog extends Dialog {
 				maxValueLabelLData.left = new FormAttachment(0, 1000, 12);
 				maxValueLabelLData.top = new FormAttachment(0, 1000, 12);
 				this.maxValueLabel.setLayoutData(maxValueLabelLData);
-				this.maxValueLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.maxValueLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.maxValueLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0152));
 			}
 			{
 				FormData maxValueSelectLData = new FormData();
 				maxValueSelectLData.width = 84;
-				maxValueSelectLData.height = OSDE.IS_LINUX ? 22 : 20;
+				maxValueSelectLData.height = DE.IS_LINUX ? 22 : 20;
 				maxValueSelectLData.left = new FormAttachment(0, 1000, 12);
 				maxValueSelectLData.top = new FormAttachment(0, 1000, 38);
 				this.maxValueSelect = new CCombo(this.dialogShell, SWT.BORDER);
-				this.maxValueSelect.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.maxValueSelect.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.maxValueSelect.setLayoutData(maxValueSelectLData);
 				this.maxValueSelect.setItems(this.initialValues);
 				this.maxValueSelect.select(7);
@@ -198,18 +198,18 @@ public class AxisEndValuesDialog extends Dialog {
 				cLabel1LData.height = 22;
 				cLabel1LData.left = new FormAttachment(0, 1000, 12);
 				cLabel1LData.top = new FormAttachment(0, 1000, 169);
-				this.minValueLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.minValueLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.minValueLabel.setLayoutData(cLabel1LData);
 				this.minValueLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0153));
 			}
 			{
 				FormData minValueSelectLData = new FormData();
 				minValueSelectLData.width = 84;
-				minValueSelectLData.height = OSDE.IS_LINUX ? 22 : 20;
+				minValueSelectLData.height = DE.IS_LINUX ? 22 : 20;
 				minValueSelectLData.left = new FormAttachment(0, 1000, 12);
 				minValueSelectLData.top = new FormAttachment(0, 1000, 195);
 				this.minValueSelect = new CCombo(this.dialogShell, SWT.BORDER);
-				this.minValueSelect.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.minValueSelect.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.minValueSelect.setLayoutData(minValueSelectLData);
 				this.minValueSelect.setItems(this.initialValues);
 				this.minValueSelect.select(5);

@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.data;
 
@@ -31,13 +31,13 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
-import osde.OSDE;
+import osde.DE;
 import osde.device.DataTypes;
 import osde.device.IDevice;
 import osde.device.ObjectFactory;
 import osde.device.PropertyType;
 import osde.device.StatisticsType;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.StringHelper;
 import osde.utils.TimeLine;
@@ -66,7 +66,7 @@ public class Record extends Vector<Integer> {
 	String							name;																				// measurement name Höhe
 	String							unit;																				// unit [m]
 	String							symbol;																			// symbol h
-	String							description						= OSDE.STRING_BLANK;	// only set if copied into compare set 
+	String							description						= DE.STRING_BLANK;	// only set if copied into compare set 
 	boolean							isActive;
 	boolean							isDisplayable;
 	boolean							isVisible							= true;
@@ -114,7 +114,7 @@ public class Record extends Vector<Integer> {
 	Vector<TriggerRange> triggerRanges				= null;
 	List<PropertyType>	properties						= new ArrayList<PropertyType>();	// offset, factor, reduction, ...
 	boolean							isPositionLeft				= true;
-	Color								color									= OpenSerialDataExplorer.COLOR_BLACK;
+	Color								color									= DataExplorer.COLOR_BLACK;
 	int									lineWidth							= 1;
 	int									lineStyle							= SWT.LINE_SOLID;
 	boolean							isRoundOut						= false;
@@ -544,7 +544,7 @@ public class Record extends Vector<Integer> {
 		PropertyType newProperty = factory.createPropertyType();
 		newProperty.setName(propertyKey);
 		newProperty.setType(type);
-		newProperty.setValue(OSDE.STRING_EMPTY + value);
+		newProperty.setValue(DE.STRING_EMPTY + value);
 		return newProperty;
 	}
 
@@ -1000,7 +1000,7 @@ public class Record extends Vector<Integer> {
 			this.df.applyPattern("0.000"); //$NON-NLS-1$
 			break;
 		}
-		RecordSet compareSet = OpenSerialDataExplorer.getInstance().getCompareSet();
+		RecordSet compareSet = DataExplorer.getInstance().getCompareSet();
 		if (compareSet != null && compareSet.size() > 0) {
 			this.parent.syncScaleNumberFormat(this.keyName, this.numberFormat);
 		}
@@ -1386,7 +1386,7 @@ public class Record extends Vector<Integer> {
 	 * @return formated string of value
 	 */
 	public String getSlopeValue(Point points) {
-		log.log(Level.FINE, OSDE.STRING_EMPTY + points.toString());
+		log.log(Level.FINE, DE.STRING_EMPTY + points.toString());
 		double measureDelta;
 		if(this.parent.isZoomMode)
 			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / this.parent.drawAreaBounds.height;
@@ -1581,28 +1581,28 @@ public class Record extends Vector<Integer> {
 	 */
 	public String getSerializeProperties() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(NAME).append(OSDE.STRING_EQUAL).append(this.name).append(DELIMITER);
-		sb.append(UNIT).append(OSDE.STRING_EQUAL).append(this.unit).append(DELIMITER);
-		sb.append(SYMBOL).append(OSDE.STRING_EQUAL).append(this.symbol).append(DELIMITER);
-		sb.append(IS_ACTIVE).append(OSDE.STRING_EQUAL).append(this.isActive).append(DELIMITER);
-		sb.append(IS_DIPLAYABLE).append(OSDE.STRING_EQUAL).append(this.isDisplayable).append(DELIMITER);
-		sb.append(IS_VISIBLE).append(OSDE.STRING_EQUAL).append(this.isVisible).append(DELIMITER);
-		sb.append(MAX_VALUE).append(OSDE.STRING_EQUAL).append(this.maxValue).append(DELIMITER);
-		sb.append(MIN_VALUE).append(OSDE.STRING_EQUAL).append(this.minValue).append(DELIMITER);
+		sb.append(NAME).append(DE.STRING_EQUAL).append(this.name).append(DELIMITER);
+		sb.append(UNIT).append(DE.STRING_EQUAL).append(this.unit).append(DELIMITER);
+		sb.append(SYMBOL).append(DE.STRING_EQUAL).append(this.symbol).append(DELIMITER);
+		sb.append(IS_ACTIVE).append(DE.STRING_EQUAL).append(this.isActive).append(DELIMITER);
+		sb.append(IS_DIPLAYABLE).append(DE.STRING_EQUAL).append(this.isDisplayable).append(DELIMITER);
+		sb.append(IS_VISIBLE).append(DE.STRING_EQUAL).append(this.isVisible).append(DELIMITER);
+		sb.append(MAX_VALUE).append(DE.STRING_EQUAL).append(this.maxValue).append(DELIMITER);
+		sb.append(MIN_VALUE).append(DE.STRING_EQUAL).append(this.minValue).append(DELIMITER);
 		for (PropertyType property : this.properties) {
 			log.log(Level.FINE, this.name + " - " + property.getName() + " = " + property.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(property.getName()).append(OSDE.STRING_UNDER_BAR).append(property.getType()).append(OSDE.STRING_EQUAL).append(property.getValue()).append(DELIMITER);
+			sb.append(property.getName()).append(DE.STRING_UNDER_BAR).append(property.getType()).append(DE.STRING_EQUAL).append(property.getValue()).append(DELIMITER);
 		}
-		sb.append(DEFINED_MAX_VALUE).append(OSDE.STRING_EQUAL).append(this.maxScaleValue).append(DELIMITER);
-		sb.append(DEFINED_MIN_VALUE).append(OSDE.STRING_EQUAL).append(this.minScaleValue).append(DELIMITER);
-		sb.append(IS_POSITION_LEFT).append(OSDE.STRING_EQUAL).append(this.isPositionLeft).append(DELIMITER);
-		sb.append(COLOR).append(OSDE.STRING_EQUAL).append(this.color.getRed()).append(OSDE.STRING_COMMA).append(this.color.getGreen()).append(OSDE.STRING_COMMA).append(this.color.getBlue()).append(DELIMITER);
-		sb.append(LINE_WITH).append(OSDE.STRING_EQUAL).append(this.lineWidth).append(DELIMITER);
-		sb.append(LINE_STYLE).append(OSDE.STRING_EQUAL).append(this.lineStyle).append(DELIMITER);
-		sb.append(IS_ROUND_OUT).append(OSDE.STRING_EQUAL).append(this.isRoundOut).append(DELIMITER);
-		sb.append(IS_START_POINT_ZERO).append(OSDE.STRING_EQUAL).append(this.isStartpointZero).append(DELIMITER);
-		sb.append(IS_START_END_DEFINED).append(OSDE.STRING_EQUAL).append(this.isStartEndDefined).append(DELIMITER);
-		sb.append(NUMBER_FORMAT).append(OSDE.STRING_EQUAL).append(this.numberFormat).append(DELIMITER);
+		sb.append(DEFINED_MAX_VALUE).append(DE.STRING_EQUAL).append(this.maxScaleValue).append(DELIMITER);
+		sb.append(DEFINED_MIN_VALUE).append(DE.STRING_EQUAL).append(this.minScaleValue).append(DELIMITER);
+		sb.append(IS_POSITION_LEFT).append(DE.STRING_EQUAL).append(this.isPositionLeft).append(DELIMITER);
+		sb.append(COLOR).append(DE.STRING_EQUAL).append(this.color.getRed()).append(DE.STRING_COMMA).append(this.color.getGreen()).append(DE.STRING_COMMA).append(this.color.getBlue()).append(DELIMITER);
+		sb.append(LINE_WITH).append(DE.STRING_EQUAL).append(this.lineWidth).append(DELIMITER);
+		sb.append(LINE_STYLE).append(DE.STRING_EQUAL).append(this.lineStyle).append(DELIMITER);
+		sb.append(IS_ROUND_OUT).append(DE.STRING_EQUAL).append(this.isRoundOut).append(DELIMITER);
+		sb.append(IS_START_POINT_ZERO).append(DE.STRING_EQUAL).append(this.isStartpointZero).append(DELIMITER);
+		sb.append(IS_START_END_DEFINED).append(DE.STRING_EQUAL).append(this.isStartEndDefined).append(DELIMITER);
+		sb.append(NUMBER_FORMAT).append(DE.STRING_EQUAL).append(this.numberFormat).append(DELIMITER);
 		return sb.substring(0, sb.lastIndexOf(Record.DELIMITER)) + Record.END_MARKER;
 	}
 	
@@ -1629,7 +1629,7 @@ public class Record extends Vector<Integer> {
 		tmpValue = recordProps.get(IS_DIPLAYABLE);
 		if (tmpValue!=null && tmpValue.length() > 0) this.isDisplayable =  Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(COLOR);
-		if (tmpValue!=null && tmpValue.length() > 5) this.color = SWTResourceManager.getColor(new Integer(tmpValue.split(OSDE.STRING_COMMA)[0]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[1]), new Integer(tmpValue.split(OSDE.STRING_COMMA)[2]));
+		if (tmpValue!=null && tmpValue.length() > 5) this.color = SWTResourceManager.getColor(new Integer(tmpValue.split(DE.STRING_COMMA)[0]), new Integer(tmpValue.split(DE.STRING_COMMA)[1]), new Integer(tmpValue.split(DE.STRING_COMMA)[2]));
 		tmpValue = recordProps.get(LINE_WITH);
 		if (tmpValue!=null && tmpValue.length() > 0) this.lineWidth =  new Integer(tmpValue.trim()).intValue();
 		tmpValue = recordProps.get(LINE_STYLE);
@@ -1664,7 +1664,7 @@ public class Record extends Vector<Integer> {
 	public void setSerializedDeviceSpecificProperties(String serializedProperties) {
 		HashMap<String, String> recordDeviceProps = StringHelper.splitString(serializedProperties, DELIMITER, this.getDevice().getUsedPropertyKeys());
 		StringBuilder sb = new StringBuilder();
-		if (log.isLoggable(Level.FINE)) sb.append(this.name).append(OSDE.STRING_MESSAGE_CONCAT);
+		if (log.isLoggable(Level.FINE)) sb.append(this.name).append(DE.STRING_MESSAGE_CONCAT);
 		
 		// each record loaded from a file gets new properties instead of using the default initialized in constructor
 		this.properties = new ArrayList<PropertyType>(); // offset, factor, reduction, ...
@@ -1676,9 +1676,9 @@ public class Record extends Vector<Integer> {
 				String prop = recordDeviceProps.get(propName);
 				PropertyType tmpProperty = new ObjectFactory().createPropertyType();
 				tmpProperty.setName(propName);
-				String type = prop.split(OSDE.STRING_EQUAL)[0].substring(1);
+				String type = prop.split(DE.STRING_EQUAL)[0].substring(1);
 				if (type != null && type.length() > 3) tmpProperty.setType(DataTypes.fromValue(type));
-				String value = prop.split(OSDE.STRING_EQUAL)[1];
+				String value = prop.split(DE.STRING_EQUAL)[1];
 				if (value != null && value.length() > 0) tmpProperty.setValue(value.trim());
 				this.properties.add(tmpProperty);
 				if (log.isLoggable(Level.FINE)) sb.append(propName).append(" = ").append(value);

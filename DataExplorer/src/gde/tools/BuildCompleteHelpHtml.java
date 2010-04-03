@@ -21,7 +21,7 @@ import java.util.logging.Handler;
 import osde.log.Level;
 import java.util.logging.Logger;
 
-import osde.OSDE;
+import osde.DE;
 import osde.exception.ApplicationConfigurationException;
 import osde.log.LogFormatter;
 import osde.utils.FileUtils;
@@ -38,27 +38,27 @@ public class BuildCompleteHelpHtml {
 			"<HTML>\n" +
 			"<HEAD>\n" +
 			"<META HTTP-EQUIV=\"CONTENT-TYPE\" CONTENT=\"text/html; charset=utf-8\">\n" +
-			"<TITLE>OpenSerialDataExplorer - Benuterhandbuch</TITLE>\n" +
+			"<TITLE>DataExplorer - Benuterhandbuch</TITLE>\n" +
 			"<META NAME=\"AUTHOR\" CONTENT=\"Winfried Brügmann\">\n" +
 			"</HEAD>\n" +
 			"<BODY LANG=\"de-DE\" DIR=\"LTR\">\n" +
-			"<H0>OpenSerialDataExplorer - Benuterhandbuch</H0>\n";
+			"<H0>DataExplorer - Benuterhandbuch</H0>\n";
 	static String header_en = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2//EN\">\n" +
 			"<HTML>\n" +
 			"<HEAD>\n" +
 			"<META HTTP-EQUIV=\"CONTENT-TYPE\" CONTENT=\"text/html; charset=utf-8\">\n" +
-			"<TITLE>OpenSerialDataExplorer - Users Guide</TITLE>\n" +
+			"<TITLE>DataExplorer - Users Guide</TITLE>\n" +
 			"<META NAME=\"AUTHOR\" CONTENT=\"Winfried Brügmann\">\n" +
 			"</HEAD>\n" +
 			"<BODY LANG=\"en-US\" DIR=\"LTR\">\n" +
-			"<H0>OpenSerialDataExplorer - Users Guide</H0>\n";
+			"<H0>DataExplorer - Users Guide</H0>\n";
 	static String footer = "</BODY>\n" + "</HTML>";
 	
 	static String supprtedDevices_de = "Aktuell unterstützte Geräte";
 	static String supprtedDevices_en = "Actual Supported Devices";
 	
-	static String filename_de = OSDE.OSDE_NAME_LONG + " - Information und Hilfe.html";
-	static String filename_en = OSDE.OSDE_NAME_LONG + " - Information and Help.html";
+	static String filename_de = DE.OSDE_NAME_LONG + " - Information und Hilfe.html";
+	static String filename_en = DE.OSDE_NAME_LONG + " - Information and Help.html";
 
 	static final String[]	SUPPORTED_LANGUAGES	= new String[] { "de", "en" };
 	static final String[]	SUPPORTED_LANGUAGE_HEADERS	= new String[] { header_de, header_en };
@@ -74,7 +74,7 @@ public class BuildCompleteHelpHtml {
 	public static void main(String[] args) throws IOException, URISyntaxException, ApplicationConfigurationException {
 		String baseFilePath;
 
-		String line = OSDE.STRING_STAR;
+		String line = DE.STRING_STAR;
 		BufferedReader reader = null;
 		BufferedWriter writer = null;
 
@@ -84,9 +84,9 @@ public class BuildCompleteHelpHtml {
 			URL url = BuildCompleteHelpHtml.class.getProtectionDomain().getCodeSource().getLocation();
 			log.log(Level.INFO, "base URL = " + url.toString()); //$NON-NLS-1$
 			baseFilePath = url.getFile();
-			baseFilePath = baseFilePath.substring(1, baseFilePath.indexOf(OSDE.OSDE_NAME_LONG) + OSDE.OSDE_NAME_LONG.length());
-			String targetPath = baseFilePath + OSDE.FILE_SEPARATOR_UNIX + "doc"  + OSDE.FILE_SEPARATOR_UNIX;
-			baseFilePath = baseFilePath + OSDE.FILE_SEPARATOR_UNIX + "src" + OSDE.FILE_SEPARATOR_UNIX + "help";
+			baseFilePath = baseFilePath.substring(1, baseFilePath.indexOf(DE.OSDE_NAME_LONG) + DE.OSDE_NAME_LONG.length());
+			String targetPath = baseFilePath + DE.FILE_SEPARATOR_UNIX + "doc"  + DE.FILE_SEPARATOR_UNIX;
+			baseFilePath = baseFilePath + DE.FILE_SEPARATOR_UNIX + "src" + DE.FILE_SEPARATOR_UNIX + "help";
 			
 
 			//iterate over de and en directory
@@ -95,7 +95,7 @@ public class BuildCompleteHelpHtml {
 				writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetPath + SUPPORTED_LANGUAGE_FILEPATHES[i]), "UTF-8")); //$NON-NLS-1$
 				writer.write(SUPPORTED_LANGUAGE_HEADERS[i]);
 					
-				String langFilePath = baseFilePath + OSDE.FILE_SEPARATOR_UNIX + SUPPORTED_LANGUAGES[i];
+				String langFilePath = baseFilePath + DE.FILE_SEPARATOR_UNIX + SUPPORTED_LANGUAGES[i];
 				log.log(Level.INFO, "langFilePath = " + langFilePath);
 				List<File> files = FileUtils.getFileListing(new File(langFilePath));
 				
@@ -125,14 +125,14 @@ public class BuildCompleteHelpHtml {
 				}
 
 				writer.write("<H1>" + SUPPORTED_LANGUAGE_DEVICES[i] + "</H1>\n");
-				URL[] urls = ((URLClassLoader)OSDE.getClassLoader()).getURLs();
+				URL[] urls = ((URLClassLoader)DE.getClassLoader()).getURLs();
 				
 				for (int j = 0; j < urls.length; ++j) {
 					String pluginBaseFilePath = urls[j].getPath().substring(1, urls[j].getPath().indexOf("bin"));
 					pluginBaseFilePath = pluginBaseFilePath + "src/help";
 					
-					if (new File(pluginBaseFilePath).exists() && !pluginBaseFilePath.contains(OSDE.OSDE_NAME_LONG) && !pluginBaseFilePath.contains("Sample")) {
-						String pluginLangFilePath = pluginBaseFilePath + OSDE.FILE_SEPARATOR_UNIX + SUPPORTED_LANGUAGES[i];
+					if (new File(pluginBaseFilePath).exists() && !pluginBaseFilePath.contains(DE.OSDE_NAME_LONG) && !pluginBaseFilePath.contains("Sample")) {
+						String pluginLangFilePath = pluginBaseFilePath + DE.FILE_SEPARATOR_UNIX + SUPPORTED_LANGUAGES[i];
 						log.log(Level.INFO, "pluginLangFilePath = " + pluginLangFilePath);
 						
 						files = FileUtils.getFileListing(new File(pluginLangFilePath));
@@ -190,7 +190,7 @@ public class BuildCompleteHelpHtml {
 	private static void initLogger() {
 		Handler ch = new ConsoleHandler();
 		LogFormatter lf = new LogFormatter();
-		rootLogger = Logger.getLogger(OSDE.STRING_EMPTY);
+		rootLogger = Logger.getLogger(DE.STRING_EMPTY);
 
 		// clean up all handlers from outside
 		Handler[] handlers = rootLogger.getHandlers();

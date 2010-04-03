@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
@@ -38,7 +38,7 @@ import osde.device.IDevice;
 import osde.device.StatisticsType;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.TabAreaContextMenu;
 import osde.utils.TimeLine;
@@ -84,7 +84,7 @@ public class StatisticsWindow extends CTabItem {
 	final int											extentFactor	= 8;																									// factor to calculate column width
 	RecordSet											oldRecordSet	= null;
 	int														oldNumberDisplayableRecords = 0;
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final Channels								channels;
 	final Settings								settings;
 	final CTabFolder							tabFolder;
@@ -92,7 +92,7 @@ public class StatisticsWindow extends CTabItem {
 	public StatisticsWindow(CTabFolder currentDisplayTab, int style) {
 		super(currentDisplayTab, style);
 		SWTResourceManager.registerResourceUser(this);
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.tabFolder = currentDisplayTab;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
@@ -123,7 +123,7 @@ public class StatisticsWindow extends CTabItem {
 				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
-					OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.composite.addControlListener(new ControlListener() {
@@ -143,7 +143,7 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup = new Group(this.composite, SWT.NONE);
 				this.descriptionGroup.setLayout(null);
 				this.descriptionGroup.setBounds(10, 10, 300, 110); // set top,left and maintain the rest by control listener
-				this.descriptionGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.descriptionGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.descriptionGroup.setText(Messages.getString(MessageIds.OSDE_MSGT0351));
 				this.descriptionGroup.setBackground(this.innerAreaBackground);
 				this.descriptionGroup.setMenu(this.popupmenu);			
@@ -151,7 +151,7 @@ public class StatisticsWindow extends CTabItem {
 					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "descriptionGroup.helpRequested " + evt); //$NON-NLS-1$
-						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						DataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.descriptionGroup.addPaintListener(new PaintListener() {
@@ -170,7 +170,7 @@ public class StatisticsWindow extends CTabItem {
 								}
 							}
 							else {
-								String tmpDescriptionText = OSDE.STRING_EMPTY;
+								String tmpDescriptionText = DE.STRING_EMPTY;
 								if (StatisticsWindow.this.descriptionTextLabel != null  && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
 									StatisticsWindow.this.descriptionTextLabel.setText(StatisticsWindow.this.descriptionText = tmpDescriptionText);
 								}
@@ -180,7 +180,7 @@ public class StatisticsWindow extends CTabItem {
 				});
 				{
 					this.descriptionTextLabel = new Text(this.descriptionGroup, SWT.LEFT | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
-					this.descriptionTextLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.descriptionTextLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.descriptionTextLabel.setText("recordSetName, (fileDescription), recordSetDescription"); //$NON-NLS-1$
 					this.descriptionTextLabel.setBackground(this.innerAreaBackground);
 					this.descriptionTextLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
@@ -192,7 +192,7 @@ public class StatisticsWindow extends CTabItem {
 				this.dataTable = new Table(this.composite, SWT.MULTI | SWT.BORDER);
 				this.dataTable.setLinesVisible(!this.isWindows);
 				this.dataTable.setHeaderVisible(true);
-				this.dataTable.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.dataTable.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by control listener
 				this.dataTable.setBackground(this.innerAreaBackground);
 				this.dataTable.setMenu(this.popupmenu);			
@@ -200,7 +200,7 @@ public class StatisticsWindow extends CTabItem {
 					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "dataTable.helpRequested " + evt); //$NON-NLS-1$
-						OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						DataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.dataTable.addPaintListener(new PaintListener() {
@@ -392,7 +392,7 @@ public class StatisticsWindow extends CTabItem {
 							// append trigger + comment
 							if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
 								sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
-								this.tabelItemText.set(0, this.tabelItemText.get(0) + (activeRecordSet.isTimeStepConstant() ? ", " : OSDE.STRING_EMPTY) + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange());
+								this.tabelItemText.set(0, this.tabelItemText.get(0) + (activeRecordSet.isTimeStepConstant() ? ", " : DE.STRING_EMPTY) + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange());
 							}
 
 							int customColumnTextExtent = 15 + SWTResourceManager.getGC(this.dataTable.getDisplay()).textExtent(sb.substring(sb.lastIndexOf(DELIMITER) + 1)).x;
@@ -520,9 +520,9 @@ public class StatisticsWindow extends CTabItem {
 	public String getContentAsText() {
 		StringBuilder sb = new StringBuilder();
 		//header
-		sb.append(OSDE.OSDE_NAME_LONG).append(OSDE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.OSDE_MSGT0350)).append(OSDE.LINE_SEPARATOR).append(OSDE.LINE_SEPARATOR);
+		sb.append(DE.OSDE_NAME_LONG).append(DE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.OSDE_MSGT0350)).append(DE.LINE_SEPARATOR).append(DE.LINE_SEPARATOR);
 		//description
-		sb.append(Messages.getString(MessageIds.OSDE_MSGT0351)).append(OSDE.LINE_SEPARATOR);
+		sb.append(Messages.getString(MessageIds.OSDE_MSGT0351)).append(DE.LINE_SEPARATOR);
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			this.descriptionText = activeChannel.getFileDescription() + "\n--------------------------\n"; //$NON-NLS-1$
@@ -534,19 +534,19 @@ public class StatisticsWindow extends CTabItem {
 		if (activeRecordSet != null) {
 			this.descriptionText = this.descriptionText + activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
 		}
-		sb.append(this.descriptionText).append(OSDE.LINE_SEPARATOR).append(OSDE.LINE_SEPARATOR);
+		sb.append(this.descriptionText).append(DE.LINE_SEPARATOR).append(DE.LINE_SEPARATOR);
 		//table header
 		sb.append(String.format("%-18s %-15s %10s  %12s  %10s %-18s  %s", 
 				Messages.getString(MessageIds.OSDE_MSGT0352), Messages.getString(MessageIds.OSDE_MSGT0353), Messages.getString(MessageIds.OSDE_MSGT0354), 
 				Messages.getString(MessageIds.OSDE_MSGT0355), Messages.getString(MessageIds.OSDE_MSGT0356), Messages.getString(MessageIds.OSDE_MSGT0357), 
-				Messages.getString(MessageIds.OSDE_MSGT0358))).append(OSDE.LINE_SEPARATOR);
+				Messages.getString(MessageIds.OSDE_MSGT0358))).append(DE.LINE_SEPARATOR);
 		//table data
 		for (String tableText : this.tabelItemText) {
 			String[] itemsText = tableText.split(DELIMITER);
 			sb.append(String.format("%-18s %-15s %12s %12s %12s %12s      ", itemsText[0],itemsText[1],itemsText[2],itemsText[3],itemsText[4],itemsText[5]));
 			if (itemsText.length > 6)
 				sb.append(itemsText[6]);
-			sb.append(OSDE.LINE_SEPARATOR);
+			sb.append(DE.LINE_SEPARATOR);
 		}
 		return sb.toString();
 	}
@@ -557,7 +557,7 @@ public class StatisticsWindow extends CTabItem {
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.tabFolder.getClientArea();
-		Image objectImage = new Image(OpenSerialDataExplorer.display, bounds.width, bounds.height);
+		Image objectImage = new Image(DataExplorer.display, bounds.width, bounds.height);
 		GC imageGC = new GC(objectImage);
 		this.composite.print(imageGC);
 		imageGC.dispose();

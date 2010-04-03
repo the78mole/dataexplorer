@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.config;
 
@@ -53,13 +53,13 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.xml.sax.SAXException;
 
-import osde.OSDE;
+import osde.DE;
 import osde.exception.ApplicationConfigurationException;
 import osde.log.Level;
 import osde.log.LogFormatter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.FileUtils;
 import osde.utils.RecordSetNameComparator;
@@ -83,14 +83,14 @@ public class Settings extends Properties {
 	private Thread 											xsdThread;
 
 	public  static final String	EMPTY												= "---"; //$NON-NLS-1$
-	public  static final String EMPTY_SIGNATURE 						= EMPTY + OSDE.STRING_SEMICOLON + EMPTY + OSDE.STRING_SEMICOLON + EMPTY;
+	public  static final String EMPTY_SIGNATURE 						= EMPTY + DE.STRING_SEMICOLON + EMPTY + DE.STRING_SEMICOLON + EMPTY;
 	private static final String	UNIX_PORT_DEV_TTY						= "/dev/tty";
 	private static final String	WINDOWS_PORT_COM						= "COM";
 	private static final String	PERMISSION_555							= "555";
 	private static final String	PATH_RESOURCE								= "resource/";
 	private static final String PATH_RESOURCE_TEMPLATE 			= "resource/template/";
 
-	private final static String		HEADER_TEXT										= "# -- OpenSerialDataExplorer Settings File -- "; //$NON-NLS-1$
+	private final static String		HEADER_TEXT										= "# -- DataExplorer Settings File -- "; //$NON-NLS-1$
 	private final static String		DEVICE_BLOCK									= "#[Actual-Device-Port-Settings]";																				// Picolario;Renschler;COM2 //$NON-NLS-1$
 	private final static String		WINDOW_BLOCK									= "#[Window-Settings]"; //$NON-NLS-1$
 	private final static String		WINDOW_LEFT										= "window_left"; //$NON-NLS-1$
@@ -178,10 +178,10 @@ public class Settings extends Properties {
 	public final static String		GRID_COMPARE_WINDOW_VER_COLOR	= "grid_compare_vertical_color"; //$NON-NLS-1$
 
 	public final static String		DEVICE_PROPERTIES_DIR_NAME		= "Devices"; //$NON-NLS-1$
-	public final static String		DEVICE_PROPERTIES_XSD_NAME		= "DeviceProperties" + OSDE.DEVICE_PROPERTIES_XSD_VERSION + OSDE.FILE_ENDING_DOT_XSD; //$NON-NLS-1$
+	public final static String		DEVICE_PROPERTIES_XSD_NAME		= "DeviceProperties" + DE.DEVICE_PROPERTIES_XSD_VERSION + DE.FILE_ENDING_DOT_XSD; //$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_DIR_NAME		= "GraphicsTemplates"; //$NON-NLS-1$
-	public final static String		GRAPHICS_TEMPLATES_XSD_NAME		= "GraphicsTemplates" + OSDE.GRAPHICS_TEMPLATES_XSD_VERSION + OSDE.FILE_ENDING_DOT_XSD; //$NON-NLS-1$
-	public final static String		GRAPHICS_TEMPLATES_EXTENSION	= OSDE.FILE_ENDING_STAR_XML;
+	public final static String		GRAPHICS_TEMPLATES_XSD_NAME		= "GraphicsTemplates" + DE.GRAPHICS_TEMPLATES_XSD_VERSION + DE.FILE_ENDING_DOT_XSD; //$NON-NLS-1$
+	public final static String		GRAPHICS_TEMPLATES_EXTENSION	= DE.FILE_ENDING_STAR_XML;
 
 	private static Settings	instance											= null;	// singelton
 	private BufferedReader	reader;																// to read the application settings
@@ -215,7 +215,7 @@ public class Settings extends Properties {
 
 	/**
 	 * a singleton needs a static method to get the instance of this calss
-	 * @return OpenSerialDataExplorer instance
+	 * @return DataExplorer instance
 	 * @throws JAXBException
 	 * @throws SAXException
 	 */
@@ -224,7 +224,7 @@ public class Settings extends Properties {
 		if (Settings.instance == null) {
 			try {
 				Settings.instance = new Settings();
-				log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - OSDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
+				log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - DE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (Exception e) {
 				log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -242,25 +242,25 @@ public class Settings extends Properties {
 	private Settings() throws SAXException, JAXBException {
 		final String $METHOD_NAME = "Settings"; //$NON-NLS-1$
 
-		if (OSDE.IS_WINDOWS) { //$NON-NLS-1$
-			this.applHomePath = (System.getenv("APPDATA") + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer").replace("\\", OSDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			this.settingsFilePath = this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer.properties"; //$NON-NLS-1$
+		if (DE.IS_WINDOWS) { //$NON-NLS-1$
+			this.applHomePath = (System.getenv("APPDATA") + DE.FILE_SEPARATOR_UNIX + "DataExplorer").replace("\\", DE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			this.settingsFilePath = this.applHomePath + DE.FILE_SEPARATOR_UNIX + "DataExplorer.properties"; //$NON-NLS-1$
 		}
-		else if (OSDE.IS_LINUX) { //$NON-NLS-1$ //$NON-NLS-2$
-			this.applHomePath = System.getProperty("user.home") + OSDE.FILE_SEPARATOR_UNIX + ".OpenSerialDataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
-			this.settingsFilePath = this.applHomePath  + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer.properties"; //$NON-NLS-1$
+		else if (DE.IS_LINUX) { //$NON-NLS-1$ //$NON-NLS-2$
+			this.applHomePath = System.getProperty("user.home") + DE.FILE_SEPARATOR_UNIX + ".DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
+			this.settingsFilePath = this.applHomePath  + DE.FILE_SEPARATOR_UNIX + "DataExplorer.properties"; //$NON-NLS-1$
 		}
 		// OPET - start - add
-		else if (OSDE.IS_MAC) { //$NON-NLS-1$ //$NON-NLS-2$
-			this.applHomePath = System.getProperty("user.home") + OSDE.FILE_SEPARATOR_UNIX + "Library" + OSDE.FILE_SEPARATOR_UNIX + "Application Support" + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
-			this.settingsFilePath = this.applHomePath  + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer.properties"; //$NON-NLS-1$
+		else if (DE.IS_MAC) { //$NON-NLS-1$ //$NON-NLS-2$
+			this.applHomePath = System.getProperty("user.home") + DE.FILE_SEPARATOR_UNIX + "Library" + DE.FILE_SEPARATOR_UNIX + "Application Support" + DE.FILE_SEPARATOR_UNIX + "DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
+			this.settingsFilePath = this.applHomePath  + DE.FILE_SEPARATOR_UNIX + "DataExplorer.properties"; //$NON-NLS-1$
 		}
 		// OPET - end
 		else {
 			log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.OSDE_MSGW0001));
 		}
 
-		this.xmlBasePath = this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + OSDE.FILE_SEPARATOR_UNIX;
+		this.xmlBasePath = this.applHomePath + DE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + DE.FILE_SEPARATOR_UNIX;
 		xsdThread = new Thread() {
 			public void run() {
 				final String $METHOD_NAME = "xsdThread.run()";
@@ -273,7 +273,7 @@ public class Settings extends Properties {
 					Settings.this.marshaller = Settings.this.jc.createMarshaller();
 					Settings.this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.valueOf(true));
 					Settings.this.marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, Settings.DEVICE_PROPERTIES_XSD_NAME);
-					log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "schema factory setup time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - OSDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$		
+					log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "schema factory setup time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - DE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$		
 				}
 				catch (Exception e) {
 					log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -285,31 +285,31 @@ public class Settings extends Properties {
 
 		// check existens of application home directory, check XSD version, copy all device XML+XSD and image files
 		FileUtils.checkDirectoryAndCreate(this.applHomePath);
-		String devicePropertiesTargetpath = this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + DEVICE_PROPERTIES_DIR_NAME;
+		String devicePropertiesTargetpath = this.applHomePath + DE.FILE_SEPARATOR_UNIX + DEVICE_PROPERTIES_DIR_NAME;
 		if (!FileUtils.checkDirectoryAndCreate(devicePropertiesTargetpath, DEVICE_PROPERTIES_XSD_NAME)) {
 			FileUtils.extract(this.getClass(), DEVICE_PROPERTIES_XSD_NAME, PATH_RESOURCE, devicePropertiesTargetpath, PERMISSION_555);
-			updateDeviceProperties(devicePropertiesTargetpath + OSDE.FILE_SEPARATOR_UNIX, true);
+			updateDeviceProperties(devicePropertiesTargetpath + DE.FILE_SEPARATOR_UNIX, true);
 			this.isDevicePropertiesUpdated = true;
 		}
 		else {	// execute every time application starts to enable update from added plug-in
-			updateDeviceProperties(devicePropertiesTargetpath + OSDE.FILE_SEPARATOR_UNIX, true);
+			updateDeviceProperties(devicePropertiesTargetpath + DE.FILE_SEPARATOR_UNIX, true);
 		}
 		xsdThread.start(); // wait to start the thread until the device XMLs are getting updated
 
 		// locale settings has been changed, replacement of device property files required
 		if (this.getLocaleChanged() && !this.isDevicePropertiesUpdated) {
-			updateDeviceProperties(devicePropertiesTargetpath + OSDE.FILE_SEPARATOR_UNIX, false);
+			updateDeviceProperties(devicePropertiesTargetpath + DE.FILE_SEPARATOR_UNIX, false);
 			this.isDevicePropertiesReplaced = true;
 		}
 
-		String templateDirectory = this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + GRAPHICS_TEMPLATES_DIR_NAME;
+		String templateDirectory = this.applHomePath + DE.FILE_SEPARATOR_UNIX + GRAPHICS_TEMPLATES_DIR_NAME;
 		if (!FileUtils.checkDirectoryAndCreate(templateDirectory, GRAPHICS_TEMPLATES_XSD_NAME)) { // there is no old XSD version
 			FileUtils.extract(this.getClass(), GRAPHICS_TEMPLATES_XSD_NAME, PATH_RESOURCE, templateDirectory, PERMISSION_555);
 			this.isGraphicsTemplateUpdated = true;
 		}
-		checkDeviceTemplates(templateDirectory + OSDE.FILE_SEPARATOR_UNIX);
+		checkDeviceTemplates(templateDirectory + DE.FILE_SEPARATOR_UNIX);
 
-		FileUtils.checkDirectoryAndCreate(this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + "Logs"); //$NON-NLS-1$
+		FileUtils.checkDirectoryAndCreate(this.applHomePath + DE.FILE_SEPARATOR_UNIX + "Logs"); //$NON-NLS-1$
 
 		log.logp(Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, String.format("settingsFilePath = %s", this.settingsFilePath)); //$NON-NLS-1$
 
@@ -335,11 +335,11 @@ public class Settings extends Properties {
 		log.logp(Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, "deviceJarBasePath = " + deviceJarBasePath); //$NON-NLS-1$
 		String[] files = new File(deviceJarBasePath).list();
 		for (String jarFileName : files) {
-			if (!jarFileName.endsWith(OSDE.FILE_ENDING_DOT_JAR)) continue;
+			if (!jarFileName.endsWith(DE.FILE_ENDING_DOT_JAR)) continue;
 			JarFile jarFile = null;
 			String[] plugins = new String[0];
 			try {
-				jarFile = new JarFile(deviceJarBasePath + OSDE.FILE_SEPARATOR_UNIX + jarFileName);
+				jarFile = new JarFile(deviceJarBasePath + DE.FILE_SEPARATOR_UNIX + jarFileName);
 				plugins = FileUtils.getDeviceJarServicesNames(jarFile);
 			}
 			catch (Throwable e) {
@@ -348,11 +348,11 @@ public class Settings extends Properties {
 			if (jarFile != null) {
 				for (String plugin : plugins) {
 					if (existCheck) {
-						if (!FileUtils.checkFileExist(devicePropertiesTargetpath + plugin + OSDE.FILE_ENDING_DOT_XML))
-							FileUtils.extract(jarFile, plugin + ".xml", PATH_RESOURCE + this.getLocale().getLanguage() + OSDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						if (!FileUtils.checkFileExist(devicePropertiesTargetpath + plugin + DE.FILE_ENDING_DOT_XML))
+							FileUtils.extract(jarFile, plugin + ".xml", PATH_RESOURCE + this.getLocale().getLanguage() + DE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 					else {
-						FileUtils.extract(jarFile, plugin + ".xml", PATH_RESOURCE + this.getLocale().getLanguage() + OSDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						FileUtils.extract(jarFile, plugin + ".xml", PATH_RESOURCE + this.getLocale().getLanguage() + DE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 				}
 			}
@@ -370,10 +370,10 @@ public class Settings extends Properties {
 		log.logp(Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, "deviceJarBasePath = " + deviceJarBasePath); //$NON-NLS-1$
 		String[] files = new File(deviceJarBasePath).list();
 		for (String jarFileName : files) {
-			if (!jarFileName.endsWith(OSDE.FILE_ENDING_DOT_JAR)) continue;
+			if (!jarFileName.endsWith(DE.FILE_ENDING_DOT_JAR)) continue;
 			JarFile jarFile = null;
 			try {
-				jarFile = new JarFile(deviceJarBasePath + OSDE.FILE_SEPARATOR_UNIX + jarFileName);
+				jarFile = new JarFile(deviceJarBasePath + DE.FILE_SEPARATOR_UNIX + jarFileName);
 			}
 			catch (IOException e) {
 				log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -384,7 +384,7 @@ public class Settings extends Properties {
 				Enumeration<JarEntry> e=jarFile.entries();
         while (e.hasMoreElements()) {
             String entryName = e.nextElement().getName();
-            if (entryName.startsWith(PATH_RESOURCE_TEMPLATE) && entryName.endsWith(OSDE.FILE_ENDING_DOT_XML)) {
+            if (entryName.startsWith(PATH_RESOURCE_TEMPLATE) && entryName.endsWith(DE.FILE_ENDING_DOT_XML)) {
             	String defaultTemplateName = entryName.substring(PATH_RESOURCE_TEMPLATE.length());
   						if (!FileUtils.checkFileExist(templateDirectoryTargetPath + defaultTemplateName))		{
     						log.logp(Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "jarFile=" + jarFile.getName() + "; defaultTemplateName=" + entryName); //$NON-NLS-1$ //$NON-NLS-2$
@@ -538,7 +538,7 @@ public class Settings extends Properties {
 	 */
   public String getProperty(String key, String defaultValue) {
   	String val = getProperty(key);
-		if (val == null || val.equals(OSDE.STRING_EMPTY) || val.equals("null")) val = defaultValue; //$NON-NLS-2$
+		if (val == null || val.equals(DE.STRING_EMPTY) || val.equals("null")) val = defaultValue; //$NON-NLS-2$
   	return val;
   }
 
@@ -574,7 +574,7 @@ public class Settings extends Properties {
 	}
 
 	public Point[] getCoolBarSizes() {
-		return StringHelper.stringToPointArray(OpenSerialDataExplorer.getInstance().getMenuToolBar().getCoolBarSizes());
+		return StringHelper.stringToPointArray(DataExplorer.getInstance().getMenuToolBar().getCoolBarSizes());
 	}
 
   public List<String> getFileHistory() {
@@ -582,7 +582,7 @@ public class Settings extends Properties {
 	}
 
 	public String getActiveDevice() {
-		return this.getProperty(ACTIVE_DEVICE, EMPTY_SIGNATURE).split(OSDE.STRING_SEMICOLON)[0].trim();
+		return this.getProperty(ACTIVE_DEVICE, EMPTY_SIGNATURE).split(DE.STRING_SEMICOLON)[0].trim();
 	}
 
 	public void setActiveDevice(String activeDeviceString) {
@@ -594,8 +594,8 @@ public class Settings extends Properties {
 	}
 
 	public String[] getObjectList() {
-		String[] objectKeys = this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.OSDE_MSGT0200)).split(OSDE.STRING_SEMICOLON);
-		objectKeys[0] = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
+		String[] objectKeys = this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.OSDE_MSGT0200)).split(DE.STRING_SEMICOLON);
+		objectKeys[0] = Messages.getString(MessageIds.OSDE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
 		return objectKeys;
 	}
 
@@ -623,7 +623,7 @@ public class Settings extends Properties {
 		else {
 			Arrays.sort(activeObjectList, this.comparator);
 			String[] tmpObjectKeys = new String[activeObjectList.length + 1];
-			tmpObjectKeys[0] = Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0];
+			tmpObjectKeys[0] = Messages.getString(MessageIds.OSDE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
 			System.arraycopy(activeObjectList, 0, tmpObjectKeys, 1, activeObjectList.length);
 			activeObjectList = tmpObjectKeys;
 		}
@@ -637,7 +637,7 @@ public class Settings extends Properties {
 		//find the active object index within sorted array
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < activeObjectList.length; ++i) {
-			sb.append(activeObjectList[i]).append(OSDE.STRING_SEMICOLON);
+			sb.append(activeObjectList[i]).append(DE.STRING_SEMICOLON);
 		}
 		this.setProperty(OBJECT_LIST, sb.toString());
 		this.setProperty(ACTIVE_OBJECT, newObjectKey);
@@ -648,7 +648,7 @@ public class Settings extends Properties {
 		for (String objectKey : this.getObjectList()) {
 			if (objectKey.length() > 1) tmpObjectVector.add(objectKey);
 		}
-		int index = tmpObjectVector.indexOf(this.getProperty(ACTIVE_OBJECT, Messages.getString(MessageIds.OSDE_MSGT0200).split(OSDE.STRING_SEMICOLON)[0]).trim());
+		int index = tmpObjectVector.indexOf(this.getProperty(ACTIVE_OBJECT, Messages.getString(MessageIds.OSDE_MSGT0200).split(DE.STRING_SEMICOLON)[0]).trim());
 		return index < 0 ? 0 : index;
 	}
 
@@ -674,14 +674,14 @@ public class Settings extends Properties {
 	 * @return the devicesFilePath
 	 */
 	public String getDevicesPath() {
-		return this.applHomePath.trim() + OSDE.FILE_SEPARATOR_UNIX + DEVICE_PROPERTIES_DIR_NAME;
+		return this.applHomePath.trim() + DE.FILE_SEPARATOR_UNIX + DEVICE_PROPERTIES_DIR_NAME;
 	}
 
 	/**
 	 * @return the graphicsTemplatePath
 	 */
 	public String getGraphicsTemplatePath() {
-		return this.applHomePath.trim() + OSDE.FILE_SEPARATOR_UNIX + GRAPHICS_TEMPLATES_DIR_NAME;
+		return this.applHomePath.trim() + DE.FILE_SEPARATOR_UNIX + GRAPHICS_TEMPLATES_DIR_NAME;
 	}
 
 	/**
@@ -690,14 +690,14 @@ public class Settings extends Properties {
 	public String getLogFilePath() {
 		final String $METHOD_NAME = "getLogFilePath"; //$NON-NLS-1$
 		log.logp(Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "applHomePath = " + this.applHomePath); //$NON-NLS-1$
-		return this.applHomePath.trim() + OSDE.FILE_SEPARATOR_UNIX + LOG_PATH + OSDE.FILE_SEPARATOR_UNIX + LOG_FILE;
+		return this.applHomePath.trim() + DE.FILE_SEPARATOR_UNIX + LOG_PATH + DE.FILE_SEPARATOR_UNIX + LOG_FILE;
 	}
 
 	/**
 	 * @return the log file path for the serial trace logs
 	 */
 	public String getSerialLogFilePath() {
-		return this.applHomePath.trim() + OSDE.FILE_SEPARATOR_UNIX + LOG_PATH + OSDE.FILE_SEPARATOR_UNIX + SERIAL_LOG_FILE;
+		return this.applHomePath.trim() + DE.FILE_SEPARATOR_UNIX + LOG_PATH + DE.FILE_SEPARATOR_UNIX + SERIAL_LOG_FILE;
 	}
 
 	/**
@@ -705,7 +705,7 @@ public class Settings extends Properties {
 	 */
 	public String getDataFilePath() {
 		final String $METHOD_NAME = "getDataFilePath"; //$NON-NLS-1$
-		String dataPath = this.getProperty(DATA_FILE_PATH, OSDE.FILE_SEPARATOR_UNIX).replace("\\\\", OSDE.FILE_SEPARATOR_UNIX).replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
+		String dataPath = this.getProperty(DATA_FILE_PATH, DE.FILE_SEPARATOR_UNIX).replace("\\\\", DE.FILE_SEPARATOR_UNIX).replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
 		log.logp(Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "dataFilePath = " + dataPath); //$NON-NLS-1$
 		return dataPath.trim();
 	}
@@ -715,7 +715,7 @@ public class Settings extends Properties {
 	 */
 	public void setDataFilePath(String newDataFilePath) {
 		final String $METHOD_NAME = "setDataFilePath"; //$NON-NLS-1$
-		String filePath = newDataFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).trim();
+		String filePath = newDataFilePath.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX).trim();
 		log.logp(Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "newDataFilePath = " + filePath); //$NON-NLS-1$
 		this.setProperty(DATA_FILE_PATH, filePath);
 	}
@@ -724,7 +724,7 @@ public class Settings extends Properties {
 	 * @return the list separator
 	 */
 	public char getListSeparator() {
-		if (this.getProperty(LIST_SEPARATOR) == null) this.setProperty(LIST_SEPARATOR, OSDE.STRING_SEMICOLON);
+		if (this.getProperty(LIST_SEPARATOR) == null) this.setProperty(LIST_SEPARATOR, DE.STRING_SEMICOLON);
 		return this.getProperty(LIST_SEPARATOR).trim().charAt(0);
 	}
 
@@ -739,7 +739,7 @@ public class Settings extends Properties {
 	 * @return the decimal separator, default value is '.'
 	 */
 	public char getDecimalSeparator() {
-		if (this.getProperty(DECIMAL_SEPARATOR) == null) this.setProperty(DECIMAL_SEPARATOR, OSDE.STRING_DOT);
+		if (this.getProperty(DECIMAL_SEPARATOR) == null) this.setProperty(DECIMAL_SEPARATOR, DE.STRING_DOT);
 		return this.getProperty(DECIMAL_SEPARATOR).trim().charAt(0);
 	}
 
@@ -754,14 +754,14 @@ public class Settings extends Properties {
 	 * set the usage of suggest date as leader of the to be saved filename
 	 */
 	public void setUsageDateAsFileNameLeader(boolean usage) {
-		this.setProperty(USE_DATA_FILE_NAME_LEADER, OSDE.STRING_EMPTY+usage);
+		this.setProperty(USE_DATA_FILE_NAME_LEADER, DE.STRING_EMPTY+usage);
 	}
 
 	/**
 	 * set usage of the object key within the file name
 	 */
 	public void setUsageObjectKeyInFileName(boolean usage) {
-		this.setProperty(USE_OBJECT_KEY_IN_FILE_NAME, OSDE.STRING_EMPTY+usage);
+		this.setProperty(USE_OBJECT_KEY_IN_FILE_NAME, DE.STRING_EMPTY+usage);
 	}
 
 	/**
@@ -803,7 +803,7 @@ public class Settings extends Properties {
 	 * set the global serial port black list enabled
 	 */
 	public void setSerialPortBlackListEnabled(boolean enabled) {
-		this.setProperty(IS_PORT_BLACKLIST, OSDE.STRING_EMPTY+enabled);
+		this.setProperty(IS_PORT_BLACKLIST, DE.STRING_EMPTY+enabled);
 	}
 
 	/**
@@ -811,8 +811,8 @@ public class Settings extends Properties {
 	 */
 	public String getSerialPortBlackList() {
 		StringBuffer blackList = new StringBuffer();
-		for (String port : this.getProperty(PORT_BLACKLIST, OSDE.STRING_EMPTY).trim().split(OSDE.STRING_BLANK)) {
-			if(port != null && port.length() > 3) blackList.append(port).append(OSDE.STRING_BLANK);
+		for (String port : this.getProperty(PORT_BLACKLIST, DE.STRING_EMPTY).trim().split(DE.STRING_BLANK)) {
+			if(port != null && port.length() > 3) blackList.append(port).append(DE.STRING_BLANK);
 		}
 		return blackList.toString().trim();
 	}
@@ -822,11 +822,11 @@ public class Settings extends Properties {
 	 */
 	public void setSerialPortBlackList(String newPortBlackList) {
 		StringBuilder blackList = new StringBuilder();
-		for (String tmpPort : newPortBlackList.split(OSDE.STRING_BLANK)) {
-			if (OSDE.IS_WINDOWS && tmpPort.toUpperCase().startsWith(WINDOWS_PORT_COM))
-				blackList.append(tmpPort.toUpperCase()).append(OSDE.STRING_BLANK);
+		for (String tmpPort : newPortBlackList.split(DE.STRING_BLANK)) {
+			if (DE.IS_WINDOWS && tmpPort.toUpperCase().startsWith(WINDOWS_PORT_COM))
+				blackList.append(tmpPort.toUpperCase()).append(DE.STRING_BLANK);
 			else if (tmpPort.startsWith(UNIX_PORT_DEV_TTY))
-				blackList.append(tmpPort).append(OSDE.STRING_BLANK);
+				blackList.append(tmpPort).append(DE.STRING_BLANK);
 		}
 		this.setProperty(PORT_BLACKLIST, blackList.toString());
 	}
@@ -843,7 +843,7 @@ public class Settings extends Properties {
 	 * set the serial port white list enabled
 	 */
 	public void setSerialPortWhiteListEnabled(boolean enabled) {
-		this.setProperty(IS_PORT_WHITELIST, OSDE.STRING_EMPTY+enabled);
+		this.setProperty(IS_PORT_WHITELIST, DE.STRING_EMPTY+enabled);
 	}
 
 	/**
@@ -851,7 +851,7 @@ public class Settings extends Properties {
 	 */
 	public Vector<String> getSerialPortWhiteList() {
 		Vector<String> whiteList = new Vector<String>();
-		for (String port : this.getProperty(PORT_WHITELIST, OSDE.STRING_EMPTY).trim().split(";| ")) { //$NON-NLS-1$
+		for (String port : this.getProperty(PORT_WHITELIST, DE.STRING_EMPTY).trim().split(";| ")) { //$NON-NLS-1$
 			if(port != null && port.length() > 3) whiteList.add(port);
 		}
 		return whiteList;
@@ -862,8 +862,8 @@ public class Settings extends Properties {
 	 */
 	public String getSerialPortWhiteListString() {
 		StringBuffer whiteList = new StringBuffer();
-		for (String port : this.getProperty(PORT_WHITELIST, OSDE.STRING_EMPTY).trim().split(";| ")) { //$NON-NLS-1$
-			if(port != null && port.length() > 3) whiteList.append(port).append(OSDE.STRING_BLANK);
+		for (String port : this.getProperty(PORT_WHITELIST, DE.STRING_EMPTY).trim().split(";| ")) { //$NON-NLS-1$
+			if(port != null && port.length() > 3) whiteList.append(port).append(DE.STRING_BLANK);
 		}
 		return whiteList.toString().trim();
 	}
@@ -873,11 +873,11 @@ public class Settings extends Properties {
 	 */
 	public void setSerialPortWhiteList(String newPortWhiteList) {
 		StringBuilder whiteList = new StringBuilder();
-		for (String tmpPort : newPortWhiteList.split(OSDE.STRING_BLANK)) {
-			if (OSDE.IS_WINDOWS && tmpPort.toUpperCase().startsWith(WINDOWS_PORT_COM))
-				whiteList.append(tmpPort.toUpperCase()).append(OSDE.STRING_SEMICOLON);
+		for (String tmpPort : newPortWhiteList.split(DE.STRING_BLANK)) {
+			if (DE.IS_WINDOWS && tmpPort.toUpperCase().startsWith(WINDOWS_PORT_COM))
+				whiteList.append(tmpPort.toUpperCase()).append(DE.STRING_SEMICOLON);
 			else if (tmpPort.startsWith(UNIX_PORT_DEV_TTY))
-					whiteList.append(tmpPort).append(OSDE.STRING_BLANK);
+					whiteList.append(tmpPort).append(DE.STRING_BLANK);
 		}
 		this.setProperty(PORT_WHITELIST, whiteList.toString());
 	}
@@ -908,7 +908,7 @@ public class Settings extends Properties {
 	 * set property if during port scan a availability check should executed (disable for slow systems)
 	 */
 	public void setPortAvailabilityCheck(boolean enabled) {
-		setProperty(DO_PORT_AVAILABLE_TEST, OSDE.STRING_EMPTY+enabled);
+		setProperty(DO_PORT_AVAILABLE_TEST, DE.STRING_EMPTY+enabled);
 	}
 
 
@@ -964,7 +964,7 @@ public class Settings extends Properties {
 	 * set property if record set comment window is visible
 	 */
 	public void setRecordCommentVisible(boolean enabled) {
-		this.setProperty(RECORD_COMMENT_VISIBLE, OSDE.STRING_EMPTY + enabled);
+		this.setProperty(RECORD_COMMENT_VISIBLE, DE.STRING_EMPTY + enabled);
 	}
 
 	/**
@@ -978,7 +978,7 @@ public class Settings extends Properties {
 	 * set property if record set comment window is visible
 	 */
 	public void setGraphicsHeaderVisible(boolean enabled) {
-		this.setProperty(GRAPHICS_HEADER_VISIBLE, OSDE.STRING_EMPTY + enabled);
+		this.setProperty(GRAPHICS_HEADER_VISIBLE, DE.STRING_EMPTY + enabled);
 	}
 
 	/**
@@ -986,7 +986,7 @@ public class Settings extends Properties {
 	 * @return actual grid line style as integer array
 	 */
 	public int[] getGridDashStyle() {
-		String[] gridLineStyle = this.getProperty(GRID_DASH_STYLE, "10, 10").split(OSDE.STRING_COMMA); //$NON-NLS-1$
+		String[] gridLineStyle = this.getProperty(GRID_DASH_STYLE, "10, 10").split(DE.STRING_COMMA); //$NON-NLS-1$
 		return new int[] {new Integer(gridLineStyle[0].trim()).intValue(), new Integer(gridLineStyle[1].trim()).intValue()};
 	}
 
@@ -1002,7 +1002,7 @@ public class Settings extends Properties {
 	 * @param newGridDashStyle {drawn, blank}
 	 */
 	public void setGridDaschStyle(int[] newGridDashStyle) {
-		this.setProperty(GRID_DASH_STYLE, OSDE.STRING_EMPTY + newGridDashStyle[0] + ", " + newGridDashStyle[1]); //$NON-NLS-1$ //$NON-NLS-2$
+		this.setProperty(GRID_DASH_STYLE, DE.STRING_EMPTY + newGridDashStyle[0] + ", " + newGridDashStyle[1]); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -1017,7 +1017,7 @@ public class Settings extends Properties {
 	 * @param newHorizontalGridType (0=none;1=each,2=eachSecond)
 	 */
 	public void setGridCompareWindowHorizontalType(int newHorizontalGridType) {
-		this.setProperty(GRID_COMPARE_WINDOW_HOR_TYPE, OSDE.STRING_EMPTY + newHorizontalGridType);
+		this.setProperty(GRID_COMPARE_WINDOW_HOR_TYPE, DE.STRING_EMPTY + newHorizontalGridType);
 	}
 
 	/**
@@ -1039,7 +1039,7 @@ public class Settings extends Properties {
 	 * @param newColor (r,g,b)
 	 */
 	public void setGridCompareWindowHorizontalColor(Color newColor) {
-		String rgb = newColor.getRGB().red + OSDE.STRING_COMMA + newColor.getRGB().green + OSDE.STRING_COMMA + newColor.getRGB().blue;
+		String rgb = newColor.getRGB().red + DE.STRING_COMMA + newColor.getRGB().green + DE.STRING_COMMA + newColor.getRGB().blue;
 		this.setProperty(GRID_COMPARE_WINDOW_HOR_COLOR, rgb);
 	}
 
@@ -1055,7 +1055,7 @@ public class Settings extends Properties {
 	 * @param newVerticalGridType (0=none;1=each,2=eachSecond)
 	 */
 	public void setGridCompareWindowVerticalType(int newVerticalGridType) {
-		this.setProperty(GRID_COMPARE_WINDOW_VER_TYPE, OSDE.STRING_EMPTY + newVerticalGridType); //$NON-NLS-1$
+		this.setProperty(GRID_COMPARE_WINDOW_VER_TYPE, DE.STRING_EMPTY + newVerticalGridType); //$NON-NLS-1$
 	}
 
 	/**
@@ -1077,7 +1077,7 @@ public class Settings extends Properties {
 	 * @param newColor (r,g,b)
 	 */
 	public void setGridCompareWindowVerticalColor(Color newColor) {
-		String rgb = newColor.getRGB().red + OSDE.STRING_COMMA + newColor.getRGB().green + OSDE.STRING_COMMA + newColor.getRGB().blue; //$NON-NLS-1$ //$NON-NLS-2$
+		String rgb = newColor.getRGB().red + DE.STRING_COMMA + newColor.getRGB().green + DE.STRING_COMMA + newColor.getRGB().blue; //$NON-NLS-1$ //$NON-NLS-2$
 		this.setProperty(GRID_COMPARE_WINDOW_VER_COLOR, rgb);
 	}
 
@@ -1085,7 +1085,7 @@ public class Settings extends Properties {
 	 * set global log level
 	 */
 	public void setGlobalLogLevel(java.util.logging.Level logLevel) {
-		Logger logger = Logger.getLogger(OSDE.STRING_EMPTY);
+		Logger logger = Logger.getLogger(DE.STRING_EMPTY);
     logger.setLevel(logLevel);
     logger.setUseParentHandlers(true);
 	}
@@ -1180,7 +1180,7 @@ public class Settings extends Properties {
 	 * @param enabled
 	 */
 	public void enabelModalDeviceDialogs(boolean enabled) {
-		this.setProperty(DEVICE_DIALOG_USE_MODAL, OSDE.STRING_EMPTY + enabled);
+		this.setProperty(DEVICE_DIALOG_USE_MODAL, DE.STRING_EMPTY + enabled);
 	}
 
 	/**
@@ -1196,7 +1196,7 @@ public class Settings extends Properties {
 	 * @param enabled
 	 */
 	public void enabelDeviceDialogsOnTop(boolean enabled) {
-		this.setProperty(DEVICE_DIALOG_ON_TOP, OSDE.STRING_EMPTY + enabled);
+		this.setProperty(DEVICE_DIALOG_ON_TOP, DE.STRING_EMPTY + enabled);
 	}
 
 	/**
@@ -1271,7 +1271,7 @@ public class Settings extends Properties {
 	 * @param newAlphaValue
 	 */
 	public void setDialogAlphaValue(int newAlphaValue) {
-		this.setProperty(ALPHA_BLENDING_VALUE, OSDE.STRING_EMPTY + newAlphaValue);
+		this.setProperty(ALPHA_BLENDING_VALUE, DE.STRING_EMPTY + newAlphaValue);
 	}
 
 	/**
@@ -1280,7 +1280,7 @@ public class Settings extends Properties {
 	 * @param enable
 	 */
 	public void setDeviceDialogAlphaEnabled(boolean enable) {
-		this.setProperty(APLHA_BLENDING_ENABLED, OSDE.STRING_EMPTY + enable);
+		this.setProperty(APLHA_BLENDING_ENABLED, DE.STRING_EMPTY + enable);
 	}
 
 	/**
@@ -1320,7 +1320,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * query value if OpenSerialDataExplorer application is registerd to operating system
+	 * query value if DataExplorer application is registerd to operating system
 	 */
 	public boolean isApplicationRegistered() {
 		return Boolean.valueOf(this.getProperty(IS_APPL_REGISTERED, "false")); //$NON-NLS-1$
@@ -1338,7 +1338,7 @@ public class Settings extends Properties {
 	 * @param curveAreaBackground
 	 */
 	public void setGraphicsCurveAreaBackground(Color curveAreaBackground) {
-		this.setProperty(GRAPHICS_AREA_BACKGROUND, curveAreaBackground.getRed()+OSDE.STRING_COMMA + curveAreaBackground.getGreen()+OSDE.STRING_COMMA + curveAreaBackground.getBlue());
+		this.setProperty(GRAPHICS_AREA_BACKGROUND, curveAreaBackground.getRed()+DE.STRING_COMMA + curveAreaBackground.getGreen()+DE.STRING_COMMA + curveAreaBackground.getBlue());
 	}
 
 	/**
@@ -1361,7 +1361,7 @@ public class Settings extends Properties {
 	 * @param curveAreaBackground
 	 */
 	public void setCompareCurveAreaBackground(Color curveAreaBackground) {
-		this.setProperty(COMPARE_AREA_BACKGROUND, curveAreaBackground.getRed()+OSDE.STRING_COMMA + curveAreaBackground.getGreen()+OSDE.STRING_COMMA + curveAreaBackground.getBlue());
+		this.setProperty(COMPARE_AREA_BACKGROUND, curveAreaBackground.getRed()+DE.STRING_COMMA + curveAreaBackground.getGreen()+DE.STRING_COMMA + curveAreaBackground.getBlue());
 	}
 
 	/**
@@ -1384,7 +1384,7 @@ public class Settings extends Properties {
 	 * @param surroundingBackground
 	 */
 	public void setGraphicsSurroundingBackground(Color surroundingBackground) {
-		this.setProperty(GRAPHICS_SURROUND_BACKGRD, surroundingBackground.getRed()+OSDE.STRING_COMMA + surroundingBackground.getGreen()+OSDE.STRING_COMMA + surroundingBackground.getBlue());
+		this.setProperty(GRAPHICS_SURROUND_BACKGRD, surroundingBackground.getRed()+DE.STRING_COMMA + surroundingBackground.getGreen()+DE.STRING_COMMA + surroundingBackground.getBlue());
 	}
 
 	/**
@@ -1407,7 +1407,7 @@ public class Settings extends Properties {
 	 * @param surroundingBackground
 	 */
 	public void setCompareSurroundingBackground(Color surroundingBackground) {
-		this.setProperty(COMPARE_SURROUND_BACKGRD, surroundingBackground.getRed()+OSDE.STRING_COMMA + surroundingBackground.getGreen()+OSDE.STRING_COMMA + surroundingBackground.getBlue());
+		this.setProperty(COMPARE_SURROUND_BACKGRD, surroundingBackground.getRed()+DE.STRING_COMMA + surroundingBackground.getGreen()+DE.STRING_COMMA + surroundingBackground.getBlue());
 	}
 
 	/**
@@ -1430,7 +1430,7 @@ public class Settings extends Properties {
 	 * @param borderColor
 	 */
 	public void setCurveGraphicsBorderColor(Color borderColor) {
-		this.setProperty(GRAPHICS_BORDER_COLOR, borderColor.getRed()+OSDE.STRING_COMMA + borderColor.getGreen()+OSDE.STRING_COMMA + borderColor.getBlue());
+		this.setProperty(GRAPHICS_BORDER_COLOR, borderColor.getRed()+DE.STRING_COMMA + borderColor.getGreen()+DE.STRING_COMMA + borderColor.getBlue());
 	}
 
 	/**
@@ -1453,7 +1453,7 @@ public class Settings extends Properties {
 	 * @param borderColor
 	 */
 	public void setCurveCompareBorderColor(Color borderColor) {
-		this.setProperty(COMPARE_BORDER_COLOR, borderColor.getRed()+OSDE.STRING_COMMA + borderColor.getGreen()+OSDE.STRING_COMMA + borderColor.getBlue());
+		this.setProperty(COMPARE_BORDER_COLOR, borderColor.getRed()+DE.STRING_COMMA + borderColor.getGreen()+DE.STRING_COMMA + borderColor.getBlue());
 	}
 
 	/**
@@ -1476,7 +1476,7 @@ public class Settings extends Properties {
 	 * @param surroundingBackground
 	 */
 	public void setSatisticsSurroundingAreaBackground(Color surroundingBackground) {
-		this.setProperty(STATISTICS_SURROUND_BACKGRD, surroundingBackground.getRed()+OSDE.STRING_COMMA + surroundingBackground.getGreen()+OSDE.STRING_COMMA + surroundingBackground.getBlue());
+		this.setProperty(STATISTICS_SURROUND_BACKGRD, surroundingBackground.getRed()+DE.STRING_COMMA + surroundingBackground.getGreen()+DE.STRING_COMMA + surroundingBackground.getBlue());
 	}
 
 	/**
@@ -1499,7 +1499,7 @@ public class Settings extends Properties {
 	 * @param innerAreaBackground
 	 */
 	public void setSatisticsInnerAreaBackground(Color innerAreaBackground) {
-		this.setProperty(STATISTICS_INNER_BACKGROUND, innerAreaBackground.getRed()+OSDE.STRING_COMMA + innerAreaBackground.getGreen()+OSDE.STRING_COMMA + innerAreaBackground.getBlue());
+		this.setProperty(STATISTICS_INNER_BACKGROUND, innerAreaBackground.getRed()+DE.STRING_COMMA + innerAreaBackground.getGreen()+DE.STRING_COMMA + innerAreaBackground.getBlue());
 	}
 
 	/**
@@ -1522,7 +1522,7 @@ public class Settings extends Properties {
 	 * @param surroundingBackground
 	 */
 	public void setAnalogSurroundingAreaBackground(Color surroundingBackground) {
-		this.setProperty(ANALOG_SURROUND_BACKGRD, surroundingBackground.getRed()+OSDE.STRING_COMMA + surroundingBackground.getGreen()+OSDE.STRING_COMMA + surroundingBackground.getBlue());
+		this.setProperty(ANALOG_SURROUND_BACKGRD, surroundingBackground.getRed()+DE.STRING_COMMA + surroundingBackground.getGreen()+DE.STRING_COMMA + surroundingBackground.getBlue());
 	}
 
 	/**
@@ -1545,7 +1545,7 @@ public class Settings extends Properties {
 	 * @param surroundingBackground
 	 */
 	public void setAnalogInnerAreaBackground(Color surroundingBackground) {
-		this.setProperty(ANALOG_INNER_BACKGROUND, surroundingBackground.getRed()+OSDE.STRING_COMMA + surroundingBackground.getGreen()+OSDE.STRING_COMMA + surroundingBackground.getBlue());
+		this.setProperty(ANALOG_INNER_BACKGROUND, surroundingBackground.getRed()+DE.STRING_COMMA + surroundingBackground.getGreen()+DE.STRING_COMMA + surroundingBackground.getBlue());
 	}
 
 	/**
@@ -1568,7 +1568,7 @@ public class Settings extends Properties {
 	 * @param surroundingBackground
 	 */
 	public void setDigitalSurroundingAreaBackground(Color surroundingBackground) {
-		this.setProperty(DIGITAL_SURROUND_BACKGRD, surroundingBackground.getRed()+OSDE.STRING_COMMA + surroundingBackground.getGreen()+OSDE.STRING_COMMA + surroundingBackground.getBlue());
+		this.setProperty(DIGITAL_SURROUND_BACKGRD, surroundingBackground.getRed()+DE.STRING_COMMA + surroundingBackground.getGreen()+DE.STRING_COMMA + surroundingBackground.getBlue());
 	}
 
 	/**
@@ -1591,7 +1591,7 @@ public class Settings extends Properties {
 	 * @param innerAreaBackground
 	 */
 	public void setDigitalInnerAreaBackground(Color innerAreaBackground) {
-		this.setProperty(DIGITAL_INNER_BACKGROUND, innerAreaBackground.getRed()+OSDE.STRING_COMMA + innerAreaBackground.getGreen()+OSDE.STRING_COMMA + innerAreaBackground.getBlue());
+		this.setProperty(DIGITAL_INNER_BACKGROUND, innerAreaBackground.getRed()+DE.STRING_COMMA + innerAreaBackground.getGreen()+DE.STRING_COMMA + innerAreaBackground.getBlue());
 	}
 
 	/**
@@ -1614,7 +1614,7 @@ public class Settings extends Properties {
 	 * @param surroundingBackground
 	 */
 	public void setCellVoltageSurroundingAreaBackground(Color surroundingBackground) {
-		this.setProperty(CELL_VOLTAGE_SURROUND_BACKGRD, surroundingBackground.getRed()+OSDE.STRING_COMMA + surroundingBackground.getGreen()+OSDE.STRING_COMMA + surroundingBackground.getBlue());
+		this.setProperty(CELL_VOLTAGE_SURROUND_BACKGRD, surroundingBackground.getRed()+DE.STRING_COMMA + surroundingBackground.getGreen()+DE.STRING_COMMA + surroundingBackground.getBlue());
 	}
 
 	/**
@@ -1637,7 +1637,7 @@ public class Settings extends Properties {
 	 * @param innerAreaBackground
 	 */
 	public void setCellVoltageInnerAreaBackground(Color innerAreaBackground) {
-		this.setProperty(CELL_VOLTAGE_INNER_BACKGROUND, innerAreaBackground.getRed()+OSDE.STRING_COMMA + innerAreaBackground.getGreen()+OSDE.STRING_COMMA + innerAreaBackground.getBlue());
+		this.setProperty(CELL_VOLTAGE_INNER_BACKGROUND, innerAreaBackground.getRed()+DE.STRING_COMMA + innerAreaBackground.getGreen()+DE.STRING_COMMA + innerAreaBackground.getBlue());
 	}
 
 	/**
@@ -1660,7 +1660,7 @@ public class Settings extends Properties {
 	 * @param surroundingBackground
 	 */
 	public void setFileCommentSurroundingAreaBackground(Color surroundingBackground) {
-		this.setProperty(FILE_COMMENT_SURROUND_BACKGRD, surroundingBackground.getRed()+OSDE.STRING_COMMA + surroundingBackground.getGreen()+OSDE.STRING_COMMA + surroundingBackground.getBlue());
+		this.setProperty(FILE_COMMENT_SURROUND_BACKGRD, surroundingBackground.getRed()+DE.STRING_COMMA + surroundingBackground.getGreen()+DE.STRING_COMMA + surroundingBackground.getBlue());
 	}
 
 	/**
@@ -1683,7 +1683,7 @@ public class Settings extends Properties {
 	 * @param innerAreaBackground
 	 */
 	public void setFileCommentInnerAreaBackground(Color innerAreaBackground) {
-		this.setProperty(FILE_COMMENT_INNER_BACKGROUND, innerAreaBackground.getRed()+OSDE.STRING_COMMA + innerAreaBackground.getGreen()+OSDE.STRING_COMMA + innerAreaBackground.getBlue());
+		this.setProperty(FILE_COMMENT_INNER_BACKGROUND, innerAreaBackground.getRed()+DE.STRING_COMMA + innerAreaBackground.getGreen()+DE.STRING_COMMA + innerAreaBackground.getBlue());
 	}
 
 	/**
@@ -1706,7 +1706,7 @@ public class Settings extends Properties {
 	 * @param surroundingBackground
 	 */
 	public void setObjectDescriptionSurroundingAreaBackground(Color surroundingBackground) {
-		this.setProperty(OBJECT_DESC_SURROUND_BACKGRD, surroundingBackground.getRed()+OSDE.STRING_COMMA + surroundingBackground.getGreen()+OSDE.STRING_COMMA + surroundingBackground.getBlue());
+		this.setProperty(OBJECT_DESC_SURROUND_BACKGRD, surroundingBackground.getRed()+DE.STRING_COMMA + surroundingBackground.getGreen()+DE.STRING_COMMA + surroundingBackground.getBlue());
 	}
 
 	/**
@@ -1729,7 +1729,7 @@ public class Settings extends Properties {
 	 * @param innerAreaBackground
 	 */
 	public void setObjectDescriptionInnerAreaBackground(Color innerAreaBackground) {
-		this.setProperty(OBJECT_DESC_INNER_BACKGROUND, innerAreaBackground.getRed()+OSDE.STRING_COMMA + innerAreaBackground.getGreen()+OSDE.STRING_COMMA + innerAreaBackground.getBlue());
+		this.setProperty(OBJECT_DESC_INNER_BACKGROUND, innerAreaBackground.getRed()+DE.STRING_COMMA + innerAreaBackground.getGreen()+DE.STRING_COMMA + innerAreaBackground.getBlue());
 	}
 
 	/**
@@ -1752,9 +1752,9 @@ public class Settings extends Properties {
 	 */
 	private Color getColor(String colorKey, String colorDefault) {
 		String color = this.getProperty(colorKey, colorDefault); // CELL_VOLTAGE_SURROUND_BACKGRD, "250,249,230"
-		int r = new Integer(color.split(OSDE.STRING_COMMA)[0].trim()).intValue();
-		int g = new Integer(color.split(OSDE.STRING_COMMA)[1].trim()).intValue();
-		int b = new Integer(color.split(OSDE.STRING_COMMA)[2].trim()).intValue();
+		int r = new Integer(color.split(DE.STRING_COMMA)[0].trim()).intValue();
+		int g = new Integer(color.split(DE.STRING_COMMA)[1].trim()).intValue();
+		int b = new Integer(color.split(DE.STRING_COMMA)[2].trim()).intValue();
 		return SWTResourceManager.getColor(r, g, b);
 	}
 

@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.data;
 
@@ -29,11 +29,11 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.printing.Printer;
 
-import osde.OSDE;
+import osde.DE;
 import osde.io.ObjectDataReaderWriter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -88,15 +88,15 @@ public class ObjectData {
 	 */
 	public ObjectData(String objectFilePath) {
 		this.fullQualifiedObjectFilePath = objectFilePath;
-		this.key = objectFilePath.replace(OSDE.FILE_SEPARATOR_WINDOWS, OSDE.FILE_SEPARATOR_UNIX).substring(objectFilePath.lastIndexOf(OSDE.FILE_SEPARATOR_UNIX) + 1, objectFilePath.lastIndexOf(OSDE.STRING_DOT));
-		this.key = this.key.contains(OSDE.STRING_DOT) ? this.key.substring(0, this.key.indexOf(OSDE.STRING_DOT)) : this.key;
+		this.key = objectFilePath.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX).substring(objectFilePath.lastIndexOf(DE.FILE_SEPARATOR_UNIX) + 1, objectFilePath.lastIndexOf(DE.STRING_DOT));
+		this.key = this.key.contains(DE.STRING_DOT) ? this.key.substring(0, this.key.indexOf(DE.STRING_DOT)) : this.key;
 		this.type = Messages.getString(MessageIds.OSDE_MSGT0279);
 		this.activationDate = Messages.getString(MessageIds.OSDE_MSGT0279);
 		this.status = Messages.getString(MessageIds.OSDE_MSGT0279);
 		this.image = null;
 		this.styledText = ObjectData.STRING_STYLED_TEXT_DEFAULT;
 		this.styleRanges = new StyleRange[] { new StyleRange(0, this.styledText.length(), null, null, SWT.BOLD) };
-		this.font = OSDE.IS_WINDOWS ? SWTResourceManager.getFont("Microsoft Sans Serif", 10, SWT.NORMAL, false, false) : SWTResourceManager.getFont("Sans Serif", 10, SWT.NORMAL, false, false); //$NON-NLS-1$ //$NON-NLS-2$
+		this.font = DE.IS_WINDOWS ? SWTResourceManager.getFont("Microsoft Sans Serif", 10, SWT.NORMAL, false, false) : SWTResourceManager.getFont("Sans Serif", 10, SWT.NORMAL, false, false); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -229,14 +229,14 @@ public class ObjectData {
 	public void print() {
 		StyledTextPrintOptions options = new StyledTextPrintOptions();
 		options.header = StyledTextPrintOptions.SEPARATOR + this.fullQualifiedObjectFilePath + StyledTextPrintOptions.SEPARATOR;
-		options.footer = StyledTextPrintOptions.SEPARATOR + StyledTextPrintOptions.PAGE_TAG + StyledTextPrintOptions.SEPARATOR + OSDE.OSDE_NAME_LONG;
+		options.footer = StyledTextPrintOptions.SEPARATOR + StyledTextPrintOptions.PAGE_TAG + StyledTextPrintOptions.SEPARATOR + DE.OSDE_NAME_LONG;
 		options.printLineBackground = true;
 		options.printTextBackground = true;
 		options.printTextFontStyle = true;
 		options.printTextForeground = true;
 		options.lineLabels = new String[] {this.key, this.type, this.activationDate, this.status};
 
-		StyledText tmpStyledText = new StyledText(OpenSerialDataExplorer.getInstance().getParent(), SWT.NONE);
+		StyledText tmpStyledText = new StyledText(DataExplorer.getInstance().getParent(), SWT.NONE);
 		tmpStyledText.setFont(this.font);
 		tmpStyledText.setText(this.styledText);
 		tmpStyledText.setStyleRanges(this.styleRanges);

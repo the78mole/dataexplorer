@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
 
@@ -36,14 +36,14 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.device.IDevice;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.TabAreaContextMenu;
 import osde.utils.GraphicsUtils;
@@ -77,7 +77,7 @@ public class AnalogDisplay extends Composite {
 	double					minValue					= 0.0;
 	double					maxValue					= 1.0;
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final Channel									channel;
 	final RecordSet								recordSet;
 	final Record									record;
@@ -101,7 +101,7 @@ public class AnalogDisplay extends Composite {
 		analogDisplayLData.horizontalAlignment = GridData.FILL;
 		this.setLayoutData(analogDisplayLData);
 		this.setLayout(AnalogDisplayLayout);		
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.recordKey = currentRecordKey;
 		this.device = currentDevice;
 		this.channel = Channels.getInstance().getActiveChannel();
@@ -129,7 +129,7 @@ public class AnalogDisplay extends Composite {
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
 				log.log(Level.FINER, "AnalogDisplay.helpRequested " + evt); //$NON-NLS-1$
-				OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_8.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_8.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		this.tacho = new Canvas(this, SWT.NONE);
@@ -142,7 +142,7 @@ public class AnalogDisplay extends Composite {
 		this.textAnalogLabel = new CLabel(this.tacho, SWT.CENTER);
 		this.textAnalogLabel.setFont(SWTResourceManager.getFont(this.application, 14, SWT.BOLD)); //$NON-NLS-1$
 		this.textAnalogLabel.setBackground(this.backgroundColor);
-		this.textAnalogLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+		this.textAnalogLabel.setForeground(DataExplorer.COLOR_BLACK);
 		this.textAnalogLabel.setBounds(0, 0, this.tacho.getSize().x, this.textHeight);
 		this.textAnalogLabel.setMenu(this.popupmenu);
 	}
@@ -197,8 +197,8 @@ public class AnalogDisplay extends Composite {
 			this.tachoImageGC.setForeground(this.record.getColor());
 			this.tachoImageGC.setLineWidth(4);
 			this.tachoImageGC.drawArc(this.centerX - this.radius, this.centerY - this.radius, 2 * this.radius, 2 * this.radius, this.angleStart, this.angleDelta);
-			this.tachoImageGC.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
-			this.tachoImageGC.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.tachoImageGC.setForeground(DataExplorer.COLOR_BLACK);
+			this.tachoImageGC.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			int numberTicks = 10; //new Double(maxValue - minValue).intValue();
 			double deltaValue = (this.maxValue - this.minValue) / numberTicks;
 			double angleSteps = this.angleDelta * 1.0 / numberTicks;
@@ -221,10 +221,10 @@ public class AnalogDisplay extends Composite {
 				GraphicsUtils.drawTextCentered(valueText, this.centerX - dxtext, this.centerY - dytext, this.tachoImageGC, SWT.HORIZONTAL);
 			}
 			// center knob
-			this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_GREY);
+			this.tachoImageGC.setBackground(DataExplorer.COLOR_GREY);
 			int knobRradius = (int) (this.radius * 0.1);
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
-			this.tachoImageGC.setBackground(OpenSerialDataExplorer.COLOR_BLACK);
+			this.tachoImageGC.setBackground(DataExplorer.COLOR_BLACK);
 			knobRradius = Double.valueOf(this.radius / 10 * 0.2).intValue();
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
 
@@ -240,7 +240,7 @@ public class AnalogDisplay extends Composite {
 				redraw(damageBounds.x, damageBounds.y, damageBounds.width, damageBounds.height, true);
 			}
 
-			drawTachoNeedle(evt.gc, OpenSerialDataExplorer.COLOR_BLACK);
+			drawTachoNeedle(evt.gc, DataExplorer.COLOR_BLACK);
 		}
 	}
 

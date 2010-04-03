@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
-import osde.OSDE;
+import osde.DE;
 
 
 /**
@@ -121,7 +121,7 @@ public class PropertyType {
      *     
      */
     public void setValue(Object newValue) {
-        this.value = (OSDE.STRING_EMPTY + newValue).trim();
+        this.value = (DE.STRING_EMPTY + newValue).trim();
     }
 
     /**
@@ -157,7 +157,7 @@ public class PropertyType {
      *     
      */
     public String getDescription() {
-        return this.description != null ? this.description : OSDE.STRING_EMPTY;
+        return this.description != null ? this.description : DE.STRING_EMPTY;
     }
 
     /**
@@ -169,7 +169,7 @@ public class PropertyType {
      *     
      */
     public void setDescription(String newValue) {
-        this.description = newValue.trim().equals(OSDE.STRING_EMPTY) ? null : newValue.trim();
+        this.description = newValue.trim().equals(DE.STRING_EMPTY) ? null : newValue.trim();
     }
 
 }

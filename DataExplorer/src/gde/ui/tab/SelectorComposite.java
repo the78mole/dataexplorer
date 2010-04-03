@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
 
@@ -38,14 +38,14 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import osde.OSDE;
+import osde.DE;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.CurveSelectorContextMenu;
 
@@ -57,7 +57,7 @@ import osde.ui.menu.CurveSelectorContextMenu;
 public class SelectorComposite extends Composite {
   final static Logger           log                                 = Logger.getLogger(SelectorComposite.class.getName());
 
-  final OpenSerialDataExplorer  	application = OpenSerialDataExplorer.getInstance();
+  final DataExplorer  	application = DataExplorer.getInstance();
   final Channels                	channels    = Channels.getInstance();
   final SashForm									parent;
   final int												windowType;
@@ -116,7 +116,7 @@ public class SelectorComposite extends Composite {
 		{
 			this.curveSelectorHeader = new CLabel(this, SWT.NONE);
 			this.curveSelectorHeader.setText("  " + Messages.getString(MessageIds.OSDE_MSGT0254)); //$NON-NLS-1$
-			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
+			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
 			this.curveSelectorHeader.pack();
 			this.initialSelectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8;
 			FormData curveSelectorHeaderLData = new FormData();
@@ -125,11 +125,11 @@ public class SelectorComposite extends Composite {
 			curveSelectorHeaderLData.left = new FormAttachment(0, 1000, 0);
 			curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 0);
 			this.curveSelectorHeader.setLayoutData(curveSelectorHeaderLData);
-			this.curveSelectorHeader.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+			this.curveSelectorHeader.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 		}
 		{
 			this.curveSelectorTable = new Table(this, SWT.FULL_SELECTION | SWT.CHECK);
-			this.curveSelectorTable.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.curveSelectorTable.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.curveSelectorTable.setLinesVisible(true);
 			FormData curveTableLData = new FormData();
 			curveTableLData.width = 82;
@@ -149,9 +149,9 @@ public class SelectorComposite extends Composite {
 						TableItem item = (TableItem) evt.item;
 						String recordName = item.getText();
 						log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$
-						SelectorComposite.this.popupmenu.setData(OpenSerialDataExplorer.RECORD_NAME, recordName);
-						SelectorComposite.this.popupmenu.setData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM, evt.item);
-						if (item.getChecked() != (Boolean) item.getData(OpenSerialDataExplorer.OLD_STATE)) {
+						SelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, recordName);
+						SelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, evt.item);
+						if (item.getChecked() != (Boolean) item.getData(DataExplorer.OLD_STATE)) {
 							Record activeRecord;
 							switch (SelectorComposite.this.windowType) {
 							case GraphicsWindow.TYPE_COMPARE:
@@ -167,13 +167,13 @@ public class SelectorComposite extends Composite {
 								if (item.getChecked()) {
 									activeRecord.setVisible(true);
 									SelectorComposite.this.popupmenu.getItem(0).setSelection(true);
-									item.setData(OpenSerialDataExplorer.OLD_STATE, true);
+									item.setData(DataExplorer.OLD_STATE, true);
 									item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
 								}
 								else {
 									activeRecord.setVisible(false);
 									SelectorComposite.this.popupmenu.getItem(0).setSelection(false);
-									item.setData(OpenSerialDataExplorer.OLD_STATE, false);
+									item.setData(DataExplorer.OLD_STATE, false);
 									item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
 								}
 							}
@@ -183,12 +183,12 @@ public class SelectorComposite extends Composite {
 								RecordSet recordSet = SelectorComposite.this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet : SelectorComposite.this.application.getCompareSet();
 								if (recordSet != null && recordSet.size() > 0) {
 									if (item.getChecked()) {
-										item.setData(OpenSerialDataExplorer.OLD_STATE, true);
+										item.setData(DataExplorer.OLD_STATE, true);
 										recordSet.setSyncRequested(true, true);
 										recordSet.setSyncRecordSelected(true);
 									}
 									else {
-										item.setData(OpenSerialDataExplorer.OLD_STATE, false);
+										item.setData(DataExplorer.OLD_STATE, false);
 										recordSet.setSyncRequested(false, true);
 										recordSet.setSyncRecordSelected(false);
 									}
@@ -236,12 +236,12 @@ public class SelectorComposite extends Composite {
 							item.setText(record.getName());
 							if (record.isVisible()) {
 								item.setChecked(true);
-								item.setData(OpenSerialDataExplorer.OLD_STATE, true);
+								item.setData(DataExplorer.OLD_STATE, true);
 								item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
 							}
 							else {
 								item.setChecked(false);
-								item.setData(OpenSerialDataExplorer.OLD_STATE, false);
+								item.setData(DataExplorer.OLD_STATE, false);
 								item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
 							}
 						}
@@ -252,9 +252,9 @@ public class SelectorComposite extends Composite {
 					item.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 					item.setText("Sync " + recordSet.getSyncableName());
 					item.setChecked(recordSet.isSyncRequested());
-					item.setData(OpenSerialDataExplorer.OLD_STATE, recordSet.isSyncRequested());
+					item.setData(DataExplorer.OLD_STATE, recordSet.isSyncRequested());
 					item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
-					item.setData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER, true);
+					item.setData(DataExplorer.RECORD_SYNC_PLACEHOLDER, true);
 					textSize = item.getText().length() * 7;
 					if (itemWidth < (textSize+checkBoxWidth)) itemWidth = textSize+checkBoxWidth;
 				}

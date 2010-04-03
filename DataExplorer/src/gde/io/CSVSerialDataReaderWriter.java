@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.io;
 
@@ -27,7 +27,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.logging.Logger;
 
-import osde.OSDE;
+import osde.DE;
 import osde.data.Channel;
 import osde.data.Channels;
 import osde.data.RecordSet;
@@ -40,7 +40,7 @@ import osde.exception.NotSupportedFileFormatException;
 import osde.log.Level;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 /**
  * Class to read and write comma separated value files which simulates serial data 
@@ -52,11 +52,11 @@ import osde.ui.OpenSerialDataExplorer;
 public class CSVSerialDataReaderWriter {
 	static Logger					log			= Logger.getLogger(CSVSerialDataReaderWriter.class.getName());
 
-	static String					lineSep	= OSDE.LINE_SEPARATOR;
+	static String					lineSep	= DE.LINE_SEPARATOR;
 	static DecimalFormat	df3			= new DecimalFormat("0.000"); //$NON-NLS-1$
 	static StringBuffer		sb;
 	
-	final static OpenSerialDataExplorer	application	= OpenSerialDataExplorer.getInstance();
+	final static DataExplorer	application	= DataExplorer.getInstance();
 	final static Channels								channels		= Channels.getInstance();
 	
 
@@ -71,7 +71,7 @@ public class CSVSerialDataReaderWriter {
 	 */
 	public static RecordSet read(String filePath, IDevice device, String recordSetNameExtend, Integer channelConfigNumber, boolean isRaw) throws NotSupportedFileFormatException, IOException, DataInconsitsentException, DataTypeException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		String line = OSDE.STRING_STAR;
+		String line = DE.STRING_STAR;
 		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
 		Channel activeChannel = null;
@@ -91,7 +91,7 @@ public class CSVSerialDataReaderWriter {
 				
 
 				if (application.getStatusBar() != null) {
-					channels.switchChannel(activeChannel.getNumber(), OSDE.STRING_EMPTY);
+					channels.switchChannel(activeChannel.getNumber(), DE.STRING_EMPTY);
 					application.getMenuToolBar().updateChannelSelector();
 					activeChannel = channels.getActiveChannel();
 				}
@@ -159,13 +159,13 @@ public class CSVSerialDataReaderWriter {
 						String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified());
 						boolean isOutdated = false;
 						try {
-							isOutdated = Integer.parseInt(dateTime.split(OSDE.STRING_DASH)[0]) <= 2000;
+							isOutdated = Integer.parseInt(dateTime.split(DE.STRING_DASH)[0]) <= 2000;
 						}
 						catch (Exception e) {
 							// ignore and state as not outdated
 						}
 						if (!dateTime.startsWith("2000-01-01") || !isOutdated) {
-							recordSet.setRecordSetDescription(device.getName() + OSDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.OSDE_MSGT0129) + dateTime);
+							recordSet.setRecordSetDescription(device.getName() + DE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.OSDE_MSGT0129) + dateTime);
 						}
 
 						// make all records displayable while absolute data
@@ -220,7 +220,7 @@ public class CSVSerialDataReaderWriter {
 		finally {
 			if (application.getStatusBar() != null) {
 				application.setProgress(100, sThreadId);
-				application.setStatusMessage(OSDE.STRING_EMPTY);
+				application.setStatusMessage(DE.STRING_EMPTY);
 			}
 		}
 		
@@ -243,7 +243,7 @@ public class CSVSerialDataReaderWriter {
 //			df3.setGroupingUsed(false);
 //			sb = new StringBuffer();
 //			RecordSet recordSet = Channels.getInstance().getActiveChannel().get(recordSetKey);
-//			IDevice device = OpenSerialDataExplorer.getInstance().getActiveDevice();
+//			IDevice device = DataExplorer.getInstance().getActiveDevice();
 //			// write device name , manufacturer, and serial port string
 //			sb.append(device.getName()).append(separator).append(recordSet.getChannelConfigName()).append(lineSep);
 //			writer.write(sb.toString());

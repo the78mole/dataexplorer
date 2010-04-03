@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.data;
 
@@ -20,11 +20,11 @@ import java.util.HashMap;
 import osde.log.Level;
 import java.util.logging.Logger;
 
-import osde.OSDE;
+import osde.DE;
 import osde.device.ChannelTypes;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 /**
  * Channels class is a map where all possible channels of a device are collected, this is a application singleton
@@ -37,13 +37,13 @@ public class Channels extends HashMap<Integer, Channel> {
 	static Channels								channles								= null;
 	int														activeChannelNumber			= 1;		// default at least one channel must exist
 	String[]											channelNames 						= new String[1];
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 
 	/**
 	 *  getInstance returns the instance of this singleton, this may called during creation time of the application
 	 *  therefore it is required to give the application instance as argument
 	 */
-	public static synchronized Channels getInstance(OpenSerialDataExplorer application) {
+	public static synchronized Channels getInstance(DataExplorer application) {
 		if (Channels.channles == null) {
 			Channels.channles = new Channels(application, 4);
 		}
@@ -66,14 +66,14 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	private Channels(int initialCapacity) {
 		super(initialCapacity);
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 	}
 
 	/**
 	 * singleton
 	 * @param initialCapacity
 	 */
-	private Channels(OpenSerialDataExplorer currentApplication, int initialCapacity) {
+	private Channels(DataExplorer currentApplication, int initialCapacity) {
 		super(initialCapacity);
 		this.application = currentApplication;
 	}
@@ -88,8 +88,8 @@ public class Channels extends HashMap<Integer, Channel> {
 		
 		if (channelName != null && channelName.length() > 5) {
 			// "2 : Outlet", use the first digit to calculate the channel number
-			if (channelName.contains(":") && channelName.split(OSDE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(OSDE.STRING_COLON)[0].trim().charAt(0))) {
-				return new Integer(channelName.split(OSDE.STRING_COLON)[0].trim());
+			if (channelName.contains(":") && channelName.split(DE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(DE.STRING_COLON)[0].trim().charAt(0))) {
+				return new Integer(channelName.split(DE.STRING_COLON)[0].trim());
 			}
 			else // old file contnet "Outlet 2" use the last digit to calculate the channel number
 				if (channelName.contains(" ") && channelName.split(" ").length > 1 && Character.isDigit(channelName.split(" ")[1].trim().charAt(0))) {
@@ -98,7 +98,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			else {
 				for (String name : this.getChannelNames()) {
 					// try name matching "Outlet"
-					if (name.split(OSDE.STRING_COLON)[1].trim().equals(channelName) || name.split(OSDE.STRING_COLON)[1].trim().split(" ")[0].trim().equals(channelName)) {
+					if (name.split(DE.STRING_COLON)[1].trim().equals(channelName) || name.split(DE.STRING_COLON)[1].trim().split(" ")[0].trim().equals(channelName)) {
 						break;
 					}
 					++searchedNumber;
@@ -128,7 +128,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	public String getChannelNamesToString() {
 		StringBuilder sb = new StringBuilder();
 		for (String channelName : this.application.getMenuToolBar().getChannelSelectCombo().getItems()) {
-			sb.append(channelName.split(OSDE.STRING_COLON)[1]).append(", "); //$NON-NLS-1$
+			sb.append(channelName.split(DE.STRING_COLON)[1]).append(", "); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
@@ -141,7 +141,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) recordSet.resetZoomAndMeasurement();
 		
-		this.switchChannel(new Integer(channelName.split(OSDE.STRING_COLON)[0].trim()).intValue(), OSDE.STRING_EMPTY);
+		this.switchChannel(new Integer(channelName.split(DE.STRING_COLON)[0].trim()).intValue(), DE.STRING_EMPTY);
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET && this.getActiveChannel().getFileName() != null) {
 					this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 				}
-				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				DataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
 						if (!Channels.this.application.getObjectKey().equals(Channels.this.getActiveChannel().getObjectKey())) {
 							log.log(Level.FINE, "switch to channels object key \"" + Channels.this.getActiveChannel().getObjectKey() + "\""); //$NON-NLS-1$
@@ -239,7 +239,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		try {
 			Channel activeChannel = Channels.getInstance().getActiveChannel();
 			if (activeChannel != null) {
-				activeChannel.objectKey = OSDE.STRING_EMPTY;
+				activeChannel.objectKey = DE.STRING_EMPTY;
 				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 				if (activeRecordSet != null) {
 					String activeRecordName = activeRecordSet.getName();
@@ -254,7 +254,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		// use super.size instead of this.size to enable only one channel for multiple channel configurations
 		for (int i = 1; i <= super.size(); i++) { 
 			Channel channel = this.get(i);
-			channel.setFileName(OSDE.STRING_EMPTY);
+			channel.setFileName(DE.STRING_EMPTY);
 			channel.setSaved(false);
 			for (int j = 0; j < channel.size(); j++) {
 				channel.getRecordSets().clear(); // clear records

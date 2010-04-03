@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.utils;
 
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 
 
@@ -48,10 +48,10 @@ public class WindowsHelper {
 		catch (Throwable t) {
 			log.log(Level.SEVERE, t.getMessage(), t);
 			if (t instanceof UnsatisfiedLinkError)
-				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0037, new Object[] {t.getClass().getSimpleName()}) 
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0037, new Object[] {t.getClass().getSimpleName()}) 
 						+ Messages.getString(MessageIds.OSDE_MSGI0033));
 			else
-				OpenSerialDataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0038, new Object[] {t.getLocalizedMessage()}));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0038, new Object[] {t.getLocalizedMessage()}));
 		}
 	}
 	
@@ -61,11 +61,11 @@ public class WindowsHelper {
 	public static void main(String[] args) {
 
 //		String [] shellLinkArgs = {
-//				"C:\\Documents and Settings\\brueg\\Desktop\\OpenSerialDataExplorer.lnk", //%USERPROFILE% //$NON-NLS-1$
+//				"C:\\Documents and Settings\\brueg\\Desktop\\DataExplorer.lnk", //%USERPROFILE% //$NON-NLS-1$
 //				"%WINDIR%\\system32\\javaw.exe", //$NON-NLS-1$
-//				"-jar -Xms40M -Xmx256M \"C:\\Program Files\\OpenSerialDataExplorer\\OpenserialDataExplorer.jar\"", //$NON-NLS-1$
-//				"C:\\Program Files\\OpenSerialDataExplorer", //$NON-NLS-1$
-//				"C:\\Program Files\\OpenSerialDataExplorer\\OpenSerialDataExplorer.ico",  //$NON-NLS-1$
+//				"-jar -Xms40M -Xmx256M \"C:\\Program Files\\DataExplorer\\DataExplorer.jar\"", //$NON-NLS-1$
+//				"C:\\Program Files\\DataExplorer", //$NON-NLS-1$
+//				"C:\\Program Files\\DataExplorer\\DataExplorer.ico",  //$NON-NLS-1$
 //				"OpenSerialData Explorer" }; //$NON-NLS-1$
 //		
 //		createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);

@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.menu;
 
@@ -32,14 +32,14 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TableItem;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.Record;
 import osde.data.RecordSet;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.dialog.AxisEndValuesDialog;
 import osde.ui.tab.GraphicsComposite;
@@ -66,7 +66,7 @@ public class CurveSelectorContextMenu {
 	MenuItem											horizontalGridRecordName, horizontalGridColor, horizontalGrid, horizontalGridOff, horizontalGridEveryTick, horizontalGridEverySecond;
 
 	RecordSet											recordSet;
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final Settings								settings = Settings.getInstance();
 	AxisEndValuesDialog						axisEndValuesDialog;
 	
@@ -79,15 +79,15 @@ public class CurveSelectorContextMenu {
 	Record												actualRecord = null;
 	boolean 											isRecordVisible = false;
 	String 												recordNameKey = null;
-	String 												recordNameMeasurement = OSDE.STRING_BLANK;
+	String 												recordNameMeasurement = DE.STRING_BLANK;
 	boolean 											isWindowTypeCompare = false;
 	boolean												isSyncPlaceholder = false; // the sync placeholder record
 	boolean												isScaleSynced = false; // scale sync for syncable records is requested
 	
 	public CurveSelectorContextMenu() {
 		super();
-		this.application = OpenSerialDataExplorer.getInstance();
-		this.axisEndValuesDialog = new AxisEndValuesDialog(OpenSerialDataExplorer.getInstance().getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
+		this.application = DataExplorer.getInstance();
+		this.axisEndValuesDialog = new AxisEndValuesDialog(DataExplorer.getInstance().getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 	}
 
 	public void createMenu(final Menu popupmenu) {
@@ -96,12 +96,12 @@ public class CurveSelectorContextMenu {
 			popupmenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
 					log.log(Level.FINEST, "popupmenu MenuListener.menuShown " + evt); //$NON-NLS-1$
-					CurveSelectorContextMenu.this.selectedItem = (TableItem) popupmenu.getData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM);
+					CurveSelectorContextMenu.this.selectedItem = (TableItem) popupmenu.getData(DataExplorer.CURVE_SELECTION_ITEM);
 					if (CurveSelectorContextMenu.this.selectedItem != null) {
 						log.log(Level.FINER, CurveSelectorContextMenu.this.selectedItem.toString());
 						if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-							CurveSelectorContextMenu.this.isSyncPlaceholder = Boolean.valueOf("" + CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER));
-							CurveSelectorContextMenu.this.isScaleSynced = Boolean.valueOf("" + CurveSelectorContextMenu.this.selectedItem.getData(OpenSerialDataExplorer.RECORD_SYNC_PLACEHOLDER));
+							CurveSelectorContextMenu.this.isSyncPlaceholder = Boolean.valueOf("" + CurveSelectorContextMenu.this.selectedItem.getData(DataExplorer.RECORD_SYNC_PLACEHOLDER));
+							CurveSelectorContextMenu.this.isScaleSynced = Boolean.valueOf("" + CurveSelectorContextMenu.this.selectedItem.getData(DataExplorer.RECORD_SYNC_PLACEHOLDER));
 							CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
 							if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
 								CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.recordNameKey.substring(CurveSelectorContextMenu.this.recordNameKey.indexOf(' ')).trim();
@@ -170,7 +170,7 @@ public class CurveSelectorContextMenu {
 								// check if record switched and measurement mode needs to be reset
 								if (!CurveSelectorContextMenu.this.recordSet.isMeasurementMode(CurveSelectorContextMenu.this.recordNameMeasurement)
 										&& !CurveSelectorContextMenu.this.recordSet.isDeltaMeasurementMode(CurveSelectorContextMenu.this.recordNameMeasurement)) {
-									CurveSelectorContextMenu.this.recordNameMeasurement = OSDE.STRING_BLANK;
+									CurveSelectorContextMenu.this.recordNameMeasurement = DE.STRING_BLANK;
 									CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
 									CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
 
@@ -201,8 +201,8 @@ public class CurveSelectorContextMenu {
 			popupmenu.addListener(SWT.FocusOut, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "widgetDisposed Action performed! " + e); //$NON-NLS-1$
-					CurveSelectorContextMenu.this.menu.setData(OpenSerialDataExplorer.RECORD_NAME, null);
-					CurveSelectorContextMenu.this.menu.setData(OpenSerialDataExplorer.CURVE_SELECTION_ITEM, null);
+					CurveSelectorContextMenu.this.menu.setData(DataExplorer.RECORD_NAME, null);
+					CurveSelectorContextMenu.this.menu.setData(DataExplorer.CURVE_SELECTION_ITEM, null);
 				}
 			});
 			this.recordName = new MenuItem(popupmenu, SWT.None);
@@ -1003,7 +1003,7 @@ public class CurveSelectorContextMenu {
 					}
 					else {
 						CurveSelectorContextMenu.this.application.setMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, false);
-						CurveSelectorContextMenu.this.application.setStatusMessage(OSDE.STRING_EMPTY);
+						CurveSelectorContextMenu.this.application.setStatusMessage(DE.STRING_EMPTY);
 					}
 				}
 			});
@@ -1023,7 +1023,7 @@ public class CurveSelectorContextMenu {
 					}
 					else {
 						CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(CurveSelectorContextMenu.this.recordNameKey, false);
-						CurveSelectorContextMenu.this.application.setStatusMessage(OSDE.STRING_EMPTY);
+						CurveSelectorContextMenu.this.application.setStatusMessage(DE.STRING_EMPTY);
 					}
 				}
 			});
@@ -1037,21 +1037,21 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "copyCurveCompare Action performed! " + e); //$NON-NLS-1$
 					CurveSelectorContextMenu.this.application.createCompareWindowTabItem(); // if ot already exist
-					String copyFromRecordKey = (String) popupmenu.getData(OpenSerialDataExplorer.RECORD_NAME);
+					String copyFromRecordKey = (String) popupmenu.getData(DataExplorer.RECORD_NAME);
 					RecordSet copyFromRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 					if (copyFromRecordSet != null && copyFromRecordKey != null) {
 						Record copyFromRecord = copyFromRecordSet.get(copyFromRecordKey);
 						if (copyFromRecord != null && copyFromRecord.isVisible()) {
 							RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
 							if (!compareSet.isEmpty() && !compareSet.get(compareSet.getFirstRecordName()).getUnit().equalsIgnoreCase(copyFromRecord.getUnit())) {
-								CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0004, new Object[] { copyFromRecordKey + OSDE.STRING_MESSAGE_CONCAT
+								CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0004, new Object[] { copyFromRecordKey + DE.STRING_MESSAGE_CONCAT
 										+ compareSet.getFirstRecordName() }));
 								return;
 							}
 							// while adding a new curve to compare set - reset the zoom mode
 							CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
 
-							String newRecordkey = copyFromRecordKey + OSDE.STRING_UNDER_BAR + compareSet.size();
+							String newRecordkey = copyFromRecordKey + DE.STRING_UNDER_BAR + compareSet.size();
 							Record newRecord = compareSet.put(newRecordkey, copyFromRecord.clone()); // will delete channelConfigKey
 							newRecord.setDescription(copyFromRecordSet.getRecordSetDescription());
 							newRecord.setVisible(true); // if a non visible record added
@@ -1171,7 +1171,7 @@ public class CurveSelectorContextMenu {
 		if (!this.recordNameMeasurement.equals(tmpRecordNameMeasurement) && this.recordNameMeasurement.length() > 1) {
 			this.application.setMeasurementActive(this.recordNameMeasurement, false);
 			this.application.setDeltaMeasurementActive(this.recordNameMeasurement, false);
-			this.application.setStatusMessage(OSDE.STRING_EMPTY);
+			this.application.setStatusMessage(DE.STRING_EMPTY);
 			isChanged = true;
 		}
 		this.recordNameMeasurement = tmpRecordNameMeasurement;

@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.tools;
 
@@ -32,16 +32,16 @@ import java.util.Properties;
 public class ReverseCorrectMessagesIds {
 
 	final static String	fileHeader				= 
-		"#/************************************************************************************** \n" + "#  	This file is part of OpenSerialDataExplorer. \n"
-	+ "# \n" + "#    OpenSerialDataExplorer is free software: you can redistribute it and/or modify \n"
+		"#/************************************************************************************** \n" + "#  	This file is part of GNU DataExplorer. \n"
+	+ "# \n" + "#    GNU DataExplorer is free software: you can redistribute it and/or modify \n"
 	+ "#    it under the terms of the GNU General Public License as published by \n"
 	+ "#    the Free Software Foundation, either version 3 of the License, or \n" + "#    (at your option) any later version. \n" + "# \n"
-	+ "#    OpenSerialDataExplorer is distributed in the hope that it will be useful, \n"
+	+ "#    DataExplorer is distributed in the hope that it will be useful, \n"
 	+ "#    but WITHOUT ANY WARRANTY; without even the implied warranty of \n" + "#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
 	+ "#    GNU General Public License for more details. \n" + "# \n" + "#    You should have received a copy of the GNU General Public License \n"
-	+ "#    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>. \n"
+	+ "#    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>. \n"
 	+ "#****************************************************************************************/ \n"
-	+ "# OpenSerialDataExplorer message file Locale.GERMANY Winfried Brügmann  - 22 Jan 2008 \n" + " \n" 
+	+ "# DataExplorer message file Locale.GERMANY Winfried Brügmann  - 22 Jan 2008 \n" + " \n" 
 	+ "# OSDE_MSGE0000 -> error messages \n"
 	+ "# OSDE_MSGW0000 -> warning messages \n" 
 	+ "# OSDE_MSGI0000 -> info messages \n" 

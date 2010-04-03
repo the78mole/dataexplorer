@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.ui.tab;
 
@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
 import osde.config.Settings;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.ui.menu.TabAreaContextMenu;
 import osde.utils.CellVoltageValues;
@@ -64,7 +64,7 @@ public class CellVoltageDisplay extends Composite {
 	Composite						cellComposite;
 	
 	final CellVoltageWindow				parent;
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final String									displayHeaderText;
 
 	final Color										backgroundColor;
@@ -85,7 +85,7 @@ public class CellVoltageDisplay extends Composite {
 	final int lowerLimitVoltage;
 
 
-	public CellVoltageDisplay(OpenSerialDataExplorer currentApplication, Composite cellVoltageMainComposite, int measurementValue, String measurementName, String measurementUnit, CellVoltageWindow useParent) {
+	public CellVoltageDisplay(DataExplorer currentApplication, Composite cellVoltageMainComposite, int measurementValue, String measurementName, String measurementUnit, CellVoltageWindow useParent) {
 		super(cellVoltageMainComposite, SWT.BORDER);
 		this.voltage = measurementValue;
 		this.displayHeaderText = String.format("%s [%S]", measurementName, measurementUnit); //$NON-NLS-1$
@@ -109,7 +109,7 @@ public class CellVoltageDisplay extends Composite {
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
 				log.log(Level.FINER, "CellVoltageDisplay.helpRequested " + evt); //$NON-NLS-1$
-				OpenSerialDataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		

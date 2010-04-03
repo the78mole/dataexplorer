@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
-import osde.OSDE;
+import osde.DE;
 
 
 /**
@@ -100,9 +100,9 @@ public enum MeasurementPropertyTypes {
   		StringBuilder sb = new StringBuilder();
   		for (MeasurementPropertyTypes element : MeasurementPropertyTypes.values()) {
   			if(element.equals(NONE_SPECIFIED)) continue;
-  			sb.append(element.value).append(OSDE.STRING_SEMICOLON);
+  			sb.append(element.value).append(DE.STRING_SEMICOLON);
   		}
-  		return sb.toString().split(OSDE.STRING_SEMICOLON);
+  		return sb.toString().split(DE.STRING_SEMICOLON);
   	}
 
   	public static boolean isNoneSpecified(String checkName) {
