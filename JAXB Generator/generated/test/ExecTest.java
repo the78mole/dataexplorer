@@ -22,8 +22,7 @@ public class ExecTest {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		String basePath = "C:/Documents and Settings/brueg/Application Data/OpenSerialDataExplorer/Devices/";
-		//String basePath = "D:/Belchen2/workspaces/test/OpenSerialDataExplorer/doc/";
+		String basePath = "C:/Documents and Settings/brueg/Application Data/DataExplorer/Devices/";
 
 		
 		try {
