@@ -22,14 +22,14 @@ package osde.device.wb.simulator;
  */ 
 public class MessageIds { 
 
-	public final static String	OSDE_MSGT1050 = "OSDE_MSGT1050";
-	public final static String	OSDE_MSGT1051 = "OSDE_MSGT1051";
-	public final static String	OSDE_MSGT1052 = "OSDE_MSGT1052";
-	public final static String	OSDE_MSGT1053 = "OSDE_MSGT1053";
-	public final static String	OSDE_MSGT1054 = "OSDE_MSGT1054";
-	public final static String	OSDE_MSGT1055 = "OSDE_MSGT1055";
-	public final static String	OSDE_MSGT1056 = "OSDE_MSGT1056";
-	public final static String	OSDE_MSGT1057 = "OSDE_MSGT1057";
-	public final static String	OSDE_MSGT1058 = "OSDE_MSGT1058";
+	public final static String	DE_MSGT1050 = "DE_MSGT1050";
+	public final static String	DE_MSGT1051 = "DE_MSGT1051";
+	public final static String	DE_MSGT1052 = "DE_MSGT1052";
+	public final static String	DE_MSGT1053 = "DE_MSGT1053";
+	public final static String	DE_MSGT1054 = "DE_MSGT1054";
+	public final static String	DE_MSGT1055 = "DE_MSGT1055";
+	public final static String	DE_MSGT1056 = "DE_MSGT1056";
+	public final static String	DE_MSGT1057 = "DE_MSGT1057";
+	public final static String	DE_MSGT1058 = "DE_MSGT1058";
 
  }

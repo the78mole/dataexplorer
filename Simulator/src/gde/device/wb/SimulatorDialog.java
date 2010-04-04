@@ -146,7 +146,7 @@ public class SimulatorDialog extends DeviceDialog {
 				this.dialogShell.layout();
 				this.dialogShell.pack();
 				this.dialogShell.setSize(336, 393);
-				this.dialogShell.setText(DEVICE_NAME + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
+				this.dialogShell.setText(DEVICE_NAME + Messages.getString(osde.messages.MessageIds.DE_MSGT0273));
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				{
 					FormData timeResultLabelLData = new FormData();
@@ -157,7 +157,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.timeResultLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.timeResultLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timeResultLabel.setLayoutData(timeResultLabelLData);
-					this.timeResultLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1050));
+					this.timeResultLabel.setText(Messages.getString(MessageIds.DE_MSGT1050));
 				}
 				{
 					FormData timesLabelLData = new FormData();
@@ -168,7 +168,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.timesLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.timesLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timesLabel.setLayoutData(timesLabelLData);
-					this.timesLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1051));
+					this.timesLabel.setText(Messages.getString(MessageIds.DE_MSGT1051));
 				}
 				{
 					FormData clusterComboLData = new FormData();
@@ -199,7 +199,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.clusterLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.clusterLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.clusterLabel.setLayoutData(clusterLabelLData);
-					this.clusterLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1052));
+					this.clusterLabel.setText(Messages.getString(MessageIds.DE_MSGT1052));
 				}
 				{
 					FormData currentLabelLData = new FormData();
@@ -210,7 +210,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.currentLabel = new CLabel(this.dialogShell, SWT.CENTER | SWT.EMBEDDED);
 					this.currentLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.currentLabel.setLayoutData(currentLabelLData);
-					this.currentLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1053));
+					this.currentLabel.setText(Messages.getString(MessageIds.DE_MSGT1053));
 				}
 				{
 					FormData currentComboLData = new FormData();
@@ -239,7 +239,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.voltageLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.voltageLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageLabel.setLayoutData(voltageLabelLData);
-					this.voltageLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1054));
+					this.voltageLabel.setText(Messages.getString(MessageIds.DE_MSGT1054));
 				}
 				{
 					FormData voltageComboLData = new FormData();
@@ -267,7 +267,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.timeLabel = new CLabel(this.dialogShell, SWT.NONE);
 					this.timeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timeLabel.setLayoutData(timeLabelLData);
-					this.timeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1055));
+					this.timeLabel.setText(Messages.getString(MessageIds.DE_MSGT1055));
 				}
 				{
 					FormData timeComboLData = new FormData();
@@ -328,7 +328,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.description = new Text(this.dialogShell, SWT.CENTER | SWT.WRAP);
 					this.description.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.description.setLayoutData(descriptionLData);
-					this.description.setText(Messages.getString(MessageIds.OSDE_MSGT1056));
+					this.description.setText(Messages.getString(MessageIds.DE_MSGT1056));
 					this.description.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 					// enable fade in for big areas inside the dialog while fast mouse move
 					this.description.addMouseTrackListener(SimulatorDialog.this.mouseTrackerEnterFadeOut);
@@ -343,7 +343,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.descriptionLabel = new CLabel(this.dialogShell, SWT.CENTER | SWT.WRAP | SWT.EMBEDDED);
 					this.descriptionLabel.setFont(SWTResourceManager.getFont(this.application, 14, SWT.NORMAL));
 					this.descriptionLabel.setLayoutData(descriptionLabelLData);
-					this.descriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1057));
+					this.descriptionLabel.setText(Messages.getString(MessageIds.DE_MSGT1057));
 					// enable fade in for big areas inside the dialog while fast mouse move
 					this.descriptionLabel.addMouseTrackListener(SimulatorDialog.this.mouseTrackerEnterFadeOut);
 				}
@@ -356,7 +356,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.startButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					this.startButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.startButton.setLayoutData(startButtonLData);
-					this.startButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0274));
+					this.startButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0274));
 					this.startButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINE, "startButton.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -371,7 +371,7 @@ public class SimulatorDialog extends DeviceDialog {
 							log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 							SimulatorDialog.this.timer = new Timer();
 							SimulatorDialog.this.timerTask = new TimerTask() {
-								String									recordSetKeyStem	= Messages.getString(MessageIds.OSDE_MSGT1058); 
+								String									recordSetKeyStem	= Messages.getString(MessageIds.DE_MSGT1058); 
 								HashMap<String, Object>	data;															// Spannung, Strom
 								String									recordSetKey;
 
@@ -436,7 +436,7 @@ public class SimulatorDialog extends DeviceDialog {
 										if (SimulatorDialog.this.timerTask != null) SimulatorDialog.this.timerTask.cancel();
 										if (SimulatorDialog.this.timer != null) SimulatorDialog.this.timer.cancel();
 										SimulatorDialog.log.log(Level.SEVERE, e.getMessage(), e);
-										SimulatorDialog.this.application.openMessageDialog(SimulatorDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+										SimulatorDialog.this.application.openMessageDialog(SimulatorDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 									catch (Exception e) {
 										log.log(Level.SEVERE, e.getMessage(), e);
@@ -456,7 +456,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.stopButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					this.stopButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.stopButton.setLayoutData(okButtonLData);
-					this.stopButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0275));
+					this.stopButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0275));
 					this.stopButton.setEnabled(false);
 					this.stopButton.addSelectionListener(new SelectionAdapter() {
 						@Override

@@ -83,7 +83,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.OSDE_MSGT1058);
+		return Messages.getString(MessageIds.DE_MSGT1058);
 	}
 
 	/**
