@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.smmodellbau;
 
@@ -31,7 +31,7 @@ import osde.exception.CheckSumMissmatchException;
 import osde.exception.TimeOutException;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.Checksum;
 
@@ -78,7 +78,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 * @throws NoSuchPortException
 	 */
-	public UniLogSerialPort(DeviceConfiguration actualDeviceConfig, OpenSerialDataExplorer currentApplication) {
+	public UniLogSerialPort(DeviceConfiguration actualDeviceConfig, DataExplorer currentApplication) {
 		super(actualDeviceConfig, currentApplication);
 	}
 

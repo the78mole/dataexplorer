@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>-- OpenSerialDataExplorer GraphicsTemplate --</comment>
+<comment>-- DataExplorer GraphicsTemplate --</comment>
 <entry key="12_numberFormat">-1</entry>
 <entry key="7_isVisible">false</entry>
 <entry key="10_lineStyle">1</entry>

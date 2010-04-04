@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.smmodellbau;
 
@@ -32,7 +32,7 @@ import osde.device.smmodellbau.unilog.MessageIds;
 import osde.exception.DataInconsitsentException;
 import osde.exception.TimeOutException;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 /**
  * Thread implementation to gather data from UniLog device
@@ -41,7 +41,7 @@ import osde.ui.OpenSerialDataExplorer;
 public class UniLogLiveGatherer extends Thread {
 	final static Logger			log													= Logger.getLogger(UniLogLiveGatherer.class.getName());
 
-	OpenSerialDataExplorer	application;
+	DataExplorer	application;
 	final String						RECORD_SET_NAME							= Messages.getString(MessageIds.OSDE_MSGT1378);
 	final UniLogSerialPort	serialPort;
 	final UniLog						device;
@@ -65,7 +65,7 @@ public class UniLogLiveGatherer extends Thread {
 	/**
 	 * @throws Exception 
 	 */
-	public UniLogLiveGatherer(OpenSerialDataExplorer currentApplication, UniLog useDevice, UniLogSerialPort useSerialPort, int channelConfigNumber, UniLogDialog useDialog) throws Exception {
+	public UniLogLiveGatherer(DataExplorer currentApplication, UniLog useDevice, UniLogSerialPort useSerialPort, int channelConfigNumber, UniLogDialog useDialog) throws Exception {
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
@@ -161,7 +161,7 @@ public class UniLogLiveGatherer extends Thread {
 							}
 
 							if (recordSet.isChildOfActiveChannel() && recordSet.equals(UniLogLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
-								OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+								DataExplorer.display.asyncExec(new Runnable() {
 									public void run() {
 										UniLogLiveGatherer.this.application.updateGraphicsWindow();
 										UniLogLiveGatherer.this.application.updateStatisticsData();

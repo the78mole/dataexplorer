@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.smmodellbau;
 
@@ -30,7 +30,7 @@ import javax.xml.bind.JAXBException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -43,7 +43,7 @@ import osde.device.smmodellbau.unilog.MessageIds;
 import osde.exception.DataInconsitsentException;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.LinearRegression;
 import osde.utils.QuasiLinearRegression;
@@ -125,7 +125,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public final static String		FIRMEWARE_VERSION					= "Firmware"; //$NON-NLS-1$
 	public final static String		SERIAL_NUMBER							= "S/N"; //$NON-NLS-1$
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final UniLogSerialPort				serialPort;
 	final UniLogDialog						dialog;
 
@@ -140,7 +140,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.smmodellbau.unilog.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
@@ -156,7 +156,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.smmodellbau.unilog.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
@@ -218,11 +218,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		String recordSetInfo = OSDE.STRING_EMPTY;
+		String recordSetInfo = DE.STRING_EMPTY;
 		for (int j = 0; j < this.getNumberOfMeasurements(channelNumber); j++) {
 			StringBuilder recordConfigData = new StringBuilder();
 			if (j == 2) {// 6=votage LOV_CONFIG_DATA_KEYS_UNILOG_2
-				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_2);
+				HashMap<String, String> configData = StringHelper.splitString(header.get(DE.LOV_CONFIG_DATA), DE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_2);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_2) {
 					if (configData.containsKey(lovKey)) {
 						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
@@ -230,7 +230,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 			}
 			else if (j == 6) {// 6=votagePerCell LOV_CONFIG_DATA_KEYS_UNILOG_6
-				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_6);
+				HashMap<String, String> configData = StringHelper.splitString(header.get(DE.LOV_CONFIG_DATA), DE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_6);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_6) {
 					if (configData.containsKey(lovKey)) {
 						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
@@ -238,7 +238,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 			}
 			else if (j == 7) { // 7=revolutionSpeed LOV_CONFIG_DATA_KEYS_UNILOG_7	
-				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_7);
+				HashMap<String, String> configData = StringHelper.splitString(header.get(DE.LOV_CONFIG_DATA), DE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_7);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_7) {
 					if (configData.containsKey(lovKey)) {
 						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
@@ -246,7 +246,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 			}
 			else if (j == 8) {// 8=efficiency LOV_CONFIG_DATA_KEYS_UNILOG_8
-				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_8);
+				HashMap<String, String> configData = StringHelper.splitString(header.get(DE.LOV_CONFIG_DATA), DE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_8);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_8) {
 					if (configData.containsKey(lovKey)) {
 						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
@@ -254,7 +254,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 			}
 			else if (j == 11) {//11=a1Value LOV_CONFIG_DATA_KEYS_UNILOG_11
-				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_11);
+				HashMap<String, String> configData = StringHelper.splitString(header.get(DE.LOV_CONFIG_DATA), DE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_11);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_11) {
 					if (configData.containsKey(lovKey)) {
 						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
@@ -262,7 +262,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 			}
 			else if (j == 12) {//12=a2Value LOV_CONFIG_DATA_KEYS_UNILOG_12
-				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_12);
+				HashMap<String, String> configData = StringHelper.splitString(header.get(DE.LOV_CONFIG_DATA), DE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_12);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_12) {
 					if (configData.containsKey(lovKey)) {
 						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
@@ -270,14 +270,14 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				}
 			}
 			else if (j == 13) {//13=a3Value LOV_CONFIG_DATA_KEYS_UNILOG_13
-				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_13);
+				HashMap<String, String> configData = StringHelper.splitString(header.get(DE.LOV_CONFIG_DATA), DE.DATA_DELIMITER, LOV_CONFIG_DATA_KEYS_UNILOG_13);
 				for (String lovKey : LOV_CONFIG_DATA_KEYS_UNILOG_13) {
 					if (configData.containsKey(lovKey)) {
 						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
 					}
 				}
 			}
-			recordSetInfo = recordSetInfo + OSDE.RECORDS_PROPERTIES + recordConfigData.toString() + Record.END_MARKER;
+			recordSetInfo = recordSetInfo + DE.RECORDS_PROPERTIES + recordConfigData.toString() + Record.END_MARKER;
 		}
 		
 		return recordSetInfo;
@@ -336,7 +336,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		StringBuilder sb = new StringBuilder();
-		String lineSep = OSDE.LINE_SEPARATOR;
+		String lineSep = DE.LINE_SEPARATOR;
 		int tmpValue = 0;
 		
 		// voltageReceiver *** power/drive *** group
@@ -471,7 +471,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
@@ -481,7 +481,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		
 		int timeStampBufferSize = 0;
 		if(!recordSet.isTimeStepConstant()) {
-			timeStampBufferSize = OSDE.SIZE_BYTES_INTEGER * recordDataSize;
+			timeStampBufferSize = DE.SIZE_BYTES_INTEGER * recordDataSize;
 			byte[] timeStampBuffer = new byte[timeStampBufferSize];
 			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
 
@@ -938,9 +938,9 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 
 		if (log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
-			sb.append("a1Modus = " + a1Modus).append(OSDE.LINE_SEPARATOR); //$NON-NLS-1$
-			sb.append("a2Modus = " + a2Modus).append(OSDE.LINE_SEPARATOR); //$NON-NLS-1$
-			sb.append("a3Modus = " + a3Modus).append(OSDE.LINE_SEPARATOR); //$NON-NLS-1$
+			sb.append("a1Modus = " + a1Modus).append(DE.LINE_SEPARATOR); //$NON-NLS-1$
+			sb.append("a2Modus = " + a2Modus).append(DE.LINE_SEPARATOR); //$NON-NLS-1$
+			sb.append("a3Modus = " + a3Modus).append(DE.LINE_SEPARATOR); //$NON-NLS-1$
 			log.log(Level.FINE, sb.toString());
 		}
 		
