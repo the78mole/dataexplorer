@@ -101,7 +101,7 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
 		env->ReleaseStringUTFChars(jworkingDirectory, workingDirectory);
 		env->ReleaseStringUTFChars(jfqIconPath, fqIconPath);
 		env->ReleaseStringUTFChars(jdescription, description);
-        return env->NewStringUTF("OSDE_MSGE0045; Could not open the COM library");
+        return env->NewStringUTF("DE_MSGE0045; Could not open the COM library");
     }
 
 
@@ -142,11 +142,11 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
                                                (WIN32_FIND_DATA *)&wfd, SLGP_UNCPRIORITY );
                                                
                     if (!SUCCEEDED(hres)) {
-                        sprintf_s(&szReturn[0], MAX_PATH,"OSDE_MSGE0044; pShellLink->GetPath(%s) failed!\n", szGotPath);
+                        sprintf_s(&szReturn[0], MAX_PATH,"DE_MSGE0044; pShellLink->GetPath(%s) failed!\n", szGotPath);
                         //printf(szReturn);
                     }
                     else if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                        sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0043; \"%s\" is a directory!\n", szGotPath);
+                        sprintf_s(&szReturn[0], MAX_PATH, "DE_MSGE0043; \"%s\" is a directory!\n", szGotPath);
                         //printf(szReturn);
                     } 
                 }
@@ -181,14 +181,14 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_createDesktopLink
         }
         else 
         {
-            sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0041; QueryInterface Error\n");
+            sprintf_s(&szReturn[0], MAX_PATH, "DE_MSGE0041; QueryInterface Error\n");
             //printf(szReturn);
         }
         pShellLink->Release();
     }
     else 
     {
-        sprintf_s(&szReturn[0], MAX_PATH, "OSDE_MSGE0040; CoCreateInstance Error - hres = %08x\n", hres);
+        sprintf_s(&szReturn[0], MAX_PATH, "DE_MSGE0040; CoCreateInstance Error - hres = %08x\n", hres);
         //printf(szReturn);
     }
 
@@ -219,9 +219,9 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_getFilePathFromLink
     hres = CoInitialize(NULL);
     if (!SUCCEEDED(hres))
     {
-        //printf("OSDE_MSGE000x; Could not open the COM library\n");
+        //printf("DE_MSGE000x; Could not open the COM library\n");
         env->ReleaseStringUTFChars(jfqShellLinkPath, fqShellLinkPath);
-        return env->NewStringUTF("OSDE_MSGE0045; Could not open the COM library");
+        return env->NewStringUTF("DE_MSGE0045; Could not open the COM library");
     }
 
 
@@ -261,11 +261,11 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_getFilePathFromLink
                     hres = pShellLink->GetPath((LPWSTR)szGotPath, 512,
                                                (WIN32_FIND_DATA *)&wfd, SLGP_UNCPRIORITY );
                     if (!SUCCEEDED(hres)) {
-                        sprintf_s(&szReturn[0], 512,"OSDE_MSGE0044; pShellLink->GetPath(%s) failed!\n", szGotPath);
+                        sprintf_s(&szReturn[0], 512,"DE_MSGE0044; pShellLink->GetPath(%s) failed!\n", szGotPath);
                         //printf(szReturn);
                     }
                     else if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                        sprintf_s(&szReturn[0], 512, "OSDE_MSGE0043; \"%s\" is a directory!\n", szGotPath);
+                        sprintf_s(&szReturn[0], 512, "DE_MSGE0043; \"%s\" is a directory!\n", szGotPath);
                         //printf(szReturn);
                     } 
 
@@ -274,7 +274,7 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_getFilePathFromLink
                     //printf("link contained file path = %s\n", szReturn);
  
 					if (utf8_length == 0) {
-                        sprintf_s(&szReturn[0], 512, "OSDE_MSGE0046; WideCharToMultiByte failed!\n");
+                        sprintf_s(&szReturn[0], 512, "DE_MSGE0046; WideCharToMultiByte failed!\n");
                         //printf(szReturn);
 					}
                     
@@ -282,19 +282,19 @@ JNIEXPORT jstring JNICALL Java_osde_utils_WindowsHelper_getFilePathFromLink
             }
             else // file does not exist
             {
-                sprintf_s(&szReturn[0], 512, "OSDE_MSGE0042; IPersistFile Load Error\n");
+                sprintf_s(&szReturn[0], 512, "DE_MSGE0042; IPersistFile Load Error\n");
                 //printf(szReturn);
             }
             pPersistFile->Release();
         }
         else {
-            sprintf_s(&szReturn[0], 512, "OSDE_MSGE0041; QueryInterface Error\n");
+            sprintf_s(&szReturn[0], 512, "DE_MSGE0041; QueryInterface Error\n");
             //printf(szReturn);
         }
         pShellLink->Release();
     }
     else {
-        sprintf_s(&szReturn[0], 512, "OSDE_MSGE0040; CoCreateInstance Error - hres = %08x\n", hres);
+        sprintf_s(&szReturn[0], 512, "DE_MSGE0040; CoCreateInstance Error - hres = %08x\n", hres);
         //printf(szReturn);
     }
 
@@ -318,8 +318,8 @@ JNIEXPORT jobjectArray JNICALL Java_osde_utils_WindowsHelper_enumerateSerialPort
 	wchar_t wszTmpResult[MAX_PATH];
 	HDEVINFO hDevInfo = SetupDiGetClassDevs(&GUID_DEVINTERFACE_COMPORT, NULL, NULL,	DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
 	if(hDevInfo == INVALID_HANDLE_VALUE) {
-		printf("OSDE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
-		sprintf_s(szReturn, "OSDE_MSGW0035; (err=%lx)", GetLastError());
+		printf("DE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
+		sprintf_s(szReturn, "DE_MSGW0035; (err=%lx)", GetLastError());
 		env->SetObjectArrayElement(	ret, 0, env->NewStringUTF(szReturn));
 		return ret; 
 	}
@@ -363,8 +363,8 @@ JNIEXPORT jobjectArray JNICALL Java_osde_utils_WindowsHelper_enumerateSerialPort
 				
 			}
 			else {
-				printf("OSDE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
-				sprintf_s(szReturn, "OSDE_MSGW0035; (err=%lx)", GetLastError());
+				printf("DE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
+				sprintf_s(szReturn, "DE_MSGW0035; (err=%lx)", GetLastError());
 				env->SetObjectArrayElement(	ret, 0, env->NewStringUTF(szReturn));
 				return ret; 
 			}
@@ -374,8 +374,8 @@ JNIEXPORT jobjectArray JNICALL Java_osde_utils_WindowsHelper_enumerateSerialPort
 				break;
 			}
 			else {
-				printf("OSDE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
-				sprintf_s(szReturn, "OSDE_MSGW0035; (err=%lx)", GetLastError());
+				printf("DE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
+				sprintf_s(szReturn, "DE_MSGW0035; (err=%lx)", GetLastError());
 				env->SetObjectArrayElement(	ret, 0, env->NewStringUTF(szReturn));
 				return ret; 
 			}
