@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.htronic;
 
@@ -25,7 +25,7 @@ import osde.device.DeviceConfiguration;
 import osde.exception.TimeOutException;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 /**
  * SSerial port implementation for AkkuMaster C4 device
@@ -128,7 +128,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	//	// Verbleibende Wartezeit bis Formieren wiederholt wird
 	//	private byte							formUpLatencyTime[]							= new byte[2];								//1 bit = 1 Minute
 
-	public AkkuMasterC4SerialPort(DeviceConfiguration actualDeviceConfig, OpenSerialDataExplorer currentApplication) {
+	public AkkuMasterC4SerialPort(DeviceConfiguration actualDeviceConfig, DataExplorer currentApplication) {
 		super(actualDeviceConfig, currentApplication);
 	}
 

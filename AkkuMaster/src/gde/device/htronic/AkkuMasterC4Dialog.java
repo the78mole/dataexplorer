@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.htronic;
 
@@ -41,12 +41,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channels;
 import osde.device.DeviceDialog;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -81,7 +81,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	final Settings								settings;
 	final AkkuMasterC4						device;
 	final AkkuMasterC4SerialPort	serialPort;
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final Channels								channels;
 	AkkuMasterChannelTab					channel1Tab, channel2Tab, channel3Tab, channel4Tab;
 
@@ -103,7 +103,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		super(parent);
 		this.device = actualDevice;
 		this.serialPort = actualDevice.getSerialPort();
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.numberChannels = actualDevice.getChannelCount();
 		this.settings = Settings.getInstance();
@@ -145,7 +145,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			});
 			{
 				this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
-				this.tabFolder.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.tabFolder.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.tabFolder.setBounds(0, 0, 430, 425);
 
 				@SuppressWarnings("nls")
@@ -188,7 +188,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 				{
 					this.versionTabItem = new CTabItem(this.tabFolder, SWT.NONE);
-					this.versionTabItem.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.versionTabItem.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.versionTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT1109));
 					{
 						this.versionComposite = new Composite(this.tabFolder, SWT.NONE);
@@ -217,66 +217,66 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						});
 						{
 							this.versionNumberLabel = new CLabel(this.versionComposite, SWT.LEFT);
-							this.versionNumberLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionNumberLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionNumberLabel.setBounds(25, 60, 150, 20);
-							this.versionNumberLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionNumberLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionNumberLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.versionNumberLabel.setForeground(DataExplorer.COLOR_BLACK);
 							this.versionNumberLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1122));
 						}
 						{
 							this.versionNumberText = new Text(this.versionComposite, SWT.NONE);
-							this.versionNumberText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionNumberText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionNumberText.setBounds(230, 63, 100, 20);
-							this.versionNumberText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionNumberText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionNumberText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.versionNumberText.setForeground(DataExplorer.COLOR_BLACK);
 							this.versionNumberText.setEditable(false);
 						}
 						{
 							this.versionDateLabel = new CLabel(this.versionComposite, SWT.LEFT);
-							this.versionDateLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionDateLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionDateLabel.setBounds(25, 110, 150, 20);
-							this.versionDateLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionDateLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionDateLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.versionDateLabel.setForeground(DataExplorer.COLOR_BLACK);
 							this.versionDateLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1123));
 						}
 						{
 							this.versionDateText = new Text(this.versionComposite, SWT.NONE);
-							this.versionDateText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionDateText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionDateText.setBounds(230, 113, 100, 20);
-							this.versionDateText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionDateText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionDateText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.versionDateText.setForeground(DataExplorer.COLOR_BLACK);
 							this.versionDateText.setEditable(false);
 						}
 						{
 							this.versionCurrentTypeLabel = new CLabel(this.versionComposite, SWT.LEFT);
-							this.versionCurrentTypeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionCurrentTypeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionCurrentTypeLabel.setBounds(25, 160, 150, 20);
-							this.versionCurrentTypeLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionCurrentTypeLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionCurrentTypeLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.versionCurrentTypeLabel.setForeground(DataExplorer.COLOR_BLACK);
 							this.versionCurrentTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1124));
 						}
 						{
 							this.versionCurrentTypeText = new Text(this.versionComposite, SWT.NONE);
-							this.versionCurrentTypeText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionCurrentTypeText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionCurrentTypeText.setBounds(230, 163, 100, 20);
-							this.versionCurrentTypeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionCurrentTypeText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionCurrentTypeText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.versionCurrentTypeText.setForeground(DataExplorer.COLOR_BLACK);
 							this.versionCurrentTypeText.setEditable(false);
 						}
 						{
 							this.versionFrontplateTypeLabel = new CLabel(this.versionComposite, SWT.LEFT);
-							this.versionFrontplateTypeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionFrontplateTypeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionFrontplateTypeLabel.setBounds(25, 210, 150, 20);
-							this.versionFrontplateTypeLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionFrontplateTypeLabel.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionFrontplateTypeLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.versionFrontplateTypeLabel.setForeground(DataExplorer.COLOR_BLACK);
 							this.versionFrontplateTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1125));
 						}
 						{
 							this.versionFrontplateTypeText = new Text(this.versionComposite, SWT.NONE);
-							this.versionFrontplateTypeText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionFrontplateTypeText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionFrontplateTypeText.setBounds(230, 213, 100, 20);
-							this.versionFrontplateTypeText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-							this.versionFrontplateTypeText.setForeground(OpenSerialDataExplorer.COLOR_BLACK);
+							this.versionFrontplateTypeText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.versionFrontplateTypeText.setForeground(DataExplorer.COLOR_BLACK);
 							this.versionFrontplateTypeText.setEditable(false);
 						}
 					}
@@ -297,49 +297,49 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				{
 					this.totalChargeCurrentText = new Label(this.statusComposite, SWT.RIGHT);
 					this.totalChargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1110));
-					this.totalChargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.totalChargeCurrentText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalChargeCurrentText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+					this.totalChargeCurrentText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.totalChargeCurrentText.setBounds(20, 3, 190, 20);
 				}
 				{
 					this.totalChargeCurrentLabel = new Label(this.statusComposite, SWT.RIGHT | SWT.EMBEDDED);
 					this.totalChargeCurrentLabel.setBounds(235, 3, 50, 20);
-					this.totalChargeCurrentLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalChargeCurrentLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.totalChargeCurrentLabel.setText(new Double(this.totalChargeCurrent).toString());
-					this.totalChargeCurrentLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.totalChargeCurrentLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
 					this.totalChargeCurrentUnit = new Label(this.statusComposite, SWT.LEFT);
-					this.totalChargeCurrentUnit.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.totalChargeCurrentUnit.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalChargeCurrentUnit.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+					this.totalChargeCurrentUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.totalChargeCurrentUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1113));
 					this.totalChargeCurrentUnit.setBounds(300, 3, 119, 20);
 				}
 				{
 					this.totalDischargeCurrentText = new Label(this.statusComposite, SWT.RIGHT);
-					this.totalDischargeCurrentText.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
-					this.totalDischargeCurrentText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalDischargeCurrentText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+					this.totalDischargeCurrentText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.totalDischargeCurrentText.setText(Messages.getString(MessageIds.OSDE_MSGT1111));
 					this.totalDischargeCurrentText.setBounds(20, 25, 190, 20);
 				}
 				{
 					this.totalDischargeCurrentLabel = new Label(this.statusComposite, SWT.RIGHT | SWT.EMBEDDED);
 					this.totalDischargeCurrentLabel.setBounds(235, 25, 50, 20);
-					this.totalDischargeCurrentLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalDischargeCurrentLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.totalDischargeCurrentLabel.setText(new Double(this.totalDischargeCurrent).toString());
-					this.totalDischargeCurrentLabel.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.totalDischargeCurrentLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
 					this.totalDischargeCurrentUnit = new Label(this.statusComposite, SWT.LEFT);
-					this.totalDischargeCurrentUnit.setBackground(OpenSerialDataExplorer.COLOR_LIGHT_GREY);
+					this.totalDischargeCurrentUnit.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					this.totalDischargeCurrentUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1112));
-					this.totalDischargeCurrentUnit.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalDischargeCurrentUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.totalDischargeCurrentUnit.setBounds(300, 25, 119, 20);
 				}
 			}
 			{
 				this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-				this.closeButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.closeButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0188));
 				this.closeButton.setBounds(87, 485, 260, 30);
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
@@ -527,7 +527,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	}
 	
 	public void updateCurrentStatus() {
-		OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+		DataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 					AkkuMasterC4Dialog.this.statusComposite.redraw();
 			}
