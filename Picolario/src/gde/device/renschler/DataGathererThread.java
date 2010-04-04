@@ -39,7 +39,7 @@ public class DataGathererThread extends Thread {
 
 	DataExplorer		application;
 	String[]									datagramNumbers;
-	final String							RECORD_SET_NAME	= Messages.getString(MessageIds.OSDE_MSGT1220);
+	final String							RECORD_SET_NAME	= Messages.getString(MessageIds.DE_MSGT1220);
 	final String							configKey;
 	final PicolarioSerialPort	serialPort;
 	final PicolarioDialog			dialog;
@@ -122,11 +122,11 @@ public class DataGathererThread extends Thread {
 		}
 		catch (DataInconsitsentException e) {
 			DataGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 		}
 		catch (Exception e) {
 			DataGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 		}
 		finally {
 			if (isPortOpenedByMe) this.serialPort.close();

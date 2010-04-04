@@ -95,7 +95,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.OSDE_MSGT1220);
+		return Messages.getString(MessageIds.DE_MSGT1220);
 	}
 
 	/**
@@ -430,7 +430,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
 				}
 			}
 			else {

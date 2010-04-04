@@ -75,7 +75,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 			answer = this.read(answer, 2000);
 
 			if (answer[0] != this.readNumberRecordSets[0] && answer[2] != this.readNumberRecordSets[0])
-				throw new IOException(Messages.getString(MessageIds.OSDE_MSGE1201));
+				throw new IOException(Messages.getString(MessageIds.DE_MSGE1201));
 
 			recordSets = (answer[1] & 0xFF);
 		}
