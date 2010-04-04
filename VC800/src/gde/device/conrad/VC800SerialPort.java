@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 import osde.device.DeviceConfiguration;
 import osde.exception.TimeOutException;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 /**
  * Sample serial port implementation, used as template for new device implementations
@@ -24,7 +24,7 @@ public class VC800SerialPort extends DeviceSerialPort {
 	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
 	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 */
-	public VC800SerialPort(DeviceConfiguration currentDeviceConfig, OpenSerialDataExplorer currentApplication) {
+	public VC800SerialPort(DeviceConfiguration currentDeviceConfig, DataExplorer currentApplication) {
 		super(currentDeviceConfig, currentApplication);
 	}
 

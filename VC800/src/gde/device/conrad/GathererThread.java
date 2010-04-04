@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.conrad;
 
@@ -29,7 +29,7 @@ import osde.exception.DataInconsitsentException;
 import osde.exception.SerialPortException;
 import osde.exception.TimeOutException;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 
 /**
@@ -41,7 +41,7 @@ public class GathererThread extends Thread {
 	final static String				$CLASS_NAME									= GathererThread.class.getName();
 	final static Logger				log													= Logger.getLogger(GathererThread.class.getName());
 
-	OpenSerialDataExplorer		application;
+	DataExplorer		application;
 	final VC800SerialPort			serialPort;
 	final VC800								device;
 	final VC800Dialog					dialog;
@@ -64,7 +64,7 @@ public class GathererThread extends Thread {
 	 * @throws ApplicationConfigurationException 
 	 * @throws Exception 
 	 */
-	public GathererThread(OpenSerialDataExplorer currentApplication, VC800 useDevice, VC800SerialPort useSerialPort, int channelConfigNumber, VC800Dialog useDialog)
+	public GathererThread(DataExplorer currentApplication, VC800 useDevice, VC800SerialPort useSerialPort, int channelConfigNumber, VC800Dialog useDialog)
 			throws ApplicationConfigurationException, SerialPortException {
 		this.application = currentApplication;
 		this.device = useDevice;
@@ -172,7 +172,7 @@ public class GathererThread extends Thread {
 					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
 
 					if (recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
-						OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+						DataExplorer.display.asyncExec(new Runnable() {
 							public void run() {
 								GathererThread.this.application.updateGraphicsWindow();
 								GathererThread.this.application.updateStatisticsData();
@@ -266,7 +266,7 @@ public class GathererThread extends Thread {
 			}
 			else {
 				final String useRecordSetKey = this.recordSetKey;
-				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				DataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						GathererThread.this.application.updateStatisticsData();

@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.conrad;
 
@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
@@ -55,7 +55,7 @@ import osde.exception.ApplicationConfigurationException;
 import osde.exception.SerialPortException;
 import osde.exception.TimeOutException;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -91,7 +91,7 @@ public class VC800Dialog extends DeviceDialog {
 
 	final VC800										device;						// get device specific things, get serial port, ...
 	final VC800SerialPort					serialPort;				// open/close port execute getData()....
-	final OpenSerialDataExplorer	application;			// interaction with application instance
+	final DataExplorer	application;			// interaction with application instance
 	final Channels								channels;					// interaction with channels, source of all records
 	final Settings								settings;					// application configuration settings
 	final HashMap<String, String>	configData = new HashMap<String, String>();
@@ -105,7 +105,7 @@ public class VC800Dialog extends DeviceDialog {
 		super(parent);
 		this.serialPort = useDevice.getSerialPort();
 		this.device = useDevice;
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
 	}
@@ -203,7 +203,7 @@ public class VC800Dialog extends DeviceDialog {
 						infoTextLData.top = new FormAttachment(0, 1000, 12);
 						infoTextLData.right = new FormAttachment(1000, 1000, -12);
 						this.infoText = new Text(this.boundsComposite, SWT.WRAP | SWT.MULTI );
-						this.infoText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.infoText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.infoText.setLayoutData(infoTextLData);
 						this.infoText.setText(Messages.getString(MessageIds.OSDE_MSGT1521));
 						this.infoText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -216,7 +216,7 @@ public class VC800Dialog extends DeviceDialog {
 						startCollectDataButtonLData.top = new FormAttachment(0, 1000, 110);
 						startCollectDataButtonLData.right = new FormAttachment(1000, 1000, -180);
 						this.startCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
-						this.startCollectDataButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.startCollectDataButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.startCollectDataButton.setLayoutData(startCollectDataButtonLData);
 						this.startCollectDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0274));
 						this.startCollectDataButton.addSelectionListener(new SelectionAdapter() {
@@ -257,7 +257,7 @@ public class VC800Dialog extends DeviceDialog {
 						stopColletDataButtonLData.top = new FormAttachment(0, 1000, 110);
 						stopColletDataButtonLData.right = new FormAttachment(1000, 1000, -12);
 						this.stopCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
-						this.stopCollectDataButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.stopCollectDataButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.stopCollectDataButton.setLayoutData(stopColletDataButtonLData);
 						this.stopCollectDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0275));
 						this.stopCollectDataButton.setEnabled(false);
@@ -280,7 +280,7 @@ public class VC800Dialog extends DeviceDialog {
 						configGroupLData.top = new FormAttachment(0, 1000, 155);
 						configGroupLData.right = new FormAttachment(1000, 1000, -12);
 						this.configGroup = new Group(this.boundsComposite, SWT.NONE);
-						this.configGroup.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.configGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						RowLayout configGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.configGroup.setLayout(configGroupLayout);
 						this.configGroup.setLayoutData(configGroupLData);
@@ -306,12 +306,12 @@ public class VC800Dialog extends DeviceDialog {
 							this.labelComposite.setLayoutData(composite1LData);
 							{
 								this.inputTypeLabel = new CLabel(this.labelComposite, SWT.NONE);
-								this.inputTypeLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.inputTypeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.inputTypeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1530));
 							}
 							{
 								this.batteryLabel = new CLabel(this.labelComposite, SWT.NONE);
-								this.batteryLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.batteryLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.batteryLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1531));
 							}
 						}
@@ -325,12 +325,12 @@ public class VC800Dialog extends DeviceDialog {
 							this.dataComposite.setLayout(composite3Layout);
 							{
 								this.inputTypeUnit = new CLabel(this.dataComposite, SWT.NONE);
-								this.inputTypeUnit.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.inputTypeUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.inputTypeUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1532));
 							}
 							{
 								this.batteryCondition = new CLabel(this.dataComposite, SWT.NONE);
-								this.batteryCondition.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.batteryCondition.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.batteryCondition.setText(this.isBatteryOK ? Messages.getString(MessageIds.OSDE_MSGT1535) : Messages.getString(MessageIds.OSDE_MSGT1536));
 							}
 						}
@@ -343,7 +343,7 @@ public class VC800Dialog extends DeviceDialog {
 						closeButtonLData.left = new FormAttachment(0, 1000, 12);
 						closeButtonLData.right = new FormAttachment(1000, 1000, -12);
 						this.closeButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
-						this.closeButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.closeButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.closeButton.setLayoutData(closeButtonLData);
 						this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0188));
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
@@ -428,7 +428,7 @@ public class VC800Dialog extends DeviceDialog {
 				this.isBatteryOK = this.device.isBatteryLevelLow(dataBuffer);
 			} while (VC800Dialog.this.configData.get(VC800.INPUT_TYPE) == null || VC800Dialog.this.configData.get(VC800.INPUT_TYPE).equals(Messages.getString(MessageIds.OSDE_MSGT1500).split(" ")[0]));
 			if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
-				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				DataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
 						VC800Dialog.this.configGroup.redraw();
 					}

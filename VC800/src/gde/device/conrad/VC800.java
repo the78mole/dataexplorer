@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.conrad;
 
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
@@ -36,7 +36,7 @@ import osde.exception.DataInconsitsentException;
 import osde.exception.SerialPortException;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 /**
  * VC8XX device class
@@ -49,7 +49,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	public final static String		INPUT_SYMBOL				= "input_symbol"; //$NON-NLS-1$
 	public final static String		INPUT_UNIT					= "input_unit"; //$NON-NLS-1$
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final VC800SerialPort					serialPort;
 	final VC800Dialog							dialog;
 
@@ -63,7 +63,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.manufactur.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = new VC800SerialPort(this, this.application);
 		this.dialog = new VC800Dialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
@@ -78,7 +78,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.conrad.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = new VC800SerialPort(this, this.application);
 		this.dialog = new VC800Dialog(this.application.getShell(), this);
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
@@ -190,7 +190,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -427,7 +427,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 				}
 				catch (SerialPortException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + OSDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + DE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
 				}
 				catch (ApplicationConfigurationException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
