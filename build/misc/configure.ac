@@ -1,5 +1,5 @@
 AC_PREREQ([2.64])
-AC_INIT([OpenSerialDataExplorer], [2.20], [winfried.bruegmann@gmx.de])
+AC_INIT([DataExplorer], [2.20], [winfried.bruegmann@gmx.de])
 
 # Checks for programs.
 AC_PROG_INSTALL

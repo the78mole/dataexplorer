@@ -1,11 +1,11 @@
-﻿******** OpenSerialDataExplorer README ***********  24 Mar 2010 WB
+﻿******** DataExplorer README ***********  24 Mar 2010 WB
 
-The OpenSerialDataExplorer (OSDE) is free software, please see http://www.gnu.org/philosophy/free-sw.html. It is also available at no
+The GNU DataExplorer is free software, please see http://www.gnu.org/philosophy/free-sw.html. It is also available at no
 cost, but without any warranty. Since the implementation is based on Java using the free available libraries RXTXcomm and SWT
 the execution of this program is possible under a number of popular operating systems like 32/64 Bit Windows and GNU Linux 
 and Mac OS. To execute the only prerequisite is an installed Java runtime with version 1.6 or higher.
 
-The OpenSerialDataExplorer gathers data from connected devices and display this data for a various of further analysis.
+The GNU DataExplorer gathers data from connected devices and display this data for a various of further analysis.
 Actual the following devices are available as plug-in: 
 											 - AkkuMasterC4 (Htronic) 4 outlet battery charger/discharger
 											 - Picolario (Renschler) variometer
@@ -23,29 +23,29 @@ More device are under construction. Help doing this is very welcome.
 A device API (IDevice) is defined to enable a relative simple adaptation of a new device to work together with the base application.
 Documentation how to proceed doing this is under construction.									 
 
-Installation of the binary distribution is an unpack of the containing OpenSerialDataExplorer directory with its sub directories to a place 
+Installation of the binary distribution is an unpack of the containing DataExplorer directory with its sub directories to a place 
 where execution right exist.
 For Windows user a proper place is %ProgramFiles% for GNU Linux user "/opt" or "/usr", Mac OS /Applications.
 
-For the first execution use a command window (Windows), shell (GNU Linux) and change into the just created OpenSerialDataExplorer
-directory and execute running Windows, OpenSerialDataExplorer.exe, running GNU Linux, OpenSerialDataExplorer. For Mac OS the start
-script is located /Applications/OpenSerialDataExplorer.app/Contents/MacOS/OpenSerialDataExplorerMac32, if the icons seams not accessible.
+For the first execution use a command window (Windows), shell (GNU Linux) and change into the just created DataExplorer
+directory and execute running Windows, DataExplorer.exe, running GNU Linux, DataExplorer. For Mac OS the start
+script is located /Applications/DataExplorer.app/Contents/MacOS/DataExplorerMac32, if the icons seams not accessible.
 
-As overview the following files are under the OpenSerialDataExplorer program resource directory:
-OpenSerialDataExplorer.exe (Windows)
+As overview the following files are under the DataExplorer program resource directory:
+DataExplorer.exe (Windows)
 DevicePropertiesEditor.exe (Windows)
-OpenSerialDataExplorer (GNU Linux)
+DataExplorer (GNU Linux)
 DevicePropertiesEditor (GNU Linux)
-OpenSerialDataExplorer.xpm (GNU Linux)
-OpenSerialDataExplorer.desktop (GNU Linux)
-OpenSerialDataExplorer.desktop (GNU Linux)
-OpenSerialDataExplorerMac32 (Mac OS)
+DataExplorer.xpm (GNU Linux)
+DataExplorer.desktop (GNU Linux)
+DataExplorer.desktop (GNU Linux)
+DataExplorerMac32 (Mac OS)
 DevicePropertiesEditorMac32 (Mac OS)
-OpenSerialDataExplorer.icns (Mac OS)
+DataExplorer.icns (Mac OS)
 RXTX_Post-Install_MacOS.txt (Mac OS)
 
 Main program files are:
-../OpenSerialDataExplorer.jar
+../DataExplorer.jar
 ../Devices/*.jar
 ../README.*
 
@@ -57,13 +57,13 @@ available since there are application relevant bugs reported which are not fixed
 RXTXcomm created from rxtx-pre2 source distribution, refer to thirdparty directory in osde source distribution archive.
 
 During the first execution of the program the application configuration directories are created 
-%APPDATA%\<user>\OpenSerialDataExplorer (Windows), 
-/home/<user>/.OpenSerialDataExplorer (Linux)
-/User/<user>/Library/Application Support/OpenSerialDataExplorer (Mac OS)
+%APPDATA%\<user>\DataExplorer (Windows), 
+/home/<user>/.DataExplorer (Linux)
+/User/<user>/Library/Application Support/DataExplorer (Mac OS)
 At this place also application configuration and trace log files are located.
 
 The directory for the user data (log data files) the user takes responsibility, the location will be stored within the application configuration file
-(OpenSerialDataExplorer.properties) and queried just after starting the application.
+(DataExplorer.properties) and queried just after starting the application.
 
 Hint: Is a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (osde/OSDE) bad major version at offset=6" 
 is received after executing launch.bat/lauchn.sh the Java version (java -version) is to old to execute this program and must be renewed.

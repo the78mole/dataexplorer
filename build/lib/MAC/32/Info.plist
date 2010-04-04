@@ -3,19 +3,19 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>OpenSerialDataExplorer</string>
+	<string>DataExplorer</string>
 	<key>CFBundleVersion</key>
 	<string>2.0</string>
 	<key>CFBundleExecutable</key>
-	<string>OpenSerialDataExplorerMac32</string>
+	<string>DataExplorerMac32</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>19260357</string>
 	<key>CFBundleGetInfoString</key>
-	<string>OpenSerialDataExplorer - explores your serial data</string>
+	<string>DataExplorer - explores your serial data</string>
 	<key>CFBundleIconFile</key>
-	<string>OpenSerialDataExplorer.icns</string>
+	<string>DataExplorer.icns</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleAllowMixedLocalizations</key>
@@ -33,7 +33,7 @@
 	<key>CFBundleSignature</key>
 	<string>19260358</string>
 	<key>CFBundleGetInfoString</key>
-	<string>OpenSerialDataExplorer's Device Properties Editor</string>
+	<string>DataExplorer's Device Properties Editor</string>
 	<key>CFBundleIconFile</key>
 	<string>DevicePropertiesEditor.icns</string>
 	<key>CFBundleInfoDictionaryVersion</key>

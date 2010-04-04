@@ -240,7 +240,7 @@ add total voltage and capacity to cell voltage tab to make this view more comple
 add drawing of connecting line while in delta measurement mode
 change default value of object key usage in settings to false until it is supported
 fix problem with numCells/prop100W editable values in UniLog dialog
-enable writing Windows program links (OpenSerialDataExplorer.lnk) via JNI to use OLE functions
+enable writing Windows program links (DataExplorer.lnk) via JNI to use OLE functions
 fix problem edit record set comment deletes the comment
 disable menu disruptive actions while loading data from file (big files)
 fix problem not displaying active record set data while loading dialog (Picolario, UniLog)

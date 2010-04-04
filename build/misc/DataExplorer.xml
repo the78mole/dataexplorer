@@ -1,9 +1,9 @@
 <launch4jConfig>
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>OpenSerialDataExplorer.jar</jar>
-  <outfile>D:\workspaces\osde\build\misc\OpenSerialDataExplorer.exe</outfile>
-  <errTitle>OpenSerialDataExplorer</errTitle>
+  <jar>DataExplorer.jar</jar>
+  <outfile>D:\workspaces\osde\build\misc\DataExplorer.exe</outfile>
+  <errTitle>DataExplorer</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
@@ -12,10 +12,10 @@
   <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
   <manifest></manifest>
-  <icon>D:\workspaces\osde\build\misc\OpenSerialDataExplorer.ico</icon>
+  <icon>D:\workspaces\osde\build\misc\DataExplorer.ico</icon>
   <classPath>
-    <mainClass>osde.OSDE</mainClass>
-    <cp>OpenSerialDataExplorer.jar</cp>
+    <mainClass>osde.DE</mainClass>
+    <cp>DataExplorer.jar</cp>
   </classPath>
   <jre>
     <path></path>

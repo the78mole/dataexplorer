@@ -1,25 +1,25 @@
-How to develop a new plug-in for the OpenSerialDataExplorer
+How to develop a new plug-in for the DataExplorer
 
 
-Beim Starten der Anwendung wird in der plugin.jar/meta-inf/manifest.mf Datei nach den Services gesucht, die das Plug.in zur Verfügung stellt, deshalb ist diese Zeile in der build.xml wichtig:
+Beim Starten der Anwendung wird in der plugin.jar/meta-inf/manifest.mf Datei nach den Services gesucht, die das Plug.in zur Verfï¿½gung stellt, deshalb ist diese Zeile in der build.xml wichtig:
 <attribute name="Export-Service" value="osde.device.bantam.eStation902,  osde.device.bantam.eStationBC6,   osde.device.bantam.eStationBC610,   osde.device.bantam.eStationBC8"/>
-Das sind die Geräte, die das Plug-in implementiert und matched 1:1 zu der Geräteimplementierungsklasse und den DeviceProperties.xml Dateien, die es in allen unterstützten Sprachen geben muss (osde/resource/de/eStationBC6.xml, ...).
-Die Geräte XML Dateien werden dann entsprechend der angewählten Sprache beim Start der Anwendung überprüft und ausgepackt.
+Das sind die Gerï¿½te, die das Plug-in implementiert und matched 1:1 zu der Gerï¿½teimplementierungsklasse und den DeviceProperties.xml Dateien, die es in allen unterstï¿½tzten Sprachen geben muss (osde/resource/de/eStationBC6.xml, ...).
+Die Gerï¿½te XML Dateien werden dann entsprechend der angewï¿½hlten Sprache beim Start der Anwendung ï¿½berprï¿½ft und ausgepackt.
 
-Die Geräteklassen werden dynamisch geladen, hierbei Berechnet sich der Klassenname folgendermaßen:
+Die Gerï¿½teklassen werden dynamisch geladen, hierbei Berechnet sich der Klassenname folgendermaï¿½en:
         String selectedDeviceName = this.selectedActiveDeviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
-        //getDeviceImplName gibt den Namen des Services ohne package zurück und entspricht dem Gerätenamen der in der XML angegeben ist
+        //getDeviceImplName gibt den Namen des Services ohne package zurï¿½ck und entspricht dem Gerï¿½tenamen der in der XML angegeben ist
         String className = "osde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
-        //getManufacturer gibt den Herstelleramen aus der XML zurück
+        //getManufacturer gibt den Herstelleramen aus der XML zurï¿½ck
 
-Im Geräteklassenkonstruktor entscheidet der Aufruf von this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP), darüber, ob ein Aufnahmevorgang direkt aus der Menüleiste gestartet werden kann oder nur der Port geöffnet wird und/oder ein Gerätedialog zu bedienen ist.
+Im Gerï¿½teklassenkonstruktor entscheidet der Aufruf von this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP), darï¿½ber, ob ein Aufnahmevorgang direkt aus der Menï¿½leiste gestartet werden kann oder nur der Port geï¿½ffnet wird und/oder ein Gerï¿½tedialog zu bedienen ist.
 
-Für die Anbindung von Ladegeräten sind die Implementierung folgender Klassen und Methoden wichtig:
-GerätSerialPort.getData() ist die Standartmethode, um Daten vom Gerät abzuholen, die dann in einem Thread, entweder timergesteuert, oder datengesteuert in den Rekords des angelegten Rekord Sets abgelegt werden (das Datenmodell findest du auf meiner Internetseite) Der eStation Lader ist datengesteuert und wartet auf der seriellen Schnittstelle auf ankommende Daten. Es wird also kein Timer verwendet, der regelmäßig Daten aus dem Gerät abholt.
-Gerät.openCloseSerialPort() entscheidet darüber, was passiert, wenn man den den Knopf in der Toolbar drückt.
-Gerät.addDataBufferAsRawDataPoints() bereitet den Datenpuffer am Stück auf (aus Datei.osd)
-Gerät.convertDataBytes() macht aus diesen bytes Zahlen und wird überall wenn nötig benutzt
-Gerät.translateValue() und Gerät.reversetranslateValue() wird benutzt um in der Anzeige die Skalen zu zeichnen, bzw die Tabellendaten zu berechnen. Die ausgelesenen Daten bleiben immer unverändert und werden nur mit 1000 multipliziert, um 3 Nachkommastellen zu ermöglichen.
+Fï¿½r die Anbindung von Ladegerï¿½ten sind die Implementierung folgender Klassen und Methoden wichtig:
+Gerï¿½tSerialPort.getData() ist die Standartmethode, um Daten vom Gerï¿½t abzuholen, die dann in einem Thread, entweder timergesteuert, oder datengesteuert in den Rekords des angelegten Rekord Sets abgelegt werden (das Datenmodell findest du auf meiner Internetseite) Der eStation Lader ist datengesteuert und wartet auf der seriellen Schnittstelle auf ankommende Daten. Es wird also kein Timer verwendet, der regelmï¿½ï¿½ig Daten aus dem Gerï¿½t abholt.
+Gerï¿½t.openCloseSerialPort() entscheidet darï¿½ber, was passiert, wenn man den den Knopf in der Toolbar drï¿½ckt.
+Gerï¿½t.addDataBufferAsRawDataPoints() bereitet den Datenpuffer am Stï¿½ck auf (aus Datei.osd)
+Gerï¿½t.convertDataBytes() macht aus diesen bytes Zahlen und wird ï¿½berall wenn nï¿½tig benutzt
+Gerï¿½t.translateValue() und Gerï¿½t.reversetranslateValue() wird benutzt um in der Anzeige die Skalen zu zeichnen, bzw die Tabellendaten zu berechnen. Die ausgelesenen Daten bleiben immer unverï¿½ndert und werden nur mit 1000 multipliziert, um 3 Nachkommastellen zu ermï¿½glichen.
 
-Um den National Language Support (NLS) brauchst du dich erst mal nicht kümmern, das kann man später machen, du brauchst dann auch noch einen Bereich, wo du die Messages ablegen kannst, damit es keine Doppelbenutzung gibt.
+Um den National Language Support (NLS) brauchst du dich erst mal nicht kï¿½mmern, das kann man spï¿½ter machen, du brauchst dann auch noch einen Bereich, wo du die Messages ablegen kannst, damit es keine Doppelbenutzung gibt.
 Die online-Hilfe Geschichten kann man auch nach hinten schieben, es gilt erst mal die Funktion hinzu bekommen.

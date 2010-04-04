@@ -1,6 +1,6 @@
 #!/bin/bash
 # ***** script to launch DevicePropertiesEditor ** 27 Jan 2010 WB *****
 
-echo java -Dfile.encoding=UTF-8 -Xms10m -Xmx56m -classpath ./OpenSerialDataExplorer.jar osde.ui.dialog.edit.DevicePropertiesEditor
-java -Dfile.encoding=UTF-8 -Xms10m -Xmx56m -classpath ./OpenSerialDataExplorer.jar osde.ui.dialog.edit.DevicePropertiesEditor
+echo java -Dfile.encoding=UTF-8 -Xms10m -Xmx56m -classpath ./DataExplorer.jar osde.ui.dialog.edit.DevicePropertiesEditor
+java -Dfile.encoding=UTF-8 -Xms10m -Xmx56m -classpath ./DataExplorer.jar osde.ui.dialog.edit.DevicePropertiesEditor
 

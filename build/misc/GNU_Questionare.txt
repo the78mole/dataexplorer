@@ -7,20 +7,20 @@ When you're done, please email it to <gnueval-input@gnu.org> (as plain text).
    need to follow GNU policies in regards to that GNU program.  
    (Summarized below, see maintainers document for full descriptions.)
 
-** Package name and version: OpenSerialDataExplorer Version 2.1
+** Package name and version: DataExplorer Version 2.1
 
 ** Author Full Name <Email>: winfried.bruegmann@gmx.de
 
-** URL to home page (if any): http://bruegmaenner.de/en/winfried/osde/OpenSerialDataExplorer.html
+** URL to home page (if any): http://bruegmaenner.de/en/winfried/osde/DataExplorer.html
 
 ** URL to sources (if any): http://bruegmaenner.de/de/winfried/osde/Source.html
 
 ** Brief description of the package:
-The OpenSerialDataExplorer is a tool to gather, view and analyze data which comes from devices with a serial data port. 
+The DataExplorer is a tool to gather, view and analyze data which comes from devices with a serial data port. 
 Views are grahical, tables, statistics, and other.
 The application itself runs on several operating system (32/64 Bit Linux and Windows, Mac OS). Devices might be data logger, 
 measurement devices, battery charging devices or similar. 
-Devices ipmlementations are packages in plug-in to make it independent of the base. The OpenSerialDataExplorer declares a device API 
+Devices ipmlementations are packages in plug-in to make it independent of the base. The DataExplorer declares a device API 
 (IDevice) where others are enabbled with relatively less coding effort to implement own device plug-in.
 The program is NLS enabled, available messages are English and German, this is also true for all users documentation. Design material and code documentation is English.
 

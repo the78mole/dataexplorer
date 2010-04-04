@@ -1,4 +1,4 @@
-OpenSerialDataExplorer is used to be build and installed using the GNU 
+DataExplorer is used to be build and installed using the GNU 
 standard way calling 
 
 	./configure && make && make install
@@ -14,11 +14,11 @@ The default install directory according the prefix variable, which might
 be different where the source gets build and make install is called.
 To define the installation directory of your choice use 
 	./configure --prefix=/opt && make install
-this will install to the given directory which will be /opt/OpenSerialDataExplorer
+this will install to the given directory which will be /opt/DataExplorer
 for the given example.
 
 First time startup requires usage of the start script in the
-installation directory (Windows use the executable OpenSerialDataExplorer.exe)
+installation directory (Windows use the executable DataExplorer.exe)
 
 Afterwards the application gives the capability to 
 maintain desktop shortcuts as well as start menu
