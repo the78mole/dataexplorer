@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.bantam;
 
@@ -29,7 +29,7 @@ import osde.exception.SerialPortException;
 import osde.exception.TimeOutException;
 import osde.log.Level;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.utils.TimeLine;
 
 /**
@@ -44,7 +44,7 @@ public class GathererThread extends Thread {
 	final static int					WAIT_TIME_RETRYS						= 36;
 
 
-	final OpenSerialDataExplorer application;
+	final DataExplorer application;
 	final EStationSerialPort	serialPort;
 	final eStation						device;
 	final EStationDialog			dialog;
@@ -65,7 +65,7 @@ public class GathererThread extends Thread {
 	 * @throws ApplicationConfigurationException 
 	 * @throws Exception 
 	 */
-	public GathererThread(OpenSerialDataExplorer currentApplication, eStation useDevice, EStationSerialPort useSerialPort, int channelConfigNumber, EStationDialog useDialog)
+	public GathererThread(DataExplorer currentApplication, eStation useDevice, EStationSerialPort useSerialPort, int channelConfigNumber, EStationDialog useDialog)
 			throws ApplicationConfigurationException, SerialPortException {
 		this.application = currentApplication;
 		this.device = useDevice;
@@ -322,7 +322,7 @@ public class GathererThread extends Thread {
 			}
 			else {
 				final String useRecordSetKey = this.recordSetKey;
-				OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+				DataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						GathererThread.this.application.updateStatisticsData();

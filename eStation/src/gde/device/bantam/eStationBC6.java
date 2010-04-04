@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.bantam;
 
@@ -21,7 +21,7 @@ import java.util.Vector;
 
 import javax.xml.bind.JAXBException;
 
-import osde.OSDE;
+import osde.DE;
 import osde.data.RecordSet;
 import osde.device.DeviceConfiguration;
 import osde.exception.DataInconsitsentException;
@@ -95,7 +95,7 @@ public class eStationBC6 extends eStation {
 	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
@@ -105,7 +105,7 @@ public class eStationBC6 extends eStation {
 		
 		int timeStampBufferSize = 0;
 		if(!recordSet.isTimeStepConstant()) {
-			timeStampBufferSize = OSDE.SIZE_BYTES_INTEGER * recordDataSize;
+			timeStampBufferSize = DE.SIZE_BYTES_INTEGER * recordDataSize;
 			byte[] timeStampBuffer = new byte[timeStampBufferSize];
 			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
 
@@ -127,7 +127,7 @@ public class eStationBC6 extends eStation {
 			points[4] = Double.valueOf((points[0] / 1000.0) * (points[2] / 1000.0)).intValue();											// energy U*C [mWh]
 			points[5] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
 			// 6=SpannungZelle1 7=SpannungZelle2 8=SpannungZelle3 9=SpannungZelle4 10=SpannungZelle5 11=SpannungZelle6
-			for (int j=0, k=0; j<points.length - 6; ++j, k+=OSDE.SIZE_BYTES_INTEGER) {
+			for (int j=0, k=0; j<points.length - 6; ++j, k+=DE.SIZE_BYTES_INTEGER) {
 				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
 				points[j+6] = (((convertBuffer[k+16]&0xff) << 24) + ((convertBuffer[k+17]&0xff) << 16) + ((convertBuffer[k+18]&0xff) << 8) + ((convertBuffer[k+19]&0xff) << 0));
 			}

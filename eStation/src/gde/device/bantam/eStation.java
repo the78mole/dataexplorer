@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.bantam;
 
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
@@ -39,7 +39,7 @@ import osde.exception.SerialPortException;
 import osde.io.LogViewReader;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 /**
  * eStation base device class
@@ -60,7 +60,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public final static String		CONFIG_BATTERY_TYPE					= "battery_type"; //$NON-NLS-1$
 	public final static String		CONFIG_PROCESSING_TIME			= "processing_time"; //$NON-NLS-1$
 
-	protected final OpenSerialDataExplorer				application;
+	protected final DataExplorer				application;
 	protected final EStationSerialPort						serialPort;
 	protected final Channels											channels;
 	protected       EStationDialog								dialog;
@@ -79,7 +79,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.OSDE_MSGT1400), Messages.getString(MessageIds.OSDE_MSGT1401), Messages.getString(MessageIds.OSDE_MSGT1402)};
 		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.OSDE_MSGT1403), Messages.getString(MessageIds.OSDE_MSGT1404), Messages.getString(MessageIds.OSDE_MSGT1405), Messages.getString(MessageIds.OSDE_MSGT1406)};
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
@@ -96,7 +96,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.OSDE_MSGT1400), Messages.getString(MessageIds.OSDE_MSGT1401), Messages.getString(MessageIds.OSDE_MSGT1402)};
 		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.OSDE_MSGT1403), Messages.getString(MessageIds.OSDE_MSGT1404), Messages.getString(MessageIds.OSDE_MSGT1405), Messages.getString(MessageIds.OSDE_MSGT1406)};
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
@@ -361,7 +361,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -371,7 +371,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		
 		int timeStampBufferSize = 0;
 		if(!recordSet.isTimeStepConstant()) {
-			timeStampBufferSize = OSDE.SIZE_BYTES_INTEGER * recordDataSize;
+			timeStampBufferSize = DE.SIZE_BYTES_INTEGER * recordDataSize;
 			byte[] timeStampBuffer = new byte[timeStampBufferSize];
 			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
 
@@ -395,7 +395,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
 			points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
 			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
-			for (int j=0, k=0; j<points.length - 8; ++j, k+=OSDE.SIZE_BYTES_INTEGER) {
+			for (int j=0, k=0; j<points.length - 8; ++j, k+=DE.SIZE_BYTES_INTEGER) {
 				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
 				points[j+8] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff) << 0));
 			}
@@ -636,7 +636,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				}
 				catch (SerialPortException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + OSDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + DE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
 				}
 				catch (ApplicationConfigurationException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
