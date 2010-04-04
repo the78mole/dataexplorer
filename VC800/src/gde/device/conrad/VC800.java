@@ -89,7 +89,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.OSDE_MSGT1537);
+		return Messages.getString(MessageIds.DE_MSGT1537);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @return lov2osdMap same reference as input parameter
 	 */
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
-		this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGW0022));		
+		this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGW0022));		
 		return lov2osdMap;
 	}
 
@@ -110,7 +110,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGW0022));
+		this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGW0022));
 		return ""; //$NON-NLS-1$
 	}
 
@@ -303,13 +303,13 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		
 		measurementInfo.put(VC800.INPUT_UNIT, unit);
 		
-		String typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1500);
-		if 			(unit.endsWith("V")) 		typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1501); //$NON-NLS-1$
-		else if (unit.endsWith("A")) 		typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1503); //$NON-NLS-1$
-		else if (unit.endsWith("Ohm")) 	typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1504); //$NON-NLS-1$
-		else if (unit.endsWith("F")) 		typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1505); //$NON-NLS-1$
-		else if (unit.endsWith("Hz")) 	typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1506); //$NON-NLS-1$
-		else if (unit.endsWith("°C")) 	typeSymbol = Messages.getString(MessageIds.OSDE_MSGT1507); //$NON-NLS-1$
+		String typeSymbol = Messages.getString(MessageIds.DE_MSGT1500);
+		if 			(unit.endsWith("V")) 		typeSymbol = Messages.getString(MessageIds.DE_MSGT1501); //$NON-NLS-1$
+		else if (unit.endsWith("A")) 		typeSymbol = Messages.getString(MessageIds.DE_MSGT1503); //$NON-NLS-1$
+		else if (unit.endsWith("Ohm")) 	typeSymbol = Messages.getString(MessageIds.DE_MSGT1504); //$NON-NLS-1$
+		else if (unit.endsWith("F")) 		typeSymbol = Messages.getString(MessageIds.DE_MSGT1505); //$NON-NLS-1$
+		else if (unit.endsWith("Hz")) 	typeSymbol = Messages.getString(MessageIds.DE_MSGT1506); //$NON-NLS-1$
+		else if (unit.endsWith("°C")) 	typeSymbol = Messages.getString(MessageIds.DE_MSGT1507); //$NON-NLS-1$
 		
 		measurementInfo.put(VC800.INPUT_TYPE, typeSymbol.split(" ")[0]); //$NON-NLS-1$
 		measurementInfo.put(VC800.INPUT_SYMBOL, typeSymbol.split(" ")[1]); //$NON-NLS-1$
@@ -323,16 +323,16 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @return the measurement mode key
 	 */
 	public String getMode(byte[] buffer) {
-		String mode = Messages.getString(MessageIds.OSDE_MSGT1510);
-		if ((buffer[0] & 0x02) > 0) mode = Messages.getString(MessageIds.OSDE_MSGT1511);
+		String mode = Messages.getString(MessageIds.DE_MSGT1510);
+		if ((buffer[0] & 0x02) > 0) mode = Messages.getString(MessageIds.DE_MSGT1511);
 		
-		if ((buffer[12] & 0x0c) > 0 && (buffer[0] & 0x04) > 0) mode += Messages.getString(MessageIds.OSDE_MSGT1512);
-		else if ((buffer[12] & 0x0c) > 0 && (buffer[0] & 0x08) > 0) mode += Messages.getString(MessageIds.OSDE_MSGT1513);
-		else if ((buffer[9] & 0x01) > 0)	mode += Messages.getString(MessageIds.OSDE_MSGT1514);
-		else if ((buffer[11] & 0x04) > 0)	mode += Messages.getString(MessageIds.OSDE_MSGT1515);
-		else if ((buffer[11] & 0x08) > 0)	mode += Messages.getString(MessageIds.OSDE_MSGT1516);
-		else if ((buffer[12] & 0x02) > 0)	mode += Messages.getString(MessageIds.OSDE_MSGT1517);
-		else if ((buffer[13] & 0x01) > 0) mode += Messages.getString(MessageIds.OSDE_MSGT1518);
+		if ((buffer[12] & 0x0c) > 0 && (buffer[0] & 0x04) > 0) mode += Messages.getString(MessageIds.DE_MSGT1512);
+		else if ((buffer[12] & 0x0c) > 0 && (buffer[0] & 0x08) > 0) mode += Messages.getString(MessageIds.DE_MSGT1513);
+		else if ((buffer[9] & 0x01) > 0)	mode += Messages.getString(MessageIds.DE_MSGT1514);
+		else if ((buffer[11] & 0x04) > 0)	mode += Messages.getString(MessageIds.DE_MSGT1515);
+		else if ((buffer[11] & 0x08) > 0)	mode += Messages.getString(MessageIds.DE_MSGT1516);
+		else if ((buffer[12] & 0x02) > 0)	mode += Messages.getString(MessageIds.DE_MSGT1517);
+		else if ((buffer[13] & 0x01) > 0) mode += Messages.getString(MessageIds.DE_MSGT1518);
 		
 		return mode;
 	}
@@ -427,11 +427,11 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 				}
 				catch (SerialPortException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + DE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0015, new Object[] { e.getClass().getSimpleName() + DE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
 				}
 				catch (ApplicationConfigurationException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0010));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
 				}
 			}

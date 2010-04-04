@@ -48,7 +48,7 @@ public class GathererThread extends Thread {
 	final Channels						channels;
 	final Channel							channel;
 	final int									channelNumber;
-	String										recordSetKey								= Messages.getString(osde.messages.MessageIds.OSDE_MSGT0272);
+	String										recordSetKey								= Messages.getString(osde.messages.MessageIds.DE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
 	boolean										isSwitchedRecordSet					= false;
 	boolean										isGatheredRecordSetVisible	= true;
@@ -187,17 +187,17 @@ public class GathererThread extends Thread {
 				}
 			}
 			catch (DataInconsitsentException e) {
-				log.log(Level.SEVERE, Messages.getString(osde.messages.MessageIds.OSDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME }));
+				log.log(Level.SEVERE, Messages.getString(osde.messages.MessageIds.DE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME }));
 				cleanup();
 			}
 			catch (Throwable e) {
 				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
 				if (e instanceof TimeOutException) {
-					this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI1502));
+					this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGI1502));
 					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGI1500));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGI1500));
 						stopDataGatheringThread(false);
 					}
 				}
@@ -229,7 +229,7 @@ public class GathererThread extends Thread {
 		RecordSet recordSet = this.channel.get(this.recordSetKey);
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
-			if (enableEndMessage) this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGI1501));
+			if (enableEndMessage) this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGI1501));
 		}
 		else {
 			cleanup();
