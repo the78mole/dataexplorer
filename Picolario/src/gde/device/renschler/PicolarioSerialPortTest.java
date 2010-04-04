@@ -37,7 +37,7 @@ public class PicolarioSerialPortTest {
 	public static void main(String[] args) {
 		DeviceConfiguration deviceConfig;
 		try {
-			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/OpenSerialDataExploroer/Devices/Picolario.xml"); //$NON-NLS-1$
+			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/DataExplorer/Devices/Picolario.xml"); //$NON-NLS-1$
 			picolario = new PicolarioSerialPort(deviceConfig, null);
 			DeviceSerialPort.listConfiguredSerialPorts(true, "", new Vector<String>());
 			
