@@ -76,8 +76,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		super(deviceProperties);		Messages.setDeviceResourceBundle("osde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.OSDE_MSGT1400), Messages.getString(MessageIds.OSDE_MSGT1401), Messages.getString(MessageIds.OSDE_MSGT1402)};
-		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.OSDE_MSGT1403), Messages.getString(MessageIds.OSDE_MSGT1404), Messages.getString(MessageIds.OSDE_MSGT1405), Messages.getString(MessageIds.OSDE_MSGT1406)};
+		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.DE_MSGT1400), Messages.getString(MessageIds.DE_MSGT1401), Messages.getString(MessageIds.DE_MSGT1402)};
+		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.DE_MSGT1403), Messages.getString(MessageIds.DE_MSGT1404), Messages.getString(MessageIds.DE_MSGT1405), Messages.getString(MessageIds.DE_MSGT1406)};
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
@@ -93,8 +93,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.OSDE_MSGT1400), Messages.getString(MessageIds.OSDE_MSGT1401), Messages.getString(MessageIds.OSDE_MSGT1402)};
-		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.OSDE_MSGT1403), Messages.getString(MessageIds.OSDE_MSGT1404), Messages.getString(MessageIds.OSDE_MSGT1405), Messages.getString(MessageIds.OSDE_MSGT1406)};
+		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.DE_MSGT1400), Messages.getString(MessageIds.DE_MSGT1401), Messages.getString(MessageIds.DE_MSGT1402)};
+		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.DE_MSGT1403), Messages.getString(MessageIds.DE_MSGT1404), Messages.getString(MessageIds.DE_MSGT1405), Messages.getString(MessageIds.DE_MSGT1406)};
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
@@ -107,7 +107,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.OSDE_MSGT1411);
+		return Messages.getString(MessageIds.DE_MSGT1411);
 	}
 
 	/**
@@ -636,11 +636,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				}
 				catch (SerialPortException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + DE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0015, new Object[] { e.getClass().getSimpleName() + DE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
 				}
 				catch (ApplicationConfigurationException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0010));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
 				}
 				catch (Throwable e) {

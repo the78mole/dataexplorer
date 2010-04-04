@@ -22,31 +22,31 @@ package osde.device.bantam;
  */ 
 public class MessageIds { 
 
-	public final static String	OSDE_MSGW1400 = "OSDE_MSGW1400";
-	public final static String	OSDE_MSGI1400 = "OSDE_MSGI1400";
-	public final static String	OSDE_MSGI1401 = "OSDE_MSGI1401";
-	public final static String	OSDE_MSGT1400 = "OSDE_MSGT1400";
-	public final static String	OSDE_MSGT1401 = "OSDE_MSGT1401";
-	public final static String	OSDE_MSGT1402 = "OSDE_MSGT1402";
-	public final static String	OSDE_MSGT1403 = "OSDE_MSGT1403";
-	public final static String	OSDE_MSGT1404 = "OSDE_MSGT1404";
-	public final static String	OSDE_MSGT1405 = "OSDE_MSGT1405";
-	public final static String	OSDE_MSGT1406 = "OSDE_MSGT1406";
-	public final static String	OSDE_MSGT1407 = "OSDE_MSGT1407";
-	public final static String	OSDE_MSGT1408 = "OSDE_MSGT1408";
-	public final static String	OSDE_MSGT1409 = "OSDE_MSGT1409";
-	public final static String	OSDE_MSGT1410 = "OSDE_MSGT1410";
-	public final static String	OSDE_MSGT1411 = "OSDE_MSGT1411";
-	public final static String	OSDE_MSGT1414 = "OSDE_MSGT1414";
-	public final static String	OSDE_MSGT1415 = "OSDE_MSGT1415";
-	public final static String	OSDE_MSGT1416 = "OSDE_MSGT1416";
-	public final static String	OSDE_MSGT1417 = "OSDE_MSGT1417";
-	public final static String	OSDE_MSGT1418 = "OSDE_MSGT1418";
-	public final static String	OSDE_MSGT1420 = "OSDE_MSGT1420";
-	public final static String	OSDE_MSGT1421 = "OSDE_MSGT1421";
-	public final static String	OSDE_MSGT1422 = "OSDE_MSGT1422";
-	public final static String	OSDE_MSGT1423 = "OSDE_MSGT1423";
-	public final static String	OSDE_MSGT1424 = "OSDE_MSGT1424";
-	public final static String	OSDE_MSGT1425 = "OSDE_MSGT1425";
+	public final static String	DE_MSGW1400 = "DE_MSGW1400";
+	public final static String	DE_MSGI1400 = "DE_MSGI1400";
+	public final static String	DE_MSGI1401 = "DE_MSGI1401";
+	public final static String	DE_MSGT1400 = "DE_MSGT1400";
+	public final static String	DE_MSGT1401 = "DE_MSGT1401";
+	public final static String	DE_MSGT1402 = "DE_MSGT1402";
+	public final static String	DE_MSGT1403 = "DE_MSGT1403";
+	public final static String	DE_MSGT1404 = "DE_MSGT1404";
+	public final static String	DE_MSGT1405 = "DE_MSGT1405";
+	public final static String	DE_MSGT1406 = "DE_MSGT1406";
+	public final static String	DE_MSGT1407 = "DE_MSGT1407";
+	public final static String	DE_MSGT1408 = "DE_MSGT1408";
+	public final static String	DE_MSGT1409 = "DE_MSGT1409";
+	public final static String	DE_MSGT1410 = "DE_MSGT1410";
+	public final static String	DE_MSGT1411 = "DE_MSGT1411";
+	public final static String	DE_MSGT1414 = "DE_MSGT1414";
+	public final static String	DE_MSGT1415 = "DE_MSGT1415";
+	public final static String	DE_MSGT1416 = "DE_MSGT1416";
+	public final static String	DE_MSGT1417 = "DE_MSGT1417";
+	public final static String	DE_MSGT1418 = "DE_MSGT1418";
+	public final static String	DE_MSGT1420 = "DE_MSGT1420";
+	public final static String	DE_MSGT1421 = "DE_MSGT1421";
+	public final static String	DE_MSGT1422 = "DE_MSGT1422";
+	public final static String	DE_MSGT1423 = "DE_MSGT1423";
+	public final static String	DE_MSGT1424 = "DE_MSGT1424";
+	public final static String	DE_MSGT1425 = "DE_MSGT1425";
 
  }

@@ -52,7 +52,7 @@ public class GathererThread extends Thread {
 	final Channel							channel;
 	final int									channelNumber;
 	
-	String										recordSetKey								= Messages.getString(osde.messages.MessageIds.OSDE_MSGT0272);
+	String										recordSetKey								= Messages.getString(osde.messages.MessageIds.DE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
 	boolean										isGatheredRecordSetVisible	= true;
 	int 											numberBatteryCells 					= 0; 
@@ -189,7 +189,7 @@ public class GathererThread extends Thread {
 					//OsdReaderWriter.write("E:\\Temp\\not.osd", this.channel, 1);
 				}
 				else { // no eStation program is executing, wait for 180 seconds max. for actions
-					this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI1400));
+					this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGI1400));
 					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for eStation activation"); //$NON-NLS-1$
 
 					if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
@@ -197,17 +197,17 @@ public class GathererThread extends Thread {
 						isProgrammExecuting = false;
 						recordSet = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
-						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGT1408));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGT1408));
 					}
 					else if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGW1400));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGW1400));
 						stopDataGatheringThread(false, null);
 					}
 				}
 			}
 			catch (DataInconsitsentException e) {
-				String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}); 
+				String message = Messages.getString(osde.messages.MessageIds.DE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}); 
 				cleanup(message);
 			}
 			catch (Throwable e) {
@@ -216,7 +216,7 @@ public class GathererThread extends Thread {
 					try {
 						finalizeRecordSet(false);
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "(dry time) waiting..."); //$NON-NLS-1$
-						this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI1401));
+						this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGI1401));
 						recordSet = null;
 						--dryTimeCycleCount;
 						Thread.sleep(waitTime_ms);
@@ -227,11 +227,11 @@ public class GathererThread extends Thread {
 				}
 				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
 				else if (e instanceof TimeOutException && !isProgrammExecuting) {
-					this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGI1400));
+					this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGI1400));
 					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for eStation activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGW1400));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGW1400));
 						stopDataGatheringThread(false, null);
 					}
 				}
@@ -271,16 +271,16 @@ public class GathererThread extends Thread {
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
 			if (enableEndMessage) 
-				this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGT1409));
+				this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGT1409));
 		}
 		else {
 			if (throwable != null) {
-				cleanup(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() })
-						+ Messages.getString(MessageIds.OSDE_MSGT1408));
+				cleanup(Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() })
+						+ Messages.getString(MessageIds.DE_MSGT1408));
 			}
 			else {
 				if (enableEndMessage)
-					cleanup(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026)	+ Messages.getString(MessageIds.OSDE_MSGT1408));
+					cleanup(Messages.getString(osde.messages.MessageIds.DE_MSGE0026)	+ Messages.getString(MessageIds.DE_MSGT1408));
 			}
 		}
 	}
