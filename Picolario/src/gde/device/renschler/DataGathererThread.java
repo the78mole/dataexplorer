@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.renschler;
 
@@ -26,7 +26,7 @@ import osde.data.RecordSet;
 import osde.device.PropertyType;
 import osde.exception.DataInconsitsentException;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.QuasiLinearRegression;
 
@@ -37,7 +37,7 @@ import osde.utils.QuasiLinearRegression;
 public class DataGathererThread extends Thread {
 	final static Logger				log							= Logger.getLogger(DataGathererThread.class.getName());
 
-	OpenSerialDataExplorer		application;
+	DataExplorer		application;
 	String[]									datagramNumbers;
 	final String							RECORD_SET_NAME	= Messages.getString(MessageIds.OSDE_MSGT1220);
 	final String							configKey;
@@ -50,7 +50,7 @@ public class DataGathererThread extends Thread {
 	/**
 	 * 
 	 */
-	public DataGathererThread(OpenSerialDataExplorer currentApplication, Picolario currentDevice, PicolarioSerialPort currentSerialPort, String[] useDatagramNumbers) {
+	public DataGathererThread(DataExplorer currentApplication, Picolario currentDevice, PicolarioSerialPort currentSerialPort, String[] useDatagramNumbers) {
 		this.application = currentApplication;
 		this.device = currentDevice;
 		this.serialPort = currentSerialPort;

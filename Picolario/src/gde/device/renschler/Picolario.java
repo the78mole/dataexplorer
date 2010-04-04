@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.renschler;
 
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channels;
 import osde.data.Record;
@@ -34,7 +34,7 @@ import osde.device.PropertyType;
 import osde.exception.DataInconsitsentException;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.LinearRegression;
 import osde.utils.QuasiLinearRegression;
@@ -52,7 +52,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public final static String		DO_SUBTRACT_FIRST	= "do_subtract_first"; //$NON-NLS-1$
 	public final static String		DO_SUBTRACT_LAST	= "subtract_last"; //$NON-NLS-1$
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final PicolarioDialog					dialog;
 	final PicolarioSerialPort			serialPort;
 	final Channels								channels;
@@ -67,7 +67,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.renschler.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
@@ -83,7 +83,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.renschler.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
@@ -185,7 +185,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
