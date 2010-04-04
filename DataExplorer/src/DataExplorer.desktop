@@ -6,7 +6,7 @@ Encoding=UTF-8
 Exec=java -Dfile.encoding=UTF-8 -jar -Xms40m -Xmx256m @OSDE_DIR@DataExplorer.jar %f
 GenericName=DataExplorer
 Icon=@OSDE_DIR@DataExplorer.xpm
-MimeType=application/x-OpenSerialData
+MimeType=application/x-DataExplorer
 Name=DataExplorer
 Path=@OSDE_DIR@
 StartupNotify=true

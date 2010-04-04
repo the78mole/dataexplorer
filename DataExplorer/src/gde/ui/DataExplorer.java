@@ -1455,7 +1455,7 @@ public class DataExplorer extends Composite {
 
 	/**
 	 * @param extensions
-	 * @return the mapped extension description *.osd -> OpenSerialData
+	 * @return the mapped extension description *.osd -> DataExplorer files
 	 */
 	public String[] getExtensionDescription(String[] extensions) {
 		String[] filterNames = new String[extensions.length];

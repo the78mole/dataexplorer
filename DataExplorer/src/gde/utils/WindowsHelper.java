@@ -66,7 +66,7 @@ public class WindowsHelper {
 //				"-jar -Xms40M -Xmx256M \"C:\\Program Files\\DataExplorer\\DataExplorer.jar\"", //$NON-NLS-1$
 //				"C:\\Program Files\\DataExplorer", //$NON-NLS-1$
 //				"C:\\Program Files\\DataExplorer\\DataExplorer.ico",  //$NON-NLS-1$
-//				"OpenSerialData Explorer" }; //$NON-NLS-1$
+//				"DataExplorer" }; //$NON-NLS-1$
 //		
 //		createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
 		log.setLevel(Level.WARNING);
@@ -157,7 +157,7 @@ public class WindowsHelper {
 	public static native String getFilePathFromLink(String fqShellLinkPath);
 
 	/**
-	 * native method called via load library to enable use of native windows functions to register OpenSerialData MIME type to associate .osd
+	 * native method called via load library to enable use of native windows functions to register DataExplorer MIME type to associate .osd
 	 * @param applicationInstallationDirectory
 	 */
 	//public static native String registerMimeType(	String applicationInstallationDirectory	) throws SecurityException, IOException;

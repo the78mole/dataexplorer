@@ -52,7 +52,7 @@ import osde.utils.StringHelper;
 
 /**
  * @author Winfried Brügmann
- * This class reads and writes OpenSerialData format
+ * This class reads and writes DataExplorer file format
  */
 public class OsdReaderWriter {
 	final static Logger									log												= Logger.getLogger(OsdReaderWriter.class.getName());
@@ -92,10 +92,10 @@ public class OsdReaderWriter {
 		line = data_in.readUTF();
 		line = line.substring(0, line.length()-1);
 		log.log(Level.FINE, line);
-		if (!line.startsWith(DE.OPEN_SERIAL_DATA_VERSION))
+		if (!line.startsWith(DE.DATA_EXPLORER_FILE_VERSION))
 			throw new NotSupportedFileFormatException(filePath);
 
-		String sVersion = line.substring(DE.OPEN_SERIAL_DATA_VERSION.length(), DE.OPEN_SERIAL_DATA_VERSION.length()+1).trim();
+		String sVersion = line.substring(DE.DATA_EXPLORER_FILE_VERSION.length(), DE.DATA_EXPLORER_FILE_VERSION.length()+1).trim();
 		int version;
 		try {
 			version = new Integer(sVersion).intValue(); // one digit only
@@ -108,7 +108,7 @@ public class OsdReaderWriter {
 		switch (version) {
 		case 1:
 		case 2: // added OBJECT_KEY to header
-			header.put(DE.OPEN_SERIAL_DATA_VERSION, DE.STRING_EMPTY+version);
+			header.put(DE.DATA_EXPLORER_FILE_VERSION, DE.STRING_EMPTY+version);
 			boolean isHeaderComplete = false;
 			while (!isHeaderComplete && headerCounter-- > 0) {
 				line = data_in.readUTF();
@@ -350,7 +350,7 @@ public class OsdReaderWriter {
 				activeChannel.checkAndLoadData();
 
 				// first line : header with version
-				String versionString = DE.OPEN_SERIAL_DATA_VERSION + useVersion + DE.STRING_NEW_LINE;
+				String versionString = DE.DATA_EXPLORER_FILE_VERSION + useVersion + DE.STRING_NEW_LINE;
 				data_out.writeUTF(versionString);
 				filePointer += DE.SIZE_UTF_SIGNATURE + versionString.getBytes("UTF8").length; //$NON-NLS-1$
 				log.log(Level.FINE, "line lenght = " + (DE.SIZE_UTF_SIGNATURE + versionString.getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

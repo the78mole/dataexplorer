@@ -162,7 +162,7 @@ public class FileHandler {
 	}
 
 	/**
-	 * handles the file dialog to open OpenSerialData or LogView file
+	 * handles the file dialog to open DataExplorer or LogView files
 	 * @param dialogName
 	 */
 	public void openFileDialog(final String dialogName) {
@@ -194,7 +194,7 @@ public class FileHandler {
 	}
 
 	/**
-	 * open a OpenSerialData file and load data into a cleaned device/channel
+	 * open a DataExplorer file and load data into a cleaned device/channel
 	 * @param openFilePath
 	 * @throws FileNotFoundException
 	 * @throws IOException

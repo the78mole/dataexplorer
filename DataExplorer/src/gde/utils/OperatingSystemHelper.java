@@ -66,7 +66,7 @@ public class OperatingSystemHelper {
 					sourceLaunchFilePath = (sourceBasePath + launchFilename);
 					log.log(Level.INFO, "sourceLaunchFilePath = " + sourceLaunchFilePath); //$NON-NLS-1$
 					targetBasePath = System.getenv("USERPROFILE") + DE.FILE_SEPARATOR_UNIX + "Desktop" + DE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
-					targetDesktopLaucherFilePath = targetBasePath + "OpenSerialData Explorer.lnk"; //$NON-NLS-1$
+					targetDesktopLaucherFilePath = targetBasePath + "DataExplorer.lnk"; //$NON-NLS-1$
 					log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 					String fqExecutablePath = sourceLaunchFilePath.replace("/", DE.FILE_SEPARATOR); //$NON-NLS-1$
 					log.log(Level.INFO, "fqExecutablePath = " + fqExecutablePath); //$NON-NLS-1$
@@ -199,7 +199,7 @@ public class OperatingSystemHelper {
 		try {
 			if (DE.IS_WINDOWS) {
 				targetBasePath = System.getenv("USERPROFILE") + DE.FILE_SEPARATOR_WINDOWS + "Desktop" + DE.FILE_SEPARATOR_WINDOWS; //$NON-NLS-1$ //$NON-NLS-2$
-				targetDesktopLaucherFilePath = targetBasePath + "OpenSerialData*.lnk"; //$NON-NLS-1$
+				targetDesktopLaucherFilePath = targetBasePath + "DataExplorer.lnk"; //$NON-NLS-1$
 				log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 
 				Process process = new ProcessBuilder("cmd", "/C", "erase", "/F", targetDesktopLaucherFilePath).start(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -337,7 +337,7 @@ public class OperatingSystemHelper {
 					log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
 					log.log(Level.INFO, "\"" + command + "\" rc = " + process.exitValue()); //$NON-NLS-1$ //$NON-NLS-2$
 					if (process.exitValue() != 0) {
-						log.log(Level.WARNING, "failed to register OpenSerialData MIME type rc = " + process.exitValue()); //$NON-NLS-1$
+						log.log(Level.WARNING, "failed to register DataExplorer MIME type rc = " + process.exitValue()); //$NON-NLS-1$
 						throw new IOException("error=740"); //$NON-NLS-1$
 					}
 					besr.close();
@@ -393,7 +393,7 @@ public class OperatingSystemHelper {
 
 					//check if xdg-utls are installed, this is the prerequisite for the registration process
 					if (Runtime.getRuntime().exec("which xdg-mime").waitFor() != 0) { //$NON-NLS-1$
-						log.log(Level.INFO, "OpenSerialData program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
+						log.log(Level.INFO, "DataExplorer program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
 						DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0030));
 						rc = 0;
 					}
@@ -495,7 +495,7 @@ public class OperatingSystemHelper {
 				log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
 				log.log(Level.INFO, "\"cmd /C assoc .osd\" rc = " + process.exitValue()); //$NON-NLS-1$
 				if (process.exitValue() == 0) {
-					log.log(Level.WARNING, "failed to deregister OpenSerialData MIME type to OS rc = " + process.exitValue()); //$NON-NLS-1$
+					log.log(Level.WARNING, "failed to deregister DataExplorer MIME type to OS rc = " + process.exitValue()); //$NON-NLS-1$
 					throw new IOException("error=740"); //$NON-NLS-1$
 				}
 				rc = 0;
@@ -526,7 +526,7 @@ public class OperatingSystemHelper {
 
 				//check if xdg-utls are installed, this is the prerequisite for the registration process
 				if (Runtime.getRuntime().exec("which xdg-mime").waitFor() != 0) { //$NON-NLS-1$
-					log.log(Level.INFO, "OpenSerialData program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
+					log.log(Level.INFO, "DataExplorer program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
 					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0030));
 					rc = 0;
 				}
