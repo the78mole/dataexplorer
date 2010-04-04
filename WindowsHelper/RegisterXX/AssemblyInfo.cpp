@@ -11,11 +11,11 @@ using namespace System::Security::Permissions;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly:AssemblyTitleAttribute("OpenSerialDataExplorer")];
+[assembly:AssemblyTitleAttribute("DataExplorer")];
 [assembly:AssemblyDescriptionAttribute("Register OpenSerialData MIME type to associate .osd file ending")];
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("")];
-[assembly:AssemblyProductAttribute("OpenSerialDataExplorer")];
+[assembly:AssemblyProductAttribute("DataExplorer")];
 [assembly:AssemblyCopyrightAttribute("")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];

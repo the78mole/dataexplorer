@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 
 
@@ -41,7 +41,7 @@
 WinHelper is a collection of windows native functions which are not accessible from Java 
 
 create header file:
-D:\workspaces\osde\WindowsHelper\WinHelperDll>"C:\Program Files\Java\jdk1.6.0_11\bin\javah.exe" -jni -classpath ..\..\OpenSerialDataExplorer\bin osde.utils.WindowsHelper
+D:\workspaces\osde\WindowsHelper\WinHelperDll>"C:\Program Files\Java\jdk1.6.0_11\bin\javah.exe" -jni -classpath ..\..\DataExplorer\bin osde.utils.WindowsHelper
 
 build:
 prepare the cygwin environment definitn e variable pointing to used JDK
