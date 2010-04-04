@@ -175,7 +175,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 				dialog.updateDataGatherProgress(memoryUsed, numberRecordSet, this.reveiceErrors, numberLess4measurements, memoryUsed);
 			}
 			else
-				throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0026));
+				throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0026));
 			
 			log.log(Level.FINE, "end"); //$NON-NLS-1$
 		}
@@ -258,7 +258,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
 		else
-			throw new Exception(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0031));
+			throw new Exception(Messages.getString(osde.messages.MessageIds.DE_MSGE0031));
 		
 		return isLiveDataAvailable;
 	}
@@ -302,7 +302,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			}
 		}
 		else
-			throw new Exception(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0031));
+			throw new Exception(Messages.getString(osde.messages.MessageIds.DE_MSGE0031));
 
 		return readBuffer;
 	}
@@ -382,7 +382,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 
 				}
 				else
-					throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0032));
+					throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0032));
 			}
 		}
 		catch (Exception e) {
@@ -423,10 +423,10 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 					
 				}
 				else
-					throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0032));
+					throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0032));
 			}
 			else
-				throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0033));
+				throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0033));
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -464,10 +464,10 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 					
 				}
 				else
-					throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0033));
+					throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0033));
 			}
 			else
-				throw new IOException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0032));
+				throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0032));
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -563,7 +563,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 		log.log(Level.FINER, "checkSumData = " + checkSumData); //$NON-NLS-1$
 		
 		if (checkSum != checkSumData)
-			throw new CheckSumMissmatchException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0034, new Object[] { checkSum, checkSumData } ));
+			throw new CheckSumMissmatchException(Messages.getString(osde.messages.MessageIds.DE_MSGE0034, new Object[] { checkSum, checkSumData } ));
 	}
 	
 	/**

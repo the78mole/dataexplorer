@@ -41,7 +41,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 	final static Logger			log													= Logger.getLogger(LiPoWatchLiveGatherer.class.getName());
 
 	DataExplorer	application;
-	final String						RECORD_SET_NAME							= Messages.getString(MessageIds.OSDE_MSGT1601);
+	final String						RECORD_SET_NAME							= Messages.getString(MessageIds.DE_MSGT1601);
 	final LiPoWatchSerialPort	serialPort;
 	final LiPoWatch						device;
 	final LiPoWatchDialog			dialog;
@@ -119,7 +119,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 			this.serialPort.wait4LiveData(100);
 		}
 		catch (Throwable e) {
-			String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
+			String message = Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
 			cleanup(recordSetKey, message, e);
 		}
 		
@@ -167,18 +167,18 @@ public class LiPoWatchLiveGatherer extends Thread {
 				}
 				catch (DataInconsitsentException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
+					String message = Messages.getString(osde.messages.MessageIds.DE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
 					cleanup(recordSetKey, message, e);				}
 				catch (TimeOutException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
-					+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1602); //$NON-NLS-1$ 
+					String message = Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+					+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGW1602); //$NON-NLS-1$ 
 					cleanup(recordSetKey, message, e);
 				}
 				catch (IOException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					String message = Messages.getString(osde.messages.MessageIds.OSDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
-					+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGW1602); //$NON-NLS-1$ 
+					String message = Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+					+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGW1602); //$NON-NLS-1$ 
 					cleanup(recordSetKey, message, e);
 				}
 				catch (Throwable e) {
