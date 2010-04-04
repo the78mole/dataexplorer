@@ -48,14 +48,14 @@ void PrintKeys( RegistryKey ^ rkey )
 }
 
 
-void registerOpenSerialData(String ^ osdeBasePath)
+void registerDataExplorerFileExtension(String ^ osdeBasePath)
 {
 /*	
 	[HKEY_CLASSES_ROOT\.osd]
-	@="DataExplorer.OpenSerialData"
+	@="DataExplorer.DataExplorerFileExtension"
 
-	[HKEY_CLASSES_ROOT\DataExplorer.OpenSerialData]
-	@="DataExplorer.OpenSerialData"
+	[HKEY_CLASSES_ROOT\DataExplorer.DataExplorerFileExtension]
+	@="DataExplorer.DataExplorerFileExtension"
 
 	[HKEY_CLASSES_ROOT\Applications\DataExplorer.exe\shell\open\command]
 	@="\"@OSDE_DIR@\DataExplorer.exe\" \"%1\""
@@ -64,12 +64,12 @@ void registerOpenSerialData(String ^ osdeBasePath)
  	RegistryKey ^ cl_root_osd = Registry::ClassesRoot->OpenSubKey(".osd", true);
 	if(!cl_root_osd) 
 		cl_root_osd = Registry::ClassesRoot->CreateSubKey(".osd");
-	cl_root_osd->SetValue("", "DataExplorer.OpenSerialData", RegistryValueKind::String);
+	cl_root_osd->SetValue("", "DataExplorer.DataExplorerFileExtension", RegistryValueKind::String);
 
-	RegistryKey ^ cl_root_osde = Registry::ClassesRoot->OpenSubKey("DataExplorer.OpenSerialData", true);
+	RegistryKey ^ cl_root_osde = Registry::ClassesRoot->OpenSubKey("DataExplorer.DataExplorerFileExtension", true);
 	if(!cl_root_osde) 
-		cl_root_osde = Registry::ClassesRoot->CreateSubKey("DataExplorer.OpenSerialData");
-	cl_root_osde->SetValue("", "DataExplorer.OpenSerialData", RegistryValueKind::String);
+		cl_root_osde = Registry::ClassesRoot->CreateSubKey("DataExplorer.DataExplorerFileExtension");
+	cl_root_osde->SetValue("", "DataExplorer.DataExplorerFileExtension", RegistryValueKind::String);
 
 	RegistryKey ^ cr_app = Registry::ClassesRoot->OpenSubKey("Applications", true);
 	RegistryKey ^ osdeApp	= cr_app->OpenSubKey("DataExplorer.exe", true);
@@ -84,12 +84,12 @@ void registerOpenSerialData(String ^ osdeBasePath)
 
 /*
 	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.osd]
-	@="DataExplorer.OpenSerialData"
+	@="DataExplorer.DataExplorerFileExtension"
 
-	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\DataExplorer.OpenSerialData]
-	@="DataExplorer.OpenSerialData"
+	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\DataExplorer.DataExplorerFileExtension]
+	@="DataExplorer.DataExplorerFileExtension"
 
-	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\DataExplorer.OpenSerialData\shell\open\command]
+	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\DataExplorer.DataExplorerFileExtension\shell\open\command]
 	@="\"@OSDE_DIR@\DataExplorer.exe\" \"%1\""
 
 	#--------------------------------------------------------------------------- 
@@ -98,13 +98,13 @@ void registerOpenSerialData(String ^ osdeBasePath)
  	RegistryKey ^ lm_cl_osd = lm_sw_cl->OpenSubKey(".osd", true);
 	if(!lm_cl_osd) 
 		lm_cl_osd = lm_sw_cl->CreateSubKey(".osd");
-	lm_cl_osd->SetValue("", "DataExplorer.OpenSerialData", RegistryValueKind::String);
+	lm_cl_osd->SetValue("", "DataExplorer.DataExplorerFileExtension", RegistryValueKind::String);
 
-	RegistryKey ^ lm_cl_osde = lm_sw_cl->OpenSubKey("DataExplorer.OpenSerialData", true);
+	RegistryKey ^ lm_cl_osde = lm_sw_cl->OpenSubKey("DataExplorer.DataExplorerFileExtension", true);
 	if(lm_cl_osde) 
-		lm_sw_cl->DeleteSubKeyTree("DataExplorer.OpenSerialData");
-	lm_cl_osde = lm_sw_cl->CreateSubKey("DataExplorer.OpenSerialData");
-	lm_cl_osde->SetValue("", "DataExplorer.OpenSerialData", RegistryValueKind::String);
+		lm_sw_cl->DeleteSubKeyTree("DataExplorer.DataExplorerFileExtension");
+	lm_cl_osde = lm_sw_cl->CreateSubKey("DataExplorer.DataExplorerFileExtension");
+	lm_cl_osde->SetValue("", "DataExplorer.DataExplorerFileExtension", RegistryValueKind::String);
 	shell = lm_cl_osde->CreateSubKey("shell");
 	open  = shell->CreateSubKey("open");
 	cmd	= open->CreateSubKey("command");
@@ -115,14 +115,14 @@ void registerOpenSerialData(String ^ osdeBasePath)
 	@="\"@OSDE_DIR@\DataExplorer.exe\" \"%1\""
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.osd]
-	"Progid"="DataExplorer.OpenSerialData"
+	"Progid"="DataExplorer.DataExplorerFileExtension"
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.osd\OpenWithList]
 	"a"="DataExplorer.exe"
 	"MRUList"="a"
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.osd\OpenWithProgids]
-	"DataExplorer.OpenSerialData"=hex(0):
+	"DataExplorer.DataExplorerFileExtension"=hex(0):
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.lov\OpenWithList]
 	"a"="LogView.exe"
@@ -130,7 +130,7 @@ void registerOpenSerialData(String ^ osdeBasePath)
 	"MRUList"="ab"
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.lov\OpenWithProgids]
-	"DataExplorer.OpenSerialData"=hex(0):
+	"DataExplorer.DataExplorerFileExtension"=hex(0):
 */
 	RegistryKey ^ cu_sw_cl_app = Registry::CurrentUser->OpenSubKey("Software")->OpenSubKey("Classes")->OpenSubKey("Applications", true);
 	RegistryKey ^ exist	= cu_sw_cl_app->OpenSubKey("DataExplorer.exe", true);
@@ -153,7 +153,7 @@ void registerOpenSerialData(String ^ osdeBasePath)
 	openWithList->SetValue("a", "DataExplorer.exe");
 	openWithList->SetValue("MRUList", "a");
 	RegistryKey ^ openWithProgids = osdxExt->CreateSubKey("OpenWithProgids");
-	openWithProgids->SetValue("DataExplorer.OpenSerialData", gcnew array<Byte>{});
+	openWithProgids->SetValue("DataExplorer.DataExplorerFileExtension", gcnew array<Byte>{});
 	
 	Boolean isOSDE = false;
 	array<String^> ^keys = gcnew array<String^>{"a", "b", "c", "d", "e", "f", "g", "h"};
@@ -196,29 +196,29 @@ void registerOpenSerialData(String ^ osdeBasePath)
 				String^ s = safe_cast<String^>(enum0->Current);
 				//Console::WriteLine( s );
 				if (s->Length >= 1) {
-					isOSDE = (s == "DataExplorer.OpenSerialData");
+					isOSDE = (s == "DataExplorer.DataExplorerFileExtension");
 					if(isOSDE)
 						break;
 				}
 			}
 			if (!isOSDE) {
-				openWithProgids->SetValue("DataExplorer.OpenSerialData", gcnew array<Byte>{});
+				openWithProgids->SetValue("DataExplorer.DataExplorerFileExtension", gcnew array<Byte>{});
 			}
 		}
 		else { // OpenWithList does not exist -> create initial with DataExplorer only
 			openWithProgids = lovExt->CreateSubKey("OpenWithProgids");
-			openWithProgids->SetValue("DataExplorer.OpenSerialData", gcnew array<Byte>{});
+			openWithProgids->SetValue("DataExplorer.DataExplorerFileExtension", gcnew array<Byte>{});
 		}
 	} // end if lovExt
 }
 
-void unregisterOpenSerialData() {
+void unregisterDataExplorerFileExtension() {
 /*	
 	[HKEY_CLASSES_ROOT\.osd]
-	@="DataExplorer.OpenSerialData"
+	@="DataExplorer.DataExplorerFileExtension"
 
-	[HKEY_CLASSES_ROOT\DataExplorer.OpenSerialData]
-	@="DataExplorer.OpenSerialData"
+	[HKEY_CLASSES_ROOT\DataExplorer.DataExplorerFileExtension]
+	@="DataExplorer.DataExplorerFileExtension"
 
 	[HKEY_CLASSES_ROOT\Applications\DataExplorer.exe\shell\open\command]
 	@="\"@OSDE_DIR@\DataExplorer.exe\" \"%1\""
@@ -228,9 +228,9 @@ void unregisterOpenSerialData() {
 	if(cl_root_osd) 
 		Registry::ClassesRoot->DeleteSubKey(".osd");
 
-	RegistryKey ^ cl_root_osde = Registry::ClassesRoot->OpenSubKey("DataExplorer.OpenSerialData", true);
+	RegistryKey ^ cl_root_osde = Registry::ClassesRoot->OpenSubKey("DataExplorer.DataExplorerFileExtension", true);
 	if(cl_root_osde) 
-		Registry::ClassesRoot->DeleteSubKeyTree("DataExplorer.OpenSerialData");
+		Registry::ClassesRoot->DeleteSubKeyTree("DataExplorer.DataExplorerFileExtension");
 
 	RegistryKey ^ cr_app = Registry::ClassesRoot->OpenSubKey("Applications", true);
 	RegistryKey ^ osdeApp = cr_app->OpenSubKey("DataExplorer.exe", true);
@@ -239,12 +239,12 @@ void unregisterOpenSerialData() {
 
 /*
 	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.osd]
-	@="DataExplorer.OpenSerialData"
+	@="DataExplorer.DataExplorerFileExtension"
 
-	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\DataExplorer.OpenSerialData]
-	@="DataExplorer.OpenSerialData"
+	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\DataExplorer.DataExplorerFileExtension]
+	@="DataExplorer.DataExplorerFileExtension"
 
-	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\DataExplorer.OpenSerialData\shell\open\command]
+	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\DataExplorer.DataExplorerFileExtension\shell\open\command]
 	@="\"@OSDE_DIR@\DataExplorer.exe\" \"%1\""
 
 	#--------------------------------------------------------------------------- 
@@ -254,23 +254,23 @@ void unregisterOpenSerialData() {
 	if(lm_cl_osd) 
 		lm_sw_cl->DeleteSubKeyTree(".osd");
 
-	RegistryKey ^ lm_cl_osde = lm_sw_cl->OpenSubKey("DataExplorer.OpenSerialData", true);
+	RegistryKey ^ lm_cl_osde = lm_sw_cl->OpenSubKey("DataExplorer.DataExplorerFileExtension", true);
 	if(lm_cl_osde) 
-		lm_sw_cl->DeleteSubKeyTree("DataExplorer.OpenSerialData");
+		lm_sw_cl->DeleteSubKeyTree("DataExplorer.DataExplorerFileExtension");
 
 /*
 	[HKEY_CURRENT_USER\Software\Classes\Applications\DataExplorer.exe\shell\open\command]
 	@="\"@OSDE_DIR@\DataExplorer.exe\" \"%1\""
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.osd]
-	"Progid"="DataExplorer.OpenSerialData"
+	"Progid"="DataExplorer.DataExplorerFileExtension"
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.osd\OpenWithList]
 	"a"="DataExplorer.exe"
 	"MRUList"="a"
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.osd\OpenWithProgids]
-	"DataExplorer.OpenSerialData"=hex(0):
+	"DataExplorer.DataExplorerFileExtension"=hex(0):
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.lov\OpenWithList]
 	"a"="LogView.exe"
@@ -278,7 +278,7 @@ void unregisterOpenSerialData() {
 	"MRUList"="ab"
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.lov\OpenWithProgids]
-	"DataExplorer.OpenSerialData"=hex(0):
+	"DataExplorer.DataExplorerFileExtension"=hex(0):
 */
 	RegistryKey ^ cu_sw_cl_app = Registry::CurrentUser->OpenSubKey("Software")->OpenSubKey("Classes")->OpenSubKey("Applications", true);
 	RegistryKey ^ exist	= cu_sw_cl_app->OpenSubKey("DataExplorer.exe", true);
@@ -324,7 +324,7 @@ void unregisterOpenSerialData() {
 				if (isOSDE) {
 					String ^ osdeKey = keys[names->Length - 2];
 					openWithList->DeleteValue(osdeKey); //"b", "DataExplorer.exe"
-					openWithProgids->DeleteValue("DataExplorer.OpenSerialData");
+					openWithProgids->DeleteValue("DataExplorer.DataExplorerFileExtension");
 				}
 			}
 		}
@@ -337,12 +337,12 @@ int main(array<System::String ^> ^args)
 	try {
 		if (args->Length > 0) {
 			if (args[0] && args[0]->Length > 5)
-				Console::WriteLine( "registerOpenSerialData(" + args[0]+ ")" );
-				registerOpenSerialData(args[0]);
+				Console::WriteLine( "registerDataExplorerFileExtension(" + args[0]+ ")" );
+				registerDataExplorerFileExtension(args[0]);
 		}
 		else {	
-			Console::WriteLine( "unregisterOpenSerialData()" );
-			unregisterOpenSerialData();
+			Console::WriteLine( "unregisterDataExplorerFileExtension()" );
+			unregisterDataExplorerFileExtension();
 		}
 	}
 	catch(System::Security::SecurityException ^ pEx) { 

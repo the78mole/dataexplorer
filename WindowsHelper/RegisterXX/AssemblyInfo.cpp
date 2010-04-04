@@ -12,7 +12,7 @@ using namespace System::Security::Permissions;
 // associated with an assembly.
 //
 [assembly:AssemblyTitleAttribute("DataExplorer")];
-[assembly:AssemblyDescriptionAttribute("Register OpenSerialData MIME type to associate .osd file ending")];
+[assembly:AssemblyDescriptionAttribute("Register DataExplorer MIME type to associate .osd file ending")];
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("")];
 [assembly:AssemblyProductAttribute("DataExplorer")];
