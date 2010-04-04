@@ -7,7 +7,7 @@
     </target>
 
     <!-- Main target -->
-    <target name="dist" depends="zip_package">
+    <target name="dist" depends="binary_package">
         <echo message="Building on system ${os.name} ${os.arch} ${sun.arch.data.model}" />
         <echo message="Building using Java ${java.version}" />
     </target>
@@ -153,7 +153,7 @@
     </target>
 
     <!-- install target -->
-    <target name="install" depends="zip_package">
+    <target name="install" depends="binary_package">
         <echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
         <condition property="isLinux">
@@ -258,12 +258,6 @@
             <!-- add new device here -->
         </patternset>
     </fileset>
-
-    <!-- build the windows launcher exe file -->
-    <target name="windowsexe" depends="package">
-        <taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="launch4j/launch4j.jar:launch4j/lib/xstream.jar" />
-        <launch4j configFile="build/misc/DataExplorer.xml" />
-    </target>
 
     <!-- create internal temporay file structure -->
     <target name="copy-files" depends="package">
@@ -459,7 +453,7 @@
     </target>
 
     <!-- zip for Windows, tar for Linux/Mac OS -->
-    <target name="zip_package" depends="copy-files">
+    <target name="binary_package" depends="copy-files">
 
         <echo message="zip Windows 32 bit files" />
         <zip destfile="${build.target.dir}/DataExplorer_${version.num}_Windows_x86_32.zip">
