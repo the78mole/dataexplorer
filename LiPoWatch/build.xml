@@ -14,7 +14,7 @@
 	<property name="module.output" location="build/classes"/>
 
 	<path id="compile.classpath">
-		<pathelement location="../OpenSerialDataExplorer/build/OpenSerialDataExplorer.jar" />
+		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
 		<pathelement location="../build/lib/RXTXcomm.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
 	</path>

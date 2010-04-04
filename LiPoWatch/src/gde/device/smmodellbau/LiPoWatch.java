@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.smmodellbau;
 
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -34,7 +34,7 @@ import osde.device.smmodellbau.lipowatch.MessageIds;
 import osde.exception.DataInconsitsentException;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.utils.CalculationThread;
 import osde.utils.StringHelper;
 
@@ -60,7 +60,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public final static String		FIRMEWARE_VERSION								= "Firmware";																																																							//$NON-NLS-1$
 	public final static String		SERIAL_NUMBER										= "S/N";																																																										//$NON-NLS-1$
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final LiPoWatchSerialPort			serialPort;
 	final LiPoWatchDialog					dialog;
 
@@ -74,7 +74,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.smmodellbau.lipowatch.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
 		this.dialog = new LiPoWatchDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
@@ -89,7 +89,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.smmodellbau.lipowatch.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
 		this.dialog = new LiPoWatchDialog(this.application.getShell(), this);
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
@@ -127,18 +127,18 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		String recordSetInfo = OSDE.STRING_EMPTY;
+		String recordSetInfo = DE.STRING_EMPTY;
 		for (int j = 0; j < this.getNumberOfMeasurements(1); j++) {
 			StringBuilder recordConfigData = new StringBuilder();
 			if (j == 18) {//11=a1Value LOV_CONFIG_DATA_KEYS_UNILOG_11
-				HashMap<String, String> configData = StringHelper.splitString(header.get(OSDE.LOV_CONFIG_DATA), OSDE.DATA_DELIMITER, LiPoWatch.LOV_CONFIG_DATA_KEYS_UNILOG_11);
+				HashMap<String, String> configData = StringHelper.splitString(header.get(DE.LOV_CONFIG_DATA), DE.DATA_DELIMITER, LiPoWatch.LOV_CONFIG_DATA_KEYS_UNILOG_11);
 				for (String lovKey : LiPoWatch.LOV_CONFIG_DATA_KEYS_UNILOG_11) {
 					if (configData.containsKey(lovKey)) {
 						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
 					}
 				}
 			}
-			recordSetInfo = recordSetInfo + OSDE.RECORDS_PROPERTIES + recordConfigData.toString() + Record.END_MARKER;
+			recordSetInfo = recordSetInfo + DE.RECORDS_PROPERTIES + recordConfigData.toString() + Record.END_MARKER;
 		}
 
 		return recordSetInfo;
@@ -249,7 +249,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$

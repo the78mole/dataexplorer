@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.smmodellbau;
 
@@ -31,7 +31,7 @@ import osde.exception.ApplicationConfigurationException;
 import osde.exception.DataInconsitsentException;
 import osde.exception.TimeOutException;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.utils.CalculationThread;
 
 /**
@@ -41,7 +41,7 @@ import osde.utils.CalculationThread;
 public class LiPoWatchDataGatherer extends Thread {
 	final static Logger			log							= Logger.getLogger(LiPoWatchDataGatherer.class.getName());
 
-	OpenSerialDataExplorer		application;
+	DataExplorer		application;
 	final String							RECORD_SET_NAME	= Messages.getString(MessageIds.OSDE_MSGT1601);
 	final LiPoWatchSerialPort	serialPort;
 	final LiPoWatchDialog			dialog;
@@ -53,7 +53,7 @@ public class LiPoWatchDataGatherer extends Thread {
 	/**
 	 * 
 	 */
-	public LiPoWatchDataGatherer(OpenSerialDataExplorer currrentApplication, LiPoWatch useDevice, LiPoWatchSerialPort useSerialPort) {
+	public LiPoWatchDataGatherer(DataExplorer currrentApplication, LiPoWatch useDevice, LiPoWatchSerialPort useSerialPort) {
 		this.application = currrentApplication;
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
@@ -85,7 +85,7 @@ public class LiPoWatchDataGatherer extends Thread {
 			
 			//update the config display of the dialog to enable comment enichments
 			final byte[] configBuffer = this.serialPort.readConfiguration();
-			OpenSerialDataExplorer.display.asyncExec(new Runnable() {
+			DataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
 					LiPoWatchDataGatherer.this.dialog.updateConfigurationValues(configBuffer);
 				}
