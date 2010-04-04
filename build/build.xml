@@ -246,7 +246,7 @@
     </target>
 
     <fileset dir="${basedir}" >
-        <patternset id="OSDE_PLUGIN_JARS">
+        <patternset id="DE_PLUGIN_JARS">
             <include name="Picolario/build/*.jar" />
             <include name="AkkuMaster/build/*.jar" />
             <include name="Simulator/build/*.jar" />
@@ -273,7 +273,7 @@
         </copy>
         <copy todir="${output.windows32.program.devices}" flatten="yes" >
             <fileset dir="${basedir}" >
-                <patternset refid="OSDE_PLUGIN_JARS"/>
+                <patternset refid="DE_PLUGIN_JARS"/>
             </fileset>
         </copy>
 
@@ -288,7 +288,7 @@
         </copy>
         <copy todir="${output.windows64.program.devices}" flatten="yes">
             <fileset dir="${basedir}" >
-                <patternset refid="OSDE_PLUGIN_JARS"/>
+                <patternset refid="DE_PLUGIN_JARS"/>
             </fileset>
         </copy>
 
@@ -304,7 +304,7 @@
         </copy>
         <copy todir="${output.linux32.program.devices}" flatten="yes">
             <fileset dir="${basedir}" >
-                <patternset refid="OSDE_PLUGIN_JARS"/>
+                <patternset refid="DE_PLUGIN_JARS"/>
             </fileset>
         </copy>
 
@@ -320,7 +320,7 @@
         </copy>
         <copy todir="${output.linux64.program.devices}" flatten="yes">
             <fileset dir="${basedir}" >
-                <patternset refid="OSDE_PLUGIN_JARS"/>
+                <patternset refid="DE_PLUGIN_JARS"/>
             </fileset>
         </copy>
 
@@ -342,7 +342,7 @@
         </copy>
         <copy todir="${output.mac32.carbon.program.devices}" flatten="yes">
             <fileset dir="${basedir}" >
-                <patternset refid="OSDE_PLUGIN_JARS"/>
+                <patternset refid="DE_PLUGIN_JARS"/>
             </fileset>
         </copy>
 
@@ -364,7 +364,7 @@
         </copy>
         <copy todir="${output.mac32.cocoa.program.devices}" flatten="yes">
             <fileset dir="${basedir}" >
-                <patternset refid="OSDE_PLUGIN_JARS"/>
+                <patternset refid="DE_PLUGIN_JARS"/>
             </fileset>
         </copy>
 
@@ -386,7 +386,7 @@
         </copy>
         <copy todir="${output.mac64.cocoa.program.devices}" flatten="yes">
             <fileset dir="${basedir}" >
-                <patternset refid="OSDE_PLUGIN_JARS"/>
+                <patternset refid="DE_PLUGIN_JARS"/>
             </fileset>
         </copy>
 
@@ -544,8 +544,7 @@
         <tar destfile="F:/DataExplorerFiles.tar.gz" compression="gzip">
             <tarfileset dir="D:/Documents/Person" casesensitive="true" >
                 <include name="DataExplorer/**"/>
-                <exclude name="DataExplorer/OSDE_*"/>
-                <exclude name="DataExplorer/**/*.zip"/>
+                <include name="DataExplorer/**/*.zip"/>
                 <exclude name="DataExplorer/**/*.pdf"/>
                 <exclude name="DataExplorer/**/*.gz"/>
                 <exclude name="DataExplorer/**/*.bak"/>
@@ -567,7 +566,7 @@
 
     <target name="source_package" depends="init" description="builds the source distribution package to run configure and make">
         <zip destfile="${build.target.dir}/DataExplorer_${version.num}_source.zip" >
-            <zipfileset dir="${basedir}" casesensitive="true" prefix="osde-${version.num}" filemode="644">
+            <zipfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
                 <include name="**/src/**"/>
                 <include name="**/build.xml"/>
                 <include name="**/initBuildOS.xml"/>
@@ -575,7 +574,7 @@
                 <include name="build/lib/**"/>
                 <include name="build/misc/**"/>
                 <include name="build/build.properties"/>
-                <exclude name="WindowsHelper/**"/>
+                <include name="WindowsHelper/**"/>
                 <exclude name="COPYING" />
                 <exclude name="READ*"/>
                 <exclude name="*.LICENSE"/>
@@ -598,10 +597,10 @@
                 <exclude name="launch4j/**"/>
                 <exclude name="Port*/**"/>
                 <exclude name="Print*/**"/>
-                <exclude name="OSDE_*/**"/>
+                <exclude name="JunitMiscTest/**"/>
                 <exclude name="RXTXcomm*/**"/>
             </zipfileset>
-            <zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="osde-${version.num}" filemode="444">
+            <zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
                 <include name="COPYING" />
                 <include name="READ*"/>
                 <include name="*.LICENSE"/>
@@ -613,14 +612,14 @@
                 <include name="configure.ac"/>
                 <include name="Makefile.in"/>
             </zipfileset>
-            <zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="osde-${version.num}" filemode="744">
+            <zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="744">
                 <include name="configure"/>
                 <include name="install-sh"/>
             </zipfileset>
             <zipfileset dir="${basedir}/DataExplorer/doc" casesensitive="true" prefix="osde-${version.num}" filemode="444">
                 <include name="DataExplorer*.txt"/>
             </zipfileset>
-            <zipfileset dir="${basedir}/RXTXcomm" casesensitive="true" prefix="osde-${version.num}/thirdparty/rxtx-2.2pre2" filemode="444">
+            <zipfileset dir="${basedir}/RXTXcomm" casesensitive="true" prefix="dataexplorer-${version.num}/thirdparty/rxtx-2.2pre2" filemode="444">
             	<include name="**/**"/>
                 <exclude name="**/CVS/**"/>
                 <exclude name="**/bin/**"/>
