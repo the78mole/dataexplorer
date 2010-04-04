@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.wb;
 
@@ -34,12 +34,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import osde.OSDE;
+import osde.DE;
 import osde.data.Channels;
 import osde.device.IDevice;
 import osde.messages.Messages;
 import osde.ui.MeasurementControl;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 
 /**
@@ -62,7 +62,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 
 	final CTabFolder								parent;
 	final IDevice										device;																																								// get device specific things, get serial port, ...
-	final OpenSerialDataExplorer		application;																																						// interaction with application instance
+	final DataExplorer		application;																																						// interaction with application instance
 	final Channels									channels;																																							// interaction with channels, source of all records
 	final CSV2SerialAdapterDialog		dialog;
 	final int												channelConfigNumber;
@@ -73,7 +73,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 		this.parent = parentTabFolder;
 		this.dialog = parentDialog;
 		this.device = useDevice;
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.setText(this.device.getChannelName(this.channelConfigNumber));
@@ -95,7 +95,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 			tabItemLabelLData.heightHint = 30;
 			tabItemLabelLData.widthHint = 292;
 			this.tabItemLabel.setLayoutData(tabItemLabelLData);
-			this.tabItemLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE+2, SWT.BOLD));
+			this.tabItemLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE+2, SWT.BOLD));
 			this.tabItemLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1801));
 		}
 		{
@@ -126,7 +126,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 				buttonCompositeLData.heightHint = 30;
 				buttonCompositeLData.widthHint = 292;
 				this.inputFileButton.setLayoutData(inputFileButtonLData);
-				this.inputFileButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.inputFileButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.inputFileButton.setText(Messages.getString(MessageIds.OSDE_MSGT1802));
 				this.inputFileButton.addSelectionListener(new SelectionAdapter() {
 					@Override

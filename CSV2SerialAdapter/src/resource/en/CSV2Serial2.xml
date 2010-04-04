@@ -3,7 +3,7 @@
     <Device>
         <name implementation="CSV2SerialAdapter">CSV2Serial2</name>
         <manufacturer>WB</manufacturer>
-        <manufacturerURL>http://www.bruegmaenner.de/OpenSerialDataExplorer</manufacturerURL>
+        <manufacturerURL>http://www.bruegmaenner.de/DataExplorer</manufacturerURL>
         <group>multimeter</group>
         <image>CSV2SerialAdapter.png</image>
         <usage>false</usage>

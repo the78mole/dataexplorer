@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.wb;
 
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
@@ -102,7 +102,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 				//dialogShell.pack();
 				this.dialogShell.setSize(310, 10 + 30 + 90 + this.measurementsCount * 30 + 55);
 				this.dialogShell.setText(this.device.getName() + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
-				this.dialogShell.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.dialogShell.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					@Override
@@ -159,7 +159,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 						saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
 						saveButtonLData.left = new FormAttachment(0, 1000, 15);
 						this.saveButton.setLayoutData(saveButtonLData);
-						this.saveButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.saveButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.saveButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0486));
 						this.saveButton.setEnabled(false);
 						this.saveButton.addSelectionListener(new SelectionAdapter() {
@@ -179,7 +179,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 						closeButtonLData.right = new FormAttachment(1000, 1000, -15);
 						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
 						this.closeButton.setLayoutData(closeButtonLData);
-						this.closeButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.closeButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0485));
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -194,7 +194,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 					tabFolderLData.left = new FormAttachment(0, 1000, 0);
 					tabFolderLData.right = new FormAttachment(1000, 1000, 0);
 					tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
-					this.tabFolder.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.tabFolder.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.tabFolder.setLayoutData(tabFolderLData);
 					this.tabFolder.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -216,7 +216,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 											Channel tmpChannel = channels.get(channelNumber);
 											if (tmpChannel != null) {
 												log.log(java.util.logging.Level.FINE,
-														"move record set " + recordSetKey + " to channel/configuration " + channelNumber + OSDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+														"move record set " + recordSetKey + " to channel/configuration " + channelNumber + DE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 												tmpChannel.put(recordSetKey, activeRecordSet.clone(channelNumber));
 												activeChannel.remove(recordSetKey);
 												channels.switchChannel(channelNumber, recordSetKey);

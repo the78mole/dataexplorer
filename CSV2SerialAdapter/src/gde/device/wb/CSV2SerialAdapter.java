@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.wb;
 
@@ -27,7 +27,7 @@ import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.widgets.FileDialog;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -41,7 +41,7 @@ import osde.io.CSVSerialDataReaderWriter;
 import osde.io.DataParser;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -52,7 +52,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 
 	public final static String		DEFAULT_RECORD_SET_EXTEND									= "Flugaufzeichnung"; //$NON-NLS-1$
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final CSV2SerialAdapterDialog	dialog;
 
 	/**
@@ -65,7 +65,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
 	}
@@ -79,7 +79,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
 	}
@@ -211,7 +211,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -219,7 +219,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
-		int timeStampBufferSize = OSDE.SIZE_BYTES_INTEGER * recordDataSize;
+		int timeStampBufferSize = DE.SIZE_BYTES_INTEGER * recordDataSize;
 		byte[] timeStampBuffer = new byte[timeStampBufferSize];
 		if(!recordSet.isTimeStepConstant()) {
 			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
@@ -429,8 +429,8 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void openCloseSerialPort() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), OSDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
-		String selectedImportFile = fd.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + fd.getFileName();
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), DE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
+		String selectedImportFile = fd.getFilterPath() + DE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 		
 		if (fd.getFileName().length() > 4) {
