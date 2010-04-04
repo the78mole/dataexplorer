@@ -314,7 +314,7 @@ public class FileHandler {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 				FileUtils.renameFile(filePath, DE.FILE_ENDING_BAK); // rename existing file to *.bak
-				OsdReaderWriter.write(filePath, activeChannel, DE.OPEN_SERIAL_DATA_VERSION_INT);
+				OsdReaderWriter.write(filePath, activeChannel, DE.DATA_EXPLORER_FILE_VERSION_INT);
 				activeChannel.setFileName(filePath.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX));
 				activeChannel.setSaved(true);
 			}

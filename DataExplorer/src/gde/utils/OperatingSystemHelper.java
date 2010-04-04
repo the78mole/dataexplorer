@@ -640,7 +640,7 @@ public class OperatingSystemHelper {
 			String line = new String(tmpChars);
 			log.log(Level.FINE, "line = " + line); //$NON-NLS-1$
 			reader.close();
-			if (!line.contains(DE.OPEN_SERIAL_DATA)) {
+			if (!line.contains(DE.DATA_EXPLORER_FILE) && !line.contains(DE.LEGACY_OSDE_FILE)) {
 				log.log(Level.FINE, "source filePath = " + filePath); //$NON-NLS-1$
 				ret = WindowsHelper.getFilePathFromLink(filePath);
 				log.log(Level.FINE, "returned FilePath = " + ret); //$NON-NLS-1$

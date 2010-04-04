@@ -92,10 +92,11 @@ public class OsdReaderWriter {
 		line = data_in.readUTF();
 		line = line.substring(0, line.length()-1);
 		log.log(Level.FINE, line);
-		if (!line.startsWith(DE.DATA_EXPLORER_FILE_VERSION))
+		if (!line.startsWith(DE.DATA_EXPLORER_FILE_VERSION) && !line.startsWith(DE.LEGACY_FILE_VERSION))
 			throw new NotSupportedFileFormatException(filePath);
 
-		String sVersion = line.substring(DE.DATA_EXPLORER_FILE_VERSION.length(), DE.DATA_EXPLORER_FILE_VERSION.length()+1).trim();
+		String sVersion = line.startsWith(DE.DATA_EXPLORER_FILE_VERSION) ? line.substring(DE.DATA_EXPLORER_FILE_VERSION.length(), DE.DATA_EXPLORER_FILE_VERSION.length()+1).trim()
+				: line.substring(DE.LEGACY_FILE_VERSION.length(), DE.LEGACY_FILE_VERSION.length()+1).trim();
 		int version;
 		try {
 			version = new Integer(sVersion).intValue(); // one digit only
