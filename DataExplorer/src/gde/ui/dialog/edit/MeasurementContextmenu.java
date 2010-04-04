@@ -69,7 +69,7 @@ public class MeasurementContextmenu {
 				MeasurementContextmenu.this.addStatisticsTypeMenuItem.setEnabled(true);
 				MeasurementContextmenu.this.addPropertyTypeMenuItem.setEnabled(true);
 				for (CTabItem tabItem : MeasurementContextmenu.this.channelConfigMeasurementPropertiesTabFolder.getItems()) {
-					if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0350))) {
+					if (tabItem.getText().equals(Messages.getString(MessageIds.DE_MSGT0350))) {
 						MeasurementContextmenu.this.addStatisticsTypeMenuItem.setEnabled(false);
 					}
 				}
@@ -82,7 +82,7 @@ public class MeasurementContextmenu {
 			}
 		});
 		this.addStatisticsTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
-		this.addStatisticsTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0533));
+		this.addStatisticsTypeMenuItem.setText(Messages.getString(MessageIds.DE_MSGT0533));
 		this.addStatisticsTypeMenuItem.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event e) {
@@ -92,7 +92,7 @@ public class MeasurementContextmenu {
 		});
 		new MenuItem(this.menu, SWT.SEPARATOR);
 		this.addPropertyTypeMenuItem = new MenuItem(this.menu, SWT.CASCADE);
-		this.addPropertyTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0534));
+		this.addPropertyTypeMenuItem.setText(Messages.getString(MessageIds.DE_MSGT0534));
 		this.addPropertyTypeMenu = new Menu(this.addPropertyTypeMenuItem);
 		this.addPropertyTypeMenuItem.setMenu(this.addPropertyTypeMenu);
 		this.addPropertyTypeMenu.addMenuListener(new MenuListener() {
@@ -158,8 +158,8 @@ public class MeasurementContextmenu {
 								break;
 							case NONE_SPECIFIED:
 								MessageBox mb = new MessageBox(MeasurementContextmenu.this.menu.getShell(), SWT.OK);
-								mb.setText(Messages.getString(MessageIds.OSDE_MSGW0540));
-								mb.setMessage(Messages.getString(MessageIds.OSDE_MSGW0541));
+								mb.setText(Messages.getString(MessageIds.DE_MSGW0540));
+								mb.setMessage(Messages.getString(MessageIds.DE_MSGW0541));
 								mb.open();
 								break;
 							}

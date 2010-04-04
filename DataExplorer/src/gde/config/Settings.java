@@ -257,7 +257,7 @@ public class Settings extends Properties {
 		}
 		// OPET - end
 		else {
-			log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.OSDE_MSGW0001));
+			log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.DE_MSGW0001));
 		}
 
 		this.xmlBasePath = this.applHomePath + DE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + DE.FILE_SEPARATOR_UNIX;
@@ -590,12 +590,12 @@ public class Settings extends Properties {
 	}
 
 	public String getObjectListAsString() {
-		return this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.OSDE_MSGT0200));
+		return this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.DE_MSGT0200));
 	}
 
 	public String[] getObjectList() {
-		String[] objectKeys = this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.OSDE_MSGT0200)).split(DE.STRING_SEMICOLON);
-		objectKeys[0] = Messages.getString(MessageIds.OSDE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
+		String[] objectKeys = this.getProperty(OBJECT_LIST, Messages.getString(MessageIds.DE_MSGT0200)).split(DE.STRING_SEMICOLON);
+		objectKeys[0] = Messages.getString(MessageIds.DE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
 		return objectKeys;
 	}
 
@@ -613,7 +613,7 @@ public class Settings extends Properties {
 
 	public void setObjectList(String[] activeObjectList, String newObjectKey) {
 		// keep object oriented out of the sorting game
-		boolean startsWithDeviceOriented = activeObjectList[0].startsWith(Messages.getString(MessageIds.OSDE_MSGT0200).substring(0, 10));
+		boolean startsWithDeviceOriented = activeObjectList[0].startsWith(Messages.getString(MessageIds.DE_MSGT0200).substring(0, 10));
 		if (startsWithDeviceOriented) {
 			String[] tmpObjectKeys = new String[activeObjectList.length - 1];
 			System.arraycopy(activeObjectList, 1, tmpObjectKeys, 0, activeObjectList.length - 1);
@@ -623,7 +623,7 @@ public class Settings extends Properties {
 		else {
 			Arrays.sort(activeObjectList, this.comparator);
 			String[] tmpObjectKeys = new String[activeObjectList.length + 1];
-			tmpObjectKeys[0] = Messages.getString(MessageIds.OSDE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
+			tmpObjectKeys[0] = Messages.getString(MessageIds.DE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
 			System.arraycopy(activeObjectList, 0, tmpObjectKeys, 1, activeObjectList.length);
 			activeObjectList = tmpObjectKeys;
 		}
@@ -648,7 +648,7 @@ public class Settings extends Properties {
 		for (String objectKey : this.getObjectList()) {
 			if (objectKey.length() > 1) tmpObjectVector.add(objectKey);
 		}
-		int index = tmpObjectVector.indexOf(this.getProperty(ACTIVE_OBJECT, Messages.getString(MessageIds.OSDE_MSGT0200).split(DE.STRING_SEMICOLON)[0]).trim());
+		int index = tmpObjectVector.indexOf(this.getProperty(ACTIVE_OBJECT, Messages.getString(MessageIds.DE_MSGT0200).split(DE.STRING_SEMICOLON)[0]).trim());
 		return index < 0 ? 0 : index;
 	}
 

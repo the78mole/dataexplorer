@@ -106,7 +106,7 @@ public class RecordSet extends HashMap<String, Record> {
 	// measurement
 	String												recordKeyMeasurement;
 
-	public static final String		DESCRIPTION_TEXT_LEAD					= Messages.getString(MessageIds.OSDE_MSGT0129);
+	public static final String		DESCRIPTION_TEXT_LEAD					= Messages.getString(MessageIds.DE_MSGT0129);
 
 	public static final int				MAX_NAME_LENGTH								= 40;
 
@@ -149,9 +149,9 @@ public class RecordSet extends HashMap<String, Record> {
 
 	int														configuredDisplayable					= 0;																						// number of record which must be displayable before table calculation begins
 
-	public final static String		UNSAVED_REASON_GRAPHICS				= Messages.getString(MessageIds.OSDE_MSGT0130);
-	public final static String		UNSAVED_REASON_DATA						= Messages.getString(MessageIds.OSDE_MSGT0131);
-	public final static String		UNSAVED_REASON_CONFIGURATION	= Messages.getString(MessageIds.OSDE_MSGT0132);
+	public final static String		UNSAVED_REASON_GRAPHICS				= Messages.getString(MessageIds.DE_MSGT0130);
+	public final static String		UNSAVED_REASON_DATA						= Messages.getString(MessageIds.DE_MSGT0131);
+	public final static String		UNSAVED_REASON_CONFIGURATION	= Messages.getString(MessageIds.DE_MSGT0132);
 	Vector<String>								unsaveReasons									= new Vector<String>();
 	int														changeCounter									= 0;																						// indicates change in general
 
@@ -462,7 +462,7 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 		}
 		else
-			throw new DataInconsitsentException(Messages.getString(MessageIds.OSDE_MSGE0035, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME})); //$NON-NLS-1$
+			throw new DataInconsitsentException(Messages.getString(MessageIds.DE_MSGE0035, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME})); //$NON-NLS-1$
 		
 		this.hasDisplayableData = true;
 	}
@@ -498,7 +498,7 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 		}
 		else
-			throw new DataInconsitsentException(Messages.getString(MessageIds.OSDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}));
+			throw new DataInconsitsentException(Messages.getString(MessageIds.DE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}));
 		
 		this.hasDisplayableData = true;
 		}
@@ -1661,7 +1661,7 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 		catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
-			this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGE0002) + DE.STRING_NEW_LINE + e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage());
+			this.application.openMessageDialogAsync(Messages.getString(MessageIds.DE_MSGE0002) + DE.STRING_NEW_LINE + e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}
 

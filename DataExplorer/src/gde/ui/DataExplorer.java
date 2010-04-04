@@ -202,14 +202,14 @@ public class DataExplorer extends Composite {
 		SWTResourceManager.registerResourceUser(this);
 		this.threadId = Thread.currentThread().getId();
 		
-		this.extensionFilterMap.put(DE.FILE_ENDING_OSD, Messages.getString(MessageIds.OSDE_MSGT0139));
-		this.extensionFilterMap.put(DE.FILE_ENDING_LOV, Messages.getString(MessageIds.OSDE_MSGT0140));
-		this.extensionFilterMap.put(DE.FILE_ENDING_CSV, Messages.getString(MessageIds.OSDE_MSGT0141));
-		this.extensionFilterMap.put(DE.FILE_ENDING_XML, Messages.getString(MessageIds.OSDE_MSGT0142));
-		this.extensionFilterMap.put(DE.FILE_ENDING_PNG, Messages.getString(MessageIds.OSDE_MSGT0213));
-		this.extensionFilterMap.put(DE.FILE_ENDING_GIF, Messages.getString(MessageIds.OSDE_MSGT0214));
-		this.extensionFilterMap.put(DE.FILE_ENDING_JPG, Messages.getString(MessageIds.OSDE_MSGT0215));
-		this.extensionFilterMap.put(DE.FILE_ENDING_STAR, Messages.getString(MessageIds.OSDE_MSGT0216));
+		this.extensionFilterMap.put(DE.FILE_ENDING_OSD, Messages.getString(MessageIds.DE_MSGT0139));
+		this.extensionFilterMap.put(DE.FILE_ENDING_LOV, Messages.getString(MessageIds.DE_MSGT0140));
+		this.extensionFilterMap.put(DE.FILE_ENDING_CSV, Messages.getString(MessageIds.DE_MSGT0141));
+		this.extensionFilterMap.put(DE.FILE_ENDING_XML, Messages.getString(MessageIds.DE_MSGT0142));
+		this.extensionFilterMap.put(DE.FILE_ENDING_PNG, Messages.getString(MessageIds.DE_MSGT0213));
+		this.extensionFilterMap.put(DE.FILE_ENDING_GIF, Messages.getString(MessageIds.DE_MSGT0214));
+		this.extensionFilterMap.put(DE.FILE_ENDING_JPG, Messages.getString(MessageIds.DE_MSGT0215));
+		this.extensionFilterMap.put(DE.FILE_ENDING_STAR, Messages.getString(MessageIds.DE_MSGT0216));
 	}
 
 	/**
@@ -275,7 +275,7 @@ public class DataExplorer extends Composite {
 				this.displayTab.setLayoutData(tabCompositeLData);
 				this.displayTab.setSimple(false);
 				{
-					this.graphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_NORMAL, Messages.getString(MessageIds.OSDE_MSGT0143), 0);
+					this.graphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_NORMAL, Messages.getString(MessageIds.DE_MSGT0143), 0);
 					this.graphicsTabItem.create();
 				}
 				this.displayTab.setSelection(0);
@@ -345,9 +345,9 @@ public class DataExplorer extends Composite {
 
 			if (this.settings.isDevicePropertiesUpdated() || this.settings.isGraphicsTemplateUpdated() || this.settings.isDevicePropertiesReplaced()) {
 				StringBuilder sb = new StringBuilder();
-				if (this.settings.isDevicePropertiesUpdated()) sb.append(Messages.getString(MessageIds.OSDE_MSGI0016)).append(DE.STRING_NEW_LINE);
-				if (this.settings.isGraphicsTemplateUpdated()) sb.append(Messages.getString(MessageIds.OSDE_MSGI0017)).append(DE.STRING_NEW_LINE);
-				if (this.settings.isDevicePropertiesReplaced()) sb.append(Messages.getString(MessageIds.OSDE_MSGI0028)).append(DE.STRING_NEW_LINE);
+				if (this.settings.isDevicePropertiesUpdated()) sb.append(Messages.getString(MessageIds.DE_MSGI0016)).append(DE.STRING_NEW_LINE);
+				if (this.settings.isGraphicsTemplateUpdated()) sb.append(Messages.getString(MessageIds.DE_MSGI0017)).append(DE.STRING_NEW_LINE);
+				if (this.settings.isDevicePropertiesReplaced()) sb.append(Messages.getString(MessageIds.DE_MSGI0028)).append(DE.STRING_NEW_LINE);
 				application.openMessageDialog(shell, sb.toString());
 			}
 
@@ -602,7 +602,7 @@ public class DataExplorer extends Composite {
 								DataExplorer.this.fileHandler.openLovFile(filePath);
 							}
 							else {
-								application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0022));
+								application.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0022));
 							}
 						}
 					}
@@ -652,8 +652,8 @@ public class DataExplorer extends Composite {
 			}
 
 			if ((DE.IS_MAC || DE.IS_LINUX) && !this.settings.isLockUucpHinted()) {
-				if (DE.IS_MAC) this.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0046));
-				if (DE.IS_LINUX) this.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0045));
+				if (DE.IS_MAC) this.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0046));
+				if (DE.IS_LINUX) this.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0045));
 				this.settings.setProperty(Settings.IS_LOCK_UUCP_HINTED, "true");
 			}
 
@@ -681,7 +681,7 @@ public class DataExplorer extends Composite {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			this.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0007) + e.getMessage());
+			this.openMessageDialog(Messages.getString(MessageIds.DE_MSGE0007) + e.getMessage());
 		}
 	}
 
@@ -1118,7 +1118,7 @@ public class DataExplorer extends Composite {
 		}
 		else { // no device
 			this.settings.setActiveDevice(Settings.EMPTY_SIGNATURE);
-			this.updateTitleBar(this.getObjectKey(), Messages.getString(MessageIds.OSDE_MSGI0023), DE.STRING_EMPTY);
+			this.updateTitleBar(this.getObjectKey(), Messages.getString(MessageIds.DE_MSGI0023), DE.STRING_EMPTY);
 			this.activeDevice = null;
 			this.channels.cleanup();
 			this.enableDeviceSwitchButtons(false);
@@ -1132,7 +1132,7 @@ public class DataExplorer extends Composite {
 		if (actualFileName != null && actualFileName.length() > 4) sb.append(separator).append(actualFileName);
 		if (objectName != null && objectName.length() > 0 
 				&& !(actualFileName != null && actualFileName.length() > 4 && actualFileName.contains(objectName))
-				&& !objectName.startsWith(Messages.getString(MessageIds.OSDE_MSGT0200).split(DE.STRING_SEMICOLON)[0])) 
+				&& !objectName.startsWith(Messages.getString(MessageIds.DE_MSGT0200).split(DE.STRING_SEMICOLON)[0])) 
 			sb.append(separator).append(objectName);
 		if (deviceName != null && deviceName.length() > 0) sb.append(separator).append(deviceName);
 		if (devicePort != null && devicePort.length() > 0) sb.append(separator).append(devicePort);
@@ -1481,7 +1481,7 @@ public class DataExplorer extends Composite {
 
 	public RGB openColorDialog() {
 		ColorDialog colorDialog = new ColorDialog(DataExplorer.shell);
-		colorDialog.setText(this.getClass().getSimpleName() + Messages.getString(MessageIds.OSDE_MSGT0145));
+		colorDialog.setText(this.getClass().getSimpleName() + Messages.getString(MessageIds.DE_MSGT0145));
 		return colorDialog.open();
 	}
 	
@@ -1669,7 +1669,7 @@ public class DataExplorer extends Composite {
 				break;
 			case GraphicsComposite.MODE_PAN:
 				if (!recordSet.isPanMode())
-					this.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0007));
+					this.openMessageDialog(Messages.getString(MessageIds.DE_MSGE0007));
 				else {
 					recordSet.resetMeasurement();
 					this.graphicsTabItem.setModeState(graphicsMode);
@@ -1701,7 +1701,7 @@ public class DataExplorer extends Composite {
 				break;
 			case GraphicsComposite.MODE_PAN:
 				if (!recordSet.isPanMode())
-					this.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0007));
+					this.openMessageDialog(Messages.getString(MessageIds.DE_MSGE0007));
 				else {
 					recordSet.resetMeasurement();
 					if (this.compareTabItem!= null && !this.compareTabItem.isDisposed())
@@ -1864,10 +1864,10 @@ public class DataExplorer extends Composite {
 		catch (Error e) {
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using OS registered web browser"); //$NON-NLS-1$
 			WebBrowser.openURL(deviceName, fileName);
-			application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGI0025));
+			application.openMessageDialogAsync(Messages.getString(MessageIds.DE_MSGI0025));
 		}
 		catch (Throwable t) {
-			application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0007) + t.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + t.getMessage());
+			application.openMessageDialog(Messages.getString(MessageIds.DE_MSGE0007) + t.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + t.getMessage());
 		}
 	}
 
@@ -2323,7 +2323,7 @@ public class DataExplorer extends Composite {
 			for (int i = 0; i < this.displayTab.getItemCount(); ++i) {
 				CTabItem tabItem = this.displayTab.getItems()[i];
 				if (tabItem instanceof FileCommentWindow) {
-					this.compareTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_COMPARE, Messages.getString(MessageIds.OSDE_MSGT0144), i);
+					this.compareTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_COMPARE, Messages.getString(MessageIds.DE_MSGT0144), i);
 					this.compareTabItem.create();
 					break;
 				}

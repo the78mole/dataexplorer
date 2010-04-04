@@ -62,9 +62,9 @@ public class Channel extends HashMap<String, RecordSet> {
 	final Channels								parent;
 	Comparator<String> 						comparator = new RecordSetNameComparator();
 	
-	public final static String		UNSAVED_REASON_ADD_OBJECT_KEY	= Messages.getString(MessageIds.OSDE_MSGT0400);
-	public final static String		UNSAVED_REASON_REMOVE_OBJECT_KEY	= Messages.getString(MessageIds.OSDE_MSGT0401);
-	public final static String		UNSAVED_REASON_CHANGED_OBJECT_DATA	= Messages.getString(MessageIds.OSDE_MSGT0402);
+	public final static String		UNSAVED_REASON_ADD_OBJECT_KEY	= Messages.getString(MessageIds.DE_MSGT0400);
+	public final static String		UNSAVED_REASON_REMOVE_OBJECT_KEY	= Messages.getString(MessageIds.DE_MSGT0401);
+	public final static String		UNSAVED_REASON_CHANGED_OBJECT_DATA	= Messages.getString(MessageIds.DE_MSGT0402);
 
 
 	/**

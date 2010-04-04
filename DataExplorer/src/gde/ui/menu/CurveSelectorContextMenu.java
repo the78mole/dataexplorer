@@ -124,7 +124,7 @@ public class CurveSelectorContextMenu {
 											CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.recordSet.isSyncableSynced();
 										}
 										else {
-											CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.OSDE_MSGT0085));
+											CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.DE_MSGT0085));
 											CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.actualRecord.isVisible();
 										}
 										CurveSelectorContextMenu.this.lineVisible.setSelection(CurveSelectorContextMenu.this.isRecordVisible);
@@ -161,10 +161,10 @@ public class CurveSelectorContextMenu {
 								// check zoom mode
 								if (CurveSelectorContextMenu.this.recordSet.isZoomMode()) {
 									CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
-									CurveSelectorContextMenu.this.axisEndValues.setText(Messages.getString(MessageIds.OSDE_MSGT0083));
+									CurveSelectorContextMenu.this.axisEndValues.setText(Messages.getString(MessageIds.DE_MSGT0083));
 								}
 								else {
-									CurveSelectorContextMenu.this.axisEndValues.setText(Messages.getString(MessageIds.OSDE_MSGT0084));
+									CurveSelectorContextMenu.this.axisEndValues.setText(Messages.getString(MessageIds.DE_MSGT0084));
 								}
 
 								// check if record switched and measurement mode needs to be reset
@@ -210,7 +210,7 @@ public class CurveSelectorContextMenu {
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 			
 			this.lineVisible = new MenuItem(popupmenu, SWT.CHECK);
-			this.lineVisible.setText(Messages.getString(MessageIds.OSDE_MSGT0085));
+			this.lineVisible.setText(Messages.getString(MessageIds.DE_MSGT0085));
 			this.lineVisible.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "lineVisibler Action performed! " + e); //$NON-NLS-1$
@@ -230,7 +230,7 @@ public class CurveSelectorContextMenu {
 			});
 
 			this.lineColor = new MenuItem(popupmenu, SWT.PUSH);
-			this.lineColor.setText(Messages.getString(MessageIds.OSDE_MSGT0086));
+			this.lineColor.setText(Messages.getString(MessageIds.DE_MSGT0086));
 			this.lineColor.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event evt) {
 					log.log(Level.FINER, "lineColor performed! " + evt); //$NON-NLS-1$
@@ -250,7 +250,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.lineWidth = new MenuItem(popupmenu, SWT.CASCADE);
-			this.lineWidth.setText(Messages.getString(MessageIds.OSDE_MSGT0087));
+			this.lineWidth.setText(Messages.getString(MessageIds.DE_MSGT0087));
 			this.lineWidthMenu = new Menu(this.lineWidth);
 			this.lineWidth.setMenu(this.lineWidthMenu);
 			this.lineWidthMenu.addMenuListener(new MenuListener() {
@@ -290,10 +290,10 @@ public class CurveSelectorContextMenu {
 
 			this.lineWidthMenuItem1 = new MenuItem(this.lineWidthMenu, SWT.CHECK);
 			this.lineWidthMenuItem1.setImage(SWTResourceManager.getImage("osde/resource/LineWidth1.gif")); //$NON-NLS-1$
-			this.lineWidthMenuItem1.setText(Messages.getString(MessageIds.OSDE_MSGT0088));
+			this.lineWidthMenuItem1.setText(Messages.getString(MessageIds.DE_MSGT0088));
 			this.lineWidthMenuItem1.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.log(Level.FINEST, Messages.getString(MessageIds.OSDE_MSGT0089) + e); 
+					log.log(Level.FINEST, Messages.getString(MessageIds.DE_MSGT0089) + e); 
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.actualRecord.setLineWidth(1);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
@@ -306,10 +306,10 @@ public class CurveSelectorContextMenu {
 			});
 			this.lineWidthMenuItem2 = new MenuItem(this.lineWidthMenu, SWT.CHECK);
 			this.lineWidthMenuItem2.setImage(SWTResourceManager.getImage("osde/resource/LineWidth2.gif")); //$NON-NLS-1$
-			this.lineWidthMenuItem2.setText(Messages.getString(MessageIds.OSDE_MSGT0090));
+			this.lineWidthMenuItem2.setText(Messages.getString(MessageIds.DE_MSGT0090));
 			this.lineWidthMenuItem2.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.log(Level.FINEST, Messages.getString(MessageIds.OSDE_MSGT0091) + e);
+					log.log(Level.FINEST, Messages.getString(MessageIds.DE_MSGT0091) + e);
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.actualRecord.setLineWidth(2);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
@@ -322,10 +322,10 @@ public class CurveSelectorContextMenu {
 			});
 			this.lineWidthMenuItem3 = new MenuItem(this.lineWidthMenu, SWT.CHECK);
 			this.lineWidthMenuItem3.setImage(SWTResourceManager.getImage("osde/resource/LineWidth3.gif")); //$NON-NLS-1$
-			this.lineWidthMenuItem3.setText(Messages.getString(MessageIds.OSDE_MSGT0092));
+			this.lineWidthMenuItem3.setText(Messages.getString(MessageIds.DE_MSGT0092));
 			this.lineWidthMenuItem3.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.log(Level.FINEST, Messages.getString(MessageIds.OSDE_MSGT0093) + e);
+					log.log(Level.FINEST, Messages.getString(MessageIds.DE_MSGT0093) + e);
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.actualRecord.setLineWidth(3);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
@@ -338,7 +338,7 @@ public class CurveSelectorContextMenu {
 			});
 
 			this.lineType = new MenuItem(popupmenu, SWT.CASCADE);
-			this.lineType.setText(Messages.getString(MessageIds.OSDE_MSGT0094));
+			this.lineType.setText(Messages.getString(MessageIds.DE_MSGT0094));
 			this.lineTypeMenu = new Menu(this.lineType);
 			this.lineType.setMenu(this.lineTypeMenu);
 			this.lineTypeMenu.addMenuListener(new MenuListener() {
@@ -378,7 +378,7 @@ public class CurveSelectorContextMenu {
 
 			this.lineTypeMenuItem1 = new MenuItem(this.lineTypeMenu, SWT.CHECK);
 			this.lineTypeMenuItem1.setImage(SWTResourceManager.getImage("osde/resource/LineType1.gif")); //$NON-NLS-1$
-			this.lineTypeMenuItem1.setText(Messages.getString(MessageIds.OSDE_MSGT0095));
+			this.lineTypeMenuItem1.setText(Messages.getString(MessageIds.DE_MSGT0095));
 			this.lineTypeMenuItem1.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "lineTypeMenuItem1 " + e); //$NON-NLS-1$
@@ -394,7 +394,7 @@ public class CurveSelectorContextMenu {
 			});
 			this.lineTypeMenuItem2 = new MenuItem(this.lineTypeMenu, SWT.CHECK);
 			this.lineTypeMenuItem2.setImage(SWTResourceManager.getImage("osde/resource/LineType2.gif")); //$NON-NLS-1$
-			this.lineTypeMenuItem2.setText(Messages.getString(MessageIds.OSDE_MSGT0096));
+			this.lineTypeMenuItem2.setText(Messages.getString(MessageIds.DE_MSGT0096));
 			this.lineTypeMenuItem2.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "lineTypeMenuItem2 " + e); //$NON-NLS-1$
@@ -410,7 +410,7 @@ public class CurveSelectorContextMenu {
 			});
 			this.lineTypeMenuItem3 = new MenuItem(this.lineTypeMenu, SWT.CHECK);
 			this.lineTypeMenuItem3.setImage(SWTResourceManager.getImage("osde/resource/LineType3.gif")); //$NON-NLS-1$
-			this.lineTypeMenuItem3.setText(Messages.getString(MessageIds.OSDE_MSGT0097));
+			this.lineTypeMenuItem3.setText(Messages.getString(MessageIds.DE_MSGT0097));
 			this.lineTypeMenuItem3.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "lineTypeMenuItem3 " + e); //$NON-NLS-1$
@@ -428,7 +428,7 @@ public class CurveSelectorContextMenu {
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
 			this.axisEndValues = new MenuItem(popupmenu, SWT.CASCADE);
-			this.axisEndValues.setText(Messages.getString(MessageIds.OSDE_MSGT0098));
+			this.axisEndValues.setText(Messages.getString(MessageIds.DE_MSGT0098));
 			this.axisEndValuesMenu = new Menu(this.axisEndValues);
 			this.axisEndValues.setMenu(this.axisEndValuesMenu);
 			this.axisEndValuesMenu.addMenuListener(new MenuListener() {
@@ -452,7 +452,7 @@ public class CurveSelectorContextMenu {
 			});
 
 			this.axisEndAuto = new MenuItem(this.axisEndValuesMenu, SWT.CHECK);
-			this.axisEndAuto.setText(Messages.getString(MessageIds.OSDE_MSGT0099));
+			this.axisEndAuto.setText(Messages.getString(MessageIds.DE_MSGT0099));
 			this.axisEndAuto.setSelection(true);
 			this.axisEndAuto.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
@@ -470,7 +470,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.axisEndRound = new MenuItem(this.axisEndValuesMenu, SWT.CHECK);
-			this.axisEndRound.setText(Messages.getString(MessageIds.OSDE_MSGT0101));
+			this.axisEndRound.setText(Messages.getString(MessageIds.DE_MSGT0101));
 			this.axisEndRound.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisEndRound.SelectionListener = " + e); //$NON-NLS-1$
@@ -494,7 +494,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.axisStarts0 = new MenuItem(this.axisEndValuesMenu, SWT.CHECK);
-			this.axisStarts0.setText(Messages.getString(MessageIds.OSDE_MSGT0103));
+			this.axisStarts0.setText(Messages.getString(MessageIds.DE_MSGT0103));
 			this.axisStarts0.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisStarts0 " + e); //$NON-NLS-1$
@@ -516,7 +516,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.axisEndManual = new MenuItem(this.axisEndValuesMenu, SWT.CHECK);
-			this.axisEndManual.setText(Messages.getString(MessageIds.OSDE_MSGT0104));
+			this.axisEndManual.setText(Messages.getString(MessageIds.DE_MSGT0104));
 			this.axisEndManual.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisEndManual Action performed! " + e); //$NON-NLS-1$
@@ -541,7 +541,7 @@ public class CurveSelectorContextMenu {
 			});
 
 			this.axisNumberFormat = new MenuItem(popupmenu, SWT.CASCADE);
-			this.axisNumberFormat.setText(Messages.getString(MessageIds.OSDE_MSGT0105));
+			this.axisNumberFormat.setText(Messages.getString(MessageIds.DE_MSGT0105));
 			this.axisNumberFormatMenu = new Menu(this.axisNumberFormat);
 			this.axisNumberFormat.setMenu(this.axisNumberFormatMenu);
 			this.axisNumberFormatMenu.addMenuListener(new MenuListener() {
@@ -596,7 +596,7 @@ public class CurveSelectorContextMenu {
 			});
 
 			this.axisNumberFormatAuto = new MenuItem(this.axisNumberFormatMenu, SWT.CHECK);
-			this.axisNumberFormatAuto.setText(Messages.getString(MessageIds.OSDE_MSGT0099));
+			this.axisNumberFormatAuto.setText(Messages.getString(MessageIds.DE_MSGT0099));
 			this.axisNumberFormatAuto.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisNumberFormatAuto " + e); //$NON-NLS-1$
@@ -609,7 +609,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.axisNumberFormat0 = new MenuItem(this.axisNumberFormatMenu, SWT.CHECK);
-			this.axisNumberFormat0.setText(Messages.getString(MessageIds.OSDE_MSGT0106));
+			this.axisNumberFormat0.setText(Messages.getString(MessageIds.DE_MSGT0106));
 			this.axisNumberFormat0.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisNumberFormat0 " + e); //$NON-NLS-1$
@@ -622,7 +622,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.axisNumberFormat1 = new MenuItem(this.axisNumberFormatMenu, SWT.CHECK);
-			this.axisNumberFormat1.setText(Messages.getString(MessageIds.OSDE_MSGT0107));
+			this.axisNumberFormat1.setText(Messages.getString(MessageIds.DE_MSGT0107));
 			this.axisNumberFormat1.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisNumberFormat1 " + e); //$NON-NLS-1$
@@ -635,7 +635,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.axisNumberFormat2 = new MenuItem(this.axisNumberFormatMenu, SWT.CHECK);
-			this.axisNumberFormat2.setText(Messages.getString(MessageIds.OSDE_MSGT0108));
+			this.axisNumberFormat2.setText(Messages.getString(MessageIds.DE_MSGT0108));
 			this.axisNumberFormat2.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisNumberFormat2 " + e); //$NON-NLS-1$
@@ -648,7 +648,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.axisNumberFormat3 = new MenuItem(this.axisNumberFormatMenu, SWT.CHECK);
-			this.axisNumberFormat3.setText(Messages.getString(MessageIds.OSDE_MSGT0109));
+			this.axisNumberFormat3.setText(Messages.getString(MessageIds.DE_MSGT0109));
 			this.axisNumberFormat3.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisNumberFormat3 " + e); //$NON-NLS-1$
@@ -662,7 +662,7 @@ public class CurveSelectorContextMenu {
 			});
 
 			this.axisPosition = new MenuItem(popupmenu, SWT.CASCADE);
-			this.axisPosition.setText(Messages.getString(MessageIds.OSDE_MSGT0110));
+			this.axisPosition.setText(Messages.getString(MessageIds.DE_MSGT0110));
 			this.axisPositionMenu = new Menu(this.axisPosition);
 			this.axisPosition.setMenu(this.axisPositionMenu);
 			this.axisPositionMenu.addMenuListener(new MenuListener() {
@@ -687,7 +687,7 @@ public class CurveSelectorContextMenu {
 			});
 
 			this.axisPositionLeft = new MenuItem(this.axisPositionMenu, SWT.CHECK);
-			this.axisPositionLeft.setText(Messages.getString(MessageIds.OSDE_MSGT0111));
+			this.axisPositionLeft.setText(Messages.getString(MessageIds.DE_MSGT0111));
 			this.axisPositionLeft.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisPositionLeft Action performed! " + e); //$NON-NLS-1$
@@ -700,7 +700,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.axisPositionRight = new MenuItem(this.axisPositionMenu, SWT.CHECK);
-			this.axisPositionRight.setText(Messages.getString(MessageIds.OSDE_MSGT0112));
+			this.axisPositionRight.setText(Messages.getString(MessageIds.DE_MSGT0112));
 			this.axisPositionRight.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "axisPositionRight Action performed! " + e); //$NON-NLS-1$
@@ -716,7 +716,7 @@ public class CurveSelectorContextMenu {
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
 			this.timeGrid = new MenuItem(popupmenu, SWT.CASCADE);
-			this.timeGrid.setText(Messages.getString(MessageIds.OSDE_MSGT0113));
+			this.timeGrid.setText(Messages.getString(MessageIds.DE_MSGT0113));
 			this.timeGridMenu = new Menu(this.timeGrid);
 			this.timeGrid.setMenu(this.timeGridMenu);
 			this.timeGridMenu.addMenuListener(new MenuListener() {
@@ -749,7 +749,7 @@ public class CurveSelectorContextMenu {
 			});
 
 			this.timeGridOff = new MenuItem(this.timeGridMenu, SWT.CHECK);
-			this.timeGridOff.setText(Messages.getString(MessageIds.OSDE_MSGT0114));
+			this.timeGridOff.setText(Messages.getString(MessageIds.DE_MSGT0114));
 			this.timeGridOff.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "timeGridOff Action performed! " + e); //$NON-NLS-1$
@@ -765,7 +765,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.timeGridMain = new MenuItem(this.timeGridMenu, SWT.CHECK);
-			this.timeGridMain.setText(Messages.getString(MessageIds.OSDE_MSGT0115));
+			this.timeGridMain.setText(Messages.getString(MessageIds.DE_MSGT0115));
 			this.timeGridMain.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "timeGridMain Action performed! " + e); //$NON-NLS-1$
@@ -783,7 +783,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.timeGridMod60 = new MenuItem(this.timeGridMenu, SWT.CHECK);
-			this.timeGridMod60.setText(Messages.getString(MessageIds.OSDE_MSGT0116));
+			this.timeGridMod60.setText(Messages.getString(MessageIds.DE_MSGT0116));
 			this.timeGridMod60.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "timeGridMod60 Action performed! " + e); //$NON-NLS-1$
@@ -801,7 +801,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.timeGridColor = new MenuItem(this.timeGridMenu, SWT.PUSH);
-			this.timeGridColor.setText(Messages.getString(MessageIds.OSDE_MSGT0117));
+			this.timeGridColor.setText(Messages.getString(MessageIds.DE_MSGT0117));
 			this.timeGridColor.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "timeGridColor Action performed! " + e); //$NON-NLS-1$
@@ -835,14 +835,14 @@ public class CurveSelectorContextMenu {
 //			});
 			
 			this.horizontalGrid = new MenuItem(popupmenu, SWT.CASCADE);
-			this.horizontalGrid.setText(Messages.getString(MessageIds.OSDE_MSGT0100));
+			this.horizontalGrid.setText(Messages.getString(MessageIds.DE_MSGT0100));
 			this.horizontalGridMenu = new Menu(this.horizontalGrid);
 			this.horizontalGrid.setMenu(this.horizontalGridMenu);
 			this.horizontalGridMenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
 					log.log(Level.FINEST, "horizontalGridMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						CurveSelectorContextMenu.this.horizontalGridRecordName.setText(Messages.getString(MessageIds.OSDE_MSGT0118) + CurveSelectorContextMenu.this.recordSet.getHorizontalGridRecordName(false));
+						CurveSelectorContextMenu.this.horizontalGridRecordName.setText(Messages.getString(MessageIds.DE_MSGT0118) + CurveSelectorContextMenu.this.recordSet.getHorizontalGridRecordName(false));
 						int gridType = CurveSelectorContextMenu.this.recordSet.getHorizontalGridType();
 						switch (gridType) {
 						case RecordSet.HORIZONTAL_GRID_EVERY:
@@ -874,7 +874,7 @@ public class CurveSelectorContextMenu {
 			new MenuItem(this.horizontalGridMenu, SWT.SEPARATOR);
 			
 			this.horizontalGridOff = new MenuItem(this.horizontalGridMenu, SWT.CHECK);
-			this.horizontalGridOff.setText(Messages.getString(MessageIds.OSDE_MSGT0119));
+			this.horizontalGridOff.setText(Messages.getString(MessageIds.DE_MSGT0119));
 			this.horizontalGridOff.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "horizontalGridOff Action performed! " + e); //$NON-NLS-1$
@@ -891,7 +891,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.horizontalGridEveryTick = new MenuItem(this.horizontalGridMenu, SWT.CHECK);
-			this.horizontalGridEveryTick.setText(Messages.getString(MessageIds.OSDE_MSGT0120));
+			this.horizontalGridEveryTick.setText(Messages.getString(MessageIds.DE_MSGT0120));
 			this.horizontalGridEveryTick.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "horizontalGridMain Action performed! " + e); //$NON-NLS-1$
@@ -911,7 +911,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.horizontalGridEverySecond = new MenuItem(this.horizontalGridMenu, SWT.CHECK);
-			this.horizontalGridEverySecond.setText(Messages.getString(MessageIds.OSDE_MSGT0121));
+			this.horizontalGridEverySecond.setText(Messages.getString(MessageIds.DE_MSGT0121));
 			this.horizontalGridEverySecond.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "horizontalGridMod60 Action performed! " + e); //$NON-NLS-1$
@@ -931,7 +931,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.horizontalGridColor = new MenuItem(this.horizontalGridMenu, SWT.PUSH);
-			this.horizontalGridColor.setText(Messages.getString(MessageIds.OSDE_MSGT0122));
+			this.horizontalGridColor.setText(Messages.getString(MessageIds.DE_MSGT0122));
 			this.horizontalGridColor.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "horizontalGridColor Action performed! " + e); //$NON-NLS-1$
@@ -968,14 +968,14 @@ public class CurveSelectorContextMenu {
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
 			this.measurement = new MenuItem(popupmenu, SWT.CASCADE);
-			this.measurement.setText(Messages.getString(MessageIds.OSDE_MSGT0123));
+			this.measurement.setText(Messages.getString(MessageIds.DE_MSGT0123));
 			this.measurementMenu = new Menu(this.horizontalGrid);
 			this.measurement.setMenu(this.measurementMenu);
 			this.measurementMenu.addMenuListener(new MenuListener() {
 				public void menuShown(MenuEvent evt) {
 					log.log(Level.FINEST, "measurementMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						CurveSelectorContextMenu.this.measurementRecordName.setText(Messages.getString(MessageIds.OSDE_MSGT0124) + CurveSelectorContextMenu.this.recordNameMeasurement);
+						CurveSelectorContextMenu.this.measurementRecordName.setText(Messages.getString(MessageIds.DE_MSGT0124) + CurveSelectorContextMenu.this.recordNameMeasurement);
 					}
 				}
 				public void menuHidden(MenuEvent evt) {
@@ -988,7 +988,7 @@ public class CurveSelectorContextMenu {
 			new MenuItem(this.measurementMenu, SWT.SEPARATOR);
 			
 			this.simpleMeasure = new MenuItem(this.measurementMenu, SWT.CHECK);
-			this.simpleMeasure.setText(Messages.getString(MessageIds.OSDE_MSGT0125));
+			this.simpleMeasure.setText(Messages.getString(MessageIds.DE_MSGT0125));
 			this.simpleMeasure.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
 					log.log(Level.FINEST, "measure.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -1008,7 +1008,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.deltaMeasure = new MenuItem(this.measurementMenu, SWT.CHECK);
-			this.deltaMeasure.setText(Messages.getString(MessageIds.OSDE_MSGT0126));
+			this.deltaMeasure.setText(Messages.getString(MessageIds.DE_MSGT0126));
 			this.deltaMeasure.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent evt) {
 					log.log(Level.FINEST, "deltaMeasure.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -1032,7 +1032,7 @@ public class CurveSelectorContextMenu {
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
 			this.copyCurveCompare = new MenuItem(popupmenu, SWT.PUSH);
-			this.copyCurveCompare.setText(Messages.getString(MessageIds.OSDE_MSGT0127));
+			this.copyCurveCompare.setText(Messages.getString(MessageIds.DE_MSGT0127));
 			this.copyCurveCompare.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "copyCurveCompare Action performed! " + e); //$NON-NLS-1$
@@ -1044,7 +1044,7 @@ public class CurveSelectorContextMenu {
 						if (copyFromRecord != null && copyFromRecord.isVisible()) {
 							RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
 							if (!compareSet.isEmpty() && !compareSet.get(compareSet.getFirstRecordName()).getUnit().equalsIgnoreCase(copyFromRecord.getUnit())) {
-								CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0004, new Object[] { copyFromRecordKey + DE.STRING_MESSAGE_CONCAT
+								CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGW0004, new Object[] { copyFromRecordKey + DE.STRING_MESSAGE_CONCAT
 										+ compareSet.getFirstRecordName() }));
 								return;
 							}
@@ -1125,7 +1125,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
 						}
 						else 
-							CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0005));
+							CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGW0005));
 						
 						//TODO check, why this is required before zoom operation ?
 						CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
@@ -1133,7 +1133,7 @@ public class CurveSelectorContextMenu {
 				}
 			});
 			this.cleanCurveCompare = new MenuItem(popupmenu, SWT.PUSH);
-			this.cleanCurveCompare.setText(Messages.getString(MessageIds.OSDE_MSGT0128));
+			this.cleanCurveCompare.setText(Messages.getString(MessageIds.DE_MSGT0128));
 			this.cleanCurveCompare.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "cleanCurveCompare Action performed! " + e); //$NON-NLS-1$

@@ -67,7 +67,7 @@ public class FileHandler {
 	public void importFileCSV(String dialogName, final boolean isRaw) {
 		IDevice activeDevice = this.application.getActiveDevice();
 		if (activeDevice == null) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0004)); 
+			this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0004)); 
 			return;
 		}
 		Settings deviceSetting = Settings.getInstance();
@@ -83,7 +83,7 @@ public class FileHandler {
 				String fileDeviceName = CSVReaderWriter.getHeader(listSeparator, csvFilePath).get(DE.DEVICE_NAME);
 				String activeDeviceName = this.application.getActiveDevice().getName();
 				if (!activeDeviceName.equals(fileDeviceName)) { // different device in file
-					String msg = Messages.getString(MessageIds.OSDE_MSGI0009, new Object[]{fileDeviceName}); 
+					String msg = Messages.getString(MessageIds.DE_MSGI0009, new Object[]{fileDeviceName}); 
 					if (SWT.NO == this.application.openYesNoMessageDialog(msg)) 
 						return;			
 					this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);				
@@ -112,12 +112,12 @@ public class FileHandler {
 	public void exportFileCSV(final String dialogName, final boolean isRaw) {
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0005)); 
+			this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0005)); 
 			return;
 		}
 		RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 		if (activeRecordSet == null) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0005)); 
+			this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0005)); 
 			return;
 		}
 
@@ -129,7 +129,7 @@ public class FileHandler {
 		final String csvFilePath = csvFileDialog.getFilterPath() + DE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
 
 		if (csvFilePath.length() > 4) { // file name has a reasonable length
-			if (FileUtils.checkFileExist(csvFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0007, new Object[] { csvFilePath }))) {
+			if (FileUtils.checkFileExist(csvFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.DE_MSGI0007, new Object[] { csvFilePath }))) {
 				return;
 			}
 
@@ -176,7 +176,7 @@ public class FileHandler {
 				String devicePath = this.application.getActiveDevice() != null ? DE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : DE.STRING_EMPTY;
 				path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + DE.FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
 				if (!FileUtils.checkDirectoryAndCreate(path)) {
-					this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0012, new Object[] { path })); 
+					this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0012, new Object[] { path })); 
 				}
 			}
 			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { DE.FILE_ENDING_STAR_OSD, DE.FILE_ENDING_STAR_LOV }, path); 
@@ -188,7 +188,7 @@ public class FileHandler {
 				else if (openFilePath.toLowerCase().endsWith(DE.FILE_ENDING_LOV))
 					openLovFile(openFilePath);
 				else
-					this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0008) + openFilePath); 
+					this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0008) + openFilePath); 
 			}
 		}
 	}
@@ -239,7 +239,7 @@ public class FileHandler {
 				// at this point we have a channel/config ordinal
 				Channel channel = this.channels.get(channelNumber);
 				if (channel.size() > 0) { // check for records to be exchanged
-					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0010, new Object[]{channelNumber + DE.STRING_BLANK_COLON_BLANK + channel.getChannelConfigKey()})); 
+					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.DE_MSGI0010, new Object[]{channelNumber + DE.STRING_BLANK_COLON_BLANK + channel.getChannelConfigKey()})); 
 					if (answer != SWT.OK) 
 						return;				
 				}
@@ -276,12 +276,12 @@ public class FileHandler {
 	public void saveOsdFile(final String dialogName, final String fileName) {
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0011)); 
+			this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0011)); 
 			return;
 		}
 		RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 		if (activeRecordSet == null) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0011));
+			this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0011));
 			return;
 		}
 
@@ -291,7 +291,7 @@ public class FileHandler {
 		String devicePath = this.application.getActiveDevice() != null ? DE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : DE.STRING_EMPTY; 
 		String path = deviceSetting.getDataFilePath() + devicePath;
 		if (!FileUtils.checkDirectoryAndCreate(path)) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0012, new Object[] { path })); 
+			this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0012, new Object[] { path })); 
 		}
 		if (fileName == null || fileName.length() < 5 || fileName.equals(getFileNameProposal())) {
 			fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { DE.FILE_ENDING_STAR_OSD }, path + DE.FILE_SEPARATOR_UNIX, getFileNameProposal()); 
@@ -306,7 +306,7 @@ public class FileHandler {
 				filePath = filePath.substring(0, filePath.lastIndexOf('.'));
 			}
 			filePath = (filePath + DE.FILE_ENDING_DOT_OSD).replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
-			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0013, new Object[]{filePath}))) { 
+			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.DE_MSGI0013, new Object[]{filePath}))) { 
 				return;
 			}
 
@@ -360,7 +360,7 @@ public class FileHandler {
 					&& this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET
 					&& this.channels.size() > 1) {
 				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
-					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0006, new Object[] {channelConfigName}));
+					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.DE_MSGI0006, new Object[] {channelConfigName}));
 					if (answer != SWT.OK) 
 						return;				
 					

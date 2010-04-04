@@ -105,7 +105,7 @@ public class FileUtils {
 		File sourceDir = new File(srcDir);
 		String[] files = sourceDir.list();
 		if (files == null) {
-			throw new ApplicationConfigurationException(Messages.getString(MessageIds.OSDE_MSGE0017, new Object[] { srcDir }));
+			throw new ApplicationConfigurationException(Messages.getString(MessageIds.DE_MSGE0017, new Object[] { srcDir }));
 		}
 		for (String srcFile : files) {
 			if (DE.IS_WINDOWS) {
@@ -639,7 +639,7 @@ public class FileUtils {
 		if (FileUtils.checkFileExist(tmpDeviceJarPath)) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
 			mBox.setText(DE.OSDE_NAME_LONG);
-			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0043, new String[] {tmpDeviceJarPath}));
+			mBox.setMessage(Messages.getString(MessageIds.DE_MSGI0043, new String[] {tmpDeviceJarPath}));
 			int ret = mBox.open();
 			if (SWT.CANCEL == ret)
 				return;
@@ -683,7 +683,7 @@ public class FileUtils {
 		if (tmpFile.exists()) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
 			mBox.setText(DE.OSDE_NAME_LONG);
-			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0044, new String[] {tmpDeviceJarPath})); 
+			mBox.setMessage(Messages.getString(MessageIds.DE_MSGI0044, new String[] {tmpDeviceJarPath})); 
 			mBox.open();
 		}
 	}
@@ -796,7 +796,7 @@ public class FileUtils {
 			deviceJarPath = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(DE.STRING_URL_BLANK, DE.STRING_BLANK);
 		}
 		else
-			throw new NoClassDefFoundError(Messages.getString(MessageIds.OSDE_MSGE0016));
+			throw new NoClassDefFoundError(Messages.getString(MessageIds.DE_MSGE0016));
 		
 		log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath); //$NON-NLS-1$
 		return deviceJarPath;
@@ -815,7 +815,7 @@ public class FileUtils {
 		if (FileUtils.checkFileExist(tmpDeviceJarPath)) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
 			mBox.setText(DE.OSDE_NAME_LONG);
-			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0043, new String[] {tmpDeviceJarPath}));
+			mBox.setMessage(Messages.getString(MessageIds.DE_MSGI0043, new String[] {tmpDeviceJarPath}));
 			int ret = mBox.open();
 			if (SWT.CANCEL == ret)
 				return;
@@ -862,7 +862,7 @@ public class FileUtils {
 		if (tmpFile.exists()) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
 			mBox.setText(DE.OSDE_NAME_LONG);
-			mBox.setMessage(Messages.getString(MessageIds.OSDE_MSGI0044, new String[] {tmpDeviceJarPath})); 
+			mBox.setMessage(Messages.getString(MessageIds.DE_MSGI0044, new String[] {tmpDeviceJarPath})); 
 			mBox.open();
 		}
 	}

@@ -115,7 +115,7 @@ public class SelectorComposite extends Composite {
 		});
 		{
 			this.curveSelectorHeader = new CLabel(this, SWT.NONE);
-			this.curveSelectorHeader.setText("  " + Messages.getString(MessageIds.OSDE_MSGT0254)); //$NON-NLS-1$
+			this.curveSelectorHeader.setText("  " + Messages.getString(MessageIds.DE_MSGT0254)); //$NON-NLS-1$
 			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
 			this.curveSelectorHeader.pack();
 			this.initialSelectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8;

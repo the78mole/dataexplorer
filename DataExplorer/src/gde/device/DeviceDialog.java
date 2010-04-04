@@ -49,7 +49,7 @@ public abstract class DeviceDialog extends Dialog {
 	protected boolean		isInDialog = false; // if dialog alpha fading is used this flag is used to switch off mouseExit and mouseEnter inner events
 	
 	protected boolean 	isClosePossible = true; // use this variable to manage if dialog can be disposed 
-	protected String 		disposeDisabledMessage = Messages.getString(MessageIds.OSDE_MSGW0007);
+	protected String 		disposeDisabledMessage = Messages.getString(MessageIds.DE_MSGW0007);
 	
 	protected final DataExplorer application;
 	

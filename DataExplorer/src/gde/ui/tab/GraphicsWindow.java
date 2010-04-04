@@ -85,7 +85,7 @@ public class GraphicsWindow extends CTabItem {
 		this.setControl(this.graphicSashForm);
 
 		{ // curveSelector
-			this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.windowType, "  " + Messages.getString(MessageIds.OSDE_MSGT0254));
+			this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.windowType, "  " + Messages.getString(MessageIds.DE_MSGT0254));
 		} // curveSelector
 
 		{ // graphics composite

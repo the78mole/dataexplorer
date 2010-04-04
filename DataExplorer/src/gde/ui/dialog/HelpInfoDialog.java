@@ -68,7 +68,7 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell = new Shell(new Shell(Display.getDefault()), SWT.SHELL_TRIM);
 			FillLayout dialogShellLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.dialogShell.setLayout(dialogShellLayout);
-			this.dialogShell.setText(DE.OSDE_NAME_LONG + Messages.getString(MessageIds.OSDE_MSGT0192));
+			this.dialogShell.setText(DE.OSDE_NAME_LONG + Messages.getString(MessageIds.DE_MSGT0192));
 			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/DataExplorer.jpg")); //$NON-NLS-1$
 
 			this.textBrowser = new Browser(this.dialogShell, style);
@@ -126,7 +126,7 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 		catch (IOException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 			DataExplorer.getInstance().openMessageDialog(this.dialogShell, 
-					Messages.getString(MessageIds.OSDE_MSGE0018, new Object[] { e.getLocalizedMessage() } )); //$NON-NLS-1$
+					Messages.getString(MessageIds.DE_MSGE0018, new Object[] { e.getLocalizedMessage() } )); //$NON-NLS-1$
 		}
 	}
 	

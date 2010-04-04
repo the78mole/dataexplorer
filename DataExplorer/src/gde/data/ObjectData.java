@@ -44,7 +44,7 @@ public class ObjectData {
 	/**
 	 * 
 	 */
-	public static final String	STRING_STYLED_TEXT_DEFAULT	= Messages.getString(MessageIds.OSDE_MSGT0433);
+	public static final String	STRING_STYLED_TEXT_DEFAULT	= Messages.getString(MessageIds.DE_MSGT0433);
 
 	final static Logger	log	= Logger.getLogger(ObjectData.class.getName());
 
@@ -90,9 +90,9 @@ public class ObjectData {
 		this.fullQualifiedObjectFilePath = objectFilePath;
 		this.key = objectFilePath.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX).substring(objectFilePath.lastIndexOf(DE.FILE_SEPARATOR_UNIX) + 1, objectFilePath.lastIndexOf(DE.STRING_DOT));
 		this.key = this.key.contains(DE.STRING_DOT) ? this.key.substring(0, this.key.indexOf(DE.STRING_DOT)) : this.key;
-		this.type = Messages.getString(MessageIds.OSDE_MSGT0279);
-		this.activationDate = Messages.getString(MessageIds.OSDE_MSGT0279);
-		this.status = Messages.getString(MessageIds.OSDE_MSGT0279);
+		this.type = Messages.getString(MessageIds.DE_MSGT0279);
+		this.activationDate = Messages.getString(MessageIds.DE_MSGT0279);
+		this.status = Messages.getString(MessageIds.DE_MSGT0279);
 		this.image = null;
 		this.styledText = ObjectData.STRING_STYLED_TEXT_DEFAULT;
 		this.styleRanges = new StyleRange[] { new StyleRange(0, this.styledText.length(), null, null, SWT.BOLD) };

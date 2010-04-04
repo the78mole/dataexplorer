@@ -221,7 +221,7 @@ public class OsdReaderWriter {
 					}
 				}
 				if (channel == null) { // 3.rd try channelConfiguration not found
-					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.OSDE_MSGI0019) + "\n" + Messages.getString(MessageIds.OSDE_MSGI0020);
+					String msg = Messages.getString(MessageIds.DE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.DE_MSGI0019) + "\n" + Messages.getString(MessageIds.DE_MSGI0020);
 					DataExplorer.getInstance().openMessageDialogAsync(msg);
 					channel = new Channel(channelConfig, channelType);
 					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
@@ -522,7 +522,7 @@ public class OsdReaderWriter {
 			}
 		}
 		else {
-			OSDEInternalException e = new OSDEInternalException(Messages.getString(MessageIds.OSDE_MSGE0009) + activeChannel + ", " + fullQualifiedFilePath + ", " + useVersion); //$NON-NLS-1$
+			OSDEInternalException e = new OSDEInternalException(Messages.getString(MessageIds.DE_MSGE0009) + activeChannel + ", " + fullQualifiedFilePath + ", " + useVersion); //$NON-NLS-1$
 			DataExplorer.getInstance().openMessageDialogAsync(e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}

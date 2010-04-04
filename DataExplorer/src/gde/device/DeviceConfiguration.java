@@ -135,7 +135,7 @@ public class DeviceConfiguration {
 	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>) //$NON-NLS-1$
 	public DeviceConfiguration(String xmlFileName) throws FileNotFoundException, JAXBException {
 
-		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.OSDE_MSGE0003) + xmlFileName);
+		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.DE_MSGE0003) + xmlFileName);
 
 		this.settings = Settings.getInstance();
 		this.unmarshaller = this.settings.getUnmarshaller();

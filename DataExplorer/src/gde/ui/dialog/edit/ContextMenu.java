@@ -59,13 +59,13 @@ public class ContextMenu {
 				ContextMenu.this.addDataBlockTypeMenuItem.setEnabled(true);
 				ContextMenu.this.addStateTypeMenuItem.setEnabled(true);
 				for (CTabItem tabItem : ContextMenu.this.parentTabFolder.getItems()) {
-					if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0510))) {
+					if (tabItem.getText().equals(Messages.getString(MessageIds.DE_MSGT0510))) {
 						ContextMenu.this.addSerialPortTypeMenuItem.setEnabled(false);
 					}
-					else if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0515))) {
+					else if (tabItem.getText().equals(Messages.getString(MessageIds.DE_MSGT0515))) {
 						ContextMenu.this.addDataBlockTypeMenuItem.setEnabled(false);
 					}
-					else if (tabItem.getText().equals(Messages.getString(MessageIds.OSDE_MSGT0470))) {
+					else if (tabItem.getText().equals(Messages.getString(MessageIds.DE_MSGT0470))) {
 						ContextMenu.this.addStateTypeMenuItem.setEnabled(false);
 					}
 				}
@@ -76,7 +76,7 @@ public class ContextMenu {
 			}
 		});
 		this.addSerialPortTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
-		this.addSerialPortTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0512));
+		this.addSerialPortTypeMenuItem.setText(Messages.getString(MessageIds.DE_MSGT0512));
 		this.addSerialPortTypeMenuItem.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event e) {
@@ -86,7 +86,7 @@ public class ContextMenu {
 		});
 		new MenuItem(this.menu, SWT.SEPARATOR);
 		this.addDataBlockTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
-		this.addDataBlockTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0513));
+		this.addDataBlockTypeMenuItem.setText(Messages.getString(MessageIds.DE_MSGT0513));
 		this.addDataBlockTypeMenuItem.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event e) {
@@ -96,7 +96,7 @@ public class ContextMenu {
 		});
 		new MenuItem(this.menu, SWT.SEPARATOR);
 		this.addStateTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
-		this.addStateTypeMenuItem.setText(Messages.getString(MessageIds.OSDE_MSGT0514));
+		this.addStateTypeMenuItem.setText(Messages.getString(MessageIds.DE_MSGT0514));
 		this.addStateTypeMenuItem.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event e) {

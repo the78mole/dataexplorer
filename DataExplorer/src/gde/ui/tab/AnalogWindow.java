@@ -56,7 +56,7 @@ public class AnalogWindow extends CTabItem {
 	Composite												analogMainComposite;
 	HashMap<String, AnalogDisplay>	displays;
 	GridLayout 											analogMainCompositeLayout;
-	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
+	String 													info = Messages.getString(MessageIds.DE_MSGT0230);
 
 	Color														surroundingBackground;
 
@@ -76,7 +76,7 @@ public class AnalogWindow extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.OSDE_MSGT0231));
+		this.setText(Messages.getString(MessageIds.DE_MSGT0231));
 		
 		this.surroundingBackground = Settings.getInstance().getAnalogSurroundingAreaBackground();
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);

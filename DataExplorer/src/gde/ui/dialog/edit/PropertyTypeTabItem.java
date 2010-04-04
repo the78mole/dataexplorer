@@ -99,10 +99,10 @@ public class PropertyTypeTabItem extends CTabItem {
 		this.tabName = useTabName;
 		this.measurementTypeTabItem = useMeasurementTypeTabItem2CreatePopupMenu;
 		this.propertyType = new ObjectFactory().createPropertyType();
-		this.propertyType.setName(Messages.getString(MessageIds.OSDE_MSGT0473));
+		this.propertyType.setName(Messages.getString(MessageIds.DE_MSGT0473));
 		this.propertyType.setType(DataTypes.INTEGER);
 		this.propertyType.setValue(DE.STRING_EMPTY + 0);
-		this.propertyType.setDescription(Messages.getString(MessageIds.OSDE_MSGT0474));
+		this.propertyType.setDescription(Messages.getString(MessageIds.DE_MSGT0474));
 
 		initGUI();
 	}
@@ -243,25 +243,25 @@ public class PropertyTypeTabItem extends CTabItem {
 			});
 			{
 				this.nameLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.nameLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0549));
+				this.nameLabel.setText(Messages.getString(MessageIds.DE_MSGT0549));
 				this.nameLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.nameLabel.setBounds(5, 12, 80, 20);
 			}
 			{
 				this.typeLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.typeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0552));
+				this.typeLabel.setText(Messages.getString(MessageIds.DE_MSGT0552));
 				this.typeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.typeLabel.setBounds(5, 38, 80, 20);
 			}
 			{
 				this.valueLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.valueLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0553));
+				this.valueLabel.setText(Messages.getString(MessageIds.DE_MSGT0553));
 				this.valueLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.valueLabel.setBounds(5, 65, 80, 20);
 			}
 			{
 				this.descriptionLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.descriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0554));
+				this.descriptionLabel.setText(Messages.getString(MessageIds.DE_MSGT0554));
 				this.descriptionLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.descriptionLabel.setBounds(5, 92, 80, 20);
 			}

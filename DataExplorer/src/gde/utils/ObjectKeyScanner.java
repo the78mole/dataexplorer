@@ -56,7 +56,7 @@ public class ObjectKeyScanner extends Thread {
 	public ObjectKeyScanner() {
 		super();
 		this.settings = Settings.getInstance();
-		this.deviceOriented = Messages.getString(MessageIds.OSDE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
+		this.deviceOriented = Messages.getString(MessageIds.DE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
 		this.objectKeys = new Vector<String>();
 		if (DataExplorer.getInstance().getMenuToolBar() != null) {
 			for (String tmpObjKey : DataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
@@ -76,7 +76,7 @@ public class ObjectKeyScanner extends Thread {
 		super();
 		this.objectKey = newObjectKey;
 		this.settings = Settings.getInstance();
-		this.deviceOriented = Messages.getString(MessageIds.OSDE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
+		this.deviceOriented = Messages.getString(MessageIds.DE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
 		this.objectKeys = new Vector<String>();
 		if (DataExplorer.getInstance().getMenuToolBar() != null) {
 			for (String tmpObjKey : DataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {

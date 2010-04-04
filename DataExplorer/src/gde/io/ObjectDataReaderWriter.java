@@ -75,7 +75,7 @@ public class ObjectDataReaderWriter {
 	@SuppressWarnings("unchecked")
 	public void read() {
 
-		String redObjectkey = Messages.getString(MessageIds.OSDE_MSGT0279);
+		String redObjectkey = Messages.getString(MessageIds.DE_MSGT0279);
 
 		File file = new File(this.filePath);
 		if (file.exists()) {
@@ -94,7 +94,7 @@ public class ObjectDataReaderWriter {
 
 						redObjectkey = content[0].substring(ObjectDataReaderWriter.BEGIN_HEADER.length());
 						if (!this.objectData.getKey().equals(redObjectkey)) {
-							throw new ApplicationConfigurationException(Messages.getString(MessageIds.OSDE_MSGW0029));
+							throw new ApplicationConfigurationException(Messages.getString(MessageIds.DE_MSGW0029));
 						}
 
 						// main characteristics
@@ -154,22 +154,22 @@ public class ObjectDataReaderWriter {
 				ObjectDataReaderWriter.log.log(Level.SEVERE, t.getLocalizedMessage(), t);
 				if (t instanceof ZipException) {
 					if (DataExplorer.getInstance().isVisible()) {
-						int answer = DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0025, new Object[] {file.getAbsolutePath()}));
+						int answer = DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.DE_MSGW0025, new Object[] {file.getAbsolutePath()}));
 						if (answer == SWT.YES) file.delete();
 					}
 					else {
-						String msg = Messages.getString(MessageIds.OSDE_MSGW0026, new Object[] {file.getAbsolutePath()}); 
+						String msg = Messages.getString(MessageIds.DE_MSGW0026, new Object[] {file.getAbsolutePath()}); 
 						DE.setInitError(msg);
 					}
 				}
 				else if (t instanceof ApplicationConfigurationException) {
 					if (DataExplorer.getInstance().isVisible()) {
-						String msg = Messages.getString(MessageIds.OSDE_MSGW0027, new Object[] {file.getAbsolutePath(), redObjectkey});
+						String msg = Messages.getString(MessageIds.DE_MSGW0027, new Object[] {file.getAbsolutePath(), redObjectkey});
 						int answer = DataExplorer.getInstance().openYesNoMessageDialog(msg);
 						if (answer == SWT.YES) file.delete();
 					}	
 					else {
-						String msg = Messages.getString(MessageIds.OSDE_MSGW0028, new Object[] {file.getAbsolutePath(), redObjectkey});
+						String msg = Messages.getString(MessageIds.DE_MSGW0028, new Object[] {file.getAbsolutePath(), redObjectkey});
 						DE.setInitError(msg);
 					}
 				}

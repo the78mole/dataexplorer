@@ -110,11 +110,11 @@ public class CSVReaderWriter {
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new FileNotFoundException(Messages.getString(MessageIds.OSDE_MSGW0011, new Object[] {filePath}));
+			throw new FileNotFoundException(Messages.getString(MessageIds.DE_MSGW0011, new Object[] {filePath}));
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new IOException(Messages.getString(MessageIds.OSDE_MSGW0012, new Object[] {filePath}));
+			throw new IOException(Messages.getString(MessageIds.DE_MSGW0012, new Object[] {filePath}));
 		}
 		finally {
 			if (reader != null) 		reader.close();
@@ -190,7 +190,7 @@ public class CSVReaderWriter {
 			String inUnit = inHeaderMeasurement.length == 2 ? inHeaderMeasurement[1].trim() : Settings.EMPTY;
 			sb_measurements.append(inMeasurement).append(DE.STRING_SEMICOLON);
 			sb_units.append(inUnit).append(DE.STRING_SEMICOLON);
-			unitCompare.append(String.format("%-30s \t%s \n", inMeasurement, Messages.getString(MessageIds.OSDE_MSGT0136, new Object[]{inUnit, expectUnit})));
+			unitCompare.append(String.format("%-30s \t%s \n", inMeasurement, Messages.getString(MessageIds.DE_MSGT0136, new Object[]{inUnit, expectUnit})));
 			if (inUnit.equals(expectUnit) || inUnit.equals(Settings.EMPTY)) ++match;
 		}
 		header.put(DE.CSV_DATA_HEADER_MEASUREMENTS, sb_measurements.toString());
@@ -199,7 +199,7 @@ public class CSVReaderWriter {
 		if (!isRaw) {
 			log.log(Level.FINE, unitCompare.toString());
 			if (match != headerLineArray.length - 1) {
-				UnitCompareException e = new UnitCompareException(Messages.getString(MessageIds.OSDE_MSGW0015, new Object[] {unitCompare.toString()})); // mismatch data header units //$NON-NLS-1$
+				UnitCompareException e = new UnitCompareException(Messages.getString(MessageIds.DE_MSGW0015, new Object[] {unitCompare.toString()})); // mismatch data header units //$NON-NLS-1$
 				log.log(Level.WARNING, e.getMessage());
 				application.openMessageDialogAsync(e.getMessage());
 			}
@@ -231,19 +231,19 @@ public class CSVReaderWriter {
 			activeChannel = activeChannel == null ? channels.getActiveChannel() : activeChannel;
 
 			if (activeChannel != null) {
-				if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0134) + filePath);
+				if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0134) + filePath);
 				int time_ms = 0;
 
 				// check for device name and channel or configuration in first line
 				if (!application.getActiveDevice().getName().equals(fileHeader.get(DE.DEVICE_NAME))) {
-					MissMatchDeviceException e = new MissMatchDeviceException(Messages.getString(MessageIds.OSDE_MSGW0013, new Object[] {fileHeader.get(DE.DEVICE_NAME)})); // mismatch device name 
+					MissMatchDeviceException e = new MissMatchDeviceException(Messages.getString(MessageIds.DE_MSGW0013, new Object[] {fileHeader.get(DE.DEVICE_NAME)})); // mismatch device name 
 					log.log(Level.SEVERE, e.getMessage(), e);
 					throw e;
 				}
 				
 				fileHeader = CSVReaderWriter.evaluateType(separator, fileHeader, (DeviceConfiguration)device);			
 				if (isRaw != fileHeader.get(DE.CSV_DATA_TYPE).equals(DE.CSV_DATA_TYPE_RAW)) {
-					throw new DataTypeException(Messages.getString(MessageIds.OSDE_MSGW0014));
+					throw new DataTypeException(Messages.getString(MessageIds.DE_MSGW0014));
 				}
 				log.log(Level.FINE, "device name check ok, channel/configuration ok"); //$NON-NLS-1$
 				
@@ -325,15 +325,15 @@ public class CSVReaderWriter {
 		}
 		catch (UnsupportedEncodingException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new UnsupportedEncodingException(Messages.getString(MessageIds.OSDE_MSGW0010));
+			throw new UnsupportedEncodingException(Messages.getString(MessageIds.DE_MSGW0010));
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new FileNotFoundException(Messages.getString(MessageIds.OSDE_MSGW0011, new Object[] {filePath}));
+			throw new FileNotFoundException(Messages.getString(MessageIds.DE_MSGW0011, new Object[] {filePath}));
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new IOException(Messages.getString(MessageIds.OSDE_MSGW0012, new Object[] {filePath}));
+			throw new IOException(Messages.getString(MessageIds.DE_MSGW0012, new Object[] {filePath}));
 		}
 		finally {
 			if (application.getStatusBar() != null) {
@@ -354,7 +354,7 @@ public class CSVReaderWriter {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 
 		try {
-			if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0138) + filePath);
+			if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0138) + filePath);
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
 			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
@@ -368,7 +368,7 @@ public class CSVReaderWriter {
 			log.log(Level.FINE, "written header line = " + sb.toString());  //$NON-NLS-1$
 			
 			sb = new StringBuffer();
-			sb.append(Messages.getString(MessageIds.OSDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; //$NON-NLS-1$
+			sb.append(Messages.getString(MessageIds.DE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; //$NON-NLS-1$
 			// write the measurements signature
 			String[] recordNames = recordSet.getRecordNames();
 			for (int i = 0; i < recordNames.length; i++) {
@@ -403,7 +403,7 @@ public class CSVReaderWriter {
 				for (int j = 0; j < recordNames.length; j++) {
 					Record record = recordSet.getRecord(recordNames[j]);
 					if (record == null)
-						throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0005, new Object[]{recordNames[j], recordSet.getChannelConfigName()}));
+						throw new Exception(Messages.getString(MessageIds.DE_MSGE0005, new Object[]{recordNames[j], recordSet.getChannelConfigName()}));
 
 					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), j);
 					if (isRaw) { // do not change any values
@@ -434,11 +434,11 @@ public class CSVReaderWriter {
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0006, new Object[]{ filePath }));
+			throw new Exception(Messages.getString(MessageIds.DE_MSGE0006, new Object[]{ filePath }));
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0007) + e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage()); 
+			throw new Exception(Messages.getString(MessageIds.DE_MSGE0007) + e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage()); 
 		}
 		finally {
 			if (application.getStatusBar() != null) application.setStatusMessage(DE.STRING_EMPTY);

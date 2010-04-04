@@ -3,11 +3,11 @@ Comment=DataExplorer - explore your serial data
 Comment[en_US]=DevicePropertiesEditor - edit your DataExplorer device properties
 Comment[de_DE]=DevicePropertiesEditor - bearbeite die DataExplorer Geräteeigenschaften
 Encoding=UTF-8
-Exec=java -Dfile.encoding=UTF-8 -Xms10m -Xmx56m -classpath @OSDE_DIR@DataExplorer.jar osde.ui.dialog.edit.DevicePropertiesEditor
+Exec=java -Dfile.encoding=UTF-8 -Xms10m -Xmx56m -classpath @DE_DIR@DataExplorer.jar osde.ui.dialog.edit.DevicePropertiesEditor
 GenericName=DevicePropertiesEditor
-Icon=@OSDE_DIR@DevicePropertiesEditor.xpm
+Icon=@DE_DIR@DevicePropertiesEditor.xpm
 Name=DevicePropertiesEditor
-Path=@OSDE_DIR@
+Path=@DE_DIR@
 StartupNotify=true
 Terminal=false
 Type=Application

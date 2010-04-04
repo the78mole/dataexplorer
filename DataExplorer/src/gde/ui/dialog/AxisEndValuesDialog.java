@@ -97,7 +97,7 @@ public class AxisEndValuesDialog extends Dialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(345, 272);
-			this.dialogShell.setText(Messages.getString(MessageIds.OSDE_MSGT0151));
+			this.dialogShell.setText(Messages.getString(MessageIds.DE_MSGT0151));
 			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Measure.gif")); //$NON-NLS-1$
 			this.dialogShell.setLocation(100, 100);
 			this.dialogShell.addDisposeListener(new DisposeListener() {
@@ -169,7 +169,7 @@ public class AxisEndValuesDialog extends Dialog {
 				maxValueLabelLData.top = new FormAttachment(0, 1000, 12);
 				this.maxValueLabel.setLayoutData(maxValueLabelLData);
 				this.maxValueLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.maxValueLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0152));
+				this.maxValueLabel.setText(Messages.getString(MessageIds.DE_MSGT0152));
 			}
 			{
 				FormData maxValueSelectLData = new FormData();
@@ -200,7 +200,7 @@ public class AxisEndValuesDialog extends Dialog {
 				cLabel1LData.top = new FormAttachment(0, 1000, 169);
 				this.minValueLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.minValueLabel.setLayoutData(cLabel1LData);
-				this.minValueLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0153));
+				this.minValueLabel.setText(Messages.getString(MessageIds.DE_MSGT0153));
 			}
 			{
 				FormData minValueSelectLData = new FormData();

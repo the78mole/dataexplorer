@@ -41,14 +41,14 @@ public class Messages {
 //	 * @param args
 //	 */
 //	public static void main(String[] args) {
-//		System.out.println(Messages.getString(MessageIds.OSDE_MSGI0001));
-//		System.out.println(Messages.getString(MessageIds.OSDE_MSGI0002, new String[] {"UniLog"}));
-//		System.out.println(Messages.getString(MessageIds.OSDE_MSGI0003, new Object[] {"UniLog", 5}));
-//		System.out.println(Messages.getString(MessageIds.OSDE_MSGI0003, new Object[] {"UniLog"}));
+//		System.out.println(Messages.getString(MessageIds.DE_MSGI0001));
+//		System.out.println(Messages.getString(MessageIds.DE_MSGI0002, new String[] {"UniLog"}));
+//		System.out.println(Messages.getString(MessageIds.DE_MSGI0003, new Object[] {"UniLog", 5}));
+//		System.out.println(Messages.getString(MessageIds.DE_MSGI0003, new Object[] {"UniLog"}));
 //	}
 	
 	/**
-	 * example usage: application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSG001, new Object{"hallo", "world"));
+	 * example usage: application.openMessageDialog(Messages.getString(MessageIds.DE_MSG001, new Object{"hallo", "world"));
 	 * @param key
 	 * @param params as object array
 	 * @return the message as string with unlined parameters
@@ -82,7 +82,7 @@ public class Messages {
 	}
 	
 	/**
-	 * example usage: application.openMessageDialog(Messages.getString(MessageIds.OSDE_MSG001));
+	 * example usage: application.openMessageDialog(Messages.getString(MessageIds.DE_MSG001));
 	 * @param key
 	 * @return the string matching the given key
 	 */

@@ -146,7 +146,7 @@ public class LogViewReader {
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				if (channel == null) { // channelConfiguration not found
-					String msg = Messages.getString(MessageIds.OSDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.OSDE_MSGI0019) + "\n" + Messages.getString(MessageIds.OSDE_MSGI0020);
+					String msg = Messages.getString(MessageIds.DE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.DE_MSGI0019) + "\n" + Messages.getString(MessageIds.DE_MSGI0020);
 					DataExplorer.getInstance().openMessageDialogAsync(msg);
 					channel = new Channel(channelConfig, channelType);
 					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
@@ -341,7 +341,7 @@ public class LogViewReader {
 		String stringVersion = new String(buffer);
 		log.log(Level.FINE, DE.LOV_SSTREAM_VERSION + stringVersion);
 		if (streamVersion != new Integer(stringVersion.split(":V")[1])) { //$NON-NLS-1$
-			NotSupportedFileFormatException e = new NotSupportedFileFormatException(Messages.getString(MessageIds.OSDE_MSGE0008, new Object[] { streamVersion, stringVersion })); 
+			NotSupportedFileFormatException e = new NotSupportedFileFormatException(Messages.getString(MessageIds.DE_MSGE0008, new Object[] { streamVersion, stringVersion })); 
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
@@ -460,7 +460,7 @@ public class LogViewReader {
 			header = getRecordSetInfo_5(data_in, header);
 		}
 		else {
-			NotSupportedFileFormatException e = new NotSupportedFileFormatException(Messages.getString(MessageIds.OSDE_MSGI0021, new Object[] { useVersion } ));
+			NotSupportedFileFormatException e = new NotSupportedFileFormatException(Messages.getString(MessageIds.DE_MSGI0021, new Object[] { useVersion } ));
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
@@ -1706,7 +1706,7 @@ public class LogViewReader {
 	private static String mapLovDeviceNames(String deviceName) throws NotSupportedException {
 		String deviceKey = deviceName.toLowerCase().trim();
 		if (!deviceMap.containsKey(deviceKey)) {
-			String msg = Messages.getString(MessageIds.OSDE_MSGW0016, new Object[] { deviceName }); 
+			String msg = Messages.getString(MessageIds.DE_MSGW0016, new Object[] { deviceName }); 
 			NotSupportedException e = new NotSupportedException(msg);
 			log.log(Level.WARNING, e.getMessage(), e);
 			throw e;

@@ -66,7 +66,7 @@ public class DataTableWindow extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.OSDE_MSGT0233));
+		this.setText(Messages.getString(MessageIds.DE_MSGT0233));
 	}
 
 	public void create() {
@@ -110,7 +110,7 @@ public class DataTableWindow extends CTabItem {
 		}
 
 		int extentFactor = 9;
-		String time = Messages.getString(MessageIds.OSDE_MSGT0234); //$NON-NLS-1$
+		String time = Messages.getString(MessageIds.DE_MSGT0234); //$NON-NLS-1$
 		this.timeColumn = new TableColumn(this.dataTable, SWT.CENTER);
 		this.timeColumn.setWidth(time.length() * extentFactor);
 		this.timeColumn.setText(time);

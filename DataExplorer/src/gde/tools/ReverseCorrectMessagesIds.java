@@ -42,10 +42,10 @@ public class ReverseCorrectMessagesIds {
 	+ "#    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>. \n"
 	+ "#****************************************************************************************/ \n"
 	+ "# DataExplorer message file Locale.GERMANY Winfried Brügmann  - 22 Jan 2008 \n" + " \n" 
-	+ "# OSDE_MSGE0000 -> error messages \n"
-	+ "# OSDE_MSGW0000 -> warning messages \n" 
-	+ "# OSDE_MSGI0000 -> info messages \n" 
-	+ "# OSDE_MSGT0000 -> normal text \n"
+	+ "# DE_MSGE0000 -> error messages \n"
+	+ "# DE_MSGW0000 -> warning messages \n" 
+	+ "# DE_MSGI0000 -> info messages \n" 
+	+ "# DE_MSGT0000 -> normal text \n"
 	+ "# range 0000 to 1000 reserved for base OSDE code \n" 
 	+ "# range 1001 to 1099 Sample + Simulator \n" 
 	+ "# range 1100 to 1199 AkkuMaster device \n" 
@@ -57,14 +57,14 @@ public class ReverseCorrectMessagesIds {
 	// add new supported device here
 	+ " \n";
 
-	final static String	begin_OSDE_MSGE		= "# begin OSDE_MSGE0000 -> error messages \n";
-	final static String	end_OSDE_MSGE			= "# end OSDE_MSGE0000 -> error messages \n\n";
-	final static String	begin_OSDE_MSGW		= "# begin OSDE_MSGW0000 -> warning messages \n";
-	final static String	end_OSDE_MSGW			= "# end OSDE_MSGW0000 -> warning messages \n\n";
-	final static String	begin_OSDE_MSGI		= "# begin OSDE_MSGI0000 -> info messages \n";
-	final static String	end_OSDE_MSGI			= "# end OSDE_MSGI0000 -> info messages \n\n";
-	final static String	begin_OSDE_MSGT		= "# begin OSDE_MSGT0000 -> normal text \n";
-	final static String	end_OSDE_MSGT			= "# end OSDE_MSGT0000 -> normal text \n\n";
+	final static String	begin_DE_MSGE		= "# begin DE_MSGE0000 -> error messages \n";
+	final static String	end_DE_MSGE			= "# end DE_MSGE0000 -> error messages \n\n";
+	final static String	begin_DE_MSGW		= "# begin DE_MSGW0000 -> warning messages \n";
+	final static String	end_DE_MSGW			= "# end DE_MSGW0000 -> warning messages \n\n";
+	final static String	begin_DE_MSGI		= "# begin DE_MSGI0000 -> info messages \n";
+	final static String	end_DE_MSGI			= "# end DE_MSGI0000 -> info messages \n\n";
+	final static String	begin_DE_MSGT		= "# begin DE_MSGT0000 -> normal text \n";
+	final static String	end_DE_MSGT			= "# end DE_MSGT0000 -> normal text \n\n";
 	final static String	skipLine					= " \n";
 	final static String	range_OSDE				= "# range 0000 to 1000 reserved for base OSDE code \n";
 	static boolean isRanageOSDE = false;
@@ -100,72 +100,72 @@ public class ReverseCorrectMessagesIds {
 		writer.write(skipLine);
 		readerIds.mark(50000);
 
-		//OSDE_MSGE*
-		writer.write(begin_OSDE_MSGE);
+		//DE_MSGE*
+		writer.write(begin_DE_MSGE);
 		while ((line = readerIds.readLine()) != null) {
 			if (!line.trim().startsWith("public final static String") || line.trim().length() <= 1) continue;
 			//System.out.println(line);
 
 			String[] sections = line.trim().split(" |\t");
-			if (!sections[4].startsWith("OSDE_MSGE")) continue;
+			if (!sections[4].startsWith("DE_MSGE")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
 			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
-		writer.write(end_OSDE_MSGE);
+		writer.write(end_DE_MSGE);
 		readerIds.reset();
 		isRanageOSDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
 
-		//OSDE_MSGW*
-		writer.write(begin_OSDE_MSGW);
+		//DE_MSGW*
+		writer.write(begin_DE_MSGW);
 		while ((line = readerIds.readLine()) != null) {
 			if (!line.trim().startsWith("public final static String") || line.trim().length() <= 1) continue;
 			//System.out.println(line);
 
 			String[] sections = line.trim().split(" |\t");
-			if (!sections[4].startsWith("OSDE_MSGW")) continue;
+			if (!sections[4].startsWith("DE_MSGW")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
 			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
-		writer.write(end_OSDE_MSGW);
+		writer.write(end_DE_MSGW);
 		readerIds.reset();
 		isRanageOSDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
 
-		//OSDE_MSGI*
-		writer.write(begin_OSDE_MSGI);
+		//DE_MSGI*
+		writer.write(begin_DE_MSGI);
 		while ((line = readerIds.readLine()) != null) {
 			if (!line.trim().startsWith("public final static String") || line.trim().length() <= 1) continue;
 			//System.out.println(line);
 
 			String[] sections = line.trim().split(" |\t");
-			if (!sections[4].startsWith("OSDE_MSGI")) continue;
+			if (!sections[4].startsWith("DE_MSGI")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
 			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 
 		}
-		writer.write(end_OSDE_MSGI);
+		writer.write(end_DE_MSGI);
 		readerIds.reset();
 		isRanageOSDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
 
-		//OSDE_MSGT*
-		writer.write(begin_OSDE_MSGT);
+		//DE_MSGT*
+		writer.write(begin_DE_MSGT);
 		while ((line = readerIds.readLine()) != null) {
 			if (!line.trim().startsWith("public final static String") || line.trim().length() <= 1) continue;
 			//System.out.println(line);
 
 			String[] sections = line.trim().split(" |\t");
-			if (!sections[4].startsWith("OSDE_MSGT")) continue;
+			if (!sections[4].startsWith("DE_MSGT")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
 			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
-		writer.write(end_OSDE_MSGT);
+		writer.write(end_DE_MSGT);
 
 		//		writer.write(fileClosing);
 

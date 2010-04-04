@@ -53,11 +53,11 @@ public class ObjectImageContextMenu {
 	public void createMenu(Menu popupMenu) {
 		this.menu = popupMenu;
 		MenuItem newItem = new MenuItem(this.menu, SWT.PUSH);
-		newItem.setText(Messages.getString(MessageIds.OSDE_MSGT0430));
+		newItem.setText(Messages.getString(MessageIds.DE_MSGT0430));
 		newItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ObjectImageContextMenu.log.log(Level.FINEST, "newItem action performed! " + e); //$NON-NLS-1$
-				FileDialog imgFileDialog = ObjectImageContextMenu.this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT0431), new String[] { DE.FILE_ENDING_STAR_JPG, DE.FILE_ENDING_STAR_PNG,
+				FileDialog imgFileDialog = ObjectImageContextMenu.this.application.openFileOpenDialog(Messages.getString(MessageIds.DE_MSGT0431), new String[] { DE.FILE_ENDING_STAR_JPG, DE.FILE_ENDING_STAR_PNG,
 						DE.FILE_ENDING_STAR_GIF }, Settings.getInstance().getDataFilePath());
 				String imgFilePath = imgFileDialog.getFilterPath();
 				ObjectImageContextMenu.log.log(Level.FINE, "imgFilePath = " + imgFilePath); //$NON-NLS-1$
@@ -69,7 +69,7 @@ public class ObjectImageContextMenu {
 			}
 		});
 		MenuItem deleteItem = new MenuItem(this.menu, SWT.PUSH);
-		deleteItem.setText(Messages.getString(MessageIds.OSDE_MSGT0432));
+		deleteItem.setText(Messages.getString(MessageIds.DE_MSGT0432));
 		deleteItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ObjectImageContextMenu.log.log(Level.FINEST, "deleteItem action performed! " + e); //$NON-NLS-1$

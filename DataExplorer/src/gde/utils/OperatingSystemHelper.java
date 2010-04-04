@@ -76,7 +76,7 @@ public class OperatingSystemHelper {
 					log.log(Level.INFO, "workingDirectory = " + workingDirectory); //$NON-NLS-1$
 					String fqIconPath = fqExecutablePath; // exe wrapper will contain icon - sourceLaunchFilePath + "ico";
 					log.log(Level.INFO, "fqIconPath = " + fqIconPath); //$NON-NLS-1$
-					String description = Messages.getString(MessageIds.OSDE_MSGT0000);
+					String description = Messages.getString(MessageIds.DE_MSGT0000);
 					log.log(Level.INFO, "description = " + description); //$NON-NLS-1$
 
 					String[] shellLinkArgs = new String[] { targetDesktopLaucherFilePath, fqExecutablePath, executableArguments, workingDirectory, fqIconPath, description };
@@ -97,7 +97,7 @@ public class OperatingSystemHelper {
 					log.log(Level.INFO, "executableArguments = " + executableArguments); //$NON-NLS-1$
 					fqIconPath = fqExecutablePath; // exe wrapper will contain icon - sourceLaunchFilePath + "ico";
 					log.log(Level.INFO, "fqIconPath = " + fqIconPath); //$NON-NLS-1$
-					description = Messages.getString(MessageIds.OSDE_MSGT0595);
+					description = Messages.getString(MessageIds.DE_MSGT0595);
 					log.log(Level.INFO, "description = " + description); //$NON-NLS-1$
 
 					shellLinkArgs = new String[] { targetDesktopLaucherFilePath, fqExecutablePath, executableArguments, workingDirectory, fqIconPath, description };
@@ -123,7 +123,7 @@ public class OperatingSystemHelper {
 						String jarFilePath = sourceBasePath + "DataExplorer.jar"; //$NON-NLS-1$
 						log.log(Level.INFO, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
 
-						FileUtils.extractWhileReplace("@OSDE_DIR@", sourceBasePath, jarFilePath, desktopFileName, extractTargetFilePath, DE.STRING_UTF_8, DE.STRING_UTF_8); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						FileUtils.extractWhileReplace("@DE_DIR@", sourceBasePath, jarFilePath, desktopFileName, extractTargetFilePath, DE.STRING_UTF_8, DE.STRING_UTF_8); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 						targetBasePath = System.getenv("HOME") + DE.FILE_SEPARATOR_UNIX + "Desktop" + DE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 						log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
@@ -145,7 +145,7 @@ public class OperatingSystemHelper {
 						String jarFilePath = sourceBasePath + "DataExplorer.jar"; //$NON-NLS-1$
 						log.log(Level.INFO, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
 
-						FileUtils.extractWhileReplace("@OSDE_DIR@", sourceBasePath, jarFilePath, desktopFileName, extractTargetFilePath, DE.STRING_UTF_8, DE.STRING_UTF_8); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						FileUtils.extractWhileReplace("@DE_DIR@", sourceBasePath, jarFilePath, desktopFileName, extractTargetFilePath, DE.STRING_UTF_8, DE.STRING_UTF_8); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 						targetBasePath = System.getenv("HOME") + DE.FILE_SEPARATOR_UNIX + "Desktop" + DE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 						log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
@@ -180,7 +180,7 @@ public class OperatingSystemHelper {
 			else {
 				log.log(Level.WARNING, "not supported OS"); //$NON-NLS-1$
 				// OPET - start - change
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0032, new Object[] {"createDesktopLink", System.getProperty(DE.STRING_OS_NAME)}));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGW0032, new Object[] {"createDesktopLink", System.getProperty(DE.STRING_OS_NAME)}));
 				// OPET - end
 				isCreated = true;
 			}
@@ -247,7 +247,7 @@ public class OperatingSystemHelper {
 				isRemoved = true;
 			}
 			else {
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0034, new Object[] {System.getProperty(DE.STRING_OS_NAME)}));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGW0034, new Object[] {System.getProperty(DE.STRING_OS_NAME)}));
 			}
 		}
 		catch (Throwable e) {
@@ -282,7 +282,7 @@ public class OperatingSystemHelper {
 
 				if (DE.IS_WINDOWS) {
 					// warn user for UAC or fail due to required admin rights accessing registry
-					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0029));
+					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGI0029));
 					String regExe = "Register" + DE.BIT_MODE + ".exe"; //$NON-NLS-1$ //$NON-NLS-2$
 					log.log(Level.INFO, "register exe = " + regExe); //$NON-NLS-1$
 
@@ -352,7 +352,7 @@ public class OperatingSystemHelper {
 
 					//installation directory must contain DataExplorer.desktop with write permission
 					if (targetFile.exists() && targetFile.canWrite()) {
-						FileUtils.extractWhileReplace("@OSDE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
+						FileUtils.extractWhileReplace("@DE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
 						FileUtils.extract(jarFile, "register.sh", DE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						FileUtils.extract(jarFile, "DataExplorer.directory", DE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -375,7 +375,7 @@ public class OperatingSystemHelper {
 
 					//installation directory must contain DataExplorer.desktop with write permission
 					if (targetFile.exists() && targetFile.canWrite()) {
-						FileUtils.extractWhileReplace("@OSDE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
+						FileUtils.extractWhileReplace("@DE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
 						FileUtils.extract(jarFile, "register.sh", DE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						FileUtils.extract(jarFile, "DevicePropertiesEditor.directory", DE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -394,17 +394,17 @@ public class OperatingSystemHelper {
 					//check if xdg-utls are installed, this is the prerequisite for the registration process
 					if (Runtime.getRuntime().exec("which xdg-mime").waitFor() != 0) { //$NON-NLS-1$
 						log.log(Level.INFO, "DataExplorer program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
-						DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0030));
+						DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGI0030));
 						rc = 0;
 					}
 				}
 				else if (DE.IS_MAC) { //$NON-NLS-1$
-					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0031));
+					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGI0031));
 					rc = 0;
 				}
 				else {
 					log.log(Level.INFO, "Unsupported OS, shell integration, MIME registration NOT IMPLEMENTED"); //$NON-NLS-1$
-					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0024, new Object[] {System.getProperty(DE.STRING_OS_NAME)}));
+					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGW0024, new Object[] {System.getProperty(DE.STRING_OS_NAME)}));
 					rc = 0;
 				}
 			}
@@ -412,15 +412,15 @@ public class OperatingSystemHelper {
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			if (e.getMessage().contains("error=740") || e instanceof IOException) { //permission access exception //$NON-NLS-1$
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0023, new Object[] {command}));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGW0023, new Object[] {command}));
 				rc = 0;
 			}
 			else if (e instanceof UnsatisfiedLinkError) {
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0037, new Object[] {e.getClass().getSimpleName()})
-						+ Messages.getString(MessageIds.OSDE_MSGI0033));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGE0037, new Object[] {e.getClass().getSimpleName()})
+						+ Messages.getString(MessageIds.DE_MSGI0033));
 			}
 			else {
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0039));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGE0039));
 			}
 		}
 		log.log(Level.INFO, "DataExplorer MIME registered = " + (rc == 0)); //$NON-NLS-1$
@@ -445,7 +445,7 @@ public class OperatingSystemHelper {
 
 			if (DE.IS_WINDOWS) {
 				// warn user for UAC or fail due to required admin rights accessing registry
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0029));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGI0029));
 				String regExe = "Register" + DE.BIT_MODE + ".exe"; //$NON-NLS-1$ //$NON-NLS-2$
 				log.log(Level.INFO, "register exe = " + regExe); //$NON-NLS-1$
 
@@ -508,7 +508,7 @@ public class OperatingSystemHelper {
 
 				//installation directory must contain DataExplorer.desktop with write permission
 				if (targetFile.exists() && targetFile.canWrite()) {
-					FileUtils.extractWhileReplace("@OSDE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
+					FileUtils.extractWhileReplace("@DE_DIR@", jarBasePath, jarFilePath, desktopFileName, extractTargetFilePath, "UTF-8", "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$);
 					FileUtils.extract(jarFile, "unregister.sh", DE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					FileUtils.extract(jarFile, "DataExplorerdirectory", DE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -527,26 +527,26 @@ public class OperatingSystemHelper {
 				//check if xdg-utls are installed, this is the prerequisite for the registration process
 				if (Runtime.getRuntime().exec("which xdg-mime").waitFor() != 0) { //$NON-NLS-1$
 					log.log(Level.INFO, "DataExplorer program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
-					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0030));
+					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGI0030));
 					rc = 0;
 				}
 			}
 			else {
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0032, new Object[] {System.getProperty(DE.STRING_OS_NAME)}));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGI0032, new Object[] {System.getProperty(DE.STRING_OS_NAME)}));
 			}
 		}
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			if (e.getMessage().contains("error=740") || e instanceof IOException) { //permission access exception //$NON-NLS-1$
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGW0023, new Object[] {command}));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGW0023, new Object[] {command}));
 				rc = 0;
 			}
 			else if ( e instanceof UnsatisfiedLinkError) {
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0037, new Object[] {e.getClass().getSimpleName()})
-						+ Messages.getString(MessageIds.OSDE_MSGI0033));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGE0037, new Object[] {e.getClass().getSimpleName()})
+						+ Messages.getString(MessageIds.DE_MSGI0033));
 			}
 			else {
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0039));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGE0039));
 			}
 		}
 		return rc == 0;
@@ -563,7 +563,7 @@ public class OperatingSystemHelper {
 				String existingSourcePath = OperatingSystemHelper.getLinkContainedFilePath(fullQualifiedTargetFilePath).replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
 				if(!existingSourcePath.equals(fullQualifiedSourceFilePath)) {
 					fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.substring(0, fullQualifiedTargetFilePath.length()-4) + DE.STRING_UNDER_BAR + DE.FILE_ENDING_DOT_OSD;
-					DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGW0033, new Object[] {fullQualifiedTargetFilePath, existingSourcePath, existingSourcePath, fullQualifiedTargetFilePath}));
+					DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.DE_MSGW0033, new Object[] {fullQualifiedTargetFilePath, existingSourcePath, existingSourcePath, fullQualifiedTargetFilePath}));
 				}
 			}
 
@@ -616,7 +616,7 @@ public class OperatingSystemHelper {
 			}
 			else {
 				log.log(Level.WARNING, "not supported OS"); //$NON-NLS-1$
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGI0035, new Object[] {System.getProperty(DE.STRING_OS_NAME)}));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGI0035, new Object[] {System.getProperty(DE.STRING_OS_NAME)}));
 			}
 		}
 		catch (IOException e) {
@@ -644,7 +644,7 @@ public class OperatingSystemHelper {
 				log.log(Level.FINE, "source filePath = " + filePath); //$NON-NLS-1$
 				ret = WindowsHelper.getFilePathFromLink(filePath);
 				log.log(Level.FINE, "returned FilePath = " + ret); //$NON-NLS-1$
-				if (ret.startsWith("OSDE_MSGE")) { //$NON-NLS-1$
+				if (ret.startsWith("DE_MSGE")) { //$NON-NLS-1$
 					String msgKey = ret.split(DE.STRING_SEMICOLON)[0];
 					String msgValue = ret.split("; ")[1];
 					throw new UnsatisfiedLinkError(Messages.getString(msgKey,

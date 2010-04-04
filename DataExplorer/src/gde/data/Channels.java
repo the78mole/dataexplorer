@@ -206,7 +206,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			}
 		}
 		else
-			this.application.openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGW0006)); 
+			this.application.openMessageDialogAsync(Messages.getString(MessageIds.DE_MSGW0006)); 
 	}
 
 	/**

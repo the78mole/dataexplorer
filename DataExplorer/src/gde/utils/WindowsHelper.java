@@ -48,10 +48,10 @@ public class WindowsHelper {
 		catch (Throwable t) {
 			log.log(Level.SEVERE, t.getMessage(), t);
 			if (t instanceof UnsatisfiedLinkError)
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0037, new Object[] {t.getClass().getSimpleName()}) 
-						+ Messages.getString(MessageIds.OSDE_MSGI0033));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGE0037, new Object[] {t.getClass().getSimpleName()}) 
+						+ Messages.getString(MessageIds.DE_MSGI0033));
 			else
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.OSDE_MSGE0038, new Object[] {t.getLocalizedMessage()}));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGE0038, new Object[] {t.getLocalizedMessage()}));
 		}
 	}
 	
@@ -80,8 +80,8 @@ public class WindowsHelper {
 	public static void registerSerialPorts() {
 		long startTime = new Date().getTime();
 		String[] enumPorts = enumerateSerialPorts();
-		if (enumPorts[0].startsWith("OSDE_MSG")) {			
-			log.log(Level.WARNING, Messages.getString(MessageIds.OSDE_MSGW0035, new Object[] {enumPorts[0].split(";")[1]}));
+		if (enumPorts[0].startsWith("DE_MSG")) {			
+			log.log(Level.WARNING, Messages.getString(MessageIds.DE_MSGW0035, new Object[] {enumPorts[0].split(";")[1]}));
 			return;
 		}
 		

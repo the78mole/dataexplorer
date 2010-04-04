@@ -129,7 +129,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				WindowsHelper.registerSerialPorts();
 			}
 			catch (Throwable e) {
-				log.log(Level.WARNING, Messages.getString(MessageIds.OSDE_MSGW0035));
+				log.log(Level.WARNING, Messages.getString(MessageIds.DE_MSGW0035));
 			}
 		}
 		
@@ -237,7 +237,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			}
 			if (this.serialPortStr == null || this.serialPortStr.length() < 4 || !isMatchAvailablePorts(this.serialPortStr, availablePorts)) {
 				if (availablePorts.size() == 1 && (this.serialPortStr != null && !isMatchAvailablePorts(this.serialPortStr, availablePorts))) {
-					if (SWT.YES == this.application.openYesNoMessageDialogSync(Messages.getString(MessageIds.OSDE_MSGE0010) + DE.LINE_SEPARATOR + Messages.getString(MessageIds.OSDE_MSGT0194, new String[] {this.serialPortStr = availablePorts.firstElement()}))) {
+					if (SWT.YES == this.application.openYesNoMessageDialogSync(Messages.getString(MessageIds.DE_MSGE0010) + DE.LINE_SEPARATOR + Messages.getString(MessageIds.DE_MSGT0194, new String[] {this.serialPortStr = availablePorts.firstElement()}))) {
 						this.serialPortStr = availablePorts.firstElement();
 						if (settings.isGlobalSerialPort())
 							settings.setSerialPort(this.serialPortStr);
@@ -248,11 +248,11 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						}
 					}
 					else {
-						throw new ApplicationConfigurationException(Messages.getString(MessageIds.OSDE_MSGE0010));
+						throw new ApplicationConfigurationException(Messages.getString(MessageIds.DE_MSGE0010));
 					}
 				}
 				else {
-					throw new ApplicationConfigurationException(Messages.getString(MessageIds.OSDE_MSGE0010));
+					throw new ApplicationConfigurationException(Messages.getString(MessageIds.DE_MSGE0010));
 				}
 			}
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, String.format("serialPortString = %s; baudeRate = %d; dataBits = %s; stopBits = %s; parity = %s; flowControlMode = %s; RTS = %s; DTR = %s", this.serialPortStr, this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity(), this.deviceConfig.getFlowCtrlMode(), this.deviceConfig.isRTS(), this.deviceConfig.isDTR())); //$NON-NLS-1$
@@ -417,7 +417,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			}
 			//this.dataAvailable = false;
 			if (timeOutCounter <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { bytes, timeout_msec })); 
+				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.DE_MSGE0011, new Object[] { bytes, timeout_msec })); 
 				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}
@@ -479,7 +479,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			}
 			//this.dataAvailable = false;
 			if (timeOutCounter <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { bytes, timeout_msec }));
+				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.DE_MSGE0011, new Object[] { bytes, timeout_msec }));
 				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}
@@ -529,7 +529,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				// ignore
 			}
 			if (timeOutCounter-- <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(osde.messages.MessageIds.OSDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
+				TimeOutException e = new TimeOutException(Messages.getString(osde.messages.MessageIds.DE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}
@@ -562,7 +562,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			timeOutCounter--;
 			//log.logp(Level.FINER, "time out counter = " + counter);
 			if (timeOutCounter <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { numBytes, timeout_msec }));
+				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.DE_MSGE0011, new Object[] { numBytes, timeout_msec }));
 				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}
@@ -587,7 +587,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int readBytes = 0;
 		int timeOutCounter = timeout_msec / sleepTime;
 		if (stableIndex >= timeOutCounter) {
-			log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.OSDE_MSGE0013));
+			log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.DE_MSGE0013));
 		}
 
 
@@ -610,7 +610,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			}
 			//this.dataAvailable = false;
 			if (timeOutCounter <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { expectedBytes, timeout_msec }));
+				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.DE_MSGE0011, new Object[] { expectedBytes, timeout_msec }));
 				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}
@@ -685,7 +685,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "stableCounter = " + stableCounter + " timeOutCounter = " + timeOutCounter); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (timeOutCounter == 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.OSDE_MSGE0011, new Object[] { expectedBytes, timeout_msec })); 
+				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.DE_MSGE0011, new Object[] { expectedBytes, timeout_msec })); 
 				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}
@@ -704,7 +704,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		final String $METHOD_NAME = "checkForLeftBytes"; //$NON-NLS-1$
 		//check available bytes in receive buffer == 0
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "inputStream available bytes = " + this.inputStream.available()); //$NON-NLS-1$
-		if (this.inputStream.available() != 0) throw new ReadWriteOutOfSyncException(Messages.getString(MessageIds.OSDE_MSGE0014));
+		if (this.inputStream.available() != 0) throw new ReadWriteOutOfSyncException(Messages.getString(MessageIds.DE_MSGE0014));
 	}
 
 	/**

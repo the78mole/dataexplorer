@@ -59,14 +59,14 @@ public class DataParser {
 	public void parse(String inputLine) throws DevicePropertiesInconsistenceException, NumberFormatException {
 		try {
 			if(!inputLine.startsWith(this.leader)) 
-				throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0046, new String[] {this.leader}));
+				throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.DE_MSGE0046, new String[] {this.leader}));
 			if(!inputLine.contains(separator)) 
-				throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0047, new String[] {inputLine, separator})); 
+				throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.DE_MSGE0047, new String[] {inputLine, separator})); 
 			
 			this.values = new int[this.size];
 			String[] strValues = inputLine.split(this.separator); // {$1, 1, 0, 14780, 0,598, 1,000, 8,838, 22}
 			log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
-			if (strValues.length-4 != this.size)  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0048, new String[] {inputLine}));
+			if (strValues.length-4 != this.size)  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.DE_MSGE0048, new String[] {inputLine}));
 			
 			String strValue = strValues[0].trim().substring(1);
 			this.recordNumber = Integer.parseInt(strValue);
@@ -111,7 +111,7 @@ public class DataParser {
 				}
 			}
 			if (!isValid) {
-				DevicePropertiesInconsistenceException e = new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.OSDE_MSGE0049, new String[] {strValue})); 
+				DevicePropertiesInconsistenceException e = new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.DE_MSGE0049, new String[] {strValue})); 
 				log.log(Level.WARNING, e.getMessage(), e);
 				throw e;
 			}

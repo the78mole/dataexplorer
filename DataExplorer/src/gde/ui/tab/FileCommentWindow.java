@@ -90,7 +90,7 @@ public class FileCommentWindow extends CTabItem {
 		this.channels = Channels.getInstance();
 		SWTResourceManager.registerResourceUser(this);
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.OSDE_MSGT0239));
+		this.setText(Messages.getString(MessageIds.DE_MSGT0239));
 
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
@@ -121,7 +121,7 @@ public class FileCommentWindow extends CTabItem {
 		});
 		{
 			this.infoLabel = new CLabel(this.commentMainComposite, SWT.LEFT);
-			this.infoLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0240));
+			this.infoLabel.setText(Messages.getString(MessageIds.DE_MSGT0240));
 			this.infoLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
 			this.infoLabel.setBackground(this.surroundingBackground);
 			this.infoLabel.setMenu(this.popupmenu);
@@ -138,7 +138,7 @@ public class FileCommentWindow extends CTabItem {
 			this.fileCommentText = new Text(this.commentMainComposite, SWT.WRAP | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 			this.fileCommentText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.fileCommentText.setBackground(this.innerAreaBackground);
-			this.fileCommentText.setText(Messages.getString(MessageIds.OSDE_MSGT0241));
+			this.fileCommentText.setText(Messages.getString(MessageIds.DE_MSGT0241));
 			this.fileCommentText.setBounds(50, 40, 500, 100);
 			this.fileCommentText.setText(this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getFileDescription() : DE.STRING_EMPTY);
 			this.fileCommentText.setMenu(this.popupmenu);
@@ -186,11 +186,11 @@ public class FileCommentWindow extends CTabItem {
 
 			this.recordCommentTableHeader = new TableColumn(this.recordCommentTable, SWT.LEFT);
 			this.recordCommentTableHeader.setWidth(250);
-			this.recordCommentTableHeader.setText(Messages.getString(MessageIds.OSDE_MSGT0242));
+			this.recordCommentTableHeader.setText(Messages.getString(MessageIds.DE_MSGT0242));
 
 			this.recordCommentTableHeader2 = new TableColumn(this.recordCommentTable, SWT.LEFT);
 			this.recordCommentTableHeader2.setWidth(500);
-			this.recordCommentTableHeader2.setText(Messages.getString(MessageIds.OSDE_MSGT0243));
+			this.recordCommentTableHeader2.setText(Messages.getString(MessageIds.DE_MSGT0243));
 		}
 	}
 

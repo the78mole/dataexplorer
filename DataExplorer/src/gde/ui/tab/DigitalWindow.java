@@ -56,7 +56,7 @@ public class DigitalWindow extends CTabItem {
 	Composite												digitalMainComposite;
 	HashMap<String, DigitalDisplay>	displays;
 	FillLayout 											digitalMainCompositeLayout = new FillLayout(SWT.HORIZONTAL);
-	String 													info = Messages.getString(MessageIds.OSDE_MSGT0230);
+	String 													info = Messages.getString(MessageIds.DE_MSGT0230);
 
 	Color														surroundingBackground;
 
@@ -77,7 +77,7 @@ public class DigitalWindow extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.OSDE_MSGT0238));
+		this.setText(Messages.getString(MessageIds.DE_MSGT0238));
 			
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();

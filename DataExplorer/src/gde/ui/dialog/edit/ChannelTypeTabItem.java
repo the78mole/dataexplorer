@@ -66,7 +66,7 @@ public class ChannelTypeTabItem extends CTabItem {
 	CTabFolder										measurementsTabFolder;
 
 	ChannelTypes									channelConfigType	= ChannelTypes.TYPE_OUTLET;
-	String												channelConfigName	= Messages.getString(MessageIds.OSDE_MSGT0527);
+	String												channelConfigName	= Messages.getString(MessageIds.DE_MSGT0527);
 
 	final CTabFolder							channelConfigInnerTabFolder;
 	final DevicePropertiesEditor	propsEditor;
@@ -158,7 +158,7 @@ public class ChannelTypeTabItem extends CTabItem {
 		this.channelType = new ObjectFactory().createChannelType();
 		this.channelConfigType = copyFrom.channelConfigType;
 		this.channelConfigName = copyFrom.channelConfigName;
-		this.channelType.setName(this.channelConfigType == ChannelTypes.TYPE_OUTLET ? this.channelConfigName : Messages.getString(MessageIds.OSDE_MSGT0507));
+		this.channelType.setName(this.channelConfigType == ChannelTypes.TYPE_OUTLET ? this.channelConfigName : Messages.getString(MessageIds.DE_MSGT0507));
 		this.channelType.setType(this.channelConfigType);
 		this.tabName = DE.STRING_BLANK + this.channelConfigNumber + DE.STRING_BLANK + (this.deviceConfig != null ? this.channelType.getName() : DE.STRING_EMPTY);
 		initGUI();
@@ -234,7 +234,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				}
 				{
 					this.channelConfigText = new Text(this.channelConfigComposite, SWT.BORDER | SWT.LEFT);
-					this.channelConfigText.setText(Messages.getString(MessageIds.OSDE_MSGT0527));
+					this.channelConfigText.setText(Messages.getString(MessageIds.DE_MSGT0527));
 					this.channelConfigText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					//this.channelConfigText.setBounds(147, 9, 128, 20);
 					fd = new FormData();
@@ -259,7 +259,7 @@ public class ChannelTypeTabItem extends CTabItem {
 				}
 				{
 					this.channelConfigLabel = new Label(this.channelConfigComposite, SWT.CENTER);
-					this.channelConfigLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0528));
+					this.channelConfigLabel.setText(Messages.getString(MessageIds.DE_MSGT0528));
 					this.channelConfigLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					//this.channelConfigLabel.setBounds(289, 9, 279, 20);
 					fd = new FormData();
@@ -324,7 +324,7 @@ public class ChannelTypeTabItem extends CTabItem {
 					fd.height = 20;
 					fd.right = new FormAttachment(1000, 1000, -10);
 					this.channelConfigAddButton.setLayoutData(fd);
-					this.channelConfigAddButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT0526));
+					this.channelConfigAddButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0526));
 					this.channelConfigAddButton.setSize(40, 20);
 					this.channelConfigAddButton.addSelectionListener(new SelectionAdapter() {
 						@Override

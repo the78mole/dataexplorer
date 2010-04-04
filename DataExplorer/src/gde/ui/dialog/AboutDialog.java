@@ -81,7 +81,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();			
 			this.dialogShell.setSize(650, 430);
-			this.dialogShell.setText(Messages.getString(MessageIds.OSDE_MSGT0146));
+			this.dialogShell.setText(Messages.getString(MessageIds.DE_MSGT0146));
 			{
 				FormData infoTextLData = new FormData();
 				infoTextLData.width = 610;
@@ -92,10 +92,10 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.infoText = new Label(this.dialogShell, SWT.LEFT | SWT.WRAP);
 				this.infoText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 				this.infoText.setLayoutData(infoTextLData);
-				this.infoText.setText(Messages.getString(MessageIds.OSDE_MSGT0147)
-						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0148)  //$NON-NLS-1$ 
-						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0149)  //$NON-NLS-1$
-						+ System.getProperty("line.separator") + Messages.getString(MessageIds.OSDE_MSGT0150)); //$NON-NLS-1$
+				this.infoText.setText(Messages.getString(MessageIds.DE_MSGT0147)
+						+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGT0148)  //$NON-NLS-1$ 
+						+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGT0149)  //$NON-NLS-1$
+						+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGT0150)); //$NON-NLS-1$
 				this.infoText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				//this.infoText.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 				//this.infoText.setForeground(DataExplorer.COLOR_BLACK);

@@ -58,7 +58,7 @@ public class WebBrowser {
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			DataExplorer.getInstance().openMessageDialog(
-					Messages.getString(MessageIds.OSDE_MSGE0018, new Object[] { e.getLocalizedMessage() } )); //$NON-NLS-1$
+					Messages.getString(MessageIds.DE_MSGE0018, new Object[] { e.getLocalizedMessage() } )); //$NON-NLS-1$
 		}
 	}
 
@@ -80,7 +80,7 @@ public class WebBrowser {
 					if (Runtime.getRuntime().exec(new String[] { "which", browsers[count] }).waitFor() == 0) browser = browsers[count]; //$NON-NLS-1$
 
 				if (browser == null)
-					throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0019, new Object[]
+					throw new Exception(Messages.getString(MessageIds.DE_MSGE0019, new Object[]
 							{ "firefox, konqueror, opera, epiphany, mozilla, netscape" } )); //$NON-NLS-1$
 				
 				Runtime.getRuntime().exec(browser + DE.STRING_BLANK + stringUrl);
@@ -89,13 +89,13 @@ public class WebBrowser {
 		 		Runtime.getRuntime().exec("open" + DE.STRING_BLANK + stringUrl);
 		 }
 			else {
-				throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0020, new Object[] {System.getProperty(DE.STRING_OS_NAME)} )); 
+				throw new Exception(Messages.getString(MessageIds.DE_MSGE0020, new Object[] {System.getProperty(DE.STRING_OS_NAME)} )); 
 			}
 
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.OSDE_MSGE0021, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+			DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.DE_MSGE0021, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 		}
 	}
 }

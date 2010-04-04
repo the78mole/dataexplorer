@@ -100,7 +100,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 	private void initGUI() {
 		try {
 			SWTResourceManager.registerResourceUser(this);
-			this.setText(Messages.getString(MessageIds.OSDE_MSGT0510));
+			this.setText(Messages.getString(MessageIds.DE_MSGT0510));
 			this.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			{
 				this.serialPortComposite = new Composite(this.tabFolder, SWT.NONE);
@@ -128,13 +128,13 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				});
 				{
 					this.serialPortDescriptionLabel = new Label(this.serialPortComposite, SWT.CENTER | SWT.WRAP);
-					this.serialPortDescriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0577));
+					this.serialPortDescriptionLabel.setText(Messages.getString(MessageIds.DE_MSGT0577));
 					this.serialPortDescriptionLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.serialPortDescriptionLabel.setBounds(12, 6, 602, 56);
 				}
 				{
 					this.portNameLabel = new Label(this.serialPortComposite, SWT.RIGHT);
-					this.portNameLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0578));
+					this.portNameLabel.setText(Messages.getString(MessageIds.DE_MSGT0578));
 					this.portNameLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.portNameLabel.setBounds(5, 74, 100, 20);
 				}
@@ -146,7 +146,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				}
 				{
 					this.baudeRateLabel = new Label(this.serialPortComposite, SWT.RIGHT);
-					this.baudeRateLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0579));
+					this.baudeRateLabel.setText(Messages.getString(MessageIds.DE_MSGT0579));
 					this.baudeRateLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.baudeRateLabel.setBounds(5, 99, 100, 20);
 				}
@@ -169,7 +169,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				}
 				{
 					this.dataBitsLabel = new Label(this.serialPortComposite, SWT.RIGHT);
-					this.dataBitsLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0580));
+					this.dataBitsLabel.setText(Messages.getString(MessageIds.DE_MSGT0580));
 					this.dataBitsLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.dataBitsLabel.setBounds(5, 124, 100, 20);
 				}
@@ -191,7 +191,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				}
 				{
 					this.stopBitsLabel = new Label(this.serialPortComposite, SWT.RIGHT);
-					this.stopBitsLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0581));
+					this.stopBitsLabel.setText(Messages.getString(MessageIds.DE_MSGT0581));
 					this.stopBitsLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.stopBitsLabel.setBounds(5, 149, 100, 20);
 				}
@@ -214,7 +214,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				}
 				{
 					this.parityLabel = new Label(this.serialPortComposite, SWT.RIGHT);
-					this.parityLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0582));
+					this.parityLabel.setText(Messages.getString(MessageIds.DE_MSGT0582));
 					this.parityLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.parityLabel.setBounds(5, 174, 100, 20);
 				}
@@ -237,7 +237,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				}
 				{
 					this.flowControlLabel = new Label(this.serialPortComposite, SWT.RIGHT);
-					this.flowControlLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0583));
+					this.flowControlLabel.setText(Messages.getString(MessageIds.DE_MSGT0583));
 					this.flowControlLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.flowControlLabel.setBounds(5, 199, 100, 20);
 				}
@@ -260,7 +260,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				}
 				{
 					this.rtsLabel = new Label(this.serialPortComposite, SWT.RIGHT);
-					this.rtsLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0584));
+					this.rtsLabel.setText(Messages.getString(MessageIds.DE_MSGT0584));
 					this.rtsLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.rtsLabel.setBounds(5, 224, 100, 20);
 				}
@@ -282,7 +282,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				}
 				{
 					this.dtrLabel = new Label(this.serialPortComposite, SWT.RIGHT);
-					this.dtrLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0585));
+					this.dtrLabel.setText(Messages.getString(MessageIds.DE_MSGT0585));
 					this.dtrLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.dtrLabel.setBounds(5, 249, 100, 20);
 				}
@@ -308,13 +308,13 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					this.timeOutComposite.setBounds(355, 80, 250, 220);
 					{
 						this.timeOutDescriptionLabel = new Label(this.timeOutComposite, SWT.WRAP);
-						this.timeOutDescriptionLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0591));
+						this.timeOutDescriptionLabel.setText(Messages.getString(MessageIds.DE_MSGT0591));
 						this.timeOutDescriptionLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.timeOutDescriptionLabel.setBounds(6, 3, 232, 69);
 					}
 					{
 						this.timeOutLabel = new Label(this.timeOutComposite, SWT.RIGHT);
-						this.timeOutLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0586));
+						this.timeOutLabel.setText(Messages.getString(MessageIds.DE_MSGT0586));
 						this.timeOutLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.timeOutLabel.setBounds(6, 70, 140, 20);
 					}
@@ -357,7 +357,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					}
 					{
 						this._RTOCharDelayTimeLabel = new Label(this.timeOutComposite, SWT.RIGHT);
-						this._RTOCharDelayTimeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0587));
+						this._RTOCharDelayTimeLabel.setText(Messages.getString(MessageIds.DE_MSGT0587));
 						this._RTOCharDelayTimeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this._RTOCharDelayTimeLabel.setBounds(6, 100, 140, 20);
 					}
@@ -386,7 +386,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					}
 					{
 						this._RTOExtraDelayTimeLabel = new Label(this.timeOutComposite, SWT.RIGHT);
-						this._RTOExtraDelayTimeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0588));
+						this._RTOExtraDelayTimeLabel.setText(Messages.getString(MessageIds.DE_MSGT0588));
 						this._RTOExtraDelayTimeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this._RTOExtraDelayTimeLabel.setBounds(6, 130, 140, 20);
 					}
@@ -415,7 +415,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					}
 					{
 						this._WTOCharDelayTimeLabel = new Label(this.timeOutComposite, SWT.RIGHT);
-						this._WTOCharDelayTimeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0589));
+						this._WTOCharDelayTimeLabel.setText(Messages.getString(MessageIds.DE_MSGT0589));
 						this._WTOCharDelayTimeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this._WTOCharDelayTimeLabel.setBounds(6, 160, 140, 20);
 					}
@@ -444,7 +444,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 					}
 					{
 						this._WTOExtraDelayTimeLabel = new Label(this.timeOutComposite, SWT.RIGHT);
-						this._WTOExtraDelayTimeLabel.setText(Messages.getString(MessageIds.OSDE_MSGT0590));
+						this._WTOExtraDelayTimeLabel.setText(Messages.getString(MessageIds.DE_MSGT0590));
 						this._WTOExtraDelayTimeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this._WTOExtraDelayTimeLabel.setBounds(6, 190, 140, 20);
 					}

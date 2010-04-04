@@ -558,7 +558,7 @@ public class GraphicsComposite extends Composite {
 
 		// draw start time for zoom mode or scope mode
 		if (startTimeFormated != 0) { 
-			String strStartTime = Messages.getString(MessageIds.OSDE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
+			String strStartTime = Messages.getString(MessageIds.DE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
 			Point point = gc.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
 			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_RED));
@@ -671,7 +671,7 @@ public class GraphicsComposite extends Composite {
 			drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
 			this.application.setStatusMessage(Messages.getString(
-					MessageIds.OSDE_MSGT0256, 
+					MessageIds.DE_MSGT0256, 
 					new Object[] { record.getName(), record.getVerticalDisplayPointAsFormattedScaleValue(this.yPosMeasure, this.curveAreaBounds), record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }
 			));
 		}
@@ -696,7 +696,7 @@ public class GraphicsComposite extends Composite {
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 			this.application.setStatusMessage(
-					Messages.getString(MessageIds.OSDE_MSGT0257, new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), 
+					Messages.getString(MessageIds.DE_MSGT0257, new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), 
 					record.getUnit(), record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 			));
 		}
@@ -858,7 +858,7 @@ public class GraphicsComposite extends Composite {
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 
 			if (leftEnabled) {
-				this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0258));
+				this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0258));
 				//cleanCutPointer();
 				this.xPosCut = this.xPosCut > 0 ? this.xPosCut : this.curveAreaBounds.width * 1 / 4;
 				this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
@@ -867,7 +867,7 @@ public class GraphicsComposite extends Composite {
 				drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);
 			}
 			else if (rightEnabled) {
-				this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0259));
+				this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0259));
 				//cleanCutPointer();
 				this.xPosCut = this.xPosCut > 0 ? this.xPosCut : this.curveAreaBounds.width * 3 / 4;
 				this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
@@ -1090,13 +1090,13 @@ public class GraphicsComposite extends Composite {
 								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
 									drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);	
 								}
-								this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0257, 
+								this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0257, 
 										new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(), 
 										record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 								)); 
 							}
 							else {
-								this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0256, 
+								this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0256, 
 										new Object[] { record.getName(), record.getVerticalDisplayPointAsFormattedScaleValue(this.yPosMeasure, this.curveAreaBounds),
 										record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }
 								)); 
@@ -1138,7 +1138,7 @@ public class GraphicsComposite extends Composite {
 
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
-							this.application.setStatusMessage(Messages.getString(MessageIds.OSDE_MSGT0257, 
+							this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0257, 
 									new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(),
 									record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 							));
@@ -1294,7 +1294,7 @@ public class GraphicsComposite extends Composite {
 					//application.setStatusMessage(DE.STRING_EMPTY);
 				}
 				else if (this.isLeftCutMode) {
-					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0260))) {
+					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.DE_MSGT0260))) {
 						recordSet = recordSet.clone(recordSet.get(0).getHorizontalPointIndexFromDisplayPoint(this.xUp), true);
 						recordSet.setRecalculationRequired();
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
@@ -1304,7 +1304,7 @@ public class GraphicsComposite extends Composite {
 					}
 				}
 				else if (this.isRightCutMode) {
-					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0260))) {
+					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.DE_MSGT0260))) {
 						recordSet = recordSet.clone(recordSet.get(0).getHorizontalPointIndexFromDisplayPoint(this.xUp), false);
 						recordSet.setRecalculationRequired();
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
@@ -1443,7 +1443,7 @@ public class GraphicsComposite extends Composite {
 				graphicsGC.setForeground(this.graphicsHeader.getForeground());
 				graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
 				graphicsGC.setFont(this.graphicsHeader.getFont());
-				GraphicsUtils.drawTextCentered(Messages.getString(MessageIds.OSDE_MSGT0144), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
+				GraphicsUtils.drawTextCentered(Messages.getString(MessageIds.DE_MSGT0144), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
 				graphicsGC.setFont(this.recordSetComment.getFont());
 				for (int i=0,yPos=30+this.canvasBounds.height+5; i<compareSetNames.length; ++i, yPos+=20) {
 					Record compareRecord = compareRecordSet.get(compareSetNames[i]);

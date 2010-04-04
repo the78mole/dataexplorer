@@ -45,7 +45,7 @@ public class TimeLine {
 	public final static int	TIME_LINE_MIN_HRS		= 4;
 	public final static int	TIME_LINE_HRS				= 5;
 
-	String									timeLineText				= Messages.getString(MessageIds.OSDE_MSGT0267);
+	String									timeLineText				= Messages.getString(MessageIds.DE_MSGT0267);
 	boolean									isTimeLinePrepared	= false;
 
 	/**
@@ -68,38 +68,38 @@ public class TimeLine {
 
 		if (totalTime_std > 5) {
 			maxTimeNumberFormated = (int) totalTime_std;
-			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0265);
+			timeLineText = Messages.getString(MessageIds.DE_MSGT0265);
 			format = TimeLine.TIME_LINE_HRS;
 		}
 		else if (totalTime_min > 60) {
 			maxTimeNumberFormated = (int) totalTime_min;
-			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0266);
+			timeLineText = Messages.getString(MessageIds.DE_MSGT0266);
 			format = TimeLine.TIME_LINE_MIN_HRS;
 		}
 		else if (totalTime_min > 10) {
 			maxTimeNumberFormated = (int) totalTime_min;
-			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0267);
+			timeLineText = Messages.getString(MessageIds.DE_MSGT0267);
 			format = TimeLine.TIME_LINE_MIN;
 		}
 		else if (totalTime_sec > 60) {
 			maxTimeNumberFormated = (int) totalTime_sec;
-			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0268);
+			timeLineText = Messages.getString(MessageIds.DE_MSGT0268);
 			format = TimeLine.TIME_LINE_SEC_MIN;
 		}
 		else if (totalTime_sec > 10) {
 			maxTimeNumberFormated = (int) totalTime_sec;
-			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0269);
+			timeLineText = Messages.getString(MessageIds.DE_MSGT0269);
 			format = TimeLine.TIME_LINE_SEC;
 		}
 		else if (totalTime_sec > 1) {
 			maxTimeNumberFormated = (int) totalTime_msec;
-			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0269);
+			timeLineText = Messages.getString(MessageIds.DE_MSGT0269);
 			factor = 1000; // 2900 -> 2,9 sec
 			format = TimeLine.TIME_LINE_SEC;
 		}
 		else {
 			maxTimeNumberFormated = (int) totalTime_msec;
-			timeLineText = Messages.getString(MessageIds.OSDE_MSGT0271);
+			timeLineText = Messages.getString(MessageIds.DE_MSGT0271);
 			factor = 1;
 			format = TimeLine.TIME_LINE_MSEC;
 		}
