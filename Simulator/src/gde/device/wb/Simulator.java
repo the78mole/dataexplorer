@@ -1,18 +1,18 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of GNU DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
 package osde.device.wb;
 
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Record;
 import osde.data.RecordSet;
@@ -33,7 +33,7 @@ import osde.device.wb.simulator.MessageIds;
 import osde.exception.DataInconsitsentException;
 import osde.messages.Messages;
 import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 
 /**
  * Sample and test device implementation, scale adjustment, ...
@@ -42,7 +42,7 @@ import osde.ui.OpenSerialDataExplorer;
 public class Simulator extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(Simulator.class.getName());
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final SimulatorSerialPort			serialPort;
 	final SimulatorDialog					dialog;
 
@@ -57,7 +57,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.wb.simulator.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = new SimulatorSerialPort(this, this.application);
 		this.dialog = new SimulatorDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
@@ -72,7 +72,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("osde.device.wb.simulator.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.serialPort = new SimulatorSerialPort(this, this.application);
 		this.dialog = new SimulatorDialog(this.application.getShell(), this);
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
@@ -152,7 +152,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
