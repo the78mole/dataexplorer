@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
  <mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
-   <mime-type type="application/x-OpenSerialData">
+   <mime-type type="application/x-DataExplorerFormat">
    <comment>DataExplorer - explore your serial data</comment>
    <comment xml:lang="en"></comment>
    <glob pattern="*.osd"/>

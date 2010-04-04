@@ -289,7 +289,7 @@ fix problem displaying old UniLog dialog data due to missing resource update (SW
 fix empty record set problem for UniLog life data gathering
 add method in UnilLog serial port impl to wait for life data to make this more relayable
 check record set modification conditions / give hints for changed properties, like graphics adjustment, calculation base, record names, ...
-add drag support for OpenSerialData files and LogView files
+add drag support for DataExplorer files and LogView files
 UniLog Firmware-Version + S/N as extra comment / device configuration property ?
 enable suggestion of actual date and object key as leader of file name in save (as) dialog
 implement reading of LogView file formats 1.13 to 1.15, 1.5 PreBeta to 2.0 BETA2, 2.0
@@ -315,7 +315,7 @@ fix problem recalculating slope data (Picolario)
 fix problem using multiple linear regression cycles
 enable on the fly UniLog configuration change
 fix errors in UniLog switching data to other configurations
-implement OpenSerialData file format version 1 as plain binary
+implement DataExplorer file format version 1 as plain binary
 enhance IDevice interface (enable file format properties parsing, split make inactive displayable from visual properties)
 
 Version 0.7  11. Apr 2008

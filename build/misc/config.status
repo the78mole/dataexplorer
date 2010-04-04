@@ -593,7 +593,7 @@ S["LIBS"]=""
 S["ECHO_T"]=""
 S["ECHO_N"]="-n"
 S["ECHO_C"]=""
-S["DEFS"]="-DPACKAGE_NAME=\\\"DataExplorer\\\" -DPACKAGE_TARNAME=\\\"openserialdataexplorer\\\" -DPACKAGE_VERSION=\\\"2.20\\\" -DPACKAGE_STRING=\\\"OpenSerialDataE"\
+S["DEFS"]="-DPACKAGE_NAME=\\\"DataExplorer\\\" -DPACKAGE_TARNAME=\\\"openserialdataexplorer\\\" -DPACKAGE_VERSION=\\\"2.20\\\" -DPACKAGE_STRING=\\\"DataExplorer"\
 "xplorer\\ 2.20\\\" -DPACKAGE_BUGREPORT=\\\"winfried.bruegmann@gmx.de\\\" -DPACKAGE_URL=\\\"\\\""
 S["mandir"]="${datarootdir}/man"
 S["localedir"]="${datarootdir}/locale"

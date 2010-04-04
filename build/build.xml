@@ -300,7 +300,7 @@
 
         <copy todir="${output.linux32.program}" flatten="yes">
             <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/OpenSerialData-mime.xml" />
+            <fileset file="build/misc/ODataExplorer-mime.xml" />
             <fileset file="build/misc/DevicePropertiesEditor.xpm" />
             <fileset file="build/misc/DataExplorer.xpm" />
             <fileset file="build/misc/DataExplorer" />
@@ -316,7 +316,7 @@
 
         <copy todir="${output.linux64.program}" flatten="yes">
             <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/OpenSerialData-mime.xml" />
+            <fileset file="build/misc/DataExplorer-mime.xml" />
             <fileset file="build/misc/DevicePropertiesEditor.xpm" />
             <fileset file="build/misc/DataExplorer.xpm" />
             <fileset file="build/misc/DataExplorer" />
@@ -332,7 +332,7 @@
 
         <copy todir="${output.mac32.carbon.program}" flatten="yes">
             <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/OpenSerialData-mime.xml" />
+            <fileset file="build/misc/DataExplorer-mime.xml" />
             <!-- fileset file="build/misc/DataExplorer.xpm" / -->
             <fileset file="build/misc/DataExplorer.icns" />
             <fileset file="build/misc/DevicePropertiesEditor.icns" />
@@ -354,7 +354,7 @@
 
         <copy todir="${output.mac32.cocoa.program}" flatten="yes">
             <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/OpenSerialData-mime.xml" />
+            <fileset file="build/misc/DataExplorer-mime.xml" />
             <!-- fileset file="build/misc/DataExplorer.xpm" / -->
             <fileset file="build/misc/DataExplorer.icns" />
             <fileset file="build/misc/DevicePropertiesEditor.icns" />
@@ -376,7 +376,7 @@
 
         <copy todir="${output.mac64.cocoa.program}" flatten="yes">
             <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/OpenSerialData-mime.xml" />
+            <fileset file="build/misc/DataExplorer-mime.xml" />
             <!-- fileset file="build/misc/DataExplorer.xpm" / -->
             <fileset file="build/misc/DataExplorer.icns" />
             <fileset file="build/misc/DevicePropertiesEditor.icns" />
@@ -547,7 +547,7 @@
     </target>
 
     <target name="backupDataFilesWindows" description="pack personal data files">
-        <tar destfile="F:/OpenSerialData.tar.gz" compression="gzip">
+        <tar destfile="F:/DataExplorerFiles.tar.gz" compression="gzip">
             <tarfileset dir="D:/Documents/Person" casesensitive="true" >
                 <include name="DataExplorer/**"/>
                 <exclude name="DataExplorer/OSDE_*"/>
