@@ -648,7 +648,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//			
 	//		}
 	//		else { // is portrait
-	//			if (printer.startJob(OSDE.OSDE_NAME_LONG)) {
+	//			if (printer.startJob(osde.DE_NAME_LONG)) {
 	//				if (isGraphics && printer.startPage()) {
 	//					GC gc = new GC(printer);
 	//					gc.setFont(SWTResourceManager.getFont(this.application, 50, SWT.NORMAL));
@@ -668,7 +668,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//					if (isStatistics) {
 	//						gc.setFont(SWTResourceManager.getFont("Lucida Console", 30, SWT.NORMAL));
 	//						String statistics = this.application.getStatisticsAsText();
-	//						statistics = statistics.substring(statistics.indexOf(OSDE.LINE_SEPARATOR));
+	//						statistics = statistics.substring(statistics.indexOf(DE.LINE_SEPARATOR));
 	//						gc.drawText(statistics, printBounds.x, printBounds.y + printBounds.height / 2);
 	//						isStatistics = false;
 	//					}
@@ -694,7 +694,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//
 	//					gc.setFont(SWTResourceManager.getFont("Lucida Console", 30, SWT.NORMAL));
 	//					String statistics = this.application.getStatisticsAsText();
-	//					statistics = statistics.substring(statistics.indexOf(OSDE.LINE_SEPARATOR));
+	//					statistics = statistics.substring(statistics.indexOf(DE.LINE_SEPARATOR));
 	//					gc.drawText(statistics, printBounds.x, printBounds.y + pt.y + 20);
 	//					isStatistics = false;
 	//
@@ -738,7 +738,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//		printer.dispose();
 
 	//	Point drawHeader(Rectangle printBounds, GC gc, String type) {
-	//		gc.drawText(OSDE.OSDE_NAME_LONG + OSDE.STRING_MESSAGE_CONCAT + type, printBounds.x, printBounds.y);
+	//		gc.drawText(osde.DE_NAME_LONG + DE.STRING_MESSAGE_CONCAT + type, printBounds.x, printBounds.y);
 	//		String date = StringHelper.getDate();
 	//		Point pt = gc.textExtent(date); // date string dimensions
 	//		gc.drawText(date, printBounds.width-pt.x, printBounds.y);

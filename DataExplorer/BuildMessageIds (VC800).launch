@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/OpenSerialDataExplorer/src/osde/tools/BuildMessageIds.java"/>
+<listEntry value="/DataExplorer/src/osde/tools/BuildMessageIds.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
@@ -9,5 +9,5 @@
 <booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="osde.tools.BuildMessageIds"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="&quot;osde.device.conrad&quot;&#13;&#10;&quot;../VC800/src/osde/device/conrad/messages.properties&quot;&#13;&#10;&quot;../VC800/src/osde/device/conrad/MessageIds.java&quot;"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="OpenSerialDataExplorer"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="DataExplorer"/>
 </launchConfiguration>

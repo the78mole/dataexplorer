@@ -988,8 +988,8 @@ public class FileUtils {
 			basePath = url.getFile().substring(0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
 			log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
-				//jarPath = basePath + "build" + OSDE.FILE_SEPARATOR_UNIX + "target" + OSDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME; //$NON-NLS-1$ //$NON-NLS-2$
-				//targetDirectory this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
+				//jarPath = basePath + "build" + DE.FILE_SEPARATOR_UNIX + "target" + DE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME; //$NON-NLS-1$ //$NON-NLS-2$
+				//targetDirectory this.applHomePath + DE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
 				jarPath = basePath + "build" + "/target/" + System.getProperty("os.name").split(DE.STRING_BLANK)[0] + DE.STRING_UNDER_BAR + DE.BIT_MODE + "/DataExplorer/devices"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			catch (Exception e) {
@@ -1005,7 +1005,7 @@ public class FileUtils {
 			log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
 				//jarPath = basePath + Settings.DEVICE_PROPERTIES_DIR_NAME;
-				//targetDirectory this.applHomePath + OSDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
+				//targetDirectory this.applHomePath + DE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
 				jarPath = basePath + "devices"; //$NON-NLS-1$
 			}
 			catch (Exception e) {

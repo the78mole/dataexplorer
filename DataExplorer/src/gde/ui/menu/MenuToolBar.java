@@ -1277,7 +1277,7 @@ public class MenuToolBar {
 	
 	/**
 	 * get the coolbar sizes as string
-	 * INITIAL_COOLBAR_SIZES = (OSDE.IS_WINDOWS == true ? "161:29;136:29;1143:29;145:29;1295:29" : "174:35;146:35;904:35;146:35;1078:35");
+	 * INITIAL_COOLBAR_SIZES = (DE.IS_WINDOWS == true ? "161:29;136:29;1143:29;145:29;1295:29" : "174:35;146:35;904:35;146:35;1078:35");
 	 */
 	public String getCoolBarSizes() {
 			return this.toolBarSizes.toString();		

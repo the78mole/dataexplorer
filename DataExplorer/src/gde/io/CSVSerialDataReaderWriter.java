@@ -320,10 +320,10 @@ public class CSVSerialDataReaderWriter {
 //		}
 //		catch (Exception e) {
 //			log.log(Level.SEVERE, e.getMessage(), e);
-//			throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0007) + e.getClass().getSimpleName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage()); 
+//			throw new Exception(Messages.getString(MessageIds.OSDE_MSGE0007) + e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage()); 
 //		}
 //		finally {
-//			if (application.getStatusBar() != null) application.setStatusMessage(OSDE.STRING_EMPTY);
+//			if (application.getStatusBar() != null) application.setStatusMessage(DE.STRING_EMPTY);
 //		}
 //
 //	}

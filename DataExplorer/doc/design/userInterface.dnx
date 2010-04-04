@@ -3,66 +3,66 @@
 <notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:notation="http://www.ibm.com/xtools/1.5.0/Notation" xmlns:uml="http://www.eclipse.org/uml2/1.0.0/UML" xmlns:umlnotation="http://www.ibm.com/xtools/1.5.0/Umlnotation" xmi:id="_Rdt44KxzEdyoqLPJoDPUOg" type="Class" name="userInterface.dnx">
   <children xmi:id="_TKVywKxzEdyoqLPJoDPUOg" sourceEdges="_Ta4wMKxzEdyoqLPJoDPUOg _ADu406x0EdyoqLPJoDPUOg _nywDZKyCEdyoqLPJoDPUOg _9OQisKyCEdyoqLPJoDPUOg _cNv5sayDEdyoqLPJoDPUOg _r03_kKyDEdyoqLPJoDPUOg _LqnCEKyEEdyoqLPJoDPUOg" targetEdges="_Ta4wMKxzEdyoqLPJoDPUOg">
     <children xmi:id="_TKVyw6xzEdyoqLPJoDPUOg" type="ImageCompartment">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
       <layoutConstraint xmi:type="notation:Size" xmi:id="_TKVyxKxzEdyoqLPJoDPUOg" width="1320" height="1320"/>
     </children>
     <children xmi:id="_TKVyxaxzEdyoqLPJoDPUOg" type="Stereotype">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_TKVyxqxzEdyoqLPJoDPUOg" type="Name">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_TKVyx6xzEdyoqLPJoDPUOg" visible="false" type="AttributeCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_TKVyyKxzEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
       <layoutConstraint xmi:type="notation:Ratio" xmi:id="_XjYPkKxzEdyoqLPJoDPUOg" value="0.32623718234507354"/>
     </children>
     <children xmi:id="_TKVyyaxzEdyoqLPJoDPUOg" type="OperationCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_TKVyyqxzEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
       <layoutConstraint xmi:type="notation:Ratio" xmi:id="_XjYPkaxzEdyoqLPJoDPUOg" value="0.6737628176549264"/>
     </children>
     <children xmi:id="_TKVyy6xzEdyoqLPJoDPUOg" visible="false" type="SignalCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_TKVyzKxzEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_TKVyzaxzEdyoqLPJoDPUOg" visible="false" type="StructureCompartment">
       <styles xmi:type="umlnotation:UMLShapeCompartmentStyle" xmi:id="_TKVyzqxzEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_TKVywaxzEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_TKVywqxzEdyoqLPJoDPUOg" x="9222" y="3816" height="4183"/>
   </children>
   <children xmi:id="__6pOQKxzEdyoqLPJoDPUOg" sourceEdges="_ny50YKyCEdyoqLPJoDPUOg _r03_mKyDEdyoqLPJoDPUOg" targetEdges="_ADu406x0EdyoqLPJoDPUOg">
     <children xmi:id="__6pOQ6xzEdyoqLPJoDPUOg" type="ImageCompartment">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
       <layoutConstraint xmi:type="notation:Size" xmi:id="__6pORKxzEdyoqLPJoDPUOg" width="1320" height="1320"/>
     </children>
     <children xmi:id="__6pORaxzEdyoqLPJoDPUOg" type="Stereotype">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="__6pORqxzEdyoqLPJoDPUOg" type="Name">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="__6pOR6xzEdyoqLPJoDPUOg" visible="false" type="AttributeCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="__6pOSKxzEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="__6pOSaxzEdyoqLPJoDPUOg" type="OperationCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="__6pOSqxzEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="__6pOS6xzEdyoqLPJoDPUOg" visible="false" type="SignalCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="__6pOTKxzEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="__6pOTaxzEdyoqLPJoDPUOg" visible="false" type="StructureCompartment">
       <styles xmi:type="umlnotation:UMLShapeCompartmentStyle" xmi:id="__6pOTqxzEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="__6pOQaxzEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="__6pOQqxzEdyoqLPJoDPUOg" x="18126" y="954" height="5133"/>
   </children>
   <children xmi:id="_iRJcAKyCEdyoqLPJoDPUOg" type="Note">
@@ -73,33 +73,33 @@
   </children>
   <children xmi:id="_nsWgcKyCEdyoqLPJoDPUOg" sourceEdges="_ny50cKyCEdyoqLPJoDPUOg" targetEdges="_nywDZKyCEdyoqLPJoDPUOg _ny50YKyCEdyoqLPJoDPUOg _ny50cKyCEdyoqLPJoDPUOg _9OQiwKyCEdyoqLPJoDPUOg">
     <children xmi:id="_nsWgc6yCEdyoqLPJoDPUOg" type="ImageCompartment">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
       <layoutConstraint xmi:type="notation:Size" xmi:id="_nsWgdKyCEdyoqLPJoDPUOg" width="1320" height="1320"/>
     </children>
     <children xmi:id="_nsWgdayCEdyoqLPJoDPUOg" type="Stereotype">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_nsWgdqyCEdyoqLPJoDPUOg" type="Name">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_nsWgd6yCEdyoqLPJoDPUOg" visible="false" type="AttributeCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_nsWgeKyCEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_nsWgeayCEdyoqLPJoDPUOg" type="OperationCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_nsWgeqyCEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_nsWge6yCEdyoqLPJoDPUOg" visible="false" type="SignalCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_nsWgfKyCEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_nsWgfayCEdyoqLPJoDPUOg" visible="false" type="StructureCompartment">
       <styles xmi:type="umlnotation:UMLShapeCompartmentStyle" xmi:id="_nsWgfqyCEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_nsWgcayCEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_nsWgcqyCEdyoqLPJoDPUOg" x="954" y="954" width="4868" height="4499"/>
   </children>
   <children xmi:id="_0IOLQKyCEdyoqLPJoDPUOg" type="Note">
@@ -110,64 +110,64 @@
   </children>
   <children xmi:id="_9LIWMKyCEdyoqLPJoDPUOg" sourceEdges="_9OQiwKyCEdyoqLPJoDPUOg" targetEdges="_9OQisKyCEdyoqLPJoDPUOg">
     <children xmi:id="_9LIWM6yCEdyoqLPJoDPUOg" type="ImageCompartment">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
       <layoutConstraint xmi:type="notation:Size" xmi:id="_9LIWNKyCEdyoqLPJoDPUOg" width="1320" height="1320"/>
     </children>
     <children xmi:id="_9LIWNayCEdyoqLPJoDPUOg" type="Stereotype">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_9LIWNqyCEdyoqLPJoDPUOg" type="Name">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_9LIWN6yCEdyoqLPJoDPUOg" visible="false" type="AttributeCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_9LIWOKyCEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_9LIWOayCEdyoqLPJoDPUOg" type="OperationCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_9LIWOqyCEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_9LIWO6yCEdyoqLPJoDPUOg" visible="false" type="SignalCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_9LIWPKyCEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_9LIWPayCEdyoqLPJoDPUOg" visible="false" type="StructureCompartment">
       <styles xmi:type="umlnotation:UMLShapeCompartmentStyle" xmi:id="_9LIWPqyCEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_9LIWMayCEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_9LIWMqyCEdyoqLPJoDPUOg" x="954" y="7950" height="3547"/>
   </children>
   <children xmi:id="_cNKD0KyDEdyoqLPJoDPUOg" sourceEdges="_cNv5uayDEdyoqLPJoDPUOg" targetEdges="_cNv5sayDEdyoqLPJoDPUOg _cNv5uayDEdyoqLPJoDPUOg _LqnCKKyEEdyoqLPJoDPUOg">
     <children xmi:id="_cNKD06yDEdyoqLPJoDPUOg" type="ImageCompartment">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
       <layoutConstraint xmi:type="notation:Size" xmi:id="_cNKD1KyDEdyoqLPJoDPUOg" width="1320" height="1320"/>
     </children>
     <children xmi:id="_cNKD1ayDEdyoqLPJoDPUOg" type="Stereotype">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_cNKD1qyDEdyoqLPJoDPUOg" type="Name">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_cNKD16yDEdyoqLPJoDPUOg" visible="false" type="AttributeCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_cNKD2KyDEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_cNKD2ayDEdyoqLPJoDPUOg" type="OperationCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_cNKD2qyDEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_cNKD26yDEdyoqLPJoDPUOg" visible="false" type="SignalCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_cNKD3KyDEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_cNKD3ayDEdyoqLPJoDPUOg" visible="false" type="StructureCompartment">
       <styles xmi:type="umlnotation:UMLShapeCompartmentStyle" xmi:id="_cNKD3qyDEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_cNKD0ayDEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cNKD0qyDEdyoqLPJoDPUOg" x="954" y="13038" width="4866" height="4497"/>
   </children>
   <children xmi:id="_e1FvYKyDEdyoqLPJoDPUOg" type="Note">
@@ -178,316 +178,316 @@
   </children>
   <children xmi:id="_r0IYsKyDEdyoqLPJoDPUOg" targetEdges="_r03_kKyDEdyoqLPJoDPUOg _r03_mKyDEdyoqLPJoDPUOg _LqnCGKyEEdyoqLPJoDPUOg">
     <children xmi:id="_r0IYs6yDEdyoqLPJoDPUOg" type="ImageCompartment">
-      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
       <layoutConstraint xmi:type="notation:Size" xmi:id="_r0IYtKyDEdyoqLPJoDPUOg" width="530" height="530"/>
     </children>
     <children xmi:id="_r0RioKyDEdyoqLPJoDPUOg" type="Stereotype">
-      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_r0RioayDEdyoqLPJoDPUOg" type="Kind">
-      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_r0RioqyDEdyoqLPJoDPUOg" type="Name">
-      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_r0Rio6yDEdyoqLPJoDPUOg" visible="false" type="AttributeCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_r0RipKyDEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_r0RipayDEdyoqLPJoDPUOg" type="OperationCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_r0RipqyDEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_r0Rip6yDEdyoqLPJoDPUOg" visible="false" type="SignalCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_r0RiqKyDEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <styles xmi:type="umlnotation:UMLClassifierStyle" xmi:id="_r0IYsayDEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Label" useClassifierShape="true"/>
-    <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+    <element xmi:type="uml:Interface" href="vizref:///#jsrctype^vcore.target=uml2.Interface^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_r0IYsqyDEdyoqLPJoDPUOg" x="18126" y="11766" width="5183" height="5762"/>
   </children>
   <children xmi:id="_LlPZ4KyEEdyoqLPJoDPUOg" sourceEdges="_LqnCGKyEEdyoqLPJoDPUOg _LqnCKKyEEdyoqLPJoDPUOg" targetEdges="_LqnCEKyEEdyoqLPJoDPUOg">
     <children xmi:id="_LlPZ46yEEdyoqLPJoDPUOg" type="ImageCompartment">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
       <layoutConstraint xmi:type="notation:Size" xmi:id="_LlPZ5KyEEdyoqLPJoDPUOg" width="1320" height="1320"/>
     </children>
     <children xmi:id="_LlPZ5ayEEdyoqLPJoDPUOg" type="Stereotype">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_LlPZ5qyEEdyoqLPJoDPUOg" type="Name">
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_LlPZ56yEEdyoqLPJoDPUOg" visible="false" type="AttributeCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_LlPZ6KyEEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_LlPZ6ayEEdyoqLPJoDPUOg" type="OperationCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_LlPZ6qyEEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_LlPZ66yEEdyoqLPJoDPUOg" visible="false" type="SignalCompartment">
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_LlPZ7KyEEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <children xmi:id="_LlPZ7ayEEdyoqLPJoDPUOg" visible="false" type="StructureCompartment">
       <styles xmi:type="umlnotation:UMLShapeCompartmentStyle" xmi:id="_LlPZ7qyEEdyoqLPJoDPUOg"/>
-      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+      <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     </children>
     <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_LlPZ4ayEEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]"/>
+    <element xmi:type="uml:Class" href="vizref:///#jsrctype^vcore.target=uml2.Class^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_LlPZ4qyEEdyoqLPJoDPUOg" x="9222" y="12084"/>
   </children>
   <styles xmi:type="umlnotation:UMLDiagramStyle" xmi:id="_Rdt44axzEdyoqLPJoDPUOg"/>
   <edges xmi:id="_Ta4wMKxzEdyoqLPJoDPUOg" source="_TKVywKxzEdyoqLPJoDPUOg" target="_TKVywKxzEdyoqLPJoDPUOg">
     <children xmi:id="_Ta4wM6xzEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_Ta4wNaxzEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_Ta4wN6xzEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_Ta4wNqxzEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Ta4wNKxzEdyoqLPJoDPUOg" x="-658" y="1231"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_Ta4wMaxzEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Ta4wMqxzEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_ADu406x0EdyoqLPJoDPUOg" source="_TKVywKxzEdyoqLPJoDPUOg" target="__6pOQKxzEdyoqLPJoDPUOg">
     <children xmi:id="_ADu41qx0EdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_ADu42Kx0EdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_ADu42qx0EdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_ADu42ax0EdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ADu416x0EdyoqLPJoDPUOg" y="-185"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_ADu41Kx0EdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ADu41ax0EdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_nywDZKyCEdyoqLPJoDPUOg" source="_TKVywKxzEdyoqLPJoDPUOg" target="_nsWgcKyCEdyoqLPJoDPUOg">
     <children xmi:id="_nywDZ6yCEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_nywDaayCEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_nywDa6yCEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_nywDaqyCEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_nywDaKyCEdyoqLPJoDPUOg" x="-911" y="230"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_nywDZayCEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_nywDZqyCEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_ny50YKyCEdyoqLPJoDPUOg" source="__6pOQKxzEdyoqLPJoDPUOg" target="_nsWgcKyCEdyoqLPJoDPUOg">
     <children xmi:id="_ny50Y6yCEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_ny50ZayCEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_ny50Z6yCEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_ny50ZqyCEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ny50ZKyCEdyoqLPJoDPUOg" x="34" y="180"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_ny50YayCEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ny50YqyCEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_ny50cKyCEdyoqLPJoDPUOg" source="_nsWgcKyCEdyoqLPJoDPUOg" target="_nsWgcKyCEdyoqLPJoDPUOg">
     <children xmi:id="_ny50c6yCEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_ny50dayCEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_ny50d6yCEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_ny50dqyCEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ny50dKyCEdyoqLPJoDPUOg" x="510" y="599"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_ny50cayCEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ny50cqyCEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_9OQisKyCEdyoqLPJoDPUOg" source="_TKVywKxzEdyoqLPJoDPUOg" target="_9LIWMKyCEdyoqLPJoDPUOg">
     <children xmi:id="_9OQis6yCEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_9OQitayCEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_9OQit6yCEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_9OQitqyCEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_9OQitKyCEdyoqLPJoDPUOg" x="210" y="-471"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_9OQisayCEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_9OQisqyCEdyoqLPJoDPUOg" points="[-2593, 1190, 5874, -2699]$[-6085, 2778, 2382, -1111]"/>
   </edges>
   <edges xmi:id="_9OQiwKyCEdyoqLPJoDPUOg" source="_9LIWMKyCEdyoqLPJoDPUOg" target="_nsWgcKyCEdyoqLPJoDPUOg">
     <children xmi:id="_9OQiw6yCEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_9OQixayCEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_9OQix6yCEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_9OQixqyCEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_9OQixKyCEdyoqLPJoDPUOg" x="-90" y="-657"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_9OQiwayCEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=SettingsDialog[jcu^name=SettingsDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Settings[jcu^name=Settings.java[jpack^name=osde.config[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_9OQiwqyCEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_cNv5sayDEdyoqLPJoDPUOg" source="_TKVywKxzEdyoqLPJoDPUOg" target="_cNKD0KyDEdyoqLPJoDPUOg">
     <children xmi:id="_cNv5tKyDEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_cNv5tqyDEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_cNv5uKyDEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_cNv5t6yDEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cNv5tayDEdyoqLPJoDPUOg" x="-421" y="-602"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_cNv5sqyDEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_cNv5s6yDEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_cNv5uayDEdyoqLPJoDPUOg" source="_cNKD0KyDEdyoqLPJoDPUOg" target="_cNKD0KyDEdyoqLPJoDPUOg">
     <children xmi:id="_cNv5vKyDEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_cNv5vqyDEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_cNv5wKyDEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_cNv5v6yDEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cNv5vayDEdyoqLPJoDPUOg" x="485" y="580"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_cNv5uqyDEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_cNv5u6yDEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_r03_kKyDEdyoqLPJoDPUOg" source="_TKVywKxzEdyoqLPJoDPUOg" target="_r0IYsKyDEdyoqLPJoDPUOg">
     <children xmi:id="_r03_k6yDEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_r03_layDEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_r03_l6yDEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_r03_lqyDEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_r03_lKyDEdyoqLPJoDPUOg" x="514" y="-404"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_r03_kayDEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_r03_kqyDEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_r03_mKyDEdyoqLPJoDPUOg" source="__6pOQKxzEdyoqLPJoDPUOg" target="_r0IYsKyDEdyoqLPJoDPUOg">
     <children xmi:id="_r03_m6yDEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_r03_nayDEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_r03_n6yDEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_r03_nqyDEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_r03_nKyDEdyoqLPJoDPUOg" y="-185"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_r03_mayDEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DeviceSelectionDialog[jcu^name=DeviceSelectionDialog.java[jpack^name=osde.ui.dialog[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_r03_mqyDEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_LqnCEKyEEdyoqLPJoDPUOg" source="_TKVywKxzEdyoqLPJoDPUOg" target="_LlPZ4KyEEdyoqLPJoDPUOg">
     <children xmi:id="_LqnCE6yEEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_LqnCFayEEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_LqnCF6yEEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_LqnCFqyEEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_LqnCFKyEEdyoqLPJoDPUOg" x="-77" y="-495"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_LqnCEayEEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=OpenSerialDataExplorer[jcu^name=OpenSerialDataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=DataExplorer[jcu^name=DataExplorer.java[jpack^name=osde.ui[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_LqnCEqyEEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_LqnCGKyEEdyoqLPJoDPUOg" source="_LlPZ4KyEEdyoqLPJoDPUOg" target="_r0IYsKyDEdyoqLPJoDPUOg">
     <children xmi:id="_LqnCG6yEEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_LqnCHayEEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_LqnCH6yEEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_LqnCHqyEEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_LqnCHKyEEdyoqLPJoDPUOg" y="-185"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_LqnCGayEEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=IDevice[jcu^name=IDevice.java[jpack^name=osde.device[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_LqnCGqyEEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
   <edges xmi:id="_LqnCKKyEEdyoqLPJoDPUOg" source="_LlPZ4KyEEdyoqLPJoDPUOg" target="_cNKD0KyDEdyoqLPJoDPUOg">
     <children xmi:id="_LqnCK6yEEdyoqLPJoDPUOg" type="KindLabel">
       <children xmi:id="_LqnCLayEEdyoqLPJoDPUOg" type="Stereotype">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_LqnCL6yEEdyoqLPJoDPUOg" type="Kind">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
       <children xmi:id="_LqnCLqyEEdyoqLPJoDPUOg" type="Name">
-        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+        <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       </children>
-      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+      <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_LqnCLKyEEdyoqLPJoDPUOg" x="2" y="136"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_LqnCKayEEdyoqLPJoDPUOg" fontName="Microsoft Sans Serif" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=OpenSerialDataExplorer]]]]]"/>
+    <element xmi:type="uml:Usage" href="vizref:///#jdep^vcore.target=uml2.Usage[jsrctype^name=GraphicsWindow[jcu^name=GraphicsWindow.java[jpack^name=osde.ui.tab[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]][jsrctype^name=Channels[jcu^name=Channels.java[jpack^name=osde.data[jsrcroot^srcfolder=src[project^vcore.target=uml2.Model^id=DataExplorer]]]]]"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_LqnCKqyEEdyoqLPJoDPUOg" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
   </edges>
 </notation:Diagram>

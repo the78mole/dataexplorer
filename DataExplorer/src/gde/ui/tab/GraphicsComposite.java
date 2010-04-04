@@ -1287,11 +1287,11 @@ public class GraphicsComposite extends Composite {
 				}
 				else if (this.isLeftMouseMeasure) {
 					this.isLeftMouseMeasure = false;
-					//application.setStatusMessage(OSDE.STRING_EMPTY);
+					//application.setStatusMessage(DE.STRING_EMPTY);
 				}
 				else if (this.isRightMouseMeasure) {
 					this.isRightMouseMeasure = false;
-					//application.setStatusMessage(OSDE.STRING_EMPTY);
+					//application.setStatusMessage(DE.STRING_EMPTY);
 				}
 				else if (this.isLeftCutMode) {
 					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.OSDE_MSGT0260))) {

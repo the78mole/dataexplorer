@@ -68,7 +68,7 @@ public class CSVReaderWriter {
 	 * read the first two line of CSV file and prepare a map with all available information 
 	 * @param separator
 	 * @param filePath
-	 * @return map with OSDE.DEVICE_NAME,OSDE.CSV_DATA_HEADER,[OSDE.CHANNEL_CONFIG_NAME]
+	 * @return map with DE.DEVICE_NAME,DE.CSV_DATA_HEADER,[DE.CHANNEL_CONFIG_NAME]
 	 * @throws NotSupportedFileFormatException
 	 * @throws IOException
 	 */

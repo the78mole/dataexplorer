@@ -522,7 +522,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 	public void setDeviceConfig(DeviceConfiguration deviceConfig) {
 		this.deviceConfig = deviceConfig;
 
-		//String tmpPortString = OSDE.IS_WINDOWS ? "COM1" : OSDE.IS_LINUX ? "/dev/ttyS0" : OSDE.IS_MAC ? "/dev/tty.usbserial" : "COMx";
+		//String tmpPortString = DE.IS_WINDOWS ? "COM1" : DE.IS_LINUX ? "/dev/ttyS0" : DE.IS_MAC ? "/dev/tty.usbserial" : "COMx";
 		//deviceConfig.setPort(tmpPortString);
 		this.portName = deviceConfig.getPort();
 		this.baudeRateIndex = getSelectionIndex(this.baudeRateCombo, DE.STRING_EMPTY + deviceConfig.getBaudeRate());

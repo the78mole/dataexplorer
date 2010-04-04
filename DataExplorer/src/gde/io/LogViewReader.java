@@ -103,12 +103,12 @@ public class LogViewReader {
 		HashMap<String, String> header = readHeader(data_in);
 		int channelNumber = new Integer(header.get(DE.CHANNEL_CONFIG_NUMBER)).intValue();
 		ChannelTypes channelType = device.getChannelTypes(channelNumber);
-		//String channelConfigName = channelType.equals(ChannelTypes.TYPE_OUTLET.name()) ? device.getChannelName(channelNumber) : header.get(OSDE.CHANNEL_CONFIG_NAME);
+		//String channelConfigName = channelType.equals(ChannelTypes.TYPE_OUTLET.name()) ? device.getChannelName(channelNumber) : header.get(DE.CHANNEL_CONFIG_NAME);
 		String channelConfigName = device.getChannelName(channelNumber);
 		log.log(Level.FINE, "channelConfigName = " + channelConfigName + " (" + DE.CHANNEL_CONFIG_TYPE + channelType + "; " + DE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		header.put(DE.CHANNEL_CONFIG_TYPE, channelType.name());
 		header.put(DE.CHANNEL_CONFIG_NAME, channelConfigName);
-		//header.put(OSDE.RECORD_SET_DATA_POINTER, OSDE.STRING_EMPTY+position);
+		//header.put(DE.RECORD_SET_DATA_POINTER, DE.STRING_EMPTY+position);
 		//header.containsKey(LOV_NUM_MEASUREMENTS)
 		
 		// record sets with it properties
@@ -120,7 +120,7 @@ public class LogViewReader {
 			recordSetInfo = recordSetInfo + DE.DATA_DELIMITER + DE.CHANNEL_CONFIG_NAME + header.get(DE.CHANNEL_CONFIG_NAME);
 			if (header.containsKey(RecordSet.TIME_STEP_MS)) {
 				// do not use LogView time
-				//recordSetInfo = recordSetInfo + OSDE.DATA_DELIMITER + RecordSet.TIME_STEP_MS + OSDE.STRING_EQUAL + header.get(RecordSet.TIME_STEP_MS);
+				//recordSetInfo = recordSetInfo + DE.DATA_DELIMITER + RecordSet.TIME_STEP_MS + DE.STRING_EQUAL + header.get(RecordSet.TIME_STEP_MS);
 				recordSetInfo = recordSetInfo + DE.DATA_DELIMITER + RecordSet.TIME_STEP_MS + DE.STRING_EQUAL +  device.getTimeStep_ms();
 			}
 			else { // format version 1.1x dos not have this info in  file (no devices with variable time step supported)
@@ -142,7 +142,7 @@ public class LogViewReader {
 				recordSetComment = recordSetInfo.get(DE.RECORD_SET_COMMENT);
 				recordSetProperties = recordSetInfo.get(DE.RECORD_SET_PROPERTIES);
 				recordsProperties = StringHelper.splitString(recordSetInfo.get(DE.RECORDS_PROPERTIES), Record.END_MARKER, DE.RECORDS_PROPERTIES);
-				//recordDataSize = new Long(recordSetInfo.get(OSDE.RECORD_DATA_SIZE)).longValue();
+				//recordDataSize = new Long(recordSetInfo.get(DE.RECORD_DATA_SIZE)).longValue();
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				if (channel == null) { // channelConfiguration not found
@@ -169,7 +169,7 @@ public class LogViewReader {
 //				catch (NumberFormatException e) { 
 //					//ignore and use OSDE value }
 //				}
-				//recordSet.setObjectKey(recordSetInfo.get(OSDE.OBJECT_KEY));
+				//recordSet.setObjectKey(recordSetInfo.get(DE.OBJECT_KEY));
 
 				//apply record sets records properties
 				String [] recordKeys = recordSet.getRecordNames();
