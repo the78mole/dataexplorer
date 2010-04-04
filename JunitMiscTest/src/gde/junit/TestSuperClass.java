@@ -173,7 +173,7 @@ public class TestSuperClass extends TestCase {
 				newInst = (IDevice) constructor.newInstance(new Object[] { selectedActiveDeviceConfig.getPropertiesFileName() });
 			}
 			else
-				throw new NoClassDefFoundError(Messages.getString(MessageIds.OSDE_MSGE0016));
+				throw new NoClassDefFoundError(Messages.getString(MessageIds.DE_MSGE0016));
 
 		}
 		catch (NoClassDefFoundError e) {
@@ -365,7 +365,7 @@ public class TestSuperClass extends TestCase {
 
 		// draw start time for zoom mode or scope mode
 		if (startTimeFormated != 0) { 
-			String strStartTime = Messages.getString(MessageIds.OSDE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
+			String strStartTime = Messages.getString(MessageIds.DE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
 			Point point = gc.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
 			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_RED));

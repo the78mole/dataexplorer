@@ -36,7 +36,7 @@ public class JarInspectAndExportTest extends TestCase {
 			this.applHomePath = System.getProperty("user.home") + DE.FILE_SEPARATOR_UNIX + ".DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
-			System.err.println(Messages.getString(MessageIds.OSDE_MSGW0001));
+			System.err.println(Messages.getString(MessageIds.DE_MSGW0001));
 			return;
 		}
 		System.out.println("applHomePath = " + this.applHomePath);
