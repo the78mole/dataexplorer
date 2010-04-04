@@ -22,10 +22,10 @@ package osde.device.wb;
  */ 
 public class MessageIds { 
 
-	public final static String	OSDE_MSGI1800 = "OSDE_MSGI1800";
-	public final static String	OSDE_MSGI1801 = "OSDE_MSGI1801";
-	public final static String	OSDE_MSGT1800 = "OSDE_MSGT1800";
-	public final static String	OSDE_MSGT1801 = "OSDE_MSGT1801";
-	public final static String	OSDE_MSGT1802 = "OSDE_MSGT1802";
+	public final static String	DE_MSGI1800 = "DE_MSGI1800";
+	public final static String	DE_MSGI1801 = "DE_MSGI1801";
+	public final static String	DE_MSGT1800 = "DE_MSGT1800";
+	public final static String	DE_MSGT1801 = "DE_MSGT1801";
+	public final static String	DE_MSGT1802 = "DE_MSGT1802";
 
  }

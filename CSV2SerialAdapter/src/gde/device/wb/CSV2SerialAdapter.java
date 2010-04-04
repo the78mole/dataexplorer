@@ -89,7 +89,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(osde.messages.MessageIds.OSDE_MSGT0272);
+		return Messages.getString(osde.messages.MessageIds.DE_MSGT0272);
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		}
 		catch (Exception e) {
-			String msg = e.getMessage() + Messages.getString(osde.messages.MessageIds.OSDE_MSGW0543);
+			String msg = e.getMessage() + Messages.getString(osde.messages.MessageIds.DE_MSGW0543);
 			log.log(Level.WARNING, msg, e);
 			application.openMessageDialog(msg);
 			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);
@@ -429,7 +429,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void openCloseSerialPort() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), DE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.DE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), DE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
 		String selectedImportFile = fd.getFilterPath() + DE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 		
