@@ -90,7 +90,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.OSDE_MSGT1186);
+		return Messages.getString(MessageIds.DE_MSGT1186);
 	}
 
 	/**
@@ -362,7 +362,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.getDialog().getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0015, new Object[] {e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage() } ));
+					this.application.openMessageDialog(this.getDialog().getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0015, new Object[] {e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage() } ));
 				}
 			}
 			else {
