@@ -11,7 +11,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import junit.framework.TestCase;
-import osde.OSDE;
+import osde.DE;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
 import osde.utils.FileUtils;
@@ -30,10 +30,10 @@ public class JarInspectAndExportTest extends TestCase {
 		super.setUp();
 
 		if (this.osname.startsWith("windows")) { //$NON-NLS-1$
-			this.applHomePath = (System.getenv("APPDATA") + OSDE.FILE_SEPARATOR_UNIX + "OpenSerialDataExplorer").replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			this.applHomePath = (System.getenv("APPDATA") + DE.FILE_SEPARATOR_UNIX + "DataExplorer").replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		else if (this.osname.startsWith("linux")) { //$NON-NLS-1$
-			this.applHomePath = System.getProperty("user.home") + OSDE.FILE_SEPARATOR_UNIX + ".OpenSerialDataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
+			this.applHomePath = System.getProperty("user.home") + DE.FILE_SEPARATOR_UNIX + ".DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
 			System.err.println(Messages.getString(MessageIds.OSDE_MSGW0001));

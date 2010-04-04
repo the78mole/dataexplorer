@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import osde.OSDE;
+import osde.DE;
 import osde.config.Settings;
 import osde.data.Channel;
 import osde.data.Channels;
@@ -35,7 +35,7 @@ import osde.device.IDevice;
 import osde.log.LogFormatter;
 import osde.messages.MessageIds;
 import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
+import osde.ui.DataExplorer;
 import osde.ui.SWTResourceManager;
 import osde.utils.CurveUtils;
 import osde.utils.TimeLine;
@@ -47,7 +47,7 @@ import osde.utils.TimeLine;
 public class TestSuperClass extends TestCase {
 	Logger																rootLogger;
 
-	final OpenSerialDataExplorer					application	= OpenSerialDataExplorer.getInstance();
+	final DataExplorer					application	= DataExplorer.getInstance();
 	final Channels												channels		= Channels.getInstance();
 	final Settings												settings		= Settings.getInstance();
 	final String 													tmpDir 			= System.getProperty("java.io.tmpdir");
@@ -94,7 +94,7 @@ public class TestSuperClass extends TestCase {
 		//this.logger2.setLevel(Level.FINE);
 		//this.logger2.setUseParentHandlers(true);
 
-		Thread.currentThread().setContextClassLoader(OSDE.getClassLoader());
+		Thread.currentThread().setContextClassLoader(DE.getClassLoader());
 
 		this.initialize();
 
@@ -130,7 +130,7 @@ public class TestSuperClass extends TestCase {
 				// loop through all device properties XML and check if device used
 				if (files[i].endsWith(".xml")) {
 					String deviceKey = files[i].substring(0, files[i].length() - 4);
-					devConfig = new DeviceConfiguration(this.settings.getDevicesPath() + OSDE.FILE_SEPARATOR + files[i]);
+					devConfig = new DeviceConfiguration(this.settings.getDevicesPath() + DE.FILE_SEPARATOR + files[i]);
 
 					// store all device configurations in a map					
 					String keyString;
@@ -140,7 +140,7 @@ public class TestSuperClass extends TestCase {
 						devConfig.setName(deviceKey);
 						keyString = deviceKey;
 					}
-					System.out.println(deviceKey + OSDE.STRING_MESSAGE_CONCAT + keyString);
+					System.out.println(deviceKey + DE.STRING_MESSAGE_CONCAT + keyString);
 					this.deviceConfigurations.put(keyString, devConfig);
 				}
 			}
@@ -157,10 +157,10 @@ public class TestSuperClass extends TestCase {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected IDevice getInstanceOfDevice(DeviceConfiguration selectedActiveDeviceConfig) {
 		IDevice newInst = null;
-		String selectedDeviceName = selectedActiveDeviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
+		String selectedDeviceName = selectedActiveDeviceConfig.getDeviceImplName().replace(DE.STRING_BLANK, DE.STRING_EMPTY).replace(DE.STRING_DASH, DE.STRING_EMPTY);
 		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
-		String className = selectedDeviceName.contains(OSDE.STRING_DOT) ? selectedDeviceName  // full qualified
-				: "osde.device." + selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
+		String className = selectedDeviceName.contains(DE.STRING_DOT) ? selectedDeviceName  // full qualified
+				: "osde.device." + selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(DE.STRING_BLANK, DE.STRING_EMPTY).replace(DE.STRING_DASH, DE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
 		try {
 			//String className = "osde.device.DefaultDeviceDialog";
 			//log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
@@ -310,7 +310,7 @@ public class TestSuperClass extends TestCase {
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
 		//System.out.println("startTime = " + startTimeFormated + " detaTime_ms = " + (int)totalDisplayDeltaTime_ms + " endTime = " + endTimeFormated);
-		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (int)totalDisplayDeltaTime_ms, OpenSerialDataExplorer.COLOR_BLACK);
+		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (int)totalDisplayDeltaTime_ms, DataExplorer.COLOR_BLACK);
 
 		// draw draw area bounding 
 		//gc.setForeground(this.curveAreaBorderColor);
