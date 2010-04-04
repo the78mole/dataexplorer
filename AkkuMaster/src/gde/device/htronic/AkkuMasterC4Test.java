@@ -40,7 +40,7 @@ public class AkkuMasterC4Test {
 	public static void main(String[] args) {
 		DeviceConfiguration deviceConfig;
 		try {
-			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/OpenSerialDataExploroer/Devices/AkkumasterC4.xml"); //$NON-NLS-1$
+			deviceConfig = new DeviceConfiguration("c:/Documents and Settings/brueg/Application Data/DataExploroer/Devices/AkkumasterC4.xml"); //$NON-NLS-1$
 			akkuMaster = new AkkuMasterC4SerialPort(deviceConfig, null);
 			DeviceSerialPort.listConfiguredSerialPorts(true, "", new Vector<String>());
 			SerialPort serialPort = akkuMaster.open();
