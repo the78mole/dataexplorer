@@ -81,15 +81,15 @@ public class UniLogDialog extends DeviceDialog {
 																															"   5 min (-> 90 d)"};	
 	public final static String[]	RX_AUTO_START_MS					= { " 1,1 ms", " 1,2 ms", " 1,3 ms", " 1,4 ms", " 1,5 ms", " 1,6 ms", " 1,7 ms", " 1,8 ms", " 1,9 ms", " Rx on" };	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
 	public final static String[]	CURRENT_SENSOR						= { " 40/80A ", "  150A ", "  400A ", "    20A " };	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	public final static String[]	A1_MODUS_NAMES						= Messages.getString(MessageIds.OSDE_MSGT1366).split(DE.STRING_SEMICOLON);
-	public final static String[]	A2_MODUS_NAMES						= Messages.getString(MessageIds.OSDE_MSGT1367).split(DE.STRING_SEMICOLON);
-	public final static String[]	A3_MODUS_NAMES						= Messages.getString(MessageIds.OSDE_MSGT1368).split(DE.STRING_SEMICOLON);
-	public final static String[]	A1_MODUS_NAMES_COMBO			= Messages.getString(MessageIds.OSDE_MSGT1372).split(DE.STRING_SEMICOLON);
-	public final static String[]	A2_MODUS_NAMES_COMBO			= Messages.getString(MessageIds.OSDE_MSGT1373).split(DE.STRING_SEMICOLON);
-	public final static String[]	A3_MODUS_NAMES_COMBO			= Messages.getString(MessageIds.OSDE_MSGT1374).split(DE.STRING_SEMICOLON);
-	public final static String[]	A1_MODUS_UNITS						= Messages.getString(MessageIds.OSDE_MSGT1369).split(DE.STRING_SEMICOLON);
-	public final static String[]	A2_MODUS_UNITS						= Messages.getString(MessageIds.OSDE_MSGT1370).split(DE.STRING_SEMICOLON);
-	public final static String[]	A3_MODUS_UNITS						= Messages.getString(MessageIds.OSDE_MSGT1371).split(DE.STRING_SEMICOLON);
+	public final static String[]	A1_MODUS_NAMES						= Messages.getString(MessageIds.DE_MSGT1366).split(DE.STRING_SEMICOLON);
+	public final static String[]	A2_MODUS_NAMES						= Messages.getString(MessageIds.DE_MSGT1367).split(DE.STRING_SEMICOLON);
+	public final static String[]	A3_MODUS_NAMES						= Messages.getString(MessageIds.DE_MSGT1368).split(DE.STRING_SEMICOLON);
+	public final static String[]	A1_MODUS_NAMES_COMBO			= Messages.getString(MessageIds.DE_MSGT1372).split(DE.STRING_SEMICOLON);
+	public final static String[]	A2_MODUS_NAMES_COMBO			= Messages.getString(MessageIds.DE_MSGT1373).split(DE.STRING_SEMICOLON);
+	public final static String[]	A3_MODUS_NAMES_COMBO			= Messages.getString(MessageIds.DE_MSGT1374).split(DE.STRING_SEMICOLON);
+	public final static String[]	A1_MODUS_UNITS						= Messages.getString(MessageIds.DE_MSGT1369).split(DE.STRING_SEMICOLON);
+	public final static String[]	A2_MODUS_UNITS						= Messages.getString(MessageIds.DE_MSGT1370).split(DE.STRING_SEMICOLON);
+	public final static String[]	A3_MODUS_UNITS						= Messages.getString(MessageIds.DE_MSGT1371).split(DE.STRING_SEMICOLON);
 
 	CTabItem											configTabItem1, configTabItem2, configTabItem3, configTabItem4;
 	Label													currentSensorLabel, a1ModusLabel, a2ModusLabel, a3ModusLabel;
@@ -229,7 +229,7 @@ public class UniLogDialog extends DeviceDialog {
 		this.device = useDevice;
 		this.application = DataExplorer.getInstance();
 		this.settings = Settings.getInstance();
-		UniLogDialog.RX_AUTO_START_MS[UniLogDialog.RX_AUTO_START_MS.length - 1] = Messages.getString(MessageIds.OSDE_MSGT1300);
+		UniLogDialog.RX_AUTO_START_MS[UniLogDialog.RX_AUTO_START_MS.length - 1] = Messages.getString(MessageIds.DE_MSGT1300);
 	}
 
 	/**
@@ -251,7 +251,7 @@ public class UniLogDialog extends DeviceDialog {
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
-				this.dialogShell.setText(UniLogDialog.DEVICE_NAME + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
+				this.dialogShell.setText(UniLogDialog.DEVICE_NAME + Messages.getString(osde.messages.MessageIds.DE_MSGT0273));
 				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 				this.dialogShell.setLayout(null);
@@ -263,7 +263,7 @@ public class UniLogDialog extends DeviceDialog {
 						UniLogDialog.log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (UniLogDialog.this.configTab1.getConfigButtonStatus() || UniLogDialog.this.configTab2.getConfigButtonStatus() || UniLogDialog.this.configTab3.getConfigButtonStatus()
 								|| UniLogDialog.this.configTab4.getConfigButtonStatus()) {
-							String msg = Messages.getString(MessageIds.OSDE_MSGI1300);
+							String msg = Messages.getString(MessageIds.DE_MSGI1300);
 							if (UniLogDialog.this.application.openYesNoMessageDialog(UniLogDialog.this.getDialogShell(), msg) == SWT.YES) {
 								UniLogDialog.log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								UniLogDialog.this.device.storeDeviceProperties();
@@ -318,7 +318,7 @@ public class UniLogDialog extends DeviceDialog {
 				{
 					this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					this.helpButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.helpButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0280));
+					this.helpButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0280));
 					this.helpButton.setBounds(31, 374, 259, 30);
 					this.helpButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 					this.helpButton.addSelectionListener(new SelectionAdapter() {
@@ -332,7 +332,7 @@ public class UniLogDialog extends DeviceDialog {
 				{
 					this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					this.closeButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0188));
+					this.closeButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0188));
 					this.closeButton.setBounds(342, 374, 260, 30);
 					this.closeButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 					this.closeButton.addSelectionListener(new SelectionAdapter() {
@@ -350,7 +350,7 @@ public class UniLogDialog extends DeviceDialog {
 					{// begin device configuration tab
 						this.baseConfigTabItem = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
 						this.baseConfigTabItem.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.baseConfigTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT1301));
+						this.baseConfigTabItem.setText(Messages.getString(MessageIds.DE_MSGT1301));
 						{
 							this.configMainComosite = new Composite(this.deviceConfigTabFolder, SWT.NONE);
 							this.baseConfigTabItem.setControl(this.configMainComosite);
@@ -396,13 +396,13 @@ public class UniLogDialog extends DeviceDialog {
 								this.statusGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.statusGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.statusGroup.setLayout(null);
-								this.statusGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1302));
+								this.statusGroup.setText(Messages.getString(MessageIds.DE_MSGT1302));
 								this.statusGroup.setBounds(12, 17, 602, 45);
 								this.statusGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.firmwareText = new CLabel(this.statusGroup, SWT.NONE);
 									this.firmwareText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.firmwareText.setText(Messages.getString(MessageIds.OSDE_MSGT1303));
+									this.firmwareText.setText(Messages.getString(MessageIds.DE_MSGT1303));
 									this.firmwareText.setBounds(146, DE.IS_MAC_COCOA ? 0 : 15, 79, 22);
 								}
 								{
@@ -414,7 +414,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.serialNumberText = new CLabel(this.statusGroup, SWT.NONE);
 									this.serialNumberText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.serialNumberText.setText(Messages.getString(MessageIds.OSDE_MSGT1304));
+									this.serialNumberText.setText(Messages.getString(MessageIds.DE_MSGT1304));
 									this.serialNumberText.setBounds(12, DE.IS_MAC_COCOA ? 0 : 15, 42, 22);
 								}
 								{
@@ -426,7 +426,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.memoryUsageText = new CLabel(this.statusGroup, SWT.NONE);
 									this.memoryUsageText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.memoryUsageText.setText(Messages.getString(MessageIds.OSDE_MSGT1305));
+									this.memoryUsageText.setText(Messages.getString(MessageIds.DE_MSGT1305));
 									this.memoryUsageText.setBounds(338, DE.IS_MAC_COCOA ? 3 : 15, 134, 22);
 								}
 								{
@@ -438,20 +438,20 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.memUsageUnit = new CLabel(this.statusGroup, SWT.NONE);
 									this.memUsageUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.memUsageUnit.setText(Messages.getString(MessageIds.OSDE_MSGT1306));
+									this.memUsageUnit.setText(Messages.getString(MessageIds.DE_MSGT1306));
 									this.memUsageUnit.setBounds(543, DE.IS_MAC_COCOA ? 0 : 15, 26, 22);
 								}
 							}
 							{
 								this.autoStartGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.autoStartGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.autoStartGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1309));
+								this.autoStartGroup.setText(Messages.getString(MessageIds.DE_MSGT1309));
 								this.autoStartGroup.setBounds(12, 226, 300, 99);
 								this.autoStartGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.currentTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
 									this.currentTriggerButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.currentTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1310));
+									this.currentTriggerButton.setText(Messages.getString(MessageIds.DE_MSGT1310));
 									this.currentTriggerButton.setBounds(34, DE.IS_MAC_COCOA ? 7 : 22, 150, 18);
 									this.currentTriggerButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -464,7 +464,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.timeTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
 									this.timeTriggerButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.timeTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1311));
+									this.timeTriggerButton.setText(Messages.getString(MessageIds.DE_MSGT1311));
 									this.timeTriggerButton.setBounds(34, DE.IS_MAC_COCOA ? 31 : 46, 150, 18);
 									this.timeTriggerButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -477,7 +477,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.impulseTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
 									this.impulseTriggerButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.impulseTriggerButton.setText(Messages.getString(MessageIds.OSDE_MSGT1312));
+									this.impulseTriggerButton.setText(Messages.getString(MessageIds.DE_MSGT1312));
 									this.impulseTriggerButton.setBounds(34, DE.IS_MAC_COCOA ? 55 : 70, 150, 18);
 									this.impulseTriggerButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -541,13 +541,13 @@ public class UniLogDialog extends DeviceDialog {
 								this.motorPropGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.motorPropGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.motorPropGroup.setLayout(null);
-								this.motorPropGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1313));
+								this.motorPropGroup.setText(Messages.getString(MessageIds.DE_MSGT1313));
 								this.motorPropGroup.setBounds(12, 117, 300, 96);
 								this.motorPropGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.numberPolsButton = new Button(this.motorPropGroup, SWT.RADIO | SWT.LEFT);
 									this.numberPolsButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.numberPolsButton.setText(Messages.getString(MessageIds.OSDE_MSGT1314));
+									this.numberPolsButton.setText(Messages.getString(MessageIds.DE_MSGT1314));
 									this.numberPolsButton.setBounds(31, DE.IS_MAC_COCOA ? 5 : 20, 150, 20);
 									this.numberPolsButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -586,7 +586,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.gearLabel = new CLabel(this.motorPropGroup, SWT.LEFT);
 									this.gearLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.gearLabel.setBounds(31, DE.IS_MAC_COCOA ? 27 : 42, 150, 20);
-									this.gearLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1315));
+									this.gearLabel.setText(Messages.getString(MessageIds.DE_MSGT1315));
 								}
 								{
 									this.gearFactorCombo = new Text(this.motorPropGroup, SWT.LEFT | SWT.BORDER);
@@ -623,7 +623,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.numberPropButton = new Button(this.motorPropGroup, SWT.RADIO | SWT.LEFT);
 									this.numberPropButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.numberPropButton.setText(Messages.getString(MessageIds.OSDE_MSGT1316));
+									this.numberPropButton.setText(Messages.getString(MessageIds.DE_MSGT1316));
 									this.numberPropButton.setBounds(31, DE.IS_MAC_COCOA ? 53 : 68, 150, 18);
 									this.numberPropButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -662,7 +662,7 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								this.dataRateGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.dataRateGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.dataRateGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1317));
+								this.dataRateGroup.setText(Messages.getString(MessageIds.DE_MSGT1317));
 								this.dataRateGroup.setBounds(337, 70, 277, 45);
 								this.dataRateGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
@@ -686,7 +686,7 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								this.sensorGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.sensorGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.sensorGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1307));
+								this.sensorGroup.setText(Messages.getString(MessageIds.DE_MSGT1307));
 								this.sensorGroup.setBounds(337, 120, 277, 120);
 								this.sensorGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
@@ -777,7 +777,7 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								this.limiterGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.limiterGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.limiterGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1308));
+								this.limiterGroup.setText(Messages.getString(MessageIds.DE_MSGT1308));
 								this.limiterGroup.setBounds(337, 243, 277, 45);
 								this.limiterGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
@@ -828,7 +828,7 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								this.readAdjustmentButton = new Button(this.configMainComosite, SWT.PUSH | SWT.FLAT | SWT.CENTER);
 								this.readAdjustmentButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.readAdjustmentButton.setText(Messages.getString(MessageIds.OSDE_MSGT1318));
+								this.readAdjustmentButton.setText(Messages.getString(MessageIds.DE_MSGT1318));
 								this.readAdjustmentButton.setBounds(12, 74, 300, 30);
 								this.readAdjustmentButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 								this.readAdjustmentButton.addSelectionListener(new SelectionAdapter() {
@@ -839,7 +839,7 @@ public class UniLogDialog extends DeviceDialog {
 											updateConfigurationValues(UniLogDialog.this.serialPort.readConfiguration());
 										}
 										catch (Exception e) {
-											UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+											UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 										}
 
 									}
@@ -848,7 +848,7 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								this.storeAdjustmentsButton = new Button(this.configMainComosite, SWT.PUSH | SWT.CENTER);
 								this.storeAdjustmentsButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.storeAdjustmentsButton.setText(Messages.getString(MessageIds.OSDE_MSGT1319));
+								this.storeAdjustmentsButton.setText(Messages.getString(MessageIds.DE_MSGT1319));
 								this.storeAdjustmentsButton.setBounds(335, 296, 281, 30);
 								this.storeAdjustmentsButton.setEnabled(false);
 								this.storeAdjustmentsButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
@@ -908,7 +908,7 @@ public class UniLogDialog extends DeviceDialog {
 					{ // begin data tab
 						this.dataTabItem = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
 						this.dataTabItem.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.dataTabItem.setText(Messages.getString(MessageIds.OSDE_MSGT1320));
+						this.dataTabItem.setText(Messages.getString(MessageIds.DE_MSGT1320));
 						{
 							this.dataMainComposite = new Composite(this.deviceConfigTabFolder, SWT.NONE);
 							this.dataMainComposite.setLayout(null);
@@ -917,7 +917,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.channleConfigGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.channleConfigGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.channleConfigGroup.setBounds(14, 12, 290, 58);
-								this.channleConfigGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1321));
+								this.channleConfigGroup.setText(Messages.getString(MessageIds.DE_MSGT1321));
 								this.channleConfigGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.useConfigCombo = new CCombo(this.channleConfigGroup, SWT.BORDER);
@@ -928,7 +928,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.useConfigCombo.setEditable(false);
 									this.useConfigCombo.setTextLimit(18);
 									this.useConfigCombo.setBackground(DataExplorer.COLOR_WHITE);
-									this.useConfigCombo.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1322));
+									this.useConfigCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT1322));
 									this.useConfigCombo.addKeyListener(new KeyAdapter() {
 										@Override
 										public void keyReleased(KeyEvent evt) {
@@ -983,7 +983,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.editConfigButton = new Button(this.channleConfigGroup, SWT.PUSH | SWT.CENTER);
 									this.editConfigButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.editConfigButton.setBounds(172, DE.IS_MAC_COCOA ? 8 : 23, 106, 23);
-									this.editConfigButton.setText(Messages.getString(MessageIds.OSDE_MSGT1323));
+									this.editConfigButton.setText(Messages.getString(MessageIds.DE_MSGT1323));
 									this.editConfigButton.setEnabled(false);
 									this.editConfigButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -999,7 +999,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.dataReadGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.dataReadGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.dataReadGroup.setBounds(14, 78, 290, 242);
-								this.dataReadGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1324));
+								this.dataReadGroup.setText(Messages.getString(MessageIds.DE_MSGT1324));
 								this.dataReadGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								this.dataReadGroup.addPaintListener(new PaintListener() {
 									public void paintControl(PaintEvent evt) {
@@ -1016,7 +1016,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.readDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 									this.readDataButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.readDataButton.setText(Messages.getString(MessageIds.OSDE_MSGT1325));
+									this.readDataButton.setText(Messages.getString(MessageIds.DE_MSGT1325));
 									this.readDataButton.setBounds(11, DE.IS_MAC_COCOA ? 15 : 30, 260, 30);
 									this.readDataButton.setEnabled(true);
 									this.readDataButton.addSelectionListener(new SelectionAdapter() {
@@ -1050,7 +1050,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.dataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.dataSetLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.dataSetLabel.setBounds(22, DE.IS_MAC_COCOA ? 53 : 68, 180, 20);
-									this.dataSetLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1326));
+									this.dataSetLabel.setText(Messages.getString(MessageIds.DE_MSGT1326));
 								}
 								{
 									this.redDataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
@@ -1062,7 +1062,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.actualDataSetNumberLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.actualDataSetNumberLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.actualDataSetNumberLabel.setBounds(22, DE.IS_MAC_COCOA ? 76 : 91, 180, 20);
-									this.actualDataSetNumberLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1327));
+									this.actualDataSetNumberLabel.setText(Messages.getString(MessageIds.DE_MSGT1327));
 								}
 								{
 									this.actualDataSetNumber = new CLabel(this.dataReadGroup, SWT.RIGHT);
@@ -1074,7 +1074,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.readDataErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.readDataErrorLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.readDataErrorLabel.setBounds(22, DE.IS_MAC_COCOA ? 98 : 113, 180, 20);
-									this.readDataErrorLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1328));
+									this.readDataErrorLabel.setText(Messages.getString(MessageIds.DE_MSGT1328));
 								}
 								{
 									this.numberReadErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
@@ -1086,7 +1086,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.readDataLess2Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.readDataLess2Label.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.readDataLess2Label.setBounds(22, DE.IS_MAC_COCOA ? 120 : 135, 180, 20);
-									this.readDataLess2Label.setText(Messages.getString(MessageIds.OSDE_MSGT1331));
+									this.readDataLess2Label.setText(Messages.getString(MessageIds.DE_MSGT1331));
 								}
 								{
 									this.numberLess2Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
@@ -1104,7 +1104,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.stopDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 									this.stopDataButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.stopDataButton.setBounds(15, DE.IS_MAC_COCOA ? 179 : 194, 260, 30);
-									this.stopDataButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0278));
+									this.stopDataButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0278));
 									this.stopDataButton.setEnabled(false);
 									this.stopDataButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -1122,14 +1122,14 @@ public class UniLogDialog extends DeviceDialog {
 								this.liveDataCaptureGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.liveDataCaptureGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.liveDataCaptureGroup.setBounds(324, 12, 284, 198);
-								this.liveDataCaptureGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1329));
-								this.liveDataCaptureGroup.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1384));
+								this.liveDataCaptureGroup.setText(Messages.getString(MessageIds.DE_MSGT1329));
+								this.liveDataCaptureGroup.setToolTipText(Messages.getString(MessageIds.DE_MSGT1384));
 								this.liveDataCaptureGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.startLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 									this.startLiveGatherButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.startLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1330));
-									this.startLiveGatherButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1384));
+									this.startLiveGatherButton.setText(Messages.getString(MessageIds.DE_MSGT1330));
+									this.startLiveGatherButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT1384));
 									this.startLiveGatherButton.setBounds(16, DE.IS_MAC_COCOA ? 11 : 26, 246, 30);
 									this.startLiveGatherButton.setSize(260, 30);
 									this.startLiveGatherButton.setEnabled(true);
@@ -1164,7 +1164,7 @@ public class UniLogDialog extends DeviceDialog {
 													UniLogDialog.this.liveThread.interrupt();
 												}
 												UniLogDialog.this.application.updateGraphicsWindow();
-												UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGE1301, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+												UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(MessageIds.DE_MSGE1301, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 												resetButtons();
 											}
 										}
@@ -1174,14 +1174,14 @@ public class UniLogDialog extends DeviceDialog {
 									this.loggingGroup = new Group(this.liveDataCaptureGroup, SWT.NONE);
 									this.loggingGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.loggingGroup.setBounds(25, 70, 228, 70);
-									this.loggingGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1332));
-									this.loggingGroup.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1383));
+									this.loggingGroup.setText(Messages.getString(MessageIds.DE_MSGT1332));
+									this.loggingGroup.setToolTipText(Messages.getString(MessageIds.DE_MSGT1383));
 									this.loggingGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
 									{
 										this.startLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
 										this.startLoggingButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.startLoggingButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0274));
-										this.startLoggingButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1383));
+										this.startLoggingButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0274));
+										this.startLoggingButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT1383));
 										this.startLoggingButton.setBounds(12, DE.IS_MAC_COCOA ? 12 : 27, 100, 30);
 										this.startLoggingButton.setEnabled(true);
 										this.startLoggingButton.addSelectionListener(new SelectionAdapter() {
@@ -1196,7 +1196,7 @@ public class UniLogDialog extends DeviceDialog {
 												}
 												catch (Exception e) {
 													UniLogDialog.log.log(Level.SEVERE, e.getMessage(), e);
-													UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+													UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 												}
 											}
 										});
@@ -1204,7 +1204,7 @@ public class UniLogDialog extends DeviceDialog {
 									{
 										this.stopLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
 										this.stopLoggingButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.stopLoggingButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0275));
+										this.stopLoggingButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0275));
 										this.stopLoggingButton.setBounds(116, DE.IS_MAC_COCOA ? 12 : 27, 100, 30);
 										this.stopLoggingButton.setEnabled(false);
 										this.stopLoggingButton.addSelectionListener(new SelectionAdapter() {
@@ -1222,7 +1222,7 @@ public class UniLogDialog extends DeviceDialog {
 												}
 												catch (Exception e) {
 													UniLogDialog.log.log(Level.SEVERE, e.getMessage(), e);
-													UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.OSDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+													UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 												}
 											}
 										});
@@ -1232,7 +1232,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.stopLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 									this.stopLiveGatherButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.stopLiveGatherButton.setBounds(17, DE.IS_MAC_COCOA ? 141 : 156, 246, 30);
-									this.stopLiveGatherButton.setText(Messages.getString(MessageIds.OSDE_MSGT1333));
+									this.stopLiveGatherButton.setText(Messages.getString(MessageIds.DE_MSGT1333));
 									this.stopLiveGatherButton.setEnabled(false);
 									this.stopLiveGatherButton.setSize(260, 30);
 									this.stopLiveGatherButton.addSelectionListener(new SelectionAdapter() {
@@ -1280,14 +1280,14 @@ public class UniLogDialog extends DeviceDialog {
 								this.clearDataBufferGroup = new Group(this.dataMainComposite, SWT.NONE);
 								this.clearDataBufferGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.clearDataBufferGroup.setBounds(324, 216, 284, 104);
-								this.clearDataBufferGroup.setText(Messages.getString(MessageIds.OSDE_MSGT1334));
-								this.clearDataBufferGroup.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1385));
+								this.clearDataBufferGroup.setText(Messages.getString(MessageIds.DE_MSGT1334));
+								this.clearDataBufferGroup.setToolTipText(Messages.getString(MessageIds.DE_MSGT1385));
 								this.clearDataBufferGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
 									this.clearMemoryButton = new Button(this.clearDataBufferGroup, SWT.PUSH | SWT.CENTER);
 									this.clearMemoryButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.clearMemoryButton.setText(Messages.getString(MessageIds.OSDE_MSGT1335));
-									this.clearMemoryButton.setToolTipText(Messages.getString(MessageIds.OSDE_MSGT1385));
+									this.clearMemoryButton.setText(Messages.getString(MessageIds.DE_MSGT1335));
+									this.clearMemoryButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT1385));
 									this.clearMemoryButton.setBounds(15, DE.IS_MAC_COCOA ? 45 : 60, 260, 30);
 									this.clearMemoryButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -1299,7 +1299,7 @@ public class UniLogDialog extends DeviceDialog {
 											}
 											catch (Exception e) {
 												UniLogDialog.log.log(Level.SEVERE, e.getMessage(), e);
-												UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGE1300, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+												UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(MessageIds.DE_MSGE1300, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 												e.printStackTrace();
 											}
 											UniLogDialog.this.clearMemoryButton.setEnabled(true);
@@ -1310,7 +1310,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.memoryDeleteInfo = new Text(this.clearDataBufferGroup, SWT.CENTER | SWT.WRAP);
 									this.memoryDeleteInfo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.memoryDeleteInfo.setBounds(12, DE.IS_MAC_COCOA ? 7 : 22, 256, 34);
-									this.memoryDeleteInfo.setText(Messages.getString(MessageIds.OSDE_MSGI1301));
+									this.memoryDeleteInfo.setText(Messages.getString(MessageIds.DE_MSGI1301));
 									this.memoryDeleteInfo.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 									this.memoryDeleteInfo.setEditable(false);
 								}
@@ -1332,7 +1332,7 @@ public class UniLogDialog extends DeviceDialog {
 									UniLogDialog.log.log(Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null && !activeChannel.getName().trim().equals(configKey)) {
-										int answer = UniLogDialog.this.application.openYesNoMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(MessageIds.OSDE_MSGI1302));
+										int answer = UniLogDialog.this.application.openYesNoMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(MessageIds.DE_MSGI1302));
 										if (answer == SWT.YES) {
 											String recordSetKey = activeRecordSet.getName();
 											UniLogDialog.log.log(Level.FINE, "move record set " + recordSetKey + " to channel/configuration " + channelNumber + DE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
