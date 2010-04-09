@@ -6,7 +6,7 @@
 //
 
 
-package osde.device;
+package gde.device;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;

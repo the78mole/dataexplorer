@@ -6,7 +6,7 @@
 //
 
 
-package osde.device;
+package gde.device;
 
 import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;

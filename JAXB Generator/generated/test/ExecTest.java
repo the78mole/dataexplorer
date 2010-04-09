@@ -11,9 +11,9 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import osde.device.DevicePropertiesType;
-import osde.device.DeviceType;
-import osde.device.SerialPortType;
+import gde.device.DevicePropertiesType;
+import gde.device.DeviceType;
+import gde.device.SerialPortType;
 
 public class ExecTest {
 
@@ -27,7 +27,7 @@ public class ExecTest {
 		
 		try {
       Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(basePath + "DeviceProperties_V03.xsd"));
-			JAXBContext jc = JAXBContext.newInstance("osde.device");
+			JAXBContext jc = JAXBContext.newInstance("de.device");
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema(schema);
 			
