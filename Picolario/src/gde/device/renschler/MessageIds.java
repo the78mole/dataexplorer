@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.renschler;
+package gde.device.renschler;
 
 /** 
  * @author Winfried Brügmann 
@@ -22,28 +22,28 @@ package osde.device.renschler;
  */ 
 public class MessageIds { 
 
-	public final static String	DE_MSGE1200 = "DE_MSGE1200";
-	public final static String	DE_MSGE1201 = "DE_MSGE1201";
-	public final static String	DE_MSGT1200 = "DE_MSGT1200";
-	public final static String	DE_MSGT1201 = "DE_MSGT1201";
-	public final static String	DE_MSGT1202 = "DE_MSGT1202";
-	public final static String	DE_MSGT1203 = "DE_MSGT1203";
-	public final static String	DE_MSGT1204 = "DE_MSGT1204";
-	public final static String	DE_MSGT1205 = "DE_MSGT1205";
-	public final static String	DE_MSGT1206 = "DE_MSGT1206";
-	public final static String	DE_MSGT1207 = "DE_MSGT1207";
-	public final static String	DE_MSGT1208 = "DE_MSGT1208";
-	public final static String	DE_MSGT1209 = "DE_MSGT1209";
-	public final static String	DE_MSGT1210 = "DE_MSGT1210";
-	public final static String	DE_MSGT1211 = "DE_MSGT1211";
-	public final static String	DE_MSGT1212 = "DE_MSGT1212";
-	public final static String	DE_MSGT1213 = "DE_MSGT1213";
-	public final static String	DE_MSGT1214 = "DE_MSGT1214";
-	public final static String	DE_MSGT1215 = "DE_MSGT1215";
-	public final static String	DE_MSGT1216 = "DE_MSGT1216";
-	public final static String	DE_MSGT1217 = "DE_MSGT1217";
-	public final static String	DE_MSGT1218 = "DE_MSGT1218";
-	public final static String	DE_MSGT1219 = "DE_MSGT1219";
-	public final static String	DE_MSGT1220 = "DE_MSGT1220";
+	public final static String	GDE_MSGE1200 = "GDE_MSGE1200";
+	public final static String	GDE_MSGE1201 = "GDE_MSGE1201";
+	public final static String	GDE_MSGT1200 = "GDE_MSGT1200";
+	public final static String	GDE_MSGT1201 = "GDE_MSGT1201";
+	public final static String	GDE_MSGT1202 = "GDE_MSGT1202";
+	public final static String	GDE_MSGT1203 = "GDE_MSGT1203";
+	public final static String	GDE_MSGT1204 = "GDE_MSGT1204";
+	public final static String	GDE_MSGT1205 = "GDE_MSGT1205";
+	public final static String	GDE_MSGT1206 = "GDE_MSGT1206";
+	public final static String	GDE_MSGT1207 = "GDE_MSGT1207";
+	public final static String	GDE_MSGT1208 = "GDE_MSGT1208";
+	public final static String	GDE_MSGT1209 = "GDE_MSGT1209";
+	public final static String	GDE_MSGT1210 = "GDE_MSGT1210";
+	public final static String	GDE_MSGT1211 = "GDE_MSGT1211";
+	public final static String	GDE_MSGT1212 = "GDE_MSGT1212";
+	public final static String	GDE_MSGT1213 = "GDE_MSGT1213";
+	public final static String	GDE_MSGT1214 = "GDE_MSGT1214";
+	public final static String	GDE_MSGT1215 = "GDE_MSGT1215";
+	public final static String	GDE_MSGT1216 = "GDE_MSGT1216";
+	public final static String	GDE_MSGT1217 = "GDE_MSGT1217";
+	public final static String	GDE_MSGT1218 = "GDE_MSGT1218";
+	public final static String	GDE_MSGT1219 = "GDE_MSGT1219";
+	public final static String	GDE_MSGT1220 = "GDE_MSGT1220";
 
  }

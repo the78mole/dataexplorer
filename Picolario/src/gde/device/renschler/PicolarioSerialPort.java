@@ -14,21 +14,21 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.renschler;
+package gde.device.renschler;
 
 import gnu.io.NoSuchPortException;
 
 import java.io.IOException;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.device.DeviceConfiguration;
-import osde.exception.ReadWriteOutOfSyncException;
-import osde.messages.Messages;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
-import osde.utils.Checksum;
+import gde.device.DeviceConfiguration;
+import gde.exception.ReadWriteOutOfSyncException;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
+import gde.utils.Checksum;
 
 /**
  * Serial communication implementation class for the Renschler Picolariolog device
@@ -75,7 +75,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 			answer = this.read(answer, 2000);
 
 			if (answer[0] != this.readNumberRecordSets[0] && answer[2] != this.readNumberRecordSets[0])
-				throw new IOException(Messages.getString(MessageIds.DE_MSGE1201));
+				throw new IOException(Messages.getString(MessageIds.GDE_MSGE1201));
 
 			recordSets = (answer[1] & 0xFF);
 		}

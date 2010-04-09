@@ -14,21 +14,21 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.renschler;
+package gde.device.renschler;
 
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.device.PropertyType;
-import osde.exception.DataInconsitsentException;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.utils.CalculationThread;
-import osde.utils.QuasiLinearRegression;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.PropertyType;
+import gde.exception.DataInconsitsentException;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.CalculationThread;
+import gde.utils.QuasiLinearRegression;
 
 /**
  * Thread implementation to gather data from Picolariolog device
@@ -39,7 +39,7 @@ public class DataGathererThread extends Thread {
 
 	DataExplorer		application;
 	String[]									datagramNumbers;
-	final String							RECORD_SET_NAME	= Messages.getString(MessageIds.DE_MSGT1220);
+	final String							RECORD_SET_NAME	= Messages.getString(MessageIds.GDE_MSGT1220);
 	final String							configKey;
 	final PicolarioSerialPort	serialPort;
 	final PicolarioDialog			dialog;
@@ -122,11 +122,11 @@ public class DataGathererThread extends Thread {
 		}
 		catch (DataInconsitsentException e) {
 			DataGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 		}
 		catch (Exception e) {
 			DataGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 		}
 		finally {
 			if (isPortOpenedByMe) this.serialPort.close();

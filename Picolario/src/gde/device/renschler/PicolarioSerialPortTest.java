@@ -14,14 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.renschler;
+package gde.device.renschler;
 
 import gnu.io.SerialPort;
 
 import java.util.Vector;
 
-import osde.device.DeviceConfiguration;
-import osde.serial.DeviceSerialPort;
+import gde.device.DeviceConfiguration;
+import gde.serial.DeviceSerialPort;
 
 /**
  * Test class for PicolarioSerialPort

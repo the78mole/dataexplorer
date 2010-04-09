@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.renschler;
+package gde.device.renschler;
 
 import java.util.logging.Logger;
 
@@ -36,16 +36,16 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.device.DeviceDialog;
-import osde.log.Level;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceDialog;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
  * Dialog class for the Picolariolog device of Uwe Renschler
@@ -116,8 +116,8 @@ public class PicolarioDialog extends DeviceDialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(345, 590);
-			this.dialogShell.setText(DEVICE_NAME + Messages.getString(osde.messages.MessageIds.DE_MSGT0273));
-			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+			this.dialogShell.setText(DEVICE_NAME + Messages.getString(de.messages.MessageIds.GDE_MSGT0273));
+			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
@@ -146,16 +146,16 @@ public class PicolarioDialog extends DeviceDialog {
 
 			{ // group 1
 				this.numberAvailableRecorsSetsGroup1 = new Group(this.dialogShell, SWT.NONE);
-				this.numberAvailableRecorsSetsGroup1.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.numberAvailableRecorsSetsGroup1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.numberAvailableRecorsSetsGroup1.setLayout(null);
-				this.numberAvailableRecorsSetsGroup1.setText(Messages.getString(MessageIds.DE_MSGT1200));
+				this.numberAvailableRecorsSetsGroup1.setText(Messages.getString(MessageIds.GDE_MSGT1200));
 				this.numberAvailableRecorsSetsGroup1.setBounds(10, 5, 320, 60);
 				this.numberAvailableRecorsSetsGroup1.addMouseTrackListener(PicolarioDialog.this.mouseTrackerEnterFadeOut);
 				{
 					this.queryAvailableRecordSetButton = new Button(this.numberAvailableRecorsSetsGroup1, SWT.PUSH | SWT.CENTER);
-					this.queryAvailableRecordSetButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.queryAvailableRecordSetButton.setText(Messages.getString(MessageIds.DE_MSGT1201)); 
-					this.queryAvailableRecordSetButton.setBounds(10, DE.IS_MAC_COCOA ? 10 : 25, 250, 25);
+					this.queryAvailableRecordSetButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.queryAvailableRecordSetButton.setText(Messages.getString(MessageIds.GDE_MSGT1201)); 
+					this.queryAvailableRecordSetButton.setBounds(10, GDE.IS_MAC_COCOA ? 10 : 25, 250, 25);
 					this.queryAvailableRecordSetButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -177,7 +177,7 @@ public class PicolarioDialog extends DeviceDialog {
 							catch (Exception e) {
 								PicolarioDialog.this.setClosePossible(true);
 								PicolarioDialog.this.serialPort.close();
-								PicolarioDialog.this.application.openMessageDialog(PicolarioDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0024, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+								PicolarioDialog.this.application.openMessageDialog(PicolarioDialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0024, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								PicolarioDialog.this.application.getDeviceSelectionDialog().open();
 							}
 						}
@@ -185,9 +185,9 @@ public class PicolarioDialog extends DeviceDialog {
 				}
 				{
 					this.numberAvailableRecordSetsLabel = new CLabel(this.numberAvailableRecorsSetsGroup1, SWT.RIGHT | SWT.BORDER);
-					this.numberAvailableRecordSetsLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.numberAvailableRecordSetsLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.numberAvailableRecordSetsLabel.setBackground(DataExplorer.COLOR_WHITE);
-					this.numberAvailableRecordSetsLabel.setBounds(270, DE.IS_MAC_COCOA ? 10 : 25, 30, 24);
+					this.numberAvailableRecordSetsLabel.setBounds(270, GDE.IS_MAC_COCOA ? 10 : 25, 30, 24);
 				}
 			} // end group1
 
@@ -198,14 +198,14 @@ public class PicolarioDialog extends DeviceDialog {
 					this.configTabItem1 = new CTabItem(this.configTabFolder, SWT.NONE);
 					this.configTabItem1.setText(this.device.getChannelName(1));
 					this.configTab1 = new PicolarioConfigTab(this.configTabFolder, this.device, this.device.getChannelName(1));
-					this.configTabItem1.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.configTabItem1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.configTabItem1.setControl(this.configTab1);
 				}
 				if (this.device.getChannelCount() > 1) {
 					this.configTabItem2 = new CTabItem(this.configTabFolder, SWT.NONE);
 					this.configTabItem2.setText(this.device.getChannelName(2));
 					this.configTab2 = new PicolarioConfigTab(this.configTabFolder, this.device, this.device.getChannelName(2));
-					this.configTabItem2.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.configTabItem2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.configTabItem2.setControl(this.configTab2);
 				}
 
@@ -223,7 +223,7 @@ public class PicolarioDialog extends DeviceDialog {
 							log.log(Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 							if (activeRecordSet != null && !activeChannel.getName().trim().equals(configKey)) {
-								int answer = PicolarioDialog.this.application.openYesNoMessageDialog(PicolarioDialog.this.getDialogShell(), Messages.getString(MessageIds.DE_MSGT1202));
+								int answer = PicolarioDialog.this.application.openYesNoMessageDialog(PicolarioDialog.this.getDialogShell(), Messages.getString(MessageIds.GDE_MSGT1202));
 								if (answer == SWT.YES) {
 									String recordSetKey = activeRecordSet.getName();
 									log.log(Level.FINE, "move record set " + recordSetKey + " to configuration " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
@@ -240,16 +240,16 @@ public class PicolarioDialog extends DeviceDialog {
 
 			{ // group 3
 				this.readDataGroup3 = new Group(this.dialogShell, SWT.NONE);
-				this.readDataGroup3.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.readDataGroup3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.readDataGroup3.setLayout(null);
-				this.readDataGroup3.setText(Messages.getString(MessageIds.DE_MSGT1203));
+				this.readDataGroup3.setText(Messages.getString(MessageIds.GDE_MSGT1203));
 				this.readDataGroup3.setBounds(10, 310, 320, 195);
 				this.readDataGroup3.addMouseTrackListener(PicolarioDialog.this.mouseTrackerEnterFadeOut);
 				{
 					this.switchRecordSetButton = new Button(this.readDataGroup3, SWT.CHECK | SWT.CENTER);
-					this.switchRecordSetButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.switchRecordSetButton.setBounds(15, DE.IS_MAC_COCOA ? 5 : 20, 290, 17);
-					this.switchRecordSetButton.setText(Messages.getString(MessageIds.DE_MSGT1204));
+					this.switchRecordSetButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.switchRecordSetButton.setBounds(15, GDE.IS_MAC_COCOA ? 5 : 20, 290, 17);
+					this.switchRecordSetButton.setText(Messages.getString(MessageIds.GDE_MSGT1204));
 					this.switchRecordSetButton.setSelection(this.doSwtichRecordSet);
 					this.switchRecordSetButton.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -261,9 +261,9 @@ public class PicolarioDialog extends DeviceDialog {
 				}
 				{
 					this.readSingle = new Button(this.readDataGroup3, SWT.PUSH | SWT.CENTER);
-					this.readSingle.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.readSingle.setText(Messages.getString(MessageIds.DE_MSGT1205));
-					this.readSingle.setBounds(10, DE.IS_MAC_COCOA ? 30 : 45, 240, 25);
+					this.readSingle.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.readSingle.setText(Messages.getString(MessageIds.GDE_MSGT1205));
+					this.readSingle.setBounds(10, GDE.IS_MAC_COCOA ? 30 : 45, 240, 25);
 					this.readSingle.setEnabled(false);
 					this.readSingle.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -288,28 +288,28 @@ public class PicolarioDialog extends DeviceDialog {
 				}
 				{
 					this.recordSetSelectCombo = new CCombo(this.readDataGroup3, SWT.BORDER | SWT.RIGHT);
-					this.recordSetSelectCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.recordSetSelectCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.recordSetSelectCombo.setText("0"); //$NON-NLS-1$
-					this.recordSetSelectCombo.setBounds(260, DE.IS_MAC_COCOA ? 32 : 47, 45, DE.IS_LINUX ? 22 : 20);
+					this.recordSetSelectCombo.setBounds(260, GDE.IS_MAC_COCOA ? 32 : 47, 45, GDE.IS_LINUX ? 22 : 20);
 				}
 				{
 					this.numberRedTelegramLabel = new CLabel(this.readDataGroup3, SWT.RIGHT);
-					this.numberRedTelegramLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.numberRedTelegramLabel.setBounds(10, DE.IS_MAC_COCOA ? 60 : 75, 234, 24);
-					this.numberRedTelegramLabel.setText(Messages.getString(MessageIds.DE_MSGT1206));
+					this.numberRedTelegramLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.numberRedTelegramLabel.setBounds(10, GDE.IS_MAC_COCOA ? 60 : 75, 234, 24);
+					this.numberRedTelegramLabel.setText(Messages.getString(MessageIds.GDE_MSGT1206));
 					this.numberRedTelegramLabel.setForeground(SWTResourceManager.getColor(64, 128, 128));
 				}
 				{
 					this.alreadyRedLabel = new CLabel(this.readDataGroup3, SWT.RIGHT);
-					this.alreadyRedLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.alreadyRedLabel.setBounds(244, DE.IS_MAC_COCOA ? 60 : 75, 56, 24);
+					this.alreadyRedLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.alreadyRedLabel.setBounds(244, GDE.IS_MAC_COCOA ? 60 : 75, 56, 24);
 					this.alreadyRedLabel.setText(this.redDatagrams);
 				}
 				{
 					this.readAllRecords = new Button(this.readDataGroup3, SWT.PUSH | SWT.CENTER);
-					this.readAllRecords.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.readAllRecords.setBounds(8, DE.IS_MAC_COCOA ? 85 : 100, 300, 25);
-					this.readAllRecords.setText(Messages.getString(MessageIds.DE_MSGT1207));
+					this.readAllRecords.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.readAllRecords.setBounds(8, GDE.IS_MAC_COCOA ? 85 : 100, 300, 25);
+					this.readAllRecords.setText(Messages.getString(MessageIds.GDE_MSGT1207));
 					this.readAllRecords.setEnabled(false);
 					this.readAllRecords.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -334,23 +334,23 @@ public class PicolarioDialog extends DeviceDialog {
 				}
 				{
 					this.alreadyRedDataSetsLabel = new CLabel(this.readDataGroup3, SWT.RIGHT);
-					this.alreadyRedDataSetsLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.alreadyRedDataSetsLabel.setBounds(10, DE.IS_MAC_COCOA ? 110 : 125, 234, 24);
+					this.alreadyRedDataSetsLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.alreadyRedDataSetsLabel.setBounds(10, GDE.IS_MAC_COCOA ? 110 : 125, 234, 24);
 					this.alreadyRedDataSetsLabel.setForeground(SWTResourceManager.getColor(64, 128, 128));
-					this.alreadyRedDataSetsLabel.setText(Messages.getString(MessageIds.DE_MSGT1208));
+					this.alreadyRedDataSetsLabel.setText(Messages.getString(MessageIds.GDE_MSGT1208));
 				}
 				{
 					this.redDataSets = new CLabel(this.readDataGroup3, SWT.RIGHT);
-					this.redDataSets.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.redDataSets.setBounds(244, DE.IS_MAC_COCOA ? 110 : 125, 56, 24);
+					this.redDataSets.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.redDataSets.setBounds(244, GDE.IS_MAC_COCOA ? 110 : 125, 56, 24);
 					this.redDataSets.setText(this.redDataSetsText);
 				}
 				{
 					this.stopButton = new Button(this.readDataGroup3, SWT.PUSH | SWT.CENTER);
-					this.stopButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.stopButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0278));
+					this.stopButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.stopButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0278));
 					this.stopButton.setEnabled(false);
-					this.stopButton.setBounds(80, DE.IS_MAC_COCOA ? 140 : 155, 150, 25);
+					this.stopButton.setBounds(80, GDE.IS_MAC_COCOA ? 140 : 155, 150, 25);
 					this.stopButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -364,8 +364,8 @@ public class PicolarioDialog extends DeviceDialog {
 
 			{
 				this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-				this.closeButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.closeButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0188));
+				this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.closeButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0188));
 				this.closeButton.setBounds(70, 520, 200, 25);
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
 					@Override

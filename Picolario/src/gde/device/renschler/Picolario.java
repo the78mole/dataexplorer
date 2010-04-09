@@ -14,30 +14,30 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.renschler;
+package gde.device.renschler;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
-import osde.device.PropertyType;
-import osde.exception.DataInconsitsentException;
-import osde.messages.Messages;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
-import osde.utils.CalculationThread;
-import osde.utils.LinearRegression;
-import osde.utils.QuasiLinearRegression;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.device.PropertyType;
+import gde.exception.DataInconsitsentException;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
+import gde.utils.CalculationThread;
+import gde.utils.LinearRegression;
+import gde.utils.QuasiLinearRegression;
 
 /**
  * Picolariolog device main implementaion class
@@ -65,7 +65,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public Picolario(String iniFile) throws FileNotFoundException, JAXBException {
 		super(iniFile);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.renschler.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("de.device.renschler.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new PicolarioSerialPort(this, this.application);
@@ -81,7 +81,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public Picolario(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.renschler.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("de.device.renschler.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new PicolarioSerialPort(this, this.application);
@@ -95,7 +95,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.DE_MSGT1220);
+		return Messages.getString(MessageIds.GDE_MSGT1220);
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
@@ -430,7 +430,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
 				}
 			}
 			else {
