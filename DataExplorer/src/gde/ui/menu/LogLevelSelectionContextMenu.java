@@ -14,9 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.menu;
+package gde.ui.menu;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -27,8 +27,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import osde.config.Settings;
-import osde.ui.dialog.SettingsDialog;
+import gde.config.Settings;
+import gde.ui.dialog.SettingsDialog;
 
 /**
  * Context menu class of the settings dialog to select a log level

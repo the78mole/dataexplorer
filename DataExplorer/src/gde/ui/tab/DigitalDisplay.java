@@ -14,10 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.tab;
+package gde.ui.tab;
 
 import java.text.DecimalFormat;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -31,17 +31,17 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.IDevice;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.menu.TabAreaContextMenu;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.IDevice;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
 
 /**
  * Child display class displaying digital active measurements
@@ -94,8 +94,8 @@ public class DigitalDisplay extends Composite {
 
 								DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
 								String actualValue = df.format(DigitalDisplay.this.device.translateValue(record, (record.lastElement() / 1000.0)));
-								String maxValue = Messages.getString(MessageIds.DE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
-								String minValue = Messages.getString(MessageIds.DE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
+								String maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
+								String minValue = Messages.getString(MessageIds.GDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
 								log.log(Level.FINE, DigitalDisplay.this.recordKey + " actualValue=" + actualValue + " maxValue=" + maxValue + " minValue=" + minValue);
 								DigitalDisplay.this.actualDigitalLabel.setForeground(record.getColor());
 								DigitalDisplay.this.actualDigitalLabel.setText(actualValue);
@@ -179,7 +179,7 @@ public class DigitalDisplay extends Composite {
 							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
 							if (record != null) {
 								DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
-								String minValue = Messages.getString(MessageIds.DE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
+								String minValue = Messages.getString(MessageIds.GDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
 								log.log(Level.FINE, DigitalDisplay.this.recordKey + " minValue=" + minValue);
 								DigitalDisplay.this.minDigitalLabel.setText(minValue);
 							}
@@ -203,7 +203,7 @@ public class DigitalDisplay extends Composite {
 							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
 							if (record != null) {
 								DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
-								String maxValue = Messages.getString(MessageIds.DE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
+								String maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
 								log.log(Level.FINE, DigitalDisplay.this.recordKey + " maxValue=" + maxValue);
 								DigitalDisplay.this.maxDigitalLabel.setText(maxValue);
 							}

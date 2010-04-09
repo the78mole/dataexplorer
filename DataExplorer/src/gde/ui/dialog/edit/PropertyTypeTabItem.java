@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.dialog.edit;
+package gde.ui.dialog.edit;
 
 import java.util.logging.Logger;
 
@@ -37,19 +37,19 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 
-import osde.DE;
-import osde.device.DataTypes;
-import osde.device.DesktopPropertyTypes;
-import osde.device.DeviceConfiguration;
-import osde.device.MeasurementPropertyTypes;
-import osde.device.ObjectFactory;
-import osde.device.PropertyType;
-import osde.log.Level;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.utils.StringHelper;
+import gde.DE;
+import gde.device.DataTypes;
+import gde.device.DesktopPropertyTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.ObjectFactory;
+import gde.device.PropertyType;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
 
 /**
  * Composite to wrap XML PropertyType enable to edit existing and create new device property files 
@@ -99,10 +99,10 @@ public class PropertyTypeTabItem extends CTabItem {
 		this.tabName = useTabName;
 		this.measurementTypeTabItem = useMeasurementTypeTabItem2CreatePopupMenu;
 		this.propertyType = new ObjectFactory().createPropertyType();
-		this.propertyType.setName(Messages.getString(MessageIds.DE_MSGT0473));
+		this.propertyType.setName(Messages.getString(MessageIds.GDE_MSGT0473));
 		this.propertyType.setType(DataTypes.INTEGER);
-		this.propertyType.setValue(DE.STRING_EMPTY + 0);
-		this.propertyType.setDescription(Messages.getString(MessageIds.DE_MSGT0474));
+		this.propertyType.setValue(GDE.STRING_EMPTY + 0);
+		this.propertyType.setDescription(Messages.getString(MessageIds.GDE_MSGT0474));
 
 		initGUI();
 	}
@@ -174,7 +174,7 @@ public class PropertyTypeTabItem extends CTabItem {
 		if (PropertyTypeTabItem.this.propertyType.getType() == DataTypes.BOOLEAN) {
 			this.valueText.setVisible(false);
 			this.valueCombo.setVisible(true);
-			PropertyTypeTabItem.this.valueCombo.select(this.propertyType.getValue().equals(DE.STRING_TRUE) ? 0 : 1);
+			PropertyTypeTabItem.this.valueCombo.select(this.propertyType.getValue().equals(GDE.STRING_TRUE) ? 0 : 1);
 		}
 		else {
 			this.valueCombo.setVisible(false);
@@ -215,14 +215,14 @@ public class PropertyTypeTabItem extends CTabItem {
 				break;
 			}
 		}
-		return dataTypeItems == null ? new String[] { DE.STRING_EMPTY } : dataTypeItems;
+		return dataTypeItems == null ? new String[] { GDE.STRING_EMPTY } : dataTypeItems;
 	}
 
 	private void initGUI() {
 		try {
 			SWTResourceManager.registerResourceUser(this);
 			this.setText(this.tabName);
-			this.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.addDisposeListener(new DisposeListener() {
 				@Override
 				public void widgetDisposed(DisposeEvent disposeevent) {
@@ -243,31 +243,31 @@ public class PropertyTypeTabItem extends CTabItem {
 			});
 			{
 				this.nameLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.nameLabel.setText(Messages.getString(MessageIds.DE_MSGT0549));
-				this.nameLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.nameLabel.setText(Messages.getString(MessageIds.GDE_MSGT0549));
+				this.nameLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.nameLabel.setBounds(5, 12, 80, 20);
 			}
 			{
 				this.typeLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.typeLabel.setText(Messages.getString(MessageIds.DE_MSGT0552));
-				this.typeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.typeLabel.setText(Messages.getString(MessageIds.GDE_MSGT0552));
+				this.typeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.typeLabel.setBounds(5, 38, 80, 20);
 			}
 			{
 				this.valueLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.valueLabel.setText(Messages.getString(MessageIds.DE_MSGT0553));
-				this.valueLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.valueLabel.setText(Messages.getString(MessageIds.GDE_MSGT0553));
+				this.valueLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.valueLabel.setBounds(5, 65, 80, 20);
 			}
 			{
 				this.descriptionLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-				this.descriptionLabel.setText(Messages.getString(MessageIds.DE_MSGT0554));
-				this.descriptionLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.descriptionLabel.setText(Messages.getString(MessageIds.GDE_MSGT0554));
+				this.descriptionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.descriptionLabel.setBounds(5, 92, 80, 20);
 			}
 			{
 				this.nameText = new Text(this.propertyTypeComposite, SWT.BORDER);
-				this.nameText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.nameText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.nameText.setBounds(90, 10, 200, 20);
 				this.nameText.addKeyListener(new KeyAdapter() {
 					@Override
@@ -284,7 +284,7 @@ public class PropertyTypeTabItem extends CTabItem {
 			}
 			{
 				this.nameCombo = new CCombo(this.propertyTypeComposite, SWT.BORDER);
-				this.nameCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.nameCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.nameCombo.setBounds(90, 10, 200, 20);
 				this.nameCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -296,7 +296,7 @@ public class PropertyTypeTabItem extends CTabItem {
 			}
 			{
 				this.typeCombo = new CCombo(this.propertyTypeComposite, SWT.BORDER);
-				this.typeCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.typeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.typeCombo.setItems(DataTypes.valuesAsStingArray());
 				this.typeCombo.setBounds(90, 37, 120, 20);
 				this.typeCombo.addSelectionListener(new SelectionAdapter() {
@@ -312,7 +312,7 @@ public class PropertyTypeTabItem extends CTabItem {
 								PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
 								PropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
 							}
-							PropertyTypeTabItem.this.valueCombo.select(PropertyTypeTabItem.this.valueCombo.getText().equals(DE.STRING_TRUE) ? 0 : 1);
+							PropertyTypeTabItem.this.valueCombo.select(PropertyTypeTabItem.this.valueCombo.getText().equals(GDE.STRING_TRUE) ? 0 : 1);
 						}
 						else {
 							PropertyTypeTabItem.this.valueText.setVisible(true);
@@ -330,7 +330,7 @@ public class PropertyTypeTabItem extends CTabItem {
 			}
 			{
 				this.valueText = new Text(this.propertyTypeComposite, SWT.BORDER);
-				this.valueText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.valueText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.valueText.setBounds(90, 65, 120, 20);
 				this.valueText.addKeyListener(this.valueKeyListener = new KeyAdapter() {
 					@Override
@@ -352,11 +352,11 @@ public class PropertyTypeTabItem extends CTabItem {
 					}
 				});
 				this.valueCombo = new CCombo(this.propertyTypeComposite, SWT.BORDER);
-				this.valueCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.valueCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.valueCombo.setBounds(90, 65, 120, 20);
 				this.valueCombo.setEditable(false);
 				this.valueCombo.setBackground(DataExplorer.COLOR_WHITE);
-				this.valueCombo.setItems(DE.STRING_ARRAY_TRUE_FALSE);
+				this.valueCombo.setItems(GDE.STRING_ARRAY_TRUE_FALSE);
 				this.valueCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -392,7 +392,7 @@ public class PropertyTypeTabItem extends CTabItem {
 			}
 			{
 				this.descriptionText = new Text(this.propertyTypeComposite, SWT.LEFT | SWT.WRAP | SWT.BORDER);
-				this.descriptionText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.descriptionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.descriptionText.setBounds(90, 92, 200, 55);
 				this.descriptionText.addKeyListener(new KeyAdapter() {
 					@Override
@@ -453,9 +453,9 @@ public class PropertyTypeTabItem extends CTabItem {
 			PropertyTypeTabItem.this.descriptionText.setText(PropertyTypeTabItem.this.propertyType.getDescription());
 		}
 		else {
-			PropertyTypeTabItem.this.nameText.setText(DE.STRING_EMPTY);
-			PropertyTypeTabItem.this.nameCombo.setText(DE.STRING_EMPTY);
-			PropertyTypeTabItem.this.descriptionText.setText(DE.STRING_EMPTY);
+			PropertyTypeTabItem.this.nameText.setText(GDE.STRING_EMPTY);
+			PropertyTypeTabItem.this.nameCombo.setText(GDE.STRING_EMPTY);
+			PropertyTypeTabItem.this.descriptionText.setText(GDE.STRING_EMPTY);
 
 		}
 		PropertyTypeTabItem.this.enableContextMenu(true);

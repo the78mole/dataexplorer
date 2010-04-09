@@ -14,9 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui;
+package gde.ui;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 
-import osde.DE;
+import gde.DE;
 
 /**
  * user interface status bar class, device, serial port, port activity, progress bar, messages
@@ -91,7 +91,7 @@ public class StatusBar {
 					this.portButton = new CLabel(this.comComposite, SWT.NONE);
 					this.portButton.setBounds(2,2, 50, 20);
 					this.portButton.setForeground(DataExplorer.COLOR_DARK_GREEN);
-					this.portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
+					this.portButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.conText = new Label(this.comComposite, SWT.LEFT);
@@ -103,7 +103,7 @@ public class StatusBar {
 					this.rxButton = new CLabel(this.comComposite, SWT.CENTER);
 					this.rxButton.setBounds(2,2, 50, 20);
 					this.rxButton.setForeground(DataExplorer.COLOR_DARK_GREEN);
-					this.rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
+					this.rxButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.rxText = new Label(this.comComposite, SWT.LEFT);
@@ -115,7 +115,7 @@ public class StatusBar {
 					this.txButton = new CLabel(this.comComposite, SWT.CENTER);
 					this.txButton.setBounds(2,2, 50, 20);
 					this.txButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-					this.txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
+					this.txButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.txText = new Label(this.comComposite, SWT.LEFT);
@@ -137,7 +137,7 @@ public class StatusBar {
 			}
 			{
 				this.msgLabel = new Label(this.statusComposite, SWT.LEFT | SWT.SINGLE);
-				this.msgLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.msgLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			}
 		}
 	}
@@ -170,41 +170,41 @@ public class StatusBar {
 	 * set the serial com port rx light on
 	 */
 	public void setSerialRxOn() {
-		if (!this.rxButton.isDisposed()) this.rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
+		if (!this.rxButton.isDisposed()) this.rxButton.setImage(SWTResourceManager.getImage("gde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
 	}
 
 	/**
 	 * set the serial com port rx light off
 	 */
 	public void setSerialRxOff() {
-		if (!this.rxButton.isDisposed()) this.rxButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
+		if (!this.rxButton.isDisposed()) this.rxButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
 	}
 
 	/**
 	 * set the serial com port tx light on
 	 */
 	public void setSerialTxOn() {
-		if (!this.txButton.isDisposed()) this.txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
+		if (!this.txButton.isDisposed()) this.txButton.setImage(SWTResourceManager.getImage("gde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
 	}
 
 	/**
 	 * set the serial com port tx light off
 	 */
 	public void setSerialTxOff() {
-		if (!this.txButton.isDisposed()) this.txButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
+		if (!this.txButton.isDisposed()) this.txButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
 	}
 
 	/**
 	 * set the serial com port light on
 	 */
 	public void setSerialPortConnected() {
-		if (!this.portButton.isDisposed()) this.portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
+		if (!this.portButton.isDisposed()) this.portButton.setImage(SWTResourceManager.getImage("gde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
 	}
 
 	/**
 	 * set the serial com port light off
 	 */
 	public void setSerialPortDisconnected() {
-		if (!this.portButton.isDisposed()) this.portButton.setImage(SWTResourceManager.getImage("osde/resource/LEDGreen.gif")); //$NON-NLS-1$
+		if (!this.portButton.isDisposed()) this.portButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
 	}
 }

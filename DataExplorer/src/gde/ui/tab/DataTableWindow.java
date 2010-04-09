@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.tab;
+package gde.ui.tab;
 
 import java.util.logging.Logger;
 
@@ -32,18 +32,18 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import osde.DE;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.IDevice;
-import osde.device.MeasurementType;
-import osde.log.Level;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
+import gde.DE;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.IDevice;
+import gde.device.MeasurementType;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
  * Table display class, displays the data in table form
@@ -66,7 +66,7 @@ public class DataTableWindow extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.DE_MSGT0233));
+		this.setText(Messages.getString(MessageIds.GDE_MSGT0233));
 	}
 
 	public void create() {
@@ -74,7 +74,7 @@ public class DataTableWindow extends CTabItem {
 		this.setControl(this.dataTable);
 		this.dataTable.setLinesVisible(true);
 		this.dataTable.setHeaderVisible(true);
-		this.dataTable.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		this.dataTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.dataTable.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
 				log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
@@ -110,7 +110,7 @@ public class DataTableWindow extends CTabItem {
 		}
 
 		int extentFactor = 9;
-		String time = Messages.getString(MessageIds.DE_MSGT0234); //$NON-NLS-1$
+		String time = Messages.getString(MessageIds.GDE_MSGT0234); //$NON-NLS-1$
 		this.timeColumn = new TableColumn(this.dataTable, SWT.CENTER);
 		this.timeColumn.setWidth(time.length() * extentFactor);
 		this.timeColumn.setText(time);
@@ -124,7 +124,7 @@ public class DataTableWindow extends CTabItem {
 				for (int i = 0; i < recordNames.length; i++) {
 					Record record = activeRecordSet.get(recordNames[i]);
 					StringBuilder sb = new StringBuilder();
-					sb.append(record.getName()).append(DE.STRING_BLANK).append(DE.STRING_LEFT_BRACKET).append(record.getUnit()).append(DE.STRING_RIGHT_BRACKET);
+					sb.append(record.getName()).append(GDE.STRING_BLANK).append(GDE.STRING_LEFT_BRACKET).append(record.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 					column.setWidth(sb.length() * extentFactor);
 					column.setText(sb.toString());
@@ -140,7 +140,7 @@ public class DataTableWindow extends CTabItem {
 				for (int i = 0; i < measurements.length; i++) {
 					MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
 					StringBuilder sb = new StringBuilder();
-					sb.append(measurement.getName()).append(DE.STRING_BLANK).append(DE.STRING_LEFT_BRACKET).append(measurement.getUnit()).append(DE.STRING_RIGHT_BRACKET);
+					sb.append(measurement.getName()).append(GDE.STRING_BLANK).append(GDE.STRING_LEFT_BRACKET).append(measurement.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 					column.setWidth(sb.length() * extentFactor);
 					column.setText(sb.toString());

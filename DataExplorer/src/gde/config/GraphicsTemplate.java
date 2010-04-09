@@ -14,17 +14,17 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.config;
+package gde.config;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.DE;
+import gde.DE;
 
 /**
  * CSlass managing graphics visualization, store, restore
@@ -72,7 +72,7 @@ public class GraphicsTemplate extends Properties {
 	 */
 	public void load() {
 		try {
-			this.currentFileFilePath = this.templatePath + DE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
+			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
 			log.log(Level.FINE, "opening template file " + this.currentFileFilePath); //$NON-NLS-1$
 			this.loadFromXML(new FileInputStream(new File(this.currentFileFilePath)));
 			this.isAvailable = true;
@@ -97,7 +97,7 @@ public class GraphicsTemplate extends Properties {
 				tmpPath.mkdir();
 			}
 
-			this.currentFileFilePath = this.templatePath + DE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
+			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
 			this.storeToXML(new FileOutputStream(new File(this.currentFileFilePath)), "-- DataExplorer GraphicsTemplate --"); //$NON-NLS-1$
 			this.isSaved = true;
 			this.selectedFileName = null;

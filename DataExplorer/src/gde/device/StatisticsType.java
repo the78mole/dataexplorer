@@ -5,7 +5,7 @@
 // Generated on: 2009.11.15 at 10:25:53 AM MEZ 
 //
 
-package osde.device;
+package gde.device;
 
 
 import java.math.BigInteger;

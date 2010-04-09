@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.tab;
+package gde.ui.tab;
 
 import java.util.logging.Logger;
 
@@ -38,16 +38,16 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import osde.DE;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.log.Level;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.menu.CurveSelectorContextMenu;
+import gde.DE;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.CurveSelectorContextMenu;
 
 /**
  * This class defines a composite whith a header (Curve Selector, ..) and a table with checkable table items
@@ -115,8 +115,8 @@ public class SelectorComposite extends Composite {
 		});
 		{
 			this.curveSelectorHeader = new CLabel(this, SWT.NONE);
-			this.curveSelectorHeader.setText("  " + Messages.getString(MessageIds.DE_MSGT0254)); //$NON-NLS-1$
-			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
+			this.curveSelectorHeader.setText("  " + Messages.getString(MessageIds.GDE_MSGT0254)); //$NON-NLS-1$
+			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 			this.curveSelectorHeader.pack();
 			this.initialSelectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8;
 			FormData curveSelectorHeaderLData = new FormData();
@@ -129,7 +129,7 @@ public class SelectorComposite extends Composite {
 		}
 		{
 			this.curveSelectorTable = new Table(this, SWT.FULL_SELECTION | SWT.CHECK);
-			this.curveSelectorTable.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.curveSelectorTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.curveSelectorTable.setLinesVisible(true);
 			FormData curveTableLData = new FormData();
 			curveTableLData.width = 82;

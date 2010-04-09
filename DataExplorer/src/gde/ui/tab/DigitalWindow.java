@@ -14,10 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.tab;
+package gde.ui.tab;
 
 import java.util.HashMap;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -35,16 +35,16 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.menu.TabAreaContextMenu;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
 
 /**
  * Display window parent of digital displays
@@ -56,7 +56,7 @@ public class DigitalWindow extends CTabItem {
 	Composite												digitalMainComposite;
 	HashMap<String, DigitalDisplay>	displays;
 	FillLayout 											digitalMainCompositeLayout = new FillLayout(SWT.HORIZONTAL);
-	String 													info = Messages.getString(MessageIds.DE_MSGT0230);
+	String 													info = Messages.getString(MessageIds.GDE_MSGT0230);
 
 	Color														surroundingBackground;
 
@@ -77,7 +77,7 @@ public class DigitalWindow extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.DE_MSGT0238));
+		this.setText(Messages.getString(MessageIds.GDE_MSGT0238));
 			
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
@@ -133,7 +133,7 @@ public class DigitalWindow extends CTabItem {
 	public void update(boolean forceUpdate) {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null && this.digitalMainComposite.isVisible()) {
-			log.log(Level.FINE, DE.STRING_BLANK);
+			log.log(Level.FINE, GDE.STRING_BLANK);
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isDigitalTabRequested()) {

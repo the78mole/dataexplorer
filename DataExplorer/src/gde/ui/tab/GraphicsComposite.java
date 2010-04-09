@@ -14,12 +14,12 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.tab;
+package gde.ui.tab;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -48,21 +48,21 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.menu.TabAreaContextMenu;
-import osde.utils.CurveUtils;
-import osde.utils.GraphicsUtils;
-import osde.utils.StringHelper;
-import osde.utils.TimeLine;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
+import gde.utils.CurveUtils;
+import gde.utils.GraphicsUtils;
+import gde.utils.StringHelper;
+import gde.utils.TimeLine;
 
 /**
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
@@ -233,7 +233,7 @@ public class GraphicsComposite extends Composite {
 							else if (tmpDescription.contains("\n")) {
 								tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\n"));
 							}
-							String tmpHeader = tmpDescription + DE.STRING_MESSAGE_CONCAT + recordSet.getName();
+							String tmpHeader = tmpDescription + GDE.STRING_MESSAGE_CONCAT + recordSet.getName();
 							if (GraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(GraphicsComposite.this.graphicsHeaderText)) {
 								GraphicsComposite.this.graphicsHeader.setText(GraphicsComposite.this.graphicsHeaderText = tmpHeader);
 							}
@@ -299,7 +299,7 @@ public class GraphicsComposite extends Composite {
 		}
 		{
 			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT);
-			this.recordSetComment.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+			this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 			this.recordSetComment.setBackground(this.surroundingBackground); 
 			this.recordSetComment.setMenu(this.popupmenu);
 			this.recordSetComment.addPaintListener(new PaintListener() {
@@ -356,7 +356,7 @@ public class GraphicsComposite extends Composite {
 		this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
 		this.canvasImageGC.setBackground(this.surroundingBackground);
 		this.canvasImageGC.fillRectangle(this.canvasBounds);
-		this.canvasImageGC.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		//get gc for other drawing operations
 		this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
 
@@ -558,7 +558,7 @@ public class GraphicsComposite extends Composite {
 
 		// draw start time for zoom mode or scope mode
 		if (startTimeFormated != 0) { 
-			String strStartTime = Messages.getString(MessageIds.DE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
+			String strStartTime = Messages.getString(MessageIds.GDE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
 			Point point = gc.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
 			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_RED));
@@ -629,7 +629,7 @@ public class GraphicsComposite extends Composite {
 		this.graphicsHeader.redraw();
 		this.recordSetComment.redraw();
 		
-		if (DE.IS_WINDOWS) {
+		if (GDE.IS_WINDOWS) {
 			Point size = this.graphicCanvas.getSize();
 			this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update
 			this.graphicCanvas.redraw(size.x-5,5,5,5,true);
@@ -671,7 +671,7 @@ public class GraphicsComposite extends Composite {
 			drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
 			this.application.setStatusMessage(Messages.getString(
-					MessageIds.DE_MSGT0256, 
+					MessageIds.GDE_MSGT0256, 
 					new Object[] { record.getName(), record.getVerticalDisplayPointAsFormattedScaleValue(this.yPosMeasure, this.curveAreaBounds), record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }
 			));
 		}
@@ -696,7 +696,7 @@ public class GraphicsComposite extends Composite {
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 			this.application.setStatusMessage(
-					Messages.getString(MessageIds.DE_MSGT0257, new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), 
+					Messages.getString(MessageIds.GDE_MSGT0257, new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), 
 					record.getUnit(), record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 			));
 		}
@@ -858,7 +858,7 @@ public class GraphicsComposite extends Composite {
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 
 			if (leftEnabled) {
-				this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0258));
+				this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0258));
 				//cleanCutPointer();
 				this.xPosCut = this.xPosCut > 0 ? this.xPosCut : this.curveAreaBounds.width * 1 / 4;
 				this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
@@ -867,7 +867,7 @@ public class GraphicsComposite extends Composite {
 				drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);
 			}
 			else if (rightEnabled) {
-				this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0259));
+				this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0259));
 				//cleanCutPointer();
 				this.xPosCut = this.xPosCut > 0 ? this.xPosCut : this.curveAreaBounds.width * 3 / 4;
 				this.canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
@@ -960,7 +960,7 @@ public class GraphicsComposite extends Composite {
 			this.isLeftCutMode = false;
 			this.isRightCutMode = false;
 			this.isScopeMode	= false;
-			this.application.setStatusMessage(DE.STRING_EMPTY);
+			this.application.setStatusMessage(GDE.STRING_EMPTY);
 			this.xPosCut = -1;
 			this.xLast = 0;
 			this.yLast = 0;
@@ -1090,13 +1090,13 @@ public class GraphicsComposite extends Composite {
 								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
 									drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);	
 								}
-								this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0257, 
+								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257, 
 										new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(), 
 										record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 								)); 
 							}
 							else {
-								this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0256, 
+								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256, 
 										new Object[] { record.getName(), record.getVerticalDisplayPointAsFormattedScaleValue(this.yPosMeasure, this.curveAreaBounds),
 										record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }
 								)); 
@@ -1138,7 +1138,7 @@ public class GraphicsComposite extends Composite {
 
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
-							this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGT0257, 
+							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257, 
 									new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(),
 									record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 							));
@@ -1196,7 +1196,7 @@ public class GraphicsComposite extends Composite {
 				}
 				else if (measureRecordKey != null && (recordSet.isMeasurementMode(measureRecordKey) || recordSet.isDeltaMeasurementMode(measureRecordKey))) {
 					if (this.xPosMeasure + 1 >= evt.x && this.xPosMeasure - 1 <= evt.x || this.xPosDelta + 1 >= evt.x && this.xPosDelta - 1 <= evt.x) { // snap mouse pointer
-						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("osde/resource/MoveH.gif")); //$NON-NLS-1$
+						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/MoveH.gif")); //$NON-NLS-1$
 					}
 					else {
 						this.graphicCanvas.setCursor(this.application.getCursor());
@@ -1206,11 +1206,11 @@ public class GraphicsComposite extends Composite {
 					this.graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_CROSS));
 				}
 				else if (this.isPanMouse) {
-					this.graphicCanvas.setCursor(SWTResourceManager.getCursor("osde/resource/Hand.gif")); //$NON-NLS-1$
+					this.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/Hand.gif")); //$NON-NLS-1$
 				}
 				else if (this.isLeftCutMode || this.isRightCutMode) {
 					if (this.xPosCut + 1 >= evt.x && this.xPosCut - 1 <= evt.x) { // snap mouse pointer
-						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("osde/resource/MoveH.gif")); //$NON-NLS-1$
+						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/MoveH.gif")); //$NON-NLS-1$
 					}
 					else {
 						this.graphicCanvas.setCursor(this.application.getCursor());
@@ -1287,14 +1287,14 @@ public class GraphicsComposite extends Composite {
 				}
 				else if (this.isLeftMouseMeasure) {
 					this.isLeftMouseMeasure = false;
-					//application.setStatusMessage(DE.STRING_EMPTY);
+					//application.setStatusMessage(GDE.STRING_EMPTY);
 				}
 				else if (this.isRightMouseMeasure) {
 					this.isRightMouseMeasure = false;
-					//application.setStatusMessage(DE.STRING_EMPTY);
+					//application.setStatusMessage(GDE.STRING_EMPTY);
 				}
 				else if (this.isLeftCutMode) {
-					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.DE_MSGT0260))) {
+					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGT0260))) {
 						recordSet = recordSet.clone(recordSet.get(0).getHorizontalPointIndexFromDisplayPoint(this.xUp), true);
 						recordSet.setRecalculationRequired();
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
@@ -1304,7 +1304,7 @@ public class GraphicsComposite extends Composite {
 					}
 				}
 				else if (this.isRightCutMode) {
-					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.DE_MSGT0260))) {
+					if (SWT.OK == this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGT0260))) {
 						recordSet = recordSet.clone(recordSet.get(0).getHorizontalPointIndexFromDisplayPoint(this.xUp), false);
 						recordSet.setRecalculationRequired();
 						this.channels.getActiveChannel().put(recordSet.getName(), recordSet);
@@ -1377,8 +1377,8 @@ public class GraphicsComposite extends Composite {
 		if (GraphicsComposite.this.channels.getActiveChannel() != null) {
 			RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
 			if (recordSet == null) {
-				GraphicsComposite.this.recordSetComment.setText(DE.STRING_EMPTY);
-				GraphicsComposite.this.graphicsHeader.setText(DE.STRING_EMPTY);
+				GraphicsComposite.this.recordSetComment.setText(GDE.STRING_EMPTY);
+				GraphicsComposite.this.graphicsHeader.setText(GDE.STRING_EMPTY);
 				GraphicsComposite.this.graphicsHeaderText = null;
 				GraphicsComposite.this.recordSetCommentText = null;
 			}
@@ -1443,7 +1443,7 @@ public class GraphicsComposite extends Composite {
 				graphicsGC.setForeground(this.graphicsHeader.getForeground());
 				graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
 				graphicsGC.setFont(this.graphicsHeader.getFont());
-				GraphicsUtils.drawTextCentered(Messages.getString(MessageIds.DE_MSGT0144), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
+				GraphicsUtils.drawTextCentered(Messages.getString(MessageIds.GDE_MSGT0144), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
 				graphicsGC.setFont(this.recordSetComment.getFont());
 				for (int i=0,yPos=30+this.canvasBounds.height+5; i<compareSetNames.length; ++i, yPos+=20) {
 					Record compareRecord = compareRecordSet.get(compareSetNames[i]);
@@ -1470,7 +1470,7 @@ public class GraphicsComposite extends Composite {
 					this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
 					this.canvasImageGC.setBackground(this.surroundingBackground);
 					this.canvasImageGC.fillRectangle(this.canvasBounds);
-					this.canvasImageGC.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
 					drawCurves(activeRecordSet, this.canvasBounds, this.canvasImageGC);
 
@@ -1494,7 +1494,7 @@ public class GraphicsComposite extends Composite {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			String fileComment = this.graphicsHeader.getText();
-			fileComment = fileComment.substring(0, fileComment.indexOf(DE.STRING_MESSAGE_CONCAT));
+			fileComment = fileComment.substring(0, fileComment.indexOf(GDE.STRING_MESSAGE_CONCAT));
 			activeChannel.setFileDescription(fileComment);
 			activeChannel.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 		}

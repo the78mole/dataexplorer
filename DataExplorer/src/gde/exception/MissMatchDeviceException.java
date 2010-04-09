@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.exception;
+package gde.exception;
 
 /**
  * Application exception class used if device referenced in file does not match active device

@@ -14,22 +14,22 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.utils;
+package gde.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Point;
 
-import osde.DE;
-import osde.device.DataTypes;
-import osde.serial.DeviceSerialPort;
+import gde.DE;
+import gde.device.DataTypes;
+import gde.serial.DeviceSerialPort;
 
 /**
  * @author Winfried Brügmann
@@ -53,7 +53,7 @@ public class StringHelper {
 				for (String key : hashKeys) {
 					if (tmpStr.startsWith(key)) {
 						String value = tmpStr.substring(key.length(), endindex).trim();
-						if (value.startsWith(DE.STRING_EQUAL)) value = value.substring(1).trim();
+						if (value.startsWith(GDE.STRING_EQUAL)) value = value.substring(1).trim();
 						resultMap.put(key, value);
 						break;
 					}
@@ -63,7 +63,7 @@ public class StringHelper {
 			for (String key : hashKeys) {
 				if (tmpStr.startsWith(key)) {
 					String value = tmpStr.substring(key.length()).trim();
-					if (value.startsWith(DE.STRING_EQUAL)) value = value.substring(1).trim();
+					if (value.startsWith(GDE.STRING_EQUAL)) value = value.substring(1).trim();
 					resultMap.put(key, value);
 					break;
 				}
@@ -141,7 +141,7 @@ public class StringHelper {
 	 * @return cleaned string
 	 */
 	public static String removeBlanks(String inputString) {
-		String[] tmpDev = inputString.split(DE.STRING_BLANK);
+		String[] tmpDev = inputString.split(GDE.STRING_BLANK);
 		StringBuilder sb = new StringBuilder();
 		for (String tmp : tmpDev) {
 			sb.append(tmp);
@@ -276,18 +276,18 @@ public class StringHelper {
 		String[] serialPortList = new String[availablePorts.size()];
 		String[] tmpSerialPortList = availablePorts.toArray(new String[availablePorts.size()]);
 		for (int i = 0; i < tmpSerialPortList.length; i++) {
-			if (DE.IS_WINDOWS) {
+			if (GDE.IS_WINDOWS) {
 				try {
 					int portNumber = Integer.parseInt(tmpSerialPortList[i].substring(3));
 					String portDescription = DeviceSerialPort.getWindowsPorts().get(portNumber)==null ? "" : DeviceSerialPort.getWindowsPorts().get(portNumber);
-					serialPortList[i] = DE.STRING_BLANK + tmpSerialPortList[i] + " - " + portDescription;
+					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + " - " + portDescription;
 				}
 				catch (Exception e) {
-					serialPortList[i] = DE.STRING_BLANK + tmpSerialPortList[i];
+					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
 				}
 			}
 			else
-			serialPortList[i] = DE.STRING_BLANK + tmpSerialPortList[i];
+			serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
 		}
 		return serialPortList;
 	}
@@ -301,18 +301,18 @@ public class StringHelper {
 		eventText.getChars(0, chars.length, chars, 0);
 		for (int i = 0; i < chars.length; i++) {
 			log.log(Level.FINER, "\"" + chars[i] + "\"");
-			if (DE.IS_WINDOWS) {
+			if (GDE.IS_WINDOWS) {
 				if (!('0' <= chars[i] && chars[i] <= '9' || 'c' == chars[i] || 'C' == chars[i] || 'o' == chars[i] || 'O' == chars[i] || 'm' == chars[i] || 'M' == chars[i] || ' ' == chars[i])) {
 					return false;
 				}
 			}
-			else if (DE.IS_LINUX) {
+			else if (GDE.IS_LINUX) {
 				if (!('0' <= chars[i] && chars[i] <= '9' || '/' == chars[i] || 'd' == chars[i] || 'e' == chars[i] || 'v' == chars[i] || 't' == chars[i] || 'y' == chars[i] || ' ' == chars[i]
 						|| 'U' == chars[i] || 'S' == chars[i] || 'B' == chars[i])) {
 					return false;
 				}
 			}
-			else if (DE.IS_MAC) { 
+			else if (GDE.IS_MAC) { 
 //				if (!(('0' <= chars[i] && chars[i] <= '9') || '/' == chars[i] || '.' == chars[i] || ('a' <= chars[i] && 'z' <= chars[i]) || ('A' <= chars[i] && 'Z' <= chars[i]))) {
 //					return false;
 //				}
@@ -330,7 +330,7 @@ public class StringHelper {
 		switch (useType) {
 		case INTEGER:
 			try {
-				if (eventText.equals(DE.STRING_EMPTY)) eventText = "0";
+				if (eventText.equals(GDE.STRING_EMPTY)) eventText = "0";
 				Integer.parseInt(eventText.trim());
 			}
 			catch (Exception e) {
@@ -422,10 +422,10 @@ public class StringHelper {
 			inByte = (byte)(inByte << 1); 
 		}
 		if (newLine) {
-			log.log(Level.INFO, DE.LINE_SEPARATOR);
+			log.log(Level.INFO, GDE.LINE_SEPARATOR);
 		}
 		else {
-			log.log(Level.INFO, DE.STRING_BLANK);
+			log.log(Level.INFO, GDE.STRING_BLANK);
 		}
 	}
 

@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.utils;
+package gde.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,16 +23,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.exception.NotSupportedFileFormatException;
-import osde.io.OsdReaderWriter;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
+import gde.DE;
+import gde.config.Settings;
+import gde.exception.NotSupportedFileFormatException;
+import gde.io.OsdReaderWriter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
 
 /**
  * This thread implementation goes through all sub folders of the data location and creates links to object related files
@@ -43,7 +43,7 @@ public class ObjectKeyScanner extends Thread {
 
 	final private Settings settings;
 	final String deviceOriented;
-	String objectKey = DE.STRING_EMPTY;
+	String objectKey = GDE.STRING_EMPTY;
 	boolean searchForKeys = false;
 	final Vector<String> objectKeys;
 	
@@ -56,7 +56,7 @@ public class ObjectKeyScanner extends Thread {
 	public ObjectKeyScanner() {
 		super();
 		this.settings = Settings.getInstance();
-		this.deviceOriented = Messages.getString(MessageIds.DE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
+		this.deviceOriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
 		this.objectKeys = new Vector<String>();
 		if (DataExplorer.getInstance().getMenuToolBar() != null) {
 			for (String tmpObjKey : DataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
@@ -76,7 +76,7 @@ public class ObjectKeyScanner extends Thread {
 		super();
 		this.objectKey = newObjectKey;
 		this.settings = Settings.getInstance();
-		this.deviceOriented = Messages.getString(MessageIds.DE_MSGT0200).split(DE.STRING_SEMICOLON)[0];
+		this.deviceOriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
 		this.objectKeys = new Vector<String>();
 		if (DataExplorer.getInstance().getMenuToolBar() != null) {
 			for (String tmpObjKey : DataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
@@ -88,7 +88,7 @@ public class ObjectKeyScanner extends Thread {
 
 	public void run() {
 		try {
-			String objectKeyDirPath = this.settings.getDataFilePath() + DE.FILE_SEPARATOR_UNIX + this.objectKey;
+			String objectKeyDirPath = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + this.objectKey;
 
 			if (this.objectKey.length() > 1) { // use exact defined object key
 				//check directory and cleanup if already exist 
@@ -112,11 +112,11 @@ public class ObjectKeyScanner extends Thread {
 				for (File file : files) {
 					try {
 						String actualFilePath = file.getAbsolutePath();
-						if (actualFilePath.endsWith(DE.FILE_ENDING_OSD) && actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
+						if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD) && actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
 							log.log(Level.FINER, "working with " + file.getName()); //$NON-NLS-1$
-							if (this.objectKey.equals(OsdReaderWriter.getHeader(file.getCanonicalPath()).get(DE.OBJECT_KEY))) {
+							if (this.objectKey.equals(OsdReaderWriter.getHeader(file.getCanonicalPath()).get(GDE.OBJECT_KEY))) {
 								log.log(Level.FINER, "found file with given object key " + file.getName()); //$NON-NLS-1$
-								String newLinkFilePath = objectKeyDirPath + DE.FILE_SEPARATOR_UNIX + file.getName();
+								String newLinkFilePath = objectKeyDirPath + GDE.FILE_SEPARATOR_UNIX + file.getName();
 								if (!new File(newLinkFilePath).exists()) {
 									OperatingSystemHelper.createFileLink(file.getCanonicalPath(), newLinkFilePath);
 								}
@@ -145,11 +145,11 @@ public class ObjectKeyScanner extends Thread {
 					for (File file : files) {
 						try {
 							String actualFilePath = file.getAbsolutePath();
-							if (actualFilePath.endsWith(DE.FILE_ENDING_OSD)) {
+							if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD)) {
 								fileCounter++;
 								if (actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) { // this is not a link
 									log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
-									String foundObjectKey = OsdReaderWriter.getHeader(file.getCanonicalPath()).get(DE.OBJECT_KEY);
+									String foundObjectKey = OsdReaderWriter.getHeader(file.getCanonicalPath()).get(GDE.OBJECT_KEY);
 									if (foundObjectKey != null && foundObjectKey.length() > 1) { // is a valid object key
 										if (!this.objectKeys.contains(foundObjectKey)) {
 											log.log(Level.FINE, "found new object key " + foundObjectKey); //$NON-NLS-1$
@@ -183,11 +183,11 @@ public class ObjectKeyScanner extends Thread {
 						String tmpObjKey = iterator.next();
 						log.log(Level.FINE, "found object key in vector = " + tmpObjKey); //$NON-NLS-1$
 						//iterate all files of temporary object key
-						objectKeyDirPath = this.settings.getDataFilePath() + DE.FILE_SEPARATOR_UNIX + tmpObjKey;
+						objectKeyDirPath = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + tmpObjKey;
 						FileUtils.checkDirectoryAndCreate(objectKeyDirPath);
 						for (File file : objectFilesMap.get(tmpObjKey)) {
 							try {
-								String newLinkFilePath = objectKeyDirPath + DE.FILE_SEPARATOR_UNIX + file.getName();
+								String newLinkFilePath = objectKeyDirPath + GDE.FILE_SEPARATOR_UNIX + file.getName();
 								if (!new File(newLinkFilePath).exists()) {
 									OperatingSystemHelper.createFileLink(file.getCanonicalPath(), newLinkFilePath);
 								}
@@ -237,7 +237,7 @@ public class ObjectKeyScanner extends Thread {
 			for (File file : files) {
 				try {
 					String actualFilePath = file.getAbsolutePath();
-					if (actualFilePath.endsWith(DE.FILE_ENDING_OSD) && !actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
+					if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD) && !actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
 						log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
 						file.delete();
 					}

@@ -14,9 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device;
+package gde.device;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -27,10 +27,10 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.config.Settings;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
+import gde.config.Settings;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
 
 /**
  * DeviceDialog is the abstract class as parent for device dialog implementations
@@ -49,7 +49,7 @@ public abstract class DeviceDialog extends Dialog {
 	protected boolean		isInDialog = false; // if dialog alpha fading is used this flag is used to switch off mouseExit and mouseEnter inner events
 	
 	protected boolean 	isClosePossible = true; // use this variable to manage if dialog can be disposed 
-	protected String 		disposeDisabledMessage = Messages.getString(MessageIds.DE_MSGW0007);
+	protected String 		disposeDisabledMessage = Messages.getString(MessageIds.GDE_MSGW0007);
 	
 	protected final DataExplorer application;
 	

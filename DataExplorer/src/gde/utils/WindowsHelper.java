@@ -14,17 +14,17 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.utils;
+package gde.utils;
 
 import java.util.Date;
 import java.util.TreeMap;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
 
 
 
@@ -48,10 +48,10 @@ public class WindowsHelper {
 		catch (Throwable t) {
 			log.log(Level.SEVERE, t.getMessage(), t);
 			if (t instanceof UnsatisfiedLinkError)
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGE0037, new Object[] {t.getClass().getSimpleName()}) 
-						+ Messages.getString(MessageIds.DE_MSGI0033));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0037, new Object[] {t.getClass().getSimpleName()}) 
+						+ Messages.getString(MessageIds.GDE_MSGI0033));
 			else
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.DE_MSGE0038, new Object[] {t.getLocalizedMessage()}));
+				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0038, new Object[] {t.getLocalizedMessage()}));
 		}
 	}
 	
@@ -80,8 +80,8 @@ public class WindowsHelper {
 	public static void registerSerialPorts() {
 		long startTime = new Date().getTime();
 		String[] enumPorts = enumerateSerialPorts();
-		if (enumPorts[0].startsWith("DE_MSG")) {			
-			log.log(Level.WARNING, Messages.getString(MessageIds.DE_MSGW0035, new Object[] {enumPorts[0].split(";")[1]}));
+		if (enumPorts[0].startsWith("GDE_MSG")) {			
+			log.log(Level.WARNING, Messages.getString(MessageIds.GDE_MSGW0035, new Object[] {enumPorts[0].split(";")[1]}));
 			return;
 		}
 		

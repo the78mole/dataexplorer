@@ -6,12 +6,12 @@
 //
 
 
-package osde.device;
+package gde.device;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
-import osde.DE;
+import gde.DE;
 
 
 /**
@@ -49,8 +49,8 @@ public enum StopBitsTypes {
   	public static String[] valuesAsStingArray() {
   		StringBuilder sb = new StringBuilder();
   		for (StopBitsTypes element : StopBitsTypes.values()) {
-  			sb.append(element).append(DE.STRING_DASH);
+  			sb.append(element).append(GDE.STRING_DASH);
   		}
-  		return sb.toString().split(DE.STRING_DASH);
+  		return sb.toString().split(GDE.STRING_DASH);
   	}
 }

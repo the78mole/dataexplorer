@@ -14,11 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.utils;
+package gde.utils;
 
 import java.text.DecimalFormat;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -27,10 +27,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 
 /**

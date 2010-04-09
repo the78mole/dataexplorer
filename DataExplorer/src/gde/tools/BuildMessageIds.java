@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.tools;
+package gde.tools;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -63,7 +63,7 @@ public class BuildMessageIds {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String packageName = "package " + args[0] + ";\n\n"; // osde.messages
+		String packageName = "package " + args[0] + ";\n\n"; // gde.messages
 		String inFilePath = args[1]; //"src/osde/messages/messages.properties";
 		String outFilePath = args[2]; //"src/osde/messages/MessageIds.java";
 		BufferedReader reader; // to read the data

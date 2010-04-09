@@ -14,19 +14,19 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.utils;
+package gde.utils;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
-import osde.DE;
-import osde.data.Record;
-import osde.device.IDevice;
-import osde.ui.DataExplorer;
+import gde.DE;
+import gde.data.Record;
+import gde.device.IDevice;
+import gde.ui.DataExplorer;
 
 /**
  * This class contains utilities to draw curves and vertical scales
@@ -226,7 +226,7 @@ public class CurveUtils {
 			//draw the first point with possible interpolated values if it does not match a measurement point at time value
 			//oldPoint = record.getParent().isScopeMode() ? record.getDisplayPoint(0, x0, y0) : record.getDisplayEndPoint(0, x0);
 			oldPoint = record.getDisplayEndPoint(0);
-			if (log.isLoggable(Level.FINEST)) sb.append(DE.LINE_SEPARATOR).append(oldPoint.toString());
+			if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(oldPoint.toString());
 		}
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage() + " zoomed compare set ?", e); //$NON-NLS-1$
@@ -238,7 +238,7 @@ public class CurveUtils {
 				for (int j = 0; j <= displayableSize && displayableSize > 1; j += xScaleFactor) {
 					// get the point to be drawn
 					newPoint = record.getDisplayPoint(j, x0, y0);
-					if (log.isLoggable(Level.FINEST)) sb.append(DE.LINE_SEPARATOR).append(newPoint.toString());
+					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newPoint.toString());
 					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 					oldPoint = newPoint; // remember the last draw point for next drawLine operation
 				}
@@ -253,7 +253,7 @@ public class CurveUtils {
 				for (; j < displayableSize && displayableSize > 1; j += xScaleFactor) {
 					// get the point to be drawn
 					newPoint = record.getDisplayPoint(j, x0, y0);
-					if (log.isLoggable(Level.FINEST)) sb.append(DE.LINE_SEPARATOR).append(newPoint.toString());
+					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newPoint.toString());
 					if (j <= drawLimit) {
 						gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 					}

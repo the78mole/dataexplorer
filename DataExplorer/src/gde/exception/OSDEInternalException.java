@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.exception;
+package gde.exception;
 
 /**
  * Exception class to be used if the application runs into wrong condition due to internal error

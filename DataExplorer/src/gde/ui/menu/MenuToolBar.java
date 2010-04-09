@@ -14,10 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.menu;
+package gde.ui.menu;
 
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -33,25 +33,25 @@ import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.device.DeviceConfiguration;
-import osde.device.DeviceDialog;
-import osde.device.IDevice;
-import osde.io.FileHandler;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.dialog.DeviceSelectionDialog;
-import osde.ui.dialog.PrintSelectionDialog;
-import osde.ui.tab.GraphicsComposite;
-import osde.utils.FileUtils;
-import osde.utils.ObjectKeyScanner;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.DeviceDialog;
+import gde.device.IDevice;
+import gde.io.FileHandler;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.dialog.DeviceSelectionDialog;
+import gde.ui.dialog.PrintSelectionDialog;
+import gde.ui.tab.GraphicsComposite;
+import gde.utils.FileUtils;
+import gde.utils.ObjectKeyScanner;
 
 /**
  * Graphical menu tool bar class
@@ -61,7 +61,7 @@ import osde.utils.ObjectKeyScanner;
 public class MenuToolBar {
 	final static Logger						log	= Logger.getLogger(MenuToolBar.class.getName());
 	
-	final String[]								SCOPE_VALUES					= Messages.getString(MessageIds.DE_MSGT0196).split(DE.STRING_SEMICOLON);
+	final String[]								SCOPE_VALUES					= Messages.getString(MessageIds.GDE_MSGT0196).split(GDE.STRING_SEMICOLON);
 	StringBuffer									toolBarSizes 					= new StringBuffer();
 
 	Point													toolSize, coolSize;
@@ -77,7 +77,7 @@ public class MenuToolBar {
 	ToolItem											prevDeviceToolItem, nextDeviceToolItem;
 	Composite											objectSelectComposite;
 	CCombo												objectSelectCombo;
-	Point													objectSelectSize = new Point(200, DE.IS_LINUX ? 22 : 20);
+	Point													objectSelectSize = new Point(200, GDE.IS_LINUX ? 22 : 20);
 	ToolItem											newObject, deleteObject, editObject;
 	String												oldObjectKey = null;
 	boolean												isObjectoriented = false;
@@ -87,9 +87,9 @@ public class MenuToolBar {
 	ToolItem											zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, scopePointsComboSep;
 	Composite											scopePointsComposite;
 	CCombo 												scopePointsCombo;
-	Point													scopePointsComboSize = new Point(70, DE.IS_LINUX ? 22 : 20);
-	static final int							leadFill	= 4+(DE.IS_WINDOWS == true ? 0 : 3);
-	static final int							trailFill	= 4+(DE.IS_WINDOWS == true ? 0 : 3);
+	Point													scopePointsComboSize = new Point(70, GDE.IS_LINUX ? 22 : 20);
+	static final int							leadFill	= 4+(GDE.IS_WINDOWS == true ? 0 : 3);
+	static final int							trailFill	= 4+(GDE.IS_WINDOWS == true ? 0 : 3);
 	boolean												isScopePointsCombo = true;
 	int														toolButtonHeight = 23;
 
@@ -103,8 +103,8 @@ public class MenuToolBar {
 	ToolItem											nextChannel, prevChannel, prevRecord, nextRecord, separator, deleteRecord, editRecord;
 	Composite											channelSelectComposite, recordSelectComposite;
 	CCombo												channelSelectCombo, recordSelectCombo;
-	Point													channelSelectSize = new Point(180, DE.IS_LINUX ? 22 : 20);
-	Point													recordSelectSize = new Point(260, DE.IS_LINUX ? 22 : 20);
+	Point													channelSelectSize = new Point(180, GDE.IS_LINUX ? 22 : 20);
+	Point													recordSelectSize = new Point(260, GDE.IS_LINUX ? 22 : 20);
 	
 	final DataExplorer	application;
 	final Channels								channels;
@@ -136,9 +136,9 @@ public class MenuToolBar {
 				this.fileCoolItem.setControl(this.fileToolBar);
 				{
 					this.newToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.newToolItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0050));
-					this.newToolItem.setImage(SWTResourceManager.getImage("osde/resource/New.gif")); //$NON-NLS-1$
-					this.newToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/NewHot.gif")); //$NON-NLS-1$
+					this.newToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0050));
+					this.newToolItem.setImage(SWTResourceManager.getImage("gde/resource/New.gif")); //$NON-NLS-1$
+					this.newToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/NewHot.gif")); //$NON-NLS-1$
 					this.newToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "newToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -150,51 +150,51 @@ public class MenuToolBar {
 				}
 				{
 					this.openToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.openToolItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0051)); //$NON-NLS-1$
-					this.openToolItem.setImage(SWTResourceManager.getImage("osde/resource/Open.gif")); //$NON-NLS-1$
-					this.openToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/OpenHot.gif")); //$NON-NLS-1$
+					this.openToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0051)); //$NON-NLS-1$
+					this.openToolItem.setImage(SWTResourceManager.getImage("gde/resource/Open.gif")); //$NON-NLS-1$
+					this.openToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/OpenHot.gif")); //$NON-NLS-1$
 					this.openToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "openToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.fileHandler.openFileDialog(Messages.getString(MessageIds.DE_MSGT0004));
+							MenuToolBar.this.fileHandler.openFileDialog(Messages.getString(MessageIds.GDE_MSGT0004));
 						}
 					});
 				}
 				{
 					this.saveToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.saveToolItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0053));
-					this.saveToolItem.setImage(SWTResourceManager.getImage("osde/resource/Save.gif")); //$NON-NLS-1$
-					this.saveToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SaveHot.gif")); //$NON-NLS-1$
+					this.saveToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0053));
+					this.saveToolItem.setImage(SWTResourceManager.getImage("gde/resource/Save.gif")); //$NON-NLS-1$
+					this.saveToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/SaveHot.gif")); //$NON-NLS-1$
 					this.saveToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "saveToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
-									MenuToolBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.DE_MSGT0006), DE.STRING_EMPTY);
+									MenuToolBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0006), GDE.STRING_EMPTY);
 								else
-									MenuToolBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.DE_MSGT0007), activeChannel.getFileName());
+									MenuToolBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0007), activeChannel.getFileName());
 							}
 						}
 					});
 				}
 				{
 					this.saveAsToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.saveAsToolItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0054));
-					this.saveAsToolItem.setImage(SWTResourceManager.getImage("osde/resource/SaveAs.gif")); //$NON-NLS-1$
-					this.saveAsToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SaveAsHot.gif")); //$NON-NLS-1$
+					this.saveAsToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0054));
+					this.saveAsToolItem.setImage(SWTResourceManager.getImage("gde/resource/SaveAs.gif")); //$NON-NLS-1$
+					this.saveAsToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/SaveAsHot.gif")); //$NON-NLS-1$
 					this.saveAsToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "saveAsToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuToolBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.DE_MSGT0006), DE.STRING_EMPTY);
+							MenuToolBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0006), GDE.STRING_EMPTY);
 						}
 					});
 				}
 				{
 					this.settingsToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.settingsToolItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0055));
-					this.settingsToolItem.setImage(SWTResourceManager.getImage("osde/resource/Settings.gif")); //$NON-NLS-1$
-					this.settingsToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/SettingsHot.gif")); //$NON-NLS-1$
+					this.settingsToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0055));
+					this.settingsToolItem.setImage(SWTResourceManager.getImage("gde/resource/Settings.gif")); //$NON-NLS-1$
+					this.settingsToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/SettingsHot.gif")); //$NON-NLS-1$
 					this.settingsToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "settingsToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -202,18 +202,18 @@ public class MenuToolBar {
 							DeviceDialog deviceDialog = MenuToolBar.this.application.getDeviceDialog();
 							if (deviceDialog == null || deviceDialog.isDisposed()) {
 								MenuToolBar.this.application.openSettingsDialog();
-								MenuToolBar.this.application.setStatusMessage(DE.STRING_EMPTY);
+								MenuToolBar.this.application.setStatusMessage(GDE.STRING_EMPTY);
 							}
 							else
-								MenuToolBar.this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGW0002), SWT.COLOR_RED);
+								MenuToolBar.this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGW0002), SWT.COLOR_RED);
 						}
 					});
 				}
 				{
 					this.copyToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.copyToolItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0073));
-					this.copyToolItem.setImage(SWTResourceManager.getImage("osde/resource/Copy.gif")); //$NON-NLS-1$
-					this.copyToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/CopyHot.gif")); //$NON-NLS-1$
+					this.copyToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0073));
+					this.copyToolItem.setImage(SWTResourceManager.getImage("gde/resource/Copy.gif")); //$NON-NLS-1$
+					this.copyToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/CopyHot.gif")); //$NON-NLS-1$
 					this.copyToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "copyToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -223,9 +223,9 @@ public class MenuToolBar {
 				}
 				{
 					this.printToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
-					this.printToolItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0074));
-					this.printToolItem.setImage(SWTResourceManager.getImage("osde/resource/Print.gif")); //$NON-NLS-1$
-					this.printToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/PrintHot.gif")); //$NON-NLS-1$
+					this.printToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0074));
+					this.printToolItem.setImage(SWTResourceManager.getImage("gde/resource/Print.gif")); //$NON-NLS-1$
+					this.printToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/PrintHot.gif")); //$NON-NLS-1$
 					this.printToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "printToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -240,7 +240,7 @@ public class MenuToolBar {
 			this.fileCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.fileCoolItem.setPreferredSize(this.size);
 			this.fileCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
-			this.toolBarSizes.append(this.toolSize.x).append(DE.STRING_COLON).append(this.toolSize.y).append(DE.STRING_SEMICOLON);
+			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 			
 			// set height used for selection combos
 			this.toolButtonHeight = this.settingsToolItem.getBounds().height;
@@ -253,9 +253,9 @@ public class MenuToolBar {
 				this.deviceObjectCoolItem.setControl(this.deviceObjectToolBar);
 				{
 					this.deviceSelectToolItem = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
-					this.deviceSelectToolItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0057));
-					this.deviceSelectToolItem.setImage(SWTResourceManager.getImage("osde/resource/DeviceSelection.gif")); //$NON-NLS-1$
-					this.deviceSelectToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/DeviceSelectionHot.gif")); //$NON-NLS-1$
+					this.deviceSelectToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0057));
+					this.deviceSelectToolItem.setImage(SWTResourceManager.getImage("gde/resource/DeviceSelection.gif")); //$NON-NLS-1$
+					this.deviceSelectToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/DeviceSelectionHot.gif")); //$NON-NLS-1$
 					this.deviceSelectToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "deviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -268,9 +268,9 @@ public class MenuToolBar {
 				}
 				{
 					this.prevDeviceToolItem = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
-					this.prevDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
-					this.prevDeviceToolItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0058));
-					this.prevDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
+					this.prevDeviceToolItem.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
+					this.prevDeviceToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0058));
+					this.prevDeviceToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
 					this.prevDeviceToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "prevDeviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -299,16 +299,16 @@ public class MenuToolBar {
 								}
 							}
 							else {
-								MenuToolBar.this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGW0017));
+								MenuToolBar.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0017));
 							}
 						}
 					});
 				}
 				{
 					this.nextDeviceToolItem = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
-					this.nextDeviceToolItem.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
-					this.nextDeviceToolItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0059));
-					this.nextDeviceToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
+					this.nextDeviceToolItem.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
+					this.nextDeviceToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0059));
+					this.nextDeviceToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
 					this.nextDeviceToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "nextDeviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -336,16 +336,16 @@ public class MenuToolBar {
 								}
 							}
 							else {
-								MenuToolBar.this.application.openMessageDialog(Messages.getString(MessageIds.DE_MSGW0030));
+								MenuToolBar.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0030));
 							}
 						}
 					});
 				}
 				{
 					this.toolBoxToolItem = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
-					this.toolBoxToolItem.setImage(SWTResourceManager.getImage("osde/resource/ToolBox.gif")); //$NON-NLS-1$
-					this.toolBoxToolItem.setHotImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
-					this.toolBoxToolItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0060));
+					this.toolBoxToolItem.setImage(SWTResourceManager.getImage("gde/resource/ToolBox.gif")); //$NON-NLS-1$
+					this.toolBoxToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+					this.toolBoxToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0060));
 					this.toolBoxToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "toolBoxToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -364,11 +364,11 @@ public class MenuToolBar {
 						this.objectSelectComposite = new Composite(this.deviceObjectToolBar, SWT.NONE);
 						this.objectSelectComposite.setLayout(null);
 						this.objectSelectCombo = new CCombo(this.objectSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.objectSelectCombo.setFont(SWTResourceManager.getFont(this.application, DE.IS_LINUX ? 9 : DE.IS_MAC ? 12 : 10, SWT.NORMAL));
+						this.objectSelectCombo.setFont(SWTResourceManager.getFont(this.application, GDE.IS_LINUX ? 9 : GDE.IS_MAC ? 12 : 10, SWT.NORMAL));
 						this.objectSelectCombo.setItems(this.settings.getObjectList()); // "device-oriented", "ASW-27", "AkkuSubC_1"" });
 						this.objectSelectCombo.select(this.settings.getActiveObjectIndex());
 						this.isObjectoriented = this.settings.getActiveObjectIndex() > 0;
-						this.objectSelectCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT0201));
+						this.objectSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0201));
 						this.objectSelectCombo.setEditable(false);
 						this.objectSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
 						this.objectSelectCombo.setVisibleItemCount(this.objectSelectCombo.getItemCount()+1);
@@ -388,7 +388,7 @@ public class MenuToolBar {
 								else { // device oriented
 									MenuToolBar.this.editObject.setEnabled(false);
 									MenuToolBar.this.deleteObject.setEnabled(false);
-									checkChannelForObjectKeyMissmatch(selectionIndex, DE.STRING_EMPTY);
+									checkChannelForObjectKeyMissmatch(selectionIndex, GDE.STRING_EMPTY);
 									MenuToolBar.this.isObjectoriented = false;
 									MenuToolBar.this.application.setObjectDescriptionTabVisible(false);
 								}
@@ -411,7 +411,7 @@ public class MenuToolBar {
 										int selectionIndex = 0;
 										if (MenuToolBar.this.oldObjectKey == null) { // new object key
 											for (; selectionIndex < tmpObjects.length; selectionIndex++) {
-												if (tmpObjects[selectionIndex].equals(DE.STRING_EMPTY)) {
+												if (tmpObjects[selectionIndex].equals(GDE.STRING_EMPTY)) {
 													tmpObjects[selectionIndex] = newObjKey;
 													break;
 												}
@@ -421,9 +421,9 @@ public class MenuToolBar {
 										else {
 											log.log(Level.FINE, "oldObjectKey = " + MenuToolBar.this.oldObjectKey); //$NON-NLS-1$
 											if (MenuToolBar.this.oldObjectKey.length() >= 1) {
-												int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.DE_MSGW0031));
+												int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031));
 												if (answer == SWT.YES) 
-													FileUtils.deleteDirectory(MenuToolBar.this.settings.getDataFilePath() + DE.FILE_SEPARATOR_UNIX  + MenuToolBar.this.oldObjectKey);
+													FileUtils.deleteDirectory(MenuToolBar.this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX  + MenuToolBar.this.oldObjectKey);
 											}
 											for (; selectionIndex < tmpObjects.length; selectionIndex++) {
 												if (tmpObjects[selectionIndex].equals(MenuToolBar.this.oldObjectKey)) {
@@ -462,16 +462,16 @@ public class MenuToolBar {
 						});		
 						this.objectSelectCombo.setSize(this.objectSelectSize);
 						this.objectSelectComposite.setSize(this.objectSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
-						this.objectSelectCombo.setLocation(leadFill, DE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
+						this.objectSelectCombo.setLocation(leadFill, GDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
 					}
 					objectSelectComboSep.setWidth(this.objectSelectComposite.getSize().x);
 					objectSelectComboSep.setControl(this.objectSelectComposite);
 				}
 				{
 					this.newObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
-					this.newObject.setImage(SWTResourceManager.getImage("osde/resource/NewObj.gif")); //$NON-NLS-1$
-					this.newObject.setToolTipText(Messages.getString(MessageIds.DE_MSGT0202));
-					this.newObject.setHotImage(SWTResourceManager.getImage("osde/resource/NewObjHot.gif")); //$NON-NLS-1$
+					this.newObject.setImage(SWTResourceManager.getImage("gde/resource/NewObj.gif")); //$NON-NLS-1$
+					this.newObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0202));
+					this.newObject.setHotImage(SWTResourceManager.getImage("gde/resource/NewObjHot.gif")); //$NON-NLS-1$
 					this.newObject.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "newObject.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -479,7 +479,7 @@ public class MenuToolBar {
 							for (String tmpObject : MenuToolBar.this.settings.getObjectList()) {
 								tmpObjects.add(tmpObject);
 							}
-							tmpObjects.add(DE.STRING_EMPTY);
+							tmpObjects.add(GDE.STRING_EMPTY);
 							MenuToolBar.this.application.setObjectDescriptionTabVisible(true);
 							MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1])); // "None", "ASW-27", "AkkuSubC_1", "" });
 							MenuToolBar.this.objectSelectCombo.select(tmpObjects.size() - 1);
@@ -491,9 +491,9 @@ public class MenuToolBar {
 				}
 				{
 					this.deleteObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
-					this.deleteObject.setImage(SWTResourceManager.getImage("osde/resource/RemObj.gif")); //$NON-NLS-1$
-					this.deleteObject.setToolTipText(Messages.getString(MessageIds.DE_MSGT0203));
-					this.deleteObject.setHotImage(SWTResourceManager.getImage("osde/resource/RemObjHot.gif")); //$NON-NLS-1$
+					this.deleteObject.setImage(SWTResourceManager.getImage("gde/resource/RemObj.gif")); //$NON-NLS-1$
+					this.deleteObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0203));
+					this.deleteObject.setHotImage(SWTResourceManager.getImage("gde/resource/RemObjHot.gif")); //$NON-NLS-1$
 					if (this.objectSelectCombo.getItemCount() == 1)	MenuToolBar.this.deleteObject.setEnabled(false);
 					this.deleteObject.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -509,7 +509,7 @@ public class MenuToolBar {
 								MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1])); // "None", "ASW-27", "AkkuSubC_1", "" });
 								currentIndex = currentIndex >= 2 ? currentIndex - 1 : tmpObjects.size() > 1 ? 1 : 0;
 								MenuToolBar.this.objectSelectCombo.select(currentIndex);
-								FileUtils.deleteDirectory(MenuToolBar.this.settings.getDataFilePath() + DE.FILE_SEPARATOR_UNIX + delObjectKey);
+								FileUtils.deleteDirectory(MenuToolBar.this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + delObjectKey);
 								if (currentIndex == 0) {
 									MenuToolBar.this.deleteObject.setEnabled(false);
 									MenuToolBar.this.editObject.setEnabled(false);
@@ -526,9 +526,9 @@ public class MenuToolBar {
 				}
 				{
 					this.editObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
-					this.editObject.setImage(SWTResourceManager.getImage("osde/resource/EditObj.gif")); //$NON-NLS-1$
-					this.editObject.setToolTipText(Messages.getString(MessageIds.DE_MSGT0204));
-					this.editObject.setHotImage(SWTResourceManager.getImage("osde/resource/EditObjHot.gif")); //$NON-NLS-1$
+					this.editObject.setImage(SWTResourceManager.getImage("gde/resource/EditObj.gif")); //$NON-NLS-1$
+					this.editObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0204));
+					this.editObject.setHotImage(SWTResourceManager.getImage("gde/resource/EditObjHot.gif")); //$NON-NLS-1$
 					if (this.objectSelectCombo.getItemCount() == 1)	MenuToolBar.this.editObject.setEnabled(false);
 					this.editObject.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -549,7 +549,7 @@ public class MenuToolBar {
 			this.deviceObjectCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.deviceCoolItem.setPreferredSize(this.size);
 			this.deviceObjectCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
-			this.toolBarSizes.append(this.toolSize.x).append(DE.STRING_COLON).append(this.toolSize.y).append(DE.STRING_SEMICOLON);
+			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end device cool item
 		
 		{ // begin zoom cool item
@@ -559,9 +559,9 @@ public class MenuToolBar {
 				this.zoomCoolItem.setControl(this.zoomToolBar);
 				{
 					this.zoomWindowItem = new ToolItem(this.zoomToolBar, SWT.NONE);
-					this.zoomWindowItem.setImage(SWTResourceManager.getImage("osde/resource/Zoom.gif")); //$NON-NLS-1$
-					this.zoomWindowItem.setHotImage(SWTResourceManager.getImage("osde/resource/ZoomHot.gif")); //$NON-NLS-1$
-					this.zoomWindowItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0061));
+					this.zoomWindowItem.setImage(SWTResourceManager.getImage("gde/resource/Zoom.gif")); //$NON-NLS-1$
+					this.zoomWindowItem.setHotImage(SWTResourceManager.getImage("gde/resource/ZoomHot.gif")); //$NON-NLS-1$
+					this.zoomWindowItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0061));
 					this.zoomWindowItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "zoomWindowItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -572,9 +572,9 @@ public class MenuToolBar {
 				}
 				{
 					this.panItem = new ToolItem(this.zoomToolBar, SWT.NONE);
-					this.panItem.setImage(SWTResourceManager.getImage("osde/resource/Pan.gif")); //$NON-NLS-1$
-					this.panItem.setHotImage(SWTResourceManager.getImage("osde/resource/PanHot.gif")); //$NON-NLS-1$
-					this.panItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0062));
+					this.panItem.setImage(SWTResourceManager.getImage("gde/resource/Pan.gif")); //$NON-NLS-1$
+					this.panItem.setHotImage(SWTResourceManager.getImage("gde/resource/PanHot.gif")); //$NON-NLS-1$
+					this.panItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0062));
 					this.panItem.setEnabled(false);
 					this.panItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -585,8 +585,8 @@ public class MenuToolBar {
 				}
 				{
 					this.cutLeftItem = new ToolItem(this.zoomToolBar, SWT.NONE);
-					this.cutLeftItem.setImage(SWTResourceManager.getImage("osde/resource/CutLeft.gif")); //$NON-NLS-1$
-					this.cutLeftItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0063));
+					this.cutLeftItem.setImage(SWTResourceManager.getImage("gde/resource/CutLeft.gif")); //$NON-NLS-1$
+					this.cutLeftItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0063));
 					this.cutLeftItem.setEnabled(false);
 					this.cutLeftItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -597,8 +597,8 @@ public class MenuToolBar {
 				}
 				{
 					this.cutRightItem = new ToolItem(this.zoomToolBar, SWT.NONE);
-					this.cutRightItem.setImage(SWTResourceManager.getImage("osde/resource/CutRight.gif")); //$NON-NLS-1$
-					this.cutRightItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0064));
+					this.cutRightItem.setImage(SWTResourceManager.getImage("gde/resource/CutRight.gif")); //$NON-NLS-1$
+					this.cutRightItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0064));
 					this.cutRightItem.setEnabled(false);
 					this.cutRightItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
@@ -608,9 +608,9 @@ public class MenuToolBar {
 				}
 				{
 					this.fitIntoItem = new ToolItem(this.zoomToolBar, SWT.NONE);
-					this.fitIntoItem.setImage(SWTResourceManager.getImage("osde/resource/Expand.gif")); //$NON-NLS-1$
-					this.fitIntoItem.setHotImage(SWTResourceManager.getImage("osde/resource/ExpandHot.gif")); //$NON-NLS-1$
-					this.fitIntoItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0065));
+					this.fitIntoItem.setImage(SWTResourceManager.getImage("gde/resource/Expand.gif")); //$NON-NLS-1$
+					this.fitIntoItem.setHotImage(SWTResourceManager.getImage("gde/resource/ExpandHot.gif")); //$NON-NLS-1$
+					this.fitIntoItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0065));
 					this.fitIntoItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "fitIntoItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -624,11 +624,11 @@ public class MenuToolBar {
 						this.scopePointsComposite = new Composite(this.zoomToolBar, SWT.NONE);
 						this.scopePointsComposite.setLayout(null);
 						this.scopePointsCombo = new CCombo(this.scopePointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.scopePointsCombo.setFont(SWTResourceManager.getFont(this.application, DE.IS_LINUX ? 9 : DE.IS_MAC ? 12 : 10, SWT.NORMAL));
+						this.scopePointsCombo.setFont(SWTResourceManager.getFont(this.application, GDE.IS_LINUX ? 9 : GDE.IS_MAC ? 12 : 10, SWT.NORMAL));
 						this.scopePointsCombo.setItems(SCOPE_VALUES);
 						this.scopePointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						this.scopePointsCombo.select(0);
-						this.scopePointsCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT0072));
+						this.scopePointsCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0072));
 						this.scopePointsCombo.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "scopePointsCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -645,7 +645,7 @@ public class MenuToolBar {
 						//this.scopePointsComboSize.x = SWTResourceManager.getGC(this.scopePointsCombo.getDisplay()).stringExtent("00000000").x;
 						this.scopePointsCombo.setSize(this.scopePointsComboSize);
 						this.scopePointsComposite.setSize(this.scopePointsComboSize.x+leadFill+trailFill, this.toolButtonHeight);
-						this.scopePointsCombo.setLocation(leadFill, DE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
+						this.scopePointsCombo.setLocation(leadFill, GDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
 					}					
 					this.scopePointsComboSep.setWidth(this.scopePointsComposite.getSize().x);
 					this.scopePointsComboSep.setControl(this.scopePointsComposite);
@@ -657,7 +657,7 @@ public class MenuToolBar {
 			this.zoomCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.zoomCoolItem.setPreferredSize(this.size);
 			this.zoomCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
-			this.toolBarSizes.append(this.toolSize.x).append(DE.STRING_COLON).append(this.toolSize.y).append(DE.STRING_SEMICOLON);
+			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end zoom cool item
 
 		{ // begin port cool item
@@ -667,10 +667,10 @@ public class MenuToolBar {
 				this.portCoolItem.setControl(this.portToolBar);
 				{
 					this.portOpenCloseItem = new ToolItem(this.portToolBar, SWT.NONE);
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0066));
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0066));
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "portOpenCloseItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -679,10 +679,10 @@ public class MenuToolBar {
 								activeDevice.openCloseSerialPort();
 								if (activeDevice.getSerialPort() != null) {
 									if (activeDevice.getSerialPort().isConnected()) {
-										MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0067));
+										MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0067));
 									}
 									else {
-										MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0066));
+										MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0066));
 									}
 								}
 							}
@@ -697,7 +697,7 @@ public class MenuToolBar {
 			this.portCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.portCoolItem.setPreferredSize(this.size);
 			this.portCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
-			this.toolBarSizes.append(this.toolSize.x).append(DE.STRING_COLON).append(this.toolSize.y).append(DE.STRING_SEMICOLON);
+			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end port cool item
 		
 		{ // begin data cool item (channel select, record select)
@@ -711,10 +711,10 @@ public class MenuToolBar {
 						this.channelSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
 						this.channelSelectComposite.setLayout(null);
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.channelSelectCombo.setFont(SWTResourceManager.getFont(this.application, DE.IS_LINUX ? 9 : DE.IS_MAC ? 12 : 10, SWT.NORMAL));
+						this.channelSelectCombo.setFont(SWTResourceManager.getFont(this.application, GDE.IS_LINUX ? 9 : GDE.IS_MAC ? 12 : 10, SWT.NORMAL));
 						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
 						this.channelSelectCombo.select(0);
-						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT0075));
+						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0075));
 						this.channelSelectCombo.setEditable(false);
 						this.channelSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
 						this.channelSelectCombo.addSelectionListener(new SelectionAdapter() {
@@ -725,17 +725,17 @@ public class MenuToolBar {
 						});
 						this.channelSelectCombo.setSize(this.channelSelectSize);
 						this.channelSelectComposite.setSize(this.channelSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
-						this.channelSelectCombo.setLocation(leadFill, DE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
+						this.channelSelectCombo.setLocation(leadFill, GDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
 					}
 					channelSelectComboSep.setWidth(this.channelSelectComposite.getSize().x);
 					channelSelectComboSep.setControl(this.channelSelectComposite);
 				}
 				{
 					this.prevChannel = new ToolItem(this.dataToolBar, SWT.NONE);
-					this.prevChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
-					this.prevChannel.setToolTipText(Messages.getString(MessageIds.DE_MSGT0076));
+					this.prevChannel.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
+					this.prevChannel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0076));
 					this.prevChannel.setEnabled(false);
-					this.prevChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
+					this.prevChannel.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
 					this.prevChannel.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "prevChannel.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -749,10 +749,10 @@ public class MenuToolBar {
 				}
 				{
 					this.nextChannel = new ToolItem(this.dataToolBar, SWT.NONE);
-					this.nextChannel.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
-					this.nextChannel.setToolTipText(Messages.getString(MessageIds.DE_MSGT0077));
+					this.nextChannel.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
+					this.nextChannel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0077));
 					this.nextChannel.setEnabled(false);
-					this.nextChannel.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
+					this.nextChannel.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
 					this.nextChannel.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "nextChannel.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -777,9 +777,9 @@ public class MenuToolBar {
 						this.recordSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
 						this.recordSelectComposite.setLayout(null);
 						this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER | SWT.LEFT);
-						this.recordSelectCombo.setFont(SWTResourceManager.getFont(this.application, DE.IS_LINUX ? 9 : DE.IS_MAC ? 12 : 10, SWT.NORMAL));
-						this.recordSelectCombo.setItems(new String[] { DE.STRING_BLANK }); // later "2) Flugaufzeichnung", "3) laden" });
-						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT0078));
+						this.recordSelectCombo.setFont(SWTResourceManager.getFont(this.application, GDE.IS_LINUX ? 9 : GDE.IS_MAC ? 12 : 10, SWT.NORMAL));
+						this.recordSelectCombo.setItems(new String[] { GDE.STRING_BLANK }); // later "2) Flugaufzeichnung", "3) laden" });
+						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0078));
 						this.recordSelectCombo.setTextLimit(RecordSet.MAX_NAME_LENGTH);
 						//this.recordSelectSize.x = SWTResourceManager.getGC(this.recordSelectCombo.getDisplay()).stringExtent("012345678901234567890123456789012345678901234567890".substring(0, RecordSet.MAX_NAME_LENGTH)).x;
 						this.recordSelectCombo.setEditable(false);
@@ -819,17 +819,17 @@ public class MenuToolBar {
 						});
 						this.recordSelectCombo.setSize(this.recordSelectSize);
 						this.recordSelectComposite.setSize(this.recordSelectSize.x+leadFill+trailFill, this.toolButtonHeight);
-						this.recordSelectCombo.setLocation(leadFill, DE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
+						this.recordSelectCombo.setLocation(leadFill, GDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
 					}
 					recordSelectComboSep.setWidth(this.recordSelectComposite.getSize().x);
 					recordSelectComboSep.setControl(this.recordSelectComposite);
 				}
 				{
 					this.prevRecord = new ToolItem(this.dataToolBar, SWT.NONE);
-					this.prevRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
-					this.prevRecord.setToolTipText(Messages.getString(MessageIds.DE_MSGT0079));
+					this.prevRecord.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLeft.gif")); //$NON-NLS-1$
+					this.prevRecord.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0079));
 					this.prevRecord.setEnabled(false);
-					this.prevRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
+					this.prevRecord.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
 					this.prevRecord.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "prevRecord.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -843,10 +843,10 @@ public class MenuToolBar {
 				}
 				{
 					this.nextRecord = new ToolItem(this.dataToolBar, SWT.NONE);
-					this.nextRecord.setImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
-					this.nextRecord.setToolTipText(Messages.getString(MessageIds.DE_MSGT0080));
+					this.nextRecord.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRight.gif")); //$NON-NLS-1$
+					this.nextRecord.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0080));
 					this.nextRecord.setEnabled(false);
-					this.nextRecord.setHotImage(SWTResourceManager.getImage("osde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
+					this.nextRecord.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
 					this.nextRecord.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "nextRecord.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -870,9 +870,9 @@ public class MenuToolBar {
 				}
 				{
 					this.deleteRecord = new ToolItem(this.dataToolBar, SWT.NONE);
-					this.deleteRecord.setImage(SWTResourceManager.getImage("osde/resource/Delete.gif")); //$NON-NLS-1$
-					this.deleteRecord.setToolTipText(Messages.getString(MessageIds.DE_MSGT0081));
-					this.deleteRecord.setHotImage(SWTResourceManager.getImage("osde/resource/DeleteHot.gif")); //$NON-NLS-1$
+					this.deleteRecord.setImage(SWTResourceManager.getImage("gde/resource/Delete.gif")); //$NON-NLS-1$
+					this.deleteRecord.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0081));
+					this.deleteRecord.setHotImage(SWTResourceManager.getImage("gde/resource/DeleteHot.gif")); //$NON-NLS-1$
 					this.deleteRecord.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "deleteRecord.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -902,7 +902,7 @@ public class MenuToolBar {
 										MenuToolBar.this.application.cleanHeaderAndCommentInGraphicsWindow();
 										MenuToolBar.this.application.updateGraphicsWindow();
 										MenuToolBar.this.application.updateStatisticsData();
-										MenuToolBar.this.application.updateDataTable(DE.STRING_EMPTY, true);
+										MenuToolBar.this.application.updateDataTable(GDE.STRING_EMPTY, true);
 										MenuToolBar.this.application.updateDigitalWindow();
 										MenuToolBar.this.application.updateAnalogWindow();
 										MenuToolBar.this.application.updateCellVoltageWindow();
@@ -915,9 +915,9 @@ public class MenuToolBar {
 				}
 				{
 					this.editRecord = new ToolItem(this.dataToolBar, SWT.NONE);
-					this.editRecord.setImage(SWTResourceManager.getImage("osde/resource/Edit.gif")); //$NON-NLS-1$
-					this.editRecord.setToolTipText(Messages.getString(MessageIds.DE_MSGT0082));
-					this.editRecord.setHotImage(SWTResourceManager.getImage("osde/resource/EditHot.gif")); //$NON-NLS-1$
+					this.editRecord.setImage(SWTResourceManager.getImage("gde/resource/Edit.gif")); //$NON-NLS-1$
+					this.editRecord.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0082));
+					this.editRecord.setHotImage(SWTResourceManager.getImage("gde/resource/EditHot.gif")); //$NON-NLS-1$
 					this.editRecord.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "editAufnahme.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -934,7 +934,7 @@ public class MenuToolBar {
 			this.dataCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			//this.dataCoolItem.setPreferredSize(this.size);
 			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
-			this.toolBarSizes.append(this.toolSize.x).append(DE.STRING_COLON).append(this.toolSize.y).append(DE.STRING_SEMICOLON);
+			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		}
 		
 		// set the focus controlled to an item which has no slection capability
@@ -996,7 +996,7 @@ public class MenuToolBar {
 			this.channelSelectCombo.setItems(channelNames); //new String[] { "K1: Kanal 1" }); // "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4" });
 		}
 		else { // no channel
-			this.channelSelectCombo.setItems(new String[] { DE.STRING_EMPTY });
+			this.channelSelectCombo.setItems(new String[] { GDE.STRING_EMPTY });
 		}
 		this.channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
 		updateChannelToolItems();
@@ -1034,7 +1034,7 @@ public class MenuToolBar {
 		}
 		else {
 			this.recordSelectCombo.setItems(new String[0]);
-			this.recordSelectCombo.setText(DE.STRING_EMPTY);
+			this.recordSelectCombo.setText(GDE.STRING_EMPTY);
 		}
 		updateRecordToolItems();
 	}
@@ -1139,44 +1139,44 @@ public class MenuToolBar {
 			case 0: // DeviceSerialPort.ICON_SET_OPEN_CLOSE
 			default:
 				if (isPortOpen) {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortClose.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortCloseHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0067));
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortCloseDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortClose.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortCloseHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0067));
 				}
 				else {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0066));
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0066));
 				}
 				break;
 			case 1: // DeviceSerialPort.ICON_SET_START_STOP
 				if (isPortOpen) {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StopGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0069));
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StopGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StopGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StopGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0069));
 				}
 				else {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/StartGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0068));
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StartGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StartGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StartGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0068));
 				}
 				break;
 			case 2: // DeviceSerialPort.ICON_SET_IMPORT_CLOSE
 				if (isPortOpen) {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportActiveDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportActiveHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportActive.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0069));
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportActiveDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportActiveHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportActive.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0069));
 				}
 				else {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportDataDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportData.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("osde/resource/" + this.language + "/ImportDataHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.DE_MSGT0068));
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportDataDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportData.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportDataHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0068));
 				}
 				break;
 			}
@@ -1277,7 +1277,7 @@ public class MenuToolBar {
 	
 	/**
 	 * get the coolbar sizes as string
-	 * INITIAL_COOLBAR_SIZES = (DE.IS_WINDOWS == true ? "161:29;136:29;1143:29;145:29;1295:29" : "174:35;146:35;904:35;146:35;1078:35");
+	 * INITIAL_COOLBAR_SIZES = (GDE.IS_WINDOWS == true ? "161:29;136:29;1143:29;145:29;1295:29" : "174:35;146:35;904:35;146:35;1078:35");
 	 */
 	public String getCoolBarSizes() {
 			return this.toolBarSizes.toString();		
@@ -1296,7 +1296,7 @@ public class MenuToolBar {
 			
 			// check if selected key matches the existing object key or is new for this channel
 			if (!newObjectKey.equals(channelObjKey)) { // channel has a key
-				int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.DE_MSGT0205, new Object[] {channelObjKey, newObjectKey}));
+				int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGT0205, new Object[] {channelObjKey, newObjectKey}));
 				if (answer == SWT.YES) { //replace existing objectkey in channel
 					activeChannel.setObjectKey(newObjectKey);
 					String updateFileDescription = activeChannel.getFileDescription();
@@ -1305,7 +1305,7 @@ public class MenuToolBar {
 						+ newObjectKey + updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey)+ channelObjKey.length());
 					}
 					else if (newObjectKey.length() > 1){
-						updateFileDescription = updateFileDescription + DE.STRING_BLANK + newObjectKey;
+						updateFileDescription = updateFileDescription + GDE.STRING_BLANK + newObjectKey;
 					}
 					activeChannel.setFileDescription(updateFileDescription);
 				}
@@ -1370,7 +1370,7 @@ public class MenuToolBar {
 	 */
 	public void updateObjectSelector() {
 		Channel activeChannel = this.channels.getActiveChannel();
-		if (activeChannel != null && activeChannel.size() > 0 && !activeChannel.getObjectKey().equals(DE.STRING_EMPTY)) {
+		if (activeChannel != null && activeChannel.size() > 0 && !activeChannel.getObjectKey().equals(GDE.STRING_EMPTY)) {
 			this.selectObjectKey(this.objectSelectCombo.getSelectionIndex(), activeChannel.getObjectKey());
 		}
 		else if (activeChannel != null && activeChannel.size() == 0) { // startup

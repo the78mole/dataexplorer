@@ -14,10 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.dialog;
+package gde.ui.dialog;
 
 import java.util.Locale;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -43,12 +43,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.DE;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.utils.CellVoltageValues;
+import gde.DE;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.CellVoltageValues;
 
 /**
  * Dialog class to adjust the voltage levels of the bar graph
@@ -108,7 +108,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(380, 380);
-			this.dialogShell.setText(Messages.getString(MessageIds.DE_MSGT0376));
+			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0376));
 			this.dialogShell.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
 			this.dialogShell.addDisposeListener( new DisposeListener() {
 				public void widgetDisposed(DisposeEvent event) {
@@ -132,7 +132,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			});
 			{
 				this.presetsGroup = new Group(this.dialogShell, SWT.BORDER);
-				this.presetsGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.presetsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				GridLayout defaultSelectionCompositeLayout1 = new GridLayout();
 				defaultSelectionCompositeLayout1.makeColumnsEqualWidth = true;
 				this.presetsGroup.setLayout(defaultSelectionCompositeLayout1);
@@ -145,7 +145,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				defaultSelectionCompositeLData.bottom = new FormAttachment(1000, 1000, -35);
 				this.presetsGroup.setLayoutData(defaultSelectionCompositeLData);
 				this.presetsGroup.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
-				this.presetsGroup.setText(Messages.getString(MessageIds.DE_MSGT0374));
+				this.presetsGroup.setText(Messages.getString(MessageIds.GDE_MSGT0374));
 				{
 					this.upperSpacer = new Composite(this.presetsGroup, SWT.NONE);
 					GridLayout upperSpacerLayout = new GridLayout();
@@ -166,8 +166,8 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					buttonLiPoLData.verticalAlignment = GridData.FILL;
 					buttonLiPoLData.grabExcessVerticalSpace = true;
 					this.buttonLiPo.setLayoutData(buttonLiPoLData);
-					this.buttonLiPo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
-					this.buttonLiPo.setText(Messages.getString(MessageIds.DE_MSGT0371));
+					this.buttonLiPo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.buttonLiPo.setText(Messages.getString(MessageIds.GDE_MSGT0371));
 					this.buttonLiPo.setSelection(true);
 					this.buttonLiPo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -190,8 +190,8 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					buttonLiIoLData.verticalAlignment = GridData.FILL;
 					buttonLiIoLData.grabExcessVerticalSpace = true;
 					this.buttonLiIo.setLayoutData(buttonLiIoLData);
-					this.buttonLiIo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
-					this.buttonLiIo.setText(Messages.getString(MessageIds.DE_MSGT0372));
+					this.buttonLiIo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.buttonLiIo.setText(Messages.getString(MessageIds.GDE_MSGT0372));
 					this.buttonLiIo.setSelection(false);
 					this.buttonLiIo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -215,8 +215,8 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					buttonLiFeLData.grabExcessVerticalSpace = true;
 					buttonLiFeLData.grabExcessHorizontalSpace = true;
 					this.buttonLiFe.setLayoutData(buttonLiFeLData);
-					this.buttonLiFe.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
-					this.buttonLiFe.setText(Messages.getString(MessageIds.DE_MSGT0373));
+					this.buttonLiFe.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.buttonLiFe.setText(Messages.getString(MessageIds.GDE_MSGT0373));
 					this.buttonLiFe.setSelection(false);
 					this.buttonLiFe.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -240,8 +240,8 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					buttonLiFeLData.grabExcessVerticalSpace = true;
 					buttonLiFeLData.grabExcessHorizontalSpace = true;
 					this.buttonNiMh.setLayoutData(buttonLiFeLData);
-					this.buttonNiMh.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
-					this.buttonNiMh.setText(Messages.getString(MessageIds.DE_MSGT0377)); //TODO
+					this.buttonNiMh.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.buttonNiMh.setText(Messages.getString(MessageIds.GDE_MSGT0377)); //TODO
 					this.buttonNiMh.setSelection(false);
 					this.buttonNiMh.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -279,8 +279,8 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				valueSelectionCompositeLData.bottom = new FormAttachment(1000, 1000, -35);
 				this.individualGroup.setLayoutData(valueSelectionCompositeLData);
 				this.individualGroup.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
-				this.individualGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.individualGroup.setText(Messages.getString(MessageIds.DE_MSGT0375));
+				this.individualGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.individualGroup.setText(Messages.getString(MessageIds.GDE_MSGT0375));
 				this.individualGroup.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "individualGroup.helpRequested, event=" + evt); //$NON-NLS-1$
@@ -357,17 +357,17 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					{
 						this.upperLimitVoltageLabel = new CLabel(this.lableComboComposite, SWT.LEFT | SWT.EMBEDDED);
 						this.upperLimitVoltageLabel.setBackground(SWTResourceManager.getColor(255, 255, 128));
-						this.upperLimitVoltageLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.upperLimitVoltageLabel.setText(Messages.getString(MessageIds.DE_MSGT0380));
-						this.upperLimitVoltageLabel.setToolTipText(Messages.getString(MessageIds.DE_MSGT0381));
+						this.upperLimitVoltageLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.upperLimitVoltageLabel.setText(Messages.getString(MessageIds.GDE_MSGT0380));
+						this.upperLimitVoltageLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0381));
 						this.upperLimitVoltageLabel.setBounds(0, 0, 115, 25);
 					}
 					{
 						this.upperLimitVoltageCombo = new CCombo(this.lableComboComposite, SWT.BORDER);
-						this.upperLimitVoltageCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.upperLimitVoltageCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.upperLimitVoltageCombo.setItems(CellVoltageValues.upperLimitVoltage);
-						this.upperLimitVoltageCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT0381));
-						this.upperLimitVoltageCombo.setBounds(0, 25, 95, DE.IS_LINUX ? 22 : 20);
+						this.upperLimitVoltageCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0381));
+						this.upperLimitVoltageCombo.setBounds(0, 25, 95, GDE.IS_LINUX ? 22 : 20);
 						this.upperLimitVoltageCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -379,18 +379,18 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 					{
 						this.upperLimitColorRedLabel = new CLabel(this.lableComboComposite, SWT.LEFT | SWT.EMBEDDED);
-						this.upperLimitColorRedLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.upperLimitColorRedLabel.setText(Messages.getString(MessageIds.DE_MSGT0382));
+						this.upperLimitColorRedLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.upperLimitColorRedLabel.setText(Messages.getString(MessageIds.GDE_MSGT0382));
 						this.upperLimitColorRedLabel.setBackground(SWTResourceManager.getColor(255, 255, 128));
-						this.upperLimitColorRedLabel.setToolTipText(Messages.getString(MessageIds.DE_MSGT0383));
+						this.upperLimitColorRedLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0383));
 						this.upperLimitColorRedLabel.setBounds(0, 49, 115, 24);
 					}
 					{
 						this.upperLimitColorRedCombo = new CCombo(this.lableComboComposite, SWT.BORDER);
-						this.upperLimitColorRedCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.upperLimitColorRedCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.upperLimitColorRedCombo.setItems(CellVoltageValues.upperLimitColorRed);
-						this.upperLimitColorRedCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT0383));
-						this.upperLimitColorRedCombo.setBounds(0, 73, 95, DE.IS_LINUX ? 22 : 20);
+						this.upperLimitColorRedCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0383));
+						this.upperLimitColorRedCombo.setBounds(0, 73, 95, GDE.IS_LINUX ? 22 : 20);
 						this.upperLimitColorRedCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -403,17 +403,17 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					{
 						this.lowerLimitColorGreenLabel = new CLabel(this.lableComboComposite, SWT.LEFT | SWT.EMBEDDED);
 						this.lowerLimitColorGreenLabel.setBackground(SWTResourceManager.getColor(255, 255, 128));
-						this.lowerLimitColorGreenLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.lowerLimitColorGreenLabel.setText(Messages.getString(MessageIds.DE_MSGT0384));
-						this.lowerLimitColorGreenLabel.setToolTipText(Messages.getString(MessageIds.DE_MSGT0385));
+						this.lowerLimitColorGreenLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.lowerLimitColorGreenLabel.setText(Messages.getString(MessageIds.GDE_MSGT0384));
+						this.lowerLimitColorGreenLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0385));
 						this.lowerLimitColorGreenLabel.setBounds(0, 97, 115, 24);
 					}
 					{
 						this.lowerLimitColorGreenCombo = new CCombo(this.lableComboComposite, SWT.BORDER);
-						this.lowerLimitColorGreenCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.lowerLimitColorGreenCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.lowerLimitColorGreenCombo.setItems(CellVoltageValues.lowerLimitColorGreen);
-						this.lowerLimitColorGreenCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT0385));
-						this.lowerLimitColorGreenCombo.setBounds(0, 121, 95, DE.IS_LINUX ? 22 : 20);
+						this.lowerLimitColorGreenCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0385));
+						this.lowerLimitColorGreenCombo.setBounds(0, 121, 95, GDE.IS_LINUX ? 22 : 20);
 						this.lowerLimitColorGreenCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -426,17 +426,17 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					{
 						this.beginSpreadVoltageLabel = new CLabel(this.lableComboComposite, SWT.LEFT | SWT.EMBEDDED);
 						this.beginSpreadVoltageLabel.setBackground(SWTResourceManager.getColor(255, 255, 128));
-						this.beginSpreadVoltageLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.beginSpreadVoltageLabel.setText(Messages.getString(MessageIds.DE_MSGT0386));
-						this.beginSpreadVoltageLabel.setToolTipText(Messages.getString(MessageIds.DE_MSGT0387));
+						this.beginSpreadVoltageLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.beginSpreadVoltageLabel.setText(Messages.getString(MessageIds.GDE_MSGT0386));
+						this.beginSpreadVoltageLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0387));
 						this.beginSpreadVoltageLabel.setBounds(0, 145, 115, 24);
 					}
 					{
 						this.beginSpreadVoltageCombo = new CCombo(this.lableComboComposite, SWT.BORDER);
-						this.beginSpreadVoltageCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.beginSpreadVoltageCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.beginSpreadVoltageCombo.setItems(CellVoltageValues.beginSpreadVoltage);
-						this.beginSpreadVoltageCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT0387));
-						this.beginSpreadVoltageCombo.setBounds(0, 169, 95, DE.IS_LINUX ? 22 : 20);
+						this.beginSpreadVoltageCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0387));
+						this.beginSpreadVoltageCombo.setBounds(0, 169, 95, GDE.IS_LINUX ? 22 : 20);
 						this.beginSpreadVoltageCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -449,17 +449,17 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					{
 						this.lowerLimitRedLabel = new CLabel(this.lableComboComposite, SWT.LEFT | SWT.EMBEDDED);
 						this.lowerLimitRedLabel.setBackground(SWTResourceManager.getColor(255, 255, 128));
-						this.lowerLimitRedLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.lowerLimitRedLabel.setText(Messages.getString(MessageIds.DE_MSGT0388));
-						this.lowerLimitRedLabel.setToolTipText(Messages.getString(MessageIds.DE_MSGT0389));
-						this.lowerLimitRedLabel.setBounds(0, 193, 115, DE.IS_LINUX ? 22 : 20);
+						this.lowerLimitRedLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.lowerLimitRedLabel.setText(Messages.getString(MessageIds.GDE_MSGT0388));
+						this.lowerLimitRedLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0389));
+						this.lowerLimitRedLabel.setBounds(0, 193, 115, GDE.IS_LINUX ? 22 : 20);
 					}
 					{
 						this.lowerLimitColorRedCombo = new CCombo(this.lableComboComposite, SWT.BORDER);
-						this.lowerLimitColorRedCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.lowerLimitColorRedCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.lowerLimitColorRedCombo.setItems(CellVoltageValues.lowerLimitColorRed);
-						this.lowerLimitColorRedCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT0389));
-						this.lowerLimitColorRedCombo.setBounds(0, 217, 95, DE.IS_LINUX ? 22 : 20);
+						this.lowerLimitColorRedCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0389));
+						this.lowerLimitColorRedCombo.setBounds(0, 217, 95, GDE.IS_LINUX ? 22 : 20);
 						this.lowerLimitColorRedCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -472,17 +472,17 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					{
 						this.lowerLimitVoltageLabel = new CLabel(this.lableComboComposite, SWT.LEFT | SWT.EMBEDDED);
 						this.lowerLimitVoltageLabel.setBackground(SWTResourceManager.getColor(255, 255, 128));
-						this.lowerLimitVoltageLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.lowerLimitVoltageLabel.setText(Messages.getString(MessageIds.DE_MSGT0390));
-						this.lowerLimitVoltageLabel.setToolTipText(Messages.getString(MessageIds.DE_MSGT0391));
+						this.lowerLimitVoltageLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.lowerLimitVoltageLabel.setText(Messages.getString(MessageIds.GDE_MSGT0390));
+						this.lowerLimitVoltageLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0391));
 						this.lowerLimitVoltageLabel.setBounds(0, 241, 115, 24);
 					}
 					{
 						this.lowerLimitVoltageCombo = new CCombo(this.lableComboComposite, SWT.BORDER);
-						this.lowerLimitVoltageCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.lowerLimitVoltageCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.lowerLimitVoltageCombo.setItems(CellVoltageValues.lowerLimitVoltage);
-						this.lowerLimitVoltageCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT0391));
-						this.lowerLimitVoltageCombo.setBounds(0, 265, 95, DE.IS_LINUX ? 22 : 20);
+						this.lowerLimitVoltageCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0391));
+						this.lowerLimitVoltageCombo.setBounds(0, 265, 95, GDE.IS_LINUX ? 22 : 20);
 						this.lowerLimitVoltageCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -501,9 +501,9 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				okButtonLData.left = new FormAttachment(0, 1000, 115);
 				okButtonLData.bottom = new FormAttachment(1000, 1000, -5);
 				this.okButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-				this.okButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.okButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.okButton.setLayoutData(okButtonLData);
-				this.okButton.setText(Messages.getString(MessageIds.DE_MSGT0188));
+				this.okButton.setText(Messages.getString(MessageIds.GDE_MSGT0188));
 				this.okButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {

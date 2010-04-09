@@ -14,10 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.tab;
+package gde.ui.tab;
 
 import java.util.HashMap;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -35,16 +35,16 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.menu.TabAreaContextMenu;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
 
 /**
  * Display window parent of analog displays
@@ -56,7 +56,7 @@ public class AnalogWindow extends CTabItem {
 	Composite												analogMainComposite;
 	HashMap<String, AnalogDisplay>	displays;
 	GridLayout 											analogMainCompositeLayout;
-	String 													info = Messages.getString(MessageIds.DE_MSGT0230);
+	String 													info = Messages.getString(MessageIds.GDE_MSGT0230);
 
 	Color														surroundingBackground;
 
@@ -76,7 +76,7 @@ public class AnalogWindow extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.DE_MSGT0231));
+		this.setText(Messages.getString(MessageIds.GDE_MSGT0231));
 		
 		this.surroundingBackground = Settings.getInstance().getAnalogSurroundingAreaBackground();
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
@@ -138,7 +138,7 @@ public class AnalogWindow extends CTabItem {
 	public synchronized void update(boolean forceUpdate) {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null && this.analogMainComposite.isVisible()) {
-			log.log(Level.FINE, DE.STRING_BLANK);
+			log.log(Level.FINE, GDE.STRING_BLANK);
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isAnalogTabRequested()) {

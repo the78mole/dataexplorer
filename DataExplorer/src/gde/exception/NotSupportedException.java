@@ -1,7 +1,7 @@
 /**
  * 
  */
-package osde.exception;
+package gde.exception;
 
 /**
  * @author brueg

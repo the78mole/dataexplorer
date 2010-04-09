@@ -14,16 +14,16 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device;
+package gde.device;
 
 import java.util.HashMap;
 import java.util.List;
 
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.exception.DataInconsitsentException;
-import osde.serial.DeviceSerialPort;
-import osde.utils.CalculationThread;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.exception.DataInconsitsentException;
+import gde.serial.DeviceSerialPort;
+import gde.utils.CalculationThread;
 
 /**
  * Defines the interface for all device implementations, it also covers some interface methods from 

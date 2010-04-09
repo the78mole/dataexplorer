@@ -6,13 +6,13 @@
 //
 
 
-package osde.device;
+package gde.device;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
-import osde.DE;
+import gde.DE;
 
 
 /**
@@ -63,8 +63,8 @@ public enum CommaSeparatorTypes {
   	public static String[] valuesAsStingArray() {
   		StringBuilder sb = new StringBuilder();
   		for (CommaSeparatorTypes element : CommaSeparatorTypes.values()) {
-  			sb.append("  ").append(element.value).append(DE.STRING_DASH);  //$NON-NLS-1$
+  			sb.append("  ").append(element.value).append(GDE.STRING_DASH);  //$NON-NLS-1$
   		}
-  		return sb.toString().split(DE.STRING_DASH);
+  		return sb.toString().split(GDE.STRING_DASH);
   	}
 }

@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui;
+package gde.ui;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,13 +29,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import osde.DE;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.device.DeviceDialog;
-import osde.device.IDevice;
-import osde.device.MeasurementType;
+import gde.DE;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceDialog;
+import gde.device.IDevice;
+import gde.device.MeasurementType;
 
 /**
  * This class enable control of the visualization control of record and the corresponding measurement type active status
@@ -80,7 +80,7 @@ public class MeasurementControl extends Composite {
 			measurementLData.width = 180;
 			measurementLData.height = 20;
 			this.measurement.setLayoutData(measurementLData);
-			this.measurement.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.measurement.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.measurement.setText(this.measurementType.getName());
 			this.measurement.setSelection(this.measurementType.isActive());
 			this.measurement.addSelectionListener(new SelectionAdapter() {
@@ -111,7 +111,7 @@ public class MeasurementControl extends Composite {
 			measurementSymbolLabelLData.width = 50;
 			measurementSymbolLabelLData.height = 20;
 			this.measurementSymbolLabel.setLayoutData(measurementSymbolLabelLData);
-			this.measurementSymbolLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.measurementSymbolLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.measurementSymbolLabel.setText(this.measurementType.getSymbol());
 		}
 		{
@@ -120,8 +120,8 @@ public class MeasurementControl extends Composite {
 			measurementUnitLabelLData.width = 50;
 			measurementUnitLabelLData.height = 20;
 			this.measurementUnitLabel.setLayoutData(measurementUnitLabelLData);
-			this.measurementUnitLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-			this.measurementUnitLabel.setText(DE.STRING_LEFT_BRACKET + this.measurementType.getUnit() + DE.STRING_RIGHT_BRACKET);
+			this.measurementUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.measurementUnitLabel.setText(GDE.STRING_LEFT_BRACKET + this.measurementType.getUnit() + GDE.STRING_RIGHT_BRACKET);
 		}
 
 	}

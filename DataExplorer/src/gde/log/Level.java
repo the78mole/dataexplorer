@@ -1,7 +1,7 @@
 /**
  * 
  */
-package osde.log;
+package gde.log;
 
 /**
  * @author brueg

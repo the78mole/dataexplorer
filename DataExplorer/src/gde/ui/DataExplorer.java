@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui;
+package gde.ui;
 
 import java.net.MalformedURLException;
 import java.util.Date;
@@ -70,36 +70,36 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.device.DeviceDialog;
-import osde.device.IDevice;
-import osde.log.Level;
-import osde.log.LogFormatter;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.dialog.AboutDialog;
-import osde.ui.dialog.DeviceSelectionDialog;
-import osde.ui.dialog.HelpInfoDialog;
-import osde.ui.dialog.SettingsDialog;
-import osde.ui.menu.MenuBar;
-import osde.ui.menu.MenuToolBar;
-import osde.ui.tab.AnalogWindow;
-import osde.ui.tab.CellVoltageWindow;
-import osde.ui.tab.DataTableWindow;
-import osde.ui.tab.DigitalWindow;
-import osde.ui.tab.FileCommentWindow;
-import osde.ui.tab.GraphicsComposite;
-import osde.ui.tab.GraphicsWindow;
-import osde.ui.tab.ObjectDescriptionWindow;
-import osde.ui.tab.StatisticsWindow;
-import osde.utils.FileUtils;
-import osde.utils.OperatingSystemHelper;
-import osde.utils.StringHelper;
-import osde.utils.WebBrowser;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceDialog;
+import gde.device.IDevice;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.dialog.AboutDialog;
+import gde.ui.dialog.DeviceSelectionDialog;
+import gde.ui.dialog.HelpInfoDialog;
+import gde.ui.dialog.SettingsDialog;
+import gde.ui.menu.MenuBar;
+import gde.ui.menu.MenuToolBar;
+import gde.ui.tab.AnalogWindow;
+import gde.ui.tab.CellVoltageWindow;
+import gde.ui.tab.DataTableWindow;
+import gde.ui.tab.DigitalWindow;
+import gde.ui.tab.FileCommentWindow;
+import gde.ui.tab.GraphicsComposite;
+import gde.ui.tab.GraphicsWindow;
+import gde.ui.tab.ObjectDescriptionWindow;
+import gde.ui.tab.StatisticsWindow;
+import gde.utils.FileUtils;
+import gde.utils.OperatingSystemHelper;
+import gde.utils.StringHelper;
+import gde.utils.WebBrowser;
 
 /**
  * Main application class of DataExplorer
@@ -139,7 +139,7 @@ public class DataExplorer extends Composite {
 	public final static Display						display										= Display.getDefault();
 	public final static Shell							shell											= new Shell(display);
 
-	osde.io.FileHandler						fileHandler;
+	de.io.FileHandler						fileHandler;
 
 	CTabFolder										displayTab;
 
@@ -202,14 +202,14 @@ public class DataExplorer extends Composite {
 		SWTResourceManager.registerResourceUser(this);
 		this.threadId = Thread.currentThread().getId();
 		
-		this.extensionFilterMap.put(DE.FILE_ENDING_OSD, Messages.getString(MessageIds.DE_MSGT0139));
-		this.extensionFilterMap.put(DE.FILE_ENDING_LOV, Messages.getString(MessageIds.DE_MSGT0140));
-		this.extensionFilterMap.put(DE.FILE_ENDING_CSV, Messages.getString(MessageIds.DE_MSGT0141));
-		this.extensionFilterMap.put(DE.FILE_ENDING_XML, Messages.getString(MessageIds.DE_MSGT0142));
-		this.extensionFilterMap.put(DE.FILE_ENDING_PNG, Messages.getString(MessageIds.DE_MSGT0213));
-		this.extensionFilterMap.put(DE.FILE_ENDING_GIF, Messages.getString(MessageIds.DE_MSGT0214));
-		this.extensionFilterMap.put(DE.FILE_ENDING_JPG, Messages.getString(MessageIds.DE_MSGT0215));
-		this.extensionFilterMap.put(DE.FILE_ENDING_STAR, Messages.getString(MessageIds.DE_MSGT0216));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_OSD, Messages.getString(MessageIds.GDE_MSGT0139));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_LOV, Messages.getString(MessageIds.GDE_MSGT0140));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_CSV, Messages.getString(MessageIds.GDE_MSGT0141));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_XML, Messages.getString(MessageIds.GDE_MSGT0142));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_PNG, Messages.getString(MessageIds.GDE_MSGT0213));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_GIF, Messages.getString(MessageIds.GDE_MSGT0214));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_JPG, Messages.getString(MessageIds.GDE_MSGT0215));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_STAR, Messages.getString(MessageIds.GDE_MSGT0216));
 	}
 
 	/**
@@ -229,7 +229,7 @@ public class DataExplorer extends Composite {
 		//final String $METHOD_NAME = "initGUI"; //$NON-NLS-1$
 		try {
 			this.setBackground(DataExplorer.COLOR_GREY);
-			this.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+			this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 
 			GridLayout thisLayout = new GridLayout(1, true);
 			thisLayout.marginWidth = 0;
@@ -275,7 +275,7 @@ public class DataExplorer extends Composite {
 				this.displayTab.setLayoutData(tabCompositeLData);
 				this.displayTab.setSimple(false);
 				{
-					this.graphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_NORMAL, Messages.getString(MessageIds.DE_MSGT0143), 0);
+					this.graphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_NORMAL, Messages.getString(MessageIds.GDE_MSGT0143), 0);
 					this.graphicsTabItem.create();
 				}
 				this.displayTab.setSelection(0);
@@ -309,12 +309,12 @@ public class DataExplorer extends Composite {
 		final String $METHOD_NAME = "execute"; //$NON-NLS-1$
 		try {
 			//cleanup possible old files and native libraries
-			if (DE.IS_WINDOWS) 
-				FileUtils.cleanFiles(DE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "WinHelper*.dll", "Register*.exe", "swt*3448.dll", "rxtxSerial.dll"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			else if (DE.IS_LINUX)
-				FileUtils.cleanFiles(DE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "*register.sh", "libswt*3448.so", "librxtxSerial.so"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			else if (DE.IS_MAC)
-				FileUtils.cleanFiles(DE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "librxtxSerial.jnilib"}); //$NON-NLS-1$
+			if (GDE.IS_WINDOWS) 
+				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "WinHelper*.dll", "Register*.exe", "swt*3448.dll", "rxtxSerial.dll"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			else if (GDE.IS_LINUX)
+				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "*register.sh", "libswt*3448.so", "librxtxSerial.so"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			else if (GDE.IS_MAC)
+				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "librxtxSerial.jnilib"}); //$NON-NLS-1$
 
 			//init settings
 			this.settings = Settings.getInstance();
@@ -330,14 +330,14 @@ public class DataExplorer extends Composite {
 			int height = this.settings.getWindow().height + y > displayBounds.height ? displayBounds.height-x : this.settings.getWindow().height;
 			shell.setSize(width, height);
 			
-			this.fileHandler = new osde.io.FileHandler();
+			this.fileHandler = new gde.io.FileHandler();
 			this.initGUI();
 
 			this.channels = Channels.getInstance(this);
-			this.compareSet = new RecordSet(null, DE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1);
+			this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1);
 
 			shell.setLayout(new FillLayout());
-			shell.setImage(SWTResourceManager.getImage("osde/resource/DataExplorer.jpg")); //$NON-NLS-1$
+			shell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.jpg")); //$NON-NLS-1$
 			shell.setText(APPLICATION_NAME);
 
 			shell.layout();
@@ -345,9 +345,9 @@ public class DataExplorer extends Composite {
 
 			if (this.settings.isDevicePropertiesUpdated() || this.settings.isGraphicsTemplateUpdated() || this.settings.isDevicePropertiesReplaced()) {
 				StringBuilder sb = new StringBuilder();
-				if (this.settings.isDevicePropertiesUpdated()) sb.append(Messages.getString(MessageIds.DE_MSGI0016)).append(DE.STRING_NEW_LINE);
-				if (this.settings.isGraphicsTemplateUpdated()) sb.append(Messages.getString(MessageIds.DE_MSGI0017)).append(DE.STRING_NEW_LINE);
-				if (this.settings.isDevicePropertiesReplaced()) sb.append(Messages.getString(MessageIds.DE_MSGI0028)).append(DE.STRING_NEW_LINE);
+				if (this.settings.isDevicePropertiesUpdated()) sb.append(Messages.getString(MessageIds.GDE_MSGI0016)).append(GDE.STRING_NEW_LINE);
+				if (this.settings.isGraphicsTemplateUpdated()) sb.append(Messages.getString(MessageIds.GDE_MSGI0017)).append(GDE.STRING_NEW_LINE);
+				if (this.settings.isDevicePropertiesReplaced()) sb.append(Messages.getString(MessageIds.GDE_MSGI0028)).append(GDE.STRING_NEW_LINE);
 				application.openMessageDialog(shell, sb.toString());
 			}
 
@@ -355,15 +355,15 @@ public class DataExplorer extends Composite {
 				public void run() {
 					DataExplorer.this.postInitGUI(inputFilePath);
 
-					for (String errorMessage : DE.getInitErrors()) {
+					for (String errorMessage : GDE.getInitErrors()) {
 						MessageBox messageDialog = new MessageBox(shell, SWT.OK | SWT.ICON_WARNING);
-						if (errorMessage.contains(DE.STRING_SEMICOLON)) {
-							String[] messages = errorMessage.split(DE.STRING_SEMICOLON);
+						if (errorMessage.contains(GDE.STRING_SEMICOLON)) {
+							String[] messages = errorMessage.split(GDE.STRING_SEMICOLON);
 							messageDialog.setText(messages[0]);
 							messageDialog.setMessage(messages[1]);
 						}
 						else {
-							messageDialog.setText(DE.OSDE_NAME_LONG);
+							messageDialog.setText(GDE.OSDE_NAME_LONG);
 							messageDialog.setMessage(errorMessage);
 						}
 						messageDialog.open();
@@ -371,7 +371,7 @@ public class DataExplorer extends Composite {
 				}
 			});
 			
-			log.logp(Level.TIME, DataExplorer.$CLASS_NAME, $METHOD_NAME, "total init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - DE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			log.logp(Level.TIME, DataExplorer.$CLASS_NAME, $METHOD_NAME, "total init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			while (!DataExplorer.shell.isDisposed()) {
 				if (!DataExplorer.display.readAndDispatch()) DataExplorer.display.sleep();
 			}
@@ -388,12 +388,12 @@ public class DataExplorer extends Composite {
 	private void updateLogger() {
 		Handler logHandler;
 		LogFormatter lf = new LogFormatter();
-		Logger rootLogger = Logger.getLogger(DE.STRING_EMPTY);
+		Logger rootLogger = Logger.getLogger(GDE.STRING_EMPTY);
 
 		// cleanup previous log handler
-		rootLogger.removeHandler(DE.logHandler);
+		rootLogger.removeHandler(GDE.logHandler);
 
-		if (System.getProperty(DE.ECLIPSE_STRING) == null) { // running outside eclipse
+		if (System.getProperty(GDE.ECLIPSE_STRING) == null) { // running outside eclipse
 			try {
 				logHandler = new FileHandler(this.settings.getLogFilePath(), 5000000, 3);
 				rootLogger.addHandler(logHandler);
@@ -511,7 +511,7 @@ public class DataExplorer extends Composite {
 				public void paintControl(PaintEvent evt) {
 					log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME,
 							"displayTab.paintControl " + DataExplorer.this.displayTab.getItems()[DataExplorer.this.displayTab.getSelectionIndex()].getText() //$NON-NLS-1$
-									+ DE.STRING_MESSAGE_CONCAT + DataExplorer.this.displayTab.getSelectionIndex() + DE.STRING_MESSAGE_CONCAT + evt);
+									+ GDE.STRING_MESSAGE_CONCAT + DataExplorer.this.displayTab.getSelectionIndex() + GDE.STRING_MESSAGE_CONCAT + evt);
 					if (isRecordSetVisible(GraphicsWindow.TYPE_NORMAL)) {
 						if (DataExplorer.this.graphicsTabItem.isCurveSelectorEnabled()) {
 							DataExplorer.this.graphicsTabItem.setSashFormWeights(DataExplorer.this.graphicsTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
@@ -595,14 +595,14 @@ public class DataExplorer extends Composite {
 						String[] files = (String[]) event.data;
 						for (String filePath : files) {
 							log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "dropped file = " + filePath); //$NON-NLS-1$
-							if (filePath.toLowerCase().endsWith(DE.FILE_ENDING_OSD)) {
+							if (filePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
 								DataExplorer.this.fileHandler.openOsdFile(filePath);
 							}
-							else if (filePath.toLowerCase().endsWith(DE.FILE_ENDING_LOV)) {
+							else if (filePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
 								DataExplorer.this.fileHandler.openLovFile(filePath);
 							}
 							else {
-								application.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0022));
+								application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0022));
 							}
 						}
 					}
@@ -613,19 +613,19 @@ public class DataExplorer extends Composite {
 			if (this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged()) this.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$
-					DataExplorer.application.openHelpDialog(DE.STRING_EMPTY, "HelpInfo.html"); //$NON-NLS-1$
+					DataExplorer.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo.html"); //$NON-NLS-1$
 				}
 			});
 			this.menuCoolBar.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$
-					DataExplorer.application.openHelpDialog(DE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
+					DataExplorer.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
 				}
 			});
 			this.menu.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$
-					DataExplorer.application.openHelpDialog(DE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
+					DataExplorer.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
 				}
 			});
 
@@ -644,16 +644,16 @@ public class DataExplorer extends Composite {
 			this.deviceSelectionDialog = new DeviceSelectionDialog(DataExplorer.shell, SWT.PRIMARY_MODAL, this);
 
 			if (!this.settings.isDesktopShortcutCreated()) {
-				this.settings.setProperty(Settings.IS_DESKTOP_SHORTCUT_CREATED, DE.STRING_EMPTY + OperatingSystemHelper.createDesktopLink());
+				this.settings.setProperty(Settings.IS_DESKTOP_SHORTCUT_CREATED, GDE.STRING_EMPTY + OperatingSystemHelper.createDesktopLink());
 			}
 
 			if (!this.settings.isApplicationRegistered()) {
-				this.settings.setProperty(Settings.IS_APPL_REGISTERED, DE.STRING_EMPTY + OperatingSystemHelper.registerApplication());
+				this.settings.setProperty(Settings.IS_APPL_REGISTERED, GDE.STRING_EMPTY + OperatingSystemHelper.registerApplication());
 			}
 
-			if ((DE.IS_MAC || DE.IS_LINUX) && !this.settings.isLockUucpHinted()) {
-				if (DE.IS_MAC) this.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0046));
-				if (DE.IS_LINUX) this.openMessageDialog(Messages.getString(MessageIds.DE_MSGI0045));
+			if ((GDE.IS_MAC || GDE.IS_LINUX) && !this.settings.isLockUucpHinted()) {
+				if (GDE.IS_MAC) this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0046));
+				if (GDE.IS_LINUX) this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0045));
 				this.settings.setProperty(Settings.IS_LOCK_UUCP_HINTED, "true");
 			}
 
@@ -674,14 +674,14 @@ public class DataExplorer extends Composite {
 			this.updateLogger();
 
 			if (inputFilePath.length() > 5) {
-				if (inputFilePath.endsWith(DE.FILE_ENDING_OSD))
+				if (inputFilePath.endsWith(GDE.FILE_ENDING_OSD))
 					this.fileHandler.openOsdFile(inputFilePath);
-				else if (inputFilePath.endsWith(DE.FILE_ENDING_LOV)) this.fileHandler.openLovFile(inputFilePath);
+				else if (inputFilePath.endsWith(GDE.FILE_ENDING_LOV)) this.fileHandler.openLovFile(inputFilePath);
 			}
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			this.openMessageDialog(Messages.getString(MessageIds.DE_MSGE0007) + e.getMessage());
+			this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 		}
 	}
 
@@ -756,7 +756,7 @@ public class DataExplorer extends Composite {
 				});
 		}
 		else {
-			if (activeRecordSet == null || requestingRecordSetName.equals(DE.STRING_EMPTY)) {
+			if (activeRecordSet == null || requestingRecordSetName.equals(GDE.STRING_EMPTY)) {
 				if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 					if (this.dataTableTabItem != null) {
 						//this.dataTableTabItem.setHeader();
@@ -1082,7 +1082,7 @@ public class DataExplorer extends Composite {
 	public void setGloabalSerialPort(String newPort) {
 		if (this.activeDevice != null) {
 			this.activeDevice.setPort(newPort);
-			this.settings.setActiveDevice(this.activeDevice.getName() + DE.STRING_SEMICOLON + this.activeDevice.getManufacturer() + DE.STRING_SEMICOLON + this.activeDevice.getPort());
+			this.settings.setActiveDevice(this.activeDevice.getName() + GDE.STRING_SEMICOLON + this.activeDevice.getManufacturer() + GDE.STRING_SEMICOLON + this.activeDevice.getPort());
 			this.updateTitleBar(this.getObjectKey(), this.activeDevice.getName(), this.activeDevice.getPort());
 		}
 		else {
@@ -1109,7 +1109,7 @@ public class DataExplorer extends Composite {
 		if (device != null) {
 			if (this.activeDevice == null || !this.activeDevice.getName().equals(device.getName())) this.activeDevice = device;
 			// do always update, the port might be changed
-			this.settings.setActiveDevice(device.getName() + DE.STRING_SEMICOLON + device.getManufacturer() + DE.STRING_SEMICOLON + device.getPort());
+			this.settings.setActiveDevice(device.getName() + GDE.STRING_SEMICOLON + device.getManufacturer() + GDE.STRING_SEMICOLON + device.getPort());
 			this.updateTitleBar(this.getObjectKey(), device.getName(), device.getPort());
 			if (this.deviceSelectionDialog.getNumberOfActiveDevices() > 1)
 				this.enableDeviceSwitchButtons(true);
@@ -1118,7 +1118,7 @@ public class DataExplorer extends Composite {
 		}
 		else { // no device
 			this.settings.setActiveDevice(Settings.EMPTY_SIGNATURE);
-			this.updateTitleBar(this.getObjectKey(), Messages.getString(MessageIds.DE_MSGI0023), DE.STRING_EMPTY);
+			this.updateTitleBar(this.getObjectKey(), Messages.getString(MessageIds.GDE_MSGI0023), GDE.STRING_EMPTY);
 			this.activeDevice = null;
 			this.channels.cleanup();
 			this.enableDeviceSwitchButtons(false);
@@ -1132,7 +1132,7 @@ public class DataExplorer extends Composite {
 		if (actualFileName != null && actualFileName.length() > 4) sb.append(separator).append(actualFileName);
 		if (objectName != null && objectName.length() > 0 
 				&& !(actualFileName != null && actualFileName.length() > 4 && actualFileName.contains(objectName))
-				&& !objectName.startsWith(Messages.getString(MessageIds.DE_MSGT0200).split(DE.STRING_SEMICOLON)[0])) 
+				&& !objectName.startsWith(Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0])) 
 			sb.append(separator).append(objectName);
 		if (deviceName != null && deviceName.length() > 0) sb.append(separator).append(deviceName);
 		if (devicePort != null && devicePort.length() > 0) sb.append(separator).append(devicePort);
@@ -1169,7 +1169,7 @@ public class DataExplorer extends Composite {
 	public void openMessageDialog(final String message) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			MessageBox messageDialog = new MessageBox(DataExplorer.shell, SWT.OK | SWT.ICON_WARNING);
-			messageDialog.setText(DE.OSDE_NAME_LONG);
+			messageDialog.setText(GDE.OSDE_NAME_LONG);
 			messageDialog.setMessage(message);
 			messageDialog.open();
 		}
@@ -1177,7 +1177,7 @@ public class DataExplorer extends Composite {
 			DataExplorer.display.syncExec(new Runnable() {
 				public void run() {
 					MessageBox messageDialog = new MessageBox(DataExplorer.shell, SWT.OK | SWT.ICON_WARNING);
-					messageDialog.setText(DE.OSDE_NAME_LONG);
+					messageDialog.setText(GDE.OSDE_NAME_LONG);
 					messageDialog.setMessage(message);
 					messageDialog.open();
 				}
@@ -1189,7 +1189,7 @@ public class DataExplorer extends Composite {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			Shell useParent = (parent != null  && !parent.isDisposed()) ? parent : DataExplorer.shell;
 			MessageBox messageDialog = new MessageBox(useParent, SWT.OK | SWT.ICON_WARNING);
-			messageDialog.setText(DE.OSDE_NAME_LONG);
+			messageDialog.setText(GDE.OSDE_NAME_LONG);
 			messageDialog.setMessage(message);
 			messageDialog.open();
 		}
@@ -1199,7 +1199,7 @@ public class DataExplorer extends Composite {
 					// parent might be disposed ??
 					Shell useParent = (parent != null  && !parent.isDisposed()) ? parent : DataExplorer.shell;
 					MessageBox messageDialog = new MessageBox(useParent, SWT.OK | SWT.ICON_WARNING);
-					messageDialog.setText(DE.OSDE_NAME_LONG);
+					messageDialog.setText(GDE.OSDE_NAME_LONG);
 					messageDialog.setMessage(message);
 					messageDialog.open();
 				}
@@ -1211,7 +1211,7 @@ public class DataExplorer extends Composite {
 		DataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				MessageBox messageDialog = new MessageBox(DataExplorer.shell, SWT.OK | SWT.ICON_WARNING);
-				messageDialog.setText(DE.OSDE_NAME_LONG);
+				messageDialog.setText(GDE.OSDE_NAME_LONG);
 				messageDialog.setMessage(message);
 				messageDialog.open();
 			}
@@ -1223,7 +1223,7 @@ public class DataExplorer extends Composite {
 		DataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				MessageBox messageDialog = new MessageBox(useParent, SWT.OK | SWT.ICON_WARNING | SWT.MODELESS);
-				messageDialog.setText(DE.OSDE_NAME_LONG);
+				messageDialog.setText(GDE.OSDE_NAME_LONG);
 				messageDialog.setMessage(message);
 				messageDialog.open();
 			}
@@ -1233,14 +1233,14 @@ public class DataExplorer extends Composite {
 	public int openOkCancelMessageDialog(Shell parent, final String message) {
 		final Shell useParent = (parent != null  && !parent.isDisposed()) ? parent : DataExplorer.shell;
 		MessageBox okCancelMessageDialog = new MessageBox(useParent, SWT.PRIMARY_MODAL | SWT.OK | SWT.CANCEL | SWT.ICON_QUESTION);
-		okCancelMessageDialog.setText(DE.OSDE_NAME_LONG);
+		okCancelMessageDialog.setText(GDE.OSDE_NAME_LONG);
 		okCancelMessageDialog.setMessage(message);
 		return okCancelMessageDialog.open();
 	}
 
 	public int openOkCancelMessageDialog(final String message) {
 		MessageBox okCancelMessageDialog = new MessageBox(this.getShell(), SWT.PRIMARY_MODAL | SWT.OK | SWT.CANCEL | SWT.ICON_QUESTION);
-		okCancelMessageDialog.setText(DE.OSDE_NAME_LONG);
+		okCancelMessageDialog.setText(GDE.OSDE_NAME_LONG);
 		okCancelMessageDialog.setMessage(message);
 		return okCancelMessageDialog.open();
 	}
@@ -1248,14 +1248,14 @@ public class DataExplorer extends Composite {
 	public int openYesNoMessageDialog(Shell parent, final String message) {
 		final Shell useParent = (parent != null  && !parent.isDisposed()) ? parent : DataExplorer.shell;
 		MessageBox yesNoMessageDialog = new MessageBox(useParent, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.ICON_QUESTION);
-		yesNoMessageDialog.setText(DE.OSDE_NAME_LONG);
+		yesNoMessageDialog.setText(GDE.OSDE_NAME_LONG);
 		yesNoMessageDialog.setMessage(message);
 		return yesNoMessageDialog.open();
 	}
 
 	public int openYesNoMessageDialog(final String message) {
 		MessageBox yesNoMessageDialog = new MessageBox(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.ICON_QUESTION);
-		yesNoMessageDialog.setText(DE.OSDE_NAME_LONG);
+		yesNoMessageDialog.setText(GDE.OSDE_NAME_LONG);
 		yesNoMessageDialog.setMessage(message);
 		return yesNoMessageDialog.open();
 	}
@@ -1265,7 +1265,7 @@ public class DataExplorer extends Composite {
 		DataExplorer.display.syncExec(new Runnable() {
 			public void run() {
 				MessageBox yesNoMessageDialog = new MessageBox(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.ICON_QUESTION);
-				yesNoMessageDialog.setText(DE.OSDE_NAME_LONG);
+				yesNoMessageDialog.setText(GDE.OSDE_NAME_LONG);
 				yesNoMessageDialog.setMessage(message);
 				DataExplorer.this.openYesNoMessageDialogAsyncValue = yesNoMessageDialog.open();
 			}
@@ -1284,7 +1284,7 @@ public class DataExplorer extends Composite {
 	public int openYesNoCancelMessageDialog(Shell parent, final String message) {
 		final Shell useParent = (parent != null  && !parent.isDisposed()) ? parent : DataExplorer.shell;
 		MessageBox yesNoCancelMessageDialog = new MessageBox(useParent, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
-		yesNoCancelMessageDialog.setText(DE.OSDE_NAME_LONG);
+		yesNoCancelMessageDialog.setText(GDE.OSDE_NAME_LONG);
 		yesNoCancelMessageDialog.setMessage(message);
 		return yesNoCancelMessageDialog.open();
 	}
@@ -1320,7 +1320,7 @@ public class DataExplorer extends Composite {
 	 * @return the object key, if device oriented an empty string will be returned
 	 */
 	public String getObjectKey() {
-		return this.menuToolBar != null ? this.menuToolBar.isObjectoriented() ? this.menuToolBar.getActiveObjectKey() : DE.STRING_EMPTY : DE.STRING_EMPTY;
+		return this.menuToolBar != null ? this.menuToolBar.isObjectoriented() ? this.menuToolBar.getActiveObjectKey() : GDE.STRING_EMPTY : GDE.STRING_EMPTY;
 	}
 	
 	/**
@@ -1335,8 +1335,8 @@ public class DataExplorer extends Composite {
 	 */
 	public String getObjectFilePath() {
 		String objectkey = this.menuToolBar.getActiveObjectKey();
-		FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + DE.FILE_SEPARATOR_UNIX + objectkey);
-		return this.settings.getDataFilePath() + DE.FILE_SEPARATOR_UNIX + objectkey + DE.FILE_SEPARATOR_UNIX;
+		FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectkey);
+		return this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectkey + GDE.FILE_SEPARATOR_UNIX;
 	}
 	
 	/**
@@ -1422,11 +1422,11 @@ public class DataExplorer extends Composite {
 	public FileDialog openFileOpenDialog(String name, String[] extensions, String path) {
 		final String $METHOD_NAME = "openFileOpenDialog"; //$NON-NLS-1$
 		FileDialog fileOpenDialog = new FileDialog(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.OPEN);
-		path = path.replace(DE.FILE_SEPARATOR_UNIX, DE.FILE_SEPARATOR);
-		path = !path.endsWith(DE.FILE_SEPARATOR) ? path + DE.FILE_SEPARATOR : path;
+		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileOpenDialog.setText(name);
-		fileOpenDialog.setFileName(DE.STRING_EMPTY);
+		fileOpenDialog.setFileName(GDE.STRING_EMPTY);
 		if (extensions != null) {
 			fileOpenDialog.setFilterExtensions(extensions);
 			fileOpenDialog.setFilterNames(getExtensionDescription(extensions));
@@ -1439,8 +1439,8 @@ public class DataExplorer extends Composite {
 	public FileDialog openFileSaveDialog(String name, String[] extensions, String path, String fileName) {
 		final String $METHOD_NAME = "openFileSaveDialog"; //$NON-NLS-1$
 		FileDialog fileSaveDialog = new FileDialog(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.SAVE);
-		path = path.replace(DE.FILE_SEPARATOR_UNIX, DE.FILE_SEPARATOR);
-		path = !path.endsWith(DE.FILE_SEPARATOR) ? path + DE.FILE_SEPARATOR : path;
+		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileSaveDialog.setText(name);
 		if (extensions != null) {
@@ -1448,7 +1448,7 @@ public class DataExplorer extends Composite {
 			fileSaveDialog.setFilterNames(getExtensionDescription(extensions));
 		}
 		if (path != null) fileSaveDialog.setFilterPath(path);
-		fileSaveDialog.setFileName(fileName != null && fileName.length() > 5 ? fileName : DE.STRING_EMPTY);
+		fileSaveDialog.setFileName(fileName != null && fileName.length() > 5 ? fileName : GDE.STRING_EMPTY);
 		fileSaveDialog.open();
 		return fileSaveDialog;
 	}
@@ -1460,7 +1460,7 @@ public class DataExplorer extends Composite {
 	public String[] getExtensionDescription(String[] extensions) {
 		String[] filterNames = new String[extensions.length];
 		for (int i = 0; i < filterNames.length; i++) {
-			int beginIndex = extensions[i].indexOf(DE.STRING_DOT);
+			int beginIndex = extensions[i].indexOf(GDE.STRING_DOT);
 			filterNames[i] = this.extensionFilterMap.get((beginIndex != -1 ? extensions[i].substring(beginIndex+1) : extensions[i]).toLowerCase());
 			if (filterNames[i] == null)
 				filterNames[i] = extensions[i];
@@ -1471,8 +1471,8 @@ public class DataExplorer extends Composite {
 	public String openDirFileDialog(String name, String path) {
 		final String $METHOD_NAME = "openDirFileDialog"; //$NON-NLS-1$
 		DirectoryDialog fileDirDialog = new DirectoryDialog(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.NONE);
-		path = path.replace(DE.FILE_SEPARATOR_UNIX, DE.FILE_SEPARATOR);
-		path = !path.endsWith(DE.FILE_SEPARATOR) ? path + DE.FILE_SEPARATOR : path;
+		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileDirDialog.setText(name);
 		if (path != null) fileDirDialog.setFilterPath(path);
@@ -1481,7 +1481,7 @@ public class DataExplorer extends Composite {
 
 	public RGB openColorDialog() {
 		ColorDialog colorDialog = new ColorDialog(DataExplorer.shell);
-		colorDialog.setText(this.getClass().getSimpleName() + Messages.getString(MessageIds.DE_MSGT0145));
+		colorDialog.setText(this.getClass().getSimpleName() + Messages.getString(MessageIds.GDE_MSGT0145));
 		return colorDialog.open();
 	}
 	
@@ -1669,7 +1669,7 @@ public class DataExplorer extends Composite {
 				break;
 			case GraphicsComposite.MODE_PAN:
 				if (!recordSet.isPanMode())
-					this.openMessageDialog(Messages.getString(MessageIds.DE_MSGE0007));
+					this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007));
 				else {
 					recordSet.resetMeasurement();
 					this.graphicsTabItem.setModeState(graphicsMode);
@@ -1701,7 +1701,7 @@ public class DataExplorer extends Composite {
 				break;
 			case GraphicsComposite.MODE_PAN:
 				if (!recordSet.isPanMode())
-					this.openMessageDialog(Messages.getString(MessageIds.DE_MSGE0007));
+					this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007));
 				else {
 					recordSet.resetMeasurement();
 					if (this.compareTabItem!= null && !this.compareTabItem.isDisposed())
@@ -1851,7 +1851,7 @@ public class DataExplorer extends Composite {
 		final String $METHOD_NAME = "openHelpDialog"; //$NON-NLS-1$
 		try {
 			this.helpDialog = new HelpInfoDialog(DataExplorer.shell, SWT.NONE);
-			if (DE.IS_WINDOWS) { //$NON-NLS-1$
+			if (GDE.IS_WINDOWS) { //$NON-NLS-1$
 				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using syle SWT.NONE (windows IE)"); //$NON-NLS-1$
 				//this.helpDialog.dispose();
 				this.helpDialog.open(deviceName, fileName, SWT.NONE);
@@ -1864,10 +1864,10 @@ public class DataExplorer extends Composite {
 		catch (Error e) {
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using OS registered web browser"); //$NON-NLS-1$
 			WebBrowser.openURL(deviceName, fileName);
-			application.openMessageDialogAsync(Messages.getString(MessageIds.DE_MSGI0025));
+			application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0025));
 		}
 		catch (Throwable t) {
-			application.openMessageDialog(Messages.getString(MessageIds.DE_MSGE0007) + t.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + t.getMessage());
+			application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + t.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + t.getMessage());
 		}
 	}
 
@@ -2323,7 +2323,7 @@ public class DataExplorer extends Composite {
 			for (int i = 0; i < this.displayTab.getItemCount(); ++i) {
 				CTabItem tabItem = this.displayTab.getItems()[i];
 				if (tabItem instanceof FileCommentWindow) {
-					this.compareTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_COMPARE, Messages.getString(MessageIds.DE_MSGT0144), i);
+					this.compareTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_COMPARE, Messages.getString(MessageIds.GDE_MSGT0144), i);
 					this.compareTabItem.create();
 					break;
 				}

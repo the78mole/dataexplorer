@@ -14,11 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.tab;
+package gde.ui.tab;
 
 import java.io.File;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -63,17 +63,17 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.ObjectData;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.menu.ObjectImageContextMenu;
-import osde.ui.menu.TabAreaContextMenu;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.ObjectData;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.ObjectImageContextMenu;
+import gde.ui.menu.TabAreaContextMenu;
 
 /**
  * @author Winfried Brügmann
@@ -94,7 +94,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 	ToolItem											fontSelect;
 	Composite											fontSizeSelectComposite;
 	CCombo												fontSizeSelectCombo;
-	Point													fontSizeSelectSize	= new Point((DE.IS_LINUX ? 60 : 40), (DE.IS_LINUX ? 22 : 20));
+	Point													fontSizeSelectSize	= new Point((GDE.IS_LINUX ? 60 : 40), (GDE.IS_LINUX ? 22 : 20));
 	ToolItem											strikeoutButton;
 	ToolItem											underlineButton;
 	ToolItem											italicButton;
@@ -152,7 +152,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		this.innerAreaBackground = Settings.getInstance().getObjectDescriptionInnerAreaBackground();
 		this.surroundingBackground = Settings.getInstance().getObjectDescriptionSurroundingAreaBackground();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.DE_MSGT0403));
+		this.setText(Messages.getString(MessageIds.GDE_MSGT0403));
 		
 		this.imagePopupMenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.imageContextMenu = new ObjectImageContextMenu();
@@ -171,7 +171,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		checkSaveObjectData();
 
 		this.activeObjectKey = this.application.getMenuToolBar().getActiveObjectKey();
-		this.objectFilePath = this.settings.getDataFilePath() + DE.FILE_SEPARATOR_UNIX + this.activeObjectKey + DE.FILE_SEPARATOR_UNIX + this.activeObjectKey + DE.FILE_ENDING_DOT_ZIP;
+		this.objectFilePath = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + this.activeObjectKey + GDE.FILE_SEPARATOR_UNIX + this.activeObjectKey + GDE.FILE_ENDING_DOT_ZIP;
 		this.object = new ObjectData(this.objectFilePath);
 
 		// check if object data can be load from file
@@ -196,7 +196,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		this.styledText.setStyleRanges(this.object.getStyleRanges().clone());
 		int index = 0;
 		for (String fontSize : this.fontSizeSelectCombo.getItems()) {
-			if (fontSize.equals(DE.STRING_EMPTY + fd.getHeight())) {
+			if (fontSize.equals(GDE.STRING_EMPTY + fd.getHeight())) {
 				this.fontSizeSelectCombo.select(index);
 				break;
 			}
@@ -253,7 +253,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 			this.headerComposite.setMenu(this.popupmenu);
 			{
 				this.objectNameLabel = new CLabel(this.headerComposite, SWT.NONE);
-				this.objectNameLabel.setText(Messages.getString(MessageIds.DE_MSGT0404));
+				this.objectNameLabel.setText(Messages.getString(MessageIds.GDE_MSGT0404));
 				this.objectNameLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.NORMAL));
 				RowData cLabel1LData = new RowData();
 				cLabel1LData.width = 130;
@@ -284,7 +284,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 			group2LData.left = new FormAttachment(0, 1000, 15);
 			group2LData.top = new FormAttachment(0, 1000, 60);
 			this.mainObjectCharacterisitcsGroup.setLayoutData(group2LData);
-			this.mainObjectCharacterisitcsGroup.setText(Messages.getString(MessageIds.DE_MSGT0416));
+			this.mainObjectCharacterisitcsGroup.setText(Messages.getString(MessageIds.GDE_MSGT0416));
 			this.mainObjectCharacterisitcsGroup.setBackground(this.surroundingBackground);
 			this.mainObjectCharacterisitcsGroup.setMenu(this.popupmenu);
 			{
@@ -295,7 +295,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				typeCompositeLData.verticalAlignment = GridData.BEGINNING;
 				typeCompositeLData.grabExcessHorizontalSpace = true;
 				typeCompositeLData.horizontalAlignment = GridData.BEGINNING;
-				typeCompositeLData.heightHint = DE.IS_LINUX ? 32 : 28;
+				typeCompositeLData.heightHint = GDE.IS_LINUX ? 32 : 28;
 				this.objectTypeComposite.setLayoutData(typeCompositeLData);
 				this.objectTypeComposite.setBackground(this.surroundingBackground);
 				this.objectTypeComposite.setMenu(this.popupmenu);
@@ -303,25 +303,25 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.objectTypeLabel = new CLabel(this.objectTypeComposite, SWT.NONE);
 					this.objectTypeLabel.setBackground(this.surroundingBackground);
 					this.objectTypeLabel.setMenu(this.popupmenu);
-					this.objectTypeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.objectTypeLabel.setText(Messages.getString(MessageIds.DE_MSGT0425));
+					this.objectTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.objectTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT0425));
 					RowData cLabel1LData1 = new RowData();
 					cLabel1LData1.width = 140;
 					cLabel1LData1.height = 22;
 					this.objectTypeLabel.setLayoutData(cLabel1LData1);
-					this.objectTypeLabel.setToolTipText(Messages.getString(MessageIds.DE_MSGT0405));
+					this.objectTypeLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0405));
 				}
 				{
 					this.objectTypeText = new Text(this.objectTypeComposite, SWT.BORDER);
 					this.objectTypeText.setBackground(this.innerAreaBackground);
 					this.objectTypeText.setMenu(this.popupmenu);
-					this.objectTypeText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.objectTypeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.objectTypeText.setEditable(true);
 					RowData cLabel2LData = new RowData();
 					cLabel2LData.width = 240;
 					cLabel2LData.height = 18;
 					this.objectTypeText.setLayoutData(cLabel2LData);
-					this.objectTypeText.setToolTipText(Messages.getString(MessageIds.DE_MSGT0405));
+					this.objectTypeText.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0405));
 					this.objectTypeText.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
@@ -339,33 +339,33 @@ public class ObjectDescriptionWindow extends CTabItem {
 				dateCompositeLData.grabExcessHorizontalSpace = true;
 				dateCompositeLData.verticalAlignment = GridData.BEGINNING;
 				dateCompositeLData.horizontalAlignment = GridData.BEGINNING;
-				dateCompositeLData.heightHint = DE.IS_LINUX ? 32 : 28;
+				dateCompositeLData.heightHint = GDE.IS_LINUX ? 32 : 28;
 				this.dateComposite.setLayoutData(dateCompositeLData);
 				this.dateComposite.setBackground(this.surroundingBackground);
 				this.dateComposite.setMenu(this.popupmenu);
 				{
 					this.dateLabel = new CLabel(this.dateComposite, SWT.NONE);
 					this.dateLabel.setMenu(this.popupmenu);
-					this.dateLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.dateLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData dateLabelLData = new RowData();
 					dateLabelLData.width = 140;
 					dateLabelLData.height = 22;
 					this.dateLabel.setLayoutData(dateLabelLData);
-					this.dateLabel.setText(Messages.getString(MessageIds.DE_MSGT0406));
-					this.dateLabel.setToolTipText(Messages.getString(MessageIds.DE_MSGT0407));
+					this.dateLabel.setText(Messages.getString(MessageIds.GDE_MSGT0406));
+					this.dateLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0407));
 					this.dateLabel.setBackground(this.surroundingBackground);
 					this.dateLabel.setMenu(this.popupmenu);
 				}
 				{
 					this.dateText = new Text(this.dateComposite, SWT.BORDER);
-					this.dateText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.dateText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData dateTextLData = new RowData();
-					dateTextLData.width = DE.IS_LINUX ? 116 : 118;
+					dateTextLData.width = GDE.IS_LINUX ? 116 : 118;
 					dateTextLData.height = 18;
 					this.dateText.setLayoutData(dateTextLData);
 					this.dateText.setBackground(this.innerAreaBackground);
 					this.dateText.setMenu(this.popupmenu);
-					this.dateText.setToolTipText(Messages.getString(MessageIds.DE_MSGT0407));
+					this.dateText.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0407));
 					this.dateText.setEditable(true);
 					this.dateText.addKeyListener(new KeyAdapter() {
 						@Override
@@ -384,7 +384,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				statusCompositeLData.grabExcessHorizontalSpace = true;
 				statusCompositeLData.verticalAlignment = GridData.BEGINNING;
 				statusCompositeLData.horizontalAlignment = GridData.BEGINNING;
-				statusCompositeLData.heightHint = DE.IS_LINUX ? 32 : 28;
+				statusCompositeLData.heightHint = GDE.IS_LINUX ? 32 : 28;
 				this.statusComposite.setLayoutData(statusCompositeLData);
 				this.statusComposite.setBackground(this.surroundingBackground);
 				this.statusComposite.setMenu(this.popupmenu);
@@ -392,27 +392,27 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.statusLabel = new CLabel(this.statusComposite, SWT.NONE);
 					this.statusLabel.setBackground(this.surroundingBackground);
 					this.statusLabel.setMenu(this.popupmenu);
-					this.statusLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.statusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData statusLabelLData = new RowData();
 					statusLabelLData.width = 140;
 					statusLabelLData.height = 22;
 					this.statusLabel.setLayoutData(statusLabelLData);
-					this.statusLabel.setText(Messages.getString(MessageIds.DE_MSGT0410));
-					this.statusLabel.setToolTipText(Messages.getString(MessageIds.DE_MSGT0411));
+					this.statusLabel.setText(Messages.getString(MessageIds.GDE_MSGT0410));
+					this.statusLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0411));
 				}
 				{
 					this.statusText = new CCombo(this.statusComposite, SWT.BORDER);
-					this.statusText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.statusText.setItems(Messages.getString(MessageIds.DE_MSGT0412).split(DE.STRING_SEMICOLON));
+					this.statusText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.statusText.setItems(Messages.getString(MessageIds.GDE_MSGT0412).split(GDE.STRING_SEMICOLON));
 					this.statusText.setBackground(this.innerAreaBackground);
 					this.statusText.setMenu(this.popupmenu);
 					this.statusText.select(0);
 					RowData group1LData = new RowData();
 					group1LData.width = 120;
-					group1LData.height = DE.IS_LINUX ? 22 : 20;
+					group1LData.height = GDE.IS_LINUX ? 22 : 20;
 					this.statusText.setLayoutData(group1LData);
 					this.statusText.setBackground(DataExplorer.COLOR_WHITE);
-					this.statusText.setToolTipText(Messages.getString(MessageIds.DE_MSGT0411));
+					this.statusText.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0411));
 					this.statusText.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -431,8 +431,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 				imageCanvasLData.grabExcessHorizontalSpace = true;
 				imageCanvasLData.widthHint = 400;
 				this.imageCanvas.setLayoutData(imageCanvasLData);
-				this.imageCanvas.setToolTipText(Messages.getString(MessageIds.DE_MSGT0413));
-				this.imageCanvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/" + this.settings.getLocale() + "/ObjectImage.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+				this.imageCanvas.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0413));
+				this.imageCanvas.setBackgroundImage(SWTResourceManager.getImage("gde/resource/" + this.settings.getLocale() + "/ObjectImage.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 				this.imageCanvas.setSize(400, 300);
 
 				this.imageContextMenu.createMenu(this.imagePopupMenu);
@@ -477,7 +477,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 			composite1LData.left = new FormAttachment(0, 1000, 440);
 			this.editGroup.setLayoutData(composite1LData);
 			this.editGroup.setLayout(new GridLayout());
-			this.editGroup.setText(Messages.getString(MessageIds.DE_MSGT0414));
+			this.editGroup.setText(Messages.getString(MessageIds.GDE_MSGT0414));
 			this.editGroup.setBackground(this.surroundingBackground);
 			this.editGroup.setMenu(this.popupmenu);
 			{
@@ -502,8 +502,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 						new ToolItem(this.fontSelectToolBar, SWT.SEPARATOR);
 						{
 							this.fontSelect = new ToolItem(this.fontSelectToolBar, SWT.BORDER);
-							this.fontSelect.setImage(SWTResourceManager.getImage("osde/resource/Font.gif")); //$NON-NLS-1$
-							this.fontSelect.setToolTipText(Messages.getString(MessageIds.DE_MSGT0417));
+							this.fontSelect.setImage(SWTResourceManager.getImage("gde/resource/Font.gif")); //$NON-NLS-1$
+							this.fontSelect.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0417));
 							this.fontSelect.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -519,10 +519,10 @@ public class ObjectDescriptionWindow extends CTabItem {
 								this.fontSizeSelectComposite = new Composite(this.fontSelectToolBar, SWT.FLAT);
 								this.fontSizeSelectComposite.setBackground(this.surroundingBackground);
 								this.fontSizeSelectCombo = new CCombo(this.fontSizeSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-								this.fontSizeSelectCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.fontSizeSelectCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.fontSizeSelectCombo.setItems(new String[] { "6", "7", "8", "9", "10", "12", "14", "16", "18" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 								this.fontSizeSelectCombo.select(3);
-								this.fontSizeSelectCombo.setToolTipText(Messages.getString(MessageIds.DE_MSGT0201));
+								this.fontSizeSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0201));
 								this.fontSizeSelectCombo.setEditable(false);
 								this.fontSizeSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
 								this.fontSizeSelectCombo.setVisibleItemCount(5);
@@ -551,8 +551,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 						new ToolItem(this.editToolBar, SWT.SEPARATOR);
 						{
 							this.boldButton = new ToolItem(this.editToolBar, SWT.PUSH);
-							this.boldButton.setImage(SWTResourceManager.getImage("osde/resource/Bold.gif")); //$NON-NLS-1$
-							this.boldButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0419));
+							this.boldButton.setImage(SWTResourceManager.getImage("gde/resource/Bold.gif")); //$NON-NLS-1$
+							this.boldButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0419));
 							this.boldButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -564,8 +564,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 						new ToolItem(this.editToolBar, SWT.SEPARATOR);
 						{
 							this.italicButton = new ToolItem(this.editToolBar, SWT.PUSH);
-							this.italicButton.setImage(SWTResourceManager.getImage("osde/resource/Italic.gif")); //$NON-NLS-1$
-							this.italicButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0420));
+							this.italicButton.setImage(SWTResourceManager.getImage("gde/resource/Italic.gif")); //$NON-NLS-1$
+							this.italicButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0420));
 							this.italicButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -577,8 +577,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 						new ToolItem(this.editToolBar, SWT.SEPARATOR);
 						{
 							this.underlineButton = new ToolItem(this.editToolBar, SWT.PUSH);
-							this.underlineButton.setImage(SWTResourceManager.getImage("osde/resource/Underline.gif")); //$NON-NLS-1$
-							this.underlineButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0421));
+							this.underlineButton.setImage(SWTResourceManager.getImage("gde/resource/Underline.gif")); //$NON-NLS-1$
+							this.underlineButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0421));
 							this.underlineButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -590,8 +590,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 						new ToolItem(this.editToolBar, SWT.SEPARATOR);
 						{
 							this.strikeoutButton = new ToolItem(this.editToolBar, SWT.PUSH);
-							this.strikeoutButton.setImage(SWTResourceManager.getImage("osde/resource/Strikeout.gif")); //$NON-NLS-1$
-							this.strikeoutButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0422));
+							this.strikeoutButton.setImage(SWTResourceManager.getImage("gde/resource/Strikeout.gif")); //$NON-NLS-1$
+							this.strikeoutButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0422));
 							this.strikeoutButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -603,8 +603,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 						new ToolItem(this.editToolBar, SWT.SEPARATOR);
 						{
 							this.fColorButton = new ToolItem(this.editToolBar, SWT.PUSH);
-							this.fColorButton.setImage(SWTResourceManager.getImage("osde/resource/fColor.gif")); //$NON-NLS-1$
-							this.fColorButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0423));
+							this.fColorButton.setImage(SWTResourceManager.getImage("gde/resource/fColor.gif")); //$NON-NLS-1$
+							this.fColorButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0423));
 							this.fColorButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -618,8 +618,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 						new ToolItem(this.editToolBar, SWT.SEPARATOR);
 						{
 							this.bColorButton = new ToolItem(this.editToolBar, SWT.PUSH);
-							this.bColorButton.setImage(SWTResourceManager.getImage("osde/resource/bColor.gif")); //$NON-NLS-1$
-							this.bColorButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0424));
+							this.bColorButton.setImage(SWTResourceManager.getImage("gde/resource/bColor.gif")); //$NON-NLS-1$
+							this.bColorButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0424));
 							this.bColorButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -633,8 +633,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 						new ToolItem(this.editToolBar, SWT.SEPARATOR);
 						{
 							this.copyButton = new ToolItem(this.editToolBar, SWT.PUSH);
-							this.copyButton.setImage(SWTResourceManager.getImage("osde/resource/Copy.gif")); //$NON-NLS-1$
-							this.copyButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0426));
+							this.copyButton.setImage(SWTResourceManager.getImage("gde/resource/Copy.gif")); //$NON-NLS-1$
+							this.copyButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0426));
 							this.copyButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -647,8 +647,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 						new ToolItem(this.editToolBar, SWT.SEPARATOR);
 						{
 							this.cutButton = new ToolItem(this.editToolBar, SWT.PUSH);
-							this.cutButton.setImage(SWTResourceManager.getImage("osde/resource/Cut.gif")); //$NON-NLS-1$
-							this.cutButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0427));
+							this.cutButton.setImage(SWTResourceManager.getImage("gde/resource/Cut.gif")); //$NON-NLS-1$
+							this.cutButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0427));
 							this.cutButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -661,8 +661,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 						new ToolItem(this.editToolBar, SWT.SEPARATOR);
 						{
 							this.pasteButton = new ToolItem(this.editToolBar, SWT.PUSH);
-							this.pasteButton.setImage(SWTResourceManager.getImage("osde/resource/Paste.gif")); //$NON-NLS-1$
-							this.pasteButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0428));
+							this.pasteButton.setImage(SWTResourceManager.getImage("gde/resource/Paste.gif")); //$NON-NLS-1$
+							this.pasteButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0428));
 							this.pasteButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -706,7 +706,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					FormLayout styledTextLayout = new FormLayout();
 					this.styledText.setLayout(styledTextLayout);
 					this.styledText.setEditable(true);
-					this.styledText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.styledText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.styledText.setHorizontalIndex(2);
 					this.styledText.setTopIndex(1);
 					FormData styledTextLData = new FormData();

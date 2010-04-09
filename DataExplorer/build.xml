@@ -35,7 +35,7 @@
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>
 			<attribute name="Built-Date" value="${TODAY}"/> 
-			<attribute name="Main-Class" value="osde.DE"/>
+			<attribute name="Main-Class" value="de.DE"/>
 			<attribute name="Class-Path" value="java/ext/swt.jar java/ext/RXTXcomm.jar"/>
    		</manifest>
  	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" >

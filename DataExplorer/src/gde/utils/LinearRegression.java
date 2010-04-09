@@ -14,14 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.utils;
+package gde.utils;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
 
 /**
  * This thread implementation calculates the slop of the height curve using linear regression

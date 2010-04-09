@@ -14,9 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.dialog;
+package gde.ui.dialog;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -30,11 +30,11 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.DE;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
+import gde.DE;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
  * Dialog class showing some info text with disclaimers, version , ...
@@ -75,13 +75,13 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 		try {
 			Shell parent = getParent();
 			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
-			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/DataExplorer.jpg")); //$NON-NLS-1$
+			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.jpg")); //$NON-NLS-1$
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			this.dialogShell.setLayout(new FormLayout());
 			this.dialogShell.layout();
 			this.dialogShell.pack();			
 			this.dialogShell.setSize(650, 430);
-			this.dialogShell.setText(Messages.getString(MessageIds.DE_MSGT0146));
+			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0146));
 			{
 				FormData infoTextLData = new FormData();
 				infoTextLData.width = 610;
@@ -92,10 +92,10 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.infoText = new Label(this.dialogShell, SWT.LEFT | SWT.WRAP);
 				this.infoText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 				this.infoText.setLayoutData(infoTextLData);
-				this.infoText.setText(Messages.getString(MessageIds.DE_MSGT0147)
-						+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGT0148)  //$NON-NLS-1$ 
-						+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGT0149)  //$NON-NLS-1$
-						+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGT0150)); //$NON-NLS-1$
+				this.infoText.setText(Messages.getString(MessageIds.GDE_MSGT0147)
+						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGT0148)  //$NON-NLS-1$ 
+						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGT0149)  //$NON-NLS-1$
+						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGT0150)); //$NON-NLS-1$
 				this.infoText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				//this.infoText.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 				//this.infoText.setForeground(DataExplorer.COLOR_BLACK);
@@ -110,7 +110,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.version = new Label(this.dialogShell, SWT.CENTER);
 				this.version.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 				this.version.setLayoutData(versionLData);
-				this.version.setText(DE.OSDE_VERSION);
+				this.version.setText(GDE.OSDE_VERSION);
 				this.version.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 			}
 			{

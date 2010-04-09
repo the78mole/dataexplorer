@@ -5,7 +5,7 @@
 // Generated on: 2009.11.13 at 07:00:40 PM MEZ 
 //
 
-package osde.device;
+package gde.device;
 
 import java.util.ArrayList;
 import java.util.List;

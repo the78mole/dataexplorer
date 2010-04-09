@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.io;
+package gde.io;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -38,14 +38,14 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 
-import osde.DE;
-import osde.data.ObjectData;
-import osde.exception.ApplicationConfigurationException;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.utils.StringHelper;
+import gde.DE;
+import gde.data.ObjectData;
+import gde.exception.ApplicationConfigurationException;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
 
 /**
  * @author Winfried Brügmann
@@ -69,13 +69,13 @@ public class ObjectDataReaderWriter {
 
 	public ObjectDataReaderWriter(ObjectData newObjectData) {
 		this.objectData = newObjectData;
-		this.filePath = newObjectData.getFullQualifiedObjectFilePath().replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX);
+		this.filePath = newObjectData.getFullQualifiedObjectFilePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 	}
 
 	@SuppressWarnings("unchecked")
 	public void read() {
 
-		String redObjectkey = Messages.getString(MessageIds.DE_MSGT0279);
+		String redObjectkey = Messages.getString(MessageIds.GDE_MSGT0279);
 
 		File file = new File(this.filePath);
 		if (file.exists()) {
@@ -89,12 +89,12 @@ public class ObjectDataReaderWriter {
 				while (entries.hasMoreElements()) {
 					ZipEntry entry = entries.nextElement();
 
-					if (entry.getName().endsWith(DE.FILE_ENDING_DOT_STF)) {
-						String[] content = StringHelper.splitString(extract(zipFile.getInputStream(entry)), ObjectDataReaderWriter.LINE_DELIMITER, DE.STRING_EMPTY);
+					if (entry.getName().endsWith(GDE.FILE_ENDING_DOT_STF)) {
+						String[] content = StringHelper.splitString(extract(zipFile.getInputStream(entry)), ObjectDataReaderWriter.LINE_DELIMITER, GDE.STRING_EMPTY);
 
 						redObjectkey = content[0].substring(ObjectDataReaderWriter.BEGIN_HEADER.length());
 						if (!this.objectData.getKey().equals(redObjectkey)) {
-							throw new ApplicationConfigurationException(Messages.getString(MessageIds.DE_MSGW0029));
+							throw new ApplicationConfigurationException(Messages.getString(MessageIds.GDE_MSGW0029));
 						}
 
 						// main characteristics
@@ -137,9 +137,9 @@ public class ObjectDataReaderWriter {
 						}
 						this.objectData.setStyleRanges(tmpRanges.toArray(new StyleRange[0]));
 					}
-					else if (entry.getName().endsWith(DE.FILE_ENDING_DOT_JPG)) {
+					else if (entry.getName().endsWith(GDE.FILE_ENDING_DOT_JPG)) {
 						//image
-						String imageKey = entry.getName().substring(0, entry.getName().length() - DE.FILE_ENDING_DOT_JPG.length());
+						String imageKey = entry.getName().substring(0, entry.getName().length() - GDE.FILE_ENDING_DOT_JPG.length());
 						InputStream inZip = zipFile.getInputStream(entry);
 						ImageLoader imageLoader = new ImageLoader();
 						this.objectData.setImage(SWTResourceManager.getImage(imageLoader.load(inZip)[0], imageKey, 400, 300, true));
@@ -154,23 +154,23 @@ public class ObjectDataReaderWriter {
 				ObjectDataReaderWriter.log.log(Level.SEVERE, t.getLocalizedMessage(), t);
 				if (t instanceof ZipException) {
 					if (DataExplorer.getInstance().isVisible()) {
-						int answer = DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.DE_MSGW0025, new Object[] {file.getAbsolutePath()}));
+						int answer = DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0025, new Object[] {file.getAbsolutePath()}));
 						if (answer == SWT.YES) file.delete();
 					}
 					else {
-						String msg = Messages.getString(MessageIds.DE_MSGW0026, new Object[] {file.getAbsolutePath()}); 
-						DE.setInitError(msg);
+						String msg = Messages.getString(MessageIds.GDE_MSGW0026, new Object[] {file.getAbsolutePath()}); 
+						GDE.setInitError(msg);
 					}
 				}
 				else if (t instanceof ApplicationConfigurationException) {
 					if (DataExplorer.getInstance().isVisible()) {
-						String msg = Messages.getString(MessageIds.DE_MSGW0027, new Object[] {file.getAbsolutePath(), redObjectkey});
+						String msg = Messages.getString(MessageIds.GDE_MSGW0027, new Object[] {file.getAbsolutePath(), redObjectkey});
 						int answer = DataExplorer.getInstance().openYesNoMessageDialog(msg);
 						if (answer == SWT.YES) file.delete();
 					}	
 					else {
-						String msg = Messages.getString(MessageIds.DE_MSGW0028, new Object[] {file.getAbsolutePath(), redObjectkey});
-						DE.setInitError(msg);
+						String msg = Messages.getString(MessageIds.GDE_MSGW0028, new Object[] {file.getAbsolutePath(), redObjectkey});
+						GDE.setInitError(msg);
 					}
 				}
 			}
@@ -212,7 +212,7 @@ public class ObjectDataReaderWriter {
 		Color background;
 		int textStyle;
 		try {
-			String[] styleRangeData = styleRangeString.split(DE.STRING_BLANK);
+			String[] styleRangeData = styleRangeString.split(GDE.STRING_BLANK);
 			startPos = Integer.parseInt(styleRangeData[0]);
 			length = Integer.parseInt(styleRangeData[1]);
 			foreground = null;
@@ -249,7 +249,7 @@ public class ObjectDataReaderWriter {
 			File targetFile = new File(this.filePath);
 			
 			// check if target directory exist, it must be created and removed by creatingor removing object key
-			File targetFileDir = new File(this.filePath.substring(0, this.filePath.lastIndexOf(DE.FILE_SEPARATOR_UNIX)));
+			File targetFileDir = new File(this.filePath.substring(0, this.filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
 			if (targetFileDir.exists()) {
 				if (targetFile.exists()) targetFile.delete();
 				ZipOutputStream outZip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(targetFile)));
@@ -257,12 +257,12 @@ public class ObjectDataReaderWriter {
 					// save the image
 					ImageLoader imageLoader = new ImageLoader();
 					imageLoader.data = new ImageData[] { this.objectData.getImage().getImageData() };
-					outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + DE.FILE_ENDING_DOT_JPG));
+					outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + GDE.FILE_ENDING_DOT_JPG));
 					imageLoader.save(outZip, SWT.IMAGE_JPEG);
 					outZip.closeEntry();
 				}
 				//save the text document
-				outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + DE.FILE_ENDING_DOT_STF));
+				outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + GDE.FILE_ENDING_DOT_STF));
 				String text = this.objectData.getKey();
 				write(outZip, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
 				ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
@@ -280,15 +280,15 @@ public class ObjectDataReaderWriter {
 				ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_STYLES);
 				StyleRange[] styles = this.objectData.getStyleRanges();
 				for (StyleRange style : styles) {
-					text = style.start + DE.STRING_BLANK + style.length + DE.STRING_BLANK + (style.foreground == null ? DE.STRING_DASH : style.foreground.getRed()) + DE.STRING_BLANK
-							+ (style.foreground == null ? DE.STRING_DASH : style.foreground.getGreen()) + DE.STRING_BLANK + (style.foreground == null ? DE.STRING_DASH : style.foreground.getBlue())
-							+ DE.STRING_BLANK + (style.background == null ? DE.STRING_DASH : style.background.getRed()) + DE.STRING_BLANK
-							+ (style.background == null ? DE.STRING_DASH : style.background.getGreen()) + DE.STRING_BLANK + (style.background == null ? DE.STRING_DASH : style.background.getBlue())
-							+ DE.STRING_BLANK + style.fontStyle + ObjectDataReaderWriter.DELIMITER;
+					text = style.start + GDE.STRING_BLANK + style.length + GDE.STRING_BLANK + (style.foreground == null ? GDE.STRING_DASH : style.foreground.getRed()) + GDE.STRING_BLANK
+							+ (style.foreground == null ? GDE.STRING_DASH : style.foreground.getGreen()) + GDE.STRING_BLANK + (style.foreground == null ? GDE.STRING_DASH : style.foreground.getBlue())
+							+ GDE.STRING_BLANK + (style.background == null ? GDE.STRING_DASH : style.background.getRed()) + GDE.STRING_BLANK
+							+ (style.background == null ? GDE.STRING_DASH : style.background.getGreen()) + GDE.STRING_BLANK + (style.background == null ? GDE.STRING_DASH : style.background.getBlue())
+							+ GDE.STRING_BLANK + style.fontStyle + ObjectDataReaderWriter.DELIMITER;
 					write(outZip, text);
 					ObjectDataReaderWriter.log.log(Level.FINE, text);
 				}
-				write(outZip, ObjectDataReaderWriter.END_STYLES + DE.STRING_NEW_LINE);
+				write(outZip, ObjectDataReaderWriter.END_STYLES + GDE.STRING_NEW_LINE);
 				ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.END_STYLES);
 				outZip.flush();
 				outZip.close();

@@ -14,11 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.tab;
+package gde.ui.tab;
 
 import java.text.DecimalFormat;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -44,19 +44,19 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Menu;
 
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.IDevice;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.dialog.CellVoltageValuesDialog;
-import osde.ui.menu.TabAreaContextMenu;
-import osde.utils.CellVoltageValues;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.IDevice;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.dialog.CellVoltageValuesDialog;
+import gde.ui.menu.TabAreaContextMenu;
+import gde.utils.CellVoltageValues;
 
 /**
  * Display window parent of cellVoltage displays
@@ -89,7 +89,7 @@ public class CellVoltageWindow extends CTabItem {
 	RecordSet										oldRecordSet					= null;
 	Channel											oldChannel						= null;
 	Color												surroundingBackground;
-	String											info									= Messages.getString(MessageIds.DE_MSGT0230);
+	String											info									= Messages.getString(MessageIds.GDE_MSGT0230);
 	Vector<CellVoltageDisplay>	displays							= new Vector<CellVoltageDisplay>();
 	int													voltageAvg						= 0;
 
@@ -142,7 +142,7 @@ public class CellVoltageWindow extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.DE_MSGT0232));
+		this.setText(Messages.getString(MessageIds.GDE_MSGT0232));
 	
 		this.lithiumValuesDialog = new CellVoltageValuesDialog(this.application, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 		
@@ -173,8 +173,8 @@ public class CellVoltageWindow extends CTabItem {
 
 			this.voltageLimitsSelection = new Group(this.cellVoltageMainComposite, SWT.NONE);
 			this.voltageLimitsSelection.setBackground(this.surroundingBackground);
-			this.voltageLimitsSelection.setText(Messages.getString(MessageIds.DE_MSGT0369));
-			this.voltageLimitsSelection.setToolTipText(Messages.getString(MessageIds.DE_MSGT0370));
+			this.voltageLimitsSelection.setText(Messages.getString(MessageIds.GDE_MSGT0369));
+			this.voltageLimitsSelection.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 			RowLayout thisLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.voltageLimitsSelection.setLayout(thisLayout);
 			this.voltageLimitsSelection.setBounds(0, 0, 420, 40);
@@ -206,8 +206,8 @@ public class CellVoltageWindow extends CTabItem {
 				this.liPoButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liPoButton.setLayoutData(liPoButtonLData);
 				this.liPoButton.setBackground(this.surroundingBackground);
-				this.liPoButton.setText(Messages.getString(MessageIds.DE_MSGT0371));
-				this.liPoButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0370));
+				this.liPoButton.setText(Messages.getString(MessageIds.GDE_MSGT0371));
+				this.liPoButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 				this.liPoButton.setSelection(false);
 				this.liPoButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -233,8 +233,8 @@ public class CellVoltageWindow extends CTabItem {
 				this.liIoButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liIoButton.setLayoutData(button1LData);
 				this.liIoButton.setBackground(this.surroundingBackground);
-				this.liIoButton.setText(Messages.getString(MessageIds.DE_MSGT0372));
-				this.liIoButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0370));
+				this.liIoButton.setText(Messages.getString(MessageIds.GDE_MSGT0372));
+				this.liIoButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 				this.liIoButton.setSelection(false);
 				this.liIoButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -260,8 +260,8 @@ public class CellVoltageWindow extends CTabItem {
 				this.liFeButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liFeButton.setLayoutData(button2LData);
 				this.liFeButton.setBackground(this.surroundingBackground);
-				this.liFeButton.setText(Messages.getString(MessageIds.DE_MSGT0373));
-				this.liFeButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0370));
+				this.liFeButton.setText(Messages.getString(MessageIds.GDE_MSGT0373));
+				this.liFeButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 				this.liFeButton.setSelection(false);
 				this.liFeButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -287,8 +287,8 @@ public class CellVoltageWindow extends CTabItem {
 				this.niMhButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.niMhButton.setLayoutData(button2LData);
 				this.niMhButton.setBackground(this.surroundingBackground);
-				this.niMhButton.setText(Messages.getString(MessageIds.DE_MSGT0377));
-				this.niMhButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0370));
+				this.niMhButton.setText(Messages.getString(MessageIds.GDE_MSGT0377));
+				this.niMhButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 				this.niMhButton.setSelection(false);
 				this.niMhButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -314,8 +314,8 @@ public class CellVoltageWindow extends CTabItem {
 				this.individualButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.individualButton.setLayoutData(button1LData1);
 				this.individualButton.setBackground(this.surroundingBackground);
-				this.individualButton.setText(Messages.getString(MessageIds.DE_MSGT0375));
-				this.individualButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0370));
+				this.individualButton.setText(Messages.getString(MessageIds.GDE_MSGT0375));
+				this.individualButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 				this.individualButton.setSelection(false);
 				this.individualButton.addSelectionListener(new SelectionAdapter() {
 					@Override

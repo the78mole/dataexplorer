@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.data;
+package gde.data;
 
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -29,12 +29,12 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.printing.Printer;
 
-import osde.DE;
-import osde.io.ObjectDataReaderWriter;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
+import gde.DE;
+import gde.io.ObjectDataReaderWriter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
  * @author Winfried Brügmann
@@ -44,7 +44,7 @@ public class ObjectData {
 	/**
 	 * 
 	 */
-	public static final String	STRING_STYLED_TEXT_DEFAULT	= Messages.getString(MessageIds.DE_MSGT0433);
+	public static final String	STRING_STYLED_TEXT_DEFAULT	= Messages.getString(MessageIds.GDE_MSGT0433);
 
 	final static Logger	log	= Logger.getLogger(ObjectData.class.getName());
 
@@ -88,15 +88,15 @@ public class ObjectData {
 	 */
 	public ObjectData(String objectFilePath) {
 		this.fullQualifiedObjectFilePath = objectFilePath;
-		this.key = objectFilePath.replace(DE.FILE_SEPARATOR_WINDOWS, DE.FILE_SEPARATOR_UNIX).substring(objectFilePath.lastIndexOf(DE.FILE_SEPARATOR_UNIX) + 1, objectFilePath.lastIndexOf(DE.STRING_DOT));
-		this.key = this.key.contains(DE.STRING_DOT) ? this.key.substring(0, this.key.indexOf(DE.STRING_DOT)) : this.key;
-		this.type = Messages.getString(MessageIds.DE_MSGT0279);
-		this.activationDate = Messages.getString(MessageIds.DE_MSGT0279);
-		this.status = Messages.getString(MessageIds.DE_MSGT0279);
+		this.key = objectFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX).substring(objectFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1, objectFilePath.lastIndexOf(GDE.STRING_DOT));
+		this.key = this.key.contains(GDE.STRING_DOT) ? this.key.substring(0, this.key.indexOf(GDE.STRING_DOT)) : this.key;
+		this.type = Messages.getString(MessageIds.GDE_MSGT0279);
+		this.activationDate = Messages.getString(MessageIds.GDE_MSGT0279);
+		this.status = Messages.getString(MessageIds.GDE_MSGT0279);
 		this.image = null;
 		this.styledText = ObjectData.STRING_STYLED_TEXT_DEFAULT;
 		this.styleRanges = new StyleRange[] { new StyleRange(0, this.styledText.length(), null, null, SWT.BOLD) };
-		this.font = DE.IS_WINDOWS ? SWTResourceManager.getFont("Microsoft Sans Serif", 10, SWT.NORMAL, false, false) : SWTResourceManager.getFont("Sans Serif", 10, SWT.NORMAL, false, false); //$NON-NLS-1$ //$NON-NLS-2$
+		this.font = GDE.IS_WINDOWS ? SWTResourceManager.getFont("Microsoft Sans Serif", 10, SWT.NORMAL, false, false) : SWTResourceManager.getFont("Sans Serif", 10, SWT.NORMAL, false, false); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -229,7 +229,7 @@ public class ObjectData {
 	public void print() {
 		StyledTextPrintOptions options = new StyledTextPrintOptions();
 		options.header = StyledTextPrintOptions.SEPARATOR + this.fullQualifiedObjectFilePath + StyledTextPrintOptions.SEPARATOR;
-		options.footer = StyledTextPrintOptions.SEPARATOR + StyledTextPrintOptions.PAGE_TAG + StyledTextPrintOptions.SEPARATOR + DE.OSDE_NAME_LONG;
+		options.footer = StyledTextPrintOptions.SEPARATOR + StyledTextPrintOptions.PAGE_TAG + StyledTextPrintOptions.SEPARATOR + GDE.OSDE_NAME_LONG;
 		options.printLineBackground = true;
 		options.printTextBackground = true;
 		options.printTextFontStyle = true;

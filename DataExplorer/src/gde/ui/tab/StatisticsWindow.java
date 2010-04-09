@@ -1,8 +1,8 @@
-package osde.ui.tab;
+package gde.ui.tab;
 
 import java.text.DecimalFormat;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -28,20 +28,20 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.IDevice;
-import osde.device.StatisticsType;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.menu.TabAreaContextMenu;
-import osde.utils.TimeLine;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.IDevice;
+import gde.device.StatisticsType;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
+import gde.utils.TimeLine;
 
 /**
  * class to represent statistics data according configuration in device properties XML file
@@ -97,7 +97,7 @@ public class StatisticsWindow extends CTabItem {
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.DE_MSGT0350));
+		this.setText(Messages.getString(MessageIds.GDE_MSGT0350));
 		
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
@@ -143,8 +143,8 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup = new Group(this.composite, SWT.NONE);
 				this.descriptionGroup.setLayout(null);
 				this.descriptionGroup.setBounds(10, 10, 300, 110); // set top,left and maintain the rest by control listener
-				this.descriptionGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.descriptionGroup.setText(Messages.getString(MessageIds.DE_MSGT0351));
+				this.descriptionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.descriptionGroup.setText(Messages.getString(MessageIds.GDE_MSGT0351));
 				this.descriptionGroup.setBackground(this.innerAreaBackground);
 				this.descriptionGroup.setMenu(this.popupmenu);			
 				this.descriptionGroup.addHelpListener(new HelpListener() {
@@ -170,7 +170,7 @@ public class StatisticsWindow extends CTabItem {
 								}
 							}
 							else {
-								String tmpDescriptionText = DE.STRING_EMPTY;
+								String tmpDescriptionText = GDE.STRING_EMPTY;
 								if (StatisticsWindow.this.descriptionTextLabel != null  && !tmpDescriptionText.equals(StatisticsWindow.this.descriptionTextLabel.getText())) {
 									StatisticsWindow.this.descriptionTextLabel.setText(StatisticsWindow.this.descriptionText = tmpDescriptionText);
 								}
@@ -180,7 +180,7 @@ public class StatisticsWindow extends CTabItem {
 				});
 				{
 					this.descriptionTextLabel = new Text(this.descriptionGroup, SWT.LEFT | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
-					this.descriptionTextLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.descriptionTextLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.descriptionTextLabel.setText("recordSetName, (fileDescription), recordSetDescription"); //$NON-NLS-1$
 					this.descriptionTextLabel.setBackground(this.innerAreaBackground);
 					this.descriptionTextLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
@@ -192,7 +192,7 @@ public class StatisticsWindow extends CTabItem {
 				this.dataTable = new Table(this.composite, SWT.MULTI | SWT.BORDER);
 				this.dataTable.setLinesVisible(!this.isWindows);
 				this.dataTable.setHeaderVisible(true);
-				this.dataTable.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.dataTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dataTable.setBounds(10, 150, 300, 100); // set top,left and maintain the rest by control listener
 				this.dataTable.setBackground(this.innerAreaBackground);
 				this.dataTable.setMenu(this.popupmenu);			
@@ -213,39 +213,39 @@ public class StatisticsWindow extends CTabItem {
 				{
 					this.measurementTableColumn = new TableColumn(this.dataTable, SWT.LEFT);
 					this.measurementTableColumn.setWidth(180);
-					this.measurementTableColumn.setText(Messages.getString(MessageIds.DE_MSGT0352));
+					this.measurementTableColumn.setText(Messages.getString(MessageIds.GDE_MSGT0352));
 				}
 				{
 					this.unitTableColumn = new TableColumn(this.dataTable, SWT.LEFT);
 					this.unitTableColumn.setWidth(120);
-					this.unitTableColumn.setText(Messages.getString(MessageIds.DE_MSGT0353));
+					this.unitTableColumn.setText(Messages.getString(MessageIds.GDE_MSGT0353));
 					this.unitTableColumn.setAlignment(SWT.LEFT);
 				}
 				{
 					this.minTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
 					this.minTableColumn.setWidth(90);
-					this.minTableColumn.setText(Messages.getString(MessageIds.DE_MSGT0354));
+					this.minTableColumn.setText(Messages.getString(MessageIds.GDE_MSGT0354));
 				}
 				{
 					this.avgTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
 					this.avgTableColumn.setWidth(90);
-					this.avgTableColumn.setText(Messages.getString(MessageIds.DE_MSGT0355));
+					this.avgTableColumn.setText(Messages.getString(MessageIds.GDE_MSGT0355));
 				}
 				{
 					this.maxTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
 					this.maxTableColumn.setWidth(90);
-					this.maxTableColumn.setText(Messages.getString(MessageIds.DE_MSGT0356));
+					this.maxTableColumn.setText(Messages.getString(MessageIds.GDE_MSGT0356));
 				}
 				{
 					this.sigmaTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
-					String sigmaText = Messages.getString(MessageIds.DE_MSGT0357);
+					String sigmaText = Messages.getString(MessageIds.GDE_MSGT0357);
 					this.sigmaTableColumn.setText(sigmaText);
 					this.sigmaTableColumn.setWidth((sigmaText.length() * this.extentFactor > 90) ? sigmaText.length() * this.extentFactor : 80);
 				}
 				{
 					this.customTableColumn = new TableColumn(this.dataTable, SWT.LEFT);
 					this.customTableColumn.setWidth(300);
-					this.customTableColumn.setText(Messages.getString(MessageIds.DE_MSGT0358));
+					this.customTableColumn.setText(Messages.getString(MessageIds.GDE_MSGT0358));
 				}
 			}
 			this.composite.layout();
@@ -277,15 +277,15 @@ public class StatisticsWindow extends CTabItem {
 					this.tabelItemText = new Vector<String>();
 
 					// time
-					String time = Messages.getString(MessageIds.DE_MSGT0234);
+					String time = Messages.getString(MessageIds.GDE_MSGT0234);
 					sb.append(time.split(" ")[0]).append(DELIMITER); //$NON-NLS-1$
-					sb.append(Messages.getString(MessageIds.DE_MSGT0359)).append(DELIMITER);
+					sb.append(Messages.getString(MessageIds.GDE_MSGT0359)).append(DELIMITER);
 					sb.append("     0      ").append(DELIMITER); //$NON-NLS-1$
 					sb.append(NO_VALUE).append(DELIMITER);
 					sb.append(TimeLine.getFomatedTime(activeRecordSet.getTime_ms(activeRecordSet.getRecordDataSize(true)-1))).append(" ").append(DELIMITER); //$NON-NLS-1$
 					sb.append(NO_VALUE).append(DELIMITER);
 					if (activeRecordSet.isTimeStepConstant()) {
-						sb.append(Messages.getString(MessageIds.DE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTime_ms(1))).append(Messages.getString(MessageIds.DE_MSGT0361)); //$NON-NLS-1$
+						sb.append(Messages.getString(MessageIds.GDE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTime_ms(1))).append(Messages.getString(MessageIds.GDE_MSGT0361)); //$NON-NLS-1$
 					}
 					this.tabelItemText.add(sb.toString());
 
@@ -392,7 +392,7 @@ public class StatisticsWindow extends CTabItem {
 							// append trigger + comment
 							if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
 								sb.append("(").append(measurementStatistics.getTrigger().getComment()).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
-								this.tabelItemText.set(0, this.tabelItemText.get(0) + (activeRecordSet.isTimeStepConstant() ? ", " : DE.STRING_EMPTY) + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange());
+								this.tabelItemText.set(0, this.tabelItemText.get(0) + (activeRecordSet.isTimeStepConstant() ? ", " : GDE.STRING_EMPTY) + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange());
 							}
 
 							int customColumnTextExtent = 15 + SWTResourceManager.getGC(this.dataTable.getDisplay()).textExtent(sb.substring(sb.lastIndexOf(DELIMITER) + 1)).x;
@@ -520,33 +520,33 @@ public class StatisticsWindow extends CTabItem {
 	public String getContentAsText() {
 		StringBuilder sb = new StringBuilder();
 		//header
-		sb.append(DE.OSDE_NAME_LONG).append(DE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.DE_MSGT0350)).append(DE.LINE_SEPARATOR).append(DE.LINE_SEPARATOR);
+		sb.append(GDE.OSDE_NAME_LONG).append(GDE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.GDE_MSGT0350)).append(GDE.LINE_SEPARATOR).append(GDE.LINE_SEPARATOR);
 		//description
-		sb.append(Messages.getString(MessageIds.DE_MSGT0351)).append(DE.LINE_SEPARATOR);
+		sb.append(Messages.getString(MessageIds.GDE_MSGT0351)).append(GDE.LINE_SEPARATOR);
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			this.descriptionText = activeChannel.getFileDescription() + "\n--------------------------\n"; //$NON-NLS-1$
 		}
 		else {
-			this.descriptionText = Messages.getString(MessageIds.DE_MSGW0036) + "\n--------------------------\n"; //$NON-NLS-1$
+			this.descriptionText = Messages.getString(MessageIds.GDE_MSGW0036) + "\n--------------------------\n"; //$NON-NLS-1$
 		}
 		RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 		if (activeRecordSet != null) {
 			this.descriptionText = this.descriptionText + activeRecordSet.getName() + " :  " + activeRecordSet.getRecordSetDescription(); //$NON-NLS-1$
 		}
-		sb.append(this.descriptionText).append(DE.LINE_SEPARATOR).append(DE.LINE_SEPARATOR);
+		sb.append(this.descriptionText).append(GDE.LINE_SEPARATOR).append(GDE.LINE_SEPARATOR);
 		//table header
 		sb.append(String.format("%-18s %-15s %10s  %12s  %10s %-18s  %s", 
-				Messages.getString(MessageIds.DE_MSGT0352), Messages.getString(MessageIds.DE_MSGT0353), Messages.getString(MessageIds.DE_MSGT0354), 
-				Messages.getString(MessageIds.DE_MSGT0355), Messages.getString(MessageIds.DE_MSGT0356), Messages.getString(MessageIds.DE_MSGT0357), 
-				Messages.getString(MessageIds.DE_MSGT0358))).append(DE.LINE_SEPARATOR);
+				Messages.getString(MessageIds.GDE_MSGT0352), Messages.getString(MessageIds.GDE_MSGT0353), Messages.getString(MessageIds.GDE_MSGT0354), 
+				Messages.getString(MessageIds.GDE_MSGT0355), Messages.getString(MessageIds.GDE_MSGT0356), Messages.getString(MessageIds.GDE_MSGT0357), 
+				Messages.getString(MessageIds.GDE_MSGT0358))).append(GDE.LINE_SEPARATOR);
 		//table data
 		for (String tableText : this.tabelItemText) {
 			String[] itemsText = tableText.split(DELIMITER);
 			sb.append(String.format("%-18s %-15s %12s %12s %12s %12s      ", itemsText[0],itemsText[1],itemsText[2],itemsText[3],itemsText[4],itemsText[5]));
 			if (itemsText.length > 6)
 				sb.append(itemsText[6]);
-			sb.append(DE.LINE_SEPARATOR);
+			sb.append(GDE.LINE_SEPARATOR);
 		}
 		return sb.toString();
 	}

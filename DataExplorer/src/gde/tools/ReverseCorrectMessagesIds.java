@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.tools;
+package gde.tools;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -42,10 +42,10 @@ public class ReverseCorrectMessagesIds {
 	+ "#    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>. \n"
 	+ "#****************************************************************************************/ \n"
 	+ "# DataExplorer message file Locale.GERMANY Winfried Brügmann  - 22 Jan 2008 \n" + " \n" 
-	+ "# DE_MSGE0000 -> error messages \n"
-	+ "# DE_MSGW0000 -> warning messages \n" 
-	+ "# DE_MSGI0000 -> info messages \n" 
-	+ "# DE_MSGT0000 -> normal text \n"
+	+ "# GDE_MSGE0000 -> error messages \n"
+	+ "# GDE_MSGW0000 -> warning messages \n" 
+	+ "# GDE_MSGI0000 -> info messages \n" 
+	+ "# GDE_MSGT0000 -> normal text \n"
 	+ "# range 0000 to 1000 reserved for base OSDE code \n" 
 	+ "# range 1001 to 1099 Sample + Simulator \n" 
 	+ "# range 1100 to 1199 AkkuMaster device \n" 
@@ -57,14 +57,14 @@ public class ReverseCorrectMessagesIds {
 	// add new supported device here
 	+ " \n";
 
-	final static String	begin_DE_MSGE		= "# begin DE_MSGE0000 -> error messages \n";
-	final static String	end_DE_MSGE			= "# end DE_MSGE0000 -> error messages \n\n";
-	final static String	begin_DE_MSGW		= "# begin DE_MSGW0000 -> warning messages \n";
-	final static String	end_DE_MSGW			= "# end DE_MSGW0000 -> warning messages \n\n";
-	final static String	begin_DE_MSGI		= "# begin DE_MSGI0000 -> info messages \n";
-	final static String	end_DE_MSGI			= "# end DE_MSGI0000 -> info messages \n\n";
-	final static String	begin_DE_MSGT		= "# begin DE_MSGT0000 -> normal text \n";
-	final static String	end_DE_MSGT			= "# end DE_MSGT0000 -> normal text \n\n";
+	final static String	begin_GDE_MSGE		= "# begin GDE_MSGE0000 -> error messages \n";
+	final static String	end_GDE_MSGE			= "# end GDE_MSGE0000 -> error messages \n\n";
+	final static String	begin_GDE_MSGW		= "# begin GDE_MSGW0000 -> warning messages \n";
+	final static String	end_GDE_MSGW			= "# end GDE_MSGW0000 -> warning messages \n\n";
+	final static String	begin_GDE_MSGI		= "# begin GDE_MSGI0000 -> info messages \n";
+	final static String	end_GDE_MSGI			= "# end GDE_MSGI0000 -> info messages \n\n";
+	final static String	begin_GDE_MSGT		= "# begin GDE_MSGT0000 -> normal text \n";
+	final static String	end_GDE_MSGT			= "# end GDE_MSGT0000 -> normal text \n\n";
 	final static String	skipLine					= " \n";
 	final static String	range_OSDE				= "# range 0000 to 1000 reserved for base OSDE code \n";
 	static boolean isRanageOSDE = false;
@@ -100,72 +100,72 @@ public class ReverseCorrectMessagesIds {
 		writer.write(skipLine);
 		readerIds.mark(50000);
 
-		//DE_MSGE*
-		writer.write(begin_DE_MSGE);
+		//GDE_MSGE*
+		writer.write(begin_GDE_MSGE);
 		while ((line = readerIds.readLine()) != null) {
 			if (!line.trim().startsWith("public final static String") || line.trim().length() <= 1) continue;
 			//System.out.println(line);
 
 			String[] sections = line.trim().split(" |\t");
-			if (!sections[4].startsWith("DE_MSGE")) continue;
+			if (!sections[4].startsWith("GDE_MSGE")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
 			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
-		writer.write(end_DE_MSGE);
+		writer.write(end_GDE_MSGE);
 		readerIds.reset();
 		isRanageOSDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
 
-		//DE_MSGW*
-		writer.write(begin_DE_MSGW);
+		//GDE_MSGW*
+		writer.write(begin_GDE_MSGW);
 		while ((line = readerIds.readLine()) != null) {
 			if (!line.trim().startsWith("public final static String") || line.trim().length() <= 1) continue;
 			//System.out.println(line);
 
 			String[] sections = line.trim().split(" |\t");
-			if (!sections[4].startsWith("DE_MSGW")) continue;
+			if (!sections[4].startsWith("GDE_MSGW")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
 			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
-		writer.write(end_DE_MSGW);
+		writer.write(end_GDE_MSGW);
 		readerIds.reset();
 		isRanageOSDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
 
-		//DE_MSGI*
-		writer.write(begin_DE_MSGI);
+		//GDE_MSGI*
+		writer.write(begin_GDE_MSGI);
 		while ((line = readerIds.readLine()) != null) {
 			if (!line.trim().startsWith("public final static String") || line.trim().length() <= 1) continue;
 			//System.out.println(line);
 
 			String[] sections = line.trim().split(" |\t");
-			if (!sections[4].startsWith("DE_MSGI")) continue;
+			if (!sections[4].startsWith("GDE_MSGI")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
 			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 
 		}
-		writer.write(end_DE_MSGI);
+		writer.write(end_GDE_MSGI);
 		readerIds.reset();
 		isRanageOSDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
 
-		//DE_MSGT*
-		writer.write(begin_DE_MSGT);
+		//GDE_MSGT*
+		writer.write(begin_GDE_MSGT);
 		while ((line = readerIds.readLine()) != null) {
 			if (!line.trim().startsWith("public final static String") || line.trim().length() <= 1) continue;
 			//System.out.println(line);
 
 			String[] sections = line.trim().split(" |\t");
-			if (!sections[4].startsWith("DE_MSGT")) continue;
+			if (!sections[4].startsWith("GDE_MSGT")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
 			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
-		writer.write(end_DE_MSGT);
+		writer.write(end_GDE_MSGT);
 
 		//		writer.write(fileClosing);
 

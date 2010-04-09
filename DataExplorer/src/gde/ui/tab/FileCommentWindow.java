@@ -14,10 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.tab;
+package gde.ui.tab;
 
 import java.util.HashMap;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -44,16 +44,16 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.menu.TabAreaContextMenu;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
 
 /**
  * Class to enable a file comment
@@ -90,7 +90,7 @@ public class FileCommentWindow extends CTabItem {
 		this.channels = Channels.getInstance();
 		SWTResourceManager.registerResourceUser(this);
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.DE_MSGT0239));
+		this.setText(Messages.getString(MessageIds.GDE_MSGT0239));
 
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
@@ -121,7 +121,7 @@ public class FileCommentWindow extends CTabItem {
 		});
 		{
 			this.infoLabel = new CLabel(this.commentMainComposite, SWT.LEFT);
-			this.infoLabel.setText(Messages.getString(MessageIds.DE_MSGT0240));
+			this.infoLabel.setText(Messages.getString(MessageIds.GDE_MSGT0240));
 			this.infoLabel.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));
 			this.infoLabel.setBackground(this.surroundingBackground);
 			this.infoLabel.setMenu(this.popupmenu);
@@ -136,11 +136,11 @@ public class FileCommentWindow extends CTabItem {
 		}
 		{
 			this.fileCommentText = new Text(this.commentMainComposite, SWT.WRAP | SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-			this.fileCommentText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.fileCommentText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.fileCommentText.setBackground(this.innerAreaBackground);
-			this.fileCommentText.setText(Messages.getString(MessageIds.DE_MSGT0241));
+			this.fileCommentText.setText(Messages.getString(MessageIds.GDE_MSGT0241));
 			this.fileCommentText.setBounds(50, 40, 500, 100);
-			this.fileCommentText.setText(this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getFileDescription() : DE.STRING_EMPTY);
+			this.fileCommentText.setText(this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getFileDescription() : GDE.STRING_EMPTY);
 			this.fileCommentText.setMenu(this.popupmenu);
 			this.fileCommentText.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
@@ -170,7 +170,7 @@ public class FileCommentWindow extends CTabItem {
 		}
 		{
 			this.recordCommentTable = new Table(this.commentMainComposite, SWT.BORDER | SWT.V_SCROLL);
-			this.recordCommentTable.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.recordCommentTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.recordCommentTable.setBounds(50, 200, 500, 100);
 			//this.table.setControl(this.dataTable);
 			this.recordCommentTable.setLinesVisible(true);
@@ -186,11 +186,11 @@ public class FileCommentWindow extends CTabItem {
 
 			this.recordCommentTableHeader = new TableColumn(this.recordCommentTable, SWT.LEFT);
 			this.recordCommentTableHeader.setWidth(250);
-			this.recordCommentTableHeader.setText(Messages.getString(MessageIds.DE_MSGT0242));
+			this.recordCommentTableHeader.setText(Messages.getString(MessageIds.GDE_MSGT0242));
 
 			this.recordCommentTableHeader2 = new TableColumn(this.recordCommentTable, SWT.LEFT);
 			this.recordCommentTableHeader2.setWidth(500);
-			this.recordCommentTableHeader2.setText(Messages.getString(MessageIds.DE_MSGT0243));
+			this.recordCommentTableHeader2.setText(Messages.getString(MessageIds.GDE_MSGT0243));
 		}
 	}
 

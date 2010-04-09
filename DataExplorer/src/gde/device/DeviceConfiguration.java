@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device;
+package gde.device;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,15 +35,15 @@ import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.log.Level;
-import osde.log.LogFormatter;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.utils.CalculationThread;
-import osde.utils.StringHelper;
+import gde.DE;
+import gde.config.Settings;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.CalculationThread;
+import gde.utils.StringHelper;
 
 /**
  * Device Configuration class makes the parsed DeviceProperties XML accessible for the application
@@ -91,14 +91,14 @@ public class DeviceConfiguration {
 		LogFormatter lf = new LogFormatter();
 		ch.setFormatter(lf);
 		ch.setLevel(Level.ALL);
-		Logger.getLogger(DE.STRING_EMPTY).addHandler(ch);
-		Logger.getLogger(DE.STRING_EMPTY).setLevel(Level.ALL);
+		Logger.getLogger(GDE.STRING_EMPTY).addHandler(ch);
+		Logger.getLogger(GDE.STRING_EMPTY).setLevel(Level.ALL);
 
 		String basePath = "C:/Documents and Settings/brueg/Application Data/DataExplorer/Devices/"; //$NON-NLS-1$
 
 		try {
       Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(basePath + "DeviceProperties_V03.xsd")); //$NON-NLS-1$
-			JAXBContext jc = JAXBContext.newInstance("osde.device"); //$NON-NLS-1$
+			JAXBContext jc = JAXBContext.newInstance("de.device"); //$NON-NLS-1$
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema(schema);
 			JAXBElement<DevicePropertiesType> elememt;
@@ -135,7 +135,7 @@ public class DeviceConfiguration {
 	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>) //$NON-NLS-1$
 	public DeviceConfiguration(String xmlFileName) throws FileNotFoundException, JAXBException {
 
-		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.DE_MSGE0003) + xmlFileName);
+		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
 
 		this.settings = Settings.getInstance();
 		this.unmarshaller = this.settings.getUnmarshaller();
@@ -372,7 +372,7 @@ public class DeviceConfiguration {
 	 */
 	public String getPort() {
 		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() 
-				: this.serialPort != null ? this.serialPort.getPort() : DE.STRING_EMPTY;
+				: this.serialPort != null ? this.serialPort.getPort() : GDE.STRING_EMPTY;
 	}
 
 	/**
@@ -437,7 +437,7 @@ public class DeviceConfiguration {
 	 */
 	private void createSerialPort() {
 		this.deviceProps.serialPort = this.serialPort = new ObjectFactory().createSerialPortType();
-		this.serialPort.setPort(DE.STRING_EMPTY);
+		this.serialPort.setPort(GDE.STRING_EMPTY);
 		this.serialPort.setBaudeRate(9600);
 		this.serialPort.setParity(ParityTypes.PARITY_NONE);
 		this.serialPort.setDataBits(DataBitsTypes.DATABITS_8);
@@ -835,7 +835,7 @@ public class DeviceConfiguration {
 	}
 	
 	public String getDataBlockPreferredDataLocation() {
-		return this.dataBlock != null ? (this.dataBlock.getPreferredDataLocation() != null ? this.dataBlock.getPreferredDataLocation() : DE.STRING_BLANK) : DE.STRING_BLANK;
+		return this.dataBlock != null ? (this.dataBlock.getPreferredDataLocation() != null ? this.dataBlock.getPreferredDataLocation() : GDE.STRING_BLANK) : GDE.STRING_BLANK;
 	}
 
 	public void setDataBlockPreferredDataLocation(String value) {
@@ -860,7 +860,7 @@ public class DeviceConfiguration {
 			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
 		}
 		if (value != null) {
-			isValidExt = (value = value.replace(DE.STRING_BLANK, DE.STRING_EMPTY).replace(DE.STRING_STAR, DE.STRING_EMPTY).replace(DE.STRING_DOT, DE.STRING_EMPTY).trim()).length() >= 1;
+			isValidExt = (value = value.replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_STAR, GDE.STRING_EMPTY).replace(GDE.STRING_DOT, GDE.STRING_EMPTY).trim()).length() >= 1;
 			if (!isValidExt) {
 				this.dataBlock.setPreferredFileExtention(null);
 			}
@@ -890,7 +890,7 @@ public class DeviceConfiguration {
 			createDesktopProperty(DesktopPropertyTypes.TABLE_TAB.name(), DataTypes.BOOLEAN, enable);
 		}
 		else {
-			property.setValue(DE.STRING_EMPTY + enable);
+			property.setValue(GDE.STRING_EMPTY + enable);
 		}
 		this.isChangePropery = true;
 	}
@@ -914,7 +914,7 @@ public class DeviceConfiguration {
 			createDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB.name(), DataTypes.BOOLEAN, enable);
 		}
 		else {
-			property.setValue(DE.STRING_EMPTY + enable);
+			property.setValue(GDE.STRING_EMPTY + enable);
 		}
 		this.isChangePropery = true;
 	}
@@ -938,7 +938,7 @@ public class DeviceConfiguration {
 			createDesktopProperty(DesktopPropertyTypes.ANALOG_TAB.name(), DataTypes.BOOLEAN, enable);
 		}
 		else {
-			property.setValue(DE.STRING_EMPTY + enable);
+			property.setValue(GDE.STRING_EMPTY + enable);
 		}
 		this.isChangePropery = true;
 	}
@@ -962,7 +962,7 @@ public class DeviceConfiguration {
 			createDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.name(), DataTypes.BOOLEAN, enable);
 		}
 		else {
-			property.setValue(DE.STRING_EMPTY + enable);
+			property.setValue(GDE.STRING_EMPTY + enable);
 		}
 		this.isChangePropery = true;
 	}
@@ -1247,7 +1247,7 @@ public class DeviceConfiguration {
 		PropertyType newProperty = factory.createPropertyType();
 		newProperty.setName(propertyKey);
 		newProperty.setType(type);
-		newProperty.setValue(DE.STRING_EMPTY + value);
+		newProperty.setValue(GDE.STRING_EMPTY + value);
 		properties.add(newProperty);
 	}
 	
@@ -1410,10 +1410,10 @@ public class DeviceConfiguration {
 		if (channel != null) {
 			List<MeasurementType> measurement = channel.getMeasurement();
 			for (MeasurementType measurementType : measurement) {
-				sb.append(measurementType.getName()).append(DE.STRING_SEMICOLON);
+				sb.append(measurementType.getName()).append(GDE.STRING_SEMICOLON);
 			}
 		}
-		return sb.toString().length()>1 ? sb.toString().split(DE.STRING_SEMICOLON) : new String[0];
+		return sb.toString().length()>1 ? sb.toString().split(GDE.STRING_SEMICOLON) : new String[0];
 	}
 	
 	/**
@@ -1426,10 +1426,10 @@ public class DeviceConfiguration {
 		if (channel != null) {
 			List<MeasurementType> measurement = channel.getMeasurement();
 			for (MeasurementType measurementType : measurement) {
-				sb.append(measurementType.getName()).append(DE.STRING_SEMICOLON);
+				sb.append(measurementType.getName()).append(GDE.STRING_SEMICOLON);
 			}
 		}
-		return sb.toString().length()>1 ? sb.toString().split(DE.STRING_SEMICOLON) : new String[0];
+		return sb.toString().length()>1 ? sb.toString().split(GDE.STRING_SEMICOLON) : new String[0];
 	}
 
 	/**
@@ -1533,7 +1533,7 @@ public class DeviceConfiguration {
 			createProperty(channelConfigNumber, measurementOrdinal, IDevice.OFFSET, DataTypes.DOUBLE, offset);
 		}
 		else {
-			property.setValue(DE.STRING_EMPTY + offset);
+			property.setValue(GDE.STRING_EMPTY + offset);
 		}
 	}
 
@@ -1551,7 +1551,7 @@ public class DeviceConfiguration {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET, DataTypes.DOUBLE, offset);
 		}
 		else {
-			property.setValue(DE.STRING_EMPTY + offset);
+			property.setValue(GDE.STRING_EMPTY + offset);
 		}
 	}
 
@@ -1601,7 +1601,7 @@ public class DeviceConfiguration {
 			createProperty(channelConfigNumber, measurementOrdinal, IDevice.FACTOR, DataTypes.DOUBLE, factor);
 		}
 		else {
-			property.setValue(DE.STRING_EMPTY + factor);
+			property.setValue(GDE.STRING_EMPTY + factor);
 		}
 	}
 
@@ -1619,7 +1619,7 @@ public class DeviceConfiguration {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR, DataTypes.DOUBLE, factor);
 		}
 		else {
-			property.setValue(DE.STRING_EMPTY + factor);
+			property.setValue(GDE.STRING_EMPTY + factor);
 		}
 	}
 
@@ -1669,7 +1669,7 @@ public class DeviceConfiguration {
 			createProperty(channelConfigNumber, measurementOrdinal, IDevice.REDUCTION, DataTypes.DOUBLE, reduction);
 		}
 		else {
-			property.setValue(DE.STRING_EMPTY + reduction);
+			property.setValue(GDE.STRING_EMPTY + reduction);
 		}
 	}
 
@@ -1687,7 +1687,7 @@ public class DeviceConfiguration {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION, DataTypes.DOUBLE, reduction);
 		}
 		else {
-			property.setValue(DE.STRING_EMPTY + reduction);
+			property.setValue(GDE.STRING_EMPTY + reduction);
 		}
 	}
 
@@ -1700,7 +1700,7 @@ public class DeviceConfiguration {
 	 */
 	public Object getMeasurementPropertyValue(int channelConfigNumber, int measurementOrdinal, String propertyKey) {
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, propertyKey);
-		return property != null ? property.getValue() : DE.STRING_EMPTY;
+		return property != null ? property.getValue() : GDE.STRING_EMPTY;
 	}
 
 	/**
@@ -1713,7 +1713,7 @@ public class DeviceConfiguration {
 	@Deprecated
 	public Object getMeasurementPropertyValue(String channelConfigKey, int measurementOrdinal, String propertyKey) {
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, propertyKey);
-		return property != null ? property.getValue() : DE.STRING_EMPTY;
+		return property != null ? property.getValue() : GDE.STRING_EMPTY;
 	}
 	
 	/**
@@ -1728,10 +1728,10 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, propertyKey);
 		if (property == null) {
-			createProperty(channelConfigNumber, measurementOrdinal, propertyKey, type, (DE.STRING_EMPTY + value).replace(DE.STRING_COMMA, DE.STRING_DOT)); //$NON-NLS-1$
+			createProperty(channelConfigNumber, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT)); //$NON-NLS-1$
 		}
 		else {
-			property.setValue((DE.STRING_EMPTY + value).replace(DE.STRING_COMMA, DE.STRING_DOT));
+			property.setValue((GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
 		}
 	}
 	
@@ -1748,10 +1748,10 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, propertyKey);
 		if (property == null) {
-			createProperty(channelConfigKey, measurementOrdinal, propertyKey, type, (DE.STRING_EMPTY + value).replace(DE.STRING_COMMA, DE.STRING_DOT)); //$NON-NLS-1$
+			createProperty(channelConfigKey, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT)); //$NON-NLS-1$
 		}
 		else {
-			property.setValue((DE.STRING_EMPTY + value).replace(DE.STRING_COMMA, DE.STRING_DOT));
+			property.setValue((GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
 		}
 	}
 
@@ -1768,7 +1768,7 @@ public class DeviceConfiguration {
 		PropertyType newProperty = factory.createPropertyType();
 		newProperty.setName(propertyKey);
 		newProperty.setType(type);
-		newProperty.setValue(DE.STRING_EMPTY + value);
+		newProperty.setValue(GDE.STRING_EMPTY + value);
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).getProperty().add(newProperty);
 	}
 
@@ -1786,7 +1786,7 @@ public class DeviceConfiguration {
 		PropertyType newProperty = factory.createPropertyType();
 		newProperty.setName(propertyKey);
 		newProperty.setType(type);
-		newProperty.setValue(DE.STRING_EMPTY + value);
+		newProperty.setValue(GDE.STRING_EMPTY + value);
 		this.getMeasurement(channelConfigKey, measurementOrdinal).getProperty().add(newProperty);
 	}
 
@@ -1801,7 +1801,7 @@ public class DeviceConfiguration {
 		PropertyType newProperty = factory.createPropertyType();
 		newProperty.setName(propertyKey);
 		newProperty.setType(type);
-		newProperty.setValue(DE.STRING_EMPTY + value);
+		newProperty.setValue(GDE.STRING_EMPTY + value);
 		
 		if (this.desktop == null) {
 			this.desktop = factory.createDesktopType();

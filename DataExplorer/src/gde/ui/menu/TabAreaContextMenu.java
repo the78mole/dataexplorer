@@ -14,9 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.menu;
+package gde.ui.menu;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -28,11 +28,11 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.tab.GraphicsWindow;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.tab.GraphicsWindow;
 
 /**
  * @author Winfried Brügmann
@@ -82,7 +82,7 @@ public class TabAreaContextMenu {
 		if (!isCreated) {
 			if (type == TYPE_GRAPHICS) { // -1 as index mean initialization phase
 				this.curveSelectionItem = new MenuItem(popupMenu, SWT.CHECK);
-				this.curveSelectionItem.setText(Messages.getString(MessageIds.DE_MSGT0040));
+				this.curveSelectionItem.setText(Messages.getString(MessageIds.GDE_MSGT0040));
 				this.curveSelectionItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "curveSelectionItem action performed! " + e); //$NON-NLS-1$
@@ -92,7 +92,7 @@ public class TabAreaContextMenu {
 					}
 				});
 				this.displayGraphicsHeaderItem = new MenuItem(popupMenu, SWT.CHECK);
-				this.displayGraphicsHeaderItem.setText(Messages.getString(MessageIds.DE_MSGT0041));
+				this.displayGraphicsHeaderItem.setText(Messages.getString(MessageIds.GDE_MSGT0041));
 				this.displayGraphicsHeaderItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "toggleViewGraphicsHeaderItem action performed! " + e); //$NON-NLS-1$
@@ -103,7 +103,7 @@ public class TabAreaContextMenu {
 					}
 				});
 				this.displayGraphicsCommentItem = new MenuItem(popupMenu, SWT.CHECK);
-				this.displayGraphicsCommentItem.setText(Messages.getString(MessageIds.DE_MSGT0042));
+				this.displayGraphicsCommentItem.setText(Messages.getString(MessageIds.GDE_MSGT0042));
 				this.displayGraphicsCommentItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "toggleViewGraphicsCommentItem action performed! " + e); //$NON-NLS-1$
@@ -117,7 +117,7 @@ public class TabAreaContextMenu {
 			}
 
 			this.copyTabItem = new MenuItem(popupMenu, SWT.PUSH);
-			this.copyTabItem.setText(Messages.getString(MessageIds.DE_MSGT0026));
+			this.copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026));
 			this.copyTabItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					TabAreaContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
@@ -126,7 +126,7 @@ public class TabAreaContextMenu {
 			});
 			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE) {
 				this.copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
-				this.copyPrintImageItem.setText(Messages.getString(MessageIds.DE_MSGT0027));
+				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027));
 				this.copyPrintImageItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "copyPrintImageItem action performed! " + e); //$NON-NLS-1$
@@ -137,7 +137,7 @@ public class TabAreaContextMenu {
 			this.separatorCopy = new MenuItem(popupMenu, SWT.SEPARATOR);
 
 			this.outherAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
-			this.outherAreaColorItem.setText(Messages.getString(MessageIds.DE_MSGT0462));
+			this.outherAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0462));
 			this.outherAreaColorItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					TabAreaContextMenu.log.log(Level.FINEST, "outherAreaColorItem action performed! " + e); //$NON-NLS-1$
@@ -148,7 +148,7 @@ public class TabAreaContextMenu {
 				}
 			});
 			this.innerAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
-			this.innerAreaColorItem.setText(Messages.getString(MessageIds.DE_MSGT0463));
+			this.innerAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0463));
 			this.innerAreaColorItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					TabAreaContextMenu.log.log(Level.FINEST, "innerAreaColorItem action performed! " + e); //$NON-NLS-1$
@@ -160,7 +160,7 @@ public class TabAreaContextMenu {
 			});
 			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE) {
 				this.borderColorItem = new MenuItem(popupMenu, SWT.PUSH);
-				this.borderColorItem.setText(Messages.getString(MessageIds.DE_MSGT0464));
+				this.borderColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0464));
 				this.borderColorItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "borderColorItem action performed! " + e); //$NON-NLS-1$

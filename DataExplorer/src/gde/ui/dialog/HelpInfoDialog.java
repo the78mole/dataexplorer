@@ -14,11 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.dialog;
+package gde.ui.dialog;
 
 import java.io.IOException;
 import java.util.jar.JarFile;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -28,13 +28,13 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.utils.FileUtils;
+import gde.DE;
+import gde.config.Settings;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.FileUtils;
 
 /**
  * simple HTTP browser to display help info material
@@ -68,8 +68,8 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell = new Shell(new Shell(Display.getDefault()), SWT.SHELL_TRIM);
 			FillLayout dialogShellLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.dialogShell.setLayout(dialogShellLayout);
-			this.dialogShell.setText(DE.OSDE_NAME_LONG + Messages.getString(MessageIds.DE_MSGT0192));
-			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/DataExplorer.jpg")); //$NON-NLS-1$
+			this.dialogShell.setText(GDE.OSDE_NAME_LONG + Messages.getString(MessageIds.GDE_MSGT0192));
+			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.jpg")); //$NON-NLS-1$
 
 			this.textBrowser = new Browser(this.dialogShell, style);
 			openURL(deviceName, fileName, style);
@@ -100,13 +100,13 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 	private void openURL(String deviceName, String fileName, int style) {
 		String jarBasePath = FileUtils.getOsdeJarBasePath() + "/";
 		String jarName = "DataExplorer.jar";
-		String helpDir = "help" + DE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + DE.FILE_SEPARATOR;
-		String targetDir = DE.JAVA_IO_TMPDIR + (DE.IS_WINDOWS ? "" : DE.FILE_SEPARATOR) + "OSDE" + DE.FILE_SEPARATOR;
+		String helpDir = "help" + GDE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + GDE.FILE_SEPARATOR;
+		String targetDir = GDE.JAVA_IO_TMPDIR + (GDE.IS_WINDOWS ? "" : GDE.FILE_SEPARATOR) + "OSDE" + GDE.FILE_SEPARATOR;
 		
 		if (deviceName.length() >= 1) { // devices/<deviceName>.jar
-			jarBasePath = jarBasePath + "devices" + DE.FILE_SEPARATOR;
+			jarBasePath = jarBasePath + "devices" + GDE.FILE_SEPARATOR;
 			jarName = deviceName + ".jar";
-			targetDir = targetDir + deviceName + DE.FILE_SEPARATOR;
+			targetDir = targetDir + deviceName + GDE.FILE_SEPARATOR;
 		}
 		
 		log.log(Level.FINE, "jarBasePath = " + jarBasePath + " jarName = " + jarName + " helpDir = " + helpDir); //$NON-NLS-1$
@@ -126,7 +126,7 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 		catch (IOException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 			DataExplorer.getInstance().openMessageDialog(this.dialogShell, 
-					Messages.getString(MessageIds.DE_MSGE0018, new Object[] { e.getLocalizedMessage() } )); //$NON-NLS-1$
+					Messages.getString(MessageIds.GDE_MSGE0018, new Object[] { e.getLocalizedMessage() } )); //$NON-NLS-1$
 		}
 	}
 	

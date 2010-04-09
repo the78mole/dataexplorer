@@ -14,9 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.tab;
+package gde.ui.tab;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -28,13 +28,13 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 
-import osde.config.Settings;
-import osde.data.Channels;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.utils.TimeLine;
+import gde.config.Settings;
+import gde.data.Channels;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.TimeLine;
 
 /**
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
@@ -85,7 +85,7 @@ public class GraphicsWindow extends CTabItem {
 		this.setControl(this.graphicSashForm);
 
 		{ // curveSelector
-			this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.windowType, "  " + Messages.getString(MessageIds.DE_MSGT0254));
+			this.curveSelectorComposite = new SelectorComposite(this.graphicSashForm, this.windowType, "  " + Messages.getString(MessageIds.GDE_MSGT0254));
 		} // curveSelector
 
 		{ // graphics composite

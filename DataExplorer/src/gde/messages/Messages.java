@@ -14,21 +14,21 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.messages;
+package gde.messages;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.config.Settings;
+import gde.config.Settings;
 
 
 public class Messages {
 	final static Logger						log						= Logger.getLogger(Messages.class.getName());
 
-	static final String					BUNDLE_NAME			= "osde.messages.messages";		//$NON-NLS-1$
+	static final String					BUNDLE_NAME			= "de.messages.messages";		//$NON-NLS-1$
 
 	static ResourceBundle	mainResourceBundle		= ResourceBundle.getBundle(BUNDLE_NAME, Settings.getInstance().getLocale());
 	static ResourceBundle	deviceResourceBundle	= ResourceBundle.getBundle(BUNDLE_NAME, Settings.getInstance().getLocale());
@@ -41,14 +41,14 @@ public class Messages {
 //	 * @param args
 //	 */
 //	public static void main(String[] args) {
-//		System.out.println(Messages.getString(MessageIds.DE_MSGI0001));
-//		System.out.println(Messages.getString(MessageIds.DE_MSGI0002, new String[] {"UniLog"}));
-//		System.out.println(Messages.getString(MessageIds.DE_MSGI0003, new Object[] {"UniLog", 5}));
-//		System.out.println(Messages.getString(MessageIds.DE_MSGI0003, new Object[] {"UniLog"}));
+//		System.out.println(Messages.getString(MessageIds.GDE_MSGI0001));
+//		System.out.println(Messages.getString(MessageIds.GDE_MSGI0002, new String[] {"UniLog"}));
+//		System.out.println(Messages.getString(MessageIds.GDE_MSGI0003, new Object[] {"UniLog", 5}));
+//		System.out.println(Messages.getString(MessageIds.GDE_MSGI0003, new Object[] {"UniLog"}));
 //	}
 	
 	/**
-	 * example usage: application.openMessageDialog(Messages.getString(MessageIds.DE_MSG001, new Object{"hallo", "world"));
+	 * example usage: application.openMessageDialog(Messages.getString(MessageIds.GDE_MSG001, new Object{"hallo", "world"));
 	 * @param key
 	 * @param params as object array
 	 * @return the message as string with unlined parameters
@@ -82,7 +82,7 @@ public class Messages {
 	}
 	
 	/**
-	 * example usage: application.openMessageDialog(Messages.getString(MessageIds.DE_MSG001));
+	 * example usage: application.openMessageDialog(Messages.getString(MessageIds.GDE_MSG001));
 	 * @param key
 	 * @return the string matching the given key
 	 */

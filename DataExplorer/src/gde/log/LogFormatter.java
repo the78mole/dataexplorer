@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.log;
+package gde.log;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

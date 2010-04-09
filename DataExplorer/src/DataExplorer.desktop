@@ -3,12 +3,12 @@ Comment=DataExplorer - explore your serial data
 Comment[en_US]=DataExplorer - explore your serial data
 Comment[de_DE]=DataExplorer - erforsche deine seriellen Daten
 Encoding=UTF-8
-Exec=java -Dfile.encoding=UTF-8 -jar -Xms40m -Xmx256m @DE_DIR@DataExplorer.jar %f
+Exec=java -Dfile.encoding=UTF-8 -jar -Xms40m -Xmx256m @GDE_DIR@DataExplorer.jar %f
 GenericName=DataExplorer
-Icon=@DE_DIR@DataExplorer.xpm
+Icon=@GDE_DIR@DataExplorer.xpm
 MimeType=application/x-DataExplorer
 Name=DataExplorer
-Path=@DE_DIR@
+Path=@GDE_DIR@
 StartupNotify=true
 Terminal=false
 Type=Application

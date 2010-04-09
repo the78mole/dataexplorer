@@ -6,13 +6,13 @@
 //
 
 
-package osde.device;
+package gde.device;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
-import osde.DE;
+import gde.DE;
 
 
 /**
@@ -87,9 +87,9 @@ public enum DeviceTypes {
   	public static String[] valuesAsStingArray() {
   		StringBuilder sb = new StringBuilder();
   		for (DeviceTypes element : DeviceTypes.values()) {
-  			sb.append(element.value).append(DE.STRING_SEMICOLON);
+  			sb.append(element.value).append(GDE.STRING_SEMICOLON);
   		}
-  		return sb.toString().split(DE.STRING_SEMICOLON);
+  		return sb.toString().split(GDE.STRING_SEMICOLON);
   	}
 
 }

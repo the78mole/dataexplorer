@@ -14,12 +14,12 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui;
+package gde.ui;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -41,8 +41,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
-import osde.DE;
-import osde.device.IDevice;
+import gde.DE;
+import gde.device.IDevice;
 
 /**
  * Class to manage SWT resources (Font, Color, Image and Cursor)
@@ -141,7 +141,7 @@ public class SWTResourceManager {
 		log.log(Level.INFO, users.size() + " widgets, " + numFonts + " font, " + numColors + " colors, " + numImage + " images, " + numCursor +  " cursors " + numMenu +  " menus ");
 		StringBuffer sb = new StringBuffer();
 		for (String key : widgets.keySet()) {
-			sb.append(key).append(DE.STRING_BLANK).append(widgets.get(key)).append(DE.STRING_COMMA);
+			sb.append(key).append(GDE.STRING_BLANK).append(widgets.get(key)).append(GDE.STRING_COMMA);
 		}
 		log.log(Level.INFO, sb.toString());
 
@@ -242,7 +242,7 @@ public class SWTResourceManager {
 
 	@SuppressWarnings("rawtypes") //$NON-NLS-1$
 	public static Font getFont(String name, int size, int style, boolean strikeout, boolean underline) {
-		String fontName = name + DE.STRING_DASH + size + DE.STRING_DASH + style + DE.STRING_DASH + strikeout + DE.STRING_DASH + underline;
+		String fontName = name + GDE.STRING_DASH + size + GDE.STRING_DASH + style + GDE.STRING_DASH + strikeout + GDE.STRING_DASH + underline;
 		if (resources.containsKey(fontName)) {
 			return (Font) resources.get(fontName);
 		}
@@ -275,7 +275,7 @@ public class SWTResourceManager {
 	}
 	
 	public static Image getImage(int x, int y) {
-		String key = "IMAGE:" + x + DE.STRING_UNDER_BAR + y; //$NON-NLS-1$
+		String key = "IMAGE:" + x + GDE.STRING_UNDER_BAR + y; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
@@ -290,7 +290,7 @@ public class SWTResourceManager {
 	}
 
 	public static Image getImage(int x, int y, String imgKey) {
-		String key = "IMAGE:" + x + DE.STRING_UNDER_BAR + y + DE.STRING_UNDER_BAR + imgKey; //$NON-NLS-1$
+		String key = "IMAGE:" + x + GDE.STRING_UNDER_BAR + y + GDE.STRING_UNDER_BAR + imgKey; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
@@ -312,7 +312,7 @@ public class SWTResourceManager {
 	 * @return specified image
 	 */
 	public static Image getImage(Point pt, String imageURL, String text) {
-		String key = "IMAGE:" + pt.x + DE.STRING_UNDER_BAR + pt.y + DE.STRING_UNDER_BAR + imageURL + DE.STRING_UNDER_BAR + text; //$NON-NLS-1$
+		String key = "IMAGE:" + pt.x + GDE.STRING_UNDER_BAR + pt.y + GDE.STRING_UNDER_BAR + imageURL + GDE.STRING_UNDER_BAR + text; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
@@ -343,7 +343,7 @@ public class SWTResourceManager {
 		// Use the image's data to create a rotated image's data
 		ImageData sd = image.getImageData();
 		boolean up = (style & SWT.UP) == SWT.UP;
-		String key = "IMAGE:" + sd.width + DE.STRING_UNDER_BAR + sd.height + DE.STRING_UNDER_BAR + style + DE.STRING_UNDER_BAR + imgKey; //$NON-NLS-1$
+		String key = "IMAGE:" + sd.width + GDE.STRING_UNDER_BAR + sd.height + GDE.STRING_UNDER_BAR + style + GDE.STRING_UNDER_BAR + imgKey; //$NON-NLS-1$
 
 		try {
 			if (resources.containsKey(key)) {
@@ -378,7 +378,7 @@ public class SWTResourceManager {
 	}
 
 	public static Image getImage(ImageData imageData) {
-		String key = "IMAGE_DATA:" + imageData.height + DE.STRING_UNDER_BAR + imageData.width + DE.STRING_UNDER_BAR + imageData.depth; //$NON-NLS-1$
+		String key = "IMAGE_DATA:" + imageData.height + GDE.STRING_UNDER_BAR + imageData.width + GDE.STRING_UNDER_BAR + imageData.depth; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
@@ -393,7 +393,7 @@ public class SWTResourceManager {
 	}
 	
 	public static Image getImage(ImageData imageData, String imgKey) {
-		String key = "IMAGE_DATA:" + imageData.height + DE.STRING_UNDER_BAR + imageData.width + DE.STRING_UNDER_BAR + imgKey ; //$NON-NLS-1$
+		String key = "IMAGE_DATA:" + imageData.height + GDE.STRING_UNDER_BAR + imageData.width + GDE.STRING_UNDER_BAR + imgKey ; //$NON-NLS-1$
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
@@ -408,7 +408,7 @@ public class SWTResourceManager {
 	}
 
 	public static Image getImage(ImageData imageData, String imgKey, int newWidth, int newHeight, boolean forceRefresh) {
-		String key = "IMAGE_DATA:" + newWidth + DE.STRING_UNDER_BAR + newHeight + DE.STRING_UNDER_BAR + imgKey;
+		String key = "IMAGE_DATA:" + newWidth + GDE.STRING_UNDER_BAR + newHeight + GDE.STRING_UNDER_BAR + imgKey;
 		try {
 			if (resources.containsKey(key) && !forceRefresh)
 				return (Image) resources.get(key);
@@ -428,7 +428,7 @@ public class SWTResourceManager {
 		String tmpUrl = null;
 		try {
 			tmpUrl = url.replace('\\', '/');
-			if (tmpUrl.startsWith(DE.FILE_SEPARATOR_UNIX))
+			if (tmpUrl.startsWith(GDE.FILE_SEPARATOR_UNIX))
 				tmpUrl = tmpUrl.substring(1);
 			if (resources.containsKey(tmpUrl))
 				return (Image) resources.get(tmpUrl);
@@ -447,7 +447,7 @@ public class SWTResourceManager {
 		String tmpUrl = null;
 		try {
 			tmpUrl = url.replace('\\', '/');
-			if (tmpUrl.startsWith(DE.FILE_SEPARATOR_UNIX))
+			if (tmpUrl.startsWith(GDE.FILE_SEPARATOR_UNIX))
 				tmpUrl = tmpUrl.substring(1);
 			if (resources.containsKey(tmpUrl))
 				return (Image) resources.get(tmpUrl);
@@ -458,7 +458,7 @@ public class SWTResourceManager {
 		} catch (Exception e) {
 			log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + tmpUrl);
 			log.log(Level.SEVERE, e.getMessage(), e);
-			return getImage(activeDeviceInstance, "osde/resource/NoDevicePicture.jpg");
+			return getImage(activeDeviceInstance, "gde/resource/NoDevicePicture.jpg");
 		}
 	}
 
@@ -473,7 +473,7 @@ public class SWTResourceManager {
 	}
 
 	public static Color getColor(int red, int green, int blue) {
-		String name = "COLOR:" + red + DE.STRING_COMMA + green + DE.STRING_COMMA + blue; //$NON-NLS-1$
+		String name = "COLOR:" + red + GDE.STRING_COMMA + green + GDE.STRING_COMMA + blue; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Color) resources.get(name);
 		Color color = new Color(Display.getDefault(), red, green, blue);
@@ -483,7 +483,7 @@ public class SWTResourceManager {
 	}
 
 	public static Pattern getPattern(float x1, float y1, float x2, float y2, int swtColor1, int alpha1, int swtColor2, int alpha2) {
-		String name = "PATTERN:" + x1 + DE.STRING_COMMA + y1 + DE.STRING_COMMA + x2 + DE.STRING_COMMA + y2 + swtColor1 + DE.STRING_COMMA + alpha1 + DE.STRING_COMMA + swtColor2 + DE.STRING_COMMA + alpha2; //$NON-NLS-1$
+		String name = "PATTERN:" + x1 + GDE.STRING_COMMA + y1 + GDE.STRING_COMMA + x2 + GDE.STRING_COMMA + y2 + swtColor1 + GDE.STRING_COMMA + alpha1 + GDE.STRING_COMMA + swtColor2 + GDE.STRING_COMMA + alpha2; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Pattern) resources.get(name);
 		Pattern pattern = new Pattern(Display.getDefault(), x1, y1, x2, y2, SWTResourceManager.getColor(swtColor1), alpha1, SWTResourceManager.getColor(swtColor2), alpha2);
@@ -493,7 +493,7 @@ public class SWTResourceManager {
 	}
 
 	public static Pattern getPattern(float x1, float y1, float x2, float y2, int swtColor1, int swtColor2) {
-		String name = "PATTERN:" + x1 + DE.STRING_COMMA + y1 + DE.STRING_COMMA + x2 + DE.STRING_COMMA + y2 + swtColor1 + DE.STRING_COMMA + swtColor2; //$NON-NLS-1$
+		String name = "PATTERN:" + x1 + GDE.STRING_COMMA + y1 + GDE.STRING_COMMA + x2 + GDE.STRING_COMMA + y2 + swtColor1 + GDE.STRING_COMMA + swtColor2; //$NON-NLS-1$
 		if (resources.containsKey(name))
 			return (Pattern) resources.get(name);
 		Pattern pattern = new Pattern(Display.getDefault(), x1, y1, x2, y2, SWTResourceManager.getColor(swtColor1), SWTResourceManager.getColor(swtColor2));
@@ -515,7 +515,7 @@ public class SWTResourceManager {
 	public static Cursor getCursor(String url) {
 		try {
 			String tmpUrl = url.replace('\\', '/');
-			if (tmpUrl.startsWith(DE.FILE_SEPARATOR_UNIX)) tmpUrl = tmpUrl.substring(1);
+			if (tmpUrl.startsWith(GDE.FILE_SEPARATOR_UNIX)) tmpUrl = tmpUrl.substring(1);
 			if (resources.containsKey(tmpUrl)) return (Cursor) resources.get(tmpUrl);
 			ImageData imgCur = new ImageData(instance.getClass().getClassLoader().getResourceAsStream(tmpUrl));
 			Cursor cursor = new Cursor(Display.getDefault(), imgCur, imgCur.width/2, imgCur.height/2);

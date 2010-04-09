@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.dialog;
+package gde.ui.dialog;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -31,7 +31,7 @@ import java.awt.print.Book;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterJob;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -52,16 +52,16 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.utils.StringHelper;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
 
 /**
  * simple print configuration dialog
@@ -113,22 +113,22 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			this.dialogShell.setLayout(null);
-			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Print.gif")); //$NON-NLS-1$
-			this.dialogShell.setText(Messages.getString(MessageIds.DE_MSGT0441));
+			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/Print.gif")); //$NON-NLS-1$
+			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0441));
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(400, 320);
 			{
 				this.headerButton = new Button(this.dialogShell, SWT.CHECK | SWT.LEFT);
-				this.headerButton.setText(Messages.getString(MessageIds.DE_MSGT0456));
-				this.headerButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0457));
+				this.headerButton.setText(Messages.getString(MessageIds.GDE_MSGT0456));
+				this.headerButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0457));
 				this.headerButton.setBounds(14, 7, 366, 27);
 				this.headerButton.setSelection(true);
 			}
 			{
 				this.configurationGroup = new Group(this.dialogShell, SWT.NONE);
 				this.configurationGroup.setLayout(null);
-				this.configurationGroup.setText(Messages.getString(MessageIds.DE_MSGT0448));
+				this.configurationGroup.setText(Messages.getString(MessageIds.GDE_MSGT0448));
 				this.configurationGroup.setBounds(7, 36, 168, 206);
 				this.configurationGroup.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
@@ -155,32 +155,32 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				});
 				{
 					this.graphicsButton = new Button(this.configurationGroup, SWT.CHECK | SWT.LEFT);
-					this.graphicsButton.setText(Messages.getString(MessageIds.DE_MSGT0453));
-					this.graphicsButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0458));
-					this.graphicsButton.setImage(SWTResourceManager.getImage("osde/resource/Graphics.gif")); //$NON-NLS-1$
+					this.graphicsButton.setText(Messages.getString(MessageIds.GDE_MSGT0453));
+					this.graphicsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0458));
+					this.graphicsButton.setImage(SWTResourceManager.getImage("gde/resource/Graphics.gif")); //$NON-NLS-1$
 					this.graphicsButton.setSelection(true);
 					this.graphicsButton.setBounds(8, 16, 148, 45);
 				}
 				{
 					this.statisticsButton = new Button(this.configurationGroup, SWT.CHECK | SWT.LEFT);
-					this.statisticsButton.setText(Messages.getString(MessageIds.DE_MSGT0350));
-					this.statisticsButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0459));
-					this.statisticsButton.setImage(SWTResourceManager.getImage("osde/resource/Statistics.gif")); //$NON-NLS-1$
+					this.statisticsButton.setText(Messages.getString(MessageIds.GDE_MSGT0350));
+					this.statisticsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0459));
+					this.statisticsButton.setImage(SWTResourceManager.getImage("gde/resource/Statistics.gif")); //$NON-NLS-1$
 					this.statisticsButton.setSelection(true);
 					this.statisticsButton.setBounds(8, 62, 148, 45);
 				}
 				{
 					this.objectButton = new Button(this.configurationGroup, SWT.CHECK | SWT.LEFT);
-					this.objectButton.setText(Messages.getString(MessageIds.DE_MSGT0455));
-					this.objectButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0460));
-					this.objectButton.setImage(SWTResourceManager.getImage("osde/resource/Object.gif")); //$NON-NLS-1$
+					this.objectButton.setText(Messages.getString(MessageIds.GDE_MSGT0455));
+					this.objectButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0460));
+					this.objectButton.setImage(SWTResourceManager.getImage("gde/resource/Object.gif")); //$NON-NLS-1$
 					this.objectButton.setBounds(8, 108, 148, 45);
 				}
 				{
 					this.curveCompareButton = new Button(this.configurationGroup, SWT.CHECK | SWT.LEFT);
-					this.curveCompareButton.setText(Messages.getString(MessageIds.DE_MSGT0442));
-					this.curveCompareButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0461));
-					this.curveCompareButton.setImage(SWTResourceManager.getImage("osde/resource/Graphics.gif")); //$NON-NLS-1$
+					this.curveCompareButton.setText(Messages.getString(MessageIds.GDE_MSGT0442));
+					this.curveCompareButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0461));
+					this.curveCompareButton.setImage(SWTResourceManager.getImage("gde/resource/Graphics.gif")); //$NON-NLS-1$
 					this.curveCompareButton.setSelection(false);
 					this.curveCompareButton.setBounds(8, 155, 148, 45);
 				}
@@ -189,12 +189,12 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				this.orientationGroup = new Group(this.dialogShell, SWT.NONE);
 				this.orientationGroup.setLayout(null);
 				this.orientationGroup.setBounds(181, 36, 203, 206);
-				this.orientationGroup.setText(Messages.getString(MessageIds.DE_MSGT0443));
+				this.orientationGroup.setText(Messages.getString(MessageIds.GDE_MSGT0443));
 				{
 					this.portraitButton = new Button(this.orientationGroup, SWT.RADIO | SWT.LEFT);
-					this.portraitButton.setText(Messages.getString(MessageIds.DE_MSGT0444));
-					this.portraitButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0445));
-					this.portraitButton.setImage(SWTResourceManager.getImage("osde/resource/Portrait.gif")); //$NON-NLS-1$
+					this.portraitButton.setText(Messages.getString(MessageIds.GDE_MSGT0444));
+					this.portraitButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0445));
+					this.portraitButton.setImage(SWTResourceManager.getImage("gde/resource/Portrait.gif")); //$NON-NLS-1$
 					this.portraitButton.setSelection(true);
 					this.portraitButton.setBounds(8, 16, 183, 65);
 					this.portraitButton.addSelectionListener(new SelectionAdapter() {
@@ -209,9 +209,9 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				}
 				{
 					this.landscapeButton = new Button(this.orientationGroup, SWT.RADIO | SWT.LEFT);
-					this.landscapeButton.setText(Messages.getString(MessageIds.DE_MSGT0446));
-					this.landscapeButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0447));
-					this.landscapeButton.setImage(SWTResourceManager.getImage("osde/resource/Landscape.gif")); //$NON-NLS-1$
+					this.landscapeButton.setText(Messages.getString(MessageIds.GDE_MSGT0446));
+					this.landscapeButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0447));
+					this.landscapeButton.setImage(SWTResourceManager.getImage("gde/resource/Landscape.gif")); //$NON-NLS-1$
 					this.landscapeButton.setSelection(false);
 					this.landscapeButton.setBounds(8, 74, 183, 65);
 					this.landscapeButton.addSelectionListener(new SelectionAdapter() {
@@ -226,9 +226,9 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				}
 				{
 					this.landscapeReverseButton = new Button(this.orientationGroup, SWT.RADIO | SWT.LEFT);
-					this.landscapeReverseButton.setText(Messages.getString(MessageIds.DE_MSGT0449));
-					this.landscapeReverseButton.setToolTipText(Messages.getString(MessageIds.DE_MSGT0450));
-					this.landscapeReverseButton.setImage(SWTResourceManager.getImage("osde/resource/LandscapeReverse.gif")); //$NON-NLS-1$
+					this.landscapeReverseButton.setText(Messages.getString(MessageIds.GDE_MSGT0449));
+					this.landscapeReverseButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0450));
+					this.landscapeReverseButton.setImage(SWTResourceManager.getImage("gde/resource/LandscapeReverse.gif")); //$NON-NLS-1$
 					this.landscapeReverseButton.setSelection(false);
 					this.landscapeReverseButton.setBounds(8, 134, 183, 65);
 					this.landscapeReverseButton.addSelectionListener(new SelectionAdapter() {
@@ -244,7 +244,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 			{
 				this.printButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-				this.printButton.setText(Messages.getString(MessageIds.DE_MSGT0451));
+				this.printButton.setText(Messages.getString(MessageIds.GDE_MSGT0451));
 				this.printButton.setBounds(212, 250, 149, 30);
 				this.printButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -263,7 +263,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 			{
 				this.cancelButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-				this.cancelButton.setText(Messages.getString(MessageIds.DE_MSGT0452));
+				this.cancelButton.setText(Messages.getString(MessageIds.GDE_MSGT0452));
 				this.cancelButton.setBounds(29, 250, 149, 30);
 				this.cancelButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -358,7 +358,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 				//prepare the page layout
 				PrintRequestAttributeSet printAttrSet = new HashPrintRequestAttributeSet();
-				printAttrSet.add(new JobName(DE.OSDE_NAME_LONG, Settings.getInstance().getLocale()));
+				printAttrSet.add(new JobName(GDE.OSDE_NAME_LONG, Settings.getInstance().getLocale()));
 				switch (orientation) {
 				case PageFormat.LANDSCAPE:
 					printAttrSet.add(OrientationRequested.LANDSCAPE);
@@ -385,24 +385,24 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					Channel activeChannel = Channels.getInstance().getActiveChannel();
 					if (activeChannel != null) {
 						fileName = activeChannel.getFileName();
-						fileName = fileName == null ? DE.OSDE_NAME_LONG + DE.STRING_MESSAGE_CONCAT : fileName + DE.STRING_MESSAGE_CONCAT;
+						fileName = fileName == null ? GDE.OSDE_NAME_LONG + GDE.STRING_MESSAGE_CONCAT : fileName + GDE.STRING_MESSAGE_CONCAT;
 					}
 					else {
-						fileName = DE.OSDE_NAME_LONG + DE.STRING_MESSAGE_CONCAT;
+						fileName = GDE.OSDE_NAME_LONG + GDE.STRING_MESSAGE_CONCAT;
 					}
 
 
 					if (documentPageFormat.getOrientation() == PageFormat.REVERSE_LANDSCAPE) {
-						if (isGraphics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
-						if (isStatistics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
-						if (isObject) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0403) : "", objectImageAWT), documentPageFormat);
-						if (isCompare) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0144) : "", compareImageAWT), documentPageFormat);
+						if (isGraphics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
+						if (isStatistics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
+						if (isObject) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
+						if (isCompare) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
 					}
 					else if (documentPageFormat.getOrientation() == PageFormat.LANDSCAPE) {
-						if (isGraphics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
-						if (isStatistics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
-						if (isObject) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0403) : "", objectImageAWT), documentPageFormat);
-						if (isCompare) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0144) : "", compareImageAWT), documentPageFormat);
+						if (isGraphics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
+						if (isStatistics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
+						if (isObject) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
+						if (isCompare) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
 					}
 					else if (documentPageFormat.getOrientation() == PageFormat.PORTRAIT) {
 						boolean isGraphicsToBePrinted = isGraphics;
@@ -411,51 +411,51 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						boolean isCompareToBePrinted = isCompare;
 
 						if (isGraphicsToBePrinted && isStatisticsToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0143) : "", graphicsImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, 
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
 							isGraphicsToBePrinted = isStatisticsToBePrinted = false;
 						}
 						else if (isGraphicsToBePrinted && isObjectToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0143) : "", graphicsImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0403)	: "", objectImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, 
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403)	: "", objectImageAWT), documentPageFormat);
 							isGraphicsToBePrinted = isObjectToBePrinted = false;
 						}
 						else if (isGraphicsToBePrinted && isObjectToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0143) : "", graphicsImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0144)	: "", compareImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, 
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144)	: "", compareImageAWT), documentPageFormat);
 							isGraphicsToBePrinted = isObjectToBePrinted = false;
 						}
 						else if (isGraphicsToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
 							isGraphicsToBePrinted = false;
 						}
 
 						if (isStatisticsToBePrinted && isObjectToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0350) : "", statisticsImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0403) : "", objectImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT, 
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
 							isStatisticsToBePrinted = isObjectToBePrinted = false;
 						}
 						else if (isStatisticsToBePrinted && isCompareToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0350) : "", statisticsImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0144) : "", compareImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT, 
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
 							isStatisticsToBePrinted = isCompareToBePrinted = false;
 						}
 						else if (isStatisticsToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
 							isStatisticsToBePrinted = false;
 						}
 
 						if (isObjectToBePrinted && isCompareToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0403) : "", objectImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0144)	: "", compareImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT, 
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144)	: "", compareImageAWT), documentPageFormat);
 							isObjectToBePrinted = isCompareToBePrinted = false;
 						}
 						else if (isObjectToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0403) : "", objectImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
 							isObjectToBePrinted = false;
 						}
 						else if (isCompareToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.DE_MSGT0144) : "", compareImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
 							isCompareToBePrinted = false;
 						}
 					}
@@ -464,7 +464,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 					catch (Exception e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						PrintSelectionDialog.this.application.openMessageDialog(DataExplorer.shell, e.getClass().getSimpleName() + DE.STRING_MESSAGE_CONCAT + e.getMessage());
+						PrintSelectionDialog.this.application.openMessageDialog(DataExplorer.shell, e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 					}
 				}
 			}
@@ -648,7 +648,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//			
 	//		}
 	//		else { // is portrait
-	//			if (printer.startJob(osde.DE_NAME_LONG)) {
+	//			if (printer.startJob(de.DE_NAME_LONG)) {
 	//				if (isGraphics && printer.startPage()) {
 	//					GC gc = new GC(printer);
 	//					gc.setFont(SWTResourceManager.getFont(this.application, 50, SWT.NORMAL));
@@ -668,7 +668,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//					if (isStatistics) {
 	//						gc.setFont(SWTResourceManager.getFont("Lucida Console", 30, SWT.NORMAL));
 	//						String statistics = this.application.getStatisticsAsText();
-	//						statistics = statistics.substring(statistics.indexOf(DE.LINE_SEPARATOR));
+	//						statistics = statistics.substring(statistics.indexOf(GDE.LINE_SEPARATOR));
 	//						gc.drawText(statistics, printBounds.x, printBounds.y + printBounds.height / 2);
 	//						isStatistics = false;
 	//					}
@@ -694,7 +694,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//
 	//					gc.setFont(SWTResourceManager.getFont("Lucida Console", 30, SWT.NORMAL));
 	//					String statistics = this.application.getStatisticsAsText();
-	//					statistics = statistics.substring(statistics.indexOf(DE.LINE_SEPARATOR));
+	//					statistics = statistics.substring(statistics.indexOf(GDE.LINE_SEPARATOR));
 	//					gc.drawText(statistics, printBounds.x, printBounds.y + pt.y + 20);
 	//					isStatistics = false;
 	//
@@ -738,7 +738,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//		printer.dispose();
 
 	//	Point drawHeader(Rectangle printBounds, GC gc, String type) {
-	//		gc.drawText(osde.DE_NAME_LONG + DE.STRING_MESSAGE_CONCAT + type, printBounds.x, printBounds.y);
+	//		gc.drawText(de.DE_NAME_LONG + GDE.STRING_MESSAGE_CONCAT + type, printBounds.x, printBounds.y);
 	//		String date = StringHelper.getDate();
 	//		Point pt = gc.textExtent(date); // date string dimensions
 	//		gc.drawText(date, printBounds.width-pt.x, printBounds.y);

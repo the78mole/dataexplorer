@@ -14,18 +14,18 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.utils;
+package gde.utils;
 
 import java.io.IOException;
 import java.util.jar.JarFile;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
+import gde.DE;
+import gde.config.Settings;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
 
 /**
  * This is a simple web browser launcher utility, where help pages can be displayed
@@ -46,8 +46,8 @@ public class WebBrowser {
 		log.log(Level.FINE, "basePath = " + basePath + " jarName = " + jarName); //$NON-NLS-1$
 		
 		try {
-			String targetDir = DE.JAVA_IO_TMPDIR + "OSDE" + DE.FILE_SEPARATOR;
-			String helpDir = "help" + DE.FILE_SEPARATOR + Settings.getInstance().getLocale().getLanguage() + DE.FILE_SEPARATOR;
+			String targetDir = GDE.JAVA_IO_TMPDIR + "OSDE" + GDE.FILE_SEPARATOR;
+			String helpDir = "help" + GDE.FILE_SEPARATOR + Settings.getInstance().getLocale().getLanguage() + GDE.FILE_SEPARATOR;
 			FileUtils.extractDir(new JarFile(basePath + jarName), helpDir, targetDir, "555");
 			
 			String stringUrl = targetDir + helpDir + fileName;
@@ -58,7 +58,7 @@ public class WebBrowser {
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			DataExplorer.getInstance().openMessageDialog(
-					Messages.getString(MessageIds.DE_MSGE0018, new Object[] { e.getLocalizedMessage() } )); //$NON-NLS-1$
+					Messages.getString(MessageIds.GDE_MSGE0018, new Object[] { e.getLocalizedMessage() } )); //$NON-NLS-1$
 		}
 	}
 
@@ -70,32 +70,32 @@ public class WebBrowser {
 	 */
 	public static void openBrowser(String stringUrl) {
 		try {
-			if (DE.IS_WINDOWS) {
+			if (GDE.IS_WINDOWS) {
 				Runtime.getRuntime().exec("rundll32.exe url.dll,FileProtocolHandler " + stringUrl); //$NON-NLS-1$
 			}
-			else if (DE.IS_LINUX){
+			else if (GDE.IS_LINUX){
 				String[] browsers = { "firefox", "konqueror", "opera", "epiphany", "mozilla", "netscape" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 				String browser = null;
 				for (int count = 0; count < browsers.length && browser == null; count++)
 					if (Runtime.getRuntime().exec(new String[] { "which", browsers[count] }).waitFor() == 0) browser = browsers[count]; //$NON-NLS-1$
 
 				if (browser == null)
-					throw new Exception(Messages.getString(MessageIds.DE_MSGE0019, new Object[]
+					throw new Exception(Messages.getString(MessageIds.GDE_MSGE0019, new Object[]
 							{ "firefox, konqueror, opera, epiphany, mozilla, netscape" } )); //$NON-NLS-1$
 				
-				Runtime.getRuntime().exec(browser + DE.STRING_BLANK + stringUrl);
+				Runtime.getRuntime().exec(browser + GDE.STRING_BLANK + stringUrl);
 			}
-			else if (DE.IS_MAC) {
-		 		Runtime.getRuntime().exec("open" + DE.STRING_BLANK + stringUrl);
+			else if (GDE.IS_MAC) {
+		 		Runtime.getRuntime().exec("open" + GDE.STRING_BLANK + stringUrl);
 		 }
 			else {
-				throw new Exception(Messages.getString(MessageIds.DE_MSGE0020, new Object[] {System.getProperty(DE.STRING_OS_NAME)} )); 
+				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0020, new Object[] {System.getProperty(GDE.STRING_OS_NAME)} )); 
 			}
 
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.DE_MSGE0021, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+			DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0021, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 		}
 	}
 }

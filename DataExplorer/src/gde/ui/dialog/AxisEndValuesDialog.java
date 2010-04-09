@@ -14,9 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.dialog;
+package gde.ui.dialog;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -39,11 +39,11 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.DE;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
+import gde.DE;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
  * Dialog class to adjust the measurement scale end values
@@ -97,8 +97,8 @@ public class AxisEndValuesDialog extends Dialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(345, 272);
-			this.dialogShell.setText(Messages.getString(MessageIds.DE_MSGT0151));
-			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/Measure.gif")); //$NON-NLS-1$
+			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0151));
+			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/Measure.gif")); //$NON-NLS-1$
 			this.dialogShell.setLocation(100, 100);
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
@@ -138,7 +138,7 @@ public class AxisEndValuesDialog extends Dialog {
 				okBbuttonLData.left = new FormAttachment(0, 1000, 17);
 				okBbuttonLData.top = new FormAttachment(0, 1000, 99);
 				this.okBbutton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-				this.okBbutton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.okBbutton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.okBbutton.setLayoutData(okBbuttonLData);
 				this.okBbutton.setText("OK"); //$NON-NLS-1$
 				this.okBbutton.addSelectionListener(new SelectionAdapter() {
@@ -158,7 +158,7 @@ public class AxisEndValuesDialog extends Dialog {
 				canvasLData.left = new FormAttachment(0, 1000, 113);
 				this.canvas = new Canvas(this.dialogShell, SWT.BORDER);
 				this.canvas.setLayoutData(canvasLData);
-				this.canvas.setBackgroundImage(SWTResourceManager.getImage("osde/resource/SmallGraph.gif")); //$NON-NLS-1$
+				this.canvas.setBackgroundImage(SWTResourceManager.getImage("gde/resource/SmallGraph.gif")); //$NON-NLS-1$
 			}
 			{
 				this.maxValueLabel = new CLabel(this.dialogShell, SWT.NONE);
@@ -168,17 +168,17 @@ public class AxisEndValuesDialog extends Dialog {
 				maxValueLabelLData.left = new FormAttachment(0, 1000, 12);
 				maxValueLabelLData.top = new FormAttachment(0, 1000, 12);
 				this.maxValueLabel.setLayoutData(maxValueLabelLData);
-				this.maxValueLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.maxValueLabel.setText(Messages.getString(MessageIds.DE_MSGT0152));
+				this.maxValueLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.maxValueLabel.setText(Messages.getString(MessageIds.GDE_MSGT0152));
 			}
 			{
 				FormData maxValueSelectLData = new FormData();
 				maxValueSelectLData.width = 84;
-				maxValueSelectLData.height = DE.IS_LINUX ? 22 : 20;
+				maxValueSelectLData.height = GDE.IS_LINUX ? 22 : 20;
 				maxValueSelectLData.left = new FormAttachment(0, 1000, 12);
 				maxValueSelectLData.top = new FormAttachment(0, 1000, 38);
 				this.maxValueSelect = new CCombo(this.dialogShell, SWT.BORDER);
-				this.maxValueSelect.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.maxValueSelect.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.maxValueSelect.setLayoutData(maxValueSelectLData);
 				this.maxValueSelect.setItems(this.initialValues);
 				this.maxValueSelect.select(7);
@@ -198,18 +198,18 @@ public class AxisEndValuesDialog extends Dialog {
 				cLabel1LData.height = 22;
 				cLabel1LData.left = new FormAttachment(0, 1000, 12);
 				cLabel1LData.top = new FormAttachment(0, 1000, 169);
-				this.minValueLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.minValueLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.minValueLabel.setLayoutData(cLabel1LData);
-				this.minValueLabel.setText(Messages.getString(MessageIds.DE_MSGT0153));
+				this.minValueLabel.setText(Messages.getString(MessageIds.GDE_MSGT0153));
 			}
 			{
 				FormData minValueSelectLData = new FormData();
 				minValueSelectLData.width = 84;
-				minValueSelectLData.height = DE.IS_LINUX ? 22 : 20;
+				minValueSelectLData.height = GDE.IS_LINUX ? 22 : 20;
 				minValueSelectLData.left = new FormAttachment(0, 1000, 12);
 				minValueSelectLData.top = new FormAttachment(0, 1000, 195);
 				this.minValueSelect = new CCombo(this.dialogShell, SWT.BORDER);
-				this.minValueSelect.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.minValueSelect.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.minValueSelect.setLayoutData(minValueSelectLData);
 				this.minValueSelect.setItems(this.initialValues);
 				this.minValueSelect.select(5);

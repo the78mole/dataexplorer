@@ -14,9 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.ui.menu;
+package gde.ui.menu;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -26,11 +26,11 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
+import gde.DE;
+import gde.config.Settings;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
 
 /**
  * @author Winfried Brügmann
@@ -53,23 +53,23 @@ public class ObjectImageContextMenu {
 	public void createMenu(Menu popupMenu) {
 		this.menu = popupMenu;
 		MenuItem newItem = new MenuItem(this.menu, SWT.PUSH);
-		newItem.setText(Messages.getString(MessageIds.DE_MSGT0430));
+		newItem.setText(Messages.getString(MessageIds.GDE_MSGT0430));
 		newItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ObjectImageContextMenu.log.log(Level.FINEST, "newItem action performed! " + e); //$NON-NLS-1$
-				FileDialog imgFileDialog = ObjectImageContextMenu.this.application.openFileOpenDialog(Messages.getString(MessageIds.DE_MSGT0431), new String[] { DE.FILE_ENDING_STAR_JPG, DE.FILE_ENDING_STAR_PNG,
-						DE.FILE_ENDING_STAR_GIF }, Settings.getInstance().getDataFilePath());
+				FileDialog imgFileDialog = ObjectImageContextMenu.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0431), new String[] { GDE.FILE_ENDING_STAR_JPG, GDE.FILE_ENDING_STAR_PNG,
+						GDE.FILE_ENDING_STAR_GIF }, Settings.getInstance().getDataFilePath());
 				String imgFilePath = imgFileDialog.getFilterPath();
 				ObjectImageContextMenu.log.log(Level.FINE, "imgFilePath = " + imgFilePath); //$NON-NLS-1$
 				if (imgFileDialog.getFileName().length() > 4) {
 					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED, true);
-					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, imgFilePath + DE.FILE_SEPARATOR_UNIX + imgFileDialog.getFileName());
+					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, imgFilePath + GDE.FILE_SEPARATOR_UNIX + imgFileDialog.getFileName());
 					ObjectImageContextMenu.this.application.updateObjectImage();
 				}
 			}
 		});
 		MenuItem deleteItem = new MenuItem(this.menu, SWT.PUSH);
-		deleteItem.setText(Messages.getString(MessageIds.DE_MSGT0432));
+		deleteItem.setText(Messages.getString(MessageIds.GDE_MSGT0432));
 		deleteItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ObjectImageContextMenu.log.log(Level.FINEST, "deleteItem action performed! " + e); //$NON-NLS-1$

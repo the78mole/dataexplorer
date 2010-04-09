@@ -14,17 +14,17 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.data;
+package gde.data;
 
 import java.util.HashMap;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.DE;
-import osde.device.ChannelTypes;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
+import gde.DE;
+import gde.device.ChannelTypes;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
 
 /**
  * Channels class is a map where all possible channels of a device are collected, this is a application singleton
@@ -88,8 +88,8 @@ public class Channels extends HashMap<Integer, Channel> {
 		
 		if (channelName != null && channelName.length() > 5) {
 			// "2 : Outlet", use the first digit to calculate the channel number
-			if (channelName.contains(":") && channelName.split(DE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(DE.STRING_COLON)[0].trim().charAt(0))) {
-				return new Integer(channelName.split(DE.STRING_COLON)[0].trim());
+			if (channelName.contains(":") && channelName.split(GDE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(GDE.STRING_COLON)[0].trim().charAt(0))) {
+				return new Integer(channelName.split(GDE.STRING_COLON)[0].trim());
 			}
 			else // old file contnet "Outlet 2" use the last digit to calculate the channel number
 				if (channelName.contains(" ") && channelName.split(" ").length > 1 && Character.isDigit(channelName.split(" ")[1].trim().charAt(0))) {
@@ -98,7 +98,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			else {
 				for (String name : this.getChannelNames()) {
 					// try name matching "Outlet"
-					if (name.split(DE.STRING_COLON)[1].trim().equals(channelName) || name.split(DE.STRING_COLON)[1].trim().split(" ")[0].trim().equals(channelName)) {
+					if (name.split(GDE.STRING_COLON)[1].trim().equals(channelName) || name.split(GDE.STRING_COLON)[1].trim().split(" ")[0].trim().equals(channelName)) {
 						break;
 					}
 					++searchedNumber;
@@ -128,7 +128,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	public String getChannelNamesToString() {
 		StringBuilder sb = new StringBuilder();
 		for (String channelName : this.application.getMenuToolBar().getChannelSelectCombo().getItems()) {
-			sb.append(channelName.split(DE.STRING_COLON)[1]).append(", "); //$NON-NLS-1$
+			sb.append(channelName.split(GDE.STRING_COLON)[1]).append(", "); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
@@ -141,7 +141,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) recordSet.resetZoomAndMeasurement();
 		
-		this.switchChannel(new Integer(channelName.split(DE.STRING_COLON)[0].trim()).intValue(), DE.STRING_EMPTY);
+		this.switchChannel(new Integer(channelName.split(GDE.STRING_COLON)[0].trim()).intValue(), GDE.STRING_EMPTY);
 	}
 
 	/**
@@ -206,7 +206,7 @@ public class Channels extends HashMap<Integer, Channel> {
 			}
 		}
 		else
-			this.application.openMessageDialogAsync(Messages.getString(MessageIds.DE_MSGW0006)); 
+			this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW0006)); 
 	}
 
 	/**
@@ -239,7 +239,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		try {
 			Channel activeChannel = Channels.getInstance().getActiveChannel();
 			if (activeChannel != null) {
-				activeChannel.objectKey = DE.STRING_EMPTY;
+				activeChannel.objectKey = GDE.STRING_EMPTY;
 				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 				if (activeRecordSet != null) {
 					String activeRecordName = activeRecordSet.getName();
@@ -254,7 +254,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		// use super.size instead of this.size to enable only one channel for multiple channel configurations
 		for (int i = 1; i <= super.size(); i++) { 
 			Channel channel = this.get(i);
-			channel.setFileName(DE.STRING_EMPTY);
+			channel.setFileName(GDE.STRING_EMPTY);
 			channel.setSaved(false);
 			for (int j = 0; j < channel.size(); j++) {
 				channel.getRecordSets().clear(); // clear records

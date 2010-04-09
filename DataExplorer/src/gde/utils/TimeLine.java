@@ -14,11 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.utils;
+package gde.utils;
 
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -26,10 +26,10 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
-import osde.data.RecordSet;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.SWTResourceManager;
+import gde.data.RecordSet;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.SWTResourceManager;
 
 /**
  * Utility class to draw time line with tick marks and numbers
@@ -45,7 +45,7 @@ public class TimeLine {
 	public final static int	TIME_LINE_MIN_HRS		= 4;
 	public final static int	TIME_LINE_HRS				= 5;
 
-	String									timeLineText				= Messages.getString(MessageIds.DE_MSGT0267);
+	String									timeLineText				= Messages.getString(MessageIds.GDE_MSGT0267);
 	boolean									isTimeLinePrepared	= false;
 
 	/**
@@ -68,38 +68,38 @@ public class TimeLine {
 
 		if (totalTime_std > 5) {
 			maxTimeNumberFormated = (int) totalTime_std;
-			timeLineText = Messages.getString(MessageIds.DE_MSGT0265);
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0265);
 			format = TimeLine.TIME_LINE_HRS;
 		}
 		else if (totalTime_min > 60) {
 			maxTimeNumberFormated = (int) totalTime_min;
-			timeLineText = Messages.getString(MessageIds.DE_MSGT0266);
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0266);
 			format = TimeLine.TIME_LINE_MIN_HRS;
 		}
 		else if (totalTime_min > 10) {
 			maxTimeNumberFormated = (int) totalTime_min;
-			timeLineText = Messages.getString(MessageIds.DE_MSGT0267);
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0267);
 			format = TimeLine.TIME_LINE_MIN;
 		}
 		else if (totalTime_sec > 60) {
 			maxTimeNumberFormated = (int) totalTime_sec;
-			timeLineText = Messages.getString(MessageIds.DE_MSGT0268);
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0268);
 			format = TimeLine.TIME_LINE_SEC_MIN;
 		}
 		else if (totalTime_sec > 10) {
 			maxTimeNumberFormated = (int) totalTime_sec;
-			timeLineText = Messages.getString(MessageIds.DE_MSGT0269);
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0269);
 			format = TimeLine.TIME_LINE_SEC;
 		}
 		else if (totalTime_sec > 1) {
 			maxTimeNumberFormated = (int) totalTime_msec;
-			timeLineText = Messages.getString(MessageIds.DE_MSGT0269);
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0269);
 			factor = 1000; // 2900 -> 2,9 sec
 			format = TimeLine.TIME_LINE_SEC;
 		}
 		else {
 			maxTimeNumberFormated = (int) totalTime_msec;
-			timeLineText = Messages.getString(MessageIds.DE_MSGT0271);
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0271);
 			factor = 1;
 			format = TimeLine.TIME_LINE_MSEC;
 		}
