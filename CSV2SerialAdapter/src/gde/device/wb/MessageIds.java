@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.wb;
+package gde.device.wb;
 
 /** 
  * @author Winfried Brügmann 
@@ -22,10 +22,10 @@ package osde.device.wb;
  */ 
 public class MessageIds { 
 
-	public final static String	DE_MSGI1800 = "DE_MSGI1800";
-	public final static String	DE_MSGI1801 = "DE_MSGI1801";
-	public final static String	DE_MSGT1800 = "DE_MSGT1800";
-	public final static String	DE_MSGT1801 = "DE_MSGT1801";
-	public final static String	DE_MSGT1802 = "DE_MSGT1802";
+	public final static String	GDE_MSGI1800 = "GDE_MSGI1800";
+	public final static String	GDE_MSGI1801 = "GDE_MSGI1801";
+	public final static String	GDE_MSGT1800 = "GDE_MSGT1800";
+	public final static String	GDE_MSGT1801 = "GDE_MSGT1801";
+	public final static String	GDE_MSGT1802 = "GDE_MSGT1802";
 
  }

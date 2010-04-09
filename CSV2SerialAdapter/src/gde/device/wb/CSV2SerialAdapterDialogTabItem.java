@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.wb;
+package gde.device.wb;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +34,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import osde.DE;
-import osde.data.Channels;
-import osde.device.IDevice;
-import osde.messages.Messages;
-import osde.ui.MeasurementControl;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
+import gde.DE;
+import gde.data.Channels;
+import gde.device.IDevice;
+import gde.messages.Messages;
+import gde.ui.MeasurementControl;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
  * This class represents a tab item of a universal record visualization control
@@ -95,8 +95,8 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 			tabItemLabelLData.heightHint = 30;
 			tabItemLabelLData.widthHint = 292;
 			this.tabItemLabel.setLayoutData(tabItemLabelLData);
-			this.tabItemLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE+2, SWT.BOLD));
-			this.tabItemLabel.setText(Messages.getString(MessageIds.DE_MSGT1801));
+			this.tabItemLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+2, SWT.BOLD));
+			this.tabItemLabel.setText(Messages.getString(MessageIds.GDE_MSGT1801));
 		}
 		{
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
@@ -126,14 +126,14 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 				buttonCompositeLData.heightHint = 30;
 				buttonCompositeLData.widthHint = 292;
 				this.inputFileButton.setLayoutData(inputFileButtonLData);
-				this.inputFileButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.inputFileButton.setText(Messages.getString(MessageIds.DE_MSGT1802));
+				this.inputFileButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.inputFileButton.setText(Messages.getString(MessageIds.GDE_MSGT1802));
 				this.inputFileButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (CSV2SerialAdapterDialogTabItem.this.isVisibilityChanged) {
-							String msg = Messages.getString(osde.messages.MessageIds.DE_MSGI0041);
+							String msg = Messages.getString(de.messages.MessageIds.GDE_MSGI0041);
 							if (CSV2SerialAdapterDialogTabItem.this.application.openYesNoMessageDialog(CSV2SerialAdapterDialogTabItem.this.dialog.getDialogShell(), msg) == SWT.YES) {
 								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								CSV2SerialAdapterDialogTabItem.this.device.storeDeviceProperties();

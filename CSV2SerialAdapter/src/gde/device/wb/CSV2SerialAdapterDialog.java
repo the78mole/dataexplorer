@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.wb;
+package gde.device.wb;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,15 +36,15 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.device.DeviceDialog;
-import osde.device.IDevice;
-import osde.messages.Messages;
-import osde.ui.SWTResourceManager;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceDialog;
+import gde.device.IDevice;
+import gde.messages.Messages;
+import gde.ui.SWTResourceManager;
 
 /**
  * Dialog class to enable visualization control
@@ -101,15 +101,15 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 				this.dialogShell.layout();
 				//dialogShell.pack();
 				this.dialogShell.setSize(310, 10 + 30 + 90 + this.measurementsCount * 30 + 55);
-				this.dialogShell.setText(this.device.getName() + Messages.getString(osde.messages.MessageIds.DE_MSGT0273));
-				this.dialogShell.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+				this.dialogShell.setText(this.device.getName() + Messages.getString(de.messages.MessageIds.GDE_MSGT0273));
+				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (CSV2SerialAdapterDialog.this.device.isChangePropery()) {
-							String msg = Messages.getString(osde.messages.MessageIds.DE_MSGI0041);
+							String msg = Messages.getString(de.messages.MessageIds.GDE_MSGI0041);
 							if (CSV2SerialAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
 								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								CSV2SerialAdapterDialog.this.device.storeDeviceProperties();
@@ -159,8 +159,8 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 						saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
 						saveButtonLData.left = new FormAttachment(0, 1000, 15);
 						this.saveButton.setLayoutData(saveButtonLData);
-						this.saveButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.saveButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0486));
+						this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.saveButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0486));
 						this.saveButton.setEnabled(false);
 						this.saveButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -179,8 +179,8 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 						closeButtonLData.right = new FormAttachment(1000, 1000, -15);
 						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
 						this.closeButton.setLayoutData(closeButtonLData);
-						this.closeButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.closeButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0485));
+						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.closeButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0485));
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -194,7 +194,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 					tabFolderLData.left = new FormAttachment(0, 1000, 0);
 					tabFolderLData.right = new FormAttachment(1000, 1000, 0);
 					tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
-					this.tabFolder.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.tabFolder.setLayoutData(tabFolderLData);
 					this.tabFolder.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -210,13 +210,13 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 									log.log(java.util.logging.Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null && activeChannel.getNumber() != channelNumber) {
-										int answer = CSV2SerialAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.DE_MSGI1801));
+										int answer = CSV2SerialAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1801));
 										if (answer == SWT.YES) {
 											String recordSetKey = activeRecordSet.getName();
 											Channel tmpChannel = channels.get(channelNumber);
 											if (tmpChannel != null) {
 												log.log(java.util.logging.Level.FINE,
-														"move record set " + recordSetKey + " to channel/configuration " + channelNumber + DE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+														"move record set " + recordSetKey + " to channel/configuration " + channelNumber + GDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 												tmpChannel.put(recordSetKey, activeRecordSet.clone(channelNumber));
 												activeChannel.remove(recordSetKey);
 												channels.switchChannel(channelNumber, recordSetKey);

@@ -39,7 +39,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implemntation for comma separated value serial data adapter"/>
-    		<attribute name="Export-Service" value="osde.device.wstech.DataVario, osde.device.wstech.DataVarioDuo, osde.device.wb.CSV2Serial1, osde.device.wb.CSV2Serial2"/>
+    		<attribute name="Export-Service" value="de.device.wstech.DataVario, gde.device.wstech.DataVarioDuo, gde.device.wb.CSV2Serial1, gde.device.wb.CSV2Serial2"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

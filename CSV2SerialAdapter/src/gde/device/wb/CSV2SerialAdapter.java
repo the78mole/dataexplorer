@@ -14,34 +14,34 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.wb;
+package gde.device.wb;
 
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.widgets.FileDialog;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
-import osde.device.MeasurementPropertyTypes;
-import osde.device.MeasurementType;
-import osde.device.PropertyType;
-import osde.exception.DataInconsitsentException;
-import osde.io.CSVSerialDataReaderWriter;
-import osde.io.DataParser;
-import osde.messages.Messages;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
+import gde.device.PropertyType;
+import gde.exception.DataInconsitsentException;
+import gde.io.CSVSerialDataReaderWriter;
+import gde.io.DataParser;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -63,7 +63,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	public CSV2SerialAdapter(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("de.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
@@ -77,7 +77,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	public CSV2SerialAdapter(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("de.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
@@ -89,7 +89,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(osde.messages.MessageIds.DE_MSGT0272);
+		return Messages.getString(de.messages.MessageIds.GDE_MSGT0272);
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		}
 		catch (Exception e) {
-			String msg = e.getMessage() + Messages.getString(osde.messages.MessageIds.DE_MSGW0543);
+			String msg = e.getMessage() + Messages.getString(de.messages.MessageIds.GDE_MSGW0543);
 			log.log(Level.WARNING, msg, e);
 			application.openMessageDialog(msg);
 			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);
@@ -211,7 +211,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -219,7 +219,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
-		int timeStampBufferSize = DE.SIZE_BYTES_INTEGER * recordDataSize;
+		int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 		byte[] timeStampBuffer = new byte[timeStampBufferSize];
 		if(!recordSet.isTimeStepConstant()) {
 			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
@@ -429,8 +429,8 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void openCloseSerialPort() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.DE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), DE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
-		String selectedImportFile = fd.getFilterPath() + DE.FILE_SEPARATOR_UNIX + fd.getFileName();
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
+		String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 		
 		if (fd.getFileName().length() > 4) {
