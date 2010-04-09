@@ -119,7 +119,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 			this.serialPort.wait4LiveData(100);
 		}
 		catch (Throwable e) {
-			String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
+			String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
 			cleanup(recordSetKey, message, e);
 		}
 		
@@ -167,17 +167,17 @@ public class LiPoWatchLiveGatherer extends Thread {
 				}
 				catch (DataInconsitsentException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
+					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
 					cleanup(recordSetKey, message, e);				}
 				catch (TimeOutException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
 					+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1602); //$NON-NLS-1$ 
 					cleanup(recordSetKey, message, e);
 				}
 				catch (IOException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
 					+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1602); //$NON-NLS-1$ 
 					cleanup(recordSetKey, message, e);
 				}

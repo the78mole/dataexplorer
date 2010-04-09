@@ -148,7 +148,7 @@ public class LiPoWatchDataGatherer extends Thread {
 		}
 		catch (DataInconsitsentException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 		}
 		catch (ApplicationConfigurationException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -156,12 +156,12 @@ public class LiPoWatchDataGatherer extends Thread {
 		}
 		catch (TimeOutException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
 			+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1602)); //$NON-NLS-1$
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
 			+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1602)); //$NON-NLS-1$
 		}
 		catch (Throwable e) {

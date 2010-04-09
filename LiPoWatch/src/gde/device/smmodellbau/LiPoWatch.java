@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -72,7 +72,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public LiPoWatch(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("de.device.smmodellbau.lipowatch.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.smmodellbau.lipowatch.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
@@ -87,7 +87,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public LiPoWatch(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("de.device.smmodellbau.lipowatch.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.smmodellbau.lipowatch.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
@@ -444,7 +444,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 				}
 				catch (Exception e) {
 					LiPoWatch.log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 				}
 			}
 			else {

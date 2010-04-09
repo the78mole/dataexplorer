@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -211,7 +211,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
 				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
-				this.dialogShell.setText("LiPoWatch" + Messages.getString(de.messages.MessageIds.GDE_MSGT0273)); //$NON-NLS-1$
+				this.dialogShell.setText("LiPoWatch" + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273)); //$NON-NLS-1$
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.setSize(509, 394);
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
@@ -487,7 +487,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 											updateConfigurationValues(LiPoWatchDialog.this.serialPort.readConfiguration());
 										}
 										catch (Exception e) {
-											LiPoWatchDialog.this.application.openMessageDialog(LiPoWatchDialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0029, new Object[] {
+											LiPoWatchDialog.this.application.openMessageDialog(LiPoWatchDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0029, new Object[] {
 													e.getClass().getSimpleName(), e.getMessage() }));
 										}
 									}
@@ -726,7 +726,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.stopReadDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 										this.stopReadDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.stopReadDataButton.setBounds(11, GDE.IS_MAC_COCOA ? 207 : 222, 218, 30);
-										this.stopReadDataButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0278));
+										this.stopReadDataButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0278));
 										this.stopReadDataButton.setEnabled(false);
 										this.stopReadDataButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1656));
 										this.stopReadDataButton.addSelectionListener(new SelectionAdapter() {
@@ -813,7 +813,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 														}
 														catch (Exception e) {
 															LiPoWatchDialog.log.log(Level.SEVERE, e.getMessage(), e);
-															LiPoWatchDialog.this.application.openMessageDialog(getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0029, new Object[] {
+															LiPoWatchDialog.this.application.openMessageDialog(getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0029, new Object[] {
 																	e.getClass().getSimpleName(), e.getMessage() }));
 														}
 													}
@@ -841,7 +841,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 														}
 														catch (Exception e) {
 															LiPoWatchDialog.log.log(Level.SEVERE, e.getMessage(), e);
-															LiPoWatchDialog.this.application.openMessageDialog(getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0029, new Object[] {
+															LiPoWatchDialog.this.application.openMessageDialog(getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0029, new Object[] {
 																	e.getClass().getSimpleName(), e.getMessage() }));
 														}
 													}
