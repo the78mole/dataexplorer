@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -146,7 +146,7 @@ public class SimulatorDialog extends DeviceDialog {
 				this.dialogShell.layout();
 				this.dialogShell.pack();
 				this.dialogShell.setSize(336, 393);
-				this.dialogShell.setText(DEVICE_NAME + Messages.getString(de.messages.MessageIds.GDE_MSGT0273));
+				this.dialogShell.setText(DEVICE_NAME + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				{
 					FormData timeResultLabelLData = new FormData();
@@ -356,7 +356,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.startButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					this.startButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.startButton.setLayoutData(startButtonLData);
-					this.startButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0274));
+					this.startButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0274));
 					this.startButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINE, "startButton.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -436,7 +436,7 @@ public class SimulatorDialog extends DeviceDialog {
 										if (SimulatorDialog.this.timerTask != null) SimulatorDialog.this.timerTask.cancel();
 										if (SimulatorDialog.this.timer != null) SimulatorDialog.this.timer.cancel();
 										SimulatorDialog.log.log(Level.SEVERE, e.getMessage(), e);
-										SimulatorDialog.this.application.openMessageDialog(SimulatorDialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+										SimulatorDialog.this.application.openMessageDialog(SimulatorDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 									catch (Exception e) {
 										log.log(Level.SEVERE, e.getMessage(), e);
@@ -456,7 +456,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.stopButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					this.stopButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.stopButton.setLayoutData(okButtonLData);
-					this.stopButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0275));
+					this.stopButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0275));
 					this.stopButton.setEnabled(false);
 					this.stopButton.addSelectionListener(new SelectionAdapter() {
 						@Override

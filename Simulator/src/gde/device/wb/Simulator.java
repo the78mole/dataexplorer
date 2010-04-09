@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -55,7 +55,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	public Simulator(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("de.device.wb.simulator.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.wb.simulator.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new SimulatorSerialPort(this, this.application);
@@ -70,7 +70,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	public Simulator(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("de.device.wb.simulator.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.wb.simulator.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new SimulatorSerialPort(this, this.application);
