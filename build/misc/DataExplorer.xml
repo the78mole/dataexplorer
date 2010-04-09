@@ -14,7 +14,7 @@
   <manifest></manifest>
   <icon>D:\workspaces\osde\build\misc\DataExplorer.ico</icon>
   <classPath>
-    <mainClass>osde.DE</mainClass>
+    <mainClass>de.DE</mainClass>
     <cp>DataExplorer.jar</cp>
   </classPath>
   <jre>

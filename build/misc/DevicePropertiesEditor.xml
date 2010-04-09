@@ -14,7 +14,7 @@
   <manifest></manifest>
   <icon>D:\workspaces\osde\build\misc\DevicePropertiesEditor.ico</icon>
   <classPath>
-    <mainClass>osde.ui.dialog.edit.DevicePropertiesEditor</mainClass>
+    <mainClass>de.ui.dialog.edit.DevicePropertiesEditor</mainClass>
     <cp>DataExplorer.jar</cp>
   </classPath>
   <jre>

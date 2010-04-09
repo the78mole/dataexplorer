@@ -2,8 +2,8 @@
 # ***** script to launch DataExplorer ** 27 Apr 2009 WB *****
 
 # determine and switch to the resource directory of the application bundle
-DE_DIR="$(dirname ${0})/../Resources"
-cd ${DE_DIR}
+GDE_DIR="$(dirname ${0})/../Resources"
+cd ${GDE_DIR}
 
 echo java -XstartOnFirstThread -Dfile.encoding=UTF-8 -jar -Xms32m -Xmx256m ./DataExplorer.jar
 java -XstartOnFirstThread -Dfile.encoding=UTF-8 -jar -Xms32m -Xmx256m ./DataExplorer.jar
