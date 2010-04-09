@@ -13,7 +13,7 @@ import gde.utils.ObjectKeyScanner;
  *
  */
 public class TestObjectKeyScanner extends TestSuperClass {
-	Logger	logger = Logger.getLogger("de.utils.ObjectKeyScanner");
+	Logger	logger = Logger.getLogger("gde.utils.ObjectKeyScanner");
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()

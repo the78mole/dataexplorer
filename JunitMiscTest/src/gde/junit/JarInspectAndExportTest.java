@@ -11,7 +11,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import junit.framework.TestCase;
-import gde.DE;
+import gde.GDE;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.FileUtils;

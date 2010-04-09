@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -67,8 +67,8 @@ public class TestSuperClass extends TestCase {
 	Handler																ch					= new ConsoleHandler();
 	LogFormatter													lf					= new LogFormatter();
 
-	Logger																logger1			= Logger.getLogger("de.data.Record");
-	Logger																logger2			= Logger.getLogger("de.data.RecordSet");
+	Logger																logger1			= Logger.getLogger("gde.data.Record");
+	Logger																logger2			= Logger.getLogger("gde.data.RecordSet");
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -160,9 +160,9 @@ public class TestSuperClass extends TestCase {
 		String selectedDeviceName = selectedActiveDeviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
 		String className = selectedDeviceName.contains(GDE.STRING_DOT) ? selectedDeviceName  // full qualified
-				: "de.device." + selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
+				: "gde.device." + selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
 		try {
-			//String className = "de.device.DefaultDeviceDialog";
+			//String className = "gde.device.DefaultDeviceDialog";
 			//log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class c = loader.loadClass(className);

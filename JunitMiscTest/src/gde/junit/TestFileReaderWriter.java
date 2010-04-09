@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 
-import gde.DE;
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
