@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import gde.DE;
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;

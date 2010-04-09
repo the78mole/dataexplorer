@@ -52,7 +52,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;

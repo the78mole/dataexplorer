@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 
-import gde.DE;
+import gde.GDE;
 import gde.device.DataBitsTypes;
 import gde.device.DataTypes;
 import gde.device.DeviceConfiguration;

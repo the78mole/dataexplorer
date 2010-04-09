@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
-import gde.DE;
+import gde.GDE;
 import gde.device.IDevice;
 
 /**

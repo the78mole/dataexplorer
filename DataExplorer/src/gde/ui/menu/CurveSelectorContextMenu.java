@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TableItem;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.Record;

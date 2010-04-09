@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.GraphicsTemplate;
 import gde.config.Settings;
 import gde.device.ChannelTypes;

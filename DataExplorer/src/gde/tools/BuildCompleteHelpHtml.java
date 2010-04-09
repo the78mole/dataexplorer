@@ -21,7 +21,7 @@ import java.util.logging.Handler;
 import gde.log.Level;
 import java.util.logging.Logger;
 
-import gde.DE;
+import gde.GDE;
 import gde.exception.ApplicationConfigurationException;
 import gde.log.LogFormatter;
 import gde.utils.FileUtils;

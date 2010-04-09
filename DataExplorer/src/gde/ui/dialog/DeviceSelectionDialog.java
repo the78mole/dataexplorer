@@ -56,7 +56,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.xml.sax.SAXParseException;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -1105,9 +1105,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		String selectedDeviceName = this.selectedActiveDeviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
 		String className = selectedDeviceName.contains(GDE.STRING_DOT) ? selectedDeviceName  // full qualified
-				: "de.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
+				: "gde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
 		try {
-			//String className = "de.device.DefaultDeviceDialog";
+			//String className = "gde.device.DefaultDeviceDialog";
 			DeviceSelectionDialog.log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class c = loader.loadClass(className);

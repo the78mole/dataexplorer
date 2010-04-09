@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;

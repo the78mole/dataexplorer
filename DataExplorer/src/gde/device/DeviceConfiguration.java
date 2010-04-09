@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -98,7 +98,7 @@ public class DeviceConfiguration {
 
 		try {
       Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(basePath + "DeviceProperties_V03.xsd")); //$NON-NLS-1$
-			JAXBContext jc = JAXBContext.newInstance("de.device"); //$NON-NLS-1$
+			JAXBContext jc = JAXBContext.newInstance("gde.device"); //$NON-NLS-1$
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema(schema);
 			JAXBElement<DevicePropertiesType> elememt;

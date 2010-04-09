@@ -26,7 +26,7 @@ import java.util.Vector;
 import gde.log.Level;
 import java.util.logging.Logger;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.exception.NotSupportedFileFormatException;
 import gde.io.OsdReaderWriter;

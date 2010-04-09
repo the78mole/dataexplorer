@@ -61,7 +61,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.xml.sax.SAXParseException;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.device.CheckSumTypes;
 import gde.device.CommaSeparatorTypes;
@@ -297,7 +297,7 @@ public class DevicePropertiesEditor extends Composite {
 			logHandler.setLevel(java.util.logging.Level.ALL);
 		}
 		// set logging levels
-		Logger logger = Logger.getLogger("de.ui.dialog.edit"); //$NON-NLS-1$
+		Logger logger = Logger.getLogger("gde.ui.dialog.edit"); //$NON-NLS-1$
 		logger.setLevel(java.util.logging.Level.INFO);
 		logger.setUseParentHandlers(true);
 	}
@@ -582,7 +582,7 @@ public class DevicePropertiesEditor extends Composite {
 							{
 								this.deviceImplementationButton = new Button(this.devicePropsComposite, SWT.CHECK);
 								this.deviceImplementationButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-								this.deviceImplementationButton.setForeground(de.ui.SWTResourceManager.getColor(SWT.COLOR_BLACK));
+								this.deviceImplementationButton.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 								this.deviceImplementationButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0478));
 								this.deviceImplementationButton.setBounds(0, 30, 22, 22);
 								this.deviceImplementationButton.addSelectionListener(new SelectionAdapter() {

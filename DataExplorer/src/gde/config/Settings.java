@@ -53,7 +53,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.xml.sax.SAXException;
 
-import gde.DE;
+import gde.GDE;
 import gde.exception.ApplicationConfigurationException;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -267,7 +267,7 @@ public class Settings extends Properties {
 				// device properties context
 				try {
 					Settings.this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(Settings.this.xmlBasePath + Settings.DEVICE_PROPERTIES_XSD_NAME));
-					Settings.this.jc = JAXBContext.newInstance("de.device"); //$NON-NLS-1$
+					Settings.this.jc = JAXBContext.newInstance("gde.device"); //$NON-NLS-1$
 					Settings.this.unmarshaller = Settings.this.jc.createUnmarshaller();
 					Settings.this.unmarshaller.setSchema(Settings.this.schema);
 					Settings.this.marshaller = Settings.this.jc.createMarshaller();
@@ -1105,12 +1105,12 @@ public class Settings extends Properties {
 	public void updateLogLevel() {
 		if (isGlobalLogLevel()) {
 			java.util.logging.Level globalLogLevel = Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "WARNING").trim()); //$NON-NLS-1$
-			setIndividualLogLevel("de.ui", globalLogLevel); //$NON-NLS-1$
-			setIndividualLogLevel("de.data", globalLogLevel); //$NON-NLS-1$
-			setIndividualLogLevel("de.config", globalLogLevel); //$NON-NLS-1$
-			setIndividualLogLevel("de.device", globalLogLevel); //$NON-NLS-1$
-			setIndividualLogLevel("de.utils", globalLogLevel); //$NON-NLS-1$
-			setIndividualLogLevel("de.io", globalLogLevel); //$NON-NLS-1$
+			setIndividualLogLevel("gde.ui", globalLogLevel); //$NON-NLS-1$
+			setIndividualLogLevel("gde.data", globalLogLevel); //$NON-NLS-1$
+			setIndividualLogLevel("gde.config", globalLogLevel); //$NON-NLS-1$
+			setIndividualLogLevel("gde.device", globalLogLevel); //$NON-NLS-1$
+			setIndividualLogLevel("gde.utils", globalLogLevel); //$NON-NLS-1$
+			setIndividualLogLevel("gde.io", globalLogLevel); //$NON-NLS-1$
 			setGlobalLogLevel(globalLogLevel); //$NON-NLS-1$
 			setLevelSerialIO(globalLogLevel);
 			Enumeration<Object> e = classbasedLogger.keys();
@@ -1122,12 +1122,12 @@ public class Settings extends Properties {
 		}
 		else {
 			setGlobalLogLevel(Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "WARNING").trim())); //$NON-NLS-1$
-			setIndividualLogLevel("de.ui", getLogLevel(Settings.UI_LOG_LEVEL)); //$NON-NLS-1$
-			setIndividualLogLevel("de.data", getLogLevel(Settings.DATA_LOG_LEVEL)); //$NON-NLS-1$
-			setIndividualLogLevel("de.config", getLogLevel(Settings.CONFIG_LOG_LEVEL)); //$NON-NLS-1$
-			setIndividualLogLevel("de.device", getLogLevel(Settings.DEVICE_LOG_LEVEL)); //$NON-NLS-1$
-			setIndividualLogLevel("de.utils", getLogLevel(Settings.UTILS_LOG_LEVEL)); //$NON-NLS-1$
-			setIndividualLogLevel("de.io", getLogLevel(Settings.FILE_IO_LOG_LEVEL)); //$NON-NLS-1$
+			setIndividualLogLevel("gde.ui", getLogLevel(Settings.UI_LOG_LEVEL)); //$NON-NLS-1$
+			setIndividualLogLevel("gde.data", getLogLevel(Settings.DATA_LOG_LEVEL)); //$NON-NLS-1$
+			setIndividualLogLevel("gde.config", getLogLevel(Settings.CONFIG_LOG_LEVEL)); //$NON-NLS-1$
+			setIndividualLogLevel("gde.device", getLogLevel(Settings.DEVICE_LOG_LEVEL)); //$NON-NLS-1$
+			setIndividualLogLevel("gde.utils", getLogLevel(Settings.UTILS_LOG_LEVEL)); //$NON-NLS-1$
+			setIndividualLogLevel("gde.io", getLogLevel(Settings.FILE_IO_LOG_LEVEL)); //$NON-NLS-1$
 			setLevelSerialIO(getLogLevel(Settings.SERIAL_IO_LOG_LEVEL));
 			Enumeration<Object> e = classbasedLogger.keys();
 			while (e.hasMoreElements()) {
@@ -1155,7 +1155,7 @@ public class Settings extends Properties {
 	private void setLevelSerialIO(java.util.logging.Level logLevel) {
 		final String $METHOD_NAME = "setLevelSerialIO"; //$NON-NLS-1$
 		try {
-			Logger logger = Logger.getLogger("de.serial.DeviceSerialPort"); //$NON-NLS-1$
+			Logger logger = Logger.getLogger("gde.serial.DeviceSerialPort"); //$NON-NLS-1$
 			for(Handler handler : logger.getHandlers()) {
 				logger.removeHandler(handler);
 			}

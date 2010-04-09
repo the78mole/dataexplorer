@@ -27,7 +27,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.logging.Logger;
 
-import gde.DE;
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;

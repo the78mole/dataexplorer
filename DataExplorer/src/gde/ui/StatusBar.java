@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 
-import gde.DE;
+import gde.GDE;
 
 /**
  * user interface status bar class, device, serial port, port activity, progress bar, messages

@@ -20,7 +20,7 @@ import java.util.HashMap;
 import gde.log.Level;
 import java.util.logging.Logger;
 
-import gde.DE;
+import gde.GDE;
 import gde.device.ChannelTypes;
 import gde.messages.MessageIds;
 import gde.messages.Messages;

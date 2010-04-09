@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.GraphicsTemplate;
 import gde.config.Settings;
 import gde.data.Channel;

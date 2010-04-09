@@ -38,7 +38,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 
-import gde.DE;
+import gde.GDE;
 import gde.data.ObjectData;
 import gde.exception.ApplicationConfigurationException;
 import gde.messages.MessageIds;

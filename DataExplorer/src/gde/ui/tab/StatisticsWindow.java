@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;

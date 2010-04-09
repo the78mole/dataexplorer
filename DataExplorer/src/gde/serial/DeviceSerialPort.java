@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
 import gde.exception.ApplicationConfigurationException;
@@ -529,7 +529,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				// ignore
 			}
 			if (timeOutCounter-- <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(de.messages.MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
+				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}

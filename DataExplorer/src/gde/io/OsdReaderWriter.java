@@ -33,7 +33,7 @@ import java.util.Vector;
 import gde.log.Level;
 import java.util.logging.Logger;
 
-import gde.DE;
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;

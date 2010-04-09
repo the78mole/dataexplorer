@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import gde.DE;
+import gde.GDE;
 import gde.device.ChannelType;
 import gde.device.ChannelTypes;
 import gde.device.DeviceConfiguration;

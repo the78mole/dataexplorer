@@ -29,7 +29,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.printing.Printer;
 
-import gde.DE;
+import gde.GDE;
 import gde.io.ObjectDataReaderWriter;
 import gde.messages.MessageIds;
 import gde.messages.Messages;

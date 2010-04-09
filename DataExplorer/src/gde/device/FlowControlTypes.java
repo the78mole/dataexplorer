@@ -11,7 +11,7 @@ package gde.device;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
-import gde.DE;
+import gde.GDE;
 
 
 /**

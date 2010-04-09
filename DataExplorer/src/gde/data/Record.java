@@ -31,7 +31,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
-import gde.DE;
+import gde.GDE;
 import gde.device.DataTypes;
 import gde.device.IDevice;
 import gde.device.ObjectFactory;

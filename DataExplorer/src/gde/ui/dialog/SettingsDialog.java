@@ -56,7 +56,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.device.CommaSeparatorTypes;
 import gde.device.DecimalSeparatorTypes;

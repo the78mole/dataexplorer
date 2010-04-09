@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/DataExplorer/src/de/GDE.java"/>
+<listEntry value="/DataExplorer/src/gde/GDE.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
@@ -13,7 +13,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.GDE"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="gde.GDE"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="DataExplorer"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms40M -Xmx256M -DECLIPSE=true"/>
 </launchConfiguration>

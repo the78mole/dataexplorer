@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package de;
+package gde;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -232,7 +232,7 @@ public class GDE {
 			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "class loader build, test it");
 			//Class c = loader.loadClass("org.eclipse.swt.widgets.Composite");
 			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, c.getProtectionDomain().getCodeSource().getLocation().toExternalForm());
-			//c = loader.loadClass("de.ui.DataExplorer");
+			//c = loader.loadClass("gde.ui.DataExplorer");
 			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Class object loaded successfully");
 			//Object o = c.getMethod("getInstance", new Class[0]).invoke(null, new Object[0]);
 			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Class instance loaded successfully");

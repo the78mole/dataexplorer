@@ -54,7 +54,7 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
@@ -758,7 +758,7 @@ public class FileUtils {
 			ClassNotFoundException {
 		String deviceImplName = deviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		String className = deviceImplName.contains(GDE.STRING_DOT) ? deviceImplName  // full qualified
-				: "de.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
+				: "gde.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
 		log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 		Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -785,7 +785,7 @@ public class FileUtils {
 		String deviceImplName = deviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		IDevice newInst = null;
 		String className = deviceImplName.contains(GDE.STRING_DOT) ? deviceImplName  // full qualified
-				: "de.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
+				: "gde.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
 		log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Class c = loader.loadClass(className);
@@ -885,7 +885,7 @@ public class FileUtils {
 								log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 
 								//new ProcessBuilder(java -classpath DataExplorer.jar gde.utils.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName")
-								new ProcessBuilder(javaexec, "-classpath", classpath, "de.utils.FileUtils", deviceJarPath, tmpDeviceJarPath).start(); //$NON-NLS-1$ //$NON-NLS-2$
+								new ProcessBuilder(javaexec, "-classpath", classpath, "gde.utils.FileUtils", deviceJarPath, tmpDeviceJarPath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage());

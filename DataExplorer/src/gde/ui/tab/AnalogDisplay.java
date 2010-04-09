@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;

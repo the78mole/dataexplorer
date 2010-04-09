@@ -28,7 +28,7 @@ import gde.config.Settings;
 public class Messages {
 	final static Logger						log						= Logger.getLogger(Messages.class.getName());
 
-	static final String					BUNDLE_NAME			= "de.messages.messages";		//$NON-NLS-1$
+	static final String					BUNDLE_NAME			= "gde.messages.messages";		//$NON-NLS-1$
 
 	static ResourceBundle	mainResourceBundle		= ResourceBundle.getBundle(BUNDLE_NAME, Settings.getInstance().getLocale());
 	static ResourceBundle	deviceResourceBundle	= ResourceBundle.getBundle(BUNDLE_NAME, Settings.getInstance().getLocale());

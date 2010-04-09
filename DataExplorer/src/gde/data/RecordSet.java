@@ -28,7 +28,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.device.DataTypes;
 import gde.device.DeviceConfiguration;

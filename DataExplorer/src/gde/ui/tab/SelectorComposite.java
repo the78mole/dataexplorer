@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import gde.DE;
+import gde.GDE;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;

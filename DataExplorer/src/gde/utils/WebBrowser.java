@@ -21,7 +21,7 @@ import java.util.jar.JarFile;
 import gde.log.Level;
 import java.util.logging.Logger;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.messages.MessageIds;
 import gde.messages.Messages;

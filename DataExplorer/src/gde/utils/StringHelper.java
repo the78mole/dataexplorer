@@ -27,7 +27,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Point;
 
-import gde.DE;
+import gde.GDE;
 import gde.device.DataTypes;
 import gde.serial.DeviceSerialPort;
 

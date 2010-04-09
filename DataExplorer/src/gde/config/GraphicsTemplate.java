@@ -24,7 +24,7 @@ import java.util.Properties;
 import gde.log.Level;
 import java.util.logging.Logger;
 
-import gde.DE;
+import gde.GDE;
 
 /**
  * CSlass managing graphics visualization, store, restore

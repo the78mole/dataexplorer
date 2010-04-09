@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="javadoc">
     <target name="javadoc">
-        <javadoc access="public" author="true" classpath="." destdir="doc/javadoc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="de.io,de.exception,de.ui.tab,de.device,de.ui.menu,de.ui.dialog,de.config,de.ui,de.log,de.data,de.utils" source="1.6" sourcepath="src" splitindex="true" use="true" version="true"/>
+        <javadoc access="public" author="true" classpath="." destdir="doc/javadoc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="gde.io,de.exception,de.ui.tab,de.device,de.ui.menu,de.ui.dialog,de.config,de.ui,de.log,de.data,de.utils" source="1.6" sourcepath="src" splitindex="true" use="true" version="true"/>
     </target>
 </project>

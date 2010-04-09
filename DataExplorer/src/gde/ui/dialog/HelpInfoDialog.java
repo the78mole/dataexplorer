@@ -28,7 +28,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.messages.MessageIds;
 import gde.messages.Messages;

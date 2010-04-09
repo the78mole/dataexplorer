@@ -70,7 +70,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -139,7 +139,7 @@ public class DataExplorer extends Composite {
 	public final static Display						display										= Display.getDefault();
 	public final static Shell							shell											= new Shell(display);
 
-	de.io.FileHandler						fileHandler;
+	gde.io.FileHandler						fileHandler;
 
 	CTabFolder										displayTab;
 
