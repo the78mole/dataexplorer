@@ -2,14 +2,14 @@ How to develop a new plug-in for the DataExplorer
 
 
 Beim Starten der Anwendung wird in der plugin.jar/meta-inf/manifest.mf Datei nach den Services gesucht, die das Plug.in zur Verf�gung stellt, deshalb ist diese Zeile in der build.xml wichtig:
-<attribute name="Export-Service" value="de.device.bantam.eStation902,  gde.device.bantam.eStationBC6,   gde.device.bantam.eStationBC610,   gde.device.bantam.eStationBC8"/>
+<attribute name="Export-Service" value="gde.device.bantam.eStation902,  gde.device.bantam.eStationBC6,   gde.device.bantam.eStationBC610,   gde.device.bantam.eStationBC8"/>
 Das sind die Ger�te, die das Plug-in implementiert und matched 1:1 zu der Ger�teimplementierungsklasse und den DeviceProperties.xml Dateien, die es in allen unterst�tzten Sprachen geben muss (gde/resource/de/eStationBC6.xml, ...).
 Die Ger�te XML Dateien werden dann entsprechend der angew�hlten Sprache beim Start der Anwendung �berpr�ft und ausgepackt.
 
 Die Ger�teklassen werden dynamisch geladen, hierbei Berechnet sich der Klassenname folgenderma�en:
         String selectedDeviceName = this.selectedActiveDeviceConfig.getDeviceImplName().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY);
         //getDeviceImplName gibt den Namen des Services ohne package zur�ck und entspricht dem Ger�tenamen der in der XML angegeben ist
-        String className = "de.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
+        String className = "gde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(OSDE.STRING_BLANK, OSDE.STRING_EMPTY).replace(OSDE.STRING_DASH, OSDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
         //getManufacturer gibt den Herstelleramen aus der XML zur�ck
 
 Im Ger�teklassenkonstruktor entscheidet der Aufruf von this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP), dar�ber, ob ein Aufnahmevorgang direkt aus der Men�leiste gestartet werden kann oder nur der Port ge�ffnet wird und/oder ein Ger�tedialog zu bedienen ist.
