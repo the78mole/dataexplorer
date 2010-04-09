@@ -27,7 +27,7 @@ import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.widgets.FileDialog;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -63,7 +63,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	public CSV2SerialAdapter(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("de.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
@@ -77,7 +77,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	public CSV2SerialAdapter(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("de.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
@@ -89,7 +89,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(de.messages.MessageIds.GDE_MSGT0272);
+		return Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		}
 		catch (Exception e) {
-			String msg = e.getMessage() + Messages.getString(de.messages.MessageIds.GDE_MSGW0543);
+			String msg = e.getMessage() + Messages.getString(gde.messages.MessageIds.GDE_MSGW0543);
 			log.log(Level.WARNING, msg, e);
 			application.openMessageDialog(msg);
 			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);

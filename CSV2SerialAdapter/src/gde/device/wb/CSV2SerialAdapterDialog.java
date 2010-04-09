@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -101,7 +101,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 				this.dialogShell.layout();
 				//dialogShell.pack();
 				this.dialogShell.setSize(310, 10 + 30 + 90 + this.measurementsCount * 30 + 55);
-				this.dialogShell.setText(this.device.getName() + Messages.getString(de.messages.MessageIds.GDE_MSGT0273));
+				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addDisposeListener(new DisposeListener() {
@@ -109,7 +109,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (CSV2SerialAdapterDialog.this.device.isChangePropery()) {
-							String msg = Messages.getString(de.messages.MessageIds.GDE_MSGI0041);
+							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041);
 							if (CSV2SerialAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
 								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								CSV2SerialAdapterDialog.this.device.storeDeviceProperties();
@@ -160,7 +160,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 						saveButtonLData.left = new FormAttachment(0, 1000, 15);
 						this.saveButton.setLayoutData(saveButtonLData);
 						this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.saveButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0486));
+						this.saveButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0486));
 						this.saveButton.setEnabled(false);
 						this.saveButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -180,7 +180,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
 						this.closeButton.setLayoutData(closeButtonLData);
 						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.closeButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0485));
+						this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0485));
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
