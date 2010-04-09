@@ -48,7 +48,7 @@ public class GathererThread extends Thread {
 	final Channels						channels;
 	final Channel							channel;
 	final int									channelNumber;
-	String										recordSetKey								= Messages.getString(de.messages.MessageIds.GDE_MSGT0272);
+	String										recordSetKey								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
 	boolean										isSwitchedRecordSet					= false;
 	boolean										isGatheredRecordSetVisible	= true;
@@ -187,7 +187,7 @@ public class GathererThread extends Thread {
 				}
 			}
 			catch (DataInconsitsentException e) {
-				log.log(Level.SEVERE, Messages.getString(de.messages.MessageIds.GDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME }));
+				log.log(Level.SEVERE, Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME }));
 				cleanup();
 			}
 			catch (Throwable e) {

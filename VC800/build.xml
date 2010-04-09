@@ -38,7 +38,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implemntation for device UniLog SM-Modellbau"/>
-    		<attribute name="Export-Service" value="de.device.conrad.VC820, gde.device.conrad.VC840"/>
+    		<attribute name="Export-Service" value="gde.device.conrad.VC820, gde.device.conrad.VC840"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

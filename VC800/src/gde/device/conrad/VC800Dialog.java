@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -131,7 +131,7 @@ public class VC800Dialog extends DeviceDialog {
 				SWTResourceManager.registerResourceUser(this.dialogShell);
 				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 				this.dialogShell.setLayout(new FormLayout());
-				this.dialogShell.setText(this.device.getName() + Messages.getString(de.messages.MessageIds.GDE_MSGT0273));
+				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.layout();
 				this.dialogShell.pack();
@@ -150,7 +150,7 @@ public class VC800Dialog extends DeviceDialog {
 										catch (Exception e) {
 											VC800Dialog.this.isConnectionWarned = true;
 											log.log(Level.WARNING, e.getMessage(), e);
-											VC800Dialog.this.application.openMessageDialog(VC800Dialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0024, new Object[] { e.getMessage() } ));
+											VC800Dialog.this.application.openMessageDialog(VC800Dialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0024, new Object[] { e.getMessage() } ));
 										}
 										finally {
 											if (VC800Dialog.this.isPortOpenedByMe) {
@@ -218,7 +218,7 @@ public class VC800Dialog extends DeviceDialog {
 						this.startCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
 						this.startCollectDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.startCollectDataButton.setLayoutData(startCollectDataButtonLData);
-						this.startCollectDataButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0274));
+						this.startCollectDataButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0274));
 						this.startCollectDataButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -243,7 +243,7 @@ public class VC800Dialog extends DeviceDialog {
 										}
 										VC800Dialog.this.boundsComposite.redraw();
 										VC800Dialog.this.application.updateGraphicsWindow();
-										VC800Dialog.this.application.openMessageDialog(VC800Dialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+										VC800Dialog.this.application.openMessageDialog(VC800Dialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 								}
 							}
@@ -259,7 +259,7 @@ public class VC800Dialog extends DeviceDialog {
 						this.stopCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
 						this.stopCollectDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.stopCollectDataButton.setLayoutData(stopColletDataButtonLData);
-						this.stopCollectDataButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0275));
+						this.stopCollectDataButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0275));
 						this.stopCollectDataButton.setEnabled(false);
 						this.stopCollectDataButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -345,7 +345,7 @@ public class VC800Dialog extends DeviceDialog {
 						this.closeButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
 						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.closeButton.setLayoutData(closeButtonLData);
-						this.closeButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0188));
+						this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0188));
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
