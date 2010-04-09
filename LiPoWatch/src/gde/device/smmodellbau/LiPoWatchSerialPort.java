@@ -14,24 +14,24 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.smmodellbau;
+package gde.device.smmodellbau;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 
-import osde.device.DeviceConfiguration;
-import osde.exception.CheckSumMissmatchException;
-import osde.exception.TimeOutException;
-import osde.messages.Messages;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.utils.Checksum;
+import gde.device.DeviceConfiguration;
+import gde.exception.CheckSumMissmatchException;
+import gde.exception.TimeOutException;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.Checksum;
 
 /**
  * LiPoWatch serial port implementation
@@ -175,7 +175,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 				dialog.updateDataGatherProgress(memoryUsed, numberRecordSet, this.reveiceErrors, numberLess4measurements, memoryUsed);
 			}
 			else
-				throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0026));
+				throw new IOException(Messages.getString(de.messages.MessageIds.GDE_MSGE0026));
 			
 			log.log(Level.FINE, "end"); //$NON-NLS-1$
 		}
@@ -258,7 +258,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
 		else
-			throw new Exception(Messages.getString(osde.messages.MessageIds.DE_MSGE0031));
+			throw new Exception(Messages.getString(de.messages.MessageIds.GDE_MSGE0031));
 		
 		return isLiveDataAvailable;
 	}
@@ -302,7 +302,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			}
 		}
 		else
-			throw new Exception(Messages.getString(osde.messages.MessageIds.DE_MSGE0031));
+			throw new Exception(Messages.getString(de.messages.MessageIds.GDE_MSGE0031));
 
 		return readBuffer;
 	}
@@ -382,7 +382,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 
 				}
 				else
-					throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0032));
+					throw new IOException(Messages.getString(de.messages.MessageIds.GDE_MSGE0032));
 			}
 		}
 		catch (Exception e) {
@@ -423,10 +423,10 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 					
 				}
 				else
-					throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0032));
+					throw new IOException(Messages.getString(de.messages.MessageIds.GDE_MSGE0032));
 			}
 			else
-				throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0033));
+				throw new IOException(Messages.getString(de.messages.MessageIds.GDE_MSGE0033));
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -464,10 +464,10 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 					
 				}
 				else
-					throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0033));
+					throw new IOException(Messages.getString(de.messages.MessageIds.GDE_MSGE0033));
 			}
 			else
-				throw new IOException(Messages.getString(osde.messages.MessageIds.DE_MSGE0032));
+				throw new IOException(Messages.getString(de.messages.MessageIds.GDE_MSGE0032));
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -563,7 +563,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 		log.log(Level.FINER, "checkSumData = " + checkSumData); //$NON-NLS-1$
 		
 		if (checkSum != checkSumData)
-			throw new CheckSumMissmatchException(Messages.getString(osde.messages.MessageIds.DE_MSGE0034, new Object[] { checkSum, checkSumData } ));
+			throw new CheckSumMissmatchException(Messages.getString(de.messages.MessageIds.GDE_MSGE0034, new Object[] { checkSum, checkSumData } ));
 	}
 	
 	/**

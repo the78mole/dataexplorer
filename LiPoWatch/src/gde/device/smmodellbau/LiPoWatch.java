@@ -14,29 +14,29 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.smmodellbau;
+package gde.device.smmodellbau;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
-import osde.device.PropertyType;
-import osde.device.smmodellbau.lipowatch.MessageIds;
-import osde.exception.DataInconsitsentException;
-import osde.messages.Messages;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
-import osde.utils.CalculationThread;
-import osde.utils.StringHelper;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.device.PropertyType;
+import gde.device.smmodellbau.lipowatch.MessageIds;
+import gde.exception.DataInconsitsentException;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
+import gde.utils.CalculationThread;
+import gde.utils.StringHelper;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -72,7 +72,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public LiPoWatch(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.smmodellbau.lipowatch.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("de.device.smmodellbau.lipowatch.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
@@ -87,7 +87,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public LiPoWatch(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.smmodellbau.lipowatch.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("de.device.smmodellbau.lipowatch.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
@@ -100,7 +100,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.DE_MSGT1601);
+		return Messages.getString(MessageIds.GDE_MSGT1601);
 	}
 
 	/**
@@ -127,18 +127,18 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		String recordSetInfo = DE.STRING_EMPTY;
+		String recordSetInfo = GDE.STRING_EMPTY;
 		for (int j = 0; j < this.getNumberOfMeasurements(1); j++) {
 			StringBuilder recordConfigData = new StringBuilder();
 			if (j == 18) {//11=a1Value LOV_CONFIG_DATA_KEYS_UNILOG_11
-				HashMap<String, String> configData = StringHelper.splitString(header.get(DE.LOV_CONFIG_DATA), DE.DATA_DELIMITER, LiPoWatch.LOV_CONFIG_DATA_KEYS_UNILOG_11);
+				HashMap<String, String> configData = StringHelper.splitString(header.get(GDE.LOV_CONFIG_DATA), GDE.DATA_DELIMITER, LiPoWatch.LOV_CONFIG_DATA_KEYS_UNILOG_11);
 				for (String lovKey : LiPoWatch.LOV_CONFIG_DATA_KEYS_UNILOG_11) {
 					if (configData.containsKey(lovKey)) {
 						recordConfigData.append(lov2osdMap.get(lovKey)).append("=").append(configData.get(lovKey)).append(Record.DELIMITER); //$NON-NLS-1$
 					}
 				}
 			}
-			recordSetInfo = recordSetInfo + DE.RECORDS_PROPERTIES + recordConfigData.toString() + Record.END_MARKER;
+			recordSetInfo = recordSetInfo + GDE.RECORDS_PROPERTIES + recordConfigData.toString() + Record.END_MARKER;
 		}
 
 		return recordSetInfo;
@@ -249,7 +249,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -444,7 +444,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 				}
 				catch (Exception e) {
 					LiPoWatch.log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 				}
 			}
 			else {
