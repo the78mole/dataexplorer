@@ -1,10 +1,10 @@
 /**
  * 
  */
-package osde.junit;
+package gde.junit;
 
 import junit.framework.TestCase;
-import osde.utils.OperatingSystemHelper;
+import gde.utils.OperatingSystemHelper;
 
 /**
  * @author brueg

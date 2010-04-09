@@ -1,7 +1,7 @@
 /**
  * 
  */
-package osde.junit;
+package gde.junit;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,10 +11,10 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import junit.framework.TestCase;
-import osde.DE;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.utils.FileUtils;
+import gde.DE;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.utils.FileUtils;
 
 /**
  * @author brueg
@@ -30,13 +30,13 @@ public class JarInspectAndExportTest extends TestCase {
 		super.setUp();
 
 		if (this.osname.startsWith("windows")) { //$NON-NLS-1$
-			this.applHomePath = (System.getenv("APPDATA") + DE.FILE_SEPARATOR_UNIX + "DataExplorer").replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			this.applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + "DataExplorer").replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		else if (this.osname.startsWith("linux")) { //$NON-NLS-1$
-			this.applHomePath = System.getProperty("user.home") + DE.FILE_SEPARATOR_UNIX + ".DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
+			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + ".DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
-			System.err.println(Messages.getString(MessageIds.DE_MSGW0001));
+			System.err.println(Messages.getString(MessageIds.GDE_MSGW0001));
 			return;
 		}
 		System.out.println("applHomePath = " + this.applHomePath);

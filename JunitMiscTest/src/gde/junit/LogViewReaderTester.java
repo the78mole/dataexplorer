@@ -1,7 +1,7 @@
 /**
  * 
  */
-package osde.junit;
+package gde.junit;
 
 import java.util.HashMap;
 import java.util.logging.ConsoleHandler;
@@ -10,8 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
-import osde.io.LogViewReader;
-import osde.log.LogFormatter;
+import gde.io.LogViewReader;
+import gde.log.LogFormatter;
 
 /**
  * @author brueg
@@ -155,7 +155,7 @@ public class LogViewReaderTester extends TestCase {
 	}
 	
 	/**
-	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
+	 * Test method for {@link gde.io.LogViewReader#getHeader(de.device.IDevice, java.lang.String)}.
 	 */
 	public final void testGetHeader_1_13() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
@@ -176,7 +176,7 @@ public class LogViewReaderTester extends TestCase {
 	}
 	
 	/**
-	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
+	 * Test method for {@link gde.io.LogViewReader#getHeader(de.device.IDevice, java.lang.String)}.
 	 */
 	public final void testGetHeader_1_15() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
@@ -197,7 +197,7 @@ public class LogViewReaderTester extends TestCase {
 	}
 	
 	/**
-	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
+	 * Test method for {@link gde.io.LogViewReader#getHeader(de.device.IDevice, java.lang.String)}.
 	 */
 	public final void testGetHeader_1_50_ALPHA() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
@@ -218,7 +218,7 @@ public class LogViewReaderTester extends TestCase {
 	}
 	
 	/**
-	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
+	 * Test method for {@link gde.io.LogViewReader#getHeader(de.device.IDevice, java.lang.String)}.
 	 */
 	public final void testGetHeader_1_50_PreBETA() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
@@ -239,7 +239,7 @@ public class LogViewReaderTester extends TestCase {
 	}
 	
 	/**
-	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
+	 * Test method for {@link gde.io.LogViewReader#getHeader(de.device.IDevice, java.lang.String)}.
 	 */
 	public final void testGetHeader_2_0_BETA() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
@@ -260,7 +260,7 @@ public class LogViewReaderTester extends TestCase {
 	}
 	
 	/**
-	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
+	 * Test method for {@link gde.io.LogViewReader#getHeader(de.device.IDevice, java.lang.String)}.
 	 */
 	public final void testGetHeader_2_0_BETA2() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
@@ -281,7 +281,7 @@ public class LogViewReaderTester extends TestCase {
 	}
 	
 	/**
-	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
+	 * Test method for {@link gde.io.LogViewReader#getHeader(de.device.IDevice, java.lang.String)}.
 	 */
 	public final void testGetHeader_2_0() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
@@ -302,7 +302,7 @@ public class LogViewReaderTester extends TestCase {
 	}
 	
 	/**
-	 * Test method for {@link osde.io.LogViewReader#getHeader(osde.device.IDevice, java.lang.String)}.
+	 * Test method for {@link gde.io.LogViewReader#getHeader(de.device.IDevice, java.lang.String)}.
 	 */
 	public final void testGetHeader_mixed() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();

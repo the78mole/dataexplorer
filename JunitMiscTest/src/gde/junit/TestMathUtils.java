@@ -1,12 +1,12 @@
 /**
  * 
  */
-package osde.junit;
+package gde.junit;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import osde.utils.MathUtils;
+import gde.utils.MathUtils;
 
 /**
  * @author brueg

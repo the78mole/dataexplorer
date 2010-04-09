@@ -6,7 +6,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import osde.log.LogFormatter;
+import gde.log.LogFormatter;
 
 
 public class TimeTest {

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package osde.junit;
+package gde.junit;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -13,7 +13,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for osde.junit");
+		TestSuite suite = new TestSuite("Test for gde.junit");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(LogViewReaderTester.class);
 		//$JUnit-END$

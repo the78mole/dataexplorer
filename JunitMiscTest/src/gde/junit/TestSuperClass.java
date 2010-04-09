@@ -1,7 +1,7 @@
 /**
  * 
  */
-package osde.junit;
+package gde.junit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,21 +24,21 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
-import osde.log.LogFormatter;
-import osde.messages.MessageIds;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.utils.CurveUtils;
-import osde.utils.TimeLine;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.CurveUtils;
+import gde.utils.TimeLine;
 
 /**
  * @author brueg
@@ -67,8 +67,8 @@ public class TestSuperClass extends TestCase {
 	Handler																ch					= new ConsoleHandler();
 	LogFormatter													lf					= new LogFormatter();
 
-	Logger																logger1			= Logger.getLogger("osde.data.Record");
-	Logger																logger2			= Logger.getLogger("osde.data.RecordSet");
+	Logger																logger1			= Logger.getLogger("de.data.Record");
+	Logger																logger2			= Logger.getLogger("de.data.RecordSet");
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -94,7 +94,7 @@ public class TestSuperClass extends TestCase {
 		//this.logger2.setLevel(Level.FINE);
 		//this.logger2.setUseParentHandlers(true);
 
-		Thread.currentThread().setContextClassLoader(DE.getClassLoader());
+		Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
 
 		this.initialize();
 
@@ -130,7 +130,7 @@ public class TestSuperClass extends TestCase {
 				// loop through all device properties XML and check if device used
 				if (files[i].endsWith(".xml")) {
 					String deviceKey = files[i].substring(0, files[i].length() - 4);
-					devConfig = new DeviceConfiguration(this.settings.getDevicesPath() + DE.FILE_SEPARATOR + files[i]);
+					devConfig = new DeviceConfiguration(this.settings.getDevicesPath() + GDE.FILE_SEPARATOR + files[i]);
 
 					// store all device configurations in a map					
 					String keyString;
@@ -140,7 +140,7 @@ public class TestSuperClass extends TestCase {
 						devConfig.setName(deviceKey);
 						keyString = deviceKey;
 					}
-					System.out.println(deviceKey + DE.STRING_MESSAGE_CONCAT + keyString);
+					System.out.println(deviceKey + GDE.STRING_MESSAGE_CONCAT + keyString);
 					this.deviceConfigurations.put(keyString, devConfig);
 				}
 			}
@@ -157,12 +157,12 @@ public class TestSuperClass extends TestCase {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected IDevice getInstanceOfDevice(DeviceConfiguration selectedActiveDeviceConfig) {
 		IDevice newInst = null;
-		String selectedDeviceName = selectedActiveDeviceConfig.getDeviceImplName().replace(DE.STRING_BLANK, DE.STRING_EMPTY).replace(DE.STRING_DASH, DE.STRING_EMPTY);
+		String selectedDeviceName = selectedActiveDeviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
-		String className = selectedDeviceName.contains(DE.STRING_DOT) ? selectedDeviceName  // full qualified
-				: "osde.device." + selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(DE.STRING_BLANK, DE.STRING_EMPTY).replace(DE.STRING_DASH, DE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
+		String className = selectedDeviceName.contains(GDE.STRING_DOT) ? selectedDeviceName  // full qualified
+				: "de.device." + selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName; //$NON-NLS-1$
 		try {
-			//String className = "osde.device.DefaultDeviceDialog";
+			//String className = "de.device.DefaultDeviceDialog";
 			//log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class c = loader.loadClass(className);
@@ -173,7 +173,7 @@ public class TestSuperClass extends TestCase {
 				newInst = (IDevice) constructor.newInstance(new Object[] { selectedActiveDeviceConfig.getPropertiesFileName() });
 			}
 			else
-				throw new NoClassDefFoundError(Messages.getString(MessageIds.DE_MSGE0016));
+				throw new NoClassDefFoundError(Messages.getString(MessageIds.GDE_MSGE0016));
 
 		}
 		catch (NoClassDefFoundError e) {
@@ -365,7 +365,7 @@ public class TestSuperClass extends TestCase {
 
 		// draw start time for zoom mode or scope mode
 		if (startTimeFormated != 0) { 
-			String strStartTime = Messages.getString(MessageIds.DE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
+			String strStartTime = Messages.getString(MessageIds.GDE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
 			Point point = gc.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
 			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_RED));

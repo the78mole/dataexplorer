@@ -1,19 +1,19 @@
 /**
  * 
  */
-package osde.junit;
+package gde.junit;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import osde.utils.ObjectKeyScanner;
+import gde.utils.ObjectKeyScanner;
 
 /**
  * @author brueg
  *
  */
 public class TestObjectKeyScanner extends TestSuperClass {
-	Logger	logger = Logger.getLogger("osde.utils.ObjectKeyScanner");
+	Logger	logger = Logger.getLogger("de.utils.ObjectKeyScanner");
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
