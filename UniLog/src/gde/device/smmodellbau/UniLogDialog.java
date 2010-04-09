@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -251,7 +251,7 @@ public class UniLogDialog extends DeviceDialog {
 					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
 
 				SWTResourceManager.registerResourceUser(this.dialogShell);
-				this.dialogShell.setText(UniLogDialog.DEVICE_NAME + Messages.getString(de.messages.MessageIds.GDE_MSGT0273));
+				this.dialogShell.setText(UniLogDialog.DEVICE_NAME + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 				this.dialogShell.setLayout(null);
@@ -318,7 +318,7 @@ public class UniLogDialog extends DeviceDialog {
 				{
 					this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					this.helpButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.helpButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0280));
+					this.helpButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0280));
 					this.helpButton.setBounds(31, 374, 259, 30);
 					this.helpButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 					this.helpButton.addSelectionListener(new SelectionAdapter() {
@@ -332,7 +332,7 @@ public class UniLogDialog extends DeviceDialog {
 				{
 					this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.closeButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0188));
+					this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0188));
 					this.closeButton.setBounds(342, 374, 260, 30);
 					this.closeButton.addMouseTrackListener(mouseTrackerEnterFadeOut);
 					this.closeButton.addSelectionListener(new SelectionAdapter() {
@@ -839,7 +839,7 @@ public class UniLogDialog extends DeviceDialog {
 											updateConfigurationValues(UniLogDialog.this.serialPort.readConfiguration());
 										}
 										catch (Exception e) {
-											UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+											UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 										}
 
 									}
@@ -1104,7 +1104,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.stopDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 									this.stopDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.stopDataButton.setBounds(15, GDE.IS_MAC_COCOA ? 179 : 194, 260, 30);
-									this.stopDataButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0278));
+									this.stopDataButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0278));
 									this.stopDataButton.setEnabled(false);
 									this.stopDataButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -1180,7 +1180,7 @@ public class UniLogDialog extends DeviceDialog {
 									{
 										this.startLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
 										this.startLoggingButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.startLoggingButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0274));
+										this.startLoggingButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0274));
 										this.startLoggingButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1383));
 										this.startLoggingButton.setBounds(12, GDE.IS_MAC_COCOA ? 12 : 27, 100, 30);
 										this.startLoggingButton.setEnabled(true);
@@ -1196,7 +1196,7 @@ public class UniLogDialog extends DeviceDialog {
 												}
 												catch (Exception e) {
 													UniLogDialog.log.log(Level.SEVERE, e.getMessage(), e);
-													UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+													UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 												}
 											}
 										});
@@ -1204,7 +1204,7 @@ public class UniLogDialog extends DeviceDialog {
 									{
 										this.stopLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
 										this.stopLoggingButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.stopLoggingButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0275));
+										this.stopLoggingButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0275));
 										this.stopLoggingButton.setBounds(116, GDE.IS_MAC_COCOA ? 12 : 27, 100, 30);
 										this.stopLoggingButton.setEnabled(false);
 										this.stopLoggingButton.addSelectionListener(new SelectionAdapter() {
@@ -1222,7 +1222,7 @@ public class UniLogDialog extends DeviceDialog {
 												}
 												catch (Exception e) {
 													UniLogDialog.log.log(Level.SEVERE, e.getMessage(), e);
-													UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+													UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 												}
 											}
 										});

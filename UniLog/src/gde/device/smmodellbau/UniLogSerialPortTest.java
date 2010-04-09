@@ -88,7 +88,7 @@ public class UniLogSerialPortTest {
 		// set logging levels
 		rootLogger.setLevel(Level.FINER);
 		// set individual log levels
-		Logger logger = Logger.getLogger("de.device.DeviceSerialPort"); //$NON-NLS-1$
+		Logger logger = Logger.getLogger("gde.device.DeviceSerialPort"); //$NON-NLS-1$
     logger.setLevel(Level.FINE);
     logger.setUseParentHandlers(true);
 

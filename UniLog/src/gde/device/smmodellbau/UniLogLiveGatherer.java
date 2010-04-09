@@ -130,7 +130,7 @@ public class UniLogLiveGatherer extends Thread {
 		}
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }) + System.getProperty("line.separator")
+			String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }) + System.getProperty("line.separator")
 					+ Messages.getString(MessageIds.GDE_MSGW1301);
 			cleanup(recordSetKey, message);
 		}
@@ -176,18 +176,18 @@ public class UniLogLiveGatherer extends Thread {
 					}
 					catch (DataInconsitsentException e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
+						String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
 						cleanup(recordSetKey, message);
 					}
 					catch (TimeOutException e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
+						String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
 								+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1301); //$NON-NLS-1$ 
 						cleanup(recordSetKey, message);
 					}
 					catch (IOException e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
+						String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
 								+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1301); //$NON-NLS-1$ 
 						cleanup(recordSetKey, message);
 					}

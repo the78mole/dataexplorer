@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
-import gde.DE;
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
@@ -328,7 +328,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0030, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0030, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -447,7 +447,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									}
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -538,7 +538,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									}
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -786,7 +786,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -803,7 +803,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -858,7 +858,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -875,7 +875,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -930,7 +930,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
@@ -947,7 +947,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (evt.character == SWT.CR) checkUpdateAnalog();
 								}
 								catch (Exception e) {
-									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+									UniLogConfigTab.this.application.openMessageDialog(UniLogConfigTab.this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								}
 							}
 						});
