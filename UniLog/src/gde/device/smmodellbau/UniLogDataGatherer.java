@@ -14,25 +14,25 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.smmodellbau;
+package gde.device.smmodellbau;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.device.smmodellbau.unilog.MessageIds;
-import osde.exception.ApplicationConfigurationException;
-import osde.exception.DataInconsitsentException;
-import osde.exception.TimeOutException;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.utils.CalculationThread;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.smmodellbau.unilog.MessageIds;
+import gde.exception.ApplicationConfigurationException;
+import gde.exception.DataInconsitsentException;
+import gde.exception.TimeOutException;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.CalculationThread;
 
 /**
  * Thread implementation to gather data from UniLog device
@@ -42,7 +42,7 @@ public class UniLogDataGatherer extends Thread {
 	final static Logger			log							= Logger.getLogger(UniLogDataGatherer.class.getName());
 
 	DataExplorer	application;
-	final String						RECORD_SET_NAME	= Messages.getString(MessageIds.DE_MSGT1378);
+	final String						RECORD_SET_NAME	= Messages.getString(MessageIds.GDE_MSGT1378);
 	final UniLogSerialPort	serialPort;
 	final UniLogDialog			dialog;
 	final UniLog						device;
@@ -136,7 +136,7 @@ public class UniLogDataGatherer extends Thread {
 		}
 		catch (DataInconsitsentException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 		}
 		catch (ApplicationConfigurationException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -144,13 +144,13 @@ public class UniLogDataGatherer extends Thread {
 		}
 		catch (TimeOutException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
-			+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGW1300)); //$NON-NLS-1$
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+			+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1300)); //$NON-NLS-1$
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
-			+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGW1300)); //$NON-NLS-1$
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
+			+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1300)); //$NON-NLS-1$
 		}
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);

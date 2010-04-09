@@ -14,25 +14,25 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.smmodellbau;
+package gde.device.smmodellbau;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.PropertyType;
-import osde.device.smmodellbau.unilog.MessageIds;
-import osde.exception.DataInconsitsentException;
-import osde.exception.TimeOutException;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.PropertyType;
+import gde.device.smmodellbau.unilog.MessageIds;
+import gde.exception.DataInconsitsentException;
+import gde.exception.TimeOutException;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
 
 /**
  * Thread implementation to gather data from UniLog device
@@ -42,7 +42,7 @@ public class UniLogLiveGatherer extends Thread {
 	final static Logger			log													= Logger.getLogger(UniLogLiveGatherer.class.getName());
 
 	DataExplorer	application;
-	final String						RECORD_SET_NAME							= Messages.getString(MessageIds.DE_MSGT1378);
+	final String						RECORD_SET_NAME							= Messages.getString(MessageIds.GDE_MSGT1378);
 	final UniLogSerialPort	serialPort;
 	final UniLog						device;
 	final UniLogDialog			dialog;
@@ -130,8 +130,8 @@ public class UniLogLiveGatherer extends Thread {
 		}
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			String message = Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }) + System.getProperty("line.separator")
-					+ Messages.getString(MessageIds.DE_MSGW1301);
+			String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }) + System.getProperty("line.separator")
+					+ Messages.getString(MessageIds.GDE_MSGW1301);
 			cleanup(recordSetKey, message);
 		}
 
@@ -176,19 +176,19 @@ public class UniLogLiveGatherer extends Thread {
 					}
 					catch (DataInconsitsentException e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						String message = Messages.getString(osde.messages.MessageIds.DE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
+						String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
 						cleanup(recordSetKey, message);
 					}
 					catch (TimeOutException e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						String message = Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
-								+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGW1301); //$NON-NLS-1$ 
+						String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
+								+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1301); //$NON-NLS-1$ 
 						cleanup(recordSetKey, message);
 					}
 					catch (IOException e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						String message = Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
-								+ System.getProperty("line.separator") + Messages.getString(MessageIds.DE_MSGW1301); //$NON-NLS-1$ 
+						String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
+								+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1301); //$NON-NLS-1$ 
 						cleanup(recordSetKey, message);
 					}
 					catch (Throwable e) {

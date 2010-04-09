@@ -14,17 +14,17 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.smmodellbau;
+package gde.device.smmodellbau;
 
 import java.util.Vector;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.device.DeviceConfiguration;
-import osde.log.LogFormatter;
-import osde.serial.DeviceSerialPort;
+import gde.device.DeviceConfiguration;
+import gde.log.LogFormatter;
+import gde.serial.DeviceSerialPort;
 
 public class UniLogSerialPortTest {
 
@@ -88,7 +88,7 @@ public class UniLogSerialPortTest {
 		// set logging levels
 		rootLogger.setLevel(Level.FINER);
 		// set individual log levels
-		Logger logger = Logger.getLogger("osde.device.DeviceSerialPort"); //$NON-NLS-1$
+		Logger logger = Logger.getLogger("de.device.DeviceSerialPort"); //$NON-NLS-1$
     logger.setLevel(Level.FINE);
     logger.setUseParentHandlers(true);
 
