@@ -58,7 +58,7 @@ void registerDataExplorerFileExtension(String ^ osdeBasePath)
 	@="DataExplorer.DataExplorerFileExtension"
 
 	[HKEY_CLASSES_ROOT\Applications\DataExplorer.exe\shell\open\command]
-	@="\"@DE_DIR@\DataExplorer.exe\" \"%1\""
+	@="\"@GDE_DIR@\DataExplorer.exe\" \"%1\""
 	#---------------------------------------------------------------------------
 */
  	RegistryKey ^ cl_root_osd = Registry::ClassesRoot->OpenSubKey(".osd", true);
@@ -90,7 +90,7 @@ void registerDataExplorerFileExtension(String ^ osdeBasePath)
 	@="DataExplorer.DataExplorerFileExtension"
 
 	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\DataExplorer.DataExplorerFileExtension\shell\open\command]
-	@="\"@DE_DIR@\DataExplorer.exe\" \"%1\""
+	@="\"@GDE_DIR@\DataExplorer.exe\" \"%1\""
 
 	#--------------------------------------------------------------------------- 
 */
@@ -112,7 +112,7 @@ void registerDataExplorerFileExtension(String ^ osdeBasePath)
 
 /*
 	[HKEY_CURRENT_USER\Software\Classes\Applications\DataExplorer.exe\shell\open\command]
-	@="\"@DE_DIR@\DataExplorer.exe\" \"%1\""
+	@="\"@GDE_DIR@\DataExplorer.exe\" \"%1\""
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.osd]
 	"Progid"="DataExplorer.DataExplorerFileExtension"
@@ -221,7 +221,7 @@ void unregisterDataExplorerFileExtension() {
 	@="DataExplorer.DataExplorerFileExtension"
 
 	[HKEY_CLASSES_ROOT\Applications\DataExplorer.exe\shell\open\command]
-	@="\"@DE_DIR@\DataExplorer.exe\" \"%1\""
+	@="\"@GDE_DIR@\DataExplorer.exe\" \"%1\""
 	#---------------------------------------------------------------------------
 */
  	RegistryKey ^ cl_root_osd = Registry::ClassesRoot->OpenSubKey(".osd", true);
@@ -245,7 +245,7 @@ void unregisterDataExplorerFileExtension() {
 	@="DataExplorer.DataExplorerFileExtension"
 
 	[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\DataExplorer.DataExplorerFileExtension\shell\open\command]
-	@="\"@DE_DIR@\DataExplorer.exe\" \"%1\""
+	@="\"@GDE_DIR@\DataExplorer.exe\" \"%1\""
 
 	#--------------------------------------------------------------------------- 
 */
@@ -260,7 +260,7 @@ void unregisterDataExplorerFileExtension() {
 
 /*
 	[HKEY_CURRENT_USER\Software\Classes\Applications\DataExplorer.exe\shell\open\command]
-	@="\"@DE_DIR@\DataExplorer.exe\" \"%1\""
+	@="\"@GDE_DIR@\DataExplorer.exe\" \"%1\""
 
 	[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.osd]
 	"Progid"="DataExplorer.DataExplorerFileExtension"
