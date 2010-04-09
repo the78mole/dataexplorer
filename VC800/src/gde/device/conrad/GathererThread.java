@@ -14,22 +14,22 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.conrad;
+package gde.device.conrad;
 
 import java.util.HashMap;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.exception.ApplicationConfigurationException;
-import osde.exception.DataInconsitsentException;
-import osde.exception.SerialPortException;
-import osde.exception.TimeOutException;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.exception.ApplicationConfigurationException;
+import gde.exception.DataInconsitsentException;
+import gde.exception.SerialPortException;
+import gde.exception.TimeOutException;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
 
 
 /**
@@ -48,7 +48,7 @@ public class GathererThread extends Thread {
 	final Channels						channels;
 	final Channel							channel;
 	final int									channelNumber;
-	String										recordSetKey								= Messages.getString(osde.messages.MessageIds.DE_MSGT0272);
+	String										recordSetKey								= Messages.getString(de.messages.MessageIds.GDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
 	boolean										isSwitchedRecordSet					= false;
 	boolean										isGatheredRecordSetVisible	= true;
@@ -187,17 +187,17 @@ public class GathererThread extends Thread {
 				}
 			}
 			catch (DataInconsitsentException e) {
-				log.log(Level.SEVERE, Messages.getString(osde.messages.MessageIds.DE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME }));
+				log.log(Level.SEVERE, Messages.getString(de.messages.MessageIds.GDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME }));
 				cleanup();
 			}
 			catch (Throwable e) {
 				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
 				if (e instanceof TimeOutException) {
-					this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGI1502));
+					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1502));
 					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGI1500));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1500));
 						stopDataGatheringThread(false);
 					}
 				}
@@ -229,7 +229,7 @@ public class GathererThread extends Thread {
 		RecordSet recordSet = this.channel.get(this.recordSetKey);
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
-			if (enableEndMessage) this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGI1501));
+			if (enableEndMessage) this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1501));
 		}
 		else {
 			cleanup();

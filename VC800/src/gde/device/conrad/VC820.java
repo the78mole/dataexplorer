@@ -14,13 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.conrad;
+package gde.device.conrad;
 
 import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBException;
 
-import osde.device.DeviceConfiguration;
+import gde.device.DeviceConfiguration;
 
 /**
  * VC820 device class

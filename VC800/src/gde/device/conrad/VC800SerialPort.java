@@ -1,13 +1,13 @@
-package osde.device.conrad;
+package gde.device.conrad;
 
 import java.io.IOException;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.device.DeviceConfiguration;
-import osde.exception.TimeOutException;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
+import gde.device.DeviceConfiguration;
+import gde.exception.TimeOutException;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
 
 /**
  * Sample serial port implementation, used as template for new device implementations

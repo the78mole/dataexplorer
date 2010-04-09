@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.conrad;
+package gde.device.conrad;
 
 /** 
  * @author Winfried Brügmann 
@@ -22,32 +22,32 @@ package osde.device.conrad;
  */ 
 public class MessageIds { 
 
-	public final static String	DE_MSGI1500 = "DE_MSGI1500";
-	public final static String	DE_MSGI1501 = "DE_MSGI1501";
-	public final static String	DE_MSGI1502 = "DE_MSGI1502";
-	public final static String	DE_MSGT1500 = "DE_MSGT1500";
-	public final static String	DE_MSGT1501 = "DE_MSGT1501";
-	public final static String	DE_MSGT1503 = "DE_MSGT1503";
-	public final static String	DE_MSGT1504 = "DE_MSGT1504";
-	public final static String	DE_MSGT1505 = "DE_MSGT1505";
-	public final static String	DE_MSGT1506 = "DE_MSGT1506";
-	public final static String	DE_MSGT1507 = "DE_MSGT1507";
-	public final static String	DE_MSGT1510 = "DE_MSGT1510";
-	public final static String	DE_MSGT1511 = "DE_MSGT1511";
-	public final static String	DE_MSGT1512 = "DE_MSGT1512";
-	public final static String	DE_MSGT1513 = "DE_MSGT1513";
-	public final static String	DE_MSGT1514 = "DE_MSGT1514";
-	public final static String	DE_MSGT1515 = "DE_MSGT1515";
-	public final static String	DE_MSGT1516 = "DE_MSGT1516";
-	public final static String	DE_MSGT1517 = "DE_MSGT1517";
-	public final static String	DE_MSGT1518 = "DE_MSGT1518";
-	public final static String	DE_MSGT1521 = "DE_MSGT1521";
-	public final static String	DE_MSGT1530 = "DE_MSGT1530";
-	public final static String	DE_MSGT1531 = "DE_MSGT1531";
-	public final static String	DE_MSGT1532 = "DE_MSGT1532";
-	public final static String	DE_MSGT1534 = "DE_MSGT1534";
-	public final static String	DE_MSGT1535 = "DE_MSGT1535";
-	public final static String	DE_MSGT1536 = "DE_MSGT1536";
-	public final static String	DE_MSGT1537 = "DE_MSGT1537";
+	public final static String	GDE_MSGI1500 = "GDE_MSGI1500";
+	public final static String	GDE_MSGI1501 = "GDE_MSGI1501";
+	public final static String	GDE_MSGI1502 = "GDE_MSGI1502";
+	public final static String	GDE_MSGT1500 = "GDE_MSGT1500";
+	public final static String	GDE_MSGT1501 = "GDE_MSGT1501";
+	public final static String	GDE_MSGT1503 = "GDE_MSGT1503";
+	public final static String	GDE_MSGT1504 = "GDE_MSGT1504";
+	public final static String	GDE_MSGT1505 = "GDE_MSGT1505";
+	public final static String	GDE_MSGT1506 = "GDE_MSGT1506";
+	public final static String	GDE_MSGT1507 = "GDE_MSGT1507";
+	public final static String	GDE_MSGT1510 = "GDE_MSGT1510";
+	public final static String	GDE_MSGT1511 = "GDE_MSGT1511";
+	public final static String	GDE_MSGT1512 = "GDE_MSGT1512";
+	public final static String	GDE_MSGT1513 = "GDE_MSGT1513";
+	public final static String	GDE_MSGT1514 = "GDE_MSGT1514";
+	public final static String	GDE_MSGT1515 = "GDE_MSGT1515";
+	public final static String	GDE_MSGT1516 = "GDE_MSGT1516";
+	public final static String	GDE_MSGT1517 = "GDE_MSGT1517";
+	public final static String	GDE_MSGT1518 = "GDE_MSGT1518";
+	public final static String	GDE_MSGT1521 = "GDE_MSGT1521";
+	public final static String	GDE_MSGT1530 = "GDE_MSGT1530";
+	public final static String	GDE_MSGT1531 = "GDE_MSGT1531";
+	public final static String	GDE_MSGT1532 = "GDE_MSGT1532";
+	public final static String	GDE_MSGT1534 = "GDE_MSGT1534";
+	public final static String	GDE_MSGT1535 = "GDE_MSGT1535";
+	public final static String	GDE_MSGT1536 = "GDE_MSGT1536";
+	public final static String	GDE_MSGT1537 = "GDE_MSGT1537";
 
  }
