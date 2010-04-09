@@ -14,16 +14,16 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.wb;
+package gde.device.wb;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import osde.device.DeviceConfiguration;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
+import gde.device.DeviceConfiguration;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
 
 /**
  * Dummy serial port implementation for the simulator device

@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.wb.simulator;
+package gde.device.wb.simulator;
 
 /** 
  * @author Winfried Brügmann 
@@ -22,14 +22,14 @@ package osde.device.wb.simulator;
  */ 
 public class MessageIds { 
 
-	public final static String	DE_MSGT1050 = "DE_MSGT1050";
-	public final static String	DE_MSGT1051 = "DE_MSGT1051";
-	public final static String	DE_MSGT1052 = "DE_MSGT1052";
-	public final static String	DE_MSGT1053 = "DE_MSGT1053";
-	public final static String	DE_MSGT1054 = "DE_MSGT1054";
-	public final static String	DE_MSGT1055 = "DE_MSGT1055";
-	public final static String	DE_MSGT1056 = "DE_MSGT1056";
-	public final static String	DE_MSGT1057 = "DE_MSGT1057";
-	public final static String	DE_MSGT1058 = "DE_MSGT1058";
+	public final static String	GDE_MSGT1050 = "GDE_MSGT1050";
+	public final static String	GDE_MSGT1051 = "GDE_MSGT1051";
+	public final static String	GDE_MSGT1052 = "GDE_MSGT1052";
+	public final static String	GDE_MSGT1053 = "GDE_MSGT1053";
+	public final static String	GDE_MSGT1054 = "GDE_MSGT1054";
+	public final static String	GDE_MSGT1055 = "GDE_MSGT1055";
+	public final static String	GDE_MSGT1056 = "GDE_MSGT1056";
+	public final static String	GDE_MSGT1057 = "GDE_MSGT1057";
+	public final static String	GDE_MSGT1058 = "GDE_MSGT1058";
 
  }

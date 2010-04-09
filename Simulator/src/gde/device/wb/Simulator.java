@@ -14,26 +14,26 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.wb;
+package gde.device.wb;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
-import osde.device.wb.simulator.MessageIds;
-import osde.exception.DataInconsitsentException;
-import osde.messages.Messages;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.device.wb.simulator.MessageIds;
+import gde.exception.DataInconsitsentException;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
 
 /**
  * Sample and test device implementation, scale adjustment, ...
@@ -55,7 +55,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	public Simulator(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.wb.simulator.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("de.device.wb.simulator.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new SimulatorSerialPort(this, this.application);
@@ -70,7 +70,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	public Simulator(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.wb.simulator.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("de.device.wb.simulator.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new SimulatorSerialPort(this, this.application);
@@ -83,7 +83,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.DE_MSGT1058);
+		return Messages.getString(MessageIds.GDE_MSGT1058);
 	}
 
 	/**
@@ -152,7 +152,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
