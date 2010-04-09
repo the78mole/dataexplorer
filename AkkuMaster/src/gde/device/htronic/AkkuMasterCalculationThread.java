@@ -14,14 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.htronic;
+package gde.device.htronic;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.ui.DataExplorer;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.ui.DataExplorer;
 
 /**
  * This class enables data calculation thread for device AkkuMaster C4

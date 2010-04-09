@@ -14,14 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.htronic;
+package gde.device.htronic;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -37,14 +37,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
-import osde.DE;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.exception.DataInconsitsentException;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
+import gde.DE;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.exception.DataInconsitsentException;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
   * Implementation for one channel tab, this will be initialized according number of available channels
@@ -113,10 +113,10 @@ public class AkkuMasterChannelTab {
 	boolean												isDischargeCurrentAdded		= false;
 	boolean												isCollectDataStopped			= true;
 	boolean												isMemorySelectionChanged	= false;
-	String												recordSetKey							= Messages.getString(osde.messages.MessageIds.DE_MSGT0272);
+	String												recordSetKey							= Messages.getString(de.messages.MessageIds.GDE_MSGT0272);
 	
 	int 													actualCurrent = 0;
-	String 												processName = DE.STRING_EMPTY;
+	String 												processName = GDE.STRING_EMPTY;
 
 
 	final Channels								channels;
@@ -157,7 +157,7 @@ public class AkkuMasterChannelTab {
 	public void addChannelTab(CTabFolder tabFolder) {
 		{
 			this.channelTab = new CTabItem(tabFolder, SWT.NONE);
-			this.channelTab.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.channelTab.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.channelTab.setText(this.name);
 			{ // begin channel composite
 				this.channelComposite = new Composite(tabFolder, SWT.NONE);
@@ -185,16 +185,16 @@ public class AkkuMasterChannelTab {
 					});
 					{
 						this.captureOnlyText = new Text(this.captureOnlyGroup, SWT.MULTI | SWT.WRAP);
-						this.captureOnlyText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.captureOnlyText.setText(Messages.getString(MessageIds.DE_MSGT1173));
+						this.captureOnlyText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.captureOnlyText.setText(Messages.getString(MessageIds.GDE_MSGT1173));
 						this.captureOnlyText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-						this.captureOnlyText.setBounds(51, DE.IS_MAC_COCOA ? 25 : 40, 315, 37);
+						this.captureOnlyText.setBounds(51, GDE.IS_MAC_COCOA ? 25 : 40, 315, 37);
 					}
 					{
 						this.captureOnlyButton = new Button(this.captureOnlyGroup, SWT.RADIO | SWT.LEFT);
-						this.captureOnlyButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
-						this.captureOnlyButton.setText(Messages.getString(MessageIds.DE_MSGT1174)); 
-						this.captureOnlyButton.setBounds(12, DE.IS_MAC_COCOA ? 0 : 15, 310, 22);
+						this.captureOnlyButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+						this.captureOnlyButton.setText(Messages.getString(MessageIds.GDE_MSGT1174)); 
+						this.captureOnlyButton.setBounds(12, GDE.IS_MAC_COCOA ? 0 : 15, 310, 22);
 						this.captureOnlyButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -212,7 +212,7 @@ public class AkkuMasterChannelTab {
 									catch (Exception e) {
 										AkkuMasterChannelTab.this.captureOnlyButton.setSelection(false);
 										AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(),
-												Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+												Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 								}
 							}
@@ -233,9 +233,9 @@ public class AkkuMasterChannelTab {
 					});
 					{
 						this.programmButton = new Button(this.programGroup, SWT.RADIO | SWT.LEFT);
-						this.programmButton.setText(Messages.getString(MessageIds.DE_MSGT1175));
-						this.programmButton.setBounds(12, DE.IS_MAC_COCOA ? 0 : 15, 295, 21);
-						this.programmButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
+						this.programmButton.setText(Messages.getString(MessageIds.GDE_MSGT1175));
+						this.programmButton.setBounds(12, GDE.IS_MAC_COCOA ? 0 : 15, 295, 21);
+						this.programmButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 						this.programmButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -253,7 +253,7 @@ public class AkkuMasterChannelTab {
 									catch (Exception e) {
 										AkkuMasterChannelTab.this.programmButton.setSelection(false);
 										AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(),
-												Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+												Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 								}
 							}
@@ -262,9 +262,9 @@ public class AkkuMasterChannelTab {
 					{
 						this.akkuGroup = new Group(this.programGroup, SWT.NONE);
 						this.akkuGroup.setLayout(null);
-						this.akkuGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.akkuGroup.setText(Messages.getString(MessageIds.DE_MSGT1176));
-						this.akkuGroup.setBounds(15, DE.IS_MAC_COCOA ? 25 : 40, 369, 67);
+						this.akkuGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.akkuGroup.setText(Messages.getString(MessageIds.GDE_MSGT1176));
+						this.akkuGroup.setBounds(15, GDE.IS_MAC_COCOA ? 25 : 40, 369, 67);
 						this.akkuGroup.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
 								log.log(Level.FINEST, "akkuGroup.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -275,18 +275,18 @@ public class AkkuMasterChannelTab {
 						});
 						{
 							this.capacityText = new Text(this.akkuGroup, SWT.NONE);
-							this.capacityText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.capacityText.setBounds(12, DE.IS_MAC_COCOA ? 5 : 20, 105, 18);
-							this.capacityText.setText(Messages.getString(MessageIds.DE_MSGT1177));
+							this.capacityText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.capacityText.setBounds(12, GDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
+							this.capacityText.setText(Messages.getString(MessageIds.GDE_MSGT1177));
 							this.capacityText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 							this.capacityText.setEditable(false);
 						}
 						{
 							this.capacityMilliAh = new CCombo(this.akkuGroup, SWT.BORDER);
-							this.capacityMilliAh.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.capacityMilliAh.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.capacityMilliAh.setItems(this.aCapacity);
 							this.capacityMilliAh.setText(this.aCapacity[5]);
-							this.capacityMilliAh.setBounds(12, DE.IS_MAC_COCOA ? 25 : 40, 105, DE.IS_LINUX ? 22 : 20);
+							this.capacityMilliAh.setBounds(12, GDE.IS_MAC_COCOA ? 25 : 40, 105, GDE.IS_LINUX ? 22 : 20);
 							this.capacityMilliAh.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -297,16 +297,16 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.countCellsText = new Text(this.akkuGroup, SWT.NONE);
-							this.countCellsText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.countCellsText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.countCellsText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-							this.countCellsText.setBounds(130, DE.IS_MAC_COCOA ? 5 : 20, 105, 18);
-							this.countCellsText.setText(Messages.getString(MessageIds.DE_MSGT1178));
+							this.countCellsText.setBounds(130, GDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
+							this.countCellsText.setText(Messages.getString(MessageIds.GDE_MSGT1178));
 							this.countCellsText.setEditable(false);
 						}
 						{
 							this.countCells = new CCombo(this.akkuGroup, SWT.BORDER);
-							this.countCells.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.countCells.setBounds(130, DE.IS_MAC_COCOA ? 25 : 40, 105, DE.IS_LINUX ? 22 : 20);
+							this.countCells.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.countCells.setBounds(130, GDE.IS_MAC_COCOA ? 25 : 40, 105, GDE.IS_LINUX ? 22 : 20);
 							this.countCells.setItems(this.aCellCount);
 							this.countCells.setText(this.aCellCount[3]);
 							this.countCells.setEditable(false);
@@ -321,18 +321,18 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.akkuTypeText = new Text(this.akkuGroup, SWT.NONE);
-							this.akkuTypeText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.akkuTypeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.akkuTypeText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-							this.akkuTypeText.setBounds(255, DE.IS_MAC_COCOA ? 5 : 20, 105, 18);
-							this.akkuTypeText.setText(Messages.getString(MessageIds.DE_MSGT1179));
+							this.akkuTypeText.setBounds(255, GDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
+							this.akkuTypeText.setText(Messages.getString(MessageIds.GDE_MSGT1179));
 							this.akkuTypeText.setDoubleClickEnabled(false);
 							this.akkuTypeText.setDragDetect(false);
 							this.akkuTypeText.setEditable(false);
 						}
 						{
 							this.akkuType = new CCombo(this.akkuGroup, SWT.BORDER);
-							this.akkuType.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.akkuType.setBounds(255, DE.IS_MAC_COCOA ? 25 : 40, 105, DE.IS_LINUX ? 22 : 20);
+							this.akkuType.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.akkuType.setBounds(255, GDE.IS_MAC_COCOA ? 25 : 40, 105, GDE.IS_LINUX ? 22 : 20);
 							this.akkuType.setItems(this.aAkkuTyp);
 							this.akkuType.setText(this.aAkkuTyp[0]);
 							this.akkuType.setEditable(false);
@@ -348,9 +348,9 @@ public class AkkuMasterChannelTab {
 					}
 					{
 						this.programTypeGroup = new Group(this.programGroup, SWT.NONE);
-						this.programTypeGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.programTypeGroup.setBounds(15, DE.IS_MAC_COCOA ? 95 : 110, 369, 123);
-						this.programTypeGroup.setText(Messages.getString(MessageIds.DE_MSGT1180));
+						this.programTypeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.programTypeGroup.setBounds(15, GDE.IS_MAC_COCOA ? 95 : 110, 369, 123);
+						this.programTypeGroup.setText(Messages.getString(MessageIds.GDE_MSGT1180));
 						this.programTypeGroup.setLayout(null);
 						this.programTypeGroup.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
@@ -363,15 +363,15 @@ public class AkkuMasterChannelTab {
 						});
 						{
 							this.programText = new Text(this.programTypeGroup, SWT.NONE);
-							this.programText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.programText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.programText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-							this.programText.setBounds(130, DE.IS_MAC_COCOA ? 5 : 20, 105, 18);
-							this.programText.setText(Messages.getString(MessageIds.DE_MSGT1181)); 
+							this.programText.setBounds(130, GDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
+							this.programText.setText(Messages.getString(MessageIds.GDE_MSGT1181)); 
 						}
 						{
 							this.program = new CCombo(this.programTypeGroup, SWT.BORDER);
-							this.program.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.program.setBounds(12, DE.IS_MAC_COCOA ? 25 : 40, 347, DE.IS_LINUX ? 22 : 20);
+							this.program.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.program.setBounds(12, GDE.IS_MAC_COCOA ? 25 : 40, 347, GDE.IS_LINUX ? 22 : 20);
 							this.program.setItems(this.aProgramm);
 							this.program.select(2);
 							this.program.setEditable(false);
@@ -385,16 +385,16 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.chargeCurrentText = new Text(this.programTypeGroup, SWT.NONE);
-							this.chargeCurrentText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.chargeCurrentText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.chargeCurrentText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-							this.chargeCurrentText.setBounds(12, DE.IS_MAC_COCOA ? 55 : 70, 105, 18);
-							this.chargeCurrentText.setText(Messages.getString(MessageIds.DE_MSGT1182));
+							this.chargeCurrentText.setBounds(12, GDE.IS_MAC_COCOA ? 55 : 70, 105, 18);
+							this.chargeCurrentText.setText(Messages.getString(MessageIds.GDE_MSGT1182));
 							this.chargeCurrentText.setEditable(false);
 						}
 						{
 							this.chargeCurrent = new CCombo(this.programTypeGroup, SWT.BORDER);
-							this.chargeCurrent.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.chargeCurrent.setBounds(12, DE.IS_MAC_COCOA ? 79 : 93, 105, DE.IS_LINUX ? 22 : 20);
+							this.chargeCurrent.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.chargeCurrent.setBounds(12, GDE.IS_MAC_COCOA ? 79 : 93, 105, GDE.IS_LINUX ? 22 : 20);
 							this.chargeCurrent.setItems(this.aChargeCurrent_mA);
 							this.chargeCurrent.setText(this.aChargeCurrent_mA[5]);
 							this.chargeCurrent.addSelectionListener(new SelectionAdapter() {
@@ -406,18 +406,18 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.dischargeCurrentText = new Text(this.programTypeGroup, SWT.NONE);
-							this.dischargeCurrentText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.dischargeCurrentText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.dischargeCurrentText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-							this.dischargeCurrentText.setBounds(130, DE.IS_MAC_COCOA ? 55 : 70, 105, 18);
+							this.dischargeCurrentText.setBounds(130, GDE.IS_MAC_COCOA ? 55 : 70, 105, 18);
 							this.dischargeCurrentText.setDragDetect(false);
 							this.dischargeCurrentText.setDoubleClickEnabled(false);
-							this.dischargeCurrentText.setText(Messages.getString(MessageIds.DE_MSGT1183));
+							this.dischargeCurrentText.setText(Messages.getString(MessageIds.GDE_MSGT1183));
 							this.dischargeCurrentText.setEditable(false);
 						}
 						{
 							this.dischargeCurrent = new CCombo(this.programTypeGroup, SWT.BORDER);
-							this.dischargeCurrent.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.dischargeCurrent.setBounds(130, DE.IS_MAC_COCOA ? 79 : 93, 105, DE.IS_LINUX ? 22 : 20);
+							this.dischargeCurrent.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.dischargeCurrent.setBounds(130, GDE.IS_MAC_COCOA ? 79 : 93, 105, GDE.IS_LINUX ? 22 : 20);
 							this.dischargeCurrent.setItems(this.aDischargeCurrent_mA);
 							this.dischargeCurrent.setText(this.aDischargeCurrent_mA[5]);
 							this.dischargeCurrent.addSelectionListener(new SelectionAdapter() {
@@ -429,16 +429,16 @@ public class AkkuMasterChannelTab {
 						}
 						{
 							this.memoryNumberText = new Text(this.programTypeGroup, SWT.NONE);
-							this.memoryNumberText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.memoryNumberText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.memoryNumberText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-							this.memoryNumberText.setBounds(255, DE.IS_MAC_COCOA ? 55 : 70, 105, 18);
-							this.memoryNumberText.setText(Messages.getString(MessageIds.DE_MSGT1184)); 
+							this.memoryNumberText.setBounds(255, GDE.IS_MAC_COCOA ? 55 : 70, 105, 18);
+							this.memoryNumberText.setText(Messages.getString(MessageIds.GDE_MSGT1184)); 
 							this.memoryNumberText.setEditable(false);
 						}
 						{
 							this.memoryNumberCombo = new CCombo(this.programTypeGroup, SWT.BORDER);
-							this.memoryNumberCombo.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.memoryNumberCombo.setBounds(255, DE.IS_MAC_COCOA ? 79 : 93, 105, DE.IS_LINUX ? 22 : 20);
+							this.memoryNumberCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.memoryNumberCombo.setBounds(255, GDE.IS_MAC_COCOA ? 79 : 93, 105, GDE.IS_LINUX ? 22 : 20);
 							this.memoryNumberCombo.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 							this.memoryNumberCombo.select(1);
 							this.memoryNumberCombo.setEditable(false);
@@ -457,8 +457,8 @@ public class AkkuMasterChannelTab {
 				{
 					this.startDataGatheringButton = new Button(this.channelComposite, SWT.PUSH | SWT.CENTER);
 					this.startDataGatheringButton.setBounds(12, 360, 190, 28);
-					this.startDataGatheringButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0277));
-					this.startDataGatheringButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.startDataGatheringButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0277));
+					this.startDataGatheringButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.startDataGatheringButton.setSelection(this.isCollectData);
 					this.startDataGatheringButton.setEnabled(false);
 					this.startDataGatheringButton.addSelectionListener(new SelectionAdapter() {
@@ -494,7 +494,7 @@ public class AkkuMasterChannelTab {
 										}
 
 										if (AkkuMasterChannelTab.this.parent.getMaxCurrent() < AkkuMasterChannelTab.this.parent.getActiveCurrent() + dischargeCurrent_mA || AkkuMasterChannelTab.this.parent.getMaxCurrent() < AkkuMasterChannelTab.this.parent.getActiveCurrent() + chargeCurrent_mA) {
-											AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(MessageIds.DE_MSGW1100, new Object[] { dischargeCurrent_mA, chargeCurrent_mA } ));
+											AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW1100, new Object[] { dischargeCurrent_mA, chargeCurrent_mA } ));
 											setCollectData(false);
 											AkkuMasterChannelTab.this.startDataGatheringButton.setSelection(true);
 											return;
@@ -528,7 +528,7 @@ public class AkkuMasterChannelTab {
 												if (0 == (Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_ERROR_NO)) {
 													AkkuMasterChannelTab.this.processName = ((String) this.data.get(AkkuMasterC4SerialPort.PROCESS_NAME)).split(" ")[1].trim(); //$NON-NLS-1$
 													log.log(Level.FINE, AkkuMasterChannelTab.this.name + ": processName = " + processName); //$NON-NLS-1$
-													AkkuMasterChannelTab.this.application.setStatusMessage(DE.STRING_EMPTY);
+													AkkuMasterChannelTab.this.application.setStatusMessage(GDE.STRING_EMPTY);
 
 													// check if device is ready for data capturing
 													int processNumber = new Integer(((String) this.data.get(AkkuMasterC4SerialPort.PROCESS_NAME)).split(" ")[0]).intValue(); //$NON-NLS-1$
@@ -615,7 +615,7 @@ public class AkkuMasterChannelTab {
 													}
 													setCollectData(false);
 													stopTimer();
-													AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0027));
+													AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0027));
 												}
 											}
 											catch (DataInconsitsentException e) {
@@ -624,7 +624,7 @@ public class AkkuMasterChannelTab {
 												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
 												stopTimer();
-												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0028, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
+												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0028, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
 											}
 											catch (Exception e) {
 												updateCurrentStatus();
@@ -632,7 +632,7 @@ public class AkkuMasterChannelTab {
 												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
 												stopTimer();
-												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0029, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
+												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0029, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
 											}
 										}
 									});
@@ -643,7 +643,7 @@ public class AkkuMasterChannelTab {
 									updateCurrentStatus();
 									AkkuMasterChannelTab.this.isStopButtonEnabled = false;
 									AkkuMasterChannelTab.this.startDataGatheringButton.setSelection(true);
-									AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0026));
+									AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0026));
 								}
 							}
 						}
@@ -652,9 +652,9 @@ public class AkkuMasterChannelTab {
 				{
 					this.stopDataGatheringButton = new Button(this.channelComposite, SWT.PUSH | SWT.CENTER);
 					this.stopDataGatheringButton.setBounds(225, 360, 190, 28);
-					this.stopDataGatheringButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0278));
+					this.stopDataGatheringButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0278));
 					this.stopDataGatheringButton.setEnabled(false);
-					this.stopDataGatheringButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.stopDataGatheringButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.stopDataGatheringButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "stopAuzeichnungButton.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -683,18 +683,18 @@ public class AkkuMasterChannelTab {
 	 * @param processName
 	 */
 	private void updateCurrentStatus() {
-		if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.DE_MSGT1126).trim()) && !isChargeCurrentAdded()) {
+		if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.GDE_MSGT1126).trim()) && !isChargeCurrentAdded()) {
 			AkkuMasterChannelTab.this.parent.addTotalChargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
 			setChargeCurrentAdded(true);
 		}
-		else if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.DE_MSGT1127).trim()) && !isDischargeCurrentAdded) {
+		else if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.GDE_MSGT1127).trim()) && !isDischargeCurrentAdded) {
 			AkkuMasterChannelTab.this.parent.addTotalDischargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
 			setDischargeCurrentAdded(true);
 		}
-		if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.DE_MSGT1126).trim()) && isDischargeCurrentAdded()) { 
+		if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.GDE_MSGT1126).trim()) && isDischargeCurrentAdded()) { 
 			AkkuMasterChannelTab.this.parent.subtractTotalChargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
 		}
-		else if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.DE_MSGT1127).trim()) && isChargeCurrentAdded()) {
+		else if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.GDE_MSGT1127).trim()) && isChargeCurrentAdded()) {
 			AkkuMasterChannelTab.this.parent.subtractTotalDischargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
 		}
 		AkkuMasterChannelTab.this.parent.updateCurrentStatus();

@@ -14,10 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.htronic;
+package gde.device.htronic;
 
 import java.util.HashMap;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -41,13 +41,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channels;
-import osde.device.DeviceDialog;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channels;
+import gde.device.DeviceDialog;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
  * Dialog class for device AkkuMaster C4
@@ -128,8 +128,8 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(440, 555);
-			this.dialogShell.setText(DEVICE_NAME + Messages.getString(osde.messages.MessageIds.DE_MSGT0273));
-			this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif"));
+			this.dialogShell.setText(DEVICE_NAME + Messages.getString(de.messages.MessageIds.GDE_MSGT0273));
+			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif"));
 			this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 				public void mouseEnter(MouseEvent evt) {
 					log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
@@ -145,17 +145,17 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			});
 			{
 				this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
-				this.tabFolder.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.tabFolder.setBounds(0, 0, 430, 425);
 
 				@SuppressWarnings("nls")
 				String[] aCapacity = new String[] { "100", "250", "500", "600", "800", "1000", "1250", "1500", "1750", "2000", "2500", "3000", "4000", "5000" };
-				String[] aCellCount = new String[] { "1"+Messages.getString(MessageIds.DE_MSGT1185), "2"+Messages.getString(MessageIds.DE_MSGT1148), "3"+Messages.getString(MessageIds.DE_MSGT1148), "4"+Messages.getString(MessageIds.DE_MSGT1148), "5"+Messages.getString(MessageIds.DE_MSGT1148), 
-						"6"+Messages.getString(MessageIds.DE_MSGT1148), "7"+Messages.getString(MessageIds.DE_MSGT1148), "8"+Messages.getString(MessageIds.DE_MSGT1148), "9"+Messages.getString(MessageIds.DE_MSGT1148), "10"+Messages.getString(MessageIds.DE_MSGT1148), 
-						"11"+Messages.getString(MessageIds.DE_MSGT1148), "12"+Messages.getString(MessageIds.DE_MSGT1148),	"13"+Messages.getString(MessageIds.DE_MSGT1148), "14"+Messages.getString(MessageIds.DE_MSGT1148) };
+				String[] aCellCount = new String[] { "1"+Messages.getString(MessageIds.GDE_MSGT1185), "2"+Messages.getString(MessageIds.GDE_MSGT1148), "3"+Messages.getString(MessageIds.GDE_MSGT1148), "4"+Messages.getString(MessageIds.GDE_MSGT1148), "5"+Messages.getString(MessageIds.GDE_MSGT1148), 
+						"6"+Messages.getString(MessageIds.GDE_MSGT1148), "7"+Messages.getString(MessageIds.GDE_MSGT1148), "8"+Messages.getString(MessageIds.GDE_MSGT1148), "9"+Messages.getString(MessageIds.GDE_MSGT1148), "10"+Messages.getString(MessageIds.GDE_MSGT1148), 
+						"11"+Messages.getString(MessageIds.GDE_MSGT1148), "12"+Messages.getString(MessageIds.GDE_MSGT1148),	"13"+Messages.getString(MessageIds.GDE_MSGT1148), "14"+Messages.getString(MessageIds.GDE_MSGT1148) };
 				String[] aAkkuType = new String[] { "0 NiCa", "1 NiMh", "2 Pb" };
-				String[] aProgramm = new String[] { Messages.getString(MessageIds.DE_MSGT1100), Messages.getString(MessageIds.DE_MSGT1101), Messages.getString(MessageIds.DE_MSGT1102), Messages.getString(MessageIds.DE_MSGT1103), Messages.getString(MessageIds.DE_MSGT1104), Messages.getString(MessageIds.DE_MSGT1105), Messages.getString(MessageIds.DE_MSGT1106), Messages.getString(MessageIds.DE_MSGT1107),
-						Messages.getString(MessageIds.DE_MSGT1108) }; 
+				String[] aProgramm = new String[] { Messages.getString(MessageIds.GDE_MSGT1100), Messages.getString(MessageIds.GDE_MSGT1101), Messages.getString(MessageIds.GDE_MSGT1102), Messages.getString(MessageIds.GDE_MSGT1103), Messages.getString(MessageIds.GDE_MSGT1104), Messages.getString(MessageIds.GDE_MSGT1105), Messages.getString(MessageIds.GDE_MSGT1106), Messages.getString(MessageIds.GDE_MSGT1107),
+						Messages.getString(MessageIds.GDE_MSGT1108) }; 
 				String[] aChargeCurrent_mA = new String[] { "50", "100", "150", "200", "250", "300", "400", "500", "750", "900", "1000", "1500", "2000" };
 				String[] aDischargeCurrent_mA = aChargeCurrent_mA;
 
@@ -188,8 +188,8 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 				{
 					this.versionTabItem = new CTabItem(this.tabFolder, SWT.NONE);
-					this.versionTabItem.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.versionTabItem.setText(Messages.getString(MessageIds.DE_MSGT1109));
+					this.versionTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.versionTabItem.setText(Messages.getString(MessageIds.GDE_MSGT1109));
 					{
 						this.versionComposite = new Composite(this.tabFolder, SWT.NONE);
 						this.versionComposite.setLayout(null);
@@ -207,25 +207,25 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 								}
 								else {
 									updateVersionText(
-											String.format(":    %s", Messages.getString(osde.messages.MessageIds.DE_MSGT0276)), //$NON-NLS-1$
-											String.format(":    %s", Messages.getString(osde.messages.MessageIds.DE_MSGT0276)), //$NON-NLS-1$
-											String.format(":    %s", Messages.getString(osde.messages.MessageIds.DE_MSGT0276)), //$NON-NLS-1$
-											String.format(":    %s", Messages.getString(osde.messages.MessageIds.DE_MSGT0276))); //$NON-NLS-1$
+											String.format(":    %s", Messages.getString(de.messages.MessageIds.GDE_MSGT0276)), //$NON-NLS-1$
+											String.format(":    %s", Messages.getString(de.messages.MessageIds.GDE_MSGT0276)), //$NON-NLS-1$
+											String.format(":    %s", Messages.getString(de.messages.MessageIds.GDE_MSGT0276)), //$NON-NLS-1$
+											String.format(":    %s", Messages.getString(de.messages.MessageIds.GDE_MSGT0276))); //$NON-NLS-1$
 									startUpdateVersionThread();
 								}
 							}
 						});
 						{
 							this.versionNumberLabel = new CLabel(this.versionComposite, SWT.LEFT);
-							this.versionNumberLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionNumberLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionNumberLabel.setBounds(25, 60, 150, 20);
 							this.versionNumberLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 							this.versionNumberLabel.setForeground(DataExplorer.COLOR_BLACK);
-							this.versionNumberLabel.setText(Messages.getString(MessageIds.DE_MSGT1122));
+							this.versionNumberLabel.setText(Messages.getString(MessageIds.GDE_MSGT1122));
 						}
 						{
 							this.versionNumberText = new Text(this.versionComposite, SWT.NONE);
-							this.versionNumberText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionNumberText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionNumberText.setBounds(230, 63, 100, 20);
 							this.versionNumberText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 							this.versionNumberText.setForeground(DataExplorer.COLOR_BLACK);
@@ -233,15 +233,15 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						}
 						{
 							this.versionDateLabel = new CLabel(this.versionComposite, SWT.LEFT);
-							this.versionDateLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionDateLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionDateLabel.setBounds(25, 110, 150, 20);
 							this.versionDateLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 							this.versionDateLabel.setForeground(DataExplorer.COLOR_BLACK);
-							this.versionDateLabel.setText(Messages.getString(MessageIds.DE_MSGT1123));
+							this.versionDateLabel.setText(Messages.getString(MessageIds.GDE_MSGT1123));
 						}
 						{
 							this.versionDateText = new Text(this.versionComposite, SWT.NONE);
-							this.versionDateText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionDateText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionDateText.setBounds(230, 113, 100, 20);
 							this.versionDateText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 							this.versionDateText.setForeground(DataExplorer.COLOR_BLACK);
@@ -249,15 +249,15 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						}
 						{
 							this.versionCurrentTypeLabel = new CLabel(this.versionComposite, SWT.LEFT);
-							this.versionCurrentTypeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionCurrentTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionCurrentTypeLabel.setBounds(25, 160, 150, 20);
 							this.versionCurrentTypeLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 							this.versionCurrentTypeLabel.setForeground(DataExplorer.COLOR_BLACK);
-							this.versionCurrentTypeLabel.setText(Messages.getString(MessageIds.DE_MSGT1124));
+							this.versionCurrentTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT1124));
 						}
 						{
 							this.versionCurrentTypeText = new Text(this.versionComposite, SWT.NONE);
-							this.versionCurrentTypeText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionCurrentTypeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionCurrentTypeText.setBounds(230, 163, 100, 20);
 							this.versionCurrentTypeText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 							this.versionCurrentTypeText.setForeground(DataExplorer.COLOR_BLACK);
@@ -265,15 +265,15 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						}
 						{
 							this.versionFrontplateTypeLabel = new CLabel(this.versionComposite, SWT.LEFT);
-							this.versionFrontplateTypeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionFrontplateTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionFrontplateTypeLabel.setBounds(25, 210, 150, 20);
 							this.versionFrontplateTypeLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 							this.versionFrontplateTypeLabel.setForeground(DataExplorer.COLOR_BLACK);
-							this.versionFrontplateTypeLabel.setText(Messages.getString(MessageIds.DE_MSGT1125));
+							this.versionFrontplateTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT1125));
 						}
 						{
 							this.versionFrontplateTypeText = new Text(this.versionComposite, SWT.NONE);
-							this.versionFrontplateTypeText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.versionFrontplateTypeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.versionFrontplateTypeText.setBounds(230, 213, 100, 20);
 							this.versionFrontplateTypeText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 							this.versionFrontplateTypeText.setForeground(DataExplorer.COLOR_BLACK);
@@ -296,51 +296,51 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				});
 				{
 					this.totalChargeCurrentText = new Label(this.statusComposite, SWT.RIGHT);
-					this.totalChargeCurrentText.setText(Messages.getString(MessageIds.DE_MSGT1110));
+					this.totalChargeCurrentText.setText(Messages.getString(MessageIds.GDE_MSGT1110));
 					this.totalChargeCurrentText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-					this.totalChargeCurrentText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalChargeCurrentText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.totalChargeCurrentText.setBounds(20, 3, 190, 20);
 				}
 				{
 					this.totalChargeCurrentLabel = new Label(this.statusComposite, SWT.RIGHT | SWT.EMBEDDED);
 					this.totalChargeCurrentLabel.setBounds(235, 3, 50, 20);
-					this.totalChargeCurrentLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalChargeCurrentLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.totalChargeCurrentLabel.setText(new Double(this.totalChargeCurrent).toString());
 					this.totalChargeCurrentLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
 					this.totalChargeCurrentUnit = new Label(this.statusComposite, SWT.LEFT);
 					this.totalChargeCurrentUnit.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-					this.totalChargeCurrentUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
-					this.totalChargeCurrentUnit.setText(Messages.getString(MessageIds.DE_MSGT1113));
+					this.totalChargeCurrentUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalChargeCurrentUnit.setText(Messages.getString(MessageIds.GDE_MSGT1113));
 					this.totalChargeCurrentUnit.setBounds(300, 3, 119, 20);
 				}
 				{
 					this.totalDischargeCurrentText = new Label(this.statusComposite, SWT.RIGHT);
 					this.totalDischargeCurrentText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-					this.totalDischargeCurrentText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
-					this.totalDischargeCurrentText.setText(Messages.getString(MessageIds.DE_MSGT1111));
+					this.totalDischargeCurrentText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalDischargeCurrentText.setText(Messages.getString(MessageIds.GDE_MSGT1111));
 					this.totalDischargeCurrentText.setBounds(20, 25, 190, 20);
 				}
 				{
 					this.totalDischargeCurrentLabel = new Label(this.statusComposite, SWT.RIGHT | SWT.EMBEDDED);
 					this.totalDischargeCurrentLabel.setBounds(235, 25, 50, 20);
-					this.totalDischargeCurrentLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalDischargeCurrentLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.totalDischargeCurrentLabel.setText(new Double(this.totalDischargeCurrent).toString());
 					this.totalDischargeCurrentLabel.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
 					this.totalDischargeCurrentUnit = new Label(this.statusComposite, SWT.LEFT);
 					this.totalDischargeCurrentUnit.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-					this.totalDischargeCurrentUnit.setText(Messages.getString(MessageIds.DE_MSGT1112));
-					this.totalDischargeCurrentUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.totalDischargeCurrentUnit.setText(Messages.getString(MessageIds.GDE_MSGT1112));
+					this.totalDischargeCurrentUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.totalDischargeCurrentUnit.setBounds(300, 25, 119, 20);
 				}
 			}
 			{
 				this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-				this.closeButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.closeButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0188));
+				this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.closeButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0188));
 				this.closeButton.setBounds(87, 485, 260, 30);
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
@@ -465,7 +465,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 								});
 							}
 							catch (Exception e) {
-								AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0024, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+								AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0024, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
 								return;
 							}
 						}
@@ -481,7 +481,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		}
 		catch (Exception e) {
 			AkkuMasterC4Dialog.log.log(Level.WARNING, e.getMessage(), e);
-			AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.dialogShell, Messages.getString(osde.messages.MessageIds.DE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+			AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.dialogShell, Messages.getString(de.messages.MessageIds.GDE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
 			this.isWarnedConnectError = true;
 		}
 	}

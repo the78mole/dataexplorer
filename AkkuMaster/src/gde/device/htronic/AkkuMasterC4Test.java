@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.htronic;
+package gde.device.htronic;
 
 import gnu.io.SerialPort;
 
@@ -22,8 +22,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
-import osde.device.DeviceConfiguration;
-import osde.serial.DeviceSerialPort;
+import gde.device.DeviceConfiguration;
+import gde.serial.DeviceSerialPort;
 
 /**
  * Class to test akkuMaster C4 device serial port communication
