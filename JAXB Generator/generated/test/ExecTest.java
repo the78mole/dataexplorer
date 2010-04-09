@@ -27,7 +27,7 @@ public class ExecTest {
 		
 		try {
       Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(basePath + "DeviceProperties_V03.xsd"));
-			JAXBContext jc = JAXBContext.newInstance("de.device");
+			JAXBContext jc = JAXBContext.newInstance("gde.device");
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema(schema);
 			
