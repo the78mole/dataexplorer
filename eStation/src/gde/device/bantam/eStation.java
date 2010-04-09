@@ -14,32 +14,32 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.bantam;
+package gde.device.bantam;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Vector;
 
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
-import osde.exception.ApplicationConfigurationException;
-import osde.exception.DataInconsitsentException;
-import osde.exception.SerialPortException;
-import osde.io.LogViewReader;
-import osde.messages.Messages;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.exception.ApplicationConfigurationException;
+import gde.exception.DataInconsitsentException;
+import gde.exception.SerialPortException;
+import gde.io.LogViewReader;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
 
 /**
  * eStation base device class
@@ -73,11 +73,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @throws FileNotFoundException 
 	 */
 	public eStation(String deviceProperties) throws FileNotFoundException, JAXBException {
-		super(deviceProperties);		Messages.setDeviceResourceBundle("osde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		super(deviceProperties);		Messages.setDeviceResourceBundle("de.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.DE_MSGT1400), Messages.getString(MessageIds.DE_MSGT1401), Messages.getString(MessageIds.DE_MSGT1402)};
-		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.DE_MSGT1403), Messages.getString(MessageIds.DE_MSGT1404), Messages.getString(MessageIds.DE_MSGT1405), Messages.getString(MessageIds.DE_MSGT1406)};
+		Messages.setDeviceResourceBundle("de.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT1400), Messages.getString(MessageIds.GDE_MSGT1401), Messages.getString(MessageIds.GDE_MSGT1402)};
+		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.GDE_MSGT1403), Messages.getString(MessageIds.GDE_MSGT1404), Messages.getString(MessageIds.GDE_MSGT1405), Messages.getString(MessageIds.GDE_MSGT1406)};
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
@@ -92,9 +92,9 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public eStation(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.DE_MSGT1400), Messages.getString(MessageIds.DE_MSGT1401), Messages.getString(MessageIds.DE_MSGT1402)};
-		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.DE_MSGT1403), Messages.getString(MessageIds.DE_MSGT1404), Messages.getString(MessageIds.DE_MSGT1405), Messages.getString(MessageIds.DE_MSGT1406)};
+		Messages.setDeviceResourceBundle("de.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT1400), Messages.getString(MessageIds.GDE_MSGT1401), Messages.getString(MessageIds.GDE_MSGT1402)};
+		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.GDE_MSGT1403), Messages.getString(MessageIds.GDE_MSGT1404), Messages.getString(MessageIds.GDE_MSGT1405), Messages.getString(MessageIds.GDE_MSGT1406)};
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
@@ -107,7 +107,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.DE_MSGT1411);
+		return Messages.getString(MessageIds.GDE_MSGT1411);
 	}
 
 	/**
@@ -361,7 +361,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = DE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -371,7 +371,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		
 		int timeStampBufferSize = 0;
 		if(!recordSet.isTimeStepConstant()) {
-			timeStampBufferSize = DE.SIZE_BYTES_INTEGER * recordDataSize;
+			timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 			byte[] timeStampBuffer = new byte[timeStampBufferSize];
 			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
 
@@ -395,7 +395,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
 			points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
 			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
-			for (int j=0, k=0; j<points.length - 8; ++j, k+=DE.SIZE_BYTES_INTEGER) {
+			for (int j=0, k=0; j<points.length - 8; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
 				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
 				points[j+8] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff) << 0));
 			}
@@ -636,11 +636,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				}
 				catch (SerialPortException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0015, new Object[] { e.getClass().getSimpleName() + DE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
 				}
 				catch (ApplicationConfigurationException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0010));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
 				}
 				catch (Throwable e) {

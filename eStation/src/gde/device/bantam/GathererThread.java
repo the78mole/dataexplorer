@@ -14,23 +14,23 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.bantam;
+package gde.device.bantam;
 
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.exception.ApplicationConfigurationException;
-import osde.exception.DataInconsitsentException;
-import osde.exception.SerialPortException;
-import osde.exception.TimeOutException;
-import osde.log.Level;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.utils.TimeLine;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.exception.ApplicationConfigurationException;
+import gde.exception.DataInconsitsentException;
+import gde.exception.SerialPortException;
+import gde.exception.TimeOutException;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.TimeLine;
 
 /**
  * Thread implementation to gather data from eStation device
@@ -52,7 +52,7 @@ public class GathererThread extends Thread {
 	final Channel							channel;
 	final int									channelNumber;
 	
-	String										recordSetKey								= Messages.getString(osde.messages.MessageIds.DE_MSGT0272);
+	String										recordSetKey								= Messages.getString(de.messages.MessageIds.GDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
 	boolean										isGatheredRecordSetVisible	= true;
 	int 											numberBatteryCells 					= 0; 
@@ -189,7 +189,7 @@ public class GathererThread extends Thread {
 					//OsdReaderWriter.write("E:\\Temp\\not.osd", this.channel, 1);
 				}
 				else { // no eStation program is executing, wait for 180 seconds max. for actions
-					this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGI1400));
+					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1400));
 					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for eStation activation"); //$NON-NLS-1$
 
 					if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
@@ -197,17 +197,17 @@ public class GathererThread extends Thread {
 						isProgrammExecuting = false;
 						recordSet = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
-						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGT1408));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGT1408));
 					}
 					else if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGW1400));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW1400));
 						stopDataGatheringThread(false, null);
 					}
 				}
 			}
 			catch (DataInconsitsentException e) {
-				String message = Messages.getString(osde.messages.MessageIds.DE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}); 
+				String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}); 
 				cleanup(message);
 			}
 			catch (Throwable e) {
@@ -216,7 +216,7 @@ public class GathererThread extends Thread {
 					try {
 						finalizeRecordSet(false);
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "(dry time) waiting..."); //$NON-NLS-1$
-						this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGI1401));
+						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1401));
 						recordSet = null;
 						--dryTimeCycleCount;
 						Thread.sleep(waitTime_ms);
@@ -227,11 +227,11 @@ public class GathererThread extends Thread {
 				}
 				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
 				else if (e instanceof TimeOutException && !isProgrammExecuting) {
-					this.application.setStatusMessage(Messages.getString(MessageIds.DE_MSGI1400));
+					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1400));
 					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for eStation activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGW1400));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW1400));
 						stopDataGatheringThread(false, null);
 					}
 				}
@@ -271,16 +271,16 @@ public class GathererThread extends Thread {
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
 			if (enableEndMessage) 
-				this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.DE_MSGT1409));
+				this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGT1409));
 		}
 		else {
 			if (throwable != null) {
-				cleanup(Messages.getString(osde.messages.MessageIds.DE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() })
-						+ Messages.getString(MessageIds.DE_MSGT1408));
+				cleanup(Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() })
+						+ Messages.getString(MessageIds.GDE_MSGT1408));
 			}
 			else {
 				if (enableEndMessage)
-					cleanup(Messages.getString(osde.messages.MessageIds.DE_MSGE0026)	+ Messages.getString(MessageIds.DE_MSGT1408));
+					cleanup(Messages.getString(de.messages.MessageIds.GDE_MSGE0026)	+ Messages.getString(MessageIds.GDE_MSGT1408));
 			}
 		}
 	}

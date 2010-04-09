@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.bantam;
+package gde.device.bantam;
 
 /** 
  * @author Winfried Brügmann 
@@ -22,31 +22,31 @@ package osde.device.bantam;
  */ 
 public class MessageIds { 
 
-	public final static String	DE_MSGW1400 = "DE_MSGW1400";
-	public final static String	DE_MSGI1400 = "DE_MSGI1400";
-	public final static String	DE_MSGI1401 = "DE_MSGI1401";
-	public final static String	DE_MSGT1400 = "DE_MSGT1400";
-	public final static String	DE_MSGT1401 = "DE_MSGT1401";
-	public final static String	DE_MSGT1402 = "DE_MSGT1402";
-	public final static String	DE_MSGT1403 = "DE_MSGT1403";
-	public final static String	DE_MSGT1404 = "DE_MSGT1404";
-	public final static String	DE_MSGT1405 = "DE_MSGT1405";
-	public final static String	DE_MSGT1406 = "DE_MSGT1406";
-	public final static String	DE_MSGT1407 = "DE_MSGT1407";
-	public final static String	DE_MSGT1408 = "DE_MSGT1408";
-	public final static String	DE_MSGT1409 = "DE_MSGT1409";
-	public final static String	DE_MSGT1410 = "DE_MSGT1410";
-	public final static String	DE_MSGT1411 = "DE_MSGT1411";
-	public final static String	DE_MSGT1414 = "DE_MSGT1414";
-	public final static String	DE_MSGT1415 = "DE_MSGT1415";
-	public final static String	DE_MSGT1416 = "DE_MSGT1416";
-	public final static String	DE_MSGT1417 = "DE_MSGT1417";
-	public final static String	DE_MSGT1418 = "DE_MSGT1418";
-	public final static String	DE_MSGT1420 = "DE_MSGT1420";
-	public final static String	DE_MSGT1421 = "DE_MSGT1421";
-	public final static String	DE_MSGT1422 = "DE_MSGT1422";
-	public final static String	DE_MSGT1423 = "DE_MSGT1423";
-	public final static String	DE_MSGT1424 = "DE_MSGT1424";
-	public final static String	DE_MSGT1425 = "DE_MSGT1425";
+	public final static String	GDE_MSGW1400 = "GDE_MSGW1400";
+	public final static String	GDE_MSGI1400 = "GDE_MSGI1400";
+	public final static String	GDE_MSGI1401 = "GDE_MSGI1401";
+	public final static String	GDE_MSGT1400 = "GDE_MSGT1400";
+	public final static String	GDE_MSGT1401 = "GDE_MSGT1401";
+	public final static String	GDE_MSGT1402 = "GDE_MSGT1402";
+	public final static String	GDE_MSGT1403 = "GDE_MSGT1403";
+	public final static String	GDE_MSGT1404 = "GDE_MSGT1404";
+	public final static String	GDE_MSGT1405 = "GDE_MSGT1405";
+	public final static String	GDE_MSGT1406 = "GDE_MSGT1406";
+	public final static String	GDE_MSGT1407 = "GDE_MSGT1407";
+	public final static String	GDE_MSGT1408 = "GDE_MSGT1408";
+	public final static String	GDE_MSGT1409 = "GDE_MSGT1409";
+	public final static String	GDE_MSGT1410 = "GDE_MSGT1410";
+	public final static String	GDE_MSGT1411 = "GDE_MSGT1411";
+	public final static String	GDE_MSGT1414 = "GDE_MSGT1414";
+	public final static String	GDE_MSGT1415 = "GDE_MSGT1415";
+	public final static String	GDE_MSGT1416 = "GDE_MSGT1416";
+	public final static String	GDE_MSGT1417 = "GDE_MSGT1417";
+	public final static String	GDE_MSGT1418 = "GDE_MSGT1418";
+	public final static String	GDE_MSGT1420 = "GDE_MSGT1420";
+	public final static String	GDE_MSGT1421 = "GDE_MSGT1421";
+	public final static String	GDE_MSGT1422 = "GDE_MSGT1422";
+	public final static String	GDE_MSGT1423 = "GDE_MSGT1423";
+	public final static String	GDE_MSGT1424 = "GDE_MSGT1424";
+	public final static String	GDE_MSGT1425 = "GDE_MSGT1425";
 
  }

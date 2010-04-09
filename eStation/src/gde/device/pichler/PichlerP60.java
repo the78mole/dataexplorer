@@ -14,14 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.pichler;
+package gde.device.pichler;
 
 import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBException;
 
-import osde.device.DeviceConfiguration;
-import osde.device.bantam.eStationBC6;
+import gde.device.DeviceConfiguration;
+import gde.device.bantam.eStationBC6;
 
 /**
  * Pichler P60 device class which is 100% eStation BC6

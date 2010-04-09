@@ -14,13 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.bantam;
+package gde.device.bantam;
 
 import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBException;
 
-import osde.device.DeviceConfiguration;
+import gde.device.DeviceConfiguration;
 
 /**
  * eStation BC8 device class

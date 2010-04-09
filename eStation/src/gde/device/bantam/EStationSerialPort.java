@@ -14,17 +14,17 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.bantam;
+package gde.device.bantam;
 
 import java.io.IOException;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
-import osde.device.DeviceConfiguration;
-import osde.exception.TimeOutException;
-import osde.serial.DeviceSerialPort;
-import osde.ui.DataExplorer;
-import osde.utils.Checksum;
+import gde.device.DeviceConfiguration;
+import gde.exception.TimeOutException;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
+import gde.utils.Checksum;
 
 /**
  * eStation serial port implementation

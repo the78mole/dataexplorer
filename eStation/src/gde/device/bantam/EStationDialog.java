@@ -14,10 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************************/
-package osde.device.bantam;
+package gde.device.bantam;
 
 import java.util.HashMap;
-import osde.log.Level;
+import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -44,14 +44,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
-import osde.DE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.device.DeviceDialog;
-import osde.messages.Messages;
-import osde.ui.DataExplorer;
-import osde.ui.SWTResourceManager;
+import gde.DE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.device.DeviceDialog;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
  * e-Station dialog implementation (902, BC6, BC610, BC8)
@@ -146,8 +146,8 @@ public class EStationDialog extends DeviceDialog {
 				SWTResourceManager.registerResourceUser(this.dialogShell);
 				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 				this.dialogShell.setLayout(new FormLayout());
-				this.dialogShell.setText(this.device.getName() + Messages.getString(osde.messages.MessageIds.DE_MSGT0273));
-				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+				this.dialogShell.setText(this.device.getName() + Messages.getString(de.messages.MessageIds.GDE_MSGT0273));
+				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.layout();
 				this.dialogShell.pack();
 				this.dialogShell.setSize(350, 465);
@@ -172,7 +172,7 @@ public class EStationDialog extends DeviceDialog {
 									}
 									catch (Exception e) {
 										EStationDialog.this.isConnectionWarned = true;
-										EStationDialog.this.application.openMessageDialog(EStationDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0024, new Object[] { e.getMessage() } ));
+										EStationDialog.this.application.openMessageDialog(EStationDialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0024, new Object[] { e.getMessage() } ));
 									}
 									EStationDialog.this.serialPort.close();
 								}
@@ -221,9 +221,9 @@ public class EStationDialog extends DeviceDialog {
 						infoTextLData.top = new FormAttachment(0, 1000, 20);
 						infoTextLData.right = new FormAttachment(1000, 1000, -12);
 						this.infoText = new CLabel(this.boundsComposite, SWT.SHADOW_IN | SWT.CENTER | SWT.EMBEDDED);
-						this.infoText.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.infoText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.infoText.setLayoutData(infoTextLData);
-						this.infoText.setText(Messages.getString(MessageIds.DE_MSGT1410));
+						this.infoText.setText(Messages.getString(MessageIds.GDE_MSGT1410));
 						this.infoText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 						this.infoText.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 					}
@@ -235,7 +235,7 @@ public class EStationDialog extends DeviceDialog {
 						startCollectDataButtonLData.right = new FormAttachment(1000, 1000, -180);
 						this.startCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
 						this.startCollectDataButton.setLayoutData(startCollectDataButtonLData);
-						this.startCollectDataButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0274));
+						this.startCollectDataButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0274));
 						this.startCollectDataButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -260,7 +260,7 @@ public class EStationDialog extends DeviceDialog {
 										}
 										EStationDialog.this.boundsComposite.redraw();
 										EStationDialog.this.application.updateGraphicsWindow();
-										EStationDialog.this.application.openMessageDialog(EStationDialog.this.getDialogShell(), Messages.getString(osde.messages.MessageIds.DE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+										EStationDialog.this.application.openMessageDialog(EStationDialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 								}
 							}
@@ -274,9 +274,9 @@ public class EStationDialog extends DeviceDialog {
 						stopColletDataButtonLData.top = new FormAttachment(0, 1000, 110);
 						stopColletDataButtonLData.right = new FormAttachment(1000, 1000, -12);
 						this.stopCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
-						this.stopCollectDataButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.stopCollectDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.stopCollectDataButton.setLayoutData(stopColletDataButtonLData);
-						this.stopCollectDataButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0275));
+						this.stopCollectDataButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0275));
 						this.stopCollectDataButton.setEnabled(false);
 						this.stopCollectDataButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -298,10 +298,10 @@ public class EStationDialog extends DeviceDialog {
 						configGroupLData.right = new FormAttachment(1000, 1000, -12);
 						this.configGroup = new Group(this.boundsComposite, SWT.NONE);
 						RowLayout configGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-						this.configGroup.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.configGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.configGroup.setLayout(configGroupLayout);
 						this.configGroup.setLayoutData(configGroupLData);
-						this.configGroup.setText(Messages.getString(MessageIds.DE_MSGT1407));
+						this.configGroup.setText(Messages.getString(MessageIds.GDE_MSGT1407));
 						this.configGroup.addPaintListener(new PaintListener() {
 							public void paintControl(PaintEvent evt) {
 								EStationDialog.log.log(Level.FINEST, "configGroup.paintControl, event=" + evt); //$NON-NLS-1$
@@ -323,33 +323,33 @@ public class EStationDialog extends DeviceDialog {
 							this.composite1.setLayoutData(composite1LData);
 							{
 								this.inputPowerLowCutOffLabel = new CLabel(this.composite1, SWT.NONE);
-								this.inputPowerLowCutOffLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.inputPowerLowCutOffLabel.setText(Messages.getString(MessageIds.DE_MSGT1414));
+								this.inputPowerLowCutOffLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.inputPowerLowCutOffLabel.setText(Messages.getString(MessageIds.GDE_MSGT1414));
 							}
 							{
 								this.capacityCutOffLabel = new CLabel(this.composite1, SWT.NONE);
-								this.capacityCutOffLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.capacityCutOffLabel.setText(Messages.getString(MessageIds.DE_MSGT1415));
+								this.capacityCutOffLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.capacityCutOffLabel.setText(Messages.getString(MessageIds.GDE_MSGT1415));
 							}
 							{
 								this.safetyTimerLabel = new CLabel(this.composite1, SWT.NONE);
-								this.safetyTimerLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.safetyTimerLabel.setText(Messages.getString(MessageIds.DE_MSGT1416));
+								this.safetyTimerLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.safetyTimerLabel.setText(Messages.getString(MessageIds.GDE_MSGT1416));
 							}
 							{
 								this.tempCutOffLabel = new CLabel(this.composite1, SWT.NONE);
-								this.tempCutOffLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.tempCutOffLabel.setText(Messages.getString(MessageIds.DE_MSGT1417));
+								this.tempCutOffLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.tempCutOffLabel.setText(Messages.getString(MessageIds.GDE_MSGT1417));
 							}
 							{
 								this.waitTimeLabel = new CLabel(this.composite1, SWT.NONE);
-								this.waitTimeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.waitTimeLabel.setText(Messages.getString(MessageIds.DE_MSGT1418));
+								this.waitTimeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.waitTimeLabel.setText(Messages.getString(MessageIds.GDE_MSGT1418));
 							}
 							{
 								this.cellTypeLabel = new CLabel(this.composite1, SWT.NONE);
-								this.cellTypeLabel.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.cellTypeLabel.setText(Messages.getString(MessageIds.DE_MSGT1420));
+								this.cellTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.cellTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT1420));
 							}
 						}
 						{
@@ -395,32 +395,32 @@ public class EStationDialog extends DeviceDialog {
 							this.composite3.setLayout(composite3Layout);
 							{
 								this.inputLowPowerCutOffUnit = new CLabel(this.composite3, SWT.NONE);
-								this.inputLowPowerCutOffUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.inputLowPowerCutOffUnit.setText(Messages.getString(MessageIds.DE_MSGT1421));
+								this.inputLowPowerCutOffUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.inputLowPowerCutOffUnit.setText(Messages.getString(MessageIds.GDE_MSGT1421));
 							}
 							{
 								this.capacityCutOffUnit = new CLabel(this.composite3, SWT.NONE);
-								this.capacityCutOffUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.capacityCutOffUnit.setText(Messages.getString(MessageIds.DE_MSGT1422));
+								this.capacityCutOffUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.capacityCutOffUnit.setText(Messages.getString(MessageIds.GDE_MSGT1422));
 							}
 							{
 								this.safetyTimerUnit = new CLabel(this.composite3, SWT.NONE);
-								this.safetyTimerUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.safetyTimerUnit.setText(Messages.getString(MessageIds.DE_MSGT1423));
+								this.safetyTimerUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.safetyTimerUnit.setText(Messages.getString(MessageIds.GDE_MSGT1423));
 							}
 							{
 								this.tempCutOffUnit = new CLabel(this.composite3, SWT.NONE);
-								this.tempCutOffUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.tempCutOffUnit.setText(Messages.getString(MessageIds.DE_MSGT1424));
+								this.tempCutOffUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.tempCutOffUnit.setText(Messages.getString(MessageIds.GDE_MSGT1424));
 							}
 							{
 								this.waitTimeUnit = new CLabel(this.composite3, SWT.NONE);
-								this.waitTimeUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.waitTimeUnit.setText(Messages.getString(MessageIds.DE_MSGT1425));
+								this.waitTimeUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.waitTimeUnit.setText(Messages.getString(MessageIds.GDE_MSGT1425));
 							}
 							{
 								this.cellTypeUnit = new CLabel(this.composite3, SWT.NONE);
-								this.cellTypeUnit.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.cellTypeUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.cellTypeUnit.setText(""); //$NON-NLS-1$
 							}
 						}
@@ -433,9 +433,9 @@ public class EStationDialog extends DeviceDialog {
 						closeButtonLData.left = new FormAttachment(0, 1000, 12);
 						closeButtonLData.right = new FormAttachment(1000, 1000, -12);
 						this.closeButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
-						this.closeButton.setFont(SWTResourceManager.getFont(DE.WIDGET_FONT_NAME, DE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.closeButton.setLayoutData(closeButtonLData);
-						this.closeButton.setText(Messages.getString(osde.messages.MessageIds.DE_MSGT0188));
+						this.closeButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0188));
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
