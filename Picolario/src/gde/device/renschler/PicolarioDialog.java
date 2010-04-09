@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -116,7 +116,7 @@ public class PicolarioDialog extends DeviceDialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(345, 590);
-			this.dialogShell.setText(DEVICE_NAME + Messages.getString(de.messages.MessageIds.GDE_MSGT0273));
+			this.dialogShell.setText(DEVICE_NAME + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
@@ -177,7 +177,7 @@ public class PicolarioDialog extends DeviceDialog {
 							catch (Exception e) {
 								PicolarioDialog.this.setClosePossible(true);
 								PicolarioDialog.this.serialPort.close();
-								PicolarioDialog.this.application.openMessageDialog(PicolarioDialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0024, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+								PicolarioDialog.this.application.openMessageDialog(PicolarioDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0024, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
 								PicolarioDialog.this.application.getDeviceSelectionDialog().open();
 							}
 						}
@@ -348,7 +348,7 @@ public class PicolarioDialog extends DeviceDialog {
 				{
 					this.stopButton = new Button(this.readDataGroup3, SWT.PUSH | SWT.CENTER);
 					this.stopButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.stopButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0278));
+					this.stopButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0278));
 					this.stopButton.setEnabled(false);
 					this.stopButton.setBounds(80, GDE.IS_MAC_COCOA ? 140 : 155, 150, 25);
 					this.stopButton.addSelectionListener(new SelectionAdapter() {
@@ -365,7 +365,7 @@ public class PicolarioDialog extends DeviceDialog {
 			{
 				this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 				this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.closeButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0188));
+				this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0188));
 				this.closeButton.setBounds(70, 520, 200, 25);
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
 					@Override

@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
-import gde.DE;
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
@@ -314,7 +314,7 @@ public class PicolarioConfigTab extends Composite {
 						this.slopeCalculationTypeCombo = new CCombo(this.heightAdaptionGroup, SWT.BORDER);
 						this.slopeCalculationTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.slopeCalculationTypeCombo.setBounds(130, GDE.IS_MAC_COCOA ? 135 : 150, 100, GDE.IS_LINUX ? 22 : 20);
-						this.slopeCalculationTypeCombo.setItems(new String[] { " " + Messages.getString(de.messages.MessageIds.GDE_MSGT0262), " " + Messages.getString(de.messages.MessageIds.GDE_MSGT0263) }); //$NON-NLS-1$ //$NON-NLS-2$
+						this.slopeCalculationTypeCombo.setItems(new String[] { " " + Messages.getString(gde.messages.MessageIds.GDE_MSGT0262), " " + Messages.getString(gde.messages.MessageIds.GDE_MSGT0263) }); //$NON-NLS-1$ //$NON-NLS-2$
 						this.slopeCalculationTypeCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1217));
 						this.slopeCalculationTypeCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
