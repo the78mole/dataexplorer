@@ -21,7 +21,7 @@ import java.util.Vector;
 
 import javax.xml.bind.JAXBException;
 
-import gde.DE;
+import gde.GDE;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.exception.DataInconsitsentException;

@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -146,7 +146,7 @@ public class EStationDialog extends DeviceDialog {
 				SWTResourceManager.registerResourceUser(this.dialogShell);
 				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 				this.dialogShell.setLayout(new FormLayout());
-				this.dialogShell.setText(this.device.getName() + Messages.getString(de.messages.MessageIds.GDE_MSGT0273));
+				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.layout();
 				this.dialogShell.pack();
@@ -172,7 +172,7 @@ public class EStationDialog extends DeviceDialog {
 									}
 									catch (Exception e) {
 										EStationDialog.this.isConnectionWarned = true;
-										EStationDialog.this.application.openMessageDialog(EStationDialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0024, new Object[] { e.getMessage() } ));
+										EStationDialog.this.application.openMessageDialog(EStationDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0024, new Object[] { e.getMessage() } ));
 									}
 									EStationDialog.this.serialPort.close();
 								}
@@ -235,7 +235,7 @@ public class EStationDialog extends DeviceDialog {
 						startCollectDataButtonLData.right = new FormAttachment(1000, 1000, -180);
 						this.startCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
 						this.startCollectDataButton.setLayoutData(startCollectDataButtonLData);
-						this.startCollectDataButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0274));
+						this.startCollectDataButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0274));
 						this.startCollectDataButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -260,7 +260,7 @@ public class EStationDialog extends DeviceDialog {
 										}
 										EStationDialog.this.boundsComposite.redraw();
 										EStationDialog.this.application.updateGraphicsWindow();
-										EStationDialog.this.application.openMessageDialog(EStationDialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+										EStationDialog.this.application.openMessageDialog(EStationDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0023, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 								}
 							}
@@ -276,7 +276,7 @@ public class EStationDialog extends DeviceDialog {
 						this.stopCollectDataButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
 						this.stopCollectDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.stopCollectDataButton.setLayoutData(stopColletDataButtonLData);
-						this.stopCollectDataButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0275));
+						this.stopCollectDataButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0275));
 						this.stopCollectDataButton.setEnabled(false);
 						this.stopCollectDataButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -435,7 +435,7 @@ public class EStationDialog extends DeviceDialog {
 						this.closeButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
 						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.closeButton.setLayoutData(closeButtonLData);
-						this.closeButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0188));
+						this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0188));
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {

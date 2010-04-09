@@ -32,7 +32,7 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
-		<property name="export.services" value="de.device.bantam.eStation902, gde.device.bantam.eStationBC6, gde.device.bantam.eStationBC610, gde.device.bantam.eStationBC8, gde.device.pichler.PichlerP6, gde.device.pichler.PichlerP60"/>
+		<property name="export.services" value="gde.device.bantam.eStation902, gde.device.bantam.eStationBC6, gde.device.bantam.eStationBC610, gde.device.bantam.eStationBC8, gde.device.pichler.PichlerP6, gde.device.pichler.PichlerP60"/>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>

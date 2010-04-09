@@ -52,7 +52,7 @@ public class GathererThread extends Thread {
 	final Channel							channel;
 	final int									channelNumber;
 	
-	String										recordSetKey								= Messages.getString(de.messages.MessageIds.GDE_MSGT0272);
+	String										recordSetKey								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
 	boolean										isGatheredRecordSetVisible	= true;
 	int 											numberBatteryCells 					= 0; 
@@ -207,7 +207,7 @@ public class GathererThread extends Thread {
 				}
 			}
 			catch (DataInconsitsentException e) {
-				String message = Messages.getString(de.messages.MessageIds.GDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}); 
+				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}); 
 				cleanup(message);
 			}
 			catch (Throwable e) {
@@ -275,12 +275,12 @@ public class GathererThread extends Thread {
 		}
 		else {
 			if (throwable != null) {
-				cleanup(Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() })
+				cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() })
 						+ Messages.getString(MessageIds.GDE_MSGT1408));
 			}
 			else {
 				if (enableEndMessage)
-					cleanup(Messages.getString(de.messages.MessageIds.GDE_MSGE0026)	+ Messages.getString(MessageIds.GDE_MSGT1408));
+					cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026)	+ Messages.getString(MessageIds.GDE_MSGT1408));
 			}
 		}
 	}

@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -73,9 +73,9 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @throws FileNotFoundException 
 	 */
 	public eStation(String deviceProperties) throws FileNotFoundException, JAXBException {
-		super(deviceProperties);		Messages.setDeviceResourceBundle("de.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		super(deviceProperties);		Messages.setDeviceResourceBundle("gde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("de.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT1400), Messages.getString(MessageIds.GDE_MSGT1401), Messages.getString(MessageIds.GDE_MSGT1402)};
 		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.GDE_MSGT1403), Messages.getString(MessageIds.GDE_MSGT1404), Messages.getString(MessageIds.GDE_MSGT1405), Messages.getString(MessageIds.GDE_MSGT1406)};
 
@@ -92,7 +92,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public eStation(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("de.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT1400), Messages.getString(MessageIds.GDE_MSGT1401), Messages.getString(MessageIds.GDE_MSGT1402)};
 		this.ACCU_TYPES = new String[] { Messages.getString(MessageIds.GDE_MSGT1403), Messages.getString(MessageIds.GDE_MSGT1404), Messages.getString(MessageIds.GDE_MSGT1405), Messages.getString(MessageIds.GDE_MSGT1406)};
 
@@ -636,11 +636,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				}
 				catch (SerialPortException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
 				}
 				catch (ApplicationConfigurationException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0010));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
 				}
 				catch (Throwable e) {
