@@ -388,7 +388,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		else if (program == programDiagnostic)
 			configStrings[2] = Messages.getString(MessageIds.GDE_MSGT1144);
 		else
-			configStrings[2] = Messages.getString(de.messages.MessageIds.GDE_MSGT0279);
+			configStrings[2] = Messages.getString(gde.messages.MessageIds.GDE_MSGT0279);
 
 		// Akku-Typ:
 		byte accuTyp = configurationDataBytes[4];
@@ -399,7 +399,7 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 		else if (accuTyp == typePB)
 			configStrings[3] = Messages.getString(MessageIds.GDE_MSGT1147); 
 		else
-			configStrings[3] = Messages.getString(de.messages.MessageIds.GDE_MSGT0279);
+			configStrings[3] = Messages.getString(gde.messages.MessageIds.GDE_MSGT0279);
 
 		// Zellenzahl:
 		configStrings[4] = configurationDataBytes[5] + Messages.getString(MessageIds.GDE_MSGT1148); 

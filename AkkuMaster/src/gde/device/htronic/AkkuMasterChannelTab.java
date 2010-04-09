@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
-import gde.DE;
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -113,7 +113,7 @@ public class AkkuMasterChannelTab {
 	boolean												isDischargeCurrentAdded		= false;
 	boolean												isCollectDataStopped			= true;
 	boolean												isMemorySelectionChanged	= false;
-	String												recordSetKey							= Messages.getString(de.messages.MessageIds.GDE_MSGT0272);
+	String												recordSetKey							= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 	
 	int 													actualCurrent = 0;
 	String 												processName = GDE.STRING_EMPTY;
@@ -212,7 +212,7 @@ public class AkkuMasterChannelTab {
 									catch (Exception e) {
 										AkkuMasterChannelTab.this.captureOnlyButton.setSelection(false);
 										AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(),
-												Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+												Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 								}
 							}
@@ -253,7 +253,7 @@ public class AkkuMasterChannelTab {
 									catch (Exception e) {
 										AkkuMasterChannelTab.this.programmButton.setSelection(false);
 										AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(),
-												Messages.getString(de.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+												Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
 								}
 							}
@@ -457,7 +457,7 @@ public class AkkuMasterChannelTab {
 				{
 					this.startDataGatheringButton = new Button(this.channelComposite, SWT.PUSH | SWT.CENTER);
 					this.startDataGatheringButton.setBounds(12, 360, 190, 28);
-					this.startDataGatheringButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0277));
+					this.startDataGatheringButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0277));
 					this.startDataGatheringButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.startDataGatheringButton.setSelection(this.isCollectData);
 					this.startDataGatheringButton.setEnabled(false);
@@ -615,7 +615,7 @@ public class AkkuMasterChannelTab {
 													}
 													setCollectData(false);
 													stopTimer();
-													AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0027));
+													AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0027));
 												}
 											}
 											catch (DataInconsitsentException e) {
@@ -624,7 +624,7 @@ public class AkkuMasterChannelTab {
 												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
 												stopTimer();
-												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0028, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
+												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
 											}
 											catch (Exception e) {
 												updateCurrentStatus();
@@ -632,7 +632,7 @@ public class AkkuMasterChannelTab {
 												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
 												stopTimer();
-												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0029, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
+												if (!AkkuMasterChannelTab.this.parent.isDisposed()) AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0029, new Object[] {e.getClass().getSimpleName(), e.getMessage()} ));
 											}
 										}
 									});
@@ -643,7 +643,7 @@ public class AkkuMasterChannelTab {
 									updateCurrentStatus();
 									AkkuMasterChannelTab.this.isStopButtonEnabled = false;
 									AkkuMasterChannelTab.this.startDataGatheringButton.setSelection(true);
-									AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0026));
+									AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0026));
 								}
 							}
 						}
@@ -652,7 +652,7 @@ public class AkkuMasterChannelTab {
 				{
 					this.stopDataGatheringButton = new Button(this.channelComposite, SWT.PUSH | SWT.CENTER);
 					this.stopDataGatheringButton.setBounds(225, 360, 190, 28);
-					this.stopDataGatheringButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0278));
+					this.stopDataGatheringButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0278));
 					this.stopDataGatheringButton.setEnabled(false);
 					this.stopDataGatheringButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.stopDataGatheringButton.addSelectionListener(new SelectionAdapter() {

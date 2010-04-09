@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.device.DeviceDialog;
@@ -128,7 +128,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(440, 555);
-			this.dialogShell.setText(DEVICE_NAME + Messages.getString(de.messages.MessageIds.GDE_MSGT0273));
+			this.dialogShell.setText(DEVICE_NAME + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif"));
 			this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 				public void mouseEnter(MouseEvent evt) {
@@ -207,10 +207,10 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 								}
 								else {
 									updateVersionText(
-											String.format(":    %s", Messages.getString(de.messages.MessageIds.GDE_MSGT0276)), //$NON-NLS-1$
-											String.format(":    %s", Messages.getString(de.messages.MessageIds.GDE_MSGT0276)), //$NON-NLS-1$
-											String.format(":    %s", Messages.getString(de.messages.MessageIds.GDE_MSGT0276)), //$NON-NLS-1$
-											String.format(":    %s", Messages.getString(de.messages.MessageIds.GDE_MSGT0276))); //$NON-NLS-1$
+											String.format(":    %s", Messages.getString(gde.messages.MessageIds.GDE_MSGT0276)), //$NON-NLS-1$
+											String.format(":    %s", Messages.getString(gde.messages.MessageIds.GDE_MSGT0276)), //$NON-NLS-1$
+											String.format(":    %s", Messages.getString(gde.messages.MessageIds.GDE_MSGT0276)), //$NON-NLS-1$
+											String.format(":    %s", Messages.getString(gde.messages.MessageIds.GDE_MSGT0276))); //$NON-NLS-1$
 									startUpdateVersionThread();
 								}
 							}
@@ -340,7 +340,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			{
 				this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 				this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.closeButton.setText(Messages.getString(de.messages.MessageIds.GDE_MSGT0188));
+				this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0188));
 				this.closeButton.setBounds(87, 485, 260, 30);
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
@@ -465,7 +465,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 								});
 							}
 							catch (Exception e) {
-								AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0024, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+								AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0024, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
 								return;
 							}
 						}
@@ -481,7 +481,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		}
 		catch (Exception e) {
 			AkkuMasterC4Dialog.log.log(Level.WARNING, e.getMessage(), e);
-			AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.dialogShell, Messages.getString(de.messages.MessageIds.GDE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+			AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.dialogShell, Messages.getString(gde.messages.MessageIds.GDE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
 			this.isWarnedConnectError = true;
 		}
 	}

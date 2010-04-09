@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import gde.DE;
+import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.Record;
@@ -59,7 +59,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	public AkkuMasterC4(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("de.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
@@ -76,7 +76,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	public AkkuMasterC4(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("de.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
@@ -362,7 +362,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.getDialog().getDialogShell(), Messages.getString(de.messages.MessageIds.GDE_MSGE0015, new Object[] {e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage() } ));
+					this.application.openMessageDialog(this.getDialog().getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] {e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage() } ));
 				}
 			}
 			else {
