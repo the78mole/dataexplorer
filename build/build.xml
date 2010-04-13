@@ -268,7 +268,7 @@
             <fileset file="build/misc/DevicePropertiesEditor.exe" />
             <!--
             <fileset file="build/misc/DataExplorer.ico" />
-            <fileset file="build/misc/launch.bat" />
+            <fileset file="build/misc/DevicePropertiesEditor.ico" />
             -->
         </copy>
         <copy todir="${output.windows32.program.devices}" flatten="yes" >
@@ -283,7 +283,7 @@
             <fileset file="build/misc/DevicePropertiesEditor.exe" />
             <!--
             <fileset file="build/misc/DataExplorer.ico" />
-            <fileset file="build/misc/launch.bat" />
+            <fileset file="build/misc/DevicePropertiesEditor.ico" />
             -->
         </copy>
         <copy todir="${output.windows64.program.devices}" flatten="yes">
@@ -294,7 +294,7 @@
 
         <copy todir="${output.linux32.program}" flatten="yes">
             <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/ODataExplorer-mime.xml" />
+            <fileset file="build/misc/DataExplorer-mime.xml" />
             <fileset file="build/misc/DevicePropertiesEditor.xpm" />
             <fileset file="build/misc/DataExplorer.xpm" />
             <fileset file="build/misc/DataExplorer" />
@@ -561,7 +561,7 @@
     </target>
 
     <target name="clean_source">
-        <delete file="${build.target.dir}/DataExplorer_${version.num}_source.zip"/>
+        <delete file="${build.target.dir}/dataexplorer-${version.num}-src.zip"/>
     </target>
 
     <target name="source_package" depends="init" description="builds the source distribution package to run configure and make">
