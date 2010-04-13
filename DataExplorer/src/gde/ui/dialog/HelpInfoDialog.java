@@ -68,7 +68,7 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell = new Shell(new Shell(Display.getDefault()), SWT.SHELL_TRIM);
 			FillLayout dialogShellLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.dialogShell.setLayout(dialogShellLayout);
-			this.dialogShell.setText(GDE.OSDE_NAME_LONG + Messages.getString(MessageIds.GDE_MSGT0192));
+			this.dialogShell.setText(GDE.GDE_NAME_LONG + Messages.getString(MessageIds.GDE_MSGT0192));
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.jpg")); //$NON-NLS-1$
 
 			this.textBrowser = new Browser(this.dialogShell, style);

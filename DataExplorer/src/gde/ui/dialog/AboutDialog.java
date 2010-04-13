@@ -110,7 +110,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.version = new Label(this.dialogShell, SWT.CENTER);
 				this.version.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 				this.version.setLayoutData(versionLData);
-				this.version.setText(GDE.OSDE_VERSION);
+				this.version.setText(GDE.GDE_VERSION);
 				this.version.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 			}
 			{

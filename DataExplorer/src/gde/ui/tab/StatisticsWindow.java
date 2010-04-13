@@ -520,7 +520,7 @@ public class StatisticsWindow extends CTabItem {
 	public String getContentAsText() {
 		StringBuilder sb = new StringBuilder();
 		//header
-		sb.append(GDE.OSDE_NAME_LONG).append(GDE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.GDE_MSGT0350)).append(GDE.LINE_SEPARATOR).append(GDE.LINE_SEPARATOR);
+		sb.append(GDE.GDE_NAME_LONG).append(GDE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.GDE_MSGT0350)).append(GDE.LINE_SEPARATOR).append(GDE.LINE_SEPARATOR);
 		//description
 		sb.append(Messages.getString(MessageIds.GDE_MSGT0351)).append(GDE.LINE_SEPARATOR);
 		Channel activeChannel = this.channels.getActiveChannel();

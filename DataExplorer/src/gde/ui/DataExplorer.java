@@ -363,7 +363,7 @@ public class DataExplorer extends Composite {
 							messageDialog.setMessage(messages[1]);
 						}
 						else {
-							messageDialog.setText(GDE.OSDE_NAME_LONG);
+							messageDialog.setText(GDE.GDE_NAME_LONG);
 							messageDialog.setMessage(errorMessage);
 						}
 						messageDialog.open();
@@ -1169,7 +1169,7 @@ public class DataExplorer extends Composite {
 	public void openMessageDialog(final String message) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			MessageBox messageDialog = new MessageBox(DataExplorer.shell, SWT.OK | SWT.ICON_WARNING);
-			messageDialog.setText(GDE.OSDE_NAME_LONG);
+			messageDialog.setText(GDE.GDE_NAME_LONG);
 			messageDialog.setMessage(message);
 			messageDialog.open();
 		}
@@ -1177,7 +1177,7 @@ public class DataExplorer extends Composite {
 			DataExplorer.display.syncExec(new Runnable() {
 				public void run() {
 					MessageBox messageDialog = new MessageBox(DataExplorer.shell, SWT.OK | SWT.ICON_WARNING);
-					messageDialog.setText(GDE.OSDE_NAME_LONG);
+					messageDialog.setText(GDE.GDE_NAME_LONG);
 					messageDialog.setMessage(message);
 					messageDialog.open();
 				}
@@ -1189,7 +1189,7 @@ public class DataExplorer extends Composite {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			Shell useParent = (parent != null  && !parent.isDisposed()) ? parent : DataExplorer.shell;
 			MessageBox messageDialog = new MessageBox(useParent, SWT.OK | SWT.ICON_WARNING);
-			messageDialog.setText(GDE.OSDE_NAME_LONG);
+			messageDialog.setText(GDE.GDE_NAME_LONG);
 			messageDialog.setMessage(message);
 			messageDialog.open();
 		}
@@ -1199,7 +1199,7 @@ public class DataExplorer extends Composite {
 					// parent might be disposed ??
 					Shell useParent = (parent != null  && !parent.isDisposed()) ? parent : DataExplorer.shell;
 					MessageBox messageDialog = new MessageBox(useParent, SWT.OK | SWT.ICON_WARNING);
-					messageDialog.setText(GDE.OSDE_NAME_LONG);
+					messageDialog.setText(GDE.GDE_NAME_LONG);
 					messageDialog.setMessage(message);
 					messageDialog.open();
 				}
@@ -1211,7 +1211,7 @@ public class DataExplorer extends Composite {
 		DataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				MessageBox messageDialog = new MessageBox(DataExplorer.shell, SWT.OK | SWT.ICON_WARNING);
-				messageDialog.setText(GDE.OSDE_NAME_LONG);
+				messageDialog.setText(GDE.GDE_NAME_LONG);
 				messageDialog.setMessage(message);
 				messageDialog.open();
 			}
@@ -1223,7 +1223,7 @@ public class DataExplorer extends Composite {
 		DataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				MessageBox messageDialog = new MessageBox(useParent, SWT.OK | SWT.ICON_WARNING | SWT.MODELESS);
-				messageDialog.setText(GDE.OSDE_NAME_LONG);
+				messageDialog.setText(GDE.GDE_NAME_LONG);
 				messageDialog.setMessage(message);
 				messageDialog.open();
 			}
@@ -1233,14 +1233,14 @@ public class DataExplorer extends Composite {
 	public int openOkCancelMessageDialog(Shell parent, final String message) {
 		final Shell useParent = (parent != null  && !parent.isDisposed()) ? parent : DataExplorer.shell;
 		MessageBox okCancelMessageDialog = new MessageBox(useParent, SWT.PRIMARY_MODAL | SWT.OK | SWT.CANCEL | SWT.ICON_QUESTION);
-		okCancelMessageDialog.setText(GDE.OSDE_NAME_LONG);
+		okCancelMessageDialog.setText(GDE.GDE_NAME_LONG);
 		okCancelMessageDialog.setMessage(message);
 		return okCancelMessageDialog.open();
 	}
 
 	public int openOkCancelMessageDialog(final String message) {
 		MessageBox okCancelMessageDialog = new MessageBox(this.getShell(), SWT.PRIMARY_MODAL | SWT.OK | SWT.CANCEL | SWT.ICON_QUESTION);
-		okCancelMessageDialog.setText(GDE.OSDE_NAME_LONG);
+		okCancelMessageDialog.setText(GDE.GDE_NAME_LONG);
 		okCancelMessageDialog.setMessage(message);
 		return okCancelMessageDialog.open();
 	}
@@ -1248,14 +1248,14 @@ public class DataExplorer extends Composite {
 	public int openYesNoMessageDialog(Shell parent, final String message) {
 		final Shell useParent = (parent != null  && !parent.isDisposed()) ? parent : DataExplorer.shell;
 		MessageBox yesNoMessageDialog = new MessageBox(useParent, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.ICON_QUESTION);
-		yesNoMessageDialog.setText(GDE.OSDE_NAME_LONG);
+		yesNoMessageDialog.setText(GDE.GDE_NAME_LONG);
 		yesNoMessageDialog.setMessage(message);
 		return yesNoMessageDialog.open();
 	}
 
 	public int openYesNoMessageDialog(final String message) {
 		MessageBox yesNoMessageDialog = new MessageBox(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.ICON_QUESTION);
-		yesNoMessageDialog.setText(GDE.OSDE_NAME_LONG);
+		yesNoMessageDialog.setText(GDE.GDE_NAME_LONG);
 		yesNoMessageDialog.setMessage(message);
 		return yesNoMessageDialog.open();
 	}
@@ -1265,7 +1265,7 @@ public class DataExplorer extends Composite {
 		DataExplorer.display.syncExec(new Runnable() {
 			public void run() {
 				MessageBox yesNoMessageDialog = new MessageBox(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.ICON_QUESTION);
-				yesNoMessageDialog.setText(GDE.OSDE_NAME_LONG);
+				yesNoMessageDialog.setText(GDE.GDE_NAME_LONG);
 				yesNoMessageDialog.setMessage(message);
 				DataExplorer.this.openYesNoMessageDialogAsyncValue = yesNoMessageDialog.open();
 			}
@@ -1284,7 +1284,7 @@ public class DataExplorer extends Composite {
 	public int openYesNoCancelMessageDialog(Shell parent, final String message) {
 		final Shell useParent = (parent != null  && !parent.isDisposed()) ? parent : DataExplorer.shell;
 		MessageBox yesNoCancelMessageDialog = new MessageBox(useParent, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
-		yesNoCancelMessageDialog.setText(GDE.OSDE_NAME_LONG);
+		yesNoCancelMessageDialog.setText(GDE.GDE_NAME_LONG);
 		yesNoCancelMessageDialog.setMessage(message);
 		return yesNoCancelMessageDialog.open();
 	}

@@ -56,8 +56,8 @@ public class GDE {
 
 	
 	// ****** begin global constants section *******
-	public static final String		OSDE_VERSION											= "Version 2.20";						//$NON-NLS-1$
-	public static final String		OSDE_NAME_LONG										= "DataExplorer";	//$NON-NLS-1$
+	public static final String		GDE_VERSION												= "Version 2.20";						//$NON-NLS-1$
+	public static final String		GDE_NAME_LONG											= "DataExplorer";	//$NON-NLS-1$
 	public final static String		DEVICE_PROPERTIES_XSD_VERSION			= "_V10"; 									//$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION		= "_V04"; 									//$NON-NLS-1$
 	
@@ -224,7 +224,7 @@ public class GDE {
 		String inputFilePath = STRING_EMPTY;
 		try {
 			GDE.initLogger();
-			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "DataExplorer " + OSDE_VERSION); //$NON-NLS-1$
+			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "DataExplorer " + GDE_VERSION); //$NON-NLS-1$
 			
 			//build the main thread context classloader to enable dynamic plugin class loading 
 			Thread.currentThread().setContextClassLoader(GDE.getClassLoader());

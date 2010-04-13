@@ -638,7 +638,7 @@ public class FileUtils {
 	public static void updateJarContent(String deviceJarPath, String tmpDeviceJarPath, String addJarEntryName, Image deviceImage, Shell messageBoxShell) throws IOException, FileNotFoundException {
 		if (FileUtils.checkFileExist(tmpDeviceJarPath)) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
-			mBox.setText(GDE.OSDE_NAME_LONG);
+			mBox.setText(GDE.GDE_NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.GDE_MSGI0043, new String[] {tmpDeviceJarPath}));
 			int ret = mBox.open();
 			if (SWT.CANCEL == ret)
@@ -682,7 +682,7 @@ public class FileUtils {
 		File tmpFile = new File(tmpDeviceJarPath);
 		if (tmpFile.exists()) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
-			mBox.setText(GDE.OSDE_NAME_LONG);
+			mBox.setText(GDE.GDE_NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.GDE_MSGI0044, new String[] {tmpDeviceJarPath})); 
 			mBox.open();
 		}
@@ -814,7 +814,7 @@ public class FileUtils {
 	public static void updateJarContent(String deviceJarPath, String tmpDeviceJarPath, String addJarEntryName, String addJarFileName, Shell messageBoxShell) throws IOException, FileNotFoundException {
 		if (FileUtils.checkFileExist(tmpDeviceJarPath)) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
-			mBox.setText(GDE.OSDE_NAME_LONG);
+			mBox.setText(GDE.GDE_NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.GDE_MSGI0043, new String[] {tmpDeviceJarPath}));
 			int ret = mBox.open();
 			if (SWT.CANCEL == ret)
@@ -861,7 +861,7 @@ public class FileUtils {
 		File tmpFile = new File(tmpDeviceJarPath);
 		if (tmpFile.exists()) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
-			mBox.setText(GDE.OSDE_NAME_LONG);
+			mBox.setText(GDE.GDE_NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.GDE_MSGI0044, new String[] {tmpDeviceJarPath})); 
 			mBox.open();
 		}

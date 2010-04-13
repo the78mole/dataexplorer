@@ -358,7 +358,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 				//prepare the page layout
 				PrintRequestAttributeSet printAttrSet = new HashPrintRequestAttributeSet();
-				printAttrSet.add(new JobName(GDE.OSDE_NAME_LONG, Settings.getInstance().getLocale()));
+				printAttrSet.add(new JobName(GDE.GDE_NAME_LONG, Settings.getInstance().getLocale()));
 				switch (orientation) {
 				case PageFormat.LANDSCAPE:
 					printAttrSet.add(OrientationRequested.LANDSCAPE);
@@ -385,10 +385,10 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					Channel activeChannel = Channels.getInstance().getActiveChannel();
 					if (activeChannel != null) {
 						fileName = activeChannel.getFileName();
-						fileName = fileName == null ? GDE.OSDE_NAME_LONG + GDE.STRING_MESSAGE_CONCAT : fileName + GDE.STRING_MESSAGE_CONCAT;
+						fileName = fileName == null ? GDE.GDE_NAME_LONG + GDE.STRING_MESSAGE_CONCAT : fileName + GDE.STRING_MESSAGE_CONCAT;
 					}
 					else {
-						fileName = GDE.OSDE_NAME_LONG + GDE.STRING_MESSAGE_CONCAT;
+						fileName = GDE.GDE_NAME_LONG + GDE.STRING_MESSAGE_CONCAT;
 					}
 
 

@@ -57,8 +57,8 @@ public class BuildCompleteHelpHtml {
 	static String supprtedDevices_de = "Aktuell unterstützte Geräte";
 	static String supprtedDevices_en = "Actual Supported Devices";
 	
-	static String filename_de = GDE.OSDE_NAME_LONG + " - Information und Hilfe.html";
-	static String filename_en = GDE.OSDE_NAME_LONG + " - Information and Help.html";
+	static String filename_de = GDE.GDE_NAME_LONG + " - Information und Hilfe.html";
+	static String filename_en = GDE.GDE_NAME_LONG + " - Information and Help.html";
 
 	static final String[]	SUPPORTED_LANGUAGES	= new String[] { "de", "en" };
 	static final String[]	SUPPORTED_LANGUAGE_HEADERS	= new String[] { header_de, header_en };
@@ -84,7 +84,7 @@ public class BuildCompleteHelpHtml {
 			URL url = BuildCompleteHelpHtml.class.getProtectionDomain().getCodeSource().getLocation();
 			log.log(Level.INFO, "base URL = " + url.toString()); //$NON-NLS-1$
 			baseFilePath = url.getFile();
-			baseFilePath = baseFilePath.substring(1, baseFilePath.indexOf(GDE.OSDE_NAME_LONG) + GDE.OSDE_NAME_LONG.length());
+			baseFilePath = baseFilePath.substring(1, baseFilePath.indexOf(GDE.GDE_NAME_LONG) + GDE.GDE_NAME_LONG.length());
 			String targetPath = baseFilePath + GDE.FILE_SEPARATOR_UNIX + "doc"  + GDE.FILE_SEPARATOR_UNIX;
 			baseFilePath = baseFilePath + GDE.FILE_SEPARATOR_UNIX + "src" + GDE.FILE_SEPARATOR_UNIX + "help";
 			
@@ -131,7 +131,7 @@ public class BuildCompleteHelpHtml {
 					String pluginBaseFilePath = urls[j].getPath().substring(1, urls[j].getPath().indexOf("bin"));
 					pluginBaseFilePath = pluginBaseFilePath + "src/help";
 					
-					if (new File(pluginBaseFilePath).exists() && !pluginBaseFilePath.contains(GDE.OSDE_NAME_LONG) && !pluginBaseFilePath.contains("Sample")) {
+					if (new File(pluginBaseFilePath).exists() && !pluginBaseFilePath.contains(GDE.GDE_NAME_LONG) && !pluginBaseFilePath.contains("Sample")) {
 						String pluginLangFilePath = pluginBaseFilePath + GDE.FILE_SEPARATOR_UNIX + SUPPORTED_LANGUAGES[i];
 						log.log(Level.INFO, "pluginLangFilePath = " + pluginLangFilePath);
 						

@@ -177,7 +177,7 @@ public class SettingsDialog extends Dialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(500, 580);
-			this.dialogShell.setText(GDE.OSDE_NAME_LONG + Messages.getString(MessageIds.GDE_MSGT0300));
+			this.dialogShell.setText(GDE.GDE_NAME_LONG + Messages.getString(MessageIds.GDE_MSGT0300));
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.gif")); //$NON-NLS-1$
 			{ // begin tab folder
 				this.settingsTabFolder = new CTabFolder(this.dialogShell, SWT.FLAT | SWT.BORDER);
