@@ -153,7 +153,7 @@
     </target>
 
     <!-- install target -->
-    <target name="install" depends="binary_package">
+    <target name="install" depends="dist,source_package">
         <echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
         <condition property="isLinux">
