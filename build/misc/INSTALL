@@ -31,11 +31,11 @@ The other method uses the ant command, a Java-based build system released by Apa
 Jakarta project. This uses an build.xml file in place of Makefiles, and works on all 
 systems. However, the ant method does not support all the features of the configure+make method.
 
-Build Kawa using configure and make
+Build DataExplorer using configure and make
 
 In your build directory do:
 
-unzip dataexplorer-<version>_source.zip
+unzip dataexplorer-<version>-src.zip
 cd dataexplorer-<version>
 
 Then you must configure the sources. This you can do the same way you configure most other 

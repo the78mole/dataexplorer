@@ -153,7 +153,7 @@
     </target>
 
     <!-- install target -->
-    <target name="install" depends="dist,source_package">
+    <target name="install" depends="dist">
         <echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
         <condition property="isLinux">
@@ -605,6 +605,7 @@
                 <include name="READ*"/>
                 <include name="*.LICENSE"/>
                 <include name="AUTHORS"/>
+                <include name="INSTALL"/>
                 <include name="Changelog"/>
                 <include name="NEWS"/>
                 <include name="Backlog"/>
@@ -616,7 +617,7 @@
                 <include name="configure"/>
                 <include name="install-sh"/>
             </zipfileset>
-            <zipfileset dir="${basedir}/DataExplorer/doc" casesensitive="true" prefix="osde-${version.num}" filemode="444">
+            <zipfileset dir="${basedir}/DataExplorer/doc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
                 <include name="DataExplorer*.txt"/>
             </zipfileset>
             <zipfileset dir="${basedir}/RXTXcomm" casesensitive="true" prefix="dataexplorer-${version.num}/thirdparty/rxtx-2.2pre2" filemode="444">
