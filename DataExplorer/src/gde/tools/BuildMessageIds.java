@@ -13,6 +13,8 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright (c) 2008 - 2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.tools;
 
@@ -45,6 +47,8 @@ public class BuildMessageIds {
 		+ "\n"
 		+ "    You should have received a copy of the GNU General Public License\n"
 		+ "    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.\n"
+    + "\n"
+    + "Copyright (c) 2008 - 2010 Winfried Bruegmann \n"
 		+ "****************************************************************************************/\n";
 		
 	final static String classHeader = "/** \n"

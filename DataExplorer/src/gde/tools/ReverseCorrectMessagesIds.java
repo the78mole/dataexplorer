@@ -13,6 +13,8 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright (c) 2008 - 2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.tools;
 
@@ -40,6 +42,8 @@ public class ReverseCorrectMessagesIds {
 	+ "#    but WITHOUT ANY WARRANTY; without even the implied warranty of \n" + "#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
 	+ "#    GNU General Public License for more details. \n" + "# \n" + "#    You should have received a copy of the GNU General Public License \n"
 	+ "#    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>. \n"
+	+ "#\n"
+	+ "#Copyright (c) 2008 - 2010 Winfried Bruegmann \n"
 	+ "#****************************************************************************************/ \n"
 	+ "# DataExplorer message file Locale.GERMANY Winfried Brügmann  - 22 Jan 2008 \n" + " \n" 
 	+ "# GDE_MSGE0000 -> error messages \n"
