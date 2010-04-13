@@ -565,7 +565,7 @@
     </target>
 
     <target name="source_package" depends="init" description="builds the source distribution package to run configure and make">
-        <zip destfile="${build.target.dir}/DataExplorer_${version.num}_source.zip" >
+        <zip destfile="${build.target.dir}/dataexplorer-${version.num}-src.zip" >
             <zipfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
                 <include name="**/src/**"/>
                 <include name="**/build.xml"/>

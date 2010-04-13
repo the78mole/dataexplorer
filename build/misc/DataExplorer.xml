@@ -2,19 +2,19 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>DataExplorer.jar</jar>
-  <outfile>D:\workspaces\osde\build\misc\DataExplorer.exe</outfile>
-  <errTitle>DataExplorer</errTitle>
+  <outfile>F:\workspaces\gnu\build\misc\DataExplorer.exe</outfile>
+  <errTitle>DataExplorer - Exception</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
   <downloadUrl>http://java.sun.com/javase/downloads/index.jsp</downloadUrl>
-  <supportUrl>http://bruegmaenner.de/de/winfried/osde/README.html</supportUrl>
+  <supportUrl>http://bruegmaenner.de/en/winfried/osde/README.html</supportUrl>
   <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
   <manifest></manifest>
-  <icon>D:\workspaces\osde\build\misc\DataExplorer.ico</icon>
+  <icon>F:\workspaces\gnu\build\misc\DataExplorer.ico</icon>
   <classPath>
-    <mainClass>de.DE</mainClass>
+    <mainClass>gde.GDE</mainClass>
     <cp>DataExplorer.jar</cp>
   </classPath>
   <jre>

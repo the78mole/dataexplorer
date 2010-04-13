@@ -2,19 +2,19 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>DataExplorer.jar</jar>
-  <outfile>D:\workspaces\osde\build\misc\DevicePropertiesEditor.exe</outfile>
-  <errTitle>DevicePropertiesEditor</errTitle>
+  <outfile>F:\workspaces\gnu\build\misc\DevicePropertiesEditor.exe</outfile>
+  <errTitle>DevicePropertiesEditor - Exception</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
   <downloadUrl>http://java.sun.com/javase/downloads/index.jsp</downloadUrl>
-  <supportUrl>http://bruegmaenner.de/de/winfried/osde/README.html</supportUrl>
+  <supportUrl>http://bruegmaenner.de/en/winfried/osde/README.html</supportUrl>
   <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
   <manifest></manifest>
-  <icon>D:\workspaces\osde\build\misc\DevicePropertiesEditor.ico</icon>
+  <icon>F:\workspaces\gnu\build\misc\DevicePropertiesEditor.ico</icon>
   <classPath>
-    <mainClass>de.ui.dialog.edit.DevicePropertiesEditor</mainClass>
+    <mainClass>gde.ui.dialog.edit.DevicePropertiesEditor</mainClass>
     <cp>DataExplorer.jar</cp>
   </classPath>
   <jre>
