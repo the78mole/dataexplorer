@@ -4,5 +4,5 @@
 xdg-mime install --novendor DataExplorer-mime.xml
 xdg-icon-resource install --context mimetypes --size 48 DataExplorer.xpm application-x-DataExplorer
 xdg-desktop-menu install --novendor /tmp/DataExplorer.directory DataExplorer.desktop
+xdg-desktop-menu install --novendor /tmp/DataExplorer.directory DevicePropertiesEditor.desktop
 xdg-mime default DataExplorer.desktop application/x-DataExplorer
-xdg-desktop-menu install --novendor /tmp/DevicePropertiesEditor.directory DevicePropertiesEditor.desktop
