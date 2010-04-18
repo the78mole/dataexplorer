@@ -3,39 +3,53 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>DataExplorer</string>
+	<string>OpenSerialDataExplorer</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>osd</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpenSerialDataExplorer.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>OpenSerialData file</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>OpenSerialData</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>lov</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>OpenSerialDataExplorer.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>LogView file</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>LogView</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+	<array>
 	<key>CFBundleVersion</key>
 	<string>2.0</string>
 	<key>CFBundleExecutable</key>
-	<string>DataExplorerMac32</string>
+	<string>OpenSerialDataExplorerMac32</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>19260357</string>
 	<key>CFBundleGetInfoString</key>
-	<string>DataExplorer - explores your serial data</string>
+	<string>OpenSerialDataExplorer - explores your serial data</string>
 	<key>CFBundleIconFile</key>
-	<string>DataExplorer.icns</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleAllowMixedLocalizations</key>
-	<string>true</string>
-</dict>
-<dict>
-	<key>CFBundleName</key>
-	<string>DevicePropertiesEditor</string>
-	<key>CFBundleVersion</key>
-	<string>2.0</string>
-	<key>CFBundleExecutable</key>
-	<string>DevicePropertiesEditorMac32</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleSignature</key>
-	<string>19260358</string>
-	<key>CFBundleGetInfoString</key>
-	<string>DataExplorer's Device Properties Editor</string>
-	<key>CFBundleIconFile</key>
-	<string>DevicePropertiesEditor.icns</string>
+	<string>OpenSerialDataExplorer.icns</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleAllowMixedLocalizations</key>
