@@ -16,8 +16,8 @@
     <target name="init_OS" >
         <echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
-        <condition property="build.os.shortname" value="Linux">
-            <os name="Linux"/>
+        <condition property="build.os.shortname" value="GNULinux">
+            <os name="GNULinux"/>
         </condition>
 
         <condition property="build.os.shortname" value="Windows">
@@ -63,15 +63,15 @@
         <property name="output.windows64.program.devices" location="${output.windows64}/DataExplorer/devices" />
         <property name="output.windows64.java.ext" location="${output.windows64}/DataExplorer/java/ext" />
 
-        <property name="output.linux32" location="${output.dir}/Linux_32" />
-        <property name="output.linux32.program" location="${output.linux32}/DataExplorer" />
-        <property name="output.linux32.program.devices" location="${output.linux32}/DataExplorer/devices" />
-        <property name="output.linux32.java.ext" location="${output.linux32}/DataExplorer/java/ext" />
+        <property name="output.gnulinux32" location="${output.dir}/GNULinux_32" />
+        <property name="output.gnulinux32.program" location="${output.gnulinux32}/DataExplorer" />
+        <property name="output.gnulinux32.program.devices" location="${output.gnulinux32}/DataExplorer/devices" />
+        <property name="output.gnulinux32.java.ext" location="${output.gnulinux32}/DataExplorer/java/ext" />
 
-        <property name="output.linux64" location="${output.dir}/Linux_64" />
-        <property name="output.linux64.program" location="${output.linux64}/DataExplorer" />
-        <property name="output.linux64.program.devices" location="${output.linux64}/DataExplorer/devices" />
-        <property name="output.linux64.java.ext" location="${output.linux64}/DataExplorer/java/ext" />
+        <property name="output.gnulinux64" location="${output.dir}/GNULinux_64" />
+        <property name="output.gnulinux64.program" location="${output.gnulinux64}/DataExplorer" />
+        <property name="output.gnulinux64.program.devices" location="${output.gnulinux64}/DataExplorer/devices" />
+        <property name="output.gnulinux64.java.ext" location="${output.gnulinux64}/DataExplorer/java/ext" />
 
         <property name="output.mac32.carbon" location="${output.dir}/Mac_32_carbon" />
         <property name="output.mac32.carbon.bundle" location="${output.mac32.carbon}/DataExplorer.app/Contents" />
@@ -108,15 +108,15 @@
         <mkdir dir="${output.windows64.program.devices}" />
         <mkdir dir="${output.windows64.java.ext}" />
 
-        <mkdir dir="${output.linux32}" />
-        <mkdir dir="${output.linux32.program}" />
-        <mkdir dir="${output.linux32.program.devices}" />
-        <mkdir dir="${output.linux32.java.ext}" />
+        <mkdir dir="${output.gnulinux32}" />
+        <mkdir dir="${output.gnulinux32.program}" />
+        <mkdir dir="${output.gnulinux32.program.devices}" />
+        <mkdir dir="${output.gnulinux32.java.ext}" />
 
-        <mkdir dir="${output.linux64}" />
-        <mkdir dir="${output.linux64.program}" />
-        <mkdir dir="${output.linux64.program.devices}" />
-        <mkdir dir="${output.linux64.java.ext}" />
+        <mkdir dir="${output.gnulinux64}" />
+        <mkdir dir="${output.gnulinux64.program}" />
+        <mkdir dir="${output.gnulinux64.program.devices}" />
+        <mkdir dir="${output.gnulinux64.java.ext}" />
 
         <mkdir dir="${output.mac32.carbon}" />
         <mkdir dir="${output.mac32.carbon.bundle}" />
@@ -156,10 +156,10 @@
     <target name="install" depends="dist">
         <echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
-        <condition property="isLinux">
-            <os name="Linux"/>
+        <condition property="isGNULinux">
+            <os name="GNULinux"/>
         </condition>
-        <antcall target="Linux"/>
+        <antcall target="GNULinux"/>
         <condition property="isWindows">
             <os name="Windows XP"/>
         </condition>
@@ -195,16 +195,16 @@
         <unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${prefix}" overwrite="true"/>
     </target>
 
-    <target name="Linux" if="isLinux">
+    <target name="GNULinux" if="isGNULinux">
         <echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-        <antcall target="LinuxDefault"/>
-        <antcall target="LinuxPrefix"/>
+        <antcall target="GNULinuxDefault"/>
+        <antcall target="GNULinuxPrefix"/>
     </target>
-    <target name="LinuxDefault" unless="prefix">
-        <echo message="installing to ${install.dir.linux}" />
-        <exec command="tar -xzf ${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.linux}"/>
+    <target name="GNULinuxDefault" unless="prefix">
+        <echo message="installing to ${install.dir.gnulinux}" />
+        <exec command="tar -xzf ${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.gnulinux}"/>
     </target>
-    <target name="LinuxPrefix" if="prefix">
+    <target name="GNULinuxPrefix" if="prefix">
         <echo message="installing to ${prefix}" />
         <exec command="tar -xzf ${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${prefix}"/>
     </target>
@@ -292,7 +292,7 @@
             </fileset>
         </copy>
 
-        <copy todir="${output.linux32.program}" flatten="yes">
+        <copy todir="${output.gnulinux32.program}" flatten="yes">
             <fileset file="DataExplorer/build/*.jar" />
             <fileset file="build/misc/DataExplorer-mime.xml" />
             <fileset file="build/misc/DevicePropertiesEditor.xpm" />
@@ -302,13 +302,13 @@
             <fileset file="build/misc/DevicePropertiesEditor" />
             <fileset file="build/misc/DevicePropertiesEditor.desktop" />
         </copy>
-        <copy todir="${output.linux32.program.devices}" flatten="yes">
+        <copy todir="${output.gnulinux32.program.devices}" flatten="yes">
             <fileset dir="${basedir}" >
                 <patternset refid="DE_PLUGIN_JARS"/>
             </fileset>
         </copy>
 
-        <copy todir="${output.linux64.program}" flatten="yes">
+        <copy todir="${output.gnulinux64.program}" flatten="yes">
             <fileset file="DataExplorer/build/*.jar" />
             <fileset file="build/misc/DataExplorer-mime.xml" />
             <fileset file="build/misc/DevicePropertiesEditor.xpm" />
@@ -318,7 +318,7 @@
             <fileset file="build/misc/DevicePropertiesEditor" />
             <fileset file="build/misc/DevicePropertiesEditor.desktop" />
         </copy>
-        <copy todir="${output.linux64.program.devices}" flatten="yes">
+        <copy todir="${output.gnulinux64.program.devices}" flatten="yes">
             <fileset dir="${basedir}" >
                 <patternset refid="DE_PLUGIN_JARS"/>
             </fileset>
@@ -401,14 +401,14 @@
             <fileset file="build/lib/Windows/64/swt.jar" />
             <fileset file="build/misc/*.LICENSE" />
         </copy>
-        <copy todir="${output.linux32.java.ext}" flatten="yes">
+        <copy todir="${output.gnulinux32.java.ext}" flatten="yes">
             <fileset file="build/lib/RXTXcomm.jar" />
-            <fileset file="build/lib/Linux/32/swt.jar" />
+            <fileset file="build/lib/GNULinux/32/swt.jar" />
             <fileset file="build/misc/*.LICENSE" />
         </copy>
-        <copy todir="${output.linux64.java.ext}" flatten="yes">
+        <copy todir="${output.gnulinux64.java.ext}" flatten="yes">
             <fileset file="build/lib/RXTXcomm.jar" />
-            <fileset file="build/lib/Linux/64/swt.jar" />
+            <fileset file="build/lib/GNULinux/64/swt.jar" />
             <fileset file="build/misc/*.LICENSE" />
         </copy>
         <copy todir="${output.mac32.carbon.java.ext}" flatten="yes">
@@ -434,10 +434,10 @@
         <copy todir="${output.windows64}/DataExplorer" flatten="yes">
             <fileset file="build/misc/README.*" />
         </copy>
-        <copy todir="${output.linux32}/DataExplorer" flatten="yes">
+        <copy todir="${output.gnulinux32}/DataExplorer" flatten="yes">
             <fileset file="build/misc/README.*" />
         </copy>
-        <copy todir="${output.linux64}/DataExplorer" flatten="yes">
+        <copy todir="${output.gnulinux64}/DataExplorer" flatten="yes">
             <fileset file="build/misc/README.*" />
         </copy>
         <copy todir="${output.mac32.carbon.program}" flatten="yes">
@@ -452,7 +452,7 @@
 
     </target>
 
-    <!-- zip for Windows, tar for Linux/Mac OS -->
+    <!-- zip for Windows, tar for GNULinux/Mac OS -->
     <target name="binary_package" depends="copy-files">
 
         <echo message="zip Windows 32 bit files" />
@@ -465,17 +465,17 @@
             <zipfileset dir="${output.windows64}" casesensitive="true" />
         </zip>
 
-        <echo message="tar Linux 32 bit files" />
-        <tar destfile="${build.target.dir}/DataExplorer_${version.num}_Linux_x86_32.tar.gz" compression="gzip">
-            <tarfileset dir="${output.linux32}" casesensitive="true" mode="755" >
+        <echo message="tar GNULinux 32 bit files" />
+        <tar destfile="${build.target.dir}/DataExplorer_${version.num}_GNULinux_x86_32.tar.gz" compression="gzip">
+            <tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="755" >
                 <include name="*/DataExplorer"/>
                 <include name="*/DevicePropertiesEditor"/>
             </tarfileset>
-            <tarfileset dir="${output.linux32}" casesensitive="true" mode="766" >
+            <tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="766" >
                 <include name="*/DataExplorer.desktop"/>
                 <include name="*/DevicePropertiesEditor.desktop"/>
             </tarfileset>
-            <tarfileset dir="${output.linux32}" casesensitive="true" mode="644" >
+            <tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="644" >
                 <include name="**"/>
                 <exclude name="*/DataExplorer"/>
                 <exclude name="*/DevicePropertiesEditor"/>
@@ -484,17 +484,17 @@
             </tarfileset>
         </tar>
 
-        <echo message="tar Linux 64 bit files" />
-        <tar destfile="${build.target.dir}/DataExplorer_${version.num}_Linux_x86_64.tar.gz" compression="gzip">
-            <tarfileset dir="${output.linux64}" casesensitive="true" mode="755" >
+        <echo message="tar GNULinux 64 bit files" />
+        <tar destfile="${build.target.dir}/DataExplorer_${version.num}_GNULinux_x86_64.tar.gz" compression="gzip">
+            <tarfileset dir="${output.gnulinux64}" casesensitive="true" mode="755" >
                 <include name="*/DataExplorer"/>
                 <include name="*/DevicePropertiesEditor"/>
             </tarfileset>
-            <tarfileset dir="${output.linux64}" casesensitive="true" mode="766" >
+            <tarfileset dir="${output.gnulinux64}" casesensitive="true" mode="766" >
                 <include name="*/DataExplorer.desktop"/>
                 <include name="*/DevicePropertiesEditor.desktop"/>
             </tarfileset>
-            <tarfileset dir="${output.linux64}" casesensitive="true" >
+            <tarfileset dir="${output.gnulinux64}" casesensitive="true" >
                 <include name="**"/>
                 <exclude name="*/DataExplorer"/>
                 <exclude name="*/DevicePropertiesEditor"/>

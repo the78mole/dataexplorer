@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>OpenSerialDataExplorer</string>
+	<string>DataExplorer</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -12,7 +12,7 @@
 				<string>osd</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>OpenSerialDataExplorer.icns</string>
+			<string>DataExplorer.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>OpenSerialData file</string>
 			<key>CFBundleTypeOSTypes</key>
@@ -22,12 +22,13 @@
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>lov</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>OpenSerialDataExplorer.icns</string>
+			<string>DataExplorer.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>LogView file</string>
 			<key>CFBundleTypeOSTypes</key>
@@ -41,18 +42,15 @@
 	<key>CFBundleVersion</key>
 	<string>2.0</string>
 	<key>CFBundleExecutable</key>
-	<array>
-		<string>OpenSerialDataExplorerMac64</string>
-		<string>DevicePropertiesEditorMac64</string>
-	</array>
+	<string>DataExplorerMac64</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>19260357</string>
 	<key>CFBundleGetInfoString</key>
-	<string>OpenSerialDataExplorer - explores your serial data</string>
+	<string>DataExplorer - explores your serial data</string>
 	<key>CFBundleIconFile</key>
-	<string>OpenSerialDataExplorer.icns</string>
+	<string>DataExplorer.icns</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleAllowMixedLocalizations</key>
