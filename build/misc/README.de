@@ -61,6 +61,7 @@ Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeich
 /home/<Benutzer>/.DataExplorer (Linux)
 /User/<Benutzer>/Library/Application Support/DataExplorer (Mac OS)
 angelegt. Hierunter werden auch Anwendungkonfiguration und Tracelogdaten abgelegt.
+Diese zum Teil dynamisch veränderten Dateien, wie Anwendungskonfiguration und Gerätekonfigurationsdateien werden bei der Benutzung verändert und sind lizenzfrei.
 
 Für das Verzeichnis der Nutzerdaten (Logdateien) ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms
 in den Anwendungkonfigurationsdatei (DataExplorer.properties) hinterlegt.

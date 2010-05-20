@@ -30,6 +30,7 @@ For Windows user a proper place is %ProgramFiles% for GNU Linux user "/opt" or "
 For the first execution use a command window (Windows), shell (GNU Linux) and change into the just created DataExplorer
 directory and execute running Windows, DataExplorer.exe, running GNU Linux, DataExplorer. For Mac OS the start
 script is located /Applications/DataExplorer.app/Contents/MacOS/DataExplorerMac32, if the icons seams not accessible.
+This dynamically written files containing the application configuration and/or device configuration data are public domain. 
 
 As overview the following files are under the DataExplorer program resource directory:
 DataExplorer.exe (Windows)
