@@ -9,7 +9,7 @@
         <usage>false</usage>
     </Device>
     <SerialPort>
-        <port>COM10</port>
+        <port>-</port>
         <baudeRate>115200</baudeRate>
         <dataBits>DATABITS_8</dataBits>
         <stopBits>STOPBITS_1</stopBits>
