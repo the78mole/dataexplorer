@@ -1,4 +1,24 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<!-- 
+*************************************************************************************
+  	This file is part of GNU DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GNU DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright (c) 2008 - 2010 Winfried Bruegmann
+************************************************************************************** 
+-->
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
@@ -61,9 +81,10 @@
 
 <DIV ID="Content">
 <H1><A CLASS="an" NAME="introduction"></A>Einleitung</H1>
-<P>Der DataExplorer ist ein Werkzeug zum Aufnehmen,
-Betrachten und Auswerten von Daten aus Ger&auml;ten, die &uuml;ber eine 
-serielle Schnittstelle erreichbar sind und ist unter vielen Betriebssystemen mit 32 und 64 Bit lauffähig (Linux, Windows, Mac OS).
+<P>Der GNU DataExplorer ist ein Werkzeug zum Aufnehmen, Betrachten und Auswerten von Daten aus Geräten,
+die es erlauben Daten entweder über eine serielle Schnittstelle auszulesen oder ihre Daten auf andere 
+Weise zugänglich machen (CSV-Datei, USB Anschluss). 
+Der GNU DataExplorer ist unter vielen Betriebssystemen mit 32 und 64 Bit lauffähig (GNU/Linux, Windows, Mac OS). 
 Sprachenunterstützung ist vorhanden, wobei aktuell Deutsch und Englisch vorhanden sind.
 </P>
 <P>Ein wesentlicher Aspekt für die Entwicklung war der
@@ -80,14 +101,13 @@ und einer Java 6 runtime.</P>
 Betriebssystemen benannt: </BR>
 <IMG SRC="images/SerialPortAssignements.jpg"></P>
 </BR>
-<H2>Warum der Name Open...</H2>
-<P>Im wesentlichen gibt es dafür zwei Gründe. Für den
-DataExplorer sind die Schnittstellen für eine Geräteanbindung
-und das Datenmodell frei zugänglich gemacht (Java-Doc). Später ist daran
-gedacht, das Projekt unter die General Public License (GPL) zu stellen.
-Hierbei wird dann auch der Quellcode offen gelegt. Das ermöglicht
-Eingriffe in den Anwendungskerncode, um Fehler zu beseitigen oder
-Funktionserweiterungen einzubringen. </BR>
+<H2>Warum freie Software unter der GPL</H2>
+<P>Im wesentlichen gibt es dafür zwei Gründe. 
+Erstmal wir der Gedanke freier Software weitergetragen. 
+Für den GNU DataExplorer sind die Schnittstellen für eine Geräteanbindung und das Datenmodell frei zugänglich. 
+Das ermöglicht Eingriffe in den Anwendungskerncode, um Fehler zu beseitigen oder Funktionserweiterungen einzubringen. 
+Es wird möglich weitere Geräte anzubinden, die mir selbst nicht zur Verfügung stehen. 
+</BR>
 Die gerätespezifischen Komponenten sind als Module extra gehalten und
 werden zu Laufzeit des Programms dynamisch geladen (plug-in). Das
 ermöglicht eine Implementierung der Gerätefunktionalität unabhängig von
