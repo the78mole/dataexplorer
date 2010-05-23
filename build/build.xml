@@ -588,7 +588,8 @@
             <zipfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
                 <include name="**/src/**"/>
                 <include name="**/build.xml"/>
-                <include name="**/initBuildOS.xml"/>
+                <include name="DataExplorer/doc/*"/>
+                <include name="DataExplorer/doc/design/*.pdf"/>
                 <exclude name="**/CVS/**"/>
                 <include name="build/lib/**"/>
                 <include name="build/misc/**"/>
