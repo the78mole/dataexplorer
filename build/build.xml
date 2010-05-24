@@ -36,7 +36,7 @@
         <echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
         <condition property="build.os.shortname" value="GNULinux">
-            <os name="GNULinux"/>
+            <os name="Linux"/>
         </condition>
 
         <condition property="build.os.shortname" value="Windows">
@@ -176,7 +176,7 @@
         <echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
         <condition property="isGNULinux">
-            <os name="GNULinux"/>
+            <os name="Linux"/>
         </condition>
         <antcall target="GNULinux"/>
         <condition property="isWindows">
@@ -584,12 +584,10 @@
     </target>
 
     <target name="source_package" depends="init" description="builds the source distribution package to run configure and make">
-        <zip destfile="${build.target.dir}/dataexplorer-${version.num}-src.zip" >
-            <zipfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
+        <tar destfile="${build.target.dir}/dataexplorer-${version.num}-src.tar.gz" compression="gzip">
+            <tarfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
                 <include name="**/src/**"/>
                 <include name="**/build.xml"/>
-                <include name="DataExplorer/doc/*"/>
-                <include name="DataExplorer/doc/design/*.pdf"/>
                 <exclude name="**/CVS/**"/>
                 <include name="build/lib/**"/>
                 <include name="build/misc/**"/>
@@ -618,8 +616,8 @@
                 <exclude name="Port*/**"/>
                 <exclude name="Print*/**"/>
                 <exclude name="RXTXcomm*/**"/>
-            </zipfileset>
-            <zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
+            </tarfileset>
+            <tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
                 <include name="COPYING" />
                 <include name="READ*"/>
                 <include name="*.LICENSE"/>
@@ -631,20 +629,22 @@
                 <include name="PROBLEMS"/>
                 <include name="configure.ac"/>
                 <include name="Makefile.in"/>
-            </zipfileset>
-            <zipfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="744">
+            </tarfileset>
+            <tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="744">
                 <include name="configure"/>
                 <include name="install-sh"/>
-            </zipfileset>
-            <zipfileset dir="${basedir}/DataExplorer/doc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
-                <include name="DataExplorer*.txt"/>
-            </zipfileset>
-            <zipfileset dir="${basedir}/RXTXcomm" casesensitive="true" prefix="dataexplorer-${version.num}/thirdparty/rxtx-2.2pre2" filemode="444">
+            </tarfileset>
+            <tarfileset dir="${basedir}/DataExplorer/doc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
+                <include name="*.odt"/>
+                <include name="*.pdf"/>
+                <include name="design/*.pdf"/>
+            </tarfileset>
+            <tarfileset dir="${basedir}/RXTXcomm" casesensitive="true" prefix="dataexplorer-${version.num}/thirdparty/rxtx-2.2pre2" filemode="444">
             	<include name="**/**"/>
                 <exclude name="**/CVS/**"/>
                 <exclude name="**/bin/**"/>
-            </zipfileset>
-        </zip>
+            </tarfileset>
+        </tar>
     </target>
 
 </project>
