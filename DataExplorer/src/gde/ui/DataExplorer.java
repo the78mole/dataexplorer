@@ -114,6 +114,7 @@ public class DataExplorer extends Composite {
 	final HashMap<String, String>	extensionFilterMap								= new HashMap<String, String>();
 
 	public final static String		APPLICATION_NAME									= "DataExplorer"; //$NON-NLS-1$
+	public final static String		LEGACY_APPLICATION_NAME						= "OpenSerialDataExplorer"; //$NON-NLS-1$
 	public final static String		RECORD_NAME												= "recordName"; //$NON-NLS-1$
 	public final static String		CURVE_SELECTION_ITEM							= "curveSelectedItem"; //$NON-NLS-1$
 	public final static String		OLD_STATE													= "oldState"; //$NON-NLS-1$
