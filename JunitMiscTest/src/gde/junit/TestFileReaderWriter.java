@@ -280,7 +280,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 		//this.devicePath = new File(this.tmpDir + "Write_0_OSD"); 
 		String dataPath = this.settings.getDataFilePath();
-		dataPath = dataPath.substring(0, dataPath.indexOf(DataExplorer.APPLICATION_NAME)) + "LogView";
+		dataPath = dataPath.substring(0, dataPath.indexOf(DataExplorer.LEGACY_APPLICATION_NAME)) + "LogView";
 		this.devicePath = new File(dataPath);
 		//this.devicePath = new File("d:\\Documents\\LogView" + GDE.FILE_SEPARATOR + "UniLog");
 
