@@ -61,7 +61,9 @@ public class TestSuperClass extends TestCase {
 	final DataExplorer					application	= DataExplorer.getInstance();
 	final Channels												channels		= Channels.getInstance();
 	final Settings												settings		= Settings.getInstance();
-	final String 													tmpDir 			= System.getProperty("java.io.tmpdir");
+	final String 													tmpDir 			= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR) 
+																												? System.getProperty("java.io.tmpdir") 
+																												: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR ;
 
 
 	final TimeLine												timeLine		= new TimeLine();

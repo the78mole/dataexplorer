@@ -30,7 +30,7 @@ public class AllTests {
 		suite.addTestSuite(TestFileReaderWriter.class);
 		suite.addTestSuite(TestObjectKeyScanner.class);
 		suite.addTestSuite(TestMathUtils.class);
-		suite.addTestSuite(LogViewReaderTester.class);
+		//suite.addTestSuite(LogViewReaderTester.class);
 		//$JUnit-END$
 		return suite;
 	}

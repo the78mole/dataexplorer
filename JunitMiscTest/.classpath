@@ -3,15 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/AkkuMaster"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DataExplorer"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Picolario"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Simulator"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/UniLog"/>
 	<classpathentry kind="var" path="SWT_JAR_PATH"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CSV2SerialAdapter"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/eStation"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/LiPoWatch"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/VC800"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
