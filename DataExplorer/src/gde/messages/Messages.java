@@ -101,8 +101,8 @@ public class Messages {
 	}
 
 	/**
-	 * method to modify the resource bundle forceusing other then the system locale
-	 * @param newLocale the locale to set,  Locale.GERMANY, Locale.ENGLISH, ...
+	 * method to modify the resource bundle force using other then the system local
+	 * @param newLocale the local to set,  Locale.GERMANY, Locale.ENGLISH, ...
 	 */
 	public static void setMainResourceBundleLocale(Locale newLocale) {
 		Messages.mainResourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, newLocale);
