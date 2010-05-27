@@ -21,630 +21,651 @@
 -->
 <project name="DataExplorerMasterBuild" default="dist" basedir="..">
 
-    <target name="echo:build.properties" if="build.properties.exists">
-        <echo message="Building using ${build.properties}" />
-    </target>
+	<target name="echo:build.properties" if="build.properties.exists">
+		<echo message="Building using ${build.properties}" />
+	</target>
 
-    <!-- Main target -->
-    <target name="dist" depends="binary_package">
-        <echo message="Building on system ${os.name} ${os.arch} ${sun.arch.data.model}" />
-        <echo message="Building using Java ${java.version}" />
-    </target>
+	<!-- Main target -->
+	<target name="dist" depends="binary_package">
+		<echo message="Building on system ${os.name} ${os.arch} ${sun.arch.data.model}" />
+		<echo message="Building using Java ${java.version}" />
+	</target>
 
-    <!-- initialize build OS name which set the lib path to swt.jar -->
-    <target name="init_OS" >
-        <echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
+	<!-- initialize build OS name which set the lib path to swt.jar -->
+	<target name="init_OS" >
+		<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
-        <condition property="build.os.shortname" value="GNULinux">
-            <os name="Linux"/>
-        </condition>
+		<condition property="build.os.shortname" value="GNULinux">
+			<os name="Linux"/>
+		</condition>
 
-        <condition property="build.os.shortname" value="Windows">
-            <os name="Windows XP"/>
-        </condition>
-        <condition property="build.os.shortname" value="Windows">
-            <os name="Windows VISTA"/>
-        </condition>
-        <condition property="build.os.shortname" value="Windows">
-            <os name="Windows 2003"/>
-        </condition>
+		<condition property="build.os.shortname" value="Windows">
+			<os name="Windows XP"/>
+		</condition>
+		<condition property="build.os.shortname" value="Windows">
+			<os name="Windows VISTA"/>
+		</condition>
+		<condition property="build.os.shortname" value="Windows">
+			<os name="Windows 2003"/>
+		</condition>
 
-        <condition property="build.os.shortname" value="MAC">
-            <os name="Mac OS"/>
-        </condition>
-        <condition property="build.os.shortname" value="MAC">
-            <os name="Mac OS X"/>
-        </condition>
+		<condition property="build.os.shortname" value="MAC">
+			<os name="Mac OS"/>
+		</condition>
+		<condition property="build.os.shortname" value="MAC">
+			<os name="Mac OS X"/>
+		</condition>
 
-        <echo message="OS short name = ${build.os.shortname}"/>
-    </target>
+		<echo message="OS short name = ${build.os.shortname}"/>
+	</target>
 
-    <!-- init -->
-    <target name="init" depends="init_OS">
-        <property name="build.properties" location="build/build.properties" />
-        <property file="${build.properties}" />
+	<!-- init -->
+	<target name="init" depends="init_OS">
+		<property name="build.properties" location="build/build.properties" />
+		<property file="${build.properties}" />
 
-        <!-- this is to have nice message about used build.properties file -->
-        <available property="build.properties.exists" file="${build.properties}" />
-        <antcall target="echo:build.properties" />
+		<!-- this is to have nice message about used build.properties file -->
+		<available property="build.properties.exists" file="${build.properties}" />
+		<antcall target="echo:build.properties" />
 
-        <!-- output directories -->
-        <property name="output.dir" location="build/target" />
-        <property name="build.target.dir" location="build/target/install" />
+		<!-- output directories -->
+		<property name="output.dir" location="build/target" />
+		<property name="build.target.dir" location="build/target/install" />
 
-        <property name="output.windows32" location="${output.dir}/Windows_32" />
-        <property name="output.windows32.program" location="${output.windows32}/DataExplorer" />
-        <property name="output.windows32.program.devices" location="${output.windows32}/DataExplorer/devices" />
-        <property name="output.windows32.java.ext" location="${output.windows32}/DataExplorer/java/ext" />
+		<property name="output.windows32" location="${output.dir}/Windows_32" />
+		<property name="output.windows32.program" location="${output.windows32}/DataExplorer" />
+		<property name="output.windows32.program.devices" location="${output.windows32}/DataExplorer/devices" />
+		<property name="output.windows32.java.ext" location="${output.windows32}/DataExplorer/java/ext" />
 
-        <property name="output.windows64" location="${output.dir}/Windows_64" />
-        <property name="output.windows64.program" location="${output.windows64}/DataExplorer" />
-        <property name="output.windows64.program.devices" location="${output.windows64}/DataExplorer/devices" />
-        <property name="output.windows64.java.ext" location="${output.windows64}/DataExplorer/java/ext" />
+		<property name="output.windows64" location="${output.dir}/Windows_64" />
+		<property name="output.windows64.program" location="${output.windows64}/DataExplorer" />
+		<property name="output.windows64.program.devices" location="${output.windows64}/DataExplorer/devices" />
+		<property name="output.windows64.java.ext" location="${output.windows64}/DataExplorer/java/ext" />
 
-        <property name="output.gnulinux32" location="${output.dir}/GNULinux_32" />
-        <property name="output.gnulinux32.program" location="${output.gnulinux32}/DataExplorer" />
-        <property name="output.gnulinux32.program.devices" location="${output.gnulinux32}/DataExplorer/devices" />
-        <property name="output.gnulinux32.java.ext" location="${output.gnulinux32}/DataExplorer/java/ext" />
+		<property name="output.gnulinux32" location="${output.dir}/GNULinux_32" />
+		<property name="output.gnulinux32.program" location="${output.gnulinux32}/DataExplorer" />
+		<property name="output.gnulinux32.program.devices" location="${output.gnulinux32}/DataExplorer/devices" />
+		<property name="output.gnulinux32.java.ext" location="${output.gnulinux32}/DataExplorer/java/ext" />
 
-        <property name="output.gnulinux64" location="${output.dir}/GNULinux_64" />
-        <property name="output.gnulinux64.program" location="${output.gnulinux64}/DataExplorer" />
-        <property name="output.gnulinux64.program.devices" location="${output.gnulinux64}/DataExplorer/devices" />
-        <property name="output.gnulinux64.java.ext" location="${output.gnulinux64}/DataExplorer/java/ext" />
+		<property name="output.gnulinux64" location="${output.dir}/GNULinux_64" />
+		<property name="output.gnulinux64.program" location="${output.gnulinux64}/DataExplorer" />
+		<property name="output.gnulinux64.program.devices" location="${output.gnulinux64}/DataExplorer/devices" />
+		<property name="output.gnulinux64.java.ext" location="${output.gnulinux64}/DataExplorer/java/ext" />
 
-        <property name="output.mac32.carbon" location="${output.dir}/Mac_32_carbon" />
-        <property name="output.mac32.carbon.bundle" location="${output.mac32.carbon}/DataExplorer.app/Contents" />
-        <property name="output.mac32.carbon.bundle.bin" location="${output.mac32.carbon.bundle}/MacOS" />
-        <property name="output.mac32.carbon.program" location="${output.mac32.carbon.bundle}/Resources" />
-        <property name="output.mac32.carbon.program.devices" location="${output.mac32.carbon.program}/devices" />
-        <property name="output.mac32.carbon.java.ext" location="${output.mac32.carbon.program}/java/ext" />
+		<property name="output.mac32.carbon" location="${output.dir}/Mac_32_carbon" />
+		<property name="output.mac32.carbon.bundle" location="${output.mac32.carbon}/DataExplorer.app/Contents" />
+		<property name="output.mac32.carbon.bundle.bin" location="${output.mac32.carbon.bundle}/MacOS" />
+		<property name="output.mac32.carbon.program" location="${output.mac32.carbon.bundle}/Resources" />
+		<property name="output.mac32.carbon.program.devices" location="${output.mac32.carbon.program}/devices" />
+		<property name="output.mac32.carbon.java.ext" location="${output.mac32.carbon.program}/java/ext" />
 
-        <property name="output.mac32.cocoa" location="${output.dir}/Mac_32_cocoa" />
-        <property name="output.mac32.cocoa.bundle" location="${output.mac32.cocoa}/DataExplorer.app/Contents" />
-        <property name="output.mac32.cocoa.bundle.bin" location="${output.mac32.cocoa.bundle}/MacOS" />
-        <property name="output.mac32.cocoa.program" location="${output.mac32.cocoa.bundle}/Resources" />
-        <property name="output.mac32.cocoa.program.devices" location="${output.mac32.cocoa.program}/devices" />
-        <property name="output.mac32.cocoa.java.ext" location="${output.mac32.cocoa.program}/java/ext" />
+		<property name="output.mac32.cocoa" location="${output.dir}/Mac_32_cocoa" />
+		<property name="output.mac32.cocoa.bundle" location="${output.mac32.cocoa}/DataExplorer.app/Contents" />
+		<property name="output.mac32.cocoa.bundle.bin" location="${output.mac32.cocoa.bundle}/MacOS" />
+		<property name="output.mac32.cocoa.program" location="${output.mac32.cocoa.bundle}/Resources" />
+		<property name="output.mac32.cocoa.program.devices" location="${output.mac32.cocoa.program}/devices" />
+		<property name="output.mac32.cocoa.java.ext" location="${output.mac32.cocoa.program}/java/ext" />
 
-        <property name="output.mac64.cocoa" location="${output.dir}/Mac_64_cocoa" />
-        <property name="output.mac64.cocoa.bundle" location="${output.mac64.cocoa}/DataExplorer.app/Contents" />
-        <property name="output.mac64.cocoa.bundle.bin" location="${output.mac64.cocoa.bundle}/MacOS" />
-        <property name="output.mac64.cocoa.program" location="${output.mac64.cocoa.bundle}/Resources" />
-        <property name="output.mac64.cocoa.program.devices" location="${output.mac64.cocoa.program}/devices" />
-        <property name="output.mac64.cocoa.java.ext" location="${output.mac64.cocoa.program}/java/ext" />
+		<property name="output.mac64.cocoa" location="${output.dir}/Mac_64_cocoa" />
+		<property name="output.mac64.cocoa.bundle" location="${output.mac64.cocoa}/DataExplorer.app/Contents" />
+		<property name="output.mac64.cocoa.bundle.bin" location="${output.mac64.cocoa.bundle}/MacOS" />
+		<property name="output.mac64.cocoa.program" location="${output.mac64.cocoa.bundle}/Resources" />
+		<property name="output.mac64.cocoa.program.devices" location="${output.mac64.cocoa.program}/devices" />
+		<property name="output.mac64.cocoa.java.ext" location="${output.mac64.cocoa.program}/java/ext" />
 
-        <!-- create output directory structure -->
-        <mkdir dir="${output.dir}" />
-        <mkdir dir="${build.target.dir}" />
+		<!-- create output directory structure -->
+		<mkdir dir="${output.dir}" />
+		<mkdir dir="${build.target.dir}" />
 
-        <mkdir dir="${output.windows32}" />
-        <mkdir dir="${output.windows32.program}" />
-        <mkdir dir="${output.windows32.program.devices}" />
-        <mkdir dir="${output.windows32.java.ext}" />
+		<mkdir dir="${output.windows32}" />
+		<mkdir dir="${output.windows32.program}" />
+		<mkdir dir="${output.windows32.program.devices}" />
+		<mkdir dir="${output.windows32.java.ext}" />
 
-        <mkdir dir="${output.windows64}" />
-        <mkdir dir="${output.windows64.program}" />
-        <mkdir dir="${output.windows64.program.devices}" />
-        <mkdir dir="${output.windows64.java.ext}" />
+		<mkdir dir="${output.windows64}" />
+		<mkdir dir="${output.windows64.program}" />
+		<mkdir dir="${output.windows64.program.devices}" />
+		<mkdir dir="${output.windows64.java.ext}" />
 
-        <mkdir dir="${output.gnulinux32}" />
-        <mkdir dir="${output.gnulinux32.program}" />
-        <mkdir dir="${output.gnulinux32.program.devices}" />
-        <mkdir dir="${output.gnulinux32.java.ext}" />
+		<mkdir dir="${output.gnulinux32}" />
+		<mkdir dir="${output.gnulinux32.program}" />
+		<mkdir dir="${output.gnulinux32.program.devices}" />
+		<mkdir dir="${output.gnulinux32.java.ext}" />
 
-        <mkdir dir="${output.gnulinux64}" />
-        <mkdir dir="${output.gnulinux64.program}" />
-        <mkdir dir="${output.gnulinux64.program.devices}" />
-        <mkdir dir="${output.gnulinux64.java.ext}" />
+		<mkdir dir="${output.gnulinux64}" />
+		<mkdir dir="${output.gnulinux64.program}" />
+		<mkdir dir="${output.gnulinux64.program.devices}" />
+		<mkdir dir="${output.gnulinux64.java.ext}" />
 
-        <mkdir dir="${output.mac32.carbon}" />
-        <mkdir dir="${output.mac32.carbon.bundle}" />
-        <mkdir dir="${output.mac32.carbon.bundle.bin}" />
-        <mkdir dir="${output.mac32.carbon.program}" />
-        <mkdir dir="${output.mac32.carbon.program.devices}" />
-        <mkdir dir="${output.mac32.carbon.java.ext}" />
+		<mkdir dir="${output.mac32.carbon}" />
+		<mkdir dir="${output.mac32.carbon.bundle}" />
+		<mkdir dir="${output.mac32.carbon.bundle.bin}" />
+		<mkdir dir="${output.mac32.carbon.program}" />
+		<mkdir dir="${output.mac32.carbon.program.devices}" />
+		<mkdir dir="${output.mac32.carbon.java.ext}" />
 
-        <mkdir dir="${output.mac64.cocoa}" />
-        <mkdir dir="${output.mac64.cocoa.bundle}" />
-        <mkdir dir="${output.mac64.cocoa.bundle.bin}" />
-        <mkdir dir="${output.mac64.cocoa.program}" />
-        <mkdir dir="${output.mac64.cocoa.program.devices}" />
-        <mkdir dir="${output.mac64.cocoa.java.ext}" />
+		<mkdir dir="${output.mac64.cocoa}" />
+		<mkdir dir="${output.mac64.cocoa.bundle}" />
+		<mkdir dir="${output.mac64.cocoa.bundle.bin}" />
+		<mkdir dir="${output.mac64.cocoa.program}" />
+		<mkdir dir="${output.mac64.cocoa.program.devices}" />
+		<mkdir dir="${output.mac64.cocoa.java.ext}" />
 
-        <!-- create src directory varaible -->
-        <property name="source.dir" location="${basedir}" />
-    </target>
+		<!-- create src directory varaible -->
+		<property name="source.dir" location="${basedir}" />
+	</target>
 
-    <!-- cleanup -->
-    <target name="clean" depends="init">
-        <delete dir="${output.dir}" />
+	<!-- cleanup -->
+	<target name="clean" depends="init">
+		<delete dir="${output.dir}" />
 
-        <ant antfile="build.xml" target="clean" dir="DataExplorer" inheritall="true"/>
-        <ant antfile="build.xml" target="clean" dir="Picolario" inheritall="true"/>
-        <ant antfile="build.xml" target="clean" dir="AkkuMaster" inheritall="true"/>
-        <ant antfile="build.xml" target="clean" dir="Simulator" inheritall="true"/>
-        <ant antfile="build.xml" target="clean" dir="UniLog" inheritall="true"/>
-        <ant antfile="build.xml" target="clean" dir="eStation" inheritall="true"/>
-        <ant antfile="build.xml" target="clean" dir="VC800" inheritall="true"/>
-        <ant antfile="build.xml" target="clean" dir="LiPoWatch" inheritall="true"/>
-        <ant antfile="build.xml" target="clean" dir="CSV2SerialAdapter" inheritall="true"/>
-        <!-- add new device here -->
-    </target>
+		<ant antfile="build.xml" target="clean" dir="DataExplorer" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="Picolario" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="AkkuMaster" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="Simulator" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="UniLog" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="eStation" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="VC800" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="LiPoWatch" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="CSV2SerialAdapter" inheritall="true"/>
+		<!-- add new device here -->
+	</target>
 
-    <!-- install target -->
-    <target name="install" depends="dist">
-        <echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
+	<!-- install target -->
+	<target name="install" depends="dist">
+		<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
-        <condition property="isGNULinux">
-            <os name="Linux"/>
-        </condition>
-        <antcall target="GNULinux"/>
-        <condition property="isWindows">
-            <os name="Windows XP"/>
-        </condition>
-        <condition property="isWindows">
-            <os name="Windows VISTA"/>
-        </condition>
-        <condition property="isWindows">
-            <os name="Windows 2003"/>
-        </condition>
-        <antcall target="Windows"/>
-        <condition property="isMAC">
-            <os name="Mac OS"/>
-        </condition>
-        <condition property="isMAC">
-            <os name="Mac OS X"/>
-        </condition>
-        <antcall target="MAC"/>
+		<condition property="isGNULinux">
+			<os name="Linux"/>
+		</condition>
+		<antcall target="GNULinux"/>
+		<condition property="isWindows">
+			<os name="Windows XP"/>
+		</condition>
+		<condition property="isWindows">
+			<os name="Windows VISTA"/>
+		</condition>
+		<condition property="isWindows">
+			<os name="Windows 2003"/>
+		</condition>
+		<antcall target="Windows"/>
+		<condition property="isMAC">
+			<os name="Mac OS"/>
+		</condition>
+		<condition property="isMAC">
+			<os name="Mac OS X"/>
+		</condition>
+		<antcall target="MAC"/>
 
-        <echo message="OS short name = ${build.os.shortname}"/>
-    </target>
+		<echo message="OS short name = ${build.os.shortname}"/>
+	</target>
 
-    <target name="Windows" if="isWindows" >
-        <echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-        <antcall target="WindowsDefault"/>
-        <antcall target="WindowsPrefix"/>
-    </target>
-    <target name="WindowsDefault" unless="prefix">
-        <echo message="installing to ${install.dir.windows}" />
-        <unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir.windows}" overwrite="true"/>
-    </target>
-    <target name="WindowsPrefix" if="prefix">
-        <echo message="installing to ${prefix}" />
-        <unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${prefix}" overwrite="true"/>
-    </target>
+	<target name="Windows" if="isWindows" >
+		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
+		<antcall target="WindowsDefault"/>
+		<antcall target="WindowsPrefix"/>
+	</target>
+	<target name="WindowsDefault" unless="prefix">
+		<echo message="installing to ${install.dir.windows}" />
+		<unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir.windows}" overwrite="true"/>
+	</target>
+	<target name="WindowsPrefix" if="prefix">
+		<echo message="installing to ${prefix}" />
+		<unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${prefix}" overwrite="true"/>
+	</target>
 
-    <target name="GNULinux" if="isGNULinux">
-        <echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-        <antcall target="GNULinuxDefault"/>
-        <antcall target="GNULinuxPrefix"/>
-    </target>
-    <target name="GNULinuxDefault" unless="prefix">
-        <echo message="installing to ${install.dir.gnulinux}" />
-        <exec command="tar -xzf ${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.gnulinux}"/>
-    </target>
-    <target name="GNULinuxPrefix" if="prefix">
-        <echo message="installing to ${prefix}" />
-        <exec command="tar -xzf ${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${prefix}"/>
-    </target>
+	<target name="GNULinux" if="isGNULinux">
+		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
+		<antcall target="GNULinuxDefault"/>
+		<antcall target="GNULinuxPrefix"/>
+	</target>
+	<target name="GNULinuxDefault" unless="prefix">
+		<echo message="installing to ${install.dir.gnulinux}" />
+		<exec command="tar -xzf ${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.gnulinux}"/>
+	</target>
+	<target name="GNULinuxPrefix" if="prefix">
+		<echo message="installing to ${prefix}" />
+		<exec command="tar -xzf ${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${prefix}"/>
+	</target>
 
-    <target name="MAC" if="isMAC">
-        <echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-        <antcall target="MacDefault"/>
-        <antcall target="MacPrefix"/>
-    </target>
-    <target name="MacDefault" unless="prefix">
-        <echo message="installing to ${install.dir.mac}" />
-        <unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${install.dir.mac}" overwrite="true"/>
-    </target>
-    <target name="MacPrefix" if="prefix">
-        <echo message="installing to ${prefix}" />
-        <unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${prefix}" overwrite="true"/>
-    </target>
-    
-    <target name="check_prefix">
-        <condition property="isPrefix">
-            <not>
-                <equals arg1="prefix" arg2=""/>
-            </not>
-        </condition>
-    </target>
-    
-    <!-- Package -->
-    <target name="package" depends="init">
-        <ant antfile="build.xml" target="package" dir="DataExplorer" inheritall="true" />
-        <ant antfile="build.xml" target="package" dir="Picolario" inheritall="true" />
-        <ant antfile="build.xml" target="package" dir="AkkuMaster" inheritall="true" />
-        <ant antfile="build.xml" target="package" dir="Simulator" inheritall="true" />
-        <ant antfile="build.xml" target="package" dir="UniLog" inheritall="true" />
-        <ant antfile="build.xml" target="package" dir="eStation" inheritall="true"/>
-        <ant antfile="build.xml" target="package" dir="VC800" inheritall="true"/>
-        <ant antfile="build.xml" target="package" dir="LiPoWatch" inheritall="true"/>
-        <ant antfile="build.xml" target="package" dir="CSV2SerialAdapter" inheritall="true"/>
-        <!-- add new device here -->
-    </target>
+	<target name="MAC" if="isMAC">
+		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
+		<antcall target="MacDefault"/>
+		<antcall target="MacPrefix"/>
+	</target>
+	<target name="MacDefault" unless="prefix">
+		<echo message="installing to ${install.dir.mac}" />
+		<unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${install.dir.mac}" overwrite="true"/>
+	</target>
+	<target name="MacPrefix" if="prefix">
+		<echo message="installing to ${prefix}" />
+		<unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${prefix}" overwrite="true"/>
+	</target>
 
-    <fileset dir="${basedir}" >
-        <patternset id="DE_PLUGIN_JARS">
-            <include name="Picolario/build/*.jar" />
-            <include name="AkkuMaster/build/*.jar" />
-            <include name="Simulator/build/*.jar" />
-            <include name="UniLog/build/*.jar" />
-            <include name="eStation/build/*.jar" />
-            <include name="VC800/build/*.jar" />
-            <include name="LiPoWatch/build/*.jar" />
-            <include name="CSV2SerialAdapter/build/*.jar" />
-            <!-- add new device here -->
-        </patternset>
-    </fileset>
+	<target name="check_prefix">
+		<condition property="isPrefix">
+			<not>
+				<equals arg1="prefix" arg2=""/>
+			</not>
+		</condition>
+	</target>
 
-    <!-- create internal temporay file structure -->
-    <target name="copy-files" depends="package">
-        <!-- programm directory -->
-        <copy todir="${output.windows32.program}" flatten="yes">
-            <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/DataExplorer.exe" />
-            <fileset file="build/misc/DevicePropertiesEditor.exe" />
-            <!--
+	<!-- Package -->
+	<target name="package" depends="init">
+		<ant antfile="build.xml" target="package" dir="DataExplorer" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="Picolario" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="AkkuMaster" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="Simulator" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="UniLog" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="eStation" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="VC800" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="LiPoWatch" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="CSV2SerialAdapter" inheritall="true"/>
+		<!-- add new device here -->
+	</target>
+
+	<fileset dir="${basedir}" >
+		<patternset id="DE_PLUGIN_JARS">
+			<include name="Picolario/build/*.jar" />
+			<include name="AkkuMaster/build/*.jar" />
+			<include name="Simulator/build/*.jar" />
+			<include name="UniLog/build/*.jar" />
+			<include name="eStation/build/*.jar" />
+			<include name="VC800/build/*.jar" />
+			<include name="LiPoWatch/build/*.jar" />
+			<include name="CSV2SerialAdapter/build/*.jar" />
+			<!-- add new device here -->
+		</patternset>
+	</fileset>
+
+	<!-- create internal temporay file structure -->
+	<target name="copy-files" depends="package">
+		<!-- programm directory -->
+		<copy todir="${output.windows32.program}" flatten="yes">
+			<fileset file="DataExplorer/build/*.jar" />
+			<fileset file="build/misc/DataExplorer.exe" />
+			<fileset file="build/misc/DevicePropertiesEditor.exe" />
+			<!--
             <fileset file="build/misc/DataExplorer.ico" />
             <fileset file="build/misc/DevicePropertiesEditor.ico" />
             -->
-        </copy>
-        <copy todir="${output.windows32.program.devices}" flatten="yes" >
-            <fileset dir="${basedir}" >
-                <patternset refid="DE_PLUGIN_JARS"/>
-            </fileset>
-        </copy>
+		</copy>
+		<copy todir="${output.windows32.program.devices}" flatten="yes" >
+			<fileset dir="${basedir}" >
+				<patternset refid="DE_PLUGIN_JARS"/>
+			</fileset>
+		</copy>
 
-        <copy todir="${output.windows64.program}" flatten="yes">
-            <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/DataExplorer.exe" />
-            <fileset file="build/misc/DevicePropertiesEditor.exe" />
-            <!--
+		<copy todir="${output.windows64.program}" flatten="yes">
+			<fileset file="DataExplorer/build/*.jar" />
+			<fileset file="build/misc/DataExplorer.exe" />
+			<fileset file="build/misc/DevicePropertiesEditor.exe" />
+			<!--
             <fileset file="build/misc/DataExplorer.ico" />
             <fileset file="build/misc/DevicePropertiesEditor.ico" />
             -->
-        </copy>
-        <copy todir="${output.windows64.program.devices}" flatten="yes">
-            <fileset dir="${basedir}" >
-                <patternset refid="DE_PLUGIN_JARS"/>
-            </fileset>
-        </copy>
+		</copy>
+		<copy todir="${output.windows64.program.devices}" flatten="yes">
+			<fileset dir="${basedir}" >
+				<patternset refid="DE_PLUGIN_JARS"/>
+			</fileset>
+		</copy>
 
-        <copy todir="${output.gnulinux32.program}" flatten="yes">
-            <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/DataExplorer-mime.xml" />
-            <fileset file="build/misc/DevicePropertiesEditor.xpm" />
-            <fileset file="build/misc/DataExplorer.xpm" />
-            <fileset file="build/misc/DataExplorer" />
-            <fileset file="build/misc/DataExplorer.desktop" />
-            <fileset file="build/misc/DevicePropertiesEditor" />
-            <fileset file="build/misc/DevicePropertiesEditor.desktop" />
-        </copy>
-        <copy todir="${output.gnulinux32.program.devices}" flatten="yes">
-            <fileset dir="${basedir}" >
-                <patternset refid="DE_PLUGIN_JARS"/>
-            </fileset>
-        </copy>
+		<copy todir="${output.gnulinux32.program}" flatten="yes">
+			<fileset file="DataExplorer/build/*.jar" />
+			<fileset file="build/misc/DataExplorer-mime.xml" />
+			<fileset file="build/misc/DevicePropertiesEditor.xpm" />
+			<fileset file="build/misc/DataExplorer.xpm" />
+			<fileset file="build/misc/DataExplorer" />
+			<fileset file="build/misc/DataExplorer.desktop" />
+			<fileset file="build/misc/DevicePropertiesEditor" />
+			<fileset file="build/misc/DevicePropertiesEditor.desktop" />
+		</copy>
+		<copy todir="${output.gnulinux32.program.devices}" flatten="yes">
+			<fileset dir="${basedir}" >
+				<patternset refid="DE_PLUGIN_JARS"/>
+			</fileset>
+		</copy>
 
-        <copy todir="${output.gnulinux64.program}" flatten="yes">
-            <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/DataExplorer-mime.xml" />
-            <fileset file="build/misc/DevicePropertiesEditor.xpm" />
-            <fileset file="build/misc/DataExplorer.xpm" />
-            <fileset file="build/misc/DataExplorer" />
-            <fileset file="build/misc/DataExplorer.desktop" />
-            <fileset file="build/misc/DevicePropertiesEditor" />
-            <fileset file="build/misc/DevicePropertiesEditor.desktop" />
-        </copy>
-        <copy todir="${output.gnulinux64.program.devices}" flatten="yes">
-            <fileset dir="${basedir}" >
-                <patternset refid="DE_PLUGIN_JARS"/>
-            </fileset>
-        </copy>
+		<copy todir="${output.gnulinux64.program}" flatten="yes">
+			<fileset file="DataExplorer/build/*.jar" />
+			<fileset file="build/misc/DataExplorer-mime.xml" />
+			<fileset file="build/misc/DevicePropertiesEditor.xpm" />
+			<fileset file="build/misc/DataExplorer.xpm" />
+			<fileset file="build/misc/DataExplorer" />
+			<fileset file="build/misc/DataExplorer.desktop" />
+			<fileset file="build/misc/DevicePropertiesEditor" />
+			<fileset file="build/misc/DevicePropertiesEditor.desktop" />
+		</copy>
+		<copy todir="${output.gnulinux64.program.devices}" flatten="yes">
+			<fileset dir="${basedir}" >
+				<patternset refid="DE_PLUGIN_JARS"/>
+			</fileset>
+		</copy>
 
-        <copy todir="${output.mac32.carbon.program}" flatten="yes">
-            <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/DataExplorer-mime.xml" />
-            <!-- fileset file="build/misc/DataExplorer.xpm" / -->
-            <fileset file="build/misc/DataExplorer.icns" />
-            <fileset file="build/misc/DevicePropertiesEditor.icns" />
-            <fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
-        </copy>
-        <copy todir="${output.mac32.carbon.bundle}" flatten="yes">
-            <fileset file="build/lib/MAC/32/Info.plist" />
-            <fileset file="build/misc/PkgInfo" />
-        </copy>
-        <copy todir="${output.mac32.carbon.bundle.bin}" flatten="yes">
-            <fileset file="build/misc/DataExplorerMac32" />
-            <fileset file="build/misc/DevicePropertiesEditorMac32" />
-        </copy>
-        <copy todir="${output.mac32.carbon.program.devices}" flatten="yes">
-            <fileset dir="${basedir}" >
-                <patternset refid="DE_PLUGIN_JARS"/>
-            </fileset>
-        </copy>
+		<copy todir="${output.mac32.carbon.program}" flatten="yes">
+			<fileset file="DataExplorer/build/*.jar" />
+			<fileset file="build/misc/DataExplorer-mime.xml" />
+			<!-- fileset file="build/misc/DataExplorer.xpm" / -->
+			<fileset file="build/misc/DataExplorer.icns" />
+			<fileset file="build/misc/DevicePropertiesEditor.icns" />
+			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
+		</copy>
+		<copy todir="${output.mac32.carbon.bundle}" flatten="yes">
+			<fileset file="build/lib/MAC/32/Info.plist" />
+			<fileset file="build/misc/PkgInfo" />
+		</copy>
+		<copy todir="${output.mac32.carbon.bundle.bin}" flatten="yes">
+			<fileset file="build/misc/DataExplorerMac32" />
+			<fileset file="build/misc/DevicePropertiesEditorMac32" />
+		</copy>
+		<copy todir="${output.mac32.carbon.program.devices}" flatten="yes">
+			<fileset dir="${basedir}" >
+				<patternset refid="DE_PLUGIN_JARS"/>
+			</fileset>
+		</copy>
 
-        <copy todir="${output.mac32.cocoa.program}" flatten="yes">
-            <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/DataExplorer-mime.xml" />
-            <!-- fileset file="build/misc/DataExplorer.xpm" / -->
-            <fileset file="build/misc/DataExplorer.icns" />
-            <fileset file="build/misc/DevicePropertiesEditor.icns" />
-            <fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
-        </copy>
-        <copy todir="${output.mac32.cocoa.bundle}" flatten="yes">
-            <fileset file="build/lib/MAC/32/Info.plist" />
-            <fileset file="build/misc/PkgInfo" />
-        </copy>
-        <copy todir="${output.mac32.cocoa.bundle.bin}" flatten="yes">
-            <fileset file="build/misc/DataExplorerMac32" />
-            <fileset file="build/misc/DevicePropertiesEditorMac32" />
-        </copy>
-        <copy todir="${output.mac32.cocoa.program.devices}" flatten="yes">
-            <fileset dir="${basedir}" >
-                <patternset refid="DE_PLUGIN_JARS"/>
-            </fileset>
-        </copy>
+		<copy todir="${output.mac32.cocoa.program}" flatten="yes">
+			<fileset file="DataExplorer/build/*.jar" />
+			<fileset file="build/misc/DataExplorer-mime.xml" />
+			<!-- fileset file="build/misc/DataExplorer.xpm" / -->
+			<fileset file="build/misc/DataExplorer.icns" />
+			<fileset file="build/misc/DevicePropertiesEditor.icns" />
+			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
+		</copy>
+		<copy todir="${output.mac32.cocoa.bundle}" flatten="yes">
+			<fileset file="build/lib/MAC/32/Info.plist" />
+			<fileset file="build/misc/PkgInfo" />
+		</copy>
+		<copy todir="${output.mac32.cocoa.bundle.bin}" flatten="yes">
+			<fileset file="build/misc/DataExplorerMac32" />
+			<fileset file="build/misc/DevicePropertiesEditorMac32" />
+		</copy>
+		<copy todir="${output.mac32.cocoa.program.devices}" flatten="yes">
+			<fileset dir="${basedir}" >
+				<patternset refid="DE_PLUGIN_JARS"/>
+			</fileset>
+		</copy>
 
-        <copy todir="${output.mac64.cocoa.program}" flatten="yes">
-            <fileset file="DataExplorer/build/*.jar" />
-            <fileset file="build/misc/DataExplorer-mime.xml" />
-            <!-- fileset file="build/misc/DataExplorer.xpm" / -->
-            <fileset file="build/misc/DataExplorer.icns" />
-            <fileset file="build/misc/DevicePropertiesEditor.icns" />
-            <fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
-        </copy>
-        <copy todir="${output.mac64.cocoa.bundle}" flatten="yes">
-            <fileset file="build/lib/MAC/64/Info.plist" />
-            <fileset file="build/misc/PkgInfo" />
-        </copy>
-        <copy todir="${output.mac64.cocoa.bundle.bin}" flatten="yes">
-            <fileset file="build/misc/DataExplorerMac64" />
-            <fileset file="build/misc/DevicePropertiesEditorMac64" />
-        </copy>
-        <copy todir="${output.mac64.cocoa.program.devices}" flatten="yes">
-            <fileset dir="${basedir}" >
-                <patternset refid="DE_PLUGIN_JARS"/>
-            </fileset>
-        </copy>
+		<copy todir="${output.mac64.cocoa.program}" flatten="yes">
+			<fileset file="DataExplorer/build/*.jar" />
+			<fileset file="build/misc/DataExplorer-mime.xml" />
+			<!-- fileset file="build/misc/DataExplorer.xpm" / -->
+			<fileset file="build/misc/DataExplorer.icns" />
+			<fileset file="build/misc/DevicePropertiesEditor.icns" />
+			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
+		</copy>
+		<copy todir="${output.mac64.cocoa.bundle}" flatten="yes">
+			<fileset file="build/lib/MAC/64/Info.plist" />
+			<fileset file="build/misc/PkgInfo" />
+		</copy>
+		<copy todir="${output.mac64.cocoa.bundle.bin}" flatten="yes">
+			<fileset file="build/misc/DataExplorerMac64" />
+			<fileset file="build/misc/DevicePropertiesEditorMac64" />
+		</copy>
+		<copy todir="${output.mac64.cocoa.program.devices}" flatten="yes">
+			<fileset dir="${basedir}" >
+				<patternset refid="DE_PLUGIN_JARS"/>
+			</fileset>
+		</copy>
 
-        <!-- java extenssions -->
-        <copy todir="${output.windows32.java.ext}" flatten="yes">
-            <fileset file="build/lib/RXTXcomm.jar" />
-            <fileset file="build/lib/Windows/32/swt.jar" />
-            <fileset file="build/misc/*.LICENSE" />
-        </copy>
-        <copy todir="${output.windows64.java.ext}" flatten="yes">
-            <fileset file="build/lib/RXTXcomm.jar" />
-            <fileset file="build/lib/Windows/64/swt.jar" />
-            <fileset file="build/misc/*.LICENSE" />
-        </copy>
-        <copy todir="${output.gnulinux32.java.ext}" flatten="yes">
-            <fileset file="build/lib/RXTXcomm.jar" />
-            <fileset file="build/lib/GNULinux/32/swt.jar" />
-            <fileset file="build/misc/*.LICENSE" />
-        </copy>
-        <copy todir="${output.gnulinux64.java.ext}" flatten="yes">
-            <fileset file="build/lib/RXTXcomm.jar" />
-            <fileset file="build/lib/GNULinux/64/swt.jar" />
-            <fileset file="build/misc/*.LICENSE" />
-        </copy>
-        <copy todir="${output.mac32.carbon.java.ext}" flatten="yes">
-            <fileset file="build/lib/RXTXcomm.jar" />
-            <fileset file="build/lib/MAC/32/carbon/swt.jar" />
-            <fileset file="build/misc/*.LICENSE" />
-        </copy>
-        <copy todir="${output.mac32.cocoa.java.ext}" flatten="yes">
-            <fileset file="build/lib/RXTXcomm.jar" />
-            <fileset file="build/lib/MAC/32/cocoa/swt.jar" />
-            <fileset file="build/misc/*.LICENSE" />
-        </copy>
-        <copy todir="${output.mac64.cocoa.java.ext}" flatten="yes">
-            <fileset file="build/lib/RXTXcomm.jar" />
-            <fileset file="build/lib/MAC/64/swt.jar" />
-            <fileset file="build/misc/*.LICENSE" />
-        </copy>
+		<!-- java extenssions -->
+		<copy todir="${output.windows32.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/Windows/32/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
+		<copy todir="${output.windows64.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/Windows/64/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
+		<copy todir="${output.gnulinux32.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/GNULinux/32/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
+		<copy todir="${output.gnulinux64.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/GNULinux/64/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
+		<copy todir="${output.mac32.carbon.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/MAC/32/carbon/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
+		<copy todir="${output.mac32.cocoa.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/MAC/32/cocoa/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
+		<copy todir="${output.mac64.cocoa.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/MAC/64/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+		</copy>
 
-        <!-- launcher scripts, README -->
-        <copy todir="${output.windows32}/DataExplorer" flatten="yes">
-            <fileset file="build/misc/README.*" />
-        </copy>
-        <copy todir="${output.windows64}/DataExplorer" flatten="yes">
-            <fileset file="build/misc/README.*" />
-        </copy>
-        <copy todir="${output.gnulinux32}/DataExplorer" flatten="yes">
-            <fileset file="build/misc/README.*" />
-        </copy>
-        <copy todir="${output.gnulinux64}/DataExplorer" flatten="yes">
-            <fileset file="build/misc/README.*" />
-        </copy>
-        <copy todir="${output.mac32.carbon.program}" flatten="yes">
-            <fileset file="build/misc/README.*" />
-        </copy>
-        <copy todir="${output.mac32.cocoa.program}" flatten="yes">
-            <fileset file="build/misc/README.*" />
-        </copy>
-        <copy todir="${output.mac64.cocoa.program}" flatten="yes">
-            <fileset file="build/misc/README.*" />
-        </copy>
+		<!-- launcher scripts, README -->
+		<copy todir="${output.windows32}/DataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.windows64}/DataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.gnulinux32}/DataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.gnulinux64}/DataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.mac32.carbon.program}" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.mac32.cocoa.program}" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.mac64.cocoa.program}" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
 
-    </target>
+	</target>
 
-    <!-- zip for Windows, tar for GNULinux/Mac OS -->
-    <target name="binary_package" depends="copy-files">
+	<!-- zip for Windows, tar for GNULinux/Mac OS -->
+	<target name="binary_package" depends="copy-files">
 
-        <echo message="zip Windows 32 bit files" />
-        <zip destfile="${build.target.dir}/DataExplorer_${version.num}_Windows_x86_32.zip">
-            <zipfileset dir="${output.windows32}" casesensitive="true" />
-        </zip>
+		<echo message="zip Windows 32 bit files" />
+		<zip destfile="${build.target.dir}/DataExplorer_${version.num}_Windows_x86_32.zip">
+			<zipfileset dir="${output.windows32}" casesensitive="true" />
+		</zip>
 
-        <echo message="zip Windows 64 bit files" />
-        <zip destfile="${build.target.dir}/DataExplorer_${version.num}_Windows_x86_64.zip">
-            <zipfileset dir="${output.windows64}" casesensitive="true" />
-        </zip>
+		<echo message="zip Windows 64 bit files" />
+		<zip destfile="${build.target.dir}/DataExplorer_${version.num}_Windows_x86_64.zip">
+			<zipfileset dir="${output.windows64}" casesensitive="true" />
+		</zip>
 
-        <echo message="tar GNULinux 32 bit files" />
-        <tar destfile="${build.target.dir}/DataExplorer_${version.num}_GNULinux_x86_32.tar.gz" compression="gzip">
-            <tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="755" >
-                <include name="*/DataExplorer"/>
-                <include name="*/DevicePropertiesEditor"/>
-            </tarfileset>
-            <tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="766" >
-                <include name="*/DataExplorer.desktop"/>
-                <include name="*/DevicePropertiesEditor.desktop"/>
-            </tarfileset>
-            <tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="644" >
-                <include name="**"/>
-                <exclude name="*/DataExplorer"/>
-                <exclude name="*/DevicePropertiesEditor"/>
-                <exclude name="*/DataExplorer.desktop"/>
-                <exclude name="*/DevicePropertiesEditor.desktop"/>
-            </tarfileset>
-        </tar>
+		<echo message="tar GNULinux 32 bit files" />
+		<tar destfile="${build.target.dir}/DataExplorer_${version.num}_GNULinux_x86_32.tar.gz" compression="gzip">
+			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="755" >
+				<include name="*/DataExplorer"/>
+				<include name="*/DevicePropertiesEditor"/>
+			</tarfileset>
+			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="766" >
+				<include name="*/DataExplorer.desktop"/>
+				<include name="*/DevicePropertiesEditor.desktop"/>
+			</tarfileset>
+			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="644" >
+				<include name="**"/>
+				<exclude name="*/DataExplorer"/>
+				<exclude name="*/DevicePropertiesEditor"/>
+				<exclude name="*/DataExplorer.desktop"/>
+				<exclude name="*/DevicePropertiesEditor.desktop"/>
+			</tarfileset>
+		</tar>
 
-        <echo message="tar GNULinux 64 bit files" />
-        <tar destfile="${build.target.dir}/DataExplorer_${version.num}_GNULinux_x86_64.tar.gz" compression="gzip">
-            <tarfileset dir="${output.gnulinux64}" casesensitive="true" mode="755" >
-                <include name="*/DataExplorer"/>
-                <include name="*/DevicePropertiesEditor"/>
-            </tarfileset>
-            <tarfileset dir="${output.gnulinux64}" casesensitive="true" mode="766" >
-                <include name="*/DataExplorer.desktop"/>
-                <include name="*/DevicePropertiesEditor.desktop"/>
-            </tarfileset>
-            <tarfileset dir="${output.gnulinux64}" casesensitive="true" >
-                <include name="**"/>
-                <exclude name="*/DataExplorer"/>
-                <exclude name="*/DevicePropertiesEditor"/>
-                <exclude name="*/DataExplorer.desktop"/>
-                <exclude name="*/DevicePropertiesEditor.desktop"/>
-            </tarfileset>
-        </tar>
+		<echo message="tar GNULinux 64 bit files" />
+		<tar destfile="${build.target.dir}/DataExplorer_${version.num}_GNULinux_x86_64.tar.gz" compression="gzip">
+			<tarfileset dir="${output.gnulinux64}" casesensitive="true" mode="755" >
+				<include name="*/DataExplorer"/>
+				<include name="*/DevicePropertiesEditor"/>
+			</tarfileset>
+			<tarfileset dir="${output.gnulinux64}" casesensitive="true" mode="766" >
+				<include name="*/DataExplorer.desktop"/>
+				<include name="*/DevicePropertiesEditor.desktop"/>
+			</tarfileset>
+			<tarfileset dir="${output.gnulinux64}" casesensitive="true" >
+				<include name="**"/>
+				<exclude name="*/DataExplorer"/>
+				<exclude name="*/DevicePropertiesEditor"/>
+				<exclude name="*/DataExplorer.desktop"/>
+				<exclude name="*/DevicePropertiesEditor.desktop"/>
+			</tarfileset>
+		</tar>
 
-        <echo message="zip Mac 32 carbon application bundle" />
-        <zip destfile="${build.target.dir}/DataExplorer_${version.num}_Mac_32_carbon.zip">
-            <zipfileset dir="${output.mac32.carbon}" casesensitive="true" filemode="755" >
-                <include name="**/DataExplorerMac32"/>
-                <include name="**/DevicePropertiesEditorMac32"/>
-            </zipfileset>
-            <zipfileset dir="${output.mac32.carbon}" casesensitive="true" >
-                <exclude name="**/DataExplorerMac32"/>
-                <exclude name="**/DevicePropertiesEditorMac32"/>
-            </zipfileset>
-        </zip>
+		<echo message="zip Mac 32 carbon application bundle" />
+		<zip destfile="${build.target.dir}/DataExplorer_${version.num}_Mac_32_carbon.zip">
+			<zipfileset dir="${output.mac32.carbon}" casesensitive="true" filemode="755" >
+				<include name="**/DataExplorerMac32"/>
+				<include name="**/DevicePropertiesEditorMac32"/>
+			</zipfileset>
+			<zipfileset dir="${output.mac32.carbon}" casesensitive="true" >
+				<exclude name="**/DataExplorerMac32"/>
+				<exclude name="**/DevicePropertiesEditorMac32"/>
+			</zipfileset>
+		</zip>
 
-        <echo message="zip Mac 32 cocoa application bundle" />
-        <zip destfile="${build.target.dir}/DataExplorer_${version.num}_Mac_32_cocoa.zip">
-            <zipfileset dir="${output.mac32.cocoa}" casesensitive="true" filemode="755" >
-                <include name="**/DataExplorerMac32"/>
-                <include name="**/DevicePropertiesEditorMac32"/>
-            </zipfileset>
-            <zipfileset dir="${output.mac32.cocoa}" casesensitive="true" >
-                <exclude name="**/DataExplorerMac32"/>
-                <exclude name="**/DevicePropertiesEditorMac32"/>
-            </zipfileset>
-        </zip>
+		<echo message="zip Mac 32 cocoa application bundle" />
+		<zip destfile="${build.target.dir}/DataExplorer_${version.num}_Mac_32_cocoa.zip">
+			<zipfileset dir="${output.mac32.cocoa}" casesensitive="true" filemode="755" >
+				<include name="**/DataExplorerMac32"/>
+				<include name="**/DevicePropertiesEditorMac32"/>
+			</zipfileset>
+			<zipfileset dir="${output.mac32.cocoa}" casesensitive="true" >
+				<exclude name="**/DataExplorerMac32"/>
+				<exclude name="**/DevicePropertiesEditorMac32"/>
+			</zipfileset>
+		</zip>
 
-        <echo message="zip Mac 64 cocoa application bundle" />
-        <zip destfile="${build.target.dir}/DataExplorer_${version.num}_Mac_64_cocoa.zip">
-            <zipfileset dir="${output.mac64.cocoa}" casesensitive="true" filemode="755" >
-                <include name="**/DataExplorerMac64"/>
-                <include name="**/DevicePropertiesEditorMac64"/>
-            </zipfileset>
-            <zipfileset dir="${output.mac64.cocoa}" casesensitive="true" >
-                <exclude name="**/DataExplorerMac64"/>
-                <exclude name="**/DevicePropertiesEditorMac64"/>
-            </zipfileset>
-        </zip>
-    </target>
+		<echo message="zip Mac 64 cocoa application bundle" />
+		<zip destfile="${build.target.dir}/DataExplorer_${version.num}_Mac_64_cocoa.zip">
+			<zipfileset dir="${output.mac64.cocoa}" casesensitive="true" filemode="755" >
+				<include name="**/DataExplorerMac64"/>
+				<include name="**/DevicePropertiesEditorMac64"/>
+			</zipfileset>
+			<zipfileset dir="${output.mac64.cocoa}" casesensitive="true" >
+				<exclude name="**/DataExplorerMac64"/>
+				<exclude name="**/DevicePropertiesEditorMac64"/>
+			</zipfileset>
+		</zip>
+	</target>
 
-    <target name="backupDataFilesWindows" description="pack personal data files">
-        <tar destfile="F:/DataExplorerFiles.tar.gz" compression="gzip">
-            <tarfileset dir="D:/Documents/Person" casesensitive="true" >
-                <include name="DataExplorer/**"/>
-                <include name="DataExplorer/**/*.zip"/>
-                <exclude name="DataExplorer/**/*.pdf"/>
-                <exclude name="DataExplorer/**/*.gz"/>
-                <exclude name="DataExplorer/**/*.bak"/>
-                <include name="LogView/**"/>
-                <exclude name="LogView/**/*.bak"/>
-                <exclude name="LogView/**/*.BAK"/>
-                <exclude name="LogView/**.zip"/>
-                <exclude name="LogView/**.pdf"/>
-                <include name="LogViewOBJ/**"/>
-                <exclude name="LogViewOBJ/**/*.bak"/>
-                <exclude name="LogViewOBJ/**/*.BAK"/>
-            </tarfileset>
-        </tar>
-    </target>
+	<target name="backupDataFilesWindows" description="pack personal data files">
+		<tar destfile="F:/DataExplorerFiles.tar.gz" compression="gzip">
+			<tarfileset dir="D:/Documents/Person" casesensitive="true" >
+				<include name="DataExplorer/**"/>
+				<include name="DataExplorer/**/*.zip"/>
+				<exclude name="DataExplorer/**/*.pdf"/>
+				<exclude name="DataExplorer/**/*.gz"/>
+				<exclude name="DataExplorer/**/*.bak"/>
+				<include name="LogView/**"/>
+				<exclude name="LogView/**/*.bak"/>
+				<exclude name="LogView/**/*.BAK"/>
+				<exclude name="LogView/**.zip"/>
+				<exclude name="LogView/**.pdf"/>
+				<include name="LogViewOBJ/**"/>
+				<exclude name="LogViewOBJ/**/*.bak"/>
+				<exclude name="LogViewOBJ/**/*.BAK"/>
+			</tarfileset>
+		</tar>
+	</target>
 
-    <target name="clean_source">
-        <delete file="${build.target.dir}/dataexplorer-${version.num}-src.zip"/>
-    </target>
+	<target name="clean_source">
+		<delete file="${build.target.dir}/dataexplorer-${version.num}-src.zip"/>
+	</target>
 
-    <target name="source_package" depends="init" description="builds the source distribution package to run configure and make">
-        <tar destfile="${build.target.dir}/dataexplorer-${version.num}-src.tar.gz" compression="gzip">
-            <tarfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
-                <include name="**/src/**"/>
-                <include name="**/build.xml"/>
-                <exclude name="**/CVS/**"/>
-                <include name="build/lib/**"/>
-                <include name="build/misc/**"/>
-                <include name="build/build.properties"/>
-                <include name="WindowsHelper/**"/>
-                <exclude name="COPYING" />
-                <exclude name="READ*"/>
-                <exclude name="*.LICENSE"/>
-                <exclude name="AUTHORS"/>
-                <exclude name="Changelog"/>
-                <exclude name="NEWS"/>
-                <exclude name="Backlog"/>
-                <exclude name="PROBLEMS"/>
-                <exclude name="Makefile.in"/>
-                <exclude name="configure"/>
-                <exclude name="install-sh"/>
-                <exclude name="build/misc/GNU*"/>
-                <exclude name="build/misc/maintain*"/>
-                <exclude name="build/misc/*.LICENSE"/>
-                <exclude name="build/misc/*.pdf"/>
-                <exclude name="build/misc/Url*"/>
-                <exclude name="**/Thumbs.db"/>
-                <exclude name="SWT*/**"/>
-                <exclude name="JAXB*/**"/>
-                <exclude name="launch4j/**"/>
-                <exclude name="Port*/**"/>
-                <exclude name="Print*/**"/>
-                <exclude name="RXTXcomm*/**"/>
-            </tarfileset>
-            <tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
-                <include name="COPYING" />
-                <include name="READ*"/>
-                <include name="*.LICENSE"/>
-                <include name="AUTHORS"/>
-                <include name="INSTALL"/>
-                <include name="Changelog"/>
-                <include name="NEWS"/>
-                <include name="Backlog"/>
-                <include name="PROBLEMS"/>
-                <include name="configure.ac"/>
-                <include name="Makefile.in"/>
-            </tarfileset>
-            <tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="744">
-                <include name="configure"/>
-                <include name="install-sh"/>
-            </tarfileset>
-            <tarfileset dir="${basedir}/DataExplorer/doc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
-                <include name="*.odt"/>
-                <include name="*.pdf"/>
-                <include name="design/*.pdf"/>
-            </tarfileset>
-            <tarfileset dir="${basedir}/RXTXcomm" casesensitive="true" prefix="dataexplorer-${version.num}/thirdparty/rxtx-2.2pre2" filemode="444">
-            	<include name="**/**"/>
-                <exclude name="**/CVS/**"/>
-                <exclude name="**/bin/**"/>
-            </tarfileset>
-        </tar>
-    </target>
+	<target name="source_package" depends="init" description="builds the source distribution package to run configure and make">
+		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-src.tar.gz" compression="gzip">
+			<tarfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
+				<include name="**/src/**"/>
+				<include name="**/build.xml"/>
+				<exclude name="**/CVS/**"/>
+				<include name="build/lib/**"/>
+				<include name="build/misc/**"/>
+				<include name="build/build.properties"/>
+				<include name="WindowsHelper/**"/>
+				<exclude name="COPYING" />
+				<exclude name="READ*"/>
+				<exclude name="*.LICENSE"/>
+				<exclude name="AUTHORS"/>
+				<exclude name="Changelog"/>
+				<exclude name="NEWS"/>
+				<exclude name="Backlog"/>
+				<exclude name="PROBLEMS"/>
+				<exclude name="Makefile.in"/>
+				<exclude name="configure"/>
+				<exclude name="install-sh"/>
+				<exclude name="build/misc/GNU*"/>
+				<exclude name="build/misc/maintain*"/>
+				<exclude name="build/misc/*.LICENSE"/>
+				<exclude name="build/misc/*.pdf"/>
+				<exclude name="build/misc/Url*"/>
+				<exclude name="**/Thumbs.db"/>
+				<exclude name="SWT*/**"/>
+				<exclude name="JAXB*/**"/>
+				<exclude name="launch4j/**"/>
+				<exclude name="Port*/**"/>
+				<exclude name="Print*/**"/>
+				<exclude name="RXTXcomm*/**"/>
+			</tarfileset>
+			<tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
+				<include name="COPYING" />
+				<include name="READ*"/>
+				<include name="*.LICENSE"/>
+				<include name="AUTHORS"/>
+				<include name="INSTALL"/>
+				<include name="Changelog"/>
+				<include name="NEWS"/>
+				<include name="Backlog"/>
+				<include name="PROBLEMS"/>
+				<include name="configure.ac"/>
+				<include name="Makefile.in"/>
+			</tarfileset>
+			<tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="744">
+				<include name="configure"/>
+				<include name="install-sh"/>
+			</tarfileset>
+			<tarfileset dir="${basedir}/DataExplorer/doc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
+				<include name="*.odt"/>
+				<include name="*.pdf"/>
+				<include name="design/*.pdf"/>
+			</tarfileset>
+			<tarfileset dir="${basedir}/RXTXcomm" casesensitive="true" prefix="dataexplorer-${version.num}/thirdparty/rxtx-2.2pre2" filemode="444">
+				<include name="**/**"/>
+				<exclude name="**/CVS/**"/>
+				<exclude name="**/bin/**"/>
+			</tarfileset>
+		</tar>
+	</target>
+
+	<target name="misc_junit_tests" depends="copy-files" description="assumes DataExplorer has been started and data directory is configured">
+		<echo message="path=${basedir}/build/target/${build.os.shortname}_${sun.arch.data.model}/DataExplorer/DataExplorer.jar" />
+		<junit printsummary="yes" haltonfailure="no" showoutput="true">
+			<env key="ECLIPSE" value="true"/>
+			<classpath>
+				<pathelement path="${java.home}/bin/rt.jar"/>
+				<pathelement path="${basedir}/thirdparty/Junit3/junit.jar"/>
+				<pathelement path="${basedir}/build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar"/>
+				<pathelement path="${basedir}/build/lib/RXTXcomm.jar"/>
+				<pathelement path="${basedir}/build/target/${build.os.shortname}_${sun.arch.data.model}/DataExplorer/DataExplorer.jar"/>
+				<pathelement location="${basedir}/JunitMiscTest/bin"/>
+			</classpath>
+			<formatter type="plain"/>
+			<batchtest fork="yes" >
+				<fileset dir="${basedir}/JunitMiscTest/src">
+					<include name="**/AllTests.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
 
 </project>
