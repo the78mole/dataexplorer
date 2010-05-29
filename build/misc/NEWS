@@ -1,14 +1,10 @@
-SerialDataExplorer - News - comes with version 2.20
+GNU DataExplorer - News - comes with version 2.20
 
-1) a newly small XSD change occur to adapt to IcedTea/OpenJDK execution
-2) use the file time stamp while importing data using CSV2SerialAdapter if possible
-3) fix height unit calculation by adding property DataVario
-4) enable reduce by first/last measurement point by property CSV2SerialAdapter
-5) fix display update problem moving record set to other configuration CSV2SerialAdapter
-6) fix bug removing SerialPortType while closing the editor
-7) fix port selection drop down box problem for Mac OS 
-8) fix problem not showing SaxParserExceptions which as result disable its describing device
-9) fix not displaying data in CSV2SerialAdapter while reasonable data are red before an read data error occurs
-10) update data table to virtual with lazy write, no more cache is required
-11) fix problem switching enable/disable of port selection within device selection dialog 
-12) add one-time hint message for Mac OS and GNU/Linux user to care about RXTXcomm requirements
+1) add WStech LinkVario
+2) small Info.plist fix for Mac OS
+3) update GNU/Linux application register function
+4) create extra WStechVario plug-in
+5) add sample udev rule files to GNU/Linux binaries
+6) enhance IDevice interface to allow extra device dependent tabulator
+7) add WStech setup tool as additional tabulator
+8) add WStech LinkVario

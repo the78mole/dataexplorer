@@ -261,6 +261,7 @@
 		<ant antfile="build.xml" target="package" dir="VC800" inheritall="true"/>
 		<ant antfile="build.xml" target="package" dir="LiPoWatch" inheritall="true"/>
 		<ant antfile="build.xml" target="package" dir="CSV2SerialAdapter" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="WStechVario" inheritall="true"/>
 		<!-- add new device here -->
 	</target>
 
@@ -274,6 +275,7 @@
 			<include name="VC800/build/*.jar" />
 			<include name="LiPoWatch/build/*.jar" />
 			<include name="CSV2SerialAdapter/build/*.jar" />
+			<include name="WStechVario/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>

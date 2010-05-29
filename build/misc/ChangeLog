@@ -1,5 +1,13 @@
 Development history / change log, please read from bottom up
 
+add sample udev rule files to GNU/Linux binaries
+add WStech setup tool as additional tabulator
+enhance IDevice interface to allow extra device dependent tabulator
+add WStech LinkVario
+create extra WStechVario plug-in
+fix Info.plist for Mac OS
+update GNU/Linux application register function
+
 Version 2.20		30 Mar 2010
 
 fix problem switching enable/disable of port selection within device selection dialog 
