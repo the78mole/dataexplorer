@@ -19,16 +19,6 @@
 package gde.device.wb;
 
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Vector;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.widgets.FileDialog;
-
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Record;
@@ -41,9 +31,20 @@ import gde.device.PropertyType;
 import gde.exception.DataInconsitsentException;
 import gde.io.CSVSerialDataReaderWriter;
 import gde.io.DataParser;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.widgets.FileDialog;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -431,7 +432,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void openCloseSerialPort() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1700), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
 		String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 		
@@ -453,5 +454,21 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	public int[] getCellVoltageOrdinals() {
 		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 		return new int[] {0, 3};
+	}
+	
+	/**
+	 * query if an utility graphics window tab is requested
+	 */
+	public boolean isUtilityGraphicsRequested() {
+		return false;
+	}
+	
+	/**
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * specific curve calculated from point combinations or other specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
+	 */
+	public CTabItem getCustomTabItem() {
+		return null;
 	}
 }

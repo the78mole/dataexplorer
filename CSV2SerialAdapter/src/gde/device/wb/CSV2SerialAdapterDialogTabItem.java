@@ -98,7 +98,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 			tabItemLabelLData.widthHint = 292;
 			this.tabItemLabel.setLayoutData(tabItemLabelLData);
 			this.tabItemLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+2, SWT.BOLD));
-			this.tabItemLabel.setText(Messages.getString(MessageIds.GDE_MSGT1801));
+			this.tabItemLabel.setText(Messages.getString(MessageIds.GDE_MSGT1701));
 		}
 		{
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
@@ -129,7 +129,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 				buttonCompositeLData.widthHint = 292;
 				this.inputFileButton.setLayoutData(inputFileButtonLData);
 				this.inputFileButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.inputFileButton.setText(Messages.getString(MessageIds.GDE_MSGT1802));
+				this.inputFileButton.setText(Messages.getString(MessageIds.GDE_MSGT1702));
 				this.inputFileButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {

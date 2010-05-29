@@ -24,10 +24,10 @@ package gde.device.wb;
  */ 
 public class MessageIds { 
 
-	public final static String	GDE_MSGI1800 = "GDE_MSGI1800";
-	public final static String	GDE_MSGI1801 = "GDE_MSGI1801";
-	public final static String	GDE_MSGT1800 = "GDE_MSGT1800";
-	public final static String	GDE_MSGT1801 = "GDE_MSGT1801";
-	public final static String	GDE_MSGT1802 = "GDE_MSGT1802";
+	public final static String	GDE_MSGI1700 = "GDE_MSGI1700";
+	public final static String	GDE_MSGI1701 = "GDE_MSGI1701";
+	public final static String	GDE_MSGT1700 = "GDE_MSGT1700";
+	public final static String	GDE_MSGT1701 = "GDE_MSGT1701";
+	public final static String	GDE_MSGT1702 = "GDE_MSGT1702";
 
  }
