@@ -1,21 +1,40 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (c) 2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.wstech;
 
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
+import gde.device.PropertyType;
+import gde.exception.DataInconsitsentException;
+import gde.io.CSVSerialDataReaderWriter;
+import gde.io.DataParser;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -28,23 +47,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.FileDialog;
 
-import osde.OSDE;
-import osde.config.Settings;
-import osde.data.Record;
-import osde.data.RecordSet;
-import osde.device.DeviceConfiguration;
-import osde.device.IDevice;
-import osde.device.MeasurementPropertyTypes;
-import osde.device.MeasurementType;
-import osde.device.PropertyType;
-import osde.exception.DataInconsitsentException;
-import osde.io.CSVSerialDataReaderWriter;
-import osde.io.DataParser;
-import osde.log.Level;
-import osde.messages.Messages;
-import osde.serial.DeviceSerialPort;
-import osde.ui.OpenSerialDataExplorer;
-
 /**
  * Class to implement WSTech DataVario device properties extending the CSV2SerialAdapter class
  * @author Winfried Brügmann
@@ -54,7 +56,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 
 	public final static String		DEFAULT_RECORD_SET_EXTEND		= "Flugaufzeichnung"; //$NON-NLS-1$
 
-	final OpenSerialDataExplorer		application;
+	final DataExplorer	application;
 	final VarioDialog		dialog;
 
 	/**
@@ -65,9 +67,9 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	public DataVario(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.wstech.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.wstech.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.dialog = new VarioDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
 	}
@@ -79,9 +81,9 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	public DataVario(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("osde.device.wstech.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.wstech.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.dialog = new VarioDialog(this.application.getShell(), this);
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
 	}
@@ -91,7 +93,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(osde.messages.MessageIds.OSDE_MSGT0272);
+		return Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 	}
 
 	/**
@@ -102,7 +104,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * load the mapping exist between lov file configuration keys and OSDE keys
+	 * load the mapping exist between lov file configuration keys and gde keys
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
@@ -112,7 +114,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * convert record LogView config data to OSDE config keys into records section
+	 * convert record LogView config data to gde config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
 	 * @param channelNumber 
@@ -212,8 +214,8 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void openCloseSerialPort() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), OSDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
-		String selectedImportFile = fd.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + fd.getFileName();
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
+		String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 		
 		if (fd.getFileName().length() > 4) {
@@ -273,7 +275,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		}
 		catch (Exception e) {
-			String msg = e.getMessage() + Messages.getString("OSDE_MSGT17031"); //$NON-NLS-1$
+			String msg = e.getMessage() + Messages.getString("GDE_MSGT17031"); //$NON-NLS-1$
 			log.log(Level.WARNING, msg, e);
 			application.openMessageDialog(msg);
 			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);
@@ -328,7 +330,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = OSDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -336,7 +338,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
-		int timeStampBufferSize = OSDE.SIZE_BYTES_INTEGER * recordDataSize;
+		int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 		byte[] timeStampBuffer = new byte[timeStampBufferSize];
 		if(!recordSet.isTimeStepConstant()) {
 			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);

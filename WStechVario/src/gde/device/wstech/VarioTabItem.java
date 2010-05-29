@@ -1,20 +1,30 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (c) 2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.wstech;
+
+import gde.GDE;
+import gde.data.Channels;
+import gde.device.IDevice;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.MeasurementControl;
+import gde.ui.SWTResourceManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +43,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-
-import osde.OSDE;
-import osde.data.Channels;
-import osde.device.IDevice;
-import osde.messages.Messages;
-import osde.ui.MeasurementControl;
-import osde.ui.OpenSerialDataExplorer;
-import osde.ui.SWTResourceManager;
 
 /**
  * This class represents a tab item of a universal record visualization control
@@ -62,7 +64,7 @@ public class VarioTabItem extends CTabItem {
 
 	final CTabFolder								parent;
 	final IDevice										device;																																								// get device specific things, get serial port, ...
-	final OpenSerialDataExplorer		application;																																						// interaction with application instance
+	final DataExplorer		application;																																						// interaction with application instance
 	final Channels									channels;																																							// interaction with channels, source of all records
 	final VarioDialog		dialog;
 	final int												channelConfigNumber;
@@ -73,7 +75,7 @@ public class VarioTabItem extends CTabItem {
 		this.parent = parentTabFolder;
 		this.dialog = parentDialog;
 		this.device = useDevice;
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.setText(this.device.getChannelName(this.channelConfigNumber));
@@ -95,8 +97,8 @@ public class VarioTabItem extends CTabItem {
 			tabItemLabelLData.heightHint = 30;
 			tabItemLabelLData.widthHint = 292;
 			this.tabItemLabel.setLayoutData(tabItemLabelLData);
-			this.tabItemLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE+2, SWT.BOLD));
-			this.tabItemLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1801));
+			this.tabItemLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+2, SWT.BOLD));
+			this.tabItemLabel.setText(Messages.getString(MessageIds.GDE_MSGT1801));
 		}
 		{
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
@@ -126,14 +128,14 @@ public class VarioTabItem extends CTabItem {
 				buttonCompositeLData.heightHint = 30;
 				buttonCompositeLData.widthHint = 292;
 				this.inputFileButton.setLayoutData(inputFileButtonLData);
-				this.inputFileButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.inputFileButton.setText(Messages.getString(MessageIds.OSDE_MSGT1802));
+				this.inputFileButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.inputFileButton.setText(Messages.getString(MessageIds.GDE_MSGT1802));
 				this.inputFileButton.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); 
 						if (VarioTabItem.this.isVisibilityChanged) {
-							String msg = Messages.getString(osde.messages.MessageIds.OSDE_MSGI0041);
+							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041);
 							if (VarioTabItem.this.application.openYesNoMessageDialog(VarioTabItem.this.dialog.getDialogShell(), msg) == SWT.YES) {
 								log.log(java.util.logging.Level.FINE, "SWT.YES"); 
 								VarioTabItem.this.device.storeDeviceProperties();

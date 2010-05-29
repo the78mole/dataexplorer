@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V10.xsd">
 	<Device>
-		<name implementation="osde.device.wstech.LinkVario">LinkVario</name>
+		<name implementation="gde.device.wstech.LinkVario">LinkVario</name>
 		<manufacturer>WSTech</manufacturer>
 		<manufacturerURL>http://www.wstech.de</manufacturerURL>
 		<group>flightrecorder</group>

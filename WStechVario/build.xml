@@ -14,7 +14,7 @@
 	<property name="module.output" location="build/classes"/>
 
 	<path id="compile.classpath">
-		<pathelement location="../OpenSerialDataExplorer/build/OpenSerialDataExplorer.jar" />
+		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
 		<pathelement location="../build/lib/RXTXcomm.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
 	</path>
@@ -39,7 +39,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implemntation for comma separated value serial data adapter"/>
-    		<attribute name="Export-Service" value="osde.device.wstech.DataVario, osde.device.wstech.DataVarioDuo, osde.device.wstech.LinkVario"/>
+    		<attribute name="Export-Service" value="gde.device.wstech.DataVario, gde.device.wstech.DataVarioDuo, gde.device.wstech.LinkVario"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

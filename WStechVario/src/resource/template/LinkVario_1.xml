@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>-- OpenSerialDataExplorer GraphicsTemplate --</comment>
+<comment>-- DataExplorer GraphicsTemplate --</comment>
 <entry key="0_color">128,128,255</entry>
 <entry key="0_defMaxValue">5.5</entry>
 <entry key="0_defMinValue">4.8</entry>

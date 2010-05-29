@@ -1,7 +1,29 @@
-/**
- * 
- */
+/**************************************************************************************
+  	This file is part of DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GNU DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (c) 2010 Winfried Bruegmann
+****************************************************************************************/
 package gde.device.wstech;
+
+import gde.GDE;
+import gde.device.IDevice;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -29,13 +51,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 
-import osde.OSDE;
-import osde.device.IDevice;
-import osde.log.Level;
-import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
-import osde.ui.SWTResourceManager;
-
 /**
  * @author brueg
  *
@@ -48,7 +63,7 @@ public class VarioToolTabItem extends CTabItem {
 
 	final CTabFolder							tabFolder;
 	final IDevice									device;
-	final OpenSerialDataExplorer	application							= OpenSerialDataExplorer.getInstance();
+	final DataExplorer	application							= DataExplorer.getInstance();
 	final boolean									isDataVarioTool;
 	final Menu										popupmenu;
 	final ContextMenu							contextMenu;
@@ -110,7 +125,7 @@ public class VarioToolTabItem extends CTabItem {
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.device = useDevice;
 		this.isDataVarioTool = isVarioTool;
-		this.setText(isVarioTool ? Messages.getString(MessageIds.OSDE_MSGT1803) : Messages.getString(MessageIds.OSDE_MSGT1804));
+		this.setText(isVarioTool ? Messages.getString(MessageIds.GDE_MSGT1803) : Messages.getString(MessageIds.GDE_MSGT1804));
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new ContextMenu(this);
 		this.create();
@@ -128,7 +143,7 @@ public class VarioToolTabItem extends CTabItem {
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.device = useDevice;
 		this.isDataVarioTool = isVarioTool;
-		this.setText(isVarioTool ? Messages.getString(MessageIds.OSDE_MSGT1803) : Messages.getString(MessageIds.OSDE_MSGT1804));
+		this.setText(isVarioTool ? Messages.getString(MessageIds.GDE_MSGT1803) : Messages.getString(MessageIds.GDE_MSGT1804));
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new ContextMenu(this);
 		this.create();
@@ -147,8 +162,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup0 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup0.setLayout(group1Layout);
-						this.setupGroup0.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup0.setText(Messages.getString(MessageIds.OSDE_MSGT1817));
+						this.setupGroup0.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup0.setText(Messages.getString(MessageIds.GDE_MSGT1817));
 						this.setupGroup0.setBounds(5, 6, 490, 45);
 						{
 							new CLabel(this.setupGroup0, SWT.NONE).setSize(5, 18);
@@ -168,7 +183,7 @@ public class VarioToolTabItem extends CTabItem {
 								public void widgetSelected(SelectionEvent evt) {
 									VarioToolTabItem.log.log(java.util.logging.Level.FINEST, "setupSlider0.widgetSelected, event=" + evt); //$NON-NLS-1$
 									VarioToolTabItem.this.setupValue0 = VarioToolTabItem.this.setupSlider0.getSelection();
-									VarioToolTabItem.this.channelText.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue0);
+									VarioToolTabItem.this.channelText.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue0);
 									VarioToolTabItem.this.frequencyText.setText(String.format("%.3f", (433.050 + VarioToolTabItem.this.setupValue0 * 0.025))); //$NON-NLS-1$
 								}
 							});
@@ -179,8 +194,8 @@ public class VarioToolTabItem extends CTabItem {
 							channelLabelLData.width = 60;
 							channelLabelLData.height = 18;
 							this.channelLabel.setLayoutData(channelLabelLData);
-							this.channelLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.channelLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1806));
+							this.channelLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.channelLabel.setText(Messages.getString(MessageIds.GDE_MSGT1806));
 						}
 						{
 							this.channelText = new Text(this.setupGroup0, SWT.CENTER | SWT.BORDER);
@@ -188,8 +203,8 @@ public class VarioToolTabItem extends CTabItem {
 							channelTextLData.width = 35;
 							channelTextLData.height = 12;
 							this.channelText.setLayoutData(channelTextLData);
-							this.channelText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.channelText.setText(OSDE.STRING_EMPTY + this.setupValue0);
+							this.channelText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.channelText.setText(GDE.STRING_EMPTY + this.setupValue0);
 							this.channelText.setEditable(false);
 							this.channelText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						}
@@ -199,8 +214,8 @@ public class VarioToolTabItem extends CTabItem {
 							frequencyLabelLData.width = 75;
 							frequencyLabelLData.height = 18;
 							this.frequencyLabel.setLayoutData(frequencyLabelLData);
-							this.frequencyLabel.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.frequencyLabel.setText(Messages.getString(MessageIds.OSDE_MSGT1807));
+							this.frequencyLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.frequencyLabel.setText(Messages.getString(MessageIds.GDE_MSGT1807));
 						}
 						{
 							this.frequencyText = new Text(this.setupGroup0, SWT.CENTER | SWT.BORDER);
@@ -208,7 +223,7 @@ public class VarioToolTabItem extends CTabItem {
 							frequencyTextLData.width = 50;
 							frequencyTextLData.height = 12;
 							this.frequencyText.setLayoutData(frequencyTextLData);
-							this.frequencyText.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.frequencyText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.frequencyText.setText(String.format("%.3f", (433.050 + this.setupValue0 * 0.025))); //$NON-NLS-1$
 							this.frequencyText.setEditable(false);
 							this.frequencyText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -219,8 +234,8 @@ public class VarioToolTabItem extends CTabItem {
 					{
 						this.setupGroup1 = new Group(this.innerContentComposite, SWT.NONE);
 						this.setupGroup1.setBounds(this.isDataVarioTool ? 505 : 5, 6, this.isDataVarioTool ? 490 : 990, 45);
-						this.setupGroup1.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup1.setText(Messages.getString(MessageIds.OSDE_MSGT1805));
+						this.setupGroup1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup1.setText(Messages.getString(MessageIds.GDE_MSGT1805));
 						RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup1.setLayout(group1Layout);
 						{
@@ -248,7 +263,7 @@ public class VarioToolTabItem extends CTabItem {
 											VarioToolTabItem.this.setupValue1 = 120;
 										else
 											VarioToolTabItem.this.setupValue1 = tmpValue;
-										VarioToolTabItem.this.setupText1.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue1);
+										VarioToolTabItem.this.setupText1.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue1);
 									}
 								}
 							});
@@ -259,8 +274,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel1aLData.width = 60;
 							setupLabel1aLData.height = 18;
 							this.setupLabel1a.setLayoutData(setupLabel1aLData);
-							this.setupLabel1a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel1a.setText(Messages.getString(MessageIds.OSDE_MSGT1809));
+							this.setupLabel1a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel1a.setText(Messages.getString(MessageIds.GDE_MSGT1809));
 						}
 						{
 							this.setupText1 = new Text(this.setupGroup1, SWT.CENTER | SWT.BORDER);
@@ -268,8 +283,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupText1LData.width = 35;
 							setupText1LData.height = 12;
 							this.setupText1.setLayoutData(setupText1LData);
-							this.setupText1.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupText1.setText(OSDE.STRING_EMPTY + this.setupValue1);
+							this.setupText1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupText1.setText(GDE.STRING_EMPTY + this.setupValue1);
 							this.setupText1.setEditable(false);
 							this.setupText1.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						}
@@ -279,8 +294,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel1bLData.width = 70;
 							setupLabel1bLData.height = 18;
 							this.setupLabel1b.setLayoutData(setupLabel1bLData);
-							this.setupLabel1b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel1b.setText(Messages.getString(MessageIds.OSDE_MSGT1810));
+							this.setupLabel1b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel1b.setText(Messages.getString(MessageIds.GDE_MSGT1810));
 						}
 						this.setupGroup1.layout();
 						this.setupGroup1.setMenu(this.popupmenu);
@@ -289,8 +304,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup2 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout group2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup2.setLayout(group2Layout);
-						this.setupGroup2.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup2.setText(Messages.getString(MessageIds.OSDE_MSGT1808));
+						this.setupGroup2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup2.setText(Messages.getString(MessageIds.GDE_MSGT1808));
 						this.setupGroup2.setBounds(5, 53, 490, 45);
 						{
 							new CLabel(this.setupGroup2, SWT.NONE).setSize(5, 18);
@@ -317,7 +332,7 @@ public class VarioToolTabItem extends CTabItem {
 											VarioToolTabItem.this.setupValue2 = 60;
 										else
 											VarioToolTabItem.this.setupValue2 = tmpValue;
-										VarioToolTabItem.this.setupText2.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue2);
+										VarioToolTabItem.this.setupText2.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue2);
 									}
 								}
 							});
@@ -328,8 +343,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel2aLData.width = 60;
 							setupLabel2aLData.height = 18;
 							this.setupLabel2a.setLayoutData(setupLabel2aLData);
-							this.setupLabel2a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel2a.setText(Messages.getString(MessageIds.OSDE_MSGT1809));
+							this.setupLabel2a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel2a.setText(Messages.getString(MessageIds.GDE_MSGT1809));
 						}
 						{
 							this.setupText2 = new Text(this.setupGroup2, SWT.CENTER | SWT.BORDER);
@@ -337,8 +352,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupText2LData.width = 35;
 							setupText2LData.height = 12;
 							this.setupText2.setLayoutData(setupText2LData);
-							this.setupText2.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupText2.setText(OSDE.STRING_EMPTY + this.setupValue2);
+							this.setupText2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupText2.setText(GDE.STRING_EMPTY + this.setupValue2);
 							this.setupText2.setEditable(false);
 							this.setupText2.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						}
@@ -348,8 +363,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel2bLData.width = 70;
 							setupLabel2bLData.height = 18;
 							this.setupLabel2b.setLayoutData(setupLabel2bLData);
-							this.setupLabel2b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel2b.setText(Messages.getString(MessageIds.OSDE_MSGT1810));
+							this.setupLabel2b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel2b.setText(Messages.getString(MessageIds.GDE_MSGT1810));
 						}
 						this.setupGroup2.layout();
 						this.setupGroup2.setMenu(this.popupmenu);
@@ -358,8 +373,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup3 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout group3Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup3.setLayout(group3Layout);
-						this.setupGroup3.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup3.setText(Messages.getString(MessageIds.OSDE_MSGT1812));
+						this.setupGroup3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup3.setText(Messages.getString(MessageIds.GDE_MSGT1812));
 						this.setupGroup3.setBounds(505, 53, 490, 45);
 						{
 							new CLabel(this.setupGroup3, SWT.NONE).setSize(5, 18);
@@ -387,7 +402,7 @@ public class VarioToolTabItem extends CTabItem {
 											VarioToolTabItem.this.setupValue3 = 30;
 										else
 											VarioToolTabItem.this.setupValue3 = tmpValue;
-										VarioToolTabItem.this.setupText3.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue3);
+										VarioToolTabItem.this.setupText3.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue3);
 									}
 								}
 							});
@@ -398,8 +413,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel3aLData.width = 60;
 							setupLabel3aLData.height = 18;
 							this.setupLabel3a.setLayoutData(setupLabel3aLData);
-							this.setupLabel3a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel3a.setText(Messages.getString(MessageIds.OSDE_MSGT1809));
+							this.setupLabel3a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel3a.setText(Messages.getString(MessageIds.GDE_MSGT1809));
 						}
 						{
 							this.setupText3 = new Text(this.setupGroup3, SWT.CENTER | SWT.BORDER);
@@ -407,8 +422,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupText3LData.width = 35;
 							setupText3LData.height = 12;
 							this.setupText3.setLayoutData(setupText3LData);
-							this.setupText3.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupText3.setText((this.setupValue3 != 60) ? OSDE.STRING_EMPTY + this.setupValue3 : OSDE.STRING_EMPTY);
+							this.setupText3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupText3.setText((this.setupValue3 != 60) ? GDE.STRING_EMPTY + this.setupValue3 : GDE.STRING_EMPTY);
 							this.setupText3.setEditable(false);
 							this.setupText3.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						}
@@ -418,8 +433,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel3bLData.width = 70;
 							setupLabel3bLData.height = 18;
 							this.setupLabel3b.setLayoutData(setupLabel3bLData);
-							this.setupLabel3b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel3b.setText(Messages.getString(MessageIds.OSDE_MSGT1810));
+							this.setupLabel3b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel3b.setText(Messages.getString(MessageIds.GDE_MSGT1810));
 						}
 						{
 							this.setupButton3c = new Button(this.setupGroup3, SWT.CHECK | SWT.LEFT);
@@ -427,21 +442,21 @@ public class VarioToolTabItem extends CTabItem {
 							setupButton3LData.width = 105;
 							setupButton3LData.height = 18;
 							this.setupButton3c.setLayoutData(setupButton3LData);
-							this.setupButton3c.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupButton3c.setText(Messages.getString(MessageIds.OSDE_MSGT1811));
+							this.setupButton3c.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupButton3c.setText(Messages.getString(MessageIds.GDE_MSGT1811));
 							this.setupButton3c.setSelection(this.setupValue3 == 60);
 							this.setupButton3c.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									VarioToolTabItem.log.log(java.util.logging.Level.FINEST, "setupButton3c.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (VarioToolTabItem.this.setupButton3c.getSelection()) {
-										VarioToolTabItem.this.setupText3.setText(OSDE.STRING_EMPTY);
+										VarioToolTabItem.this.setupText3.setText(GDE.STRING_EMPTY);
 										VarioToolTabItem.this.setupSlider3.setEnabled(false);
 										VarioToolTabItem.this.setupValue3 = 60;
 									}
 									else {
 										VarioToolTabItem.this.setupValue3 = 20;
-										VarioToolTabItem.this.setupText3.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue3);
+										VarioToolTabItem.this.setupText3.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue3);
 										VarioToolTabItem.this.setupSlider3.setEnabled(true);
 										VarioToolTabItem.this.setupSlider3.setSelection(VarioToolTabItem.this.setupValue3);
 									}
@@ -455,8 +470,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup4 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout group4Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup4.setLayout(group4Layout);
-						this.setupGroup4.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup4.setText(Messages.getString(MessageIds.OSDE_MSGT1813));
+						this.setupGroup4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup4.setText(Messages.getString(MessageIds.GDE_MSGT1813));
 						this.setupGroup4.setBounds(5, 100, 490, 95);
 						{
 							new CLabel(this.setupGroup4, SWT.NONE).setSize(5, 72);
@@ -471,8 +486,8 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupComposite4a.setLayoutData(composite1LData);
 							{
 								this.setupButton4a = new Button(this.setupComposite4a, SWT.RADIO | SWT.LEFT);
-								this.setupButton4a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton4a.setText(Messages.getString(MessageIds.OSDE_MSGT1814));
+								this.setupButton4a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton4a.setText(Messages.getString(MessageIds.GDE_MSGT1814));
 								this.setupButton4a.setSelection(this.setupValue4 == 1);
 								this.setupButton4a.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -491,8 +506,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupLabel4 = new CLabel(this.setupComposite4a, SWT.NONE);
-								this.setupLabel4.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupLabel4.setText(Messages.getString(MessageIds.OSDE_MSGT1815));
+								this.setupLabel4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupLabel4.setText(Messages.getString(MessageIds.GDE_MSGT1815));
 							}
 							{
 								this.setupComposite4b = new Composite(this.setupComposite4a, SWT.NONE);
@@ -504,8 +519,8 @@ public class VarioToolTabItem extends CTabItem {
 									this.setupComposite4c.setLayout(additionalHeightButtonsCompositeLayout);
 									{
 										this.setupButton4b = new Button(this.setupComposite4c, SWT.RADIO | SWT.LEFT);
-										this.setupButton4b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.setupButton4b.setText(Messages.getString(MessageIds.OSDE_MSGT1816));
+										this.setupButton4b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+										this.setupButton4b.setText(Messages.getString(MessageIds.GDE_MSGT1816));
 										this.setupButton4b.setSelection(this.setupValue4 == 3);
 										this.setupButton4b.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -524,8 +539,8 @@ public class VarioToolTabItem extends CTabItem {
 									}
 									{
 										this.setupButton4c = new Button(this.setupComposite4c, SWT.RADIO | SWT.LEFT);
-										this.setupButton4c.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.setupButton4c.setText(Messages.getString(MessageIds.OSDE_MSGT1818));
+										this.setupButton4c.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+										this.setupButton4c.setText(Messages.getString(MessageIds.GDE_MSGT1818));
 										this.setupButton4c.setSelection(this.setupValue4 == 4);
 										this.setupButton4c.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -544,8 +559,8 @@ public class VarioToolTabItem extends CTabItem {
 									}
 									{
 										this.setupButton4d = new Button(this.setupComposite4c, SWT.RADIO | SWT.LEFT);
-										this.setupButton4d.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.setupButton4d.setText(Messages.getString(MessageIds.OSDE_MSGT1819));
+										this.setupButton4d.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+										this.setupButton4d.setText(Messages.getString(MessageIds.GDE_MSGT1819));
 										this.setupButton4d.setSelection(this.setupValue4 == 5);
 										this.setupButton4d.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -564,8 +579,8 @@ public class VarioToolTabItem extends CTabItem {
 									}
 									{
 										this.setupButton4e = new Button(this.setupComposite4c, SWT.RADIO | SWT.LEFT);
-										this.setupButton4e.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.setupButton4e.setText(Messages.getString(MessageIds.OSDE_MSGT1820));
+										this.setupButton4e.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+										this.setupButton4e.setText(Messages.getString(MessageIds.GDE_MSGT1820));
 										this.setupButton4e.setSelection(this.setupValue4 == 6);
 										this.setupButton4e.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -586,8 +601,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton4f = new Button(this.setupComposite4a, SWT.RADIO | SWT.LEFT);
-								this.setupButton4f.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton4f.setText(Messages.getString(MessageIds.OSDE_MSGT1821));
+								this.setupButton4f.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton4f.setText(Messages.getString(MessageIds.GDE_MSGT1821));
 								this.setupButton4f.setSelection(this.setupValue4 == 2);
 								this.setupButton4f.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -612,8 +627,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup5 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout group5Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup5.setLayout(group5Layout);
-						this.setupGroup5.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup5.setText(Messages.getString(MessageIds.OSDE_MSGT1823));
+						this.setupGroup5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup5.setText(Messages.getString(MessageIds.GDE_MSGT1823));
 						this.setupGroup5.setBounds(505, 100, 490, 95);
 						{
 							new CLabel(this.setupGroup5, SWT.NONE).setSize(5, 90);
@@ -628,8 +643,8 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupComposite5.setLayoutData(composite2LData);
 							{
 								this.setupButton5a = new Button(this.setupComposite5, SWT.RADIO | SWT.LEFT);
-								this.setupButton5a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton5a.setText(Messages.getString(MessageIds.OSDE_MSGT1824));
+								this.setupButton5a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton5a.setText(Messages.getString(MessageIds.GDE_MSGT1824));
 								this.setupButton5a.setSelection(this.setupValue5 == 1);
 								this.setupButton5a.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -646,8 +661,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton5b = new Button(this.setupComposite5, SWT.RADIO | SWT.LEFT);
-								this.setupButton5b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton5b.setText(Messages.getString(MessageIds.OSDE_MSGT1825));
+								this.setupButton5b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton5b.setText(Messages.getString(MessageIds.GDE_MSGT1825));
 								this.setupButton5b.setSelection(this.setupValue5 == 2);
 								this.setupButton5b.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -664,8 +679,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton5c = new Button(this.setupComposite5, SWT.RADIO | SWT.LEFT);
-								this.setupButton5c.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton5c.setText(Messages.getString(MessageIds.OSDE_MSGT1826));
+								this.setupButton5c.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton5c.setText(Messages.getString(MessageIds.GDE_MSGT1826));
 								this.setupButton5c.setSelection(this.setupValue5 == 3);
 								this.setupButton5c.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -682,8 +697,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton5d = new Button(this.setupComposite5, SWT.RADIO | SWT.LEFT);
-								this.setupButton5d.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton5d.setText(Messages.getString(MessageIds.OSDE_MSGT1827));
+								this.setupButton5d.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton5d.setText(Messages.getString(MessageIds.GDE_MSGT1827));
 								this.setupButton5d.setSelection(this.setupValue5 == 4);
 								this.setupButton5d.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -706,8 +721,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup6 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout group6Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup6.setLayout(group6Layout);
-						this.setupGroup6.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup6.setText(Messages.getString(MessageIds.OSDE_MSGT1828));
+						this.setupGroup6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup6.setText(Messages.getString(MessageIds.GDE_MSGT1828));
 						this.setupGroup6.setBounds(5, 197, 490, 45);
 						{
 							new CLabel(this.setupGroup6, SWT.NONE).setSize(5, 18);
@@ -745,8 +760,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel6aLData.width = 85;
 							setupLabel6aLData.height = 18;
 							this.setupLabel6a.setLayoutData(setupLabel6aLData);
-							this.setupLabel6a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel6a.setText(Messages.getString(MessageIds.OSDE_MSGT1829));
+							this.setupLabel6a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel6a.setText(Messages.getString(MessageIds.GDE_MSGT1829));
 						}
 						{
 							this.setupText6 = new Text(this.setupGroup6, SWT.CENTER | SWT.BORDER);
@@ -754,7 +769,7 @@ public class VarioToolTabItem extends CTabItem {
 							setupText6LData.width = 35;
 							setupText6LData.height = 12;
 							this.setupText6.setLayoutData(setupText6LData);
-							this.setupText6.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupText6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.setupText6.setText(String.format("%.1f", this.setupValue6 / 10.0)); //$NON-NLS-1$
 							this.setupText6.setEditable(false);
 							this.setupText6.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -765,8 +780,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel6bLData.width = 70;
 							setupLabel6bLData.height = 18;
 							this.setupLabel6b.setLayoutData(setupLabel6bLData);
-							this.setupLabel6b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel6b.setText(Messages.getString(MessageIds.OSDE_MSGT1830));
+							this.setupLabel6b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel6b.setText(Messages.getString(MessageIds.GDE_MSGT1830));
 						}
 						this.setupGroup6.layout();
 						this.setupGroup6.setMenu(this.popupmenu);
@@ -775,8 +790,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup7 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup7Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup7.setLayout(setupGroup7Layout);
-						this.setupGroup7.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup7.setText(Messages.getString(MessageIds.OSDE_MSGT1831));
+						this.setupGroup7.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup7.setText(Messages.getString(MessageIds.GDE_MSGT1831));
 						this.setupGroup7.setBounds(505, 197, 490, 45);
 						{
 							new CLabel(this.setupGroup7, SWT.NONE).setSize(5, 18);
@@ -814,8 +829,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel7aLData.width = 60;
 							setupLabel7aLData.height = 18;
 							this.setupLabel7a.setLayoutData(setupLabel7aLData);
-							this.setupLabel7a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel7a.setText(Messages.getString(MessageIds.OSDE_MSGT1832));
+							this.setupLabel7a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel7a.setText(Messages.getString(MessageIds.GDE_MSGT1832));
 						}
 						{
 							this.setupText7 = new Text(this.setupGroup7, SWT.CENTER | SWT.BORDER);
@@ -823,7 +838,7 @@ public class VarioToolTabItem extends CTabItem {
 							setupText7LData.width = 35;
 							setupText7LData.height = 12;
 							this.setupText7.setLayoutData(setupText7LData);
-							this.setupText7.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupText7.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.setupText7.setText(String.format("%.1f", this.setupValue7 / -10.0)); //$NON-NLS-1$
 							this.setupText7.setEditable(false);
 							this.setupText7.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -834,8 +849,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel7bLData.width = 70;
 							setupLabel7bLData.height = 18;
 							this.setupLabel7b.setLayoutData(setupLabel7bLData);
-							this.setupLabel7b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel7b.setText(Messages.getString(MessageIds.OSDE_MSGT1833));
+							this.setupLabel7b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel7b.setText(Messages.getString(MessageIds.GDE_MSGT1833));
 						}
 						this.setupGroup7.layout();
 						this.setupGroup7.setMenu(this.popupmenu);
@@ -844,8 +859,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup8 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup8Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup8.setLayout(setupGroup8Layout);
-						this.setupGroup8.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup8.setText(Messages.getString(MessageIds.OSDE_MSGT1834));
+						this.setupGroup8.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup8.setText(Messages.getString(MessageIds.GDE_MSGT1834));
 						this.setupGroup8.setBounds(5, 244, 990, 114);
 						{
 							new CLabel(this.setupGroup8, SWT.NONE).setSize(5, 50);
@@ -860,8 +875,8 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupComposite8.setLayout(setupComposite8Layout);
 							{
 								this.setupButton8a = new Button(this.setupComposite8, SWT.RADIO | SWT.LEFT);
-								this.setupButton8a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton8a.setText(Messages.getString(MessageIds.OSDE_MSGT1835));
+								this.setupButton8a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton8a.setText(Messages.getString(MessageIds.GDE_MSGT1835));
 								this.setupButton8a.setSelection(this.setupValue8 == 0);
 								this.setupButton8a.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -879,8 +894,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton8b = new Button(this.setupComposite8, SWT.RADIO | SWT.LEFT);
-								this.setupButton8b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton8b.setText(Messages.getString(MessageIds.OSDE_MSGT1836));
+								this.setupButton8b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton8b.setText(Messages.getString(MessageIds.GDE_MSGT1836));
 								this.setupButton8b.setSelection(this.setupValue8 == 1);
 								this.setupButton8b.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -898,8 +913,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton8c = new Button(this.setupComposite8, SWT.RADIO | SWT.LEFT);
-								this.setupButton8c.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton8c.setText(Messages.getString(MessageIds.OSDE_MSGT1837));
+								this.setupButton8c.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton8c.setText(Messages.getString(MessageIds.GDE_MSGT1837));
 								this.setupButton8c.setSelection(this.setupValue8 == 2);
 								this.setupButton8c.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -917,8 +932,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton8d = new Button(this.setupComposite8, SWT.RADIO | SWT.LEFT);
-								this.setupButton8d.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton8d.setText(Messages.getString(MessageIds.OSDE_MSGT1838));
+								this.setupButton8d.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton8d.setText(Messages.getString(MessageIds.GDE_MSGT1838));
 								this.setupButton8d.setSelection(this.setupValue8 == 3);
 								this.setupButton8d.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -936,8 +951,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton8e = new Button(this.setupComposite8, SWT.RADIO | SWT.LEFT);
-								this.setupButton8e.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton8e.setText(Messages.getString(MessageIds.OSDE_MSGT1839));
+								this.setupButton8e.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton8e.setText(Messages.getString(MessageIds.GDE_MSGT1839));
 								this.setupButton8e.setSelection(this.setupValue8 == 4);
 								this.setupButton8e.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -961,8 +976,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup9 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup9Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup9.setLayout(setupGroup9Layout);
-						this.setupGroup9.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup9.setText(Messages.getString(MessageIds.OSDE_MSGT1840));
+						this.setupGroup9.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup9.setText(Messages.getString(MessageIds.GDE_MSGT1840));
 						this.setupGroup9.setBounds(5, 361, 490, 133);
 						{
 							new CLabel(this.setupGroup9, SWT.NONE).setSize(5, 90);
@@ -977,8 +992,8 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupComposite9.setLayout(setupComposite9Layout);
 							{
 								this.setupButton9a = new Button(this.setupComposite9, SWT.RADIO | SWT.LEFT);
-								this.setupButton9a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton9a.setText(Messages.getString(MessageIds.OSDE_MSGT1841));
+								this.setupButton9a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton9a.setText(Messages.getString(MessageIds.GDE_MSGT1841));
 								this.setupButton9a.setSelection(this.setupValue9 == 0);
 								this.setupButton9a.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -997,8 +1012,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton9b = new Button(this.setupComposite9, SWT.RADIO | SWT.LEFT);
-								this.setupButton9b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton9b.setText(Messages.getString(MessageIds.OSDE_MSGT1842));
+								this.setupButton9b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton9b.setText(Messages.getString(MessageIds.GDE_MSGT1842));
 								this.setupButton9b.setSelection(this.setupValue9 == 1);
 								this.setupButton9b.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1017,8 +1032,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton9c = new Button(this.setupComposite9, SWT.RADIO | SWT.LEFT);
-								this.setupButton9c.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton9c.setText(Messages.getString(MessageIds.OSDE_MSGT1843));
+								this.setupButton9c.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton9c.setText(Messages.getString(MessageIds.GDE_MSGT1843));
 								this.setupButton9c.setSelection(this.setupValue9 == 2);
 								this.setupButton9c.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1037,8 +1052,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton9d = new Button(this.setupComposite9, SWT.RADIO | SWT.LEFT);
-								this.setupButton9d.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton9d.setText(Messages.getString(MessageIds.OSDE_MSGT1844));
+								this.setupButton9d.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton9d.setText(Messages.getString(MessageIds.GDE_MSGT1844));
 								this.setupButton9d.setSelection(this.setupValue9 == 3);
 								this.setupButton9d.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1057,8 +1072,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton9e = new Button(this.setupComposite9, SWT.RADIO | SWT.LEFT);
-								this.setupButton9e.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton9e.setText(Messages.getString(MessageIds.OSDE_MSGT1845));
+								this.setupButton9e.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton9e.setText(Messages.getString(MessageIds.GDE_MSGT1845));
 								this.setupButton9e.setSelection(this.setupValue9 == 4);
 								this.setupButton9e.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1077,8 +1092,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton9f = new Button(this.setupComposite9, SWT.RADIO | SWT.LEFT);
-								this.setupButton9f.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton9f.setText(Messages.getString(MessageIds.OSDE_MSGT1846));
+								this.setupButton9f.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton9f.setText(Messages.getString(MessageIds.GDE_MSGT1846));
 								this.setupButton9f.setSelection(this.setupValue9 == 5);
 								this.setupButton9f.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1103,8 +1118,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup10 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup10Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup10.setLayout(setupGroup10Layout);
-						this.setupGroup10.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup10.setText(Messages.getString(MessageIds.OSDE_MSGT1847));
+						this.setupGroup10.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup10.setText(Messages.getString(MessageIds.GDE_MSGT1847));
 						this.setupGroup10.setBounds(505, 361, 490, 133);
 						{
 							new CLabel(this.setupGroup10, SWT.NONE).setSize(5, 90);
@@ -1119,8 +1134,8 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupComposite10.setLayout(setupComposite10Layout);
 							{
 								this.setupButton10a = new Button(this.setupComposite10, SWT.RADIO | SWT.LEFT);
-								this.setupButton10a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton10a.setText(Messages.getString(MessageIds.OSDE_MSGT1848));
+								this.setupButton10a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton10a.setText(Messages.getString(MessageIds.GDE_MSGT1848));
 								this.setupButton10a.setSelection(this.setupValue10 == 0);
 								this.setupButton10a.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1138,8 +1153,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton10b = new Button(this.setupComposite10, SWT.RADIO | SWT.LEFT);
-								this.setupButton10b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton10b.setText(Messages.getString(MessageIds.OSDE_MSGT1849));
+								this.setupButton10b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton10b.setText(Messages.getString(MessageIds.GDE_MSGT1849));
 								this.setupButton10b.setSelection(this.setupValue10 == 1);
 								this.setupButton10b.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1157,8 +1172,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton10c = new Button(this.setupComposite10, SWT.RADIO | SWT.LEFT);
-								this.setupButton10c.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton10c.setText(Messages.getString(MessageIds.OSDE_MSGT1850));
+								this.setupButton10c.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton10c.setText(Messages.getString(MessageIds.GDE_MSGT1850));
 								this.setupButton10c.setSelection(this.setupValue10 == 2);
 								this.setupButton10c.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1176,8 +1191,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton10d = new Button(this.setupComposite10, SWT.RADIO | SWT.LEFT);
-								this.setupButton10d.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton10d.setText(Messages.getString(MessageIds.OSDE_MSGT1852));
+								this.setupButton10d.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton10d.setText(Messages.getString(MessageIds.GDE_MSGT1852));
 								this.setupButton10d.setSelection(this.setupValue10 == 3);
 								this.setupButton10d.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1195,8 +1210,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton10e = new Button(this.setupComposite10, SWT.RADIO | SWT.LEFT);
-								this.setupButton10e.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton10e.setText(Messages.getString(MessageIds.OSDE_MSGT1853));
+								this.setupButton10e.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton10e.setText(Messages.getString(MessageIds.GDE_MSGT1853));
 								this.setupButton10e.setSelection(this.setupValue10 == 4);
 								this.setupButton10e.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1223,8 +1238,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup11 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup11Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup11.setLayout(setupGroup11Layout);
-						this.setupGroup11.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup11.setText(Messages.getString(MessageIds.OSDE_MSGT1854));
+						this.setupGroup11.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup11.setText(Messages.getString(MessageIds.GDE_MSGT1854));
 						this.setupGroup11.setBounds(5, 497, 490, 45);
 						{
 							new CLabel(this.setupGroup3, SWT.NONE).setSize(5, 18);
@@ -1252,7 +1267,7 @@ public class VarioToolTabItem extends CTabItem {
 											VarioToolTabItem.this.setupValue11 = 125;
 										else
 											VarioToolTabItem.this.setupValue11 = tmpValue;
-										VarioToolTabItem.this.setupText11.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue11);
+										VarioToolTabItem.this.setupText11.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue11);
 									}
 								}
 							});
@@ -1263,8 +1278,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel11aLData.width = 91;
 							setupLabel11aLData.height = 18;
 							this.setupLabel11a.setLayoutData(setupLabel11aLData);
-							this.setupLabel11a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel11a.setText(Messages.getString(MessageIds.OSDE_MSGT1855));
+							this.setupLabel11a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel11a.setText(Messages.getString(MessageIds.GDE_MSGT1855));
 						}
 						{
 							this.setupText11 = new Text(this.setupGroup11, SWT.CENTER | SWT.BORDER);
@@ -1272,8 +1287,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupText11LData.width = 35;
 							setupText11LData.height = 12;
 							this.setupText11.setLayoutData(setupText11LData);
-							this.setupText11.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupText11.setText((this.setupValue11 == 0) ? OSDE.STRING_EMPTY : OSDE.STRING_EMPTY + this.setupValue11);
+							this.setupText11.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupText11.setText((this.setupValue11 == 0) ? GDE.STRING_EMPTY : GDE.STRING_EMPTY + this.setupValue11);
 							this.setupText11.setEditable(false);
 							this.setupText11.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						}
@@ -1283,8 +1298,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel11bLData.width = 51;
 							setupLabel11bLData.height = 18;
 							this.setupLabel11b.setLayoutData(setupLabel11bLData);
-							this.setupLabel11b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel11b.setText(Messages.getString(MessageIds.OSDE_MSGT1856));
+							this.setupLabel11b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel11b.setText(Messages.getString(MessageIds.GDE_MSGT1856));
 						}
 						{
 							this.setupButton11 = new Button(this.setupGroup11, SWT.CHECK | SWT.LEFT);
@@ -1292,8 +1307,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupButton11LData.width = 105;
 							setupButton11LData.height = 18;
 							this.setupButton11.setLayoutData(setupButton11LData);
-							this.setupButton11.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupButton11.setText(Messages.getString(MessageIds.OSDE_MSGT1811));
+							this.setupButton11.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupButton11.setText(Messages.getString(MessageIds.GDE_MSGT1811));
 							this.setupButton11.setSelection(this.setupValue11 == 0);
 							this.setupButton11.addSelectionListener(new SelectionAdapter() {
 								@Override
@@ -1301,12 +1316,12 @@ public class VarioToolTabItem extends CTabItem {
 									VarioToolTabItem.log.log(java.util.logging.Level.FINEST, "setupButton3c.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (VarioToolTabItem.this.setupButton11.getSelection()) {
 										VarioToolTabItem.this.setupValue11 = 0;
-										VarioToolTabItem.this.setupText11.setText(OSDE.STRING_EMPTY);
+										VarioToolTabItem.this.setupText11.setText(GDE.STRING_EMPTY);
 										VarioToolTabItem.this.setupSlider11.setEnabled(false);
 									}
 									else {
 										VarioToolTabItem.this.setupValue11 = 60;
-										VarioToolTabItem.this.setupText11.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue11);
+										VarioToolTabItem.this.setupText11.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue11);
 										VarioToolTabItem.this.setupSlider11.setEnabled(true);
 										VarioToolTabItem.this.setupSlider11.setSelection(VarioToolTabItem.this.setupValue11);
 									}
@@ -1320,8 +1335,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup12 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup12Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup12.setLayout(setupGroup12Layout);
-						this.setupGroup12.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup12.setText(Messages.getString(MessageIds.OSDE_MSGT1857));
+						this.setupGroup12.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup12.setText(Messages.getString(MessageIds.GDE_MSGT1857));
 						this.setupGroup12.setBounds(505, 497, 490, 45);
 						{
 							new CLabel(this.setupGroup12, SWT.NONE).setSize(5, 18);
@@ -1347,7 +1362,7 @@ public class VarioToolTabItem extends CTabItem {
 											tmpValue = 50;
 										else if (tmpValue > 500) tmpValue = 500;
 
-										VarioToolTabItem.this.setupText12.setText((tmpValue == 0) ? OSDE.STRING_EMPTY : String.format("%.1f", tmpValue / 10.0));
+										VarioToolTabItem.this.setupText12.setText((tmpValue == 0) ? GDE.STRING_EMPTY : String.format("%.1f", tmpValue / 10.0));
 										VarioToolTabItem.this.setupValue12 = tmpValue * 2 / 10;
 									}
 								}
@@ -1359,8 +1374,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel12aLData.width = 85;
 							setupLabel12aLData.height = 18;
 							this.setupLabel12a.setLayoutData(setupLabel12aLData);
-							this.setupLabel12a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel12a.setText(Messages.getString(MessageIds.OSDE_MSGT1829));
+							this.setupLabel12a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel12a.setText(Messages.getString(MessageIds.GDE_MSGT1829));
 						}
 						{
 							this.setupText12 = new Text(this.setupGroup12, SWT.CENTER | SWT.BORDER);
@@ -1368,8 +1383,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupText12LData.width = 35;
 							setupText12LData.height = 12;
 							this.setupText12.setLayoutData(setupText12LData);
-							this.setupText12.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupText12.setText((this.setupValue12 == 0) ? OSDE.STRING_EMPTY : String.format("%.1f", this.setupValue12 * 5 / 10.0));
+							this.setupText12.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupText12.setText((this.setupValue12 == 0) ? GDE.STRING_EMPTY : String.format("%.1f", this.setupValue12 * 5 / 10.0));
 							this.setupText12.setEditable(false);
 							this.setupText12.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						}
@@ -1379,8 +1394,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel12bLData.width = 51;
 							setupLabel12bLData.height = 18;
 							this.setupLabel12b.setLayoutData(setupLabel12bLData);
-							this.setupLabel12b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel12b.setText(Messages.getString(MessageIds.OSDE_MSGT1830));
+							this.setupLabel12b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel12b.setText(Messages.getString(MessageIds.GDE_MSGT1830));
 						}
 						{
 							this.setupButton12 = new Button(this.setupGroup12, SWT.CHECK | SWT.LEFT);
@@ -1388,8 +1403,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupButton12LData.width = 105;
 							setupButton12LData.height = 18;
 							this.setupButton12.setLayoutData(setupButton12LData);
-							this.setupButton12.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupButton12.setText(Messages.getString(MessageIds.OSDE_MSGT1811));
+							this.setupButton12.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupButton12.setText(Messages.getString(MessageIds.GDE_MSGT1811));
 							this.setupButton12.setSelection(this.setupValue12 == 0);
 							this.setupButton12.addSelectionListener(new SelectionAdapter() {
 								@Override
@@ -1397,12 +1412,12 @@ public class VarioToolTabItem extends CTabItem {
 									VarioToolTabItem.log.log(java.util.logging.Level.FINEST, "setupButton12.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (VarioToolTabItem.this.setupButton12.getSelection()) {
 										VarioToolTabItem.this.setupValue12 = 0;
-										VarioToolTabItem.this.setupText12.setText(OSDE.STRING_EMPTY);
+										VarioToolTabItem.this.setupText12.setText(GDE.STRING_EMPTY);
 										VarioToolTabItem.this.setupSlider12.setEnabled(false);
 									}
 									else {
 										VarioToolTabItem.this.setupValue12 = 150;
-										VarioToolTabItem.this.setupText12.setText((VarioToolTabItem.this.setupValue12 == 0) ? OSDE.STRING_EMPTY : String.format("%.1f", VarioToolTabItem.this.setupValue12 * 5 / 10.0));
+										VarioToolTabItem.this.setupText12.setText((VarioToolTabItem.this.setupValue12 == 0) ? GDE.STRING_EMPTY : String.format("%.1f", VarioToolTabItem.this.setupValue12 * 5 / 10.0));
 										VarioToolTabItem.this.setupSlider12.setEnabled(true);
 										VarioToolTabItem.this.setupSlider12.setSelection(VarioToolTabItem.this.setupValue12);
 									}
@@ -1416,8 +1431,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup13 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup13Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup13.setLayout(setupGroup13Layout);
-						this.setupGroup13.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup13.setText(Messages.getString(MessageIds.OSDE_MSGT1860));
+						this.setupGroup13.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup13.setText(Messages.getString(MessageIds.GDE_MSGT1860));
 						this.setupGroup13.setBounds(5, 545, 490, 91);
 						{
 							this.setupComposite13a = new Composite(this.setupGroup13, SWT.NONE);
@@ -1433,8 +1448,8 @@ public class VarioToolTabItem extends CTabItem {
 								setupButton13aLData.width = 462;
 								setupButton13aLData.height = 18;
 								this.setupButton13a.setLayoutData(setupButton13aLData);
-								this.setupButton13a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton13a.setText(Messages.getString(MessageIds.OSDE_MSGT1861));
+								this.setupButton13a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton13a.setText(Messages.getString(MessageIds.GDE_MSGT1861));
 								this.setupButton13a.setSelection((this.setupValue13 % 2) == 1);
 								this.setupButton13a.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1443,7 +1458,7 @@ public class VarioToolTabItem extends CTabItem {
 										if (VarioToolTabItem.this.setupButton13a.getSelection()) {
 											VarioToolTabItem.this.setupValue13 = getSetupSlider13Value(VarioToolTabItem.this.setupSlider13.getSelection());
 											VarioToolTabItem.this.setupSlider13.setEnabled(VarioToolTabItem.this.setupValue13 > 2);
-											VarioToolTabItem.this.setupText13.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue13);
+											VarioToolTabItem.this.setupText13.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue13);
 											VarioToolTabItem.this.setupButton13b.setSelection(false);
 											VarioToolTabItem.this.setupButton13c.setSelection(VarioToolTabItem.this.setupValue13 > 2);
 										}
@@ -1456,8 +1471,8 @@ public class VarioToolTabItem extends CTabItem {
 								setupButton13LData.width = 462;
 								setupButton13LData.height = 18;
 								this.setupButton13b.setLayoutData(setupButton13LData);
-								this.setupButton13b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton13b.setText(Messages.getString(MessageIds.OSDE_MSGT1862));
+								this.setupButton13b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton13b.setText(Messages.getString(MessageIds.GDE_MSGT1862));
 								this.setupButton13b.setSelection((this.setupValue13 % 2) == 0);
 								this.setupButton13b.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1466,7 +1481,7 @@ public class VarioToolTabItem extends CTabItem {
 										if (VarioToolTabItem.this.setupButton13b.getSelection()) {
 											VarioToolTabItem.this.setupValue13 = getSetupSlider13Value(VarioToolTabItem.this.setupSlider13.getSelection());
 											VarioToolTabItem.this.setupSlider13.setEnabled(VarioToolTabItem.this.setupValue13 > 2);
-											VarioToolTabItem.this.setupText13.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue13);
+											VarioToolTabItem.this.setupText13.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue13);
 											VarioToolTabItem.this.setupButton13a.setSelection(false);
 											VarioToolTabItem.this.setupButton13c.setSelection(VarioToolTabItem.this.setupValue13 > 2);
 										}
@@ -1480,8 +1495,8 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupComposite13b.setLayout(composite1Layout1);
 							{
 								this.setupButton13c = new Button(this.setupComposite13b, SWT.CHECK | SWT.LEFT);
-								this.setupButton13c.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton13c.setText(Messages.getString(MessageIds.OSDE_MSGT1863));
+								this.setupButton13c.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton13c.setText(Messages.getString(MessageIds.GDE_MSGT1863));
 								this.setupButton13c.setSelection(this.setupValue13 > 2);
 								this.setupButton13c.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1490,11 +1505,11 @@ public class VarioToolTabItem extends CTabItem {
 										if (VarioToolTabItem.this.setupButton13c.getSelection()) {
 											VarioToolTabItem.this.setupValue13 = getSetupSlider13Value(VarioToolTabItem.this.setupSlider13.getSelection()) + (VarioToolTabItem.this.setupButton13a.getSelection() ? 1 : 2);
 											VarioToolTabItem.this.setupSlider13.setEnabled(true);
-											VarioToolTabItem.this.setupText13.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue13);
+											VarioToolTabItem.this.setupText13.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue13);
 										}
 										else {
 											VarioToolTabItem.this.setupSlider13.setEnabled(false);
-											VarioToolTabItem.this.setupText13.setText(OSDE.STRING_EMPTY);
+											VarioToolTabItem.this.setupText13.setText(GDE.STRING_EMPTY);
 										}
 									}
 								});
@@ -1518,7 +1533,7 @@ public class VarioToolTabItem extends CTabItem {
 										if (tmpValue % 10 == 0) {
 											tmpValue = getSetupSlider13Value(tmpValue);
 
-											VarioToolTabItem.this.setupText13.setText(OSDE.STRING_EMPTY + tmpValue);
+											VarioToolTabItem.this.setupText13.setText(GDE.STRING_EMPTY + tmpValue);
 											VarioToolTabItem.this.setupValue13 = tmpValue + (VarioToolTabItem.this.setupButton13a.getSelection() ? 1 : 2);
 										}
 									}
@@ -1530,15 +1545,15 @@ public class VarioToolTabItem extends CTabItem {
 								setupText13LData.width = 20;
 								setupText13LData.height = 12;
 								this.setupText13.setLayoutData(setupText13LData);
-								this.setupText13.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupText13.setText(this.setupValue13 <= 2 ? OSDE.STRING_EMPTY : OSDE.STRING_EMPTY + this.setupValues13[this.setupValue13]);
+								this.setupText13.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupText13.setText(this.setupValue13 <= 2 ? GDE.STRING_EMPTY : GDE.STRING_EMPTY + this.setupValues13[this.setupValue13]);
 								this.setupText13.setEditable(false);
 								this.setupText13.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 							}
 							{
 								this.setupLabel13 = new CLabel(this.setupComposite13b, SWT.NONE);
-								this.setupLabel13.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupLabel13.setText(Messages.getString(MessageIds.OSDE_MSGT1864));
+								this.setupLabel13.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupLabel13.setText(Messages.getString(MessageIds.GDE_MSGT1864));
 								RowData setupText13LData = new RowData();
 								setupText13LData.width = 159;
 								setupText13LData.height = 19;
@@ -1552,8 +1567,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup14 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout group1Layout1 = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup14.setLayout(group1Layout1);
-						this.setupGroup14.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup14.setText(Messages.getString(MessageIds.OSDE_MSGT1865));
+						this.setupGroup14.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup14.setText(Messages.getString(MessageIds.GDE_MSGT1865));
 						this.setupGroup14.setBounds(505, 545, 490, 91);
 						{
 							new CLabel(this.setupGroup14, SWT.NONE).setSize(5, 37);
@@ -1572,8 +1587,8 @@ public class VarioToolTabItem extends CTabItem {
 								setupButton14aLData.width = 322;
 								setupButton14aLData.height = 18;
 								this.setupButton14a.setLayoutData(setupButton14aLData);
-								this.setupButton14a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton14a.setText(Messages.getString(MessageIds.OSDE_MSGT1866));
+								this.setupButton14a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton14a.setText(Messages.getString(MessageIds.GDE_MSGT1866));
 								this.setupButton14a.setSelection(this.setupValue14 == 1);
 								this.setupButton14a.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1593,8 +1608,8 @@ public class VarioToolTabItem extends CTabItem {
 								setupButton14bLData.width = 322;
 								setupButton14bLData.height = 18;
 								this.setupButton14b.setLayoutData(setupButton14bLData);
-								this.setupButton14b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton14b.setText(Messages.getString(MessageIds.OSDE_MSGT1867));
+								this.setupButton14b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton14b.setText(Messages.getString(MessageIds.GDE_MSGT1867));
 								this.setupButton14b.setSelection(this.setupValue14 == 2);
 								this.setupButton14b.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1614,8 +1629,8 @@ public class VarioToolTabItem extends CTabItem {
 								setupButton14cLData.width = 322;
 								setupButton14cLData.height = 18;
 								this.setupButton14c.setLayoutData(setupButton14cLData);
-								this.setupButton14c.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton14c.setText(Messages.getString(MessageIds.OSDE_MSGT1868));
+								this.setupButton14c.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton14c.setText(Messages.getString(MessageIds.GDE_MSGT1868));
 								this.setupButton14c.setSelection(this.setupValue14 == 3);
 								this.setupButton14c.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -1637,16 +1652,16 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup15 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup15Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup15.setLayout(setupGroup15Layout);
-						this.setupGroup15.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup15.setText(Messages.getString(MessageIds.OSDE_MSGT1869));
+						this.setupGroup15.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup15.setText(Messages.getString(MessageIds.GDE_MSGT1869));
 						this.setupGroup15.setBounds(5, 639, 490, 45);
 						{
 							new CLabel(this.setupGroup15, SWT.NONE);
 						}
 						{
 							this.setupButton15a = new Button(this.setupGroup15, SWT.RADIO | SWT.LEFT);
-							this.setupButton15a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupButton15a.setText(Messages.getString(MessageIds.OSDE_MSGT1870));
+							this.setupButton15a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupButton15a.setText(Messages.getString(MessageIds.GDE_MSGT1870));
 							this.setupButton15a.setSelection(this.setupValue15 == 1);
 							this.setupButton15a.addSelectionListener(new SelectionAdapter() {
 								@Override
@@ -1661,8 +1676,8 @@ public class VarioToolTabItem extends CTabItem {
 						}
 						{
 							this.setupButton15b = new Button(this.setupGroup15, SWT.RADIO | SWT.LEFT);
-							this.setupButton15b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupButton15b.setText(Messages.getString(MessageIds.OSDE_MSGT1871));
+							this.setupButton15b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupButton15b.setText(Messages.getString(MessageIds.GDE_MSGT1871));
 							this.setupButton15b.setSelection(this.setupValue15 == 0);
 							this.setupButton15b.addSelectionListener(new SelectionAdapter() {
 								@Override
@@ -1682,8 +1697,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup16 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup16Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup16.setLayout(setupGroup16Layout);
-						this.setupGroup16.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup16.setText(Messages.getString(MessageIds.OSDE_MSGT1872));
+						this.setupGroup16.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup16.setText(Messages.getString(MessageIds.GDE_MSGT1872));
 						this.setupGroup16.setBounds(505, 639, 490, 45);
 						{
 							new CLabel(this.setupGroup16, SWT.NONE).setSize(5, 18);
@@ -1708,7 +1723,7 @@ public class VarioToolTabItem extends CTabItem {
 										VarioToolTabItem.this.setupValue16 = 20;
 									else
 										VarioToolTabItem.this.setupValue16 = tmpValue;
-									VarioToolTabItem.this.setupText16.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue16);
+									VarioToolTabItem.this.setupText16.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue16);
 								}
 							});
 						}
@@ -1718,8 +1733,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel16aLData.width = 85;
 							setupLabel16aLData.height = 18;
 							this.setupLabel16a.setLayoutData(setupLabel16aLData);
-							this.setupLabel16a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel16a.setText(Messages.getString(MessageIds.OSDE_MSGT1851));
+							this.setupLabel16a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel16a.setText(Messages.getString(MessageIds.GDE_MSGT1851));
 						}
 						{
 							this.setupText16 = new Text(this.setupGroup16, SWT.CENTER | SWT.BORDER);
@@ -1727,8 +1742,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupText16LData.width = 35;
 							setupText16LData.height = 12;
 							this.setupText16.setLayoutData(setupText16LData);
-							this.setupText16.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupText16.setText(OSDE.STRING_EMPTY + this.setupValue16);
+							this.setupText16.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupText16.setText(GDE.STRING_EMPTY + this.setupValue16);
 						}
 						{
 							this.setupLabel16b = new CLabel(this.setupGroup16, SWT.LEFT);
@@ -1736,8 +1751,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel16bLData.width = 70;
 							setupLabel16bLData.height = 18;
 							this.setupLabel16b.setLayoutData(setupLabel16bLData);
-							this.setupLabel16b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel16b.setText(Messages.getString(MessageIds.OSDE_MSGT1810));
+							this.setupLabel16b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel16b.setText(Messages.getString(MessageIds.GDE_MSGT1810));
 						}
 						this.setupGroup16.layout();
 						this.setupGroup16.setMenu(this.popupmenu);
@@ -1746,16 +1761,16 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup17 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup17Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup17.setLayout(setupGroup17Layout);
-						this.setupGroup17.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup17.setText(Messages.getString(MessageIds.OSDE_MSGT1873));
+						this.setupGroup17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup17.setText(Messages.getString(MessageIds.GDE_MSGT1873));
 						this.setupGroup17.setBounds(5, 687, 490, 71);
 						{
 							new CLabel(this.setupGroup17, SWT.NONE).setSize(5, 18);
 						}
 						{
 							this.setupButton17 = new Button(this.setupGroup17, SWT.CHECK | SWT.LEFT);
-							this.setupButton17.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupButton17.setText(Messages.getString(MessageIds.OSDE_MSGT1874));
+							this.setupButton17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupButton17.setText(Messages.getString(MessageIds.GDE_MSGT1874));
 							RowData setupButton17LData = new RowData();
 							setupButton17LData.width = 469;
 							setupButton17LData.height = 18;
@@ -1808,8 +1823,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel17aLData.width = 66;
 							setupLabel17aLData.height = 18;
 							this.setupLabel17a.setLayoutData(setupLabel17aLData);
-							this.setupLabel17a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel17a.setText(Messages.getString(MessageIds.OSDE_MSGT1875));
+							this.setupLabel17a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel17a.setText(Messages.getString(MessageIds.GDE_MSGT1875));
 						}
 						{
 							this.setupText17 = new Text(this.setupGroup17, SWT.CENTER | SWT.BORDER);
@@ -1817,7 +1832,7 @@ public class VarioToolTabItem extends CTabItem {
 							setupText17LData.width = 29;
 							setupText17LData.height = 12;
 							this.setupText17.setLayoutData(setupText17LData);
-							this.setupText17.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupText17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.setupText17.setText(String.format("%.1f", (this.setupValue17 & 0x7f) / 10.0)); //$NON-NLS-1$
 						}
 						{
@@ -1826,8 +1841,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel17bLData.width = 24;
 							setupLabel17bLData.height = 18;
 							this.setupLabel17b.setLayoutData(setupLabel17bLData);
-							this.setupLabel17b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel17b.setText(Messages.getString(MessageIds.OSDE_MSGT1876));
+							this.setupLabel17b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel17b.setText(Messages.getString(MessageIds.GDE_MSGT1876));
 						}
 						{
 							this.setupLabel17c = new CLabel(this.setupGroup17, SWT.NONE);
@@ -1835,8 +1850,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel17cLData.width = 194;
 							setupLabel17cLData.height = 18;
 							this.setupLabel17c.setLayoutData(setupLabel17cLData);
-							this.setupLabel17c.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel17c.setText(Messages.getString(MessageIds.OSDE_MSGT1877));
+							this.setupLabel17c.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel17c.setText(Messages.getString(MessageIds.GDE_MSGT1877));
 						}
 						this.setupGroup17.layout();
 						this.setupGroup17.setMenu(this.popupmenu);
@@ -1845,8 +1860,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup18 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup18Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup18.setLayout(setupGroup18Layout);
-						this.setupGroup18.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup18.setText(Messages.getString(MessageIds.OSDE_MSGT1878));
+						this.setupGroup18.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup18.setText(Messages.getString(MessageIds.GDE_MSGT1878));
 						this.setupGroup18.setBounds(505, 687, 490, 71);
 						{
 							this.fillComposite = new Composite(this.setupGroup18, SWT.NONE);
@@ -1883,7 +1898,7 @@ public class VarioToolTabItem extends CTabItem {
 											VarioToolTabItem.this.setupValue18 = 100;
 										else
 											VarioToolTabItem.this.setupValue18 = tmpValue;
-										VarioToolTabItem.this.setupText18.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue18);
+										VarioToolTabItem.this.setupText18.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue18);
 									}
 								}
 							});
@@ -1894,8 +1909,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel18aLData.width = 60;
 							setupLabel18aLData.height = 18;
 							this.setupLabel18a.setLayoutData(setupLabel18aLData);
-							this.setupLabel18a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel18a.setText(Messages.getString(MessageIds.OSDE_MSGT1879));
+							this.setupLabel18a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel18a.setText(Messages.getString(MessageIds.GDE_MSGT1879));
 						}
 						{
 							this.setupText18 = new Text(this.setupGroup18, SWT.CENTER | SWT.BORDER);
@@ -1903,8 +1918,8 @@ public class VarioToolTabItem extends CTabItem {
 							setupText18LData.width = 35;
 							setupText18LData.height = 12;
 							this.setupText18.setLayoutData(setupText18LData);
-							this.setupText18.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupText18.setText(this.setupValue18 == 0 ? OSDE.STRING_EMPTY : OSDE.STRING_EMPTY + this.setupValue18);
+							this.setupText18.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupText18.setText(this.setupValue18 == 0 ? GDE.STRING_EMPTY : GDE.STRING_EMPTY + this.setupValue18);
 							this.setupText18.setEditable(false);
 							this.setupText18.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						}
@@ -1914,13 +1929,13 @@ public class VarioToolTabItem extends CTabItem {
 							setupLabel18bLData.width = 43;
 							setupLabel18bLData.height = 16;
 							this.setupLabel18b.setLayoutData(setupLabel18bLData);
-							this.setupLabel18b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel18b.setText(Messages.getString(MessageIds.OSDE_MSGT1880));
+							this.setupLabel18b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupLabel18b.setText(Messages.getString(MessageIds.GDE_MSGT1880));
 						}
 						{
 							this.setupButton18 = new Button(this.setupGroup18, SWT.CHECK | SWT.LEFT);
-							this.setupButton18.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupButton18.setText(Messages.getString(MessageIds.OSDE_MSGT1881));
+							this.setupButton18.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupButton18.setText(Messages.getString(MessageIds.GDE_MSGT1881));
 							RowData setupButton18LData = new RowData();
 							setupButton18LData.width = 144;
 							setupButton18LData.height = 20;
@@ -1931,12 +1946,12 @@ public class VarioToolTabItem extends CTabItem {
 									VarioToolTabItem.log.log(Level.FINEST, "setupButton18.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (VarioToolTabItem.this.setupButton18.getSelection()) {
 										VarioToolTabItem.this.setupValue18 = 0;
-										VarioToolTabItem.this.setupText18.setText(OSDE.STRING_EMPTY);
+										VarioToolTabItem.this.setupText18.setText(GDE.STRING_EMPTY);
 										VarioToolTabItem.this.setupSlider18.setEnabled(false);
 									}
 									else {
 										VarioToolTabItem.this.setupValue18 = 20;
-										VarioToolTabItem.this.setupText18.setText(OSDE.STRING_EMPTY + VarioToolTabItem.this.setupValue18);
+										VarioToolTabItem.this.setupText18.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue18);
 										VarioToolTabItem.this.setupSlider18.setEnabled(true);
 										VarioToolTabItem.this.setupSlider18.setSelection(VarioToolTabItem.this.setupValue18);
 									}
@@ -1950,8 +1965,8 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup19 = new Group(this.innerContentComposite, SWT.NONE);
 						RowLayout setupGroup19Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						this.setupGroup19.setLayout(setupGroup19Layout);
-						this.setupGroup19.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.setupGroup19.setText(Messages.getString(MessageIds.OSDE_MSGT1882));
+						this.setupGroup19.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.setupGroup19.setText(Messages.getString(MessageIds.GDE_MSGT1882));
 						this.setupGroup19.setBounds(5, 760, 990, 105);
 						{
 							new CLabel(this.setupGroup19, SWT.NONE).setSize(5, 85);
@@ -1990,15 +2005,15 @@ public class VarioToolTabItem extends CTabItem {
 													: VarioToolTabItem.this.setupButton19c.getSelection() ? (VarioToolTabItem.this.setupValue19 & 0x07) | 0x10
 															: VarioToolTabItem.this.setupButton19c.getSelection() ? (VarioToolTabItem.this.setupValue19 & 0x07) | 0x20 : (VarioToolTabItem.this.setupValue19 & 0x07);
 
-											VarioToolTabItem.this.setupText19.setText(OSDE.STRING_EMPTY + (VarioToolTabItem.this.setupValue19 & 0x03));
+											VarioToolTabItem.this.setupText19.setText(GDE.STRING_EMPTY + (VarioToolTabItem.this.setupValue19 & 0x03));
 										}
 									}
 								});
 							}
 							{
 								this.setupLabel19a = new CLabel(this.setupComposite19a, SWT.NONE);
-								this.setupLabel19a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupLabel19a.setText(Messages.getString(MessageIds.OSDE_MSGT1883));
+								this.setupLabel19a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupLabel19a.setText(Messages.getString(MessageIds.GDE_MSGT1883));
 							}
 							{
 								this.setupText19 = new Text(this.setupComposite19a, SWT.CENTER | SWT.BORDER);
@@ -2006,13 +2021,13 @@ public class VarioToolTabItem extends CTabItem {
 								setupText19LData.width = 30;
 								setupText19LData.height = 16;
 								this.setupText19.setLayoutData(setupText19LData);
-								this.setupText19.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupText19.setText(OSDE.STRING_EMPTY + (this.setupValue19 & 0x03));
+								this.setupText19.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupText19.setText(GDE.STRING_EMPTY + (this.setupValue19 & 0x03));
 							}
 							{
 								this.setupLabel19b = new CLabel(this.setupComposite19a, SWT.NONE);
-								this.setupLabel19b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupLabel19b.setText(Messages.getString(MessageIds.OSDE_MSGT1884));
+								this.setupLabel19b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupLabel19b.setText(Messages.getString(MessageIds.GDE_MSGT1884));
 							}
 						}
 						{
@@ -2025,8 +2040,8 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupComposite19b.setLayout(setupComposite19bLayout);
 							{
 								this.setupButton19a = new Button(this.setupComposite19b, SWT.RADIO | SWT.LEFT);
-								this.setupButton19a.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton19a.setText(Messages.getString(MessageIds.OSDE_MSGT1885));
+								this.setupButton19a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton19a.setText(Messages.getString(MessageIds.GDE_MSGT1885));
 								this.setupButton19a.setSelection((this.setupValue19 & 0x38) == 0x00); // 000000
 								this.setupButton19a.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
@@ -2042,8 +2057,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton19b = new Button(this.setupComposite19b, SWT.RADIO | SWT.LEFT);
-								this.setupButton19b.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton19b.setText(Messages.getString(MessageIds.OSDE_MSGT1886));
+								this.setupButton19b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton19b.setText(Messages.getString(MessageIds.GDE_MSGT1886));
 								this.setupButton19b.setSelection((this.setupValue19 & 0x38) == 0x08); // 001000
 								this.setupButton19b.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
@@ -2059,8 +2074,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton19c = new Button(this.setupComposite19b, SWT.RADIO | SWT.LEFT);
-								this.setupButton19c.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton19c.setText(Messages.getString(MessageIds.OSDE_MSGT1887));
+								this.setupButton19c.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton19c.setText(Messages.getString(MessageIds.GDE_MSGT1887));
 								this.setupButton19c.setSelection((this.setupValue19 & 0x38) == 0x10); // 010000
 								this.setupButton19c.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
@@ -2076,8 +2091,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton19d = new Button(this.setupComposite19b, SWT.RADIO | SWT.LEFT);
-								this.setupButton19d.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton19d.setText(Messages.getString(MessageIds.OSDE_MSGT1888));
+								this.setupButton19d.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton19d.setText(Messages.getString(MessageIds.GDE_MSGT1888));
 								this.setupButton19d.setSelection((this.setupValue19 & 0x38) == 0x20); // 100000
 								this.setupButton19d.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
@@ -2102,8 +2117,8 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupComposite19c.setLayout(setupComposite19cLayout);
 							{
 								this.setupButton19e = new Button(this.setupComposite19c, SWT.RADIO | SWT.LEFT);
-								this.setupButton19e.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton19e.setText(Messages.getString(MessageIds.OSDE_MSGT1889));
+								this.setupButton19e.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton19e.setText(Messages.getString(MessageIds.GDE_MSGT1889));
 								this.setupButton19e.setSelection(true);
 								this.setupButton19e.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
@@ -2117,8 +2132,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton19f = new Button(this.setupComposite19c, SWT.RADIO | SWT.LEFT);
-								this.setupButton19f.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton19f.setText(Messages.getString(MessageIds.OSDE_MSGT1890));
+								this.setupButton19f.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton19f.setText(Messages.getString(MessageIds.GDE_MSGT1890));
 								this.setupButton19f.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										VarioToolTabItem.log.log(Level.FINEST, "setupButton19f.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -2131,8 +2146,8 @@ public class VarioToolTabItem extends CTabItem {
 							}
 							{
 								this.setupButton19g = new Button(this.setupComposite19c, SWT.RADIO | SWT.LEFT);
-								this.setupButton19g.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.setupButton19g.setText(Messages.getString(MessageIds.OSDE_MSGT1891));
+								this.setupButton19g.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.setupButton19g.setText(Messages.getString(MessageIds.GDE_MSGT1891));
 								this.setupButton19g.addSelectionListener(new SelectionAdapter() {
 									public void widgetSelected(SelectionEvent evt) {
 										VarioToolTabItem.log.log(Level.FINEST, "setupButton19g.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -2161,9 +2176,9 @@ public class VarioToolTabItem extends CTabItem {
 	}
 
 	void loadSetup() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.OSDE_MSGT1800), new String[] { OSDE.FILE_ENDING_HEX, OSDE.FILE_ENDING_STAR }, this.device
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] { GDE.FILE_ENDING_HEX, GDE.FILE_ENDING_STAR }, this.device
 				.getDataBlockPreferredDataLocation());
-		String selectedSetupFile = fd.getFilterPath() + OSDE.FILE_SEPARATOR_UNIX + fd.getFileName();
+		String selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		VarioToolTabItem.log.log(Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {
@@ -2179,21 +2194,21 @@ public class VarioToolTabItem extends CTabItem {
 				if (this.isDataVarioTool) {
 					this.setupValue0 = buffer[0]; // transmit channel
 					this.setupSlider0.setSelection(this.setupValue0);
-					this.channelText.setText(OSDE.STRING_EMPTY + this.setupValue0);
+					this.channelText.setText(GDE.STRING_EMPTY + this.setupValue0);
 					this.frequencyText.setText(String.format("%.3f", (433.050 + this.setupValue0 * 0.025))); //$NON-NLS-1$
 				}
 				this.setupValue1 = buffer[1]; // repeat positive height 
 				this.setupSlider1.setSelection(this.setupValue1);
-				this.setupText1.setText(OSDE.STRING_EMPTY + this.setupValue1);
+				this.setupText1.setText(GDE.STRING_EMPTY + this.setupValue1);
 
 				this.setupValue2 = buffer[2]; // repeat negative height 
 				this.setupSlider2.setSelection(this.setupValue2);
-				this.setupText2.setText(OSDE.STRING_EMPTY + this.setupValue2);
+				this.setupText2.setText(GDE.STRING_EMPTY + this.setupValue2);
 
 				this.setupValue3 = buffer[3]; // repeat integral height 
 				this.setupSlider3.setSelection(this.setupValue3);
 				this.setupSlider3.setEnabled(this.setupValue3 != 60);
-				this.setupText3.setText((this.setupValue3 != 60) ? OSDE.STRING_EMPTY + this.setupValue3 : OSDE.STRING_EMPTY);
+				this.setupText3.setText((this.setupValue3 != 60) ? GDE.STRING_EMPTY + this.setupValue3 : GDE.STRING_EMPTY);
 				this.setupButton3c.setSelection(this.setupValue3 == 60);
 
 				this.setupValue4 = buffer[4]; // velocity
@@ -2243,13 +2258,13 @@ public class VarioToolTabItem extends CTabItem {
 				this.setupValue11 = buffer[11]; // temperature alarm level
 				this.setupSlider11.setSelection(this.setupValue11);
 				this.setupSlider11.setEnabled(this.setupValue11 != 0);
-				this.setupText11.setText((this.setupValue11 == 0) ? OSDE.STRING_EMPTY : OSDE.STRING_EMPTY + this.setupValue11);
+				this.setupText11.setText((this.setupValue11 == 0) ? GDE.STRING_EMPTY : GDE.STRING_EMPTY + this.setupValue11);
 				this.setupButton11.setSelection(this.setupValue11 == 0);
 
 				this.setupValue12 = buffer[12]; // motor battery voltage alarm level
 				this.setupSlider12.setSelection(this.setupValue12 / 2 * 10);
 				this.setupSlider12.setEnabled(this.setupValue12 != 0);
-				this.setupText12.setText((this.setupValue12 == 0) ? OSDE.STRING_EMPTY : String.format("%.1f", this.setupValue12 * 5.0 / 10));
+				this.setupText12.setText((this.setupValue12 == 0) ? GDE.STRING_EMPTY : String.format("%.1f", this.setupValue12 * 5.0 / 10));
 				this.setupButton12.setSelection(this.setupValue12 == 0);
 
 				this.setupValue13 = buffer[13]; // integral vario config
@@ -2258,7 +2273,7 @@ public class VarioToolTabItem extends CTabItem {
 				this.setupButton13c.setSelection(this.setupValue13 > 2);
 				this.setupSlider13.setEnabled(this.setupValue13 > 2);
 				this.setupSlider13.setSelection((this.setupValue13 < 4) ? 20 : (this.setupValue13 > 7) ? 100 : 50);
-				this.setupText13.setText(this.setupValue13 <= 2 ? OSDE.STRING_EMPTY : OSDE.STRING_EMPTY + this.setupValues13[this.setupValue13]);
+				this.setupText13.setText(this.setupValue13 <= 2 ? GDE.STRING_EMPTY : GDE.STRING_EMPTY + this.setupValues13[this.setupValue13]);
 
 				this.setupValue14 = buffer[14]; // current sensor type
 				this.setupButton14a.setSelection(this.setupValue14 == 1);
@@ -2271,7 +2286,7 @@ public class VarioToolTabItem extends CTabItem {
 
 				this.setupValue16 = buffer[16]; // current delay
 				this.setupSlider16.setSelection(this.setupValue16);
-				this.setupText16.setText(OSDE.STRING_EMPTY + this.setupValue16);
+				this.setupText16.setText(GDE.STRING_EMPTY + this.setupValue16);
 
 				this.setupValue17 = buffer[17]; // temperature alarm level
 				this.setupButton17.setSelection((this.setupValue17 & 0x80) == 0x80);
@@ -2281,13 +2296,13 @@ public class VarioToolTabItem extends CTabItem {
 				this.setupValue18 = buffer[18]; // motor battery capacity alarm level
 				this.setupSlider18.setSelection(this.setupValue18);
 				this.setupSlider18.setEnabled(this.setupValue18 != 0);
-				this.setupText18.setText(this.setupValue18 == 0 ? OSDE.STRING_EMPTY : OSDE.STRING_EMPTY + this.setupValue18);
+				this.setupText18.setText(this.setupValue18 == 0 ? GDE.STRING_EMPTY : GDE.STRING_EMPTY + this.setupValue18);
 				this.setupButton18.setSelection(this.setupValue18 == 0);
 
 				if (!this.isDataVarioTool) {
 					this.setupValue19 = buffer[0]; // link vario SIO config
 					this.setupSlider19.setSelection((this.setupValue19 & 0x03) * 10);
-					this.setupText19.setText(OSDE.STRING_EMPTY + (this.setupValue19 & 0x03));
+					this.setupText19.setText(GDE.STRING_EMPTY + (this.setupValue19 & 0x03));
 					this.setupButton19a.setSelection((this.setupValue19 & 0x38) == 0x00); // 000000
 					this.setupButton19b.setSelection((this.setupValue19 & 0x38) == 0x08); // 001000
 					this.setupButton19c.setSelection((this.setupValue19 & 0x38) == 0x10); // 010000
@@ -2301,10 +2316,10 @@ public class VarioToolTabItem extends CTabItem {
 	}
 
 	void saveSetup() {
-		FileDialog fileDialog = this.application.openFileSaveDialog(Messages.getString(MessageIds.OSDE_MSGT1800), new String[] { OSDE.FILE_ENDING_HEX, OSDE.FILE_ENDING_STAR }, this.device
+		FileDialog fileDialog = this.application.openFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] { GDE.FILE_ENDING_HEX, GDE.FILE_ENDING_STAR }, this.device
 				.getDataBlockPreferredDataLocation(), this.getDefaultFileName());
 		VarioToolTabItem.log.log(Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
-		File setupFile = new File(fileDialog.getFilterPath() + OSDE.FILE_SEPARATOR + fileDialog.getFileName());
+		File setupFile = new File(fileDialog.getFilterPath() + GDE.FILE_SEPARATOR + fileDialog.getFileName());
 		byte[] buffer = new byte[20];
 
 		try {
@@ -2338,7 +2353,7 @@ public class VarioToolTabItem extends CTabItem {
 			data_out.close();
 		}
 		catch (Exception e) {
-			VarioToolTabItem.log.log(Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + OSDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
+			VarioToolTabItem.log.log(Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 

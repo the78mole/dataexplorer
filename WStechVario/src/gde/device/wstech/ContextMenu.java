@@ -1,20 +1,28 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (c) 2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.wstech;
+
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.tab.GraphicsWindow;
 
 import java.util.logging.Logger;
 
@@ -24,12 +32,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-
-import osde.log.Level;
-import osde.messages.Messages;
-import osde.ui.OpenSerialDataExplorer;
-import osde.ui.SWTResourceManager;
-import osde.ui.tab.GraphicsWindow;
 
 /**
  * @author Winfried Brügmann
@@ -43,7 +45,7 @@ public class ContextMenu {
 	public final static int				TYPE_SIMPLE		= 2;
 	public final static int				TYPE_TABLE		= 3;
 
-	final OpenSerialDataExplorer	application;
+	final DataExplorer	application;
 	final VarioToolTabItem varioToolTabItem;
 
 	MenuItem											setupLoadItem;
@@ -57,7 +59,7 @@ public class ContextMenu {
 	MenuItem											convert2SkyplotterItem;
 
 	public ContextMenu(VarioToolTabItem useVarioToolTabItem) {
-		this.application = OpenSerialDataExplorer.getInstance();
+		this.application = DataExplorer.getInstance();
 		this.varioToolTabItem = useVarioToolTabItem;
 	}
 
@@ -78,7 +80,7 @@ public class ContextMenu {
 //			}
 //		});
 		this.setupLoadItem = new MenuItem(popupMenu, SWT.PUSH);
-		this.setupLoadItem.setText(Messages.getString(MessageIds.OSDE_MSGT1892));
+		this.setupLoadItem.setText(Messages.getString(MessageIds.GDE_MSGT1892));
 		this.setupLoadItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ContextMenu.log.log(Level.FINEST, "curveSelectionItem action performed! " + e); //$NON-NLS-1$
@@ -86,7 +88,7 @@ public class ContextMenu {
 			}
 		});
 		this.setupSaveItem = new MenuItem(popupMenu, SWT.PUSH);
-		this.setupSaveItem.setText(Messages.getString(MessageIds.OSDE_MSGT1893));
+		this.setupSaveItem.setText(Messages.getString(MessageIds.GDE_MSGT1893));
 		this.setupSaveItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ContextMenu.log.log(Level.FINEST, "toggleViewGraphicsHeaderItem action performed! " + e); //$NON-NLS-1$
@@ -97,7 +99,7 @@ public class ContextMenu {
 		this.separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);
 
 		this.convertKLM2DItem = new MenuItem(popupMenu, SWT.PUSH);
-		this.convertKLM2DItem.setText(Messages.getString(MessageIds.OSDE_MSGT1894));
+		this.convertKLM2DItem.setText(Messages.getString(MessageIds.GDE_MSGT1894));
 		this.convertKLM2DItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
@@ -105,7 +107,7 @@ public class ContextMenu {
 			}
 		});
 		this.convertKLM3DGPSItem = new MenuItem(popupMenu, SWT.PUSH);
-		this.convertKLM3DGPSItem.setText(Messages.getString(MessageIds.OSDE_MSGT1895));
+		this.convertKLM3DGPSItem.setText(Messages.getString(MessageIds.GDE_MSGT1895));
 		this.convertKLM3DGPSItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ContextMenu.log.log(Level.FINEST, "copyPrintImageItem action performed! " + e); //$NON-NLS-1$
@@ -113,7 +115,7 @@ public class ContextMenu {
 			}
 		});
 		this.convertKLM3DBaroItem = new MenuItem(popupMenu, SWT.PUSH);
-		this.convertKLM3DBaroItem.setText(Messages.getString(MessageIds.OSDE_MSGT1896));
+		this.convertKLM3DBaroItem.setText(Messages.getString(MessageIds.GDE_MSGT1896));
 		this.convertKLM3DBaroItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ContextMenu.log.log(Level.FINEST, "outherAreaColorItem action performed! " + e); //$NON-NLS-1$
@@ -124,7 +126,7 @@ public class ContextMenu {
 		this.separatorCopy = new MenuItem(popupMenu, SWT.SEPARATOR);
 
 		this.convert2GPXItem = new MenuItem(popupMenu, SWT.PUSH);
-		this.convert2GPXItem.setText(Messages.getString(MessageIds.OSDE_MSGT1897));
+		this.convert2GPXItem.setText(Messages.getString(MessageIds.GDE_MSGT1897));
 		this.convert2GPXItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ContextMenu.log.log(Level.FINEST, "innerAreaColorItem action performed! " + e); //$NON-NLS-1$
@@ -135,7 +137,7 @@ public class ContextMenu {
 			}
 		});
 		this.convert2SkyplotterItem = new MenuItem(popupMenu, SWT.PUSH);
-		this.convert2SkyplotterItem.setText(Messages.getString(MessageIds.OSDE_MSGT1898));
+		this.convert2SkyplotterItem.setText(Messages.getString(MessageIds.GDE_MSGT1898));
 		this.convert2SkyplotterItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ContextMenu.log.log(Level.FINEST, "borderColorItem action performed! " + e); //$NON-NLS-1$

@@ -1,20 +1,32 @@
 /**************************************************************************************
-  	This file is part of OpenSerialDataExplorer.
+  	This file is part of DataExplorer.
 
-    OpenSerialDataExplorer is free software: you can redistribute it and/or modify
+    GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenSerialDataExplorer is distributed in the hope that it will be useful,
+    GNU DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenSerialDataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (c) 2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.wstech;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceDialog;
+import gde.device.IDevice;
+import gde.messages.Messages;
+import gde.ui.SWTResourceManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,16 +47,6 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-
-import osde.OSDE;
-import osde.config.Settings;
-import osde.data.Channel;
-import osde.data.Channels;
-import osde.data.RecordSet;
-import osde.device.DeviceDialog;
-import osde.device.IDevice;
-import osde.messages.Messages;
-import osde.ui.SWTResourceManager;
 
 /**
  * Dialog class to enable visualization control
@@ -101,15 +103,15 @@ public class VarioDialog extends DeviceDialog {
 				this.dialogShell.layout();
 				//dialogShell.pack();
 				this.dialogShell.setSize(310, 10 + 30 + 90 + this.measurementsCount * 30 + 55);
-				this.dialogShell.setText(this.device.getName() + Messages.getString(osde.messages.MessageIds.OSDE_MSGT0273));
-				this.dialogShell.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.dialogShell.setImage(SWTResourceManager.getImage("osde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
+				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (VarioDialog.this.device.isChangePropery()) {
-							String msg = Messages.getString(osde.messages.MessageIds.OSDE_MSGI0041);
+							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041);
 							if (VarioDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
 								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								VarioDialog.this.device.storeDeviceProperties();
@@ -159,8 +161,8 @@ public class VarioDialog extends DeviceDialog {
 						saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
 						saveButtonLData.left = new FormAttachment(0, 1000, 15);
 						this.saveButton.setLayoutData(saveButtonLData);
-						this.saveButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.saveButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0486));
+						this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.saveButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0486));
 						this.saveButton.setEnabled(false);
 						this.saveButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -179,8 +181,8 @@ public class VarioDialog extends DeviceDialog {
 						closeButtonLData.right = new FormAttachment(1000, 1000, -15);
 						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
 						this.closeButton.setLayoutData(closeButtonLData);
-						this.closeButton.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.closeButton.setText(Messages.getString(osde.messages.MessageIds.OSDE_MSGT0485));
+						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0485));
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -194,7 +196,7 @@ public class VarioDialog extends DeviceDialog {
 					tabFolderLData.left = new FormAttachment(0, 1000, 0);
 					tabFolderLData.right = new FormAttachment(1000, 1000, 0);
 					tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
-					this.tabFolder.setFont(SWTResourceManager.getFont(OSDE.WIDGET_FONT_NAME, OSDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.tabFolder.setLayoutData(tabFolderLData);
 					this.tabFolder.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -210,13 +212,13 @@ public class VarioDialog extends DeviceDialog {
 									log.log(java.util.logging.Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null && activeChannel.getNumber() != channelNumber) {
-										int answer = VarioDialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.OSDE_MSGI1801));
+										int answer = VarioDialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1801));
 										if (answer == SWT.YES) {
 											String recordSetKey = activeRecordSet.getName();
 											Channel tmpChannel = channels.get(channelNumber);
 											if (tmpChannel != null) {
 												log.log(java.util.logging.Level.FINE,
-														"move record set " + recordSetKey + " to channel/configuration " + channelNumber + OSDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+														"move record set " + recordSetKey + " to channel/configuration " + channelNumber + GDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 												tmpChannel.put(recordSetKey, activeRecordSet.clone(channelNumber));
 												activeChannel.remove(recordSetKey);
 												channels.switchChannel(channelNumber, recordSetKey);
