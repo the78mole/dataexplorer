@@ -18,20 +18,6 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
-import gnu.io.NoSuchPortException;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Vector;
-
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Record;
@@ -43,6 +29,7 @@ import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.smmodellbau.unilog.MessageIds;
 import gde.exception.DataInconsitsentException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
@@ -50,6 +37,18 @@ import gde.utils.CalculationThread;
 import gde.utils.LinearRegression;
 import gde.utils.QuasiLinearRegression;
 import gde.utils.StringHelper;
+import gnu.io.NoSuchPortException;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * UniLog default device implementation, just copied from Sample project
@@ -965,5 +964,21 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 */
 	public int[] getCellVoltageOrdinals() {
 		return new int[] {-1, -1};
+	}
+	
+	/**
+	 * query if an utility graphics window tab is requested
+	 */
+	public boolean isUtilityGraphicsRequested() {
+		return false;
+	}
+	
+	/**
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * specific curve calculated from point combinations or other specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
+	 */
+	public CTabItem getCustomTabItem() {
+		return null;
 	}
 }
