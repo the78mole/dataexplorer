@@ -18,13 +18,6 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Record;
@@ -34,11 +27,20 @@ import gde.device.IDevice;
 import gde.device.PropertyType;
 import gde.device.smmodellbau.lipowatch.MessageIds;
 import gde.exception.DataInconsitsentException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
 import gde.utils.StringHelper;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.custom.CTabItem;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -462,5 +464,21 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public int[] getCellVoltageOrdinals() {
 		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 		return new int[] { 0, 3 };
+	}
+	
+	/**
+	 * query if an utility graphics window tab is requested
+	 */
+	public boolean isUtilityGraphicsRequested() {
+		return false;
+	}
+	
+	/**
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * specific curve calculated from point combinations or other specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
+	 */
+	public CTabItem getCustomTabItem() {
+		return null;
 	}
 }
