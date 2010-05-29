@@ -1062,6 +1062,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.application.setDigitalTabItemVisible(activeDevice.isDigitalTabRequested());
 			this.application.setAnalogTabItemVisible(activeDevice.isAnalogTabRequested());
 			this.application.setCellVoltageTabItemVisible(activeDevice.isVoltagePerCellTabRequested());
+			this.application.setUtilGraphicsWindowVisible(activeDevice.isUtilityGraphicsRequested());
+			this.application.registerCustomTabItem(activeDevice.getCustomTabItem());
 			setupDataChannels(activeDevice);
 			this.application.setupDataTableHeader();
 			this.application.updateDigitalWindow();

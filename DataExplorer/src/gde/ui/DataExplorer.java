@@ -98,6 +98,7 @@ import gde.ui.tab.GraphicsComposite;
 import gde.ui.tab.GraphicsWindow;
 import gde.ui.tab.ObjectDescriptionWindow;
 import gde.ui.tab.StatisticsWindow;
+import gde.ui.tab.UtilGraphicsWindow;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
@@ -137,6 +138,7 @@ public class DataExplorer extends Composite {
 	public final static int				TAB_INDEX_COMMENT									= 6;
 
 	public final static String		COMPARE_RECORD_SET								= "compare_set"; //$NON-NLS-1$
+	public final static String		UTILITY_RECORD_SET								= "utility_set"; //$NON-NLS-1$
 
 	public static DataExplorer	application								= null;
 	public final static Display						display										= Display.getDefault();
@@ -168,6 +170,8 @@ public class DataExplorer extends Composite {
 	CellVoltageWindow							cellVoltageTabItem;
 	FileCommentWindow							fileCommentTabItem;
 	ObjectDescriptionWindow				objectDescriptionTabItem; 
+	CTabItem											customTabItem;
+	UtilGraphicsWindow						utilGraphicsTabItem;
 	Composite											tabComposite;
 	Composite											statusComposite;
 	StatusBar											statusBar;
@@ -180,6 +184,7 @@ public class DataExplorer extends Composite {
 
 	Channels											channels;
 	RecordSet											compareSet;
+	RecordSet											utilitySet;
 	final long										threadId;
 	String												progressBarUser = null;
 
@@ -213,6 +218,7 @@ public class DataExplorer extends Composite {
 		this.extensionFilterMap.put(GDE.FILE_ENDING_GIF, Messages.getString(MessageIds.GDE_MSGT0214));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_JPG, Messages.getString(MessageIds.GDE_MSGT0215));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_STAR, Messages.getString(MessageIds.GDE_MSGT0216));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_HEX, Messages.getString(MessageIds.GDE_MSGT0217));
 	}
 
 	/**
@@ -337,7 +343,8 @@ public class DataExplorer extends Composite {
 			this.initGUI();
 
 			this.channels = Channels.getInstance(this);
-			this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1);
+			//this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, OpenSerialDataExplorer.COMPARE_RECORD_SET, 1);
+			//this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, OpenSerialDataExplorer.UTILITY_RECORD_SET, 1);
 
 			shell.setLayout(new FillLayout());
 			shell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.jpg")); //$NON-NLS-1$
@@ -434,10 +441,7 @@ public class DataExplorer extends Composite {
 
 			//createCompareWindowTabItem();
 
-			if (this.menuToolBar.isObjectoriented()) {
-				this.objectDescriptionTabItem = new ObjectDescriptionWindow(this.displayTab, SWT.NONE);
-				this.objectDescriptionTabItem.create();
-			}
+			this.setObjectDescriptionTabVisible(this.menuToolBar.isObjectoriented());
 			
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init listener");
 			shell.addListener(SWT.Close, new Listener() {
@@ -1126,6 +1130,16 @@ public class DataExplorer extends Composite {
 			this.channels.cleanup();
 			this.enableDeviceSwitchButtons(false);
 		}
+		//cleanup device specific utility graphics tab item
+		if (this.utilGraphicsTabItem != null) {
+			this.utilGraphicsTabItem.dispose();
+			this.utilGraphicsTabItem = null;
+		}
+		//cleanup device specific custom tab item
+		if (this.customTabItem != null || (this.customTabItem != null && !this.customTabItem.isDisposed())) {
+			this.customTabItem.dispose();
+			this.customTabItem = null;		
+		}
 	}
 
 	public void updateTitleBar(final String objectName, final String deviceName, final String devicePort) {
@@ -1594,7 +1608,11 @@ public class DataExplorer extends Composite {
 	}
 
 	public RecordSet getCompareSet() {
-		return this.compareSet;
+		return this.compareSet == null ? this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1) : this.compareSet;
+	}
+	
+	public RecordSet getUtilitySet() {
+		return this.utilitySet == null ? this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.UTILITY_RECORD_SET, 1) : this.utilitySet;
 	}
 
 	/**
@@ -1920,24 +1938,6 @@ public class DataExplorer extends Composite {
 	 */
 	public void updateObjectImage() {
 		if (this.objectDescriptionTabItem != null) this.objectDescriptionTabItem.redrawImageCanvas();
-	}
-
-	/**
-	 * @param visible boolean value to set the object description tabulator visible
-	 */
-	public void setObjectDescriptionTabVisible(boolean visible) {
-		if (visible) {
-			if (this.objectDescriptionTabItem == null || this.objectDescriptionTabItem.isDisposed()) {
-				this.objectDescriptionTabItem = new ObjectDescriptionWindow(this.displayTab, SWT.NONE);
-				this.objectDescriptionTabItem.create();
-			}
-		}
-		else {
-			if (this.objectDescriptionTabItem != null) {
-				this.objectDescriptionTabItem.dispose();
-				this.objectDescriptionTabItem = null;
-			}
-		}
 	}
 
 	/**
@@ -2332,5 +2332,76 @@ public class DataExplorer extends Composite {
 				}
 			}
 		}
+	}
+	/**
+	 * @param visible boolean value to set the object description tabulator visible
+	 */
+	public void setObjectDescriptionTabVisible(boolean visible) {
+		if (visible) {
+			if (this.objectDescriptionTabItem == null || this.objectDescriptionTabItem.isDisposed()) {
+				for (int i = 0; i < this.displayTab.getItemCount(); ++i) {
+					CTabItem tabItem = this.displayTab.getItems()[i];
+					if (tabItem instanceof FileCommentWindow) {
+						this.objectDescriptionTabItem = new ObjectDescriptionWindow(this.displayTab, SWT.NONE, i+1);
+						this.objectDescriptionTabItem.create();
+						break;
+					}
+				}
+			}
+		}
+		else {
+			if (this.objectDescriptionTabItem != null) {
+				this.objectDescriptionTabItem.dispose();
+				this.objectDescriptionTabItem = null;
+			}
+		}
+	}
+	
+	/**
+	 * register a utility graphics tab item for device specific purpose
+	 */
+	public UtilGraphicsWindow setUtilGraphicsWindowVisible(boolean visible) {
+		if (visible) {
+			if (this.utilGraphicsTabItem == null || this.utilGraphicsTabItem.isDisposed()) {
+				this.utilGraphicsTabItem = new UtilGraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_UTIL, "Utility Graphics", this.displayTab.getItemCount());
+				this.utilGraphicsTabItem.create();
+			}
+		}
+		else {
+			if (this.utilGraphicsTabItem != null) {
+				this.utilGraphicsTabItem.dispose();
+				this.utilGraphicsTabItem = null;
+			}
+		}
+		return utilGraphicsTabItem;
+	}
+	
+	/**
+	 * register a custom tab item for device specific purpose
+	 */
+	public CTabItem registerCustomTabItem(CTabItem customDeviceTabItem) {
+		if (customDeviceTabItem == null) {
+			if (this.customTabItem != null || (this.customTabItem != null && !this.customTabItem.isDisposed())) {
+				this.customTabItem.dispose();
+				this.customTabItem = null;		
+			}
+		}
+		else {
+			this.customTabItem = customDeviceTabItem;
+//			Vector<Control> tabListVector = new Vector<Control>();
+//			for ( Control oldTabControl : this.displayTab.getTabList() ) {
+//				tabListVector.add(oldTabControl);
+//			}
+//			tabListVector.add(customDeviceTabItem.getControl());
+//			this.displayTab.setTabList(tabListVector.toArray(new Control[1]));
+		}
+		return customTabItem;
+	}
+	
+	/**
+	 * @return the display tab folder which is required to create and register a new custom tabItem	 * @return
+	 */
+	public CTabFolder getTabFolder() {
+		return this.displayTab;
 	}
 }

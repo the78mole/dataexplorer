@@ -142,8 +142,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 	Color													innerAreaBackground;
 	Color													surroundingBackground;
 
-	public ObjectDescriptionWindow(CTabFolder currentDisplayTab, int style) {
-		super(currentDisplayTab, style);
+	public ObjectDescriptionWindow(CTabFolder currentDisplayTab, int style, int position) {
+		super(currentDisplayTab, style, position);
 		SWTResourceManager.registerResourceUser(this);
 		this.application = DataExplorer.getInstance();
 		this.tabFolder = currentDisplayTab;

@@ -58,7 +58,7 @@ public class GDE {
 
 	
 	// ****** begin global constants section *******
-	public static final String		GDE_VERSION												= "Version 2.20";						//$NON-NLS-1$
+	public static final String		GDE_VERSION												= "Version 2.25";						//$NON-NLS-1$
 	public static final String		GDE_NAME_LONG											= "DataExplorer";	//$NON-NLS-1$
 	public final static String		DEVICE_PROPERTIES_XSD_VERSION			= "_V10"; 									//$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION		= "_V04"; 									//$NON-NLS-1$
@@ -145,6 +145,7 @@ public class GDE {
 	public static final String		FILE_ENDING_BAK						= "bak";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_TMP						= "tmp";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR					= "*";		//$NON-NLS-1$
+	public static final String		FILE_ENDING_HEX						= "HEX";	//$NON-NLS-1$
 
 	public final static String		LINE_SEPARATOR						= System.getProperty("line.separator"); // is OS dependent //$NON-NLS-1$
 

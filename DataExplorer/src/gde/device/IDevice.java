@@ -21,6 +21,8 @@ package gde.device;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.swt.custom.CTabItem;
+
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.exception.DataInconsitsentException;
@@ -801,4 +803,16 @@ public interface IDevice {
 	 * set value of -1 to suppress this measurement
 	 */
 	public int[] getCellVoltageOrdinals();
+	
+	/**
+	 * query if an utility graphics window tab is requested
+	 */
+	public boolean isUtilityGraphicsRequested();
+	
+	/**
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * specific curve calculated from point combinations or other specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
+	 */
+	public CTabItem getCustomTabItem();
 }

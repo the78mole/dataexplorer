@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008 - 2010 Winfried Bruegmann
+    Copyright (c) 2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.tab;
 
@@ -42,8 +42,8 @@ import gde.utils.TimeLine;
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
  * @author Winfried Brügmann
  */
-public class GraphicsWindow extends CTabItem {
-	final static Logger						log											= Logger.getLogger(GraphicsWindow.class.getName());
+public class UtilGraphicsWindow extends CTabItem {
+	final static Logger						log											= Logger.getLogger(UtilGraphicsWindow.class.getName());
 
 	public static final int				TYPE_NORMAL							= 0;
 	public static final int				TYPE_COMPARE						= 1;
@@ -69,7 +69,7 @@ public class GraphicsWindow extends CTabItem {
 	final TimeLine								timeLine								= new TimeLine();
 	final int											windowType;
 	
-	public GraphicsWindow(CTabFolder currentDisplayTab, int style, int currentType, String useTabName, int index) {
+	public UtilGraphicsWindow(CTabFolder currentDisplayTab, int style, int currentType, String useTabName, int index) {
 		super(currentDisplayTab, style, index);
 		SWTResourceManager.registerResourceUser(this);
 		this.application = DataExplorer.getInstance();
@@ -117,8 +117,8 @@ public class GraphicsWindow extends CTabItem {
 		else {
 			DataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					GraphicsWindow.this.graphicsComposite.doRedrawGraphics();
-					GraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
+					UtilGraphicsWindow.this.graphicsComposite.doRedrawGraphics();
+					UtilGraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 				}
 			});
 		}
@@ -134,7 +134,7 @@ public class GraphicsWindow extends CTabItem {
 		else {
 			DataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
-					GraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
+					UtilGraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 				}
 			});
 		}
