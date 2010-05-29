@@ -18,13 +18,6 @@
 ****************************************************************************************/
 package gde.device.conrad;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -36,9 +29,18 @@ import gde.device.IDevice;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.custom.CTabItem;
 
 /**
  * VC8XX device class
@@ -453,5 +455,21 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 */
 	public int[] getCellVoltageOrdinals() {
 		return new int[] {-1, -1};
+	}
+	
+	/**
+	 * query if an utility graphics window tab is requested
+	 */
+	public boolean isUtilityGraphicsRequested() {
+		return false;
+	}
+	
+	/**
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * specific curve calculated from point combinations or other specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
+	 */
+	public CTabItem getCustomTabItem() {
+		return null;
 	}
 }
