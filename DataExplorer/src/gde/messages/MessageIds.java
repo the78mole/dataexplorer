@@ -13,8 +13,8 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
-    Copyright (c) 2008 - 2010 Winfried Bruegmann
+
+Copyright (c) 2008 - 2010 Winfried Bruegmann 
 ****************************************************************************************/
 package gde.messages;
 
@@ -160,6 +160,7 @@ public class MessageIds {
 	public final static String	GDE_MSGI0044 = "GDE_MSGI0044";
 	public final static String	GDE_MSGI0045 = "GDE_MSGI0045";
 	public final static String	GDE_MSGI0046 = "GDE_MSGI0046";
+	public final static String	GDE_MSGI0047 = "GDE_MSGI0047";
 	public final static String	GDE_MSGT0000 = "GDE_MSGT0000";
 	public final static String	GDE_MSGT0001 = "GDE_MSGT0001";
 	public final static String	GDE_MSGT0002 = "GDE_MSGT0002";

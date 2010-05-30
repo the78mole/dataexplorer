@@ -135,6 +135,7 @@ public class GDE {
 	public static final String		FILE_ENDING_DOT_TMP				= ".tmp";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_XML				= ".xml";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_XSD				= ".xsd";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_DOT_HEX				= ".hex";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_LOV						= "lov";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_OSD						= "osd";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_CSV						= "csv";	//$NON-NLS-1$
@@ -145,7 +146,7 @@ public class GDE {
 	public static final String		FILE_ENDING_BAK						= "bak";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_TMP						= "tmp";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR					= "*";		//$NON-NLS-1$
-	public static final String		FILE_ENDING_HEX						= "HEX";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_HEX						= "hex";	//$NON-NLS-1$
 
 	public final static String		LINE_SEPARATOR						= System.getProperty("line.separator"); // is OS dependent //$NON-NLS-1$
 
