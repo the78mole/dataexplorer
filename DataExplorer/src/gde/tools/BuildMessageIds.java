@@ -68,8 +68,8 @@ public class BuildMessageIds {
 	 */
 	public static void main(String[] args) throws IOException {
 		String packageName = "package " + args[0] + ";\n\n"; // gde.messages
-		String inFilePath = args[1]; //"src/osde/messages/messages.properties";
-		String outFilePath = args[2]; //"src/osde/messages/MessageIds.java";
+		String inFilePath = args[1]; //"src/gde/messages/messages.properties";
+		String outFilePath = args[2]; //"src/gde/messages/MessageIds.java";
 		BufferedReader reader; // to read the data
 		BufferedWriter writer; // to write the data
 		String line;
