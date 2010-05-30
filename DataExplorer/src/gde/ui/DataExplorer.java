@@ -218,7 +218,6 @@ public class DataExplorer extends Composite {
 		this.extensionFilterMap.put(GDE.FILE_ENDING_GIF, Messages.getString(MessageIds.GDE_MSGT0214));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_JPG, Messages.getString(MessageIds.GDE_MSGT0215));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_STAR, Messages.getString(MessageIds.GDE_MSGT0216));
-		this.extensionFilterMap.put(GDE.FILE_ENDING_HEX, Messages.getString(MessageIds.GDE_MSGT0217));
 	}
 
 	/**
@@ -1436,14 +1435,14 @@ public class DataExplorer extends Composite {
 		}
 	}
 
-	public FileDialog openFileOpenDialog(String name, String[] extensions, String path) {
+	public FileDialog openFileOpenDialog(String name, String[] extensions, String path, String fileName) {
 		final String $METHOD_NAME = "openFileOpenDialog"; //$NON-NLS-1$
 		FileDialog fileOpenDialog = new FileDialog(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.OPEN);
 		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileOpenDialog.setText(name);
-		fileOpenDialog.setFileName(GDE.STRING_EMPTY);
+		fileOpenDialog.setFileName(fileName == null ? GDE.STRING_EMPTY : fileName);
 		if (extensions != null) {
 			fileOpenDialog.setFilterExtensions(extensions);
 			fileOpenDialog.setFilterNames(getExtensionDescription(extensions));

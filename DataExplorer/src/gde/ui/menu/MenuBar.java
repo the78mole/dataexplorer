@@ -606,7 +606,7 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
-									.getGraphicsTemplatePath());
+									.getGraphicsTemplatePath(), null);
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							GraphicsTemplate template = activeChannel.getTemplate();
 							template.setNewFileName(fileDialog.getFileName());

@@ -75,7 +75,7 @@ public class FileHandler {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path);
+		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, null);
 		if (csvFileDialog.getFileName().length() > 4) {
 			final String csvFilePath = csvFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
 
@@ -181,7 +181,7 @@ public class FileHandler {
 					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path })); 
 				}
 			}
-			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD, GDE.FILE_ENDING_STAR_LOV }, path); 
+			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD, GDE.FILE_ENDING_STAR_LOV }, path, null); 
 			if (openFileDialog.getFileName().length() > 4) {
 				String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 
