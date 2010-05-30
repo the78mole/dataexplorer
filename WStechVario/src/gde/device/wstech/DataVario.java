@@ -55,6 +55,8 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(DataVario.class.getName());
 
 	public final static String		DEFAULT_RECORD_SET_EXTEND		= "Flugaufzeichnung"; //$NON-NLS-1$
+	public final static int				GPS_HEIGHT 									= 0;
+	public final static int				BARO_HEIGHT									= 1;
 
 	final DataExplorer	application;
 	final VarioDialog		dialog;
@@ -214,7 +216,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void openCloseSerialPort() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation(), null);
 		String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 		

@@ -2176,8 +2176,8 @@ public class VarioToolTabItem extends CTabItem {
 	}
 
 	void loadSetup() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] { GDE.FILE_ENDING_HEX, GDE.FILE_ENDING_STAR }, this.device
-				.getDataBlockPreferredDataLocation());
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] { GDE.FILE_ENDING_STAR }, this.device
+				.getDataBlockPreferredDataLocation(), this.getDefaultFileName());
 		String selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		VarioToolTabItem.log.log(Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
 
@@ -2373,5 +2373,34 @@ public class VarioToolTabItem extends CTabItem {
 		else
 			tmpValue = 5;
 		return tmpValue;
+	}
+	
+	/**
+	 * query the supported firmware version
+	 */
+	public String getFirmwareVersion() {
+		return this.getText().startsWith("Link") ? "00x" : "50x";
+	}
+	
+	/**
+	 * converts the actual displayed data set to KLM file format
+	 * @param type types are GPS_HEGHT | BARO_HEIGHT
+	 */
+	public void convert2KML3D(int type) {
+		this.application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGI0047));
+	}
+	
+	/**
+	 * converts the actual displayed data set to GPX file format
+	 */
+	public void convert2GPX() {
+		this.application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGI0047));
+	}
+	
+	/**
+	 * converts the actual displayed data set to GPX file format
+	 */
+	public void convert2Skylotter() {
+		this.application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGI0047));
 	}
 }

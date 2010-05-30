@@ -21,13 +21,11 @@ package gde.device.wstech;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 import gde.ui.tab.GraphicsWindow;
 
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -48,10 +46,10 @@ public class ContextMenu {
 	final DataExplorer	application;
 	final VarioToolTabItem varioToolTabItem;
 
+	MenuItem											headerItem;
 	MenuItem											setupLoadItem;
 	MenuItem											setupSaveItem;
 	MenuItem											separatorView;
-	MenuItem											convertKLM2DItem;
 	MenuItem											convertKLM3DGPSItem;
 	MenuItem											separatorCopy;
 	MenuItem											convertKLM3DBaroItem;
@@ -79,6 +77,11 @@ public class ContextMenu {
 //			public void menuHidden(MenuEvent e) {
 //			}
 //		});
+		this.headerItem = new MenuItem(popupMenu, SWT.NONE);
+		this.headerItem.setText(Messages.getString(MessageIds.GDE_MSGT1894) + varioToolTabItem.getFirmwareVersion());
+
+		this.separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);
+
 		this.setupLoadItem = new MenuItem(popupMenu, SWT.PUSH);
 		this.setupLoadItem.setText(Messages.getString(MessageIds.GDE_MSGT1892));
 		this.setupLoadItem.addListener(SWT.Selection, new Listener() {
@@ -98,20 +101,12 @@ public class ContextMenu {
 
 		this.separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);
 
-		this.convertKLM2DItem = new MenuItem(popupMenu, SWT.PUSH);
-		this.convertKLM2DItem.setText(Messages.getString(MessageIds.GDE_MSGT1894));
-		this.convertKLM2DItem.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				ContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
-				//TODO
-			}
-		});
 		this.convertKLM3DGPSItem = new MenuItem(popupMenu, SWT.PUSH);
 		this.convertKLM3DGPSItem.setText(Messages.getString(MessageIds.GDE_MSGT1895));
 		this.convertKLM3DGPSItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ContextMenu.log.log(Level.FINEST, "copyPrintImageItem action performed! " + e); //$NON-NLS-1$
-				//TODO
+				varioToolTabItem.convert2KML3D(DataVario.GPS_HEIGHT);
 			}
 		});
 		this.convertKLM3DBaroItem = new MenuItem(popupMenu, SWT.PUSH);
@@ -119,7 +114,7 @@ public class ContextMenu {
 		this.convertKLM3DBaroItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ContextMenu.log.log(Level.FINEST, "outherAreaColorItem action performed! " + e); //$NON-NLS-1$
-				//TODO
+				varioToolTabItem.convert2KML3D(DataVario.BARO_HEIGHT);
 			}
 		});
 		
@@ -130,10 +125,7 @@ public class ContextMenu {
 		this.convert2GPXItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ContextMenu.log.log(Level.FINEST, "innerAreaColorItem action performed! " + e); //$NON-NLS-1$
-				RGB rgb = ContextMenu.this.application.openColorDialog();
-				if (rgb != null) {
-					ContextMenu.this.application.setInnerAreaBackground(ContextMenu.this.application.getTabSelectionIndex(), SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
-				}
+				varioToolTabItem.convert2GPX();
 			}
 		});
 		this.convert2SkyplotterItem = new MenuItem(popupMenu, SWT.PUSH);
@@ -141,7 +133,7 @@ public class ContextMenu {
 		this.convert2SkyplotterItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ContextMenu.log.log(Level.FINEST, "borderColorItem action performed! " + e); //$NON-NLS-1$
-				//TODO
+				varioToolTabItem.convert2Skylotter();
 			}
 		});
 	}
