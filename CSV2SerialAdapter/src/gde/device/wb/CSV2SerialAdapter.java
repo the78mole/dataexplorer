@@ -432,7 +432,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void openCloseSerialPort() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1700), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation());
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1700), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation(), null);
 		String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 		
