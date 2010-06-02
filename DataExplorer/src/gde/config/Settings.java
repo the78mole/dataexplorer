@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008 - 2010 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.config;
 
@@ -245,17 +245,17 @@ public class Settings extends Properties {
 		final String $METHOD_NAME = "Settings"; //$NON-NLS-1$
 
 		if (GDE.IS_WINDOWS) { //$NON-NLS-1$
-			this.applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + "DataExplorer").replace("\\", GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			this.settingsFilePath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + "DataExplorer.properties"; //$NON-NLS-1$
+			this.applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + GDE.GDE_NAME_LONG).replace("\\", GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
+			this.settingsFilePath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + GDE.GDE_NAME_LONG + ".properties"; //$NON-NLS-1$
 		}
 		else if (GDE.IS_LINUX) { //$NON-NLS-1$ //$NON-NLS-2$
-			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + ".DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
-			this.settingsFilePath = this.applHomePath  + GDE.FILE_SEPARATOR_UNIX + "DataExplorer.properties"; //$NON-NLS-1$
+			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "." + GDE.GDE_NAME_LONG; //$NON-NLS-1$ //$NON-NLS-2$
+			this.settingsFilePath = this.applHomePath  + GDE.FILE_SEPARATOR_UNIX  + GDE.GDE_NAME_LONG + ".properties"; //$NON-NLS-1$
 		}
 		// OPET - start - add
 		else if (GDE.IS_MAC) { //$NON-NLS-1$ //$NON-NLS-2$
 			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX + "DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
-			this.settingsFilePath = this.applHomePath  + GDE.FILE_SEPARATOR_UNIX + "DataExplorer.properties"; //$NON-NLS-1$
+			this.settingsFilePath = this.applHomePath  + GDE.FILE_SEPARATOR_UNIX + GDE.GDE_NAME_LONG + ".properties"; //$NON-NLS-1$
 		}
 		// OPET - end
 		else {
@@ -420,7 +420,7 @@ public class Settings extends Properties {
 			}
 		}
 		catch (Exception e) {
-			log.logp(Level.WARNING, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			log.logp(Level.WARNING, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage());
 		}
 
 	}

@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008 - 2010 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.utils;
 
@@ -984,6 +984,7 @@ public class FileUtils {
 		String basePath;
 		String jarPath = null;
 		URL url = DataExplorer.class.getProtectionDomain().getCodeSource().getLocation();
+		System.out.println("base URL = " + url.toExternalForm());
 		log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
 		if (url.getPath().endsWith("/")) { // running inside Eclipse //$NON-NLS-1$
 			log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$

@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008 - 2010 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.utils;
 
@@ -143,6 +143,7 @@ public class ObjectKeyScanner extends Thread {
 				HashMap<String,Vector<File>> objectFilesMap = new HashMap<String,Vector<File>>();
 				int fileCounter = 0;
 				if (this.searchForKeys) {
+					System.out.println("this.settings.getDataFilePath() = " + this.settings.getDataFilePath());
 					List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()));
 					for (File file : files) {
 						try {
