@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008 - 2010 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.junit;
 
@@ -26,11 +26,11 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for gde.junit");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(JarInspectAndExportTest.class);
 		suite.addTestSuite(TestFileReaderWriter.class);
 		suite.addTestSuite(TestObjectKeyScanner.class);
 		suite.addTestSuite(TestMathUtils.class);
-		//suite.addTestSuite(LogViewReaderTester.class);
+		suite.addTestSuite(JarInspectAndExportTest.class);
+		suite.addTestSuite(LogViewReaderTester.class);
 		//$JUnit-END$
 		return suite;
 	}

@@ -14,14 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008 - 2010 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.junit;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.List;
 
 import gde.GDE;
 import gde.data.Channel;
@@ -30,12 +25,20 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.exception.NotSupportedException;
 import gde.io.CSVReaderWriter;
+import gde.io.CSVSerialDataReaderWriter;
 import gde.io.LogViewReader;
 import gde.io.OsdReaderWriter;
-import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.List;
 
 public class TestFileReaderWriter extends TestSuperClass {
 
@@ -44,7 +47,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 	 */
 	@Override
 	public void setUp() throws Exception {
-		super.setUp();		
+		super.setUp();
 	}
 
 	/**
@@ -54,51 +57,86 @@ public class TestFileReaderWriter extends TestSuperClass {
 	public final void testCsvReaderOsdWriter() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
-		//this.devicePath = new File(this.tmpDir + "Write_0_OSD"); 
-		this.devicePath = new File(this.settings.getDataFilePath());
-		//this.devicePath = new File(this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "eStationBC6");
+		this.setDataPath(); //set the dataPath variable
 
 		try {
-			List<File> files = FileUtils.getFileListing(this.devicePath);
+			List<File> files = FileUtils.getFileListing(this.dataPath);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && !file.getPath().toLowerCase().contains("csv2serialadapter")) {
 					System.out.println("working with : " + file);
+					
 					try {
-						HashMap<String, String> fileHeader = CSVReaderWriter.getHeader(';', file.getAbsolutePath());
-						String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
-						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
-						if (deviceConfig == null) throw new NotSupportedException("device = " + fileDeviceName + " is not supported or in list of active devices");
-						IDevice device = this.getInstanceOfDevice(deviceConfig);
-						this.application.setActiveDeviceWoutUI(device);
-						
-						setupDataChannels(device);
-						fileHeader = CSVReaderWriter.evaluateType(';', fileHeader, deviceConfig);
+						//System.out.println("file.getPath() = " + file.getPath());
+						String deviceName = file.getPath().substring(0, file.getPath().lastIndexOf(GDE.FILE_SEPARATOR));
+						deviceName = deviceName.substring(1+deviceName.lastIndexOf(GDE.FILE_SEPARATOR));
+						//System.out.println("deviceName = " + deviceName);
+						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+						if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
 
-						int channelConfigNumber = this.channels.getChannelNumber(fileHeader.get(GDE.CHANNEL_CONFIG_NAME));
-						if (channelConfigNumber > device.getChannelCount()){
-							channelConfigNumber = 1;
-							fileHeader.put(GDE.CHANNEL_CONFIG_NAME, this.channels.get(1).getChannelConfigKey());
-						}
-						this.channels.setActiveChannelNumber(channelConfigNumber);
-						Channel activeChannel = this.channels.getActiveChannel();
-						activeChannel.setFileName(file.getAbsolutePath());
-						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
-						activeChannel.setSaved(true);
-						
-						RecordSet recordSet = CSVReaderWriter.read(';', file.getAbsolutePath(), "csv test", fileHeader.get(GDE.CSV_DATA_TYPE).equals(GDE.CSV_DATA_TYPE_RAW));
+						BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "ISO-8859-1")); //$NON-NLS-1$
+						String line = reader.readLine();
+						boolean isCVS2SerialFormat = line.startsWith(deviceConfig.getDataBlockLeader()) && line.contains(deviceConfig.getDataBlockSeparator().value());
+						reader.close();
+					
+						if (!isCVS2SerialFormat) {
+							HashMap<String, String> fileHeader = CSVReaderWriter.getHeader(';', file.getAbsolutePath());
+							String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
+							deviceConfig = this.deviceConfigurations.get(fileDeviceName);
+							if (deviceConfig == null) throw new NotSupportedException("device = " + fileDeviceName + " is not supported or in list of active devices");
+							IDevice device = this.getInstanceOfDevice(deviceConfig);
+							this.application.setActiveDeviceWoutUI(device);
 
-						if (recordSet != null) {
-							activeChannel.setActiveRecordSet(recordSet);
-							activeChannel.applyTemplate(recordSet.getName(), true);
-							//device.makeInActiveDisplayable(recordSet);
-							drawCurves(recordSet, 1024, 768);
+							setupDataChannels(device);
+							fileHeader = CSVReaderWriter.evaluateType(';', fileHeader, deviceConfig);
+
+							int channelConfigNumber = this.channels.getChannelNumber(fileHeader.get(GDE.CHANNEL_CONFIG_NAME));
+							if (channelConfigNumber > device.getChannelCount()) {
+								channelConfigNumber = 1;
+								fileHeader.put(GDE.CHANNEL_CONFIG_NAME, this.channels.get(1).getChannelConfigKey());
+							}
+							this.channels.setActiveChannelNumber(channelConfigNumber);
+							Channel activeChannel = this.channels.getActiveChannel();
+							activeChannel.setFileName(file.getAbsolutePath());
+							activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
+							activeChannel.setSaved(true);
+
+							RecordSet recordSet = CSVReaderWriter.read(';', file.getAbsolutePath(), "csv test", fileHeader.get(GDE.CSV_DATA_TYPE).equals(GDE.CSV_DATA_TYPE_RAW));
+
+							if (recordSet != null) {
+								activeChannel.setActiveRecordSet(recordSet);
+								activeChannel.applyTemplate(recordSet.getName(), true);
+								//device.makeInActiveDisplayable(recordSet);
+								drawCurves(recordSet, 1024, 768);
+							}
 						}
-						
+						else { // CSV2SerialAdapter file
+							IDevice device = this.getInstanceOfDevice(deviceConfig);
+							this.application.setActiveDeviceWoutUI(device);
+
+							setupDataChannels(device);
+
+							this.channels.setActiveChannelNumber(1);
+							Channel activeChannel = this.channels.getActiveChannel();
+							activeChannel.setFileName(file.getAbsolutePath());
+							activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
+							activeChannel.setSaved(true);
+
+							CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1, true);
+							RecordSet recordSet = activeChannel.getActiveRecordSet();
+
+							if (recordSet != null) {
+								activeChannel.setActiveRecordSet(recordSet);
+								activeChannel.applyTemplate(recordSet.getName(), true);
+								//device.makeInActiveDisplayable(recordSet);
+								drawCurves(recordSet, 1024, 768);
+							}
+						}
+
 						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
 						new File(tmpDir1).mkdirs();
 						String absolutFilePath = tmpDir1 + file.getName();
-						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length()-4)+"_cvs.osd";
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 					}
@@ -114,7 +152,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 			e.printStackTrace();
 			fail(e.toString());
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
 		for (String key : failures.keySet()) {
 			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
@@ -134,7 +172,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 			List<File> files = FileUtils.getFileListing(new File(tmpDir1));
 
 			for (File file : files) {
-			String filePath = file.getAbsolutePath();
+				String filePath = file.getAbsolutePath();
 				if (filePath.toLowerCase().endsWith(".osd")) {
 					try {
 						if (filePath.equals(OperatingSystemHelper.getLinkContainedFilePath(filePath))) {
@@ -189,14 +227,14 @@ public class TestFileReaderWriter extends TestSuperClass {
 			e.printStackTrace();
 			fail(e.toString());
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
 		for (String key : failures.keySet()) {
 			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
 		}
 		if (failures.size() > 0) fail(sb.toString());
 	}
-	
+
 	/**
 	 * test reading OSD files from directories used by OSDE application and writes OSD files to %TEMP%\Write_1_OSD
 	 * all consitent files must red without failures, 
@@ -205,12 +243,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 	public final void testOsdReaderOsdWriter() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
-		//this.devicePath = new File(this.tmpDir + "Write_0_OSD"); 
-		this.devicePath = new File(this.settings.getDataFilePath());
-		//this.devicePath = new File(this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "UniLog");
+		this.setDataPath(); //set the dataPath variable
 
 		try {
-			List<File> files = FileUtils.getFileListing(this.devicePath);
+			List<File> files = FileUtils.getFileListing(this.dataPath);
 
 			for (File file : files) {
 				String filePath = file.getAbsolutePath();
@@ -263,7 +299,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 			e.printStackTrace();
 			fail(e.toString());
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
 		for (String key : failures.keySet()) {
 			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
@@ -278,14 +314,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 	public final void testLovReaderOsdWriter() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
-		//this.devicePath = new File(this.tmpDir + "Write_0_OSD"); 
-		String dataPath = this.settings.getDataFilePath();
-		dataPath = dataPath.substring(0, dataPath.indexOf(DataExplorer.LEGACY_APPLICATION_NAME)) + "LogView";
-		this.devicePath = new File(dataPath);
-		//this.devicePath = new File("d:\\Documents\\LogView" + GDE.FILE_SEPARATOR + "UniLog");
+		this.setDataPath(); //set the dataPath variable
 
 		try {
-			List<File> files = FileUtils.getFileListing(this.devicePath);
+			List<File> files = FileUtils.getFileListing(this.dataPath);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".lov")) {
@@ -296,7 +328,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 						IDevice device = this.getInstanceOfDevice(deviceConfig);
 						this.application.setActiveDeviceWoutUI(device);
-						
+
 						setupDataChannels(device);
 
 						LogViewReader.read(file.getAbsolutePath());
@@ -306,13 +338,12 @@ public class TestFileReaderWriter extends TestSuperClass {
 						activeChannel.setFileDescription(fileHeader.get(GDE.FILE_COMMENT));
 						activeChannel.setSaved(true);
 						//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
-						
+
 						for (String recordSetName : activeChannel.getRecordSetNames()) {
 							//System.out.println("start drawing curves : " + recordSetName);
 							RecordSet recordSet = activeChannel.get(recordSetName);
 							if (recordSet != null) {
-								if (!recordSet.hasDisplayableData()) 
-									recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), false);
+								if (!recordSet.hasDisplayableData()) recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), false);
 								//System.out.println("loaded FileData : " + recordSetName);
 								activeChannel.setActiveRecordSet(recordSet);
 								activeChannel.applyTemplate(recordSetName, true);
@@ -324,7 +355,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
 						new File(tmpDir1).mkdirs();
 						String absolutFilePath = tmpDir1 + file.getName();
-						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length()-4)+"_lov.osd";
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_lov.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 					}
@@ -340,7 +371,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 			e.printStackTrace();
 			fail(e.toString());
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
 		for (String key : failures.keySet()) {
 			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
@@ -368,7 +399,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 						IDevice device = this.getInstanceOfDevice(deviceConfig);
 						this.application.setActiveDeviceWoutUI(device);
-						
+
 						setupDataChannels(device);
 
 						OsdReaderWriter.read(file.getAbsolutePath());
@@ -378,7 +409,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						activeChannel.setFileDescription(fileHeader.get(GDE.FILE_COMMENT));
 						activeChannel.setSaved(true);
 						activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
-						
+
 						for (String recordSetName : activeChannel.getRecordSetNames()) {
 							RecordSet recordSet = activeChannel.get(recordSetName);
 							if (recordSet != null) {
@@ -406,7 +437,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 			e.printStackTrace();
 			fail(e.toString());
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
 		for (String key : failures.keySet()) {
 			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");

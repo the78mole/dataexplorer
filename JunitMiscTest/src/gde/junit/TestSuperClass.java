@@ -14,9 +14,25 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008 - 2010 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.junit;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.CurveUtils;
+import gde.utils.TimeLine;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,26 +55,10 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.log.LogFormatter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.CurveUtils;
-import gde.utils.TimeLine;
-
 public class TestSuperClass extends TestCase {
 	Logger																rootLogger;
-
-	final DataExplorer					application	= DataExplorer.getInstance();
+	
+	final DataExplorer										application	= DataExplorer.getInstance();
 	final Channels												channels		= Channels.getInstance();
 	final Settings												settings		= Settings.getInstance();
 	final String 													tmpDir 			= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR) 
@@ -75,7 +75,7 @@ public class TestSuperClass extends TestCase {
 
 	TreeMap<String, DeviceConfiguration>	deviceConfigurations;
 	Vector<String>												activeDevices;
-	File																	devicePath;
+	File																	dataPath;
 
 	Handler																ch					= new ConsoleHandler();
 	LogFormatter													lf					= new LogFormatter();
@@ -423,5 +423,36 @@ public class TestSuperClass extends TestCase {
 			int y = horizontalGridVector.get(i);
 			gc.drawLine(0, y - useOffSetY, width - 1, y - useOffSetY);
 		}
+	}
+	
+	/**
+	 * ger the path where the class GDE gets loaded
+	 * @return
+	 */
+	protected String getLoaderPath() {
+		return GDE.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+	}
+	
+	protected File setDataPath() {
+		boolean settingsPropertiesExist = new File(this.settings.getSettingsFilePath()).exists();
+		boolean isDataPathConfigured = new File(this.settings.getDataFilePath()).getPath() != GDE.FILE_SEPARATOR_UNIX;
+		
+		if (settingsPropertiesExist && isDataPathConfigured) {
+			this.dataPath = new File(this.settings.getDataFilePath());
+		}
+		else {
+			String srcDataPath = this.getLoaderPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+			if (srcDataPath.endsWith("bin/")) { // running inside eclipse
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.GDE_NAME_LONG)) + "DataFilesTestSamples/" + GDE.GDE_NAME_LONG  ;
+			}
+			else {
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf("build")) + "DataFilesTestSamples/" + GDE.GDE_NAME_LONG  ;
+			}
+			this.dataPath = new File(srcDataPath); ///usr/src/dataexplorer-2.23-src/build/target/<os_arch>/DataExplorer/DataExplorer.jar
+		}
+		
+		this.settings.setDataFilePath(this.dataPath.getPath());
+		System.out.println("this.devicePath = " + this.dataPath.getPath());
+		return this.dataPath;
 	}
 }

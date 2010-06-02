@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008 - 2010 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.junit;
 
@@ -34,6 +34,9 @@ public class TestObjectKeyScanner extends TestSuperClass {
 		super.setUp();		
     this.logger.setLevel(Level.FINER);
     this.logger.setUseParentHandlers(true);
+    
+    this.setDataPath();
+    //System.out.println("this.settings.getDataFilePath() = " + this.settings.getDataFilePath());
 	}
 	
 	public final void testFindAllObjectKeysAndCreateLinks() {
