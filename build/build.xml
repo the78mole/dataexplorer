@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008 - 2010 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010 Winfried Bruegmann
 ************************************************************************************** 
 -->
 <project name="DataExplorerMasterBuild" default="dist" basedir="..">
@@ -595,6 +595,8 @@
 				<include name="build/misc/**"/>
 				<include name="build/build.properties"/>
 				<include name="WindowsHelper/**"/>
+				<include name="thirdparty/**"/>
+				<include name="DataFilesTestSamples/**"/>
 				<exclude name="COPYING" />
 				<exclude name="READ*"/>
 				<exclude name="*.LICENSE"/>
@@ -622,6 +624,7 @@
 			<tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
 				<include name="COPYING" />
 				<include name="READ*"/>
+				<include name="LICENSING.txt"/>
 				<include name="*.LICENSE"/>
 				<include name="AUTHORS"/>
 				<include name="INSTALL"/>
@@ -649,10 +652,11 @@
 		</tar>
 	</target>
 
-	<target name="misc_junit_tests" depends="copy-files" description="assumes DataExplorer has been started and data directory is configured">
+	<target name="misc_junit_tests" depends="init,copy-files" description="assumes DataExplorer has been started and data directory is configured">
+		<ant antfile="build.xml" target="compile" dir="JunitMiscTest" inheritall="true" />
+
 		<echo message="path=${basedir}/build/target/${build.os.shortname}_${sun.arch.data.model}/DataExplorer/DataExplorer.jar" />
 		<junit printsummary="yes" haltonfailure="no" showoutput="true">
-			<env key="ECLIPSE" value="true"/>
 			<classpath>
 				<pathelement path="${java.home}/bin/rt.jar"/>
 				<pathelement path="${basedir}/thirdparty/Junit3/junit.jar"/>

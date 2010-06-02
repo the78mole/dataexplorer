@@ -12,3 +12,7 @@ clean:
     
 install: 
 	ant -Dprefix=${prefix} -f build/build.xml install
+
+check: 
+	ant -f build/build.xml misc_junit_tests
+	
