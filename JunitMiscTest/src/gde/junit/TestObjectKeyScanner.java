@@ -66,4 +66,8 @@ public class TestObjectKeyScanner extends TestSuperClass {
 		}
 	}
 
+	public final void testDeleteLinks() {
+		ObjectKeyScanner.cleanFileLinks();
+	}
+
 }

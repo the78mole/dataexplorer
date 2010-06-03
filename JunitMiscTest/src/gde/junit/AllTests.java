@@ -27,10 +27,11 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for gde.junit");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(TestFileReaderWriter.class);
-		suite.addTestSuite(TestObjectKeyScanner.class);
 		suite.addTestSuite(TestMathUtils.class);
 		suite.addTestSuite(JarInspectAndExportTest.class);
 		suite.addTestSuite(LogViewReaderTester.class);
+		suite.addTestSuite(TestObjectKeyScanner.class);
+		suite.addTestSuite(CleanupTestTemp.class);
 		//$JUnit-END$
 		return suite;
 	}
