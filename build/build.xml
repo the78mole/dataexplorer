@@ -652,7 +652,7 @@
 		</tar>
 	</target>
 
-	<target name="misc_junit_tests" depends="init,copy-files" description="assumes DataExplorer has been started and data directory is configured">
+	<target name="check" depends="init,copy-files" description="assumes DataExplorer has been started and data directory is configured">
 		<ant antfile="build.xml" target="compile" dir="JunitMiscTest" inheritall="true" />
 
 		<echo message="path=${basedir}/build/target/${build.os.shortname}_${sun.arch.data.model}/DataExplorer/DataExplorer.jar" />
