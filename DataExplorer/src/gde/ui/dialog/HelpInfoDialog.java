@@ -100,7 +100,7 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 	 * @param fileName
 	 */
 	private void openURL(String deviceName, String fileName, int style) {
-		String jarBasePath = FileUtils.getOsdeJarBasePath() + "/";
+		String jarBasePath = FileUtils.getJarBasePath() + "/";
 		String jarName = "DataExplorer.jar";
 		String helpDir = "help" + GDE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + GDE.FILE_SEPARATOR;
 		String targetDir = GDE.JAVA_IO_TMPDIR + (GDE.IS_WINDOWS ? "" : GDE.FILE_SEPARATOR) + "OSDE" + GDE.FILE_SEPARATOR;

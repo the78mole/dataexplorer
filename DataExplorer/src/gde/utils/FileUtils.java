@@ -951,10 +951,10 @@ public class FileUtils {
 	}
 
 	/**
-	 * find out the base path where the OSDE Jars are located  
+	 * find out the base path where the application Jars are located  
 	 * @return operating depending path where the device plug-in jar are located
 	 */
-	public static String getOsdeJarBasePath() {
+	public static String getJarBasePath() {
 		String basePath;
 		URL url = DataExplorer.class.getProtectionDomain().getCodeSource().getLocation();
 		log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
@@ -963,7 +963,9 @@ public class FileUtils {
 			String bitmode = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
 			bitmode = bitmode != null && bitmode.length() == 2 ? bitmode : System.getProperty("com.ibm.vm.bitmode"); //$NON-NLS-1$
 			basePath = url.getFile().substring(GDE.IS_WINDOWS ? 1 : 0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
-			basePath = basePath + "build" + "/target/" + System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + bitmode + "/DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			basePath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
+				+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
+				+ "/" + GDE.GDE_NAME_LONG + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else { // started outside java -jar *.jar
 			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
@@ -992,7 +994,9 @@ public class FileUtils {
 			try {
 				//jarPath = basePath + "build" + GDE.FILE_SEPARATOR_UNIX + "target" + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME; //$NON-NLS-1$ //$NON-NLS-2$
 				//targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
-				jarPath = basePath + "build" + "/target/" + System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE + "/DataExplorer/devices"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				jarPath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
+					+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
+					+ "/" + GDE.GDE_NAME_LONG + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (Exception e) {
 				e.printStackTrace(System.err);

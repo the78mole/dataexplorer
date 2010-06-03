@@ -1325,7 +1325,6 @@ public class Record extends Vector<Integer> {
 		}
 		catch (RuntimeException e) {
 			log.log(Level.WARNING, e.getMessage() + " xPos = " + xPos, e);
-			System.out.println("xPos = " + xPos);
 		}
 		return pointPosY > this.parent.drawAreaBounds.height ? this.parent.drawAreaBounds.height : pointPosY < 0 ? 0 : pointPosY;
 	}

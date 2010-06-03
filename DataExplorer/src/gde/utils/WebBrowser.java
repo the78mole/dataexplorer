@@ -37,7 +37,7 @@ public class WebBrowser {
 	private static Logger				log			= Logger.getLogger(WebBrowser.class.getName());
 
 	public static void openURL(String deviceName, String fileName) {
-		String basePath = FileUtils.getOsdeJarBasePath() + "/";
+		String basePath = FileUtils.getJarBasePath() + "/";
 		String jarName = "DataExplorer.jar";
 		
 		if (deviceName.length() >= 1) { // devices/<deviceName>.jar

@@ -937,7 +937,7 @@ public class LogViewReader {
 			int dataSize = parse2Int(buffer);
 			
 			if (tmpDataSize != dataSize) { 
-				System.out.println("data size calculation wrong");
+				log.log(Level.WARNING, "data size calculation wrong");
 			}	
 				log.log(Level.FINE, GDE.RECORD_DATA_SIZE + dataSize);
 				sb.append(GDE.RECORD_DATA_SIZE).append(dataSize).append(GDE.DATA_DELIMITER);

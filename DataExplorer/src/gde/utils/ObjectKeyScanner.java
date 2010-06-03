@@ -143,7 +143,7 @@ public class ObjectKeyScanner extends Thread {
 				HashMap<String,Vector<File>> objectFilesMap = new HashMap<String,Vector<File>>();
 				int fileCounter = 0;
 				if (this.searchForKeys) {
-					System.out.println("this.settings.getDataFilePath() = " + this.settings.getDataFilePath());
+					log.log(Level.FINE, "this.settings.getDataFilePath() = " + this.settings.getDataFilePath());
 					List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()));
 					for (File file : files) {
 						try {

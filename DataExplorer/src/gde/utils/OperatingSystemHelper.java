@@ -277,7 +277,7 @@ public class OperatingSystemHelper {
 			else {
 				log.log(Level.INFO, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 
-				String jarBasePath = FileUtils.getOsdeJarBasePath();
+				String jarBasePath = FileUtils.getJarBasePath();
 				String jarFilePath = jarBasePath + "/DataExplorer.jar"; //$NON-NLS-1$
 
 				JarFile jarFile = new JarFile(jarFilePath);
@@ -431,7 +431,7 @@ public class OperatingSystemHelper {
 		String targetDir = GDE.JAVA_IO_TMPDIR;
 		String command = GDE.STRING_BLANK;
 
-		String jarBasePath = FileUtils.getOsdeJarBasePath();
+		String jarBasePath = FileUtils.getJarBasePath();
 		String jarFilePath = jarBasePath + "/DataExplorer.jar"; //$NON-NLS-1$
 
 		try {

@@ -202,19 +202,6 @@ public class Settings extends Properties {
 	private String					applHomePath;													// default path to application home directory
 	Comparator<String> 			comparator 										= new RecordSetNameComparator(); //used to sort object key list
 
-
-	//	/**
-	//	 * for unit test only
-	//	 */
-	//	public static void main(String[] args) {
-	//		Settings settings = Settings.getInstance();
-	//		settings.write();
-	//		settings.load();
-	//		System.out.println(settings.toString());
-	//		settings.write();
-	//
-	//	}
-
 	/**
 	 * a singleton needs a static method to get the instance of this calss
 	 * @return DataExplorer instance

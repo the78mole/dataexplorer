@@ -257,7 +257,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 			tmpRecord.statistics = this.device.getMeasurementStatistic(channelConfigurationNumber, i);
 			if (tmpRecord.statistics == null)
-				System.out.println();
+				log.log(Level.WARNING, "tmpRecord.statistics == null");
 			TriggerType tmpTrigger = tmpRecord.statistics != null ? tmpRecord.statistics.getTrigger() : null;
 			tmpRecord.triggerIsGreater = tmpTrigger != null ? tmpTrigger.isGreater() : null;
 			tmpRecord.triggerLevel = tmpTrigger != null ? tmpTrigger.getLevel() : null;
