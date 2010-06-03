@@ -984,7 +984,6 @@ public class FileUtils {
 		String basePath;
 		String jarPath = null;
 		URL url = DataExplorer.class.getProtectionDomain().getCodeSource().getLocation();
-		System.out.println("base URL = " + url.toExternalForm());
 		log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
 		if (url.getPath().endsWith("/")) { // running inside Eclipse //$NON-NLS-1$
 			log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$
