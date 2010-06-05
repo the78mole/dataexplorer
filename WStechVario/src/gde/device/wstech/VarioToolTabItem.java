@@ -980,13 +980,13 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup9.setText(Messages.getString(MessageIds.GDE_MSGT1840));
 						this.setupGroup9.setBounds(5, 361, 490, 133);
 						{
-							new CLabel(this.setupGroup9, SWT.NONE).setSize(5, 90);
+							new CLabel(this.setupGroup9, SWT.NONE).setSize(5, 108);
 						}
 						{
 							this.setupComposite9 = new Composite(this.setupGroup9, SWT.NONE);
 							FillLayout setupComposite9Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
 							RowData setupComposite9LData = new RowData();
-							setupComposite9LData.width = 470;
+							setupComposite9LData.width = 460;
 							setupComposite9LData.height = 108;
 							this.setupComposite9.setLayoutData(setupComposite9LData);
 							this.setupComposite9.setLayout(setupComposite9Layout);
@@ -1122,7 +1122,7 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup10.setText(Messages.getString(MessageIds.GDE_MSGT1847));
 						this.setupGroup10.setBounds(505, 361, 490, 133);
 						{
-							new CLabel(this.setupGroup10, SWT.NONE).setSize(5, 90);
+							new CLabel(this.setupGroup10, SWT.NONE).setSize(5, 109);
 						}
 						{
 							this.setupComposite10 = new Composite(this.setupGroup10, SWT.NONE);
@@ -1772,7 +1772,7 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupButton17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.setupButton17.setText(Messages.getString(MessageIds.GDE_MSGT1874));
 							RowData setupButton17LData = new RowData();
-							setupButton17LData.width = 469;
+							setupButton17LData.width = 460;
 							setupButton17LData.height = 18;
 							this.setupButton17.setLayoutData(setupButton17LData);
 							this.setupButton17.setSelection((this.setupValue17 & 0x80) == 0x80);
@@ -1869,7 +1869,7 @@ public class VarioToolTabItem extends CTabItem {
 							fillCompositeLayout.makeColumnsEqualWidth = true;
 							this.fillComposite.setLayout(fillCompositeLayout);
 							RowData fillCompositeLData = new RowData();
-							fillCompositeLData.width = 478;
+							fillCompositeLData.width = 460;
 							fillCompositeLData.height = 12;
 							this.fillComposite.setLayoutData(fillCompositeLData);
 						}
