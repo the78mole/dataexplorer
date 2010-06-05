@@ -6,5 +6,5 @@ GNU DataExplorer - News - comes with version 2.20
 4) create extra WStechVario plug-in
 5) add sample udev rule files to GNU/Linux binaries
 6) enhance IDevice interface to allow extra device dependent tabulator
-7) add WStech setup tool as additional tabulator
-8) add WStech LinkVario
+7) add WStech DataVario setup tool as additional tabulator
+8) add WStech LinkVario setup tool as additional tabulator

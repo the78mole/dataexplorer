@@ -1,7 +1,7 @@
 [Desktop Entry]
-Comment=DataExplorer - explore your serial data
-Comment[en_US]=DataExplorer - explore your serial data
-Comment[de_DE]=DataExplorer - erforsche serielle Daten
+Comment=DataExplorer - explore your measurement data
+Comment[en_US]=DataExplorer - explore your measurement data
+Comment[de_DE]=DataExplorer - erforsche deine Messdaten
 Encoding=UTF-8
 Exec=java -Dfile.encoding=UTF-8 -jar -Xms40m -Xmx256m @GDE_DIR@DataExplorer.jar %f
 GenericName=DataExplorer

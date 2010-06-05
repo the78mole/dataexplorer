@@ -40,7 +40,7 @@
 		</dict>
 	<array>
 	<key>CFBundleVersion</key>
-	<string>2.0</string>
+	<string>2.25</string>
 	<key>CFBundleExecutable</key>
 	<string>DataExplorerMac64</string>
 	<key>CFBundlePackageType</key>
@@ -48,7 +48,7 @@
 	<key>CFBundleSignature</key>
 	<string>19260357</string>
 	<key>CFBundleGetInfoString</key>
-	<string>DataExplorer - explores your serial data</string>
+	<string>DataExplorer - explores your measurement data</string>
 	<key>CFBundleIconFile</key>
 	<string>DataExplorer.icns</string>
 	<key>CFBundleInfoDictionaryVersion</key>
