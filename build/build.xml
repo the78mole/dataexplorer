@@ -207,11 +207,11 @@
 	</target>
 	<target name="WindowsDefault" unless="prefix">
 		<echo message="installing to ${install.dir.windows}" />
-		<unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir.windows}" overwrite="true"/>
+		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir.windows}" overwrite="true"/>
 	</target>
 	<target name="WindowsPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
-		<unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${prefix}" overwrite="true"/>
+		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${prefix}" overwrite="true"/>
 	</target>
 
 	<target name="GNULinux" if="isGNULinux">
@@ -221,11 +221,11 @@
 	</target>
 	<target name="GNULinuxDefault" unless="prefix">
 		<echo message="installing to ${install.dir.gnulinux}" />
-		<exec command="tar -xzf ${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.gnulinux}"/>
+		<exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.gnulinux}"/>
 	</target>
 	<target name="GNULinuxPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
-		<exec command="tar -xzf ${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${prefix}"/>
+		<exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${prefix}"/>
 	</target>
 
 	<target name="MAC" if="isMAC">
@@ -235,11 +235,11 @@
 	</target>
 	<target name="MacDefault" unless="prefix">
 		<echo message="installing to ${install.dir.mac}" />
-		<unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${install.dir.mac}" overwrite="true"/>
+		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${install.dir.mac}" overwrite="true"/>
 	</target>
 	<target name="MacPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
-		<unzip src="${build.target.dir}/DataExplorer_${version.num}_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${prefix}" overwrite="true"/>
+		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${prefix}" overwrite="true"/>
 	</target>
 
 	<target name="check_prefix">
@@ -477,17 +477,17 @@
 	<target name="binary_package" depends="copy-files">
 
 		<echo message="zip Windows 32 bit files" />
-		<zip destfile="${build.target.dir}/DataExplorer_${version.num}_Windows_x86_32.zip">
+		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Windows_x86_32.zip">
 			<zipfileset dir="${output.windows32}" casesensitive="true" />
 		</zip>
 
 		<echo message="zip Windows 64 bit files" />
-		<zip destfile="${build.target.dir}/DataExplorer_${version.num}_Windows_x86_64.zip">
+		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Windows_x86_64.zip">
 			<zipfileset dir="${output.windows64}" casesensitive="true" />
 		</zip>
 
 		<echo message="tar GNULinux 32 bit files" />
-		<tar destfile="${build.target.dir}/DataExplorer_${version.num}_GNULinux_x86_32.tar.gz" compression="gzip">
+		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-bin_GNULinux_x86_32.tar.gz" compression="gzip">
 			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="755" >
 				<include name="*/DataExplorer"/>
 				<include name="*/DevicePropertiesEditor"/>
@@ -506,7 +506,7 @@
 		</tar>
 
 		<echo message="tar GNULinux 64 bit files" />
-		<tar destfile="${build.target.dir}/DataExplorer_${version.num}_GNULinux_x86_64.tar.gz" compression="gzip">
+		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-bin_GNULinux_x86_64.tar.gz" compression="gzip">
 			<tarfileset dir="${output.gnulinux64}" casesensitive="true" mode="755" >
 				<include name="*/DataExplorer"/>
 				<include name="*/DevicePropertiesEditor"/>
@@ -525,7 +525,7 @@
 		</tar>
 
 		<echo message="zip Mac 32 carbon application bundle" />
-		<zip destfile="${build.target.dir}/DataExplorer_${version.num}_Mac_32_carbon.zip">
+		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_32_carbon.zip">
 			<zipfileset dir="${output.mac32.carbon}" casesensitive="true" filemode="755" >
 				<include name="**/DataExplorerMac32"/>
 				<include name="**/DevicePropertiesEditorMac32"/>
@@ -537,7 +537,7 @@
 		</zip>
 
 		<echo message="zip Mac 32 cocoa application bundle" />
-		<zip destfile="${build.target.dir}/DataExplorer_${version.num}_Mac_32_cocoa.zip">
+		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_32_cocoa.zip">
 			<zipfileset dir="${output.mac32.cocoa}" casesensitive="true" filemode="755" >
 				<include name="**/DataExplorerMac32"/>
 				<include name="**/DevicePropertiesEditorMac32"/>
@@ -549,7 +549,7 @@
 		</zip>
 
 		<echo message="zip Mac 64 cocoa application bundle" />
-		<zip destfile="${build.target.dir}/DataExplorer_${version.num}_Mac_64_cocoa.zip">
+		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_64_cocoa.zip">
 			<zipfileset dir="${output.mac64.cocoa}" casesensitive="true" filemode="755" >
 				<include name="**/DataExplorerMac64"/>
 				<include name="**/DevicePropertiesEditorMac64"/>
@@ -596,7 +596,7 @@
 				<include name="build/build.properties"/>
 				<include name="WindowsHelper/**"/>
 				<include name="thirdparty/**"/>
-				<include name="DataFilesTestSamples/**"/>
+				<exclude name="DataFilesTestSamples/**"/>
 				<exclude name="COPYING" />
 				<exclude name="READ*"/>
 				<exclude name="*.LICENSE"/>

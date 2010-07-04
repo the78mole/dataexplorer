@@ -6,8 +6,6 @@ check group membership on UNIX systems (uucp for serial port locking)
  
 documentation: How to create a device plug-in 
  
-create a preferences property where a UNIX based system user gets a reminder enabling uucp lock for RXTXcomm
- 
 enable plug-in to create it own tabulator based view 
  
 create more junit tests 
