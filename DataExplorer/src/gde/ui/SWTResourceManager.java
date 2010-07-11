@@ -242,7 +242,6 @@ public class SWTResourceManager {
 		return getFont(name, size, style, false, false);
 	}
 
-	@SuppressWarnings("rawtypes") //$NON-NLS-1$
 	public static Font getFont(String name, int size, int style, boolean strikeout, boolean underline) {
 		String fontName = name + GDE.STRING_DASH + size + GDE.STRING_DASH + style + GDE.STRING_DASH + strikeout + GDE.STRING_DASH + underline;
 		if (resources.containsKey(fontName)) {
@@ -251,7 +250,7 @@ public class SWTResourceManager {
 		FontData fd = new FontData(name, size, style);
 		if (strikeout || underline) {
 			try {
-				Class lfCls = Class.forName("org.eclipse.swt.internal.win32.LOGFONT"); //$NON-NLS-1$
+				Class<?> lfCls = Class.forName("org.eclipse.swt.internal.win32.LOGFONT"); //$NON-NLS-1$
 				Object lf = FontData.class.getField("data").get(fd); //$NON-NLS-1$
 				if (lf != null && lfCls != null) {
 					if (strikeout)

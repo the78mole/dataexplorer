@@ -755,7 +755,6 @@ public class FileUtils {
 	 * @throws ApplicationConfigurationException
 	 * @throws ClassNotFoundException
 	 */
-	@SuppressWarnings("rawtypes")
 	public static String findDeviceProjectDirectoryPath(DeviceConfiguration deviceConfig) throws MalformedURLException, URISyntaxException, ApplicationConfigurationException,
 			ClassNotFoundException {
 		String deviceImplName = deviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
@@ -764,7 +763,7 @@ public class FileUtils {
 		log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 		Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		Class c = loader.loadClass(className);
+		Class<?> c = loader.loadClass(className);
 		String basPath = c.getProtectionDomain().getCodeSource().getLocation().getPath();
 		return basPath.substring(0, basPath.indexOf("bin")-1);
 	}
@@ -780,7 +779,6 @@ public class FileUtils {
 	 * @throws InvocationTargetException
 	 * @throws NoClassDefFoundError
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static String getJarFileNameOfDevice(DeviceConfiguration deviceConfig) throws ClassNotFoundException, NoSuchMethodException,
 			InstantiationException, IllegalAccessException, InvocationTargetException, NoClassDefFoundError {
 		String deviceJarPath = null;
@@ -790,8 +788,8 @@ public class FileUtils {
 				: "gde.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
 		log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		Class c = loader.loadClass(className);
-		Constructor constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
+		Class<?> c = loader.loadClass(className);
+		Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
 		log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (constructor != null) {
 			newInst = (IDevice) constructor.newInstance(new Object[] { deviceConfig });

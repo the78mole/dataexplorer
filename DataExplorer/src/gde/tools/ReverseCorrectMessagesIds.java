@@ -58,6 +58,8 @@ public class ReverseCorrectMessagesIds {
 	+ "# range 1400 to 1499 eStation device \n"
 	+ "# range 1500 to 1599 VC800 device \n"
 	+ "# range 1600 to 1699 LiPoWatch device \n" 
+	+ "# range 1700 to 1799 CSV2SerialDataAdapter device \n"
+	+ "# range 1800 to 1899 WStechVario device  \n"
 	// add new supported device here
 	+ " \n";
 

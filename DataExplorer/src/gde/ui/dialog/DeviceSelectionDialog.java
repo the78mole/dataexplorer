@@ -1103,7 +1103,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	/**
 	 * calculates the new class name for the device
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IDevice getInstanceOfDevice() {
 		IDevice newInst = null;
 		String selectedDeviceName = this.selectedActiveDeviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
@@ -1114,9 +1113,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			//String className = "gde.device.DefaultDeviceDialog";
 			DeviceSelectionDialog.log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			Class c = loader.loadClass(className);
+			Class<?> c = loader.loadClass(className);
 			//Class c = Class.forName(className);
-			Constructor constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
+			Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
 			DeviceSelectionDialog.log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (constructor != null) {
 				newInst = (IDevice) constructor.newInstance(new Object[] { this.selectedActiveDeviceConfig });
