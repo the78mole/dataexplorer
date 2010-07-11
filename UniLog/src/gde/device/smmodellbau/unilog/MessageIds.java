@@ -6,15 +6,15 @@
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GNU DataExplorer is distributed in the hope that it will be useful,
+    DataExplorer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
-    Copyright (c) 2008,2009,2010 Winfried Bruegmann
+
+Copyright (c) 2008,2009,2010 Winfried Bruegmann 
 ****************************************************************************************/
 package gde.device.smmodellbau.unilog;
 
@@ -112,5 +112,15 @@ public class MessageIds {
 	public final static String	GDE_MSGT1383 = "GDE_MSGT1383";
 	public final static String	GDE_MSGT1384 = "GDE_MSGT1384";
 	public final static String	GDE_MSGT1385 = "GDE_MSGT1385";
+	public final static String	GDE_MSGT1386 = "GDE_MSGT1386";
+	public final static String	GDE_MSGT1387 = "GDE_MSGT1387";
+	public final static String	GDE_MSGT1389 = "GDE_MSGT1389";
+	public final static String	GDE_MSGT1390 = "GDE_MSGT1390";
+	public final static String	GDE_MSGT1391 = "GDE_MSGT1391";
+	public final static String	GDE_MSGT1392 = "GDE_MSGT1392";
+	public final static String	GDE_MSGT1393 = "GDE_MSGT1393";
+	public final static String	GDE_MSGT1394 = "GDE_MSGT1394";
+	public final static String	GDE_MSGT1395 = "GDE_MSGT1395";
+	public final static String	GDE_MSGT1396 = "GDE_MSGT1396";
 
  }

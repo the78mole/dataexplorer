@@ -161,6 +161,9 @@ public class UniLogDialog extends DeviceDialog {
 	Button												stopLiveGatherButton;
 	Button												editConfigButton;
 	Text													memoryDeleteInfo;
+	
+	CTabItem											telemetryTabItem;
+	UniLogTelemetryTab						telemetryTab;
 
 	final Settings								settings;
 	final UniLogSerialPort				serialPort;																																																																	// open/close port execute getData()....
@@ -843,7 +846,6 @@ public class UniLogDialog extends DeviceDialog {
 										catch (Exception e) {
 											UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 										}
-
 									}
 								});
 							}
@@ -929,6 +931,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.useConfigCombo.select(this.channelSelectionIndex);
 									this.useConfigCombo.setEditable(false);
 									this.useConfigCombo.setTextLimit(18);
+									this.useConfigCombo.setVisibleItemCount(5);
 									this.useConfigCombo.setBackground(DataExplorer.COLOR_WHITE);
 									this.useConfigCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1322));
 									this.useConfigCombo.addKeyListener(new KeyAdapter() {
@@ -1373,6 +1376,15 @@ public class UniLogDialog extends DeviceDialog {
 					});
 				} // end tabs
 
+				{ // begin telemetry tab
+					this.telemetryTabItem = new CTabItem(this.deviceConfigTabFolder, SWT.NONE);
+					this.telemetryTabItem.setText(Messages.getString(MessageIds.GDE_MSGT1390));
+					this.telemetryTab = new UniLogTelemetryTab(this.deviceConfigTabFolder, this.device);
+					this.telemetryTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.telemetryTabItem.setControl(this.telemetryTab);
+
+				} // end tab
+				
 				int index = Channels.getInstance().getActiveChannelNumber();
 				this.deviceConfigTabFolder.setSelection(index < 1 || index > this.deviceConfigTabFolder.getChildren().length - 2 ? 1 : index);
 

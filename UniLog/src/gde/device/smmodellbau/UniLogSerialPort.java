@@ -48,15 +48,16 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	public final static String 		TIME_MILLI_SEC					= "time_ms"; 				//$NON-NLS-1$
 	public final static String 		A_MODUS_1_2_3						= "aModus_1_2_3"; 	//$NON-NLS-1$
 	
-	final static byte[]		COMMAND_QUERY_STATE			= { 0x54 };		// 'T' query UniLog state
-	final static byte[]		COMMAND_RESET						= { 0x72 };		// 'r' reset UniLog to repeat data send (from the begin)
-	final static byte[]		COMMAND_READ_DATA				= { 0x6C };		// 'l' UniLog read request, answer is one data set (telegram)
-	final static byte[]		COMMAND_REPEAT					= { 0x77 };		// 'w' repeat data transmission, UniLog re-send same data set (telegram)
-	final static byte[]		COMMAND_DELETE					= { (byte) 0xC0, 0x03, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06 };
-	final static byte[]		COMMAND_QUERY_CONFIG		= { (byte) 0xC0, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
-	final static byte[]		COMMAND_LIVE_VALUES			= { 0x76 };		// 'v' query UniLog live values
-	final static byte[]		COMMAND_START_LOGGING		= { 0x53 };		// 'S' start logging data
-	final static byte[]		COMMAND_STOP_LOGGING		= { 0x73 };		// 's' stop logging data
+	final static byte[]		COMMAND_QUERY_STATE				= { 0x54 };		// 'T' query UniLog state
+	final static byte[]		COMMAND_RESET							= { 0x72 };		// 'r' reset UniLog to repeat data send (from the begin)
+	final static byte[]		COMMAND_READ_DATA					= { 0x6C };		// 'l' UniLog read request, answer is one data set (telegram)
+	final static byte[]		COMMAND_REPEAT						= { 0x77 };		// 'w' repeat data transmission, UniLog re-send same data set (telegram)
+	final static byte[]		COMMAND_DELETE						= { (byte) 0xC0, 0x03, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06 };
+	final static byte[]		COMMAND_QUERY_CONFIG			= { (byte) 0xC0, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
+	final static byte[]		COMMAND_QUERY_TELE_CONFIG	= { (byte) 0xC0, 0x03, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07 };
+	final static byte[]		COMMAND_LIVE_VALUES				= { 0x76 };		// 'v' query UniLog live values
+	final static byte[]		COMMAND_START_LOGGING			= { 0x53 };		// 'S' start logging data
+	final static byte[]		COMMAND_STOP_LOGGING			= { 0x73 };		// 's' stop logging data
 
 	//final static byte[]		COMMAND_PREPARE_DELETE			= { 0x78, 0x79, 0x31 };					// "xy1"
 	//final static byte[]		COMMAND_PREPARE_SET_CONFIG	= { 0x78, 0x79, (byte) 0xA7 };	// "xyz"
@@ -354,6 +355,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		}
 		return success;
 	}
+	
 	/**
 	 * set UniLog configuration with new values
 	 * @param updateBuffer - byte array to be written
@@ -437,6 +439,47 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		}
 		return readBuffer;
 	}
+	
+	/**
+	 * query the configuration information from UniLog
+	 * @return byte array containing the configuration information 
+	 * @throws Exception
+	 */
+	public synchronized byte[] readTelemetryConfiguration() throws Exception {
+		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
+		boolean isPortOpenedByMe = false;
+		try {
+			if(!this.isConnected()) {
+				this.open();
+				isPortOpenedByMe = true;
+			}
+
+			// check device connected
+			if (this.checkConnectionStatus()) {
+				// check data ready for read operation
+				if (this.checkDataReady()) {
+
+					this.write(COMMAND_QUERY_TELE_CONFIG);
+					readBuffer = this.read(readBuffer, 2000);
+
+					verifyChecksum(readBuffer); // valid data set -> set values
+					
+				}
+				else
+					throw new IOException(Messages.getString(gde.messages.MessageIds.GDE_MSGE0033));
+			}
+			else
+				throw new IOException(Messages.getString(gde.messages.MessageIds.GDE_MSGE0032));
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		finally {
+			if(isPortOpenedByMe) this.close();
+		}
+		return readBuffer;
+	}	
 
 	/**
 	 * query if UniLog is connected and capable for communication
