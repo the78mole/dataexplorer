@@ -342,8 +342,8 @@ public class DataExplorer extends Composite {
 			this.initGUI();
 
 			this.channels = Channels.getInstance(this);
-			//this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, OpenSerialDataExplorer.COMPARE_RECORD_SET, 1);
-			//this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, OpenSerialDataExplorer.UTILITY_RECORD_SET, 1);
+			//this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1);
+			//this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.UTILITY_RECORD_SET, 1);
 
 			shell.setLayout(new FillLayout());
 			shell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.jpg")); //$NON-NLS-1$

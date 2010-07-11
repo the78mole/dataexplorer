@@ -64,7 +64,7 @@ public class OsdReaderWriter {
 
 
 	/**
-	 * get open serial data file header data
+	 * get data file header data
 	 * @param filePath
 	 * @return hash map containing header data as string accessible by public header keys
 	 * @throws FileNotFoundException

@@ -143,7 +143,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.aboutText = new Label(this.dialogShell, SWT.CENTER);
 				this.aboutText.setLayoutData(aboutTextLData);
 				this.aboutText.setFont(SWTResourceManager.getFont(this.application, 18, 2));
-				this.aboutText.setText("Open Serial Data Explorer"); //$NON-NLS-1$
+				this.aboutText.setText("DataExplorer"); //$NON-NLS-1$
 				this.aboutText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				this.aboutText.setText(DataExplorer.getInstance().getClass().getSimpleName());
 			}
