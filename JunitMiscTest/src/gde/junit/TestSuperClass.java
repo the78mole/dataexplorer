@@ -167,7 +167,6 @@ public class TestSuperClass extends TestCase {
 	/**
 	 * calculates the new class name for the device
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected IDevice getInstanceOfDevice(DeviceConfiguration selectedActiveDeviceConfig) {
 		IDevice newInst = null;
 		String selectedDeviceName = selectedActiveDeviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
@@ -178,9 +177,9 @@ public class TestSuperClass extends TestCase {
 			//String className = "gde.device.DefaultDeviceDialog";
 			//log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			Class c = loader.loadClass(className);
+			Class<?> c = loader.loadClass(className);
 			//Class c = Class.forName(className);
-			Constructor constructor = c.getDeclaredConstructor(new Class[] { String.class });
+			Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { String.class });
 			//log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (constructor != null) {
 				newInst = (IDevice) constructor.newInstance(new Object[] { selectedActiveDeviceConfig.getPropertiesFileName() });
