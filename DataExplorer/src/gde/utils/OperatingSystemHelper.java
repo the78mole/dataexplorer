@@ -732,4 +732,39 @@ public class OperatingSystemHelper {
     }  
     log.log(Level.INFO, sb.toString());
 	}
+	
+	/**
+	 * check for group uucp membership, by calling 'groups'
+	 * @return true if the current user is part of uucp group 
+	 */
+	public static boolean isUucpMember() {
+		boolean isMember = false;
+		try {
+			String command = "groups";  //$NON-NLS-1$
+			log.log(Level.FINER, "executing: " + command); //$NON-NLS-1$
+			Process process = new ProcessBuilder(command).start(); //$NON-NLS-1$ //$NON-NLS-2$
+			process.waitFor();
+			BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			String line;
+			while ((line = bisr.readLine()) != null) {
+				log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
+				if (line.contains("uucp")) {
+					isMember = true;
+				}
+			}
+			while ((line = besr.readLine()) != null) {
+				log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
+			}
+			if (process.exitValue() != 0) {
+				String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.SEVERE, msg);
+			}
+			besr.close();
+			bisr.close();
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+		}
+		return isMember;
+	}
 }

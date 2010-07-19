@@ -658,8 +658,10 @@ public class DataExplorer extends Composite {
 			}
 
 			if ((GDE.IS_MAC || GDE.IS_LINUX) && !this.settings.isLockUucpHinted()) {
-				if (GDE.IS_MAC) this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0046));
-				if (GDE.IS_LINUX) this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0045));
+				if (GDE.IS_MAC && !OperatingSystemHelper.isUucpMember()) 
+					this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0046));
+				else if (GDE.IS_LINUX && !OperatingSystemHelper.isUucpMember()) 
+					this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0045));
 				this.settings.setProperty(Settings.IS_LOCK_UUCP_HINTED, "true");
 			}
 

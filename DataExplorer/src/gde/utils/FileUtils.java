@@ -963,7 +963,7 @@ public class FileUtils {
 			basePath = url.getFile().substring(GDE.IS_WINDOWS ? 1 : 0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
 				+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
-				+ "/" + GDE.GDE_NAME_LONG + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
+				+ "/" + GDE.GDE_NAME_LONG; // + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else { // started outside java -jar *.jar
 			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
