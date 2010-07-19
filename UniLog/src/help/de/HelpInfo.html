@@ -23,13 +23,7 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
 	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.4  (Win32)">
 	<META NAME="AUTHOR" CONTENT="Winfried Br&uuml;gmann">
-	<META NAME="CREATED" CONTENT="20080223;17323053">
-	<META NAME="CHANGEDBY" CONTENT="Winfried Br&uuml;gmann">
-	<META NAME="CHANGED" CONTENT="20080718;18580692">
-	<META NAME="CHANGEDBY" CONTENT="Winfried Brügmann">
-	<META NAME="CHANGEDBY" CONTENT="Winfried Brügmann">
 </HEAD>
 <BODY LANG="de-DE" DIR="LTR">
 <DIV TYPE=HEADER>
@@ -135,6 +129,7 @@ ver&auml;ndern. Nach dr&uuml;cken der Entertaste wird der neue Name
 sofort in der Ger&auml;tekonfiguration persistent gemacht und ist
 aktiv. 
 </P>
+
 <H2><A NAME="config_tab"></A><FONT FACE="Arial"><FONT SIZE=4><I>Der
 Konfigurationstabulator</I></FONT></FONT></H2>
 <P>Diese ist ein komplexer Tabulator und zeigt alle Ger&auml;teeing&auml;nge
@@ -188,7 +183,7 @@ Nun folgt ein Beispiel für eine Motormessung, die wichtigsten Daten, bzw. &Auml
 <P> 
 Für später ist geplant, die Werte, die zur statistischen Berechnung f&uuml;hren &uuml;ber einen Dialog einstellbar zu machen.
 </P>
-<P><B>Hinweis : </B>Falls vier Tabulatoren zu viel sind kann man
+<P><B>Hinweis : </B>Falls vier Konfigurations-Tabulatoren zu viel sind kann man
 durch eine &Auml;nderung der UniLog.xml die Anzahl reduzieren
 (auskommentieren in XML mit &lt;!-- Kommentar --&gt;). Mehr wie vier
 Tabulatoren f&uuml;r noch mehr Konfigurationen ist m&ouml;glich aber
@@ -196,6 +191,17 @@ nicht implementiert.
 Selbstverst&auml;ndlich ist es auch m&ouml;glich alle Messgr&ouml;&szlig;en
 zu aktivieren und nur &uuml;ber die Schalter im Kurvenselektor zu
 filtern.
+</P>
+
+<H2><A NAME="telemetry"></A><FONT FACE="Arial"><FONT SIZE=4><I>Der
+„Telemetrie“ Tabulator</I></FONT></FONT></H2>
+<P>&Uuml;ber den Telemetritabulator lassen sich alle Telemetrieeinstellungen, für die relevanten untertützten Sender-/Empf&auml;nger-Systeme einstellen.
+Unterst&uuml;tzt sind aktuell Jeti Duplex, Futaba und Multiplex M-Link, seit dem UniLog Firmwarelevel 1.12.
+Als erstes sollte man die im UniLog abgelegten Konfigurationsdaten einlesen und erst dann unter Zuhilfenahme der Sender-/Empf&auml;nger-Telemetriebedienungsanleitung die entsprechende Konfiguratin verändern.
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_8.png" NAME="Bild8" ALT="Bild8 Telemetrietabulator" BORDER=0>
+</P>
+<P>Wird eine Einstellung verändert, wird auch den Knopf freigeschaltet, der ein &Uuml;bertragen der ver&auml;nderten Telemetriekonfiguration in das UniLog  erm&ouml;glicht.
 </P>
 </BODY>
 </HTML>

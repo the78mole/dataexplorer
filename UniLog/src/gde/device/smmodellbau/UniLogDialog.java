@@ -296,8 +296,10 @@ public class UniLogDialog extends DeviceDialog {
 						int selection = UniLogDialog.this.deviceConfigTabFolder.getSelectionIndex();
 						if (selection == 0)
 							UniLogDialog.this.application.openHelpDialog(UniLogDialog.DEVICE_NAME, "HelpInfo.html#adjustment"); //$NON-NLS-1$
-						else if (selection == UniLogDialog.this.deviceConfigTabFolder.getItemCount() - 1)
+						else if (selection == UniLogDialog.this.deviceConfigTabFolder.getItemCount() - 2)
 							UniLogDialog.this.application.openHelpDialog(UniLogDialog.DEVICE_NAME, "HelpInfo.html#data_io"); //$NON-NLS-1$
+						else if (selection == UniLogDialog.this.deviceConfigTabFolder.getItemCount() - 1)
+							UniLogDialog.this.application.openHelpDialog(UniLogDialog.DEVICE_NAME, "HelpInfo.html#telemetry"); //$NON-NLS-1$
 						else
 							UniLogDialog.this.application.openHelpDialog(UniLogDialog.DEVICE_NAME, "HelpInfo.html#config_tab"); //$NON-NLS-1$
 					}
