@@ -1209,7 +1209,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * set the mouse tracker in graphics window active for zoom window selection
 	 * @param zoomModeEnabled the isZoomMode to set
 	 */
-	public void setZoomMode(boolean zoomModeEnabled) {
+	public synchronized void setZoomMode(boolean zoomModeEnabled) {
 		if (!zoomModeEnabled) {
 			this.resetMeasurement();
 			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records

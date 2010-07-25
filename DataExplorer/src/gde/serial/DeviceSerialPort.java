@@ -402,10 +402,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int timeOutCounter = timeout_msec / sleepTime;
 
 		try {
-			wait4Bytes(bytes, timeout_msec);
-
 			if (this.application != null) this.application.setSerialRxOn();
-			
+
+			wait4Bytes(bytes, timeout_msec);
+	
 			while (bytes != readBytes && timeOutCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
 				if (bytes != readBytes) {
@@ -550,7 +550,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public int wait4Bytes(int numBytes, int timeout_msec) throws TimeOutException, IOException, InterruptedException {
 		final String $METHOD_NAME = "wait4Bytes"; //$NON-NLS-1$
-		int sleepTime = 1; // usec
+		int sleepTime = 100; // msec
 		int timeOutCounter = timeout_msec / sleepTime;
 		int resBytes = 0;
 
