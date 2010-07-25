@@ -18,24 +18,23 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
-import gnu.io.NoSuchPortException;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Vector;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-
 import gde.device.DeviceConfiguration;
 import gde.exception.CheckSumMissmatchException;
 import gde.exception.TimeOutException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.Checksum;
+import gnu.io.NoSuchPortException;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
 
 /**
  * UniLog serial port implementation class, just copied from Sample projectS
@@ -59,9 +58,6 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	final static byte[]		COMMAND_START_LOGGING			= { 0x53 };		// 'S' start logging data
 	final static byte[]		COMMAND_STOP_LOGGING			= { 0x73 };		// 's' stop logging data
 
-	//final static byte[]		COMMAND_PREPARE_DELETE			= { 0x78, 0x79, 0x31 };					// "xy1"
-	//final static byte[]		COMMAND_PREPARE_SET_CONFIG	= { 0x78, 0x79, (byte) 0xA7 };	// "xyz"
-	
 	final static byte			DATA_STATE_WAITING			= 0x57;		// 'W' UniLog connected, needs some time to organize flash
 	final static byte			DATA_STATE_READY				= 0x46;		// 'F' UniLog ready to receive command
 	final static byte			DATA_STATE_OK						= 0x6A;		// 'j' operation successful ended
@@ -183,15 +179,22 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			this.write(COMMAND_READ_DATA);
 			readBuffer = this.read(readBuffer, 2000);
 			
-			// give it another try
 			if (!isChecksumOK(readBuffer)) {
+				// give it another try
 				++this.reveiceErrors;
 				this.write(COMMAND_REPEAT);
+				Thread.sleep(10);
 				readBuffer = this.read(readBuffer, 2000);
 				verifyChecksum(readBuffer); // throws exception if checksum miss match
 			}
 		}
 		catch (IOException e) {
+			log.log(Level.ALL, "content readBuffer = " + readBuffer);
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		catch (TimeOutException e) {
+			log.log(Level.ALL, "content readBuffer = " + readBuffer);
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
@@ -489,11 +492,17 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 */
 	public synchronized boolean checkConnectionStatus() throws IOException, TimeOutException {
 		boolean isConnect = false;
-		int counter = 20;
+		int counter = 50;
 
 		while (!isConnect && counter-- > 0) {
 			this.write(COMMAND_QUERY_STATE);
 			byte[] buffer = new byte[1];
+			try {
+				Thread.sleep(100);
+			}
+			catch (InterruptedException e) {
+				// ignore
+			}
 			buffer = this.read(buffer, 2000);
 			if (buffer[0] == DATA_STATE_WAITING || buffer[0] == DATA_STATE_READY) {
 				isConnect = true;
