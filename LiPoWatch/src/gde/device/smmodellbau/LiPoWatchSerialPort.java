@@ -124,15 +124,12 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 					readBuffer = readSingleTelegramm();
 
 					dataLength = (readBuffer[0] & 0x7F); 
-					//Datensatztyp = Asc(Mid(strResult, 10, 1)) And &HF
 					dataSetType = (readBuffer[9] & 0x0F);
 					if (dataSetType == 0) { // normal data set type
 						
-						//Zeit = (CLng(Asc(Mid(strResult, 5, 1))) * 256 * 256 * 256 + CLng(Asc(Mid(strResult, 4, 1))) * 256 * 256 + CLng(Asc(Mid(strResult, 3, 1))) * 256 + Asc(Mid(strResult, 2, 1))) / 1000
 						int time_ms =  (((readBuffer[4] & 0xFF) << 24) + ((readBuffer[3] & 0xFF) << 16) + ((readBuffer[2] & 0xFF) << 8) + (readBuffer[1] & 0xFF));
 
 						// number record set
-						//Datensatznummer = CLng(Asc(Mid(strResult, 11, 1))) + 1
 						if(numberRecordSet == ((readBuffer[10] & 0xFF) + 1)) {
 							telegrams.add(readBuffer);
 						}
@@ -198,7 +195,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @throws Exception
 	 */
 	public byte[] readSingleTelegramm() throws Exception {
-		byte[] tmp1ReadBuffer = new byte[1], tmp2ReadBuffer, readBuffer;
+		byte[] tmp1ReadBuffer = new byte[1], tmp2ReadBuffer = new byte[1], readBuffer = new byte[1];
 		int length = 0;
 		
 		try {
@@ -227,6 +224,12 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			}
 		}
 		catch (IOException e) {
+			log.log(Level.ALL, "content readBuffer = " + readBuffer);
+			log.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		catch (TimeOutException e) {
+			log.log(Level.ALL, "content readBuffer = " + readBuffer);
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
@@ -376,7 +379,6 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 				this.open();
 				// check data ready for read operation
 				if (this.waitDataReady()) {
-					//this.write(COMMAND_PREPARE_DELETE);
 					this.write(COMMAND_DELETE);
 					byte[] readBuffer = new byte[1];
 					readBuffer = this.read(readBuffer, 5000);
@@ -415,7 +417,6 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			if (this.checkConnectionStatus()) {
 				// check data ready for read operation
 				if (this.checkDataReady()) {
-					//this.write(COMMAND_PREPARE_SET_CONFIG);
 
 					this.write(updateBuffer);
 					byte[] readBuffer = new byte[1];
@@ -488,7 +489,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @throws IOException
 	 * @throws TimeOutException 
 	 */
-	public boolean checkConnectionStatus() throws IOException, TimeOutException {
+	public synchronized boolean checkConnectionStatus() throws IOException, TimeOutException {
 		boolean isConnect = false;
 		int counter = 50;
 
@@ -496,7 +497,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			this.write(COMMAND_QUERY_STATE);
 			byte[] buffer = new byte[1];
 			try {
-				Thread.sleep(50);
+				Thread.sleep(100);
 			}
 			catch (InterruptedException e) {
 				// ignore
@@ -521,7 +522,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 		while (!isReady && counter-- > 0) {
 			this.write(COMMAND_QUERY_STATE);
 			try {
-				Thread.sleep(50);
+				Thread.sleep(100);
 			}
 			catch (InterruptedException e) {
 				// ignore
