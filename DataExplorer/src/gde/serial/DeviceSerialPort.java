@@ -550,7 +550,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public int wait4Bytes(int numBytes, int timeout_msec) throws TimeOutException, IOException, InterruptedException {
 		final String $METHOD_NAME = "wait4Bytes"; //$NON-NLS-1$
-		int sleepTime = 100; // msec
+		int sleepTime = 2; // msec
 		int timeOutCounter = timeout_msec / sleepTime;
 		int resBytes = 0;
 
