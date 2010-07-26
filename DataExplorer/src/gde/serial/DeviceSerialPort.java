@@ -396,7 +396,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
-		int sleepTime = 4; // ms
+		int sleepTime = 1; // ms
 		int bytes = readBuffer.length;
 		int readBytes = 0;
 		int timeOutCounter = timeout_msec / sleepTime;
@@ -520,7 +520,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public long wait4Bytes(int timeout_msec) throws InterruptedException, TimeOutException, IOException {
 		final String $METHOD_NAME = "wait4Bytes"; //$NON-NLS-1$
-		int sleepTime = 2;
+		int sleepTime = 1;
 		int timeOutCounter = timeout_msec / sleepTime;
 
 		while (0 == this.inputStream.available()) {
@@ -550,11 +550,11 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public int wait4Bytes(int numBytes, int timeout_msec) throws TimeOutException, IOException, InterruptedException {
 		final String $METHOD_NAME = "wait4Bytes"; //$NON-NLS-1$
-		int sleepTime = 2; // msec
+		int sleepTime = 1; // msec
 		int timeOutCounter = timeout_msec / sleepTime;
 		int resBytes = 0;
 
-		while ((resBytes = this.inputStream.available()) < numBytes) {
+		while ((resBytes = this.inputStream.available()) < (numBytes/10)) {
 			try {
 				Thread.sleep(sleepTime);
 			}
