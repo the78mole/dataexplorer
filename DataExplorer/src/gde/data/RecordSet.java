@@ -1240,7 +1240,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * reset the record set in viewpoint of measurement and zooming
 	 */
-	public void resetZoomAndMeasurement() {
+	public synchronized void resetZoomAndMeasurement() {
 		this.setZoomMode(false);
 		this.setMeasurementMode(this.recordKeyMeasurement, false);
 		this.setDeltaMeasurementMode(this.recordKeyMeasurement, false);
