@@ -697,9 +697,10 @@ public class GraphicsComposite extends Composite {
 			
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
-			this.application.setStatusMessage(
-					Messages.getString(MessageIds.GDE_MSGT0257, new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), 
-					record.getUnit(), record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
+			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257, 
+					new Object[] { record.getName(), Messages.getString(MessageIds.GDE_MSGT0212), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(), 
+						TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
+						record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 			));
 		}
 	}
@@ -1093,8 +1094,9 @@ public class GraphicsComposite extends Composite {
 									drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);	
 								}
 								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257, 
-										new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(), 
-										record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
+										new Object[] { record.getName(), Messages.getString(MessageIds.GDE_MSGT0212), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(), 
+											TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
+											record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 								)); 
 							}
 							else {
@@ -1141,8 +1143,9 @@ public class GraphicsComposite extends Composite {
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257, 
-									new Object[] { record.getName(), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(),
-									record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
+									new Object[] { record.getName(), Messages.getString(MessageIds.GDE_MSGT0212), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(), 
+										TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
+										record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 							));
 						}
 						else if (this.isPanMouse) {
