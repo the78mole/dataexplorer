@@ -224,12 +224,12 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			}
 		}
 		catch (IOException e) {
-			log.log(Level.ALL, "content readBuffer = " + readBuffer);
+			log.log(Level.SEVERE, "content readBuffer = " + readBuffer);
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
 		catch (TimeOutException e) {
-			log.log(Level.ALL, "content readBuffer = " + readBuffer);
+			log.log(Level.SEVERE, "content readBuffer = " + readBuffer);
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
