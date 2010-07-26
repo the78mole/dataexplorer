@@ -554,7 +554,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int timeOutCounter = timeout_msec / sleepTime;
 		int resBytes = 0;
 
-		while ((resBytes = this.inputStream.available()) < (numBytes/10)) {
+		while ((resBytes = this.inputStream.available()) < (numBytes/2)) {
 			try {
 				Thread.sleep(sleepTime);
 			}
