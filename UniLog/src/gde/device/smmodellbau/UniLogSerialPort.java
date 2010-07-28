@@ -183,7 +183,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				// give it another try
 				++this.reveiceErrors;
 				this.write(COMMAND_REPEAT);
-				Thread.sleep(10);
+				//Thread.sleep(0, 5);
 				readBuffer = this.read(readBuffer, 2000);
 				verifyChecksum(readBuffer); // throws exception if checksum miss match
 			}
