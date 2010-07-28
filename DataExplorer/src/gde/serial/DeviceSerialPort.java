@@ -262,10 +262,10 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			portId = CommPortIdentifier.getPortIdentifier(this.serialPortStr);
 			this.serialPort = (SerialPort) portId.open("DataExplorer", 10000); //$NON-NLS-1$
 			// set port parameters
-			this.serialPort.setInputBufferSize(2048);
-			this.serialPort.setOutputBufferSize(2048);
 			this.serialPort.setSerialPortParams(this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits().ordinal()+5, this.deviceConfig.getStopBits().ordinal()+1, this.deviceConfig.getParity().ordinal());
 			this.serialPort.setFlowControlMode(this.deviceConfig.getFlowCtrlMode().ordinal());
+			//this.serialPort.setInputBufferSize(8192);
+			//this.serialPort.setOutputBufferSize(1024);
 			this.serialPort.setRTS(this.deviceConfig.isRTS());
 			this.serialPort.setDTR(this.deviceConfig.isDTR());
 
@@ -351,6 +351,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			// write string to serial port
 			this.outputStream.write(writeBuffer);
 			//this.outputStream.flush();
+			
 			if (this.application != null) this.application.setSerialTxOff();
 		}
 		catch (IOException e) {
@@ -554,7 +555,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int timeOutCounter = timeout_msec / sleepTime;
 		int resBytes = 0;
 
-		while ((resBytes = this.inputStream.available()) < (numBytes/2)) {
+		while ((resBytes = this.inputStream.available()) < numBytes) {
 			try {
 				Thread.sleep(sleepTime);
 			}
@@ -729,6 +730,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						}
 						byte[] buf = new byte[getInputStream().available()];
 						if (buf.length > 0) getInputStream().read(buf);
+						getOutputStream().flush();
+						Thread.sleep(5);
 					}
 					catch (Exception e) {
 						log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
