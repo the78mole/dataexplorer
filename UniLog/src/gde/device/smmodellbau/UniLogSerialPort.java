@@ -180,23 +180,50 @@ public class UniLogSerialPort extends DeviceSerialPort {
 			readBuffer = this.read(readBuffer, 2000);
 			
 			if (!isChecksumOK(readBuffer)) {
-				// give it another try
-				++this.reveiceErrors;
-				this.write(COMMAND_REPEAT);
-				//Thread.sleep(0, 5);
-				readBuffer = this.read(readBuffer, 2000);
-				verifyChecksum(readBuffer); // throws exception if checksum miss match
+				readBuffer = readRetry(readBuffer);
 			}
 		}
 		catch (IOException e) {
-			log.log(Level.SEVERE, "content readBuffer = " + readBuffer);
-			log.log(Level.SEVERE, e.getMessage(), e);
-			throw e;
+			readBuffer = readRetry(readBuffer);
 		}
 		catch (TimeOutException e) {
-			log.log(Level.SEVERE, "content readBuffer = " + readBuffer);
-			log.log(Level.SEVERE, e.getMessage(), e);
-			throw e;
+			readBuffer = readRetry(readBuffer);
+		}
+		
+		return readBuffer;
+	}
+
+	/**
+	 * read re-try function, will send COMMAND_REPEAT and re-read the last telegram
+	 * @param readBuffer
+	 * @return
+	 * @throws IOException
+	 * @throws TimeOutException
+	 * @throws CheckSumMissmatchException
+	 */
+	byte[] readRetry(byte[] readBuffer) throws IOException, TimeOutException, CheckSumMissmatchException {
+		
+		if (log.isLoggable(Level.WARNING)) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("Read before data: "); //$NON-NLS-1$
+			for (int i = 0; i < readBuffer.length; i++) {
+				sb.append(String.format("%02X ", readBuffer[i])); //$NON-NLS-1$
+			}
+			log.logp(Level.WARNING, "UniLogSerialPort", "readRetry", sb.toString());
+		}
+		
+		++this.reveiceErrors;
+		this.write(COMMAND_REPEAT);
+		readBuffer = this.read(readBuffer, 2000);
+		verifyChecksum(readBuffer); // throws exception if checksum miss match
+		
+		if (log.isLoggable(Level.WARNING)) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("Read after data: "); //$NON-NLS-1$
+			for (int i = 0; i < readBuffer.length; i++) {
+				sb.append(String.format("%02X ", readBuffer[i])); //$NON-NLS-1$
+			}
+			log.logp(Level.WARNING, "UniLogSerialPort", "readRetry", sb.toString());
 		}
 		
 		return readBuffer;
