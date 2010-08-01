@@ -208,32 +208,41 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			readBuffer[0] = tmp1ReadBuffer[0];
 			System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
 			
-			// give it another try
 			if (!isChecksumOK(readBuffer)) {
-				++this.reveiceErrors;
-				this.write(COMMAND_REPEAT);
-				log.log(Level.WARNING, "errors = " + this.reveiceErrors); //$NON-NLS-1$
-				this.read(tmp1ReadBuffer, 2000);			
-				length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
-				tmp2ReadBuffer = new byte[length-1];
-				this.read(tmp2ReadBuffer, 2000);		
-				readBuffer = new byte[length];
-				readBuffer[0] = tmp1ReadBuffer[0];
-				System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
-				verifyChecksum(readBuffer); // throws exception if checksum miss match
+				readBuffer = readRetry(tmp1ReadBuffer);
 			}
 		}
-		catch (IOException e) {
-			log.log(Level.SEVERE, "content readBuffer = " + readBuffer);
-			log.log(Level.SEVERE, e.getMessage(), e);
-			throw e;
-		}
-		catch (TimeOutException e) {
-			log.log(Level.SEVERE, "content readBuffer = " + readBuffer);
-			log.log(Level.SEVERE, e.getMessage(), e);
-			throw e;
+		catch (Exception e) {
+			readBuffer = readRetry(tmp1ReadBuffer);
 		}
 		
+		return readBuffer;
+	}
+
+	/**
+	 * read re-try function, will send COMMAND_REPEAT and re-read the last telegram
+	 * @param readBuffer
+	 * @return
+	 * @throws IOException
+	 * @throws TimeOutException
+	 * @throws CheckSumMissmatchException
+	 */
+	byte[] readRetry(byte[] tmp1ReadBuffer) throws IOException, TimeOutException, CheckSumMissmatchException {
+		byte[] tmp2ReadBuffer;
+		byte[] readBuffer;
+		int length;
+		// give it another try
+		++this.reveiceErrors;
+		this.write(COMMAND_REPEAT);
+		log.log(Level.WARNING, "errors = " + this.reveiceErrors); //$NON-NLS-1$
+		this.read(tmp1ReadBuffer, 2000);			
+		length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
+		tmp2ReadBuffer = new byte[length-1];
+		this.read(tmp2ReadBuffer, 2000);		
+		readBuffer = new byte[length];
+		readBuffer[0] = tmp1ReadBuffer[0];
+		System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
+		verifyChecksum(readBuffer); // throws exception if checksum miss match
 		return readBuffer;
 	}
 	
