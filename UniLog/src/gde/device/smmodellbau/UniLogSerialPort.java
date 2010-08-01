@@ -183,10 +183,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				readBuffer = readRetry(readBuffer);
 			}
 		}
-		catch (IOException e) {
-			readBuffer = readRetry(readBuffer);
-		}
-		catch (TimeOutException e) {
+		catch (Exception e) {
 			readBuffer = readRetry(readBuffer);
 		}
 		
