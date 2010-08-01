@@ -338,6 +338,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		try {
 			if (this.application != null) this.application.setSerialTxOn();
 
+			this.outputStream.write(writeBuffer);
+			//this.outputStream.flush();
+
 			if (log.isLoggable(Level.FINE)) {
 				StringBuffer sb = new StringBuffer();
 				sb.append("Write data: "); //$NON-NLS-1$
@@ -347,10 +350,6 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 				sb.append(" to port ").append(this.serialPort.getName()).append(System.getProperty("line.separator")); //$NON-NLS-1$ //$NON-NLS-2$
 				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
-
-			// write string to serial port
-			this.outputStream.write(writeBuffer);
-			//this.outputStream.flush();
 			
 			if (this.application != null) this.application.setSerialTxOff();
 		}
@@ -397,19 +396,19 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 */
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
-		int sleepTime = 1; // ms
+		int sleepTime = 2; // ms
 		int bytes = readBuffer.length;
 		int readBytes = 0;
 		int timeOutCounter = timeout_msec / sleepTime;
 
 		try {
 			if (this.application != null) this.application.setSerialRxOn();
-
-			wait4Bytes(bytes, timeout_msec);
 	
-			while (bytes != readBytes && timeOutCounter-- > 0){
-				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
-				if (bytes != readBytes) {
+			while (bytes != readBytes && timeOutCounter-- > 0) {
+				if (this.inputStream.available() > 0) {
+					readBytes += this.inputStream.read(readBuffer, readBytes, bytes - readBytes);
+				}
+				else {
 					try {
 						Thread.sleep(sleepTime);
 					}
@@ -437,11 +436,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			if (this.application != null) this.application.setSerialRxOff();
 		}
 		catch (IOException e) {
-			log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
-			throw e;
-		}
-		catch (InterruptedException e) {
 			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			throw e;
 		}
 		return readBuffer;
 	}
@@ -468,7 +464,6 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			wait4Bytes(timeout_msec);
 
 			if (this.application != null) this.application.setSerialRxOn();
-
 			while (bytes != readBytes && timeOutCounter-- > 0){
 				readBytes += this.inputStream.read(readBuffer, readBytes, bytes - readBytes);
 				if (bytes != readBytes) {
