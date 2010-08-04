@@ -68,6 +68,7 @@ public class GDE {
 	public static final boolean		IS_MAC										= System.getProperty("os.name").toLowerCase().startsWith("mac");		//$NON-NLS-1$
 	public static final boolean		IS_MAC_CARBON							= GDE.IS_MAC && System.getProperty("DO_NOT_USE_CARBON") == null && SWT.getPlatform().toLowerCase().startsWith("carbon");		//$NON-NLS-1$
 	public static final boolean		IS_MAC_COCOA							= GDE.IS_MAC && System.getProperty("DO_NOT_USE_COCOA") == null && SWT.getPlatform().toLowerCase().startsWith("cocoa");		//$NON-NLS-1$
+	public static final boolean		IS_ARCH_DATA_MODEL_64			= System.getProperty("sun.arch.data.model").equals("64");		//$NON-NLS-1$
 	
 	public final static int				WIDGET_FONT_SIZE					= GDE.IS_LINUX ? 8 : GDE.IS_MAC ? 12 : 9;
 	public final static String		WIDGET_FONT_NAME					= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : "Sans Serif"; 					//$NON-NLS-1$ //$NON-NLS-2$
