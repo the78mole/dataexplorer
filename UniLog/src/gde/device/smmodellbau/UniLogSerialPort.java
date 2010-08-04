@@ -211,6 +211,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		
 		++this.reveiceErrors;
 		this.write(COMMAND_REPEAT);
+		readBuffer = new byte[DATA_LENGTH_BYTES];
 		readBuffer = this.read(readBuffer, 2000);
 		verifyChecksum(readBuffer); // throws exception if checksum miss match
 		
