@@ -264,8 +264,8 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			// set port parameters
 			this.serialPort.setSerialPortParams(this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits().ordinal()+5, this.deviceConfig.getStopBits().ordinal()+1, this.deviceConfig.getParity().ordinal());
 			this.serialPort.setFlowControlMode(this.deviceConfig.getFlowCtrlMode().ordinal());
-			//this.serialPort.setInputBufferSize(8192);
-			//this.serialPort.setOutputBufferSize(1024);
+			this.serialPort.setInputBufferSize(1024);
+			this.serialPort.setOutputBufferSize(512);
 			this.serialPort.setRTS(this.deviceConfig.isRTS());
 			this.serialPort.setDTR(this.deviceConfig.isDTR());
 
@@ -339,7 +339,9 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			if (this.application != null) this.application.setSerialTxOn();
 
 			this.outputStream.write(writeBuffer);
-			//this.outputStream.flush();
+			if (GDE.IS_LINUX && GDE.IS_ARCH_DATA_MODEL_64) {
+				this.outputStream.flush();
+			}
 
 			if (log.isLoggable(Level.FINE)) {
 				StringBuffer sb = new StringBuffer();
