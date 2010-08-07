@@ -20,11 +20,14 @@
 package gde.utils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -592,7 +595,7 @@ public class OperatingSystemHelper {
 					log.log(Level.WARNING, e.getMessage());
 				}
 			}
-			else if (GDE.IS_LINUX || GDE.IS_MAC) { //$NON-NLS-1$
+			else if (GDE.IS_LINUX) { //$NON-NLS-1$
 				try {
 					String fullQualifiedLinkTargetPath = fullQualifiedSourceFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 					String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
@@ -620,6 +623,16 @@ public class OperatingSystemHelper {
 				catch (Throwable e) {
 					log.log(Level.WARNING, e.getMessage());
 				}
+			}
+			else if (GDE.IS_MAC) { //$NON-NLS-1$
+				fullQualifiedSourceFilePath = fullQualifiedSourceFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				log.log(Level.FINE, "sourceBasePath = " + fullQualifiedSourceFilePath + ", targetFileLinkPath = " + fullQualifiedTargetFilePath); //$NON-NLS-1$
+				
+				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fullQualifiedTargetFilePath), "UTF-8")); //$NON-NLS-1$
+				writer.write(fullQualifiedSourceFilePath);
+				writer.write(GDE.LINE_SEPARATOR);
+				writer.close();
 			}
 			else {
 				log.log(Level.WARNING, "not supported OS"); //$NON-NLS-1$
@@ -659,7 +672,7 @@ public class OperatingSystemHelper {
 				}
 			}
 		}
-		else if (GDE.IS_LINUX  || GDE.IS_MAC) {
+		else if (GDE.IS_LINUX) {
 			try {
 				String command = "ls -al " + filePath;  //$NON-NLS-1$
 				log.log(Level.FINER, "executing: " + command); //$NON-NLS-1$
@@ -687,6 +700,19 @@ public class OperatingSystemHelper {
 				log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 
+		}
+		else if (GDE.IS_MAC) {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8")); //$NON-NLS-1$
+			char[] tmpChars = new char[25]; // max path length
+			reader.read(tmpChars);
+			String line = new String(tmpChars);
+			log.log(Level.FINE, "line = " + line); //$NON-NLS-1$
+			if (!line.contains(GDE.DATA_EXPLORER_FILE) && !line.contains(GDE.LEGACY_OSDE_FILE)) {
+				line = line + reader.readLine();
+				ret = line.trim();
+				log.log(Level.FINE, "returned FilePath = " + ret); //$NON-NLS-1$
+			}
+			reader.close();
 		}
 		else {
 			log.log(Level.WARNING, "Operating System implementation not available"); //$NON-NLS-1$
