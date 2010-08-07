@@ -356,6 +356,7 @@
 		<copy todir="${output.mac32.carbon.bundle}" flatten="yes">
 			<fileset file="build/lib/MAC/32/Info.plist" />
 			<fileset file="build/misc/PkgInfo" />
+			<fileset file="build/misc/version.plist" />
 		</copy>
 		<copy todir="${output.mac32.carbon.bundle.bin}" flatten="yes">
 			<fileset file="build/misc/DataExplorerMac32" />
@@ -378,6 +379,7 @@
 		<copy todir="${output.mac32.cocoa.bundle}" flatten="yes">
 			<fileset file="build/lib/MAC/32/Info.plist" />
 			<fileset file="build/misc/PkgInfo" />
+			<fileset file="build/misc/version.plist" />
 		</copy>
 		<copy todir="${output.mac32.cocoa.bundle.bin}" flatten="yes">
 			<fileset file="build/misc/DataExplorerMac32" />
@@ -400,6 +402,7 @@
 		<copy todir="${output.mac64.cocoa.bundle}" flatten="yes">
 			<fileset file="build/lib/MAC/64/Info.plist" />
 			<fileset file="build/misc/PkgInfo" />
+			<fileset file="build/misc/version.plist" />
 		</copy>
 		<copy todir="${output.mac64.cocoa.bundle.bin}" flatten="yes">
 			<fileset file="build/misc/DataExplorerMac64" />
