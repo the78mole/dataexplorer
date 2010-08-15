@@ -1,10 +1,10 @@
-GNU DataExplorer - News - comes with version 2.20
+GNU DataExplorer - News - comes with version 2.40
 
-1) add WStech LinkVario
-2) small Info.plist fix for Mac OS
-3) update GNU/Linux application register function
-4) create extra WStechVario plug-in
-5) add sample udev rule files to GNU/Linux binaries
-6) enhance IDevice interface to allow extra device dependent tabulator
-7) add WStech DataVario setup tool as additional tabulator
-8) add WStech LinkVario setup tool as additional tabulator
+1) fix Info.plist for Mac OS
+2) update UniLog to suport firmeware 1.13 with M-Link configuration
+3) update WStech online help VarioTool
+4) fix MAC OS link problem by defining simple link files as workaround
+5) stabilize GNU/Linux 64 bit serial read 
+6) show delta values during delta measurement
+7) implement KML and GPX export and enable export using file -> export menu
+8) 
