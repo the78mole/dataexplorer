@@ -1055,6 +1055,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				activeDevice.getDialog().dispose();
 			}
 		}
+		// cleanup menuBar for device specific entries
+		this.application.getMenuBar().cleanup();
+		
 		// prepare every thing for the new device
 		if ((activeDevice = getInstanceOfDevice()) != null) {
 			this.application.setActiveDevice(activeDevice);

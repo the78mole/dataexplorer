@@ -862,4 +862,21 @@ public class MenuBar {
 		this.prevDeviceMenuItem.setEnabled(enabled);
 		this.nextDeviceMenuItem.setEnabled(enabled);
 	}
+	
+	/**
+	 * @return the file menu for update purpose
+	 */
+	public Menu getExportMenu() {
+		return this.exportMenu;
+	}
+	
+	/**
+	 * remove menu entries not any longer required
+	 */
+	public void cleanup() {
+		//cleanup exportMenu for device specific entries
+		for (int i = this.exportMenu.getItemCount()-1; !this.exportMenu.getItem(i).getText().equals(Messages.getString(MessageIds.GDE_MSGT0018)); i--) {
+			this.exportMenu.getItem(i).dispose();
+		}
+	}
 }

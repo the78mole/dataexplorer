@@ -392,4 +392,100 @@ public class FileHandler {
 		}
 	}
 
+	/**
+	 * handles the export of an KML file
+	 * @param dialogName
+	 * @param ordinalLongitude
+	 * @param ordinalLatitude
+	 * @param ordinalHeight
+	 * @param isRelative
+	 */
+	public void exportFileKML(final String dialogName, final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final boolean isRelative) {
+		final Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel == null) {
+			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005)); 
+			return;
+		}
+		RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+		if (activeRecordSet == null) {
+			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005)); 
+			return;
+		}
+
+		Settings deviceSetting = Settings.getInstance();
+		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String fileName = activeChannel.getFileName();
+		fileName = fileName.substring(0, fileName.indexOf(".")); 
+		FileDialog kmlFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_KML }, path, fileName.length() > 4 ? fileName : getFileNameProposal()); 
+		final String kmlFilePath = kmlFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + kmlFileDialog.getFileName();
+
+		if (kmlFilePath.length() > 4) { // file name has a reasonable length
+			if (FileUtils.checkFileExist(kmlFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { kmlFilePath }))) {
+				return;
+			}
+
+			try {
+				this.application.enableMenuActions(false);
+				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+				KMLWriter.write(activeRecordSet, kmlFilePath, ordinalLongitude, ordinalLatitude, ordinalHeight, isRelative);
+			}
+			catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+				this.application.openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			}
+			this.application.enableMenuActions(true);
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+		}
+	}
+
+	/**
+	 * handles the export of an GPX file
+	 * @param dialogName
+	 * @param ordinalLongitude
+	 * @param ordinalLatitude
+	 * @param ordinalGPSHeight
+	 * @param ordinalVelocity
+	 * @param ordinalHeight
+	 * @param isRelative
+	 */
+	public void exportFileGPX(final String dialogName, final int ordinalLongitude, final int ordinalLatitude, final int ordinalGPSHeight, final int ordinalVelocity, final int ordinalHeight, final boolean isRelative
+) {
+		final Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel == null) {
+			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005)); 
+			return;
+		}
+		RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+		if (activeRecordSet == null) {
+			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005)); 
+			return;
+		}
+
+		Settings deviceSetting = Settings.getInstance();
+		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String fileName = activeChannel.getFileName();
+		fileName = fileName.substring(0, fileName.indexOf(".")); 
+		FileDialog gpxFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName.length() > 4 ? fileName : getFileNameProposal()); 
+		final String gpxFilePath = gpxFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + gpxFileDialog.getFileName();
+
+		if (gpxFilePath.length() > 4) { // file name has a reasonable length
+			if (FileUtils.checkFileExist(gpxFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { gpxFilePath }))) {
+				return;
+			}
+
+			try {
+				this.application.enableMenuActions(false);
+				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+				GPXWriter.write(activeRecordSet, gpxFilePath, ordinalLongitude, ordinalLatitude, ordinalGPSHeight, ordinalVelocity, ordinalHeight, isRelative);
+			}
+			catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+				this.application.openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			}
+			this.application.enableMenuActions(true);
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+		}
+	}
 }
