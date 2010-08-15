@@ -2381,26 +2381,4 @@ public class VarioToolTabItem extends CTabItem {
 	public String getFirmwareVersion() {
 		return this.getText().startsWith("Link") ? "00x" : "50x";
 	}
-	
-	/**
-	 * converts the actual displayed data set to KLM file format
-	 * @param type types are GPS_HEGHT | BARO_HEIGHT
-	 */
-	public void convert2KML3D(int type) {
-		this.application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGI0047));
-	}
-	
-	/**
-	 * converts the actual displayed data set to GPX file format
-	 */
-	public void convert2GPX() {
-		this.application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGI0047));
-	}
-	
-	/**
-	 * converts the actual displayed data set to GPX file format
-	 */
-	public void convert2Skylotter() {
-		this.application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGI0047));
-	}
 }
