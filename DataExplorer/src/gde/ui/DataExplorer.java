@@ -217,6 +217,8 @@ public class DataExplorer extends Composite {
 		this.extensionFilterMap.put(GDE.FILE_ENDING_PNG, Messages.getString(MessageIds.GDE_MSGT0213));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_GIF, Messages.getString(MessageIds.GDE_MSGT0214));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_JPG, Messages.getString(MessageIds.GDE_MSGT0215));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_KML, Messages.getString(MessageIds.GDE_MSGT0222));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_GPX, Messages.getString(MessageIds.GDE_MSGT0223));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_STAR, Messages.getString(MessageIds.GDE_MSGT0216));
 	}
 
@@ -1131,6 +1133,7 @@ public class DataExplorer extends Composite {
 			this.channels.cleanup();
 			this.enableDeviceSwitchButtons(false);
 		}
+		
 		//cleanup device specific utility graphics tab item
 		if (this.utilGraphicsTabItem != null) {
 			this.utilGraphicsTabItem.dispose();

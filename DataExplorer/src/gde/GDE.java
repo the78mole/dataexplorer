@@ -139,6 +139,8 @@ public class GDE {
 	public static final String		FILE_ENDING_DOT_XML				= ".xml";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_XSD				= ".xsd";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_HEX				= ".hex";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_DOT_KML				= ".kml";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_DOT_GPX				= ".gpx";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_LOV						= "lov";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_OSD						= "osd";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_CSV						= "csv";	//$NON-NLS-1$
@@ -148,6 +150,8 @@ public class GDE {
 	public static final String		FILE_ENDING_GIF						= "gif";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_BAK						= "bak";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_TMP						= "tmp";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_KML						= "kml";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_GPX						= "gpx";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR					= "*";		//$NON-NLS-1$
 	public static final String		FILE_ENDING_HEX						= "hex";	//$NON-NLS-1$
 
