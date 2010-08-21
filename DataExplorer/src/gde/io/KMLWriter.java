@@ -90,7 +90,7 @@ public class KMLWriter {
 		BufferedWriter writer = null;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		StringBuilder	sb = new StringBuilder();
-		int height0 = 0;
+		double height0 = 0;
 		
 		try {
 			long startTime = new Date().getTime();
@@ -123,12 +123,12 @@ public class KMLWriter {
 								-50, 70, 1000, "ff00ff00", 2, 0));
 						isLeaderWritten = true;
 						
-						height0 = isRelative ? (int)device.translateValue(recordHeight, recordHeight.get(i)) : 0;
+						height0 = isRelative ? device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) : 0;
 					}
 					// add data entries, translate according device and measurement unit
 					sb.append(String.format(Locale.ENGLISH, "\t\t\t%.7f,", device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0)))
-						.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLongitude, recordLatitude.get(i) / 1000.0)))
-						.append(String.format(Locale.ENGLISH, "%.0f", device.translateValue(recordLongitude, recordHeight.get(i)) - height0)).append(GDE.LINE_SEPARATOR);
+						.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0)))
+						.append(String.format(Locale.ENGLISH, "%.0f", device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0)).append(GDE.LINE_SEPARATOR);
 	
 					writer.write(sb.toString());
 					sb = new StringBuilder();
