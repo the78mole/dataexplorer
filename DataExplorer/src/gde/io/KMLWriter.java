@@ -94,7 +94,7 @@ public class KMLWriter {
 		
 		try {
 			long startTime = new Date().getTime();
-			if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138) + filePath);
+			if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] {GDE.FILE_ENDING_KML, filePath}));
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "UTF-8")); //$NON-NLS-1$
 			IDevice device = DataExplorer.getInstance().getActiveDevice();
 
