@@ -318,7 +318,7 @@ public class CSVSerialDataReaderWriter {
 //		}
 //		catch (IOException e) {
 //			log.log(Level.SEVERE, e.getMessage(), e);
-//			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0006, new Object[]{ filePath }));
+//			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0006, new Object[]{ GDE.FILE_ENDING_CSV, filePath, e.getMessage() }));
 //		}
 //		catch (Exception e) {
 //			log.log(Level.SEVERE, e.getMessage(), e);

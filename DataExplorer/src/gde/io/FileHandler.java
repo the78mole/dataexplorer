@@ -412,9 +412,12 @@ public class FileHandler {
 		String fileName = activeChannel.getFileName();
 		fileName = fileName.substring(0, fileName.indexOf("."));
 		FileDialog kmlFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_KML }, path, fileName.length() > 4 ? fileName : getFileNameProposal());
-		final String kmlFilePath = kmlFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + kmlFileDialog.getFileName();
+		String kmlFilePath = kmlFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + kmlFileDialog.getFileName();
+		if (!kmlFilePath.endsWith(GDE.FILE_ENDING_DOT_KML)) {
+			kmlFilePath = kmlFilePath.substring(0, kmlFilePath.lastIndexOf(GDE.STRING_DOT) > kmlFilePath.length() - 5 ? kmlFilePath.lastIndexOf(GDE.STRING_DOT) : kmlFilePath.length()) + GDE.FILE_ENDING_DOT_KML;
+		}
 
-		if (kmlFileDialog.getFileName().length() > 4 && kmlFilePath.substring(kmlFilePath.length() - 4).equals(GDE.FILE_ENDING_DOT_KML)) { // file name has a reasonable length
+		if (kmlFileDialog.getFileName().endsWith(GDE.FILE_ENDING_DOT_KML) ? kmlFileDialog.getFileName().length() > 4 : kmlFileDialog.getFileName().length() > 1) { // file name has a reasonable length
 			if (FileUtils.checkFileExist(kmlFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { kmlFilePath }))) {
 				return;
 			}
@@ -462,9 +465,12 @@ public class FileHandler {
 		String fileName = activeChannel.getFileName();
 		fileName = fileName.substring(0, fileName.indexOf("."));
 		FileDialog gpxFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName.length() > 4 ? fileName : getFileNameProposal());
-		final String gpxFilePath = gpxFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + gpxFileDialog.getFileName();
+		String gpxFilePath = gpxFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + gpxFileDialog.getFileName();
+		if (!gpxFilePath.endsWith(GDE.FILE_ENDING_DOT_GPX)) {
+			gpxFilePath = gpxFilePath.substring(0, gpxFilePath.lastIndexOf(GDE.STRING_DOT) > gpxFilePath.length() - 5 ? gpxFilePath.lastIndexOf(GDE.STRING_DOT) : gpxFilePath.length()) + GDE.FILE_ENDING_DOT_GPX;
+		}
 
-		if (gpxFileDialog.getFileName().length() > 4 && gpxFilePath.substring(gpxFilePath.length() - 4).equals(GDE.FILE_ENDING_DOT_GPX)) { // file name has a reasonable length
+		if (gpxFileDialog.getFileName().endsWith(GDE.FILE_ENDING_DOT_GPX) ? gpxFileDialog.getFileName().length() > 4 : gpxFileDialog.getFileName().length() > 1) { // file name has a reasonable length
 			if (FileUtils.checkFileExist(gpxFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { gpxFilePath }))) {
 				return;
 			}
