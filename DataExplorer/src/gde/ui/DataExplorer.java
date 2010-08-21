@@ -1537,6 +1537,13 @@ public class DataExplorer extends Composite {
 			});
 		}
 	}
+	
+	/**
+	 * update graphics catptions (header and description)
+	 */
+	public void updateGraphicsCaptions() {
+		this.graphicsTabItem.updateCaptions();
+	}
 
 	/**
 	 * update the graphics window curve selector table only (after calculating values to make records displayable)

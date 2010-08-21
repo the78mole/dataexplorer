@@ -1302,7 +1302,7 @@ public class MenuToolBar {
 				if (answer == SWT.YES) { //replace existing objectkey in channel
 					activeChannel.setObjectKey(newObjectKey);
 					String updateFileDescription = activeChannel.getFileDescription();
-					if (updateFileDescription.contains(channelObjKey)) {
+					if (channelObjKey.length() > 1 && updateFileDescription.contains(channelObjKey)) {
 						updateFileDescription = updateFileDescription.substring(0, updateFileDescription.indexOf(channelObjKey))
 						+ newObjectKey + updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey)+ channelObjKey.length());
 					}

@@ -1387,9 +1387,13 @@ public class GraphicsComposite extends Composite {
 				GraphicsComposite.this.graphicsHeaderText = null;
 				GraphicsComposite.this.recordSetCommentText = null;
 			}
-			GraphicsComposite.this.recordSetComment.redraw();
-			GraphicsComposite.this.graphicsHeader.redraw();
+			updateCaptions();
 		}
+	}
+
+	public void updateCaptions() {
+		GraphicsComposite.this.recordSetComment.redraw();
+		GraphicsComposite.this.graphicsHeader.redraw();
 	}
 
 	/**

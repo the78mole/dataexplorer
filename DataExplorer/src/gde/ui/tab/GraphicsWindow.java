@@ -112,13 +112,31 @@ public class GraphicsWindow extends CTabItem {
 	public void redrawGraphics() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			this.graphicsComposite.doRedrawGraphics();
+			this.graphicsComposite.updateCaptions();
 			this.curveSelectorComposite.doUpdateCurveSelectorTable();
 		}
 		else {
 			DataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
 					GraphicsWindow.this.graphicsComposite.doRedrawGraphics();
+					GraphicsWindow.this.graphicsComposite.updateCaptions();
 					GraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
+				}
+			});
+		}
+	}
+	
+	/**
+	 * update graphics window header and description
+   */ 
+	public void updateCaptions() {
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			this.graphicsComposite.updateCaptions();
+		}
+		else {
+			DataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					GraphicsWindow.this.graphicsComposite.updateCaptions();
 				}
 			});
 		}
