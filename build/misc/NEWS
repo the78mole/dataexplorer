@@ -7,4 +7,4 @@ GNU DataExplorer - News - comes with version 2.40
 5) stabilize GNU/Linux 64 bit serial read 
 6) show delta values during delta measurement
 7) implement KML and GPX export and enable export using file -> export menu
-8) 
+8) fix update problem while changing or updating object key
