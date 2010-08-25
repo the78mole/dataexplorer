@@ -8,3 +8,4 @@ GNU DataExplorer - News - comes with version 2.40
 6) show delta values during delta measurement
 7) implement KML and GPX export and enable export using file -> export menu
 8) fix update problem while changing or updating object key
+9) enable deep re-naming of object keys (include object meta data and update of all data files)
