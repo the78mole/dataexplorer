@@ -406,11 +406,11 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		try {
 			if (this.application != null) this.application.setSerialRxOn();
 	
-			while (bytes != readBytes && timeOutCounter-- > 0) {
-				if (this.inputStream.available() > 0) {
-					readBytes += this.inputStream.read(readBuffer, readBytes, bytes - readBytes);
-				}
-				else {
+			wait4Bytes(bytes, timeout_msec - (timeout_msec/5));
+
+			while (bytes != readBytes && timeOutCounter-- > 0){
+				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
+				if (bytes != readBytes) {
 					try {
 						Thread.sleep(sleepTime);
 					}
@@ -546,7 +546,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 	 * @throws InterruptedException 
 	 * @throws IOException 
 	 */
-	public int wait4Bytes(int numBytes, int timeout_msec) throws TimeOutException, IOException, InterruptedException {
+	public int wait4Bytes(int numBytes, int timeout_msec) throws IOException {
 		final String $METHOD_NAME = "wait4Bytes"; //$NON-NLS-1$
 		int sleepTime = 1; // msec
 		int timeOutCounter = timeout_msec / sleepTime;
@@ -563,8 +563,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			//log.logp(Level.FINER, "time out counter = " + counter);
 			if (timeOutCounter <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { numBytes, timeout_msec }));
-				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
-				throw e;
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 		}
 		

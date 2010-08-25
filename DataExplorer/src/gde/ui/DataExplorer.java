@@ -18,6 +18,38 @@
 ****************************************************************************************/
 package gde.ui;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceDialog;
+import gde.device.IDevice;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.dialog.AboutDialog;
+import gde.ui.dialog.DeviceSelectionDialog;
+import gde.ui.dialog.HelpInfoDialog;
+import gde.ui.dialog.SettingsDialog;
+import gde.ui.menu.MenuBar;
+import gde.ui.menu.MenuToolBar;
+import gde.ui.tab.AnalogWindow;
+import gde.ui.tab.CellVoltageWindow;
+import gde.ui.tab.DataTableWindow;
+import gde.ui.tab.DigitalWindow;
+import gde.ui.tab.FileCommentWindow;
+import gde.ui.tab.GraphicsComposite;
+import gde.ui.tab.GraphicsWindow;
+import gde.ui.tab.ObjectDescriptionWindow;
+import gde.ui.tab.StatisticsWindow;
+import gde.ui.tab.UtilGraphicsWindow;
+import gde.utils.FileUtils;
+import gde.utils.OperatingSystemHelper;
+import gde.utils.StringHelper;
+import gde.utils.WebBrowser;
+
 import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.HashMap;
@@ -71,38 +103,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.device.DeviceDialog;
-import gde.device.IDevice;
-import gde.log.Level;
-import gde.log.LogFormatter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.dialog.AboutDialog;
-import gde.ui.dialog.DeviceSelectionDialog;
-import gde.ui.dialog.HelpInfoDialog;
-import gde.ui.dialog.SettingsDialog;
-import gde.ui.menu.MenuBar;
-import gde.ui.menu.MenuToolBar;
-import gde.ui.tab.AnalogWindow;
-import gde.ui.tab.CellVoltageWindow;
-import gde.ui.tab.DataTableWindow;
-import gde.ui.tab.DigitalWindow;
-import gde.ui.tab.FileCommentWindow;
-import gde.ui.tab.GraphicsComposite;
-import gde.ui.tab.GraphicsWindow;
-import gde.ui.tab.ObjectDescriptionWindow;
-import gde.ui.tab.StatisticsWindow;
-import gde.ui.tab.UtilGraphicsWindow;
-import gde.utils.FileUtils;
-import gde.utils.OperatingSystemHelper;
-import gde.utils.StringHelper;
-import gde.utils.WebBrowser;
 
 /**
  * Main application class of DataExplorer
@@ -2365,6 +2365,16 @@ public class DataExplorer extends Composite {
 				this.objectDescriptionTabItem.dispose();
 				this.objectDescriptionTabItem = null;
 			}
+		}
+	}
+	
+	/**
+	 * @return the current object data object if object oriented, else null wil be returned
+	 */
+	public void updateCurrentObjectData(String newObjectKey) {
+		if (this.objectDescriptionTabItem != null) {
+			this.objectDescriptionTabItem.setObject(this.objectDescriptionTabItem.getObject(), newObjectKey);
+			this.updateObjectDescriptionWindow();
 		}
 	}
 	

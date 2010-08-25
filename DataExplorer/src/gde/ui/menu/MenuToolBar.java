@@ -18,8 +18,29 @@
 ****************************************************************************************/
 package gde.ui.menu;
 
-import java.util.Vector;
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.DeviceDialog;
+import gde.device.IDevice;
+import gde.io.FileHandler;
+import gde.io.OsdReaderWriter;
 import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.dialog.DeviceSelectionDialog;
+import gde.ui.dialog.PrintSelectionDialog;
+import gde.ui.tab.GraphicsComposite;
+import gde.utils.FileUtils;
+import gde.utils.ObjectKeyScanner;
+
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -34,26 +55,6 @@ import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.device.DeviceConfiguration;
-import gde.device.DeviceDialog;
-import gde.device.IDevice;
-import gde.io.FileHandler;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.dialog.DeviceSelectionDialog;
-import gde.ui.dialog.PrintSelectionDialog;
-import gde.ui.tab.GraphicsComposite;
-import gde.utils.FileUtils;
-import gde.utils.ObjectKeyScanner;
 
 /**
  * Graphical menu tool bar class
@@ -420,25 +421,35 @@ public class MenuToolBar {
 											}
 											checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
 										}
-										else {
+										else { //rename object key
 											log.log(Level.FINE, "oldObjectKey = " + MenuToolBar.this.oldObjectKey); //$NON-NLS-1$
 											if (MenuToolBar.this.oldObjectKey.length() >= 1) {
-												int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031));
+												checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
+
+												// query if new object key should be used to modify all existing data files with the new corrected one
+												int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0048, new String[] {MenuToolBar.this.oldObjectKey, newObjKey}));
+												if (answer == SWT.YES) {
+													OsdReaderWriter.updateObjectKey(MenuToolBar.this.oldObjectKey, newObjKey);
+													MenuToolBar.this.application.updateCurrentObjectData(newObjKey);
+												}
+												
+												//query for old directory deletion
+												answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031));
 												if (answer == SWT.YES) 
 													FileUtils.deleteDirectory(MenuToolBar.this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX  + MenuToolBar.this.oldObjectKey);
-											}
-											for (; selectionIndex < tmpObjects.length; selectionIndex++) {
-												if (tmpObjects[selectionIndex].equals(MenuToolBar.this.oldObjectKey)) {
-													tmpObjects[selectionIndex] = newObjKey;
-													break;
+												
+												//replace modified object key
+												for (; selectionIndex < tmpObjects.length; selectionIndex++) {
+													if (tmpObjects[selectionIndex].equals(MenuToolBar.this.oldObjectKey)) {
+														tmpObjects[selectionIndex] = newObjKey;
+														break;
+													}
 												}
+												MenuToolBar.this.oldObjectKey = null;
 											}
-											checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
-											MenuToolBar.this.oldObjectKey = null;
 										}
-										MenuToolBar.this.objectSelectCombo.setItems(tmpObjects);
-										MenuToolBar.this.objectSelectCombo.select(selectionIndex);
-										MenuToolBar.this.settings.setObjectList(MenuToolBar.this.objectSelectCombo.getItems(), selectionIndex);
+										MenuToolBar.this.setObjectList(tmpObjects, newObjKey);
+										
 										if (selectionIndex >= 1) {
 											MenuToolBar.this.deleteObject.setEnabled(true);
 											MenuToolBar.this.editObject.setEnabled(true);
@@ -1303,8 +1314,14 @@ public class MenuToolBar {
 					activeChannel.setObjectKey(newObjectKey);
 					String updateFileDescription = activeChannel.getFileDescription();
 					if (channelObjKey.length() > 1 && updateFileDescription.contains(channelObjKey)) {
+						if (newObjectKey.length() > 1){
 						updateFileDescription = updateFileDescription.substring(0, updateFileDescription.indexOf(channelObjKey))
 						+ newObjectKey + updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey)+ channelObjKey.length());
+						}
+						else { // newObjectKey = ""
+							updateFileDescription = updateFileDescription.substring(0, updateFileDescription.indexOf(channelObjKey) - 1)
+							+ updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey)+ channelObjKey.length());
+						}
 					}
 					else if (newObjectKey.length() > 1){
 						updateFileDescription = updateFileDescription + GDE.STRING_BLANK + newObjectKey;

@@ -138,6 +138,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 	boolean												isObjectDataSaved		= true;
 	Vector<StyleRange>						cachedStyles				= new Vector<StyleRange>();
 	ObjectData										object;
+
 	Image													image;
 	Color													innerAreaBackground;
 	Color													surroundingBackground;
@@ -988,4 +989,14 @@ public class ObjectDescriptionWindow extends CTabItem {
 		this.fontSizeSelectComposite.setBackground(this.surroundingBackground);
 		this.tabComposite.redraw();
 	}
+	
+	public ObjectData getObject() {
+		return object;
+	}
+
+	public void setObject(ObjectData object, String newObjectKey) {
+		this.isObjectDataSaved = false;
+		this.object = new ObjectData(object, newObjectKey);
+	}
+
 }

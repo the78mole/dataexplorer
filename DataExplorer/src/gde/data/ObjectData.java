@@ -32,6 +32,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.printing.Printer;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.io.ObjectDataReaderWriter;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -105,6 +106,7 @@ public class ObjectData {
 	 * copy constructor
 	 */
 	public ObjectData(ObjectData objectData) {
+		this.fullQualifiedObjectFilePath = Settings.getInstance().getDataFilePath() + objectData.key + GDE.FILE_SEPARATOR + objectData.key + GDE.FILE_ENDING_DOT_ZIP;
 		this.key = objectData.key;
 		this.type = objectData.type;
 		this.activationDate = objectData.activationDate;
@@ -118,6 +120,27 @@ public class ObjectData {
 			tmpRanges.add(new StyleRange(range.start, range.length, foreground, background, range.fontStyle));
 		}
 		this.styleRanges = tmpRanges.toArray(new StyleRange[0]);
+	}
+
+	/**
+	 * copy constructor
+	 */
+	public ObjectData(ObjectData objectData, String updateObjectKey) {
+		this.fullQualifiedObjectFilePath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + updateObjectKey + GDE.FILE_SEPARATOR_UNIX + updateObjectKey + GDE.FILE_ENDING_DOT_ZIP;
+		this.key = objectData.key;
+		this.type = objectData.type;
+		this.activationDate = objectData.activationDate;
+		this.status = objectData.status;
+		this.image = objectData.image != null ? SWTResourceManager.getImage(objectData.image.getImageData(), this.key, imageWidth, imageHeight, false) : null;
+		this.styledText = objectData.styledText;
+		Vector<StyleRange> tmpRanges = new Vector<StyleRange>();
+		for (StyleRange range : objectData.styleRanges) {
+			Color foreground = range.foreground != null ? SWTResourceManager.getColor(range.foreground.getRed(), range.foreground.getGreen(), range.foreground.getBlue()) : null;
+			Color background = range.background != null ? SWTResourceManager.getColor(range.background.getRed(), range.background.getGreen(), range.background.getBlue()) : null;
+			tmpRanges.add(new StyleRange(range.start, range.length, foreground, background, range.fontStyle));
+		}
+		this.styleRanges = tmpRanges.toArray(new StyleRange[0]);
+		this.key = updateObjectKey;
 	}
 
 	/**
@@ -218,12 +241,12 @@ public class ObjectData {
 		this.styleRanges = newStyleRanges;
 	}
 
-	public void save() {
+	public synchronized void save() {
 		ObjectDataReaderWriter objWriter = new ObjectDataReaderWriter(this);
 		objWriter.write();
 	}
 
-	public void load() {
+	public synchronized void load() {
 		ObjectDataReaderWriter objReader = new ObjectDataReaderWriter(this);
 		objReader.read();
 	}

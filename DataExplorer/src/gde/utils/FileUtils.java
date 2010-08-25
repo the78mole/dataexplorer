@@ -18,6 +18,17 @@
 ****************************************************************************************/
 package gde.utils;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.exception.ApplicationConfigurationException;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.dialog.edit.DevicePropertiesEditor;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -55,17 +66,6 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.exception.ApplicationConfigurationException;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.dialog.edit.DevicePropertiesEditor;
 
 /**
  * Utility class with helpers around file and directory handling
@@ -215,17 +215,25 @@ public class FileUtils {
 	
 	/**
 	 * rename a file to given file extension
+	 *@return newFilePath
 	 */
-	public static void renameFile(String filePath, String extension) {
+	public static String renameFile(String filePath, String extension) {
+		String resultFilePath = filePath;
 		if (checkFileExist(filePath)) {
 			File file = new File(filePath);
 			if (file.canWrite()) {
-				file.renameTo(new File(filePath.substring(0, filePath.lastIndexOf(GDE.STRING_DOT)+1) + extension)); //$NON-NLS-1$
+				File newFile = new File(filePath.substring(0, filePath.lastIndexOf(GDE.STRING_DOT)+1) + extension);
+				if (newFile.exists()) {
+					newFile.delete();
+				}
+				file.renameTo(newFile);				
+				resultFilePath = filePath.substring(0, filePath.lastIndexOf(GDE.STRING_DOT)+1) + extension;
 			}
 			else {
 				log.log(Level.WARNING, "no write permission on " + file.getAbsolutePath()); //$NON-NLS-1$
 			}
 		}
+		return resultFilePath;
 	}
 
 	/**

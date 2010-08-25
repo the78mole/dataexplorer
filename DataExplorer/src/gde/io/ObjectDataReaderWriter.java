@@ -244,15 +244,122 @@ public class ObjectDataReaderWriter {
 	}
 
 	/**
-	 * write conten of ObjectData to a zip file
+	 * write content of ObjectData to a zip file
 	 */
 	public void write() {
 		try {
 			File targetFile = new File(this.filePath);
-			
+
 			// check if target directory exist, it must be created and removed by creatingor removing object key
 			File targetFileDir = new File(this.filePath.substring(0, this.filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
 			if (targetFileDir.exists()) {
+				if (targetFile.exists()) {
+					targetFile.delete();
+				}
+				else {
+					targetFile.createNewFile();
+				}
+			}
+			else {
+				targetFileDir.mkdir();
+				targetFile.createNewFile();
+			}
+			ZipOutputStream outZip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(targetFile)));
+			if (this.objectData.getImage() != null) { // image not set in object window
+				// save the image
+				ImageLoader imageLoader = new ImageLoader();
+				imageLoader.data = new ImageData[] { this.objectData.getImage().getImageData() };
+				outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + GDE.FILE_ENDING_DOT_JPG));
+				imageLoader.save(outZip, SWT.IMAGE_JPEG);
+				outZip.closeEntry();
+			}
+			//save the text document
+			outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + GDE.FILE_ENDING_DOT_STF));
+			String text = this.objectData.getKey();
+			write(outZip, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_HEADER + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			text = this.objectData.getType() + ObjectDataReaderWriter.DELIMITER + this.objectData.getActivationDate() + ObjectDataReaderWriter.DELIMITER + this.objectData.getStatus();
+			write(outZip, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_CHARACTERISTICS + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			FontData fd = this.objectData.getFontData();
+			text = fd.getName() + DELIMITER + fd.getHeight() + DELIMITER + fd.getStyle();
+			write(outZip, ObjectDataReaderWriter.BEGIN_FONT + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_FONT + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			text = this.objectData.getStyledText();
+			write(outZip, ObjectDataReaderWriter.BEGIN_STYLED_TEXT + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_STYLED_TEXT + text + ObjectDataReaderWriter.LINE_DELIMITER);
+			write(outZip, ObjectDataReaderWriter.BEGIN_STYLES);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.BEGIN_STYLES);
+			StyleRange[] styles = this.objectData.getStyleRanges();
+			for (StyleRange style : styles) {
+				text = style.start + GDE.STRING_BLANK + style.length + GDE.STRING_BLANK + (style.foreground == null ? GDE.STRING_DASH : style.foreground.getRed()) + GDE.STRING_BLANK
+						+ (style.foreground == null ? GDE.STRING_DASH : style.foreground.getGreen()) + GDE.STRING_BLANK + (style.foreground == null ? GDE.STRING_DASH : style.foreground.getBlue())
+						+ GDE.STRING_BLANK + (style.background == null ? GDE.STRING_DASH : style.background.getRed()) + GDE.STRING_BLANK
+						+ (style.background == null ? GDE.STRING_DASH : style.background.getGreen()) + GDE.STRING_BLANK + (style.background == null ? GDE.STRING_DASH : style.background.getBlue())
+						+ GDE.STRING_BLANK + style.fontStyle + ObjectDataReaderWriter.DELIMITER;
+				write(outZip, text);
+				ObjectDataReaderWriter.log.log(Level.FINE, text);
+			}
+			write(outZip, ObjectDataReaderWriter.END_STYLES + GDE.STRING_NEW_LINE);
+			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.END_STYLES);
+			outZip.flush();
+			outZip.close();
+		}
+		catch (IOException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * helper method to write the zip entry bytes
+	 * @param outZip
+	 * @param text
+	 * @throws IOException
+	 */
+	void write(ZipOutputStream outZip, String text) throws IOException {
+		byte[] buffer = text.getBytes();
+		int length = buffer.length;
+		outZip.write(buffer, 0, length);
+	}
+	
+/*
+	@SuppressWarnings("unchecked")
+	public void update(String newObjectKey) {
+		
+		String sourceFilePath =  
+		String targetFilePath = 
+
+		String redObjectkey = Messages.getString(MessageIds.GDE_MSGT0279);
+
+		File file = new File(filePath);
+		if (file.exists()) {
+			try {
+				ZipFile zipFile = new ZipFile(file);
+
+				Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zipFile.entries();
+
+				while (entries.hasMoreElements()) {
+					ZipEntry entry = entries.nextElement();
+
+					if (entry.getName().endsWith(GDE.FILE_ENDING_DOT_STF)) {
+						String[] content = StringHelper.splitString(extract(zipFile.getInputStream(entry)), ObjectDataReaderWriter.LINE_DELIMITER, GDE.STRING_EMPTY);
+
+						redObjectkey = content[0].substring(ObjectDataReaderWriter.BEGIN_HEADER.length());
+						if (newObjectKey.equals(redObjectkey)) {
+							
+						}
+
+					}
+					else if (entry.getName().endsWith(GDE.FILE_ENDING_DOT_JPG)) {
+						//image
+						String imageKey = entry.getName().substring(0, entry.getName().length() - GDE.FILE_ENDING_DOT_JPG.length());
+					}
+					else {
+						ObjectDataReaderWriter.log.log(Level.WARNING, entry.getName());
+					}
+				}
+				
+
 				if (targetFile.exists()) targetFile.delete();
 				ZipOutputStream outZip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(targetFile)));
 				if (this.objectData.getImage() != null) { // image not set in object window
@@ -294,25 +401,33 @@ public class ObjectDataReaderWriter {
 				ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.END_STYLES);
 				outZip.flush();
 				outZip.close();
+			
 			}
-			else {
-				log.log(Level.WARNING, "could not save object data, since object key removed");
+			catch (Throwable t) {
+				ObjectDataReaderWriter.log.log(Level.SEVERE, t.getLocalizedMessage(), t);
+				if (t instanceof ZipException) {
+					if (DataExplorer.getInstance().isVisible()) {
+						int answer = DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0025, new Object[] {file.getAbsolutePath()}));
+						if (answer == SWT.YES) file.delete();
+					}
+					else {
+						String msg = Messages.getString(MessageIds.GDE_MSGW0026, new Object[] {file.getAbsolutePath()}); 
+						GDE.setInitError(msg);
+					}
+				}
+				else if (t instanceof ApplicationConfigurationException) {
+					if (DataExplorer.getInstance().isVisible()) {
+						String msg = Messages.getString(MessageIds.GDE_MSGW0027, new Object[] {file.getAbsolutePath(), redObjectkey});
+						int answer = DataExplorer.getInstance().openYesNoMessageDialog(msg);
+						if (answer == SWT.YES) file.delete();
+					}	
+					else {
+						String msg = Messages.getString(MessageIds.GDE_MSGW0028, new Object[] {file.getAbsolutePath(), redObjectkey});
+						GDE.setInitError(msg);
+					}
+				}
 			}
 		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
-
-	/**
-	 * helper method to write the zip entry bytes
-	 * @param outZip
-	 * @param text
-	 * @throws IOException
-	 */
-	void write(ZipOutputStream outZip, String text) throws IOException {
-		byte[] buffer = text.getBytes();
-		int length = buffer.length;
-		outZip.write(buffer, 0, length);
-	}
+	*/
 }
