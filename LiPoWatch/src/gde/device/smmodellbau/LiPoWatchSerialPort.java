@@ -203,7 +203,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 			this.read(tmp1ReadBuffer, 2000);			
 			length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
 			tmp2ReadBuffer = new byte[length-1];
-			this.read(tmp2ReadBuffer, 2000);		
+			this.read(tmp2ReadBuffer, 4000);		
 			readBuffer = new byte[length];
 			readBuffer[0] = tmp1ReadBuffer[0];
 			System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
@@ -238,7 +238,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 		this.read(tmp1ReadBuffer, 2000);			
 		length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
 		tmp2ReadBuffer = new byte[length-1];
-		this.read(tmp2ReadBuffer, 2000);		
+		this.read(tmp2ReadBuffer, 4000);		
 		readBuffer = new byte[length];
 		readBuffer[0] = tmp1ReadBuffer[0];
 		System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
@@ -289,10 +289,10 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 		if (this.isConnected()) {
 			try {
 				this.write(COMMAND_LIVE_VALUES);
-				this.read(tmp1ReadBuffer, 1000);				
+				this.read(tmp1ReadBuffer, 2000);				
 				length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
 				tmp2ReadBuffer = new byte[length-1];
-				this.read(tmp2ReadBuffer, 2000);			
+				this.read(tmp2ReadBuffer, 4000);			
 				readBuffer = new byte[length];
 				readBuffer[0] = tmp1ReadBuffer[0];
 				System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
@@ -300,10 +300,10 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 				// give it another try
 				if (!isChecksumOK(readBuffer)) {
 					this.write(COMMAND_LIVE_VALUES);
-					this.read(tmp1ReadBuffer, 1000);				
+					this.read(tmp1ReadBuffer, 2000);				
 					length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
 					tmp2ReadBuffer = new byte[length-1];
-					this.read(tmp2ReadBuffer, 2000);			
+					this.read(tmp2ReadBuffer, 4000);			
 					readBuffer = new byte[length];
 					readBuffer[0] = tmp1ReadBuffer[0];
 					System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
@@ -471,7 +471,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 					this.waitDataReady();
 					
 					this.write(COMMAND_QUERY_CONFIG);				
-					this.read(readBuffer, 2000);
+					this.read(readBuffer, 4000);
 					verifyChecksum(readBuffer); // valid data set -> set values
 					
 				}
