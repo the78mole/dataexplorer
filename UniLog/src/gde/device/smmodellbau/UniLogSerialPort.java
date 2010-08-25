@@ -177,7 +177,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		
 		try {
 			this.write(COMMAND_READ_DATA);
-			readBuffer = this.read(readBuffer, 2000);
+			readBuffer = this.read(readBuffer, 4000);
 			
 			if (!isChecksumOK(readBuffer)) {
 				readBuffer = readRetry(readBuffer);
@@ -212,7 +212,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		++this.reveiceErrors;
 		this.write(COMMAND_REPEAT);
 		readBuffer = new byte[DATA_LENGTH_BYTES];
-		readBuffer = this.read(readBuffer, 2000);
+		readBuffer = this.read(readBuffer, 4000);
 		verifyChecksum(readBuffer); // throws exception if checksum miss match
 		
 		if (log.isLoggable(Level.WARNING)) {
@@ -271,12 +271,12 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		if (this.isConnected()) {
 			try {
 				this.write(COMMAND_LIVE_VALUES);
-				readBuffer = this.read(readBuffer, 1000);
+				readBuffer = this.read(readBuffer, 4000);
 
 				// give it another try
 				if (!isChecksumOK(readBuffer)) {
 					this.write(COMMAND_LIVE_VALUES);
-					readBuffer = this.read(readBuffer, 1000);
+					readBuffer = this.read(readBuffer, 4000);
 					verifyChecksum(readBuffer); // throws exception if checksum miss match
 				}
 			}
@@ -366,7 +366,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 					//this.write(COMMAND_PREPARE_DELETE);
 					this.write(COMMAND_DELETE);
 					byte[] readBuffer = new byte[1];
-					readBuffer = this.read(readBuffer, 2000);
+					readBuffer = this.read(readBuffer, 4000);
 					if (readBuffer[0] != DATA_STATE_OK) success = true;
 
 				}
@@ -407,7 +407,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 
 					this.write(updateBuffer);
 					byte[] readBuffer = new byte[1];
-					readBuffer = this.read(readBuffer, 2000);
+					readBuffer = this.read(readBuffer, 4000);
 					if (readBuffer[0] == DATA_STATE_OK) success = true;
 					
 				}
@@ -447,7 +447,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				if (this.checkDataReady()) {
 
 					this.write(COMMAND_QUERY_CONFIG);
-					readBuffer = this.read(readBuffer, 2000);
+					readBuffer = this.read(readBuffer, 4000);
 
 					verifyChecksum(readBuffer); // valid data set -> set values
 					
@@ -488,7 +488,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 				if (this.checkDataReady()) {
 
 					this.write(COMMAND_QUERY_TELE_CONFIG);
-					readBuffer = this.read(readBuffer, 2000);
+					readBuffer = this.read(readBuffer, 4000);
 
 					verifyChecksum(readBuffer); // valid data set -> set values
 					
