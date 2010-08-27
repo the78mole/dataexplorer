@@ -8,7 +8,7 @@
   <chdir>.</chdir>
   <priority>normal</priority>
   <downloadUrl>http://java.sun.com/javase/downloads/index.jsp</downloadUrl>
-  <supportUrl>http://bruegmaenner.de/en/winfried/osde/README.html</supportUrl>
+  <supportUrl>http://savannah.nongnu.org/projects/dataexplorer</supportUrl>
   <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
   <manifest></manifest>
@@ -21,7 +21,7 @@
     <path></path>
     <minVersion>1.6.0</minVersion>
     <maxVersion></maxVersion>
-    <jdkPreference>preferJre</jdkPreference>
+    <jdkPreference>jreOnly</jdkPreference>
     <initialHeapSize>10</initialHeapSize>
     <maxHeapSize>56</maxHeapSize>
     <opt>-Dfile.encoding=UTF-8</opt>
@@ -29,7 +29,7 @@
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
     <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>
-    <jreVersionErr>This application requires a Java Runtime Environment &gt; 1.6.0 </jreVersionErr>
+    <jreVersionErr>This application requires a Java Runtime Environment &gt; </jreVersionErr>
     <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted.</launcherErr>
     <instanceAlreadyExistsMsg>An application instance is already running.</instanceAlreadyExistsMsg>
   </messages>
