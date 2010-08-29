@@ -1305,6 +1305,7 @@ public class Record extends Vector<Integer> {
 		try {
 			double tmpTimeValue = this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms();
 			int[] indexs = this.findBoundingIndexes(tmpTimeValue);
+			log.log(Level.FINE, tmpTimeValue + "; " + indexs[0] + "; " + indexs[1]);
 			if (indexs[0] == indexs[1]) {
 				pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue)).intValue();
 			}

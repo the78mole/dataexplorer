@@ -128,6 +128,7 @@ public class GDE {
 	public static final String		FILE_ENDING_DOT_JAR				= ".jar";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_LOV				= ".lov";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_OSD				= ".osd";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_DOT_CSV				= ".csv";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_JPG				= ".jpg";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_PNG				= ".png";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_GIF				= ".gif";	//$NON-NLS-1$

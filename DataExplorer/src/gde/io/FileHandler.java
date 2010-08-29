@@ -127,7 +127,11 @@ public class FileHandler {
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
 		FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, getFileNameProposal());
 		String recordSetKey = activeRecordSet.getName();
-		final String csvFilePath = csvFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
+		String csvFilePath = csvFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
+
+		if (!csvFilePath.endsWith(GDE.FILE_ENDING_DOT_CSV)) { //check and correct file ending
+			csvFilePath = csvFilePath.substring(0, csvFilePath.lastIndexOf(GDE.STRING_DOT) > csvFilePath.length() - 5 ? csvFilePath.lastIndexOf(GDE.STRING_DOT) : csvFilePath.length()) + GDE.FILE_ENDING_DOT_CSV;
+		}
 
 		if (csvFilePath.length() > 4) { // file name has a reasonable length
 			if (FileUtils.checkFileExist(csvFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { csvFilePath }))) {
@@ -299,6 +303,10 @@ public class FileHandler {
 		}
 		else {
 			filePath = path + GDE.FILE_SEPARATOR_UNIX + fileName; // including ending ".osd"
+		}
+		
+		if (!filePath.endsWith(GDE.FILE_ENDING_DOT_OSD)) { //check and correct file ending
+			filePath = filePath.substring(0, filePath.lastIndexOf(GDE.STRING_DOT) > filePath.length() - 5 ? filePath.lastIndexOf(GDE.STRING_DOT) : filePath.length()) + GDE.FILE_ENDING_DOT_OSD;
 		}
 
 		if (filePath.length() > 4 && !filePath.endsWith(getFileNameProposal())) { // file name has a reasonable length
