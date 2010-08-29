@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V10.xsd">
+    <Device>
+        <name implementation="QcCopter">QuadroControl II/XS</name>
+        <manufacturer>tt-tronix</manufacturer>
+        <manufacturerURL>http://www.qc-copter.de</manufacturerURL>
+        <group>multimeter</group>
+        <image>QC-Copter.png</image>
+        <usage>false</usage>
+    </Device>
+    <SerialPort>
+        <port>-</port>
+        <baudeRate>57600</baudeRate>
+        <dataBits>DATABITS_8</dataBits>
+        <stopBits>STOPBITS_1</stopBits>
+        <parity>PARITY_NONE</parity>
+        <flowControlMode>FLOWCONTROL_RTSCTS_OUT</flowControlMode>
+        <isRTS>true</isRTS>
+        <isDTR>true</isDTR>
+    </SerialPort>
+    <TimeBase>
+        <name>Time</name>
+        <symbol>t</symbol>
+        <unit>msec</unit>
+        <timeStep>1000.0</timeStep>
+    </TimeBase>
+    <DataBlock>
+        <format size="61" type="BINARY"/>
+        <checkSum type="ADD" format="BINARY"/>
+        <timeUnit>sec</timeUnit>
+        <separator>semicolon</separator>
+        <leader>$</leader>
+        <trailer>0D0A</trailer>
+    </DataBlock>
+    <State>
+        <property description="Bezeichnung für Lesevorgang" type="Integer" value="1" name="lesen"/>
+    </State>
+    <Channel type="TYPE_CONFIG" name="normal">
+        <Measurement>
+            <name>Integral Roll</name>
+            <symbol>Ri</symbol>
+            <unit></unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Winkel Roll</name>
+            <symbol>Rw</symbol>
+            <unit>°</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Integral Nick</name>
+            <symbol>Ni</symbol>
+            <unit></unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Winkel Nick</name>
+            <symbol>N°</symbol>
+            <unit>°</unit>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Gyro Roll</name>
+            <symbol>Rg</symbol>
+            <unit></unit>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Gyro Nick</name>
+            <symbol>Gn</symbol>
+            <unit></unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Gyro Gier</name>
+            <symbol>Gg</symbol>
+            <unit></unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>ACC Roll</name>
+            <symbol>Ar</symbol>
+            <unit></unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>ACC Nick</name>
+            <symbol>An</symbol>
+            <unit></unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>ACC Z</name>
+            <symbol>Az</symbol>
+            <unit></unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Akkuspannung</name>
+            <symbol>U</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Motor VR/V</name>
+            <symbol>Mvr</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Motor VL/V</name>
+            <symbol>Mvl</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Motor HL/L</name>
+            <symbol>Mhl</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Motor HR/H</name>
+            <symbol>Mhr</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>User Daten 1</name>
+            <symbol>D1</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>User Daten 2</name>
+            <symbol>D2</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>User Daten 3</name>
+            <symbol>D3</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>User Daten 4</name>
+            <symbol>D4</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>User Daten 5</name>
+            <symbol>D5</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>User Daten 6</name>
+            <symbol>D6</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+    </Channel>
+    <Desktop>
+        <property type="Boolean" value="true" name="table_tab"/>
+        <property type="Boolean" value="true" name="digital_tab"/>
+        <property type="Boolean" value="true" name="analog_tab"/>
+        <property type="Boolean" value="false" name="voltage_per_cell_tab"/>
+    </Desktop>
+</DeviceProperties>
