@@ -60,6 +60,7 @@ public class ReverseCorrectMessagesIds {
 	+ "# range 1600 to 1699 LiPoWatch device \n" 
 	+ "# range 1700 to 1799 CSV2SerialDataAdapter device \n"
 	+ "# range 1800 to 1899 WStechVario device  \n"
+	+ "# range 1900 to 1999 QC-Copter device  \n"
 	// add new supported device here
 	+ " \n";
 
