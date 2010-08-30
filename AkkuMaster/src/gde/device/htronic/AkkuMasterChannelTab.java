@@ -466,10 +466,6 @@ public class AkkuMasterChannelTab {
 					this.startDataGatheringButton.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "startAufzeichnungButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							AkkuMasterChannelTab.this.isDataGatheringEnabled = false;
-							AkkuMasterChannelTab.this.isStopButtonEnabled = true;
-							updateStartDataGatheringButton();
-							updateStopDataGatheringButton();
 							if (!isCollectData()) {
 								setCollectData(true);
 
@@ -498,13 +494,18 @@ public class AkkuMasterChannelTab {
 										if (AkkuMasterChannelTab.this.parent.getMaxCurrent() < AkkuMasterChannelTab.this.parent.getActiveCurrent() + dischargeCurrent_mA || AkkuMasterChannelTab.this.parent.getMaxCurrent() < AkkuMasterChannelTab.this.parent.getActiveCurrent() + chargeCurrent_mA) {
 											AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW1100, new Object[] { dischargeCurrent_mA, chargeCurrent_mA } ));
 											setCollectData(false);
-											AkkuMasterChannelTab.this.startDataGatheringButton.setSelection(true);
+											AkkuMasterChannelTab.this.startDataGatheringButton.setSelection(false);
 											return;
 										}
 
 										AkkuMasterChannelTab.this.serialPort.start(AkkuMasterChannelTab.this.channelSig);
 										AkkuMasterChannelTab.this.serialPort.ok(AkkuMasterChannelTab.this.channelSig);
 									}
+									AkkuMasterChannelTab.this.isDataGatheringEnabled = false;
+									updateStartDataGatheringButton();
+									AkkuMasterChannelTab.this.isStopButtonEnabled = true;
+									updateStopDataGatheringButton();
+									
 									AkkuMasterChannelTab.this.channels.switchChannel(AkkuMasterChannelTab.this.channel.getName());
 									// prepare timed data gatherer thread
 									int delay = 0;
@@ -599,6 +600,9 @@ public class AkkuMasterChannelTab {
 															log.log(Level.WARNING, "Timer stopped AkkuMaster inactiv - " + AkkuMasterChannelTab.this.name); //$NON-NLS-1$
 															AkkuMasterChannelTab.this.application.setStatusMessage("=====> Timer stopped AkkuMaster inactiv - " + AkkuMasterChannelTab.this.name, SWT.COLOR_RED); //$NON-NLS-1$
 															setRetryCounter(10);
+															updateCurrentStatus();
+															AkkuMasterChannelTab.this.isChargeCurrentAdded = false;
+															AkkuMasterChannelTab.this.isDischargeCurrentAdded = false;
 														}
 														else {
 															log.log(Level.FINE, "Waiting for device activation - " + AkkuMasterChannelTab.this.name); //$NON-NLS-1$
@@ -609,6 +613,8 @@ public class AkkuMasterChannelTab {
 												else { // some error state
 													log.log(Level.FINE, "canceling timer due to error"); //$NON-NLS-1$
 													updateCurrentStatus();
+													AkkuMasterChannelTab.this.isChargeCurrentAdded = false;
+													AkkuMasterChannelTab.this.isDischargeCurrentAdded = false;
 													if (!isCaptureOnly()) try {
 														AkkuMasterChannelTab.this.serialPort.stop(AkkuMasterChannelTab.this.channelSig);
 													}
@@ -617,11 +623,13 @@ public class AkkuMasterChannelTab {
 													}
 													setCollectData(false);
 													stopTimer();
-													AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0027));
+													AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0027));											
 												}
 											}
 											catch (DataInconsitsentException e) {
 												updateCurrentStatus();
+												AkkuMasterChannelTab.this.isChargeCurrentAdded = false;
+												AkkuMasterChannelTab.this.isDischargeCurrentAdded = false;
 												// exception is logged where it is thrown first 
 												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
@@ -630,6 +638,9 @@ public class AkkuMasterChannelTab {
 											}
 											catch (Exception e) {
 												updateCurrentStatus();
+												AkkuMasterChannelTab.this.isChargeCurrentAdded = false;
+												AkkuMasterChannelTab.this.isDischargeCurrentAdded = false;
+												
 												// exception is logged where it is thrown first 
 												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
@@ -643,6 +654,9 @@ public class AkkuMasterChannelTab {
 								}
 								catch (Throwable e1) {
 									updateCurrentStatus();
+									AkkuMasterChannelTab.this.isChargeCurrentAdded = false;
+									AkkuMasterChannelTab.this.isDischargeCurrentAdded = false;
+									
 									AkkuMasterChannelTab.this.isStopButtonEnabled = false;
 									AkkuMasterChannelTab.this.startDataGatheringButton.setSelection(true);
 									AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0026));
@@ -661,6 +675,9 @@ public class AkkuMasterChannelTab {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "stopAuzeichnungButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							updateCurrentStatus();
+							AkkuMasterChannelTab.this.isChargeCurrentAdded = false;
+							AkkuMasterChannelTab.this.isDischargeCurrentAdded = false;
+
 							updateDialogAfterStop();
 							if (!isCaptureOnly()) try {
 								AkkuMasterChannelTab.this.serialPort.stop(AkkuMasterChannelTab.this.channelSig);
@@ -685,20 +702,48 @@ public class AkkuMasterChannelTab {
 	 * @param processName
 	 */
 	private void updateCurrentStatus() {
-		if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.GDE_MSGT1126).trim()) && !isChargeCurrentAdded()) {
-			AkkuMasterChannelTab.this.parent.addTotalChargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
-			setChargeCurrentAdded(true);
+		log.log(Level.FINE, AkkuMasterChannelTab.this.processName.trim() + " - " + AkkuMasterChannelTab.this.isChargeCurrentAdded + ", " + AkkuMasterChannelTab.this.isDischargeCurrentAdded);
+		//charge
+		if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.GDE_MSGT1126).trim())) {
+			if(this.isChargeCurrentAdded == false) {
+				AkkuMasterChannelTab.this.parent.addTotalChargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
+				this.isChargeCurrentAdded = true;
+			}
+			else {
+				AkkuMasterChannelTab.this.parent.subtractTotalChargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
+				this.isChargeCurrentAdded = false;
+			}
+			if(this.isDischargeCurrentAdded == true) { //discharge -> charge
+				AkkuMasterChannelTab.this.parent.subtractTotalDischargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
+				this.isDischargeCurrentAdded = false;
+			}
 		}
-		else if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.GDE_MSGT1127).trim()) && !isDischargeCurrentAdded) {
-			AkkuMasterChannelTab.this.parent.addTotalDischargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
-			setDischargeCurrentAdded(true);
+		//discharge
+		else if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.GDE_MSGT1127).trim())) {
+			if (this.isDischargeCurrentAdded == false) {
+				AkkuMasterChannelTab.this.parent.addTotalDischargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
+				this.isDischargeCurrentAdded = true;
+			}
+			else {
+				AkkuMasterChannelTab.this.parent.subtractTotalDischargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
+				this.isDischargeCurrentAdded = false;
+			}
+			if (this.isChargeCurrentAdded == true) { //charge -> discharge
+				AkkuMasterChannelTab.this.parent.subtractTotalChargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
+				this.isChargeCurrentAdded = false;
+			}
 		}
-		if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.GDE_MSGT1126).trim()) && isDischargeCurrentAdded()) { 
-			AkkuMasterChannelTab.this.parent.subtractTotalChargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
+		else { // timer stopped
+			if (this.isChargeCurrentAdded = true) {
+				AkkuMasterChannelTab.this.parent.subtractTotalChargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
+				this.isChargeCurrentAdded = false;				
+			}
+			if (this.isDischargeCurrentAdded == true) {
+				AkkuMasterChannelTab.this.parent.subtractTotalDischargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
+				this.isDischargeCurrentAdded = false;
+			}
 		}
-		else if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.GDE_MSGT1127).trim()) && isChargeCurrentAdded()) {
-			AkkuMasterChannelTab.this.parent.subtractTotalDischargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
-		}
+		log.log(Level.FINE, AkkuMasterChannelTab.this.processName.trim() + " - " + AkkuMasterChannelTab.this.isChargeCurrentAdded + ", " + AkkuMasterChannelTab.this.isDischargeCurrentAdded);
 		AkkuMasterChannelTab.this.parent.updateCurrentStatus();
 	}
 
@@ -1058,24 +1103,10 @@ public class AkkuMasterChannelTab {
 	}
 
 	/**
-	 * @param isAdded the isChargeCurrentAdded to set
-	 */
-	public void setChargeCurrentAdded(boolean isAdded) {
-		this.isChargeCurrentAdded = isAdded;
-	}
-
-	/**
 	 * @return the isChargeCurrentAdded
 	 */
 	public boolean isChargeCurrentAdded() {
 		return this.isChargeCurrentAdded;
-	}
-
-	/**
-	 * @param isAdded the isDischargeCurrentAdded to set
-	 */
-	public void setDischargeCurrentAdded(boolean isAdded) {
-		this.isDischargeCurrentAdded = isAdded;
 	}
 
 	/**
