@@ -1,7 +1,7 @@
 /************************************************************************************** 
-  	This file is part of DataExplorer.
+  	This file is part of GNU DataExplorer.
 
-		DataExplorer is free software: you can redistribute it and/or modify
+		GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
@@ -12,7 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+
+Copyright (c) 2008,2009,2010 Winfried Bruegmann 
 ****************************************************************************************/
 package gde.device.wstech;
 
@@ -81,6 +83,7 @@ public class MessageIds {
 	public final static String	GDE_MSGT1855 = "GDE_MSGT1855";
 	public final static String	GDE_MSGT1856 = "GDE_MSGT1856";
 	public final static String	GDE_MSGT1857 = "GDE_MSGT1857";
+	public final static String	GDE_MSGT1858 = "GDE_MSGT1858";
 	public final static String	GDE_MSGT1860 = "GDE_MSGT1860";
 	public final static String	GDE_MSGT1861 = "GDE_MSGT1861";
 	public final static String	GDE_MSGT1862 = "GDE_MSGT1862";

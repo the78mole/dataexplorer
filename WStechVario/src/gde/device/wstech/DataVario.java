@@ -59,7 +59,6 @@ import org.eclipse.swt.widgets.MenuItem;
 public class DataVario  extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(DataVario.class.getName());
 
-	public final static String		DEFAULT_RECORD_SET_EXTEND		= "Flugaufzeichnung"; //$NON-NLS-1$
 	public final static int				HEIGHT_RELATIVE									= 0;
 	public final static int				HEIGHT_ABSOLUTE									= 1;
 
@@ -106,7 +105,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
+		return Messages.getString(MessageIds.GDE_MSGT1858);
 	}
 
 	/**
@@ -234,7 +233,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		if (fd.getFileName().length() > 4) {
 			try {
 				Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-				CSVSerialDataReaderWriter.read(selectedImportFile, this, DataVario.DEFAULT_RECORD_SET_EXTEND, channelConfigNumber, true);
+				CSVSerialDataReaderWriter.read(selectedImportFile, this, this.getRecordSetStemName(), channelConfigNumber, true);
 			}
 			catch (Throwable e) {
 				log.log(Level.WARNING, e.getMessage(), e);
