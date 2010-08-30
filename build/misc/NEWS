@@ -9,3 +9,4 @@ GNU DataExplorer - News - comes with version 2.40
 7) implement KML and GPX export and enable export using file -> export menu
 8) fix update problem while changing or updating object key
 9) enable deep re-naming of object keys (include object meta data and update of all data files)
+10) refine display of AkkuMaster's total charge/discharge current 
