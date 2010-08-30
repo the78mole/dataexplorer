@@ -401,7 +401,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 		int sleepTime = 2; // ms
 		int bytes = readBuffer.length;
 		int readBytes = 0;
-		int timeOutCounter = timeout_msec / sleepTime;
+		int timeOutCounter = timeout_msec / (sleepTime + 18); //18 ms read blocking time
 
 		try {
 			if (this.application != null) this.application.setSerialRxOn();
@@ -418,12 +418,13 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						// ignore
 					}
 				}
-			}
-			//this.dataAvailable = false;
-			if (timeOutCounter <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { bytes, timeout_msec })); 
-				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
-				throw e;
+
+				//this.dataAvailable = false;
+				if (timeOutCounter <= 0) {
+					TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { bytes, timeout_msec })); 
+					log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+					throw e;
+				}
 			}
 			
 			if (log.isLoggable(Level.FINE)) {
@@ -564,6 +565,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			if (timeOutCounter <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { numBytes, timeout_msec }));
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				break;
 			}
 		}
 		
