@@ -33,6 +33,7 @@ import gde.device.PropertyType;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
+import gde.io.LogViewReader;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.serial.DeviceSerialPort;
@@ -134,7 +135,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
 	public int getLovDataByteSize() {
-		return 0;  // sometimes first 4 bytes give the length of data + 4 bytes for number
+		return 4;  //TODO sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
 
 	/**
@@ -282,7 +283,63 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		//TODO
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		int deviceDataBufferSize = this.getDataBlockSize(); // const.
+		int[] points = new int[this.getNumberOfMeasurements(1)];
+		int offset = 0;
+		int progressCycle = 0;
+		int lovDataSize = this.getLovDataByteSize();
+		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0; 
+		
+		if (dataBuffer[0] == 0x7B) {
+			byte[] convertBuffer = new byte[deviceDataBufferSize];
+			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+
+			for (int i = 0; i < recordDataSize; i++) {
+				System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+				recordSet.addPoints(convertDataBytes(points, convertBuffer));
+
+				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
+			}
+			
+			recordSet.setTimeStep_ms(this.getAverageTimeStep_ms() != null ? this.getAverageTimeStep_ms() : 1478); // no average time available, use a hard coded one
+		}
+		else { // none constant time steps
+			byte[] sizeBuffer = new byte[4];
+			byte[] convertBuffer = new byte[deviceDataBufferSize];
+			
+			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+			for (int i = 0; i < recordDataSize; i++) {
+				System.arraycopy(dataBuffer, offset, sizeBuffer, 0, 4);
+				lovDataSize = 4 + LogViewReader.parse2Int(sizeBuffer);
+				System.arraycopy(dataBuffer, offset + 4, convertBuffer, 0, deviceDataBufferSize);
+				recordSet.addPoints(convertDataBytes(points, convertBuffer));
+				offset += lovDataSize;
+				
+				StringBuilder sb = new StringBuilder();
+				byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize - 4];
+				//sb.append(timeBuffer.length).append(" - ");
+				System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
+				String timeStamp = new String(timeBuffer).substring(0, timeBuffer.length-8)+"0000000000";
+				long dateTime = new Long(timeStamp.substring(6,17));
+				log.log(Level.FINEST, timeStamp + " " + timeStamp.substring(6,17) + " " + dateTime);
+				sb.append(dateTime);
+				//System.arraycopy(dataBuffer, offset - 4, sizeBuffer, 0, 4);
+				//sb.append(" ? ").append(LogViewReader.parse2Int(sizeBuffer));
+				deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime)/1000 - 217; // value 217 is a compromis manual selected
+				sb.append(" - ").append(deltaTime);
+				sb.append(" - ").append(sumTimeDelta += deltaTime);
+				log.log(Level.FINER, sb.toString());
+				lastDateTime = dateTime;
+				
+				recordSet.addTimeStep_ms(sumTimeDelta);
+
+				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
+			}
+//			recordSet.setTimeStep_ms((double)sumTimeDelta/recordDataSize);
+//			log.log(Level.FINE, sumTimeDelta/recordDataSize + " " + sumTimeDelta);
+		}
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
 	/**
@@ -292,17 +349,15 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
-		//TODO
-		points[0] = Integer.valueOf((((dataBuffer[35] & 0xFF)-0x80)*100 + ((dataBuffer[36] & 0xFF)-0x80))*10);  //35,36   feed-back voltage
-		points[1] = Integer.valueOf((((dataBuffer[33] & 0xFF)-0x80)*100 + ((dataBuffer[34] & 0xFF)-0x80))*10);  //33,34   feed-back current : 0=0.0A,900=9.00A
-		points[2] = Integer.valueOf((((dataBuffer[43] & 0xFF)-0x80)*100 + ((dataBuffer[44] & 0xFF)-0x80))*1000);//43,44  cq_capa_dis;  : charged capacity
-		points[3] = Double.valueOf((points[0] / 1000.0) * (points[1] / 1000.0) * 1000).intValue(); 							// power U*I [W]
-		points[4] = Double.valueOf((points[0] / 1000.0) * (points[2] / 1000.0)).intValue();											// energy U*C [mWh]
-		points[5] = Integer.valueOf((((dataBuffer[37] & 0xFF)-0x80)*100 + ((dataBuffer[38] & 0xFF)-0x80))*10);  //37,38  fd_ex_th;     : external temperature
-		points[6] = Integer.valueOf((((dataBuffer[39] & 0xFF)-0x80)*100 + ((dataBuffer[40] & 0xFF)-0x80))*10);  //39,40  fd_in_th      : internal temperature
-		points[7] = Integer.valueOf((((dataBuffer[41] & 0xFF)-0x80)*100 + ((dataBuffer[42] & 0xFF)-0x80))*10);  //41,42  fd_in_12v;    : input voltage(00.00V 30.00V)
-		for (int i=0, j=0; i<points.length - 8; ++i, j+=2) {
-			points[i+8]  = Integer.valueOf((((dataBuffer[j+45] & 0xFF)-0x80)*100 + ((dataBuffer[j+46] & 0xFF)-0x80))*10);  //45,46 CELL_420v[1];
+		//TODO check if calculation is OK
+		for (int i=0, j=0; i<points.length - 4; ++i, j+=3) {
+			//DBx_0 = 94 + [ A7 A6 A5 A4 A3 A2 ]
+			//DBx_1 = 94 + [ A1 A0 B7 B6 B5 ]
+			//DBx_2 = 94 + [ B4 B3 B2 B1 B0 ]
+			int DBx_0 = 94 + (dataBuffer[i*j] & 0xF8);
+			int DBx_1 = 94 + (dataBuffer[i*j+1] & 0x02) + (dataBuffer[i*j+2] & 0xE0); 
+			int DBx_2 = 94 + (dataBuffer[i*j+2] & 0x1F); 
+			points[i]  = DBx_0 + DBx_1 + DBx_2; 
 		}
 
 		return points;
@@ -343,10 +398,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 			
-			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
-			for (int j = 0; j < points.length; j++) {
-				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8) + ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
-			}
+			points = convertDataBytes(points, convertBuffer);
 			
 			if(recordSet.isTimeStepConstant()) 
 				recordSet.addPoints(points);

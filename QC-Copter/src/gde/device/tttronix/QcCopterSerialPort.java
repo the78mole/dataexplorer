@@ -128,7 +128,13 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 		final String $METHOD_NAME = "isChecksumOK";
 		boolean isOK = false;
 		int check_sum = Checksum.ADD(buffer, 1, this.dataSize-4); //STX, ETX, PS1, PS2
-		//TODO if (((check_sum & 0xF0) >> 4) + 0x30 == (buffer[73]&0xFF+0x80) && (check_sum & 0x00F) + 0x30 == (buffer[74]&0xFF))
+		//PS1 = 94 + [PS11 PS10 PS9 PS8 PS7 PS6]
+		//PS2 = 94 + [PS5 PS4 PS3 PS2 PS1 PS0]
+		check_sum = check_sum & 0xFFF; // 3x4 = 12 bit
+		int PS1 = 94 + (check_sum & 0xFC0); // 111111000000
+		int PS2 = 94 + (check_sum & 0x03F); // 000000111111
+		//TODO verify if checksum calculation is OK
+		if (PS1 == buffer[this.dataSize-3] && PS2 == buffer[this.dataSize-2])
 			isOK = true;
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
 		return isOK;
