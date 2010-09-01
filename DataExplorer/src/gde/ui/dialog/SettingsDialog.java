@@ -1321,11 +1321,11 @@ public class SettingsDialog extends Dialog {
 		StringBuilder sb = new StringBuilder();
 		while (loggerNames.hasMoreElements()) {
 			String loggerName = loggerNames.nextElement();
-			if (loggerName.startsWith("osde") && loggerName.replace('.', ':').split(":").length >= 3) { //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append(loggerName).append(";"); //$NON-NLS-1$
+			if (loggerName.startsWith(GDE.STRING_BASE_PACKAGE) && loggerName.replace(GDE.STRING_DOT, GDE.STRING_COLON).split(GDE.STRING_COLON).length >= 3) {
+				sb.append(loggerName).append(GDE.STRING_SEMICOLON);
 			}
 		}
-		String[] loggers = sb.toString().split(";"); //$NON-NLS-1$
+		String[] loggers = sb.toString().split(GDE.STRING_SEMICOLON); //$NON-NLS-1$
 		Arrays.sort(loggers);
 		if (SettingsDialog.log.isLoggable(Level.FINER)) {
 			for (String string : loggers) {
@@ -1333,15 +1333,15 @@ public class SettingsDialog extends Dialog {
 			}
 		}
 		SettingsDialog.this.tree.removeAll();
-		String root = ""; //$NON-NLS-1$
+		String root = GDE.STRING_EMPTY;
 		TreeItem treeItemRoot = null;
 		TreeItem treeItemNode;
 		for (String string : loggers) {
-			String[] tmp = string.replace('.', ':').split(":"); //$NON-NLS-1$
+			String[] tmp = string.replace(GDE.STRING_DOT, GDE.STRING_COLON).split(GDE.STRING_COLON); 
 			switch (tmp.length) {
 			case 3:
-				if (!root.equals(tmp[0] + "." + tmp[1])) { //$NON-NLS-1$
-					root = tmp[0] + "." + tmp[1]; //$NON-NLS-1$
+				if (!root.equals(tmp[0] + GDE.STRING_DOT + tmp[1])) {
+					root = tmp[0] + GDE.STRING_DOT + tmp[1];
 					treeItemRoot = new TreeItem(SettingsDialog.this.tree, SWT.SINGLE);
 					treeItemRoot.setText(root);
 				}
@@ -1349,8 +1349,8 @@ public class SettingsDialog extends Dialog {
 				treeItemNode.setText(tmp[2]);
 				break;
 			case 4:
-				if (!root.equals(tmp[0] + "." + tmp[1] + "." + tmp[2])) { //$NON-NLS-1$ //$NON-NLS-2$
-					root = tmp[0] + "." + tmp[1] + "." + tmp[2]; //$NON-NLS-1$ //$NON-NLS-2$
+				if (!root.equals(tmp[0] + GDE.STRING_DOT + tmp[1] + GDE.STRING_DOT + tmp[2])) {
+					root = tmp[0] + GDE.STRING_DOT + tmp[1] + GDE.STRING_DOT + tmp[2];
 					treeItemRoot = new TreeItem(SettingsDialog.this.tree, SWT.SINGLE);
 					treeItemRoot.setText(root);
 				}
