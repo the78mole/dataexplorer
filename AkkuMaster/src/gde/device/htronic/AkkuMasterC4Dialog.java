@@ -143,6 +143,8 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				public void mouseExit(MouseEvent evt) {
 					log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 					fadeInAlpaBlending(evt, AkkuMasterC4Dialog.this.getDialogShell().getClientArea(), 10, 10, -10, 15);
+					AkkuMasterC4Dialog.this.totalChargeCurrentLabel.redraw(0,0,5,5,true);
+					AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.redraw(0,0,5,5,true);
 				}
 			});
 			{
@@ -292,8 +294,8 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.statusComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						AkkuMasterC4Dialog.log.log(Level.FINEST, "statusComposite.widgetSelected, event=" + evt); //$NON-NLS-1$
-						AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.setText("" + AkkuMasterC4Dialog.this.totalDischargeCurrent);
-						AkkuMasterC4Dialog.this.totalChargeCurrentLabel.setText("" + AkkuMasterC4Dialog.this.totalChargeCurrent);
+						AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
+						AkkuMasterC4Dialog.this.totalChargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalChargeCurrent));
 					}
 				});
 				{
@@ -404,56 +406,60 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 	/**
 	 * add current to discharge current sum
-	 * @param newCurrent
+	 * @param newDeltaDischargeCurrent
 	 */
-	public void addTotalDischargeCurrent(int newCurrent) {
-		this.totalDischargeCurrent = this.totalDischargeCurrent + newCurrent;
+	public void addTotalDischargeCurrent(int newDeltaDischargeCurrent) {
+		this.totalDischargeCurrent = this.totalDischargeCurrent + newDeltaDischargeCurrent;
 		DataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
-				AkkuMasterC4Dialog.this.totalChargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalChargeCurrent));
 				AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
+				AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.redraw(0,0,5,5,true);
+				log.log(Level.WARNING, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
 			}
 		});
 	}
 
 	/**
 	 * subtract current to discharge current sum
-	 * @param newCurrent
+	 * @param newDeltaDischargeCurrent
 	 */
-	public void subtractTotalDischargeCurrent(int newCurrent) {
-		this.totalDischargeCurrent = this.totalDischargeCurrent - newCurrent;
+	public void subtractTotalDischargeCurrent(int newDeltaDischargeCurrent) {
+		this.totalDischargeCurrent = this.totalDischargeCurrent - newDeltaDischargeCurrent;
 		DataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
-				AkkuMasterC4Dialog.this.totalChargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalChargeCurrent));
 				AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
+				AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.redraw(0,0,5,5,true);
+				log.log(Level.WARNING, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
 			}
 		});
 	}
 
 	/**
 	 * add current to charge current sum
-	 * @param newCurrent
+	 * @param newDeltaChargeCurrent
 	 */
-	public void addTotalChargeCurrent(int newCurrent) {
-		this.totalChargeCurrent = this.totalChargeCurrent + newCurrent;
+	public void addTotalChargeCurrent(int newDeltaChargeCurrent) {
+		this.totalChargeCurrent = this.totalChargeCurrent + newDeltaChargeCurrent;
 		DataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				AkkuMasterC4Dialog.this.totalChargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalChargeCurrent));
-				AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
+				AkkuMasterC4Dialog.this.totalChargeCurrentLabel.redraw(0,0,5,5,true);
+				log.log(Level.WARNING, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
 			}
 		});
 	}
 
 	/**
 	 * subtract current to charge current sum
-	 * @param newCurrent
+	 * @param newDeltaChargeCurrent
 	 */
-	public void subtractTotalChargeCurrent(int newCurrent) {
-		this.totalChargeCurrent = this.totalChargeCurrent - newCurrent;
+	public void subtractTotalChargeCurrent(int newDeltaChargeCurrent) {
+		this.totalChargeCurrent = this.totalChargeCurrent - newDeltaChargeCurrent;
 		DataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
 				AkkuMasterC4Dialog.this.totalChargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalChargeCurrent));
-				AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
+				AkkuMasterC4Dialog.this.totalChargeCurrentLabel.redraw(0,0,5,5,true);
+				log.log(Level.WARNING, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
 			}
 		});
 	}
@@ -550,13 +556,5 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	public AkkuMasterC4 getDevice() {
 		return this.device;
-	}
-	
-	public void updateCurrentStatus() {
-		DataExplorer.display.asyncExec(new Runnable() {
-			public void run() {
-					AkkuMasterC4Dialog.this.statusComposite.redraw();
-			}
-		});
 	}
 }
