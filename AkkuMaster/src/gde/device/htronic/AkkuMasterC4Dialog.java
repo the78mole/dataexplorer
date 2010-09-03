@@ -414,7 +414,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			public void run() {
 				AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
 				AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.redraw(0,0,5,5,true);
-				log.log(Level.WARNING, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
+				log.log(Level.FINE, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
 			}
 		});
 	}
@@ -429,7 +429,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			public void run() {
 				AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
 				AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.redraw(0,0,5,5,true);
-				log.log(Level.WARNING, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
+				log.log(Level.FINE, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
 			}
 		});
 	}
@@ -444,7 +444,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			public void run() {
 				AkkuMasterC4Dialog.this.totalChargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalChargeCurrent));
 				AkkuMasterC4Dialog.this.totalChargeCurrentLabel.redraw(0,0,5,5,true);
-				log.log(Level.WARNING, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
+				log.log(Level.FINE, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
 			}
 		});
 	}
@@ -459,7 +459,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			public void run() {
 				AkkuMasterC4Dialog.this.totalChargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalChargeCurrent));
 				AkkuMasterC4Dialog.this.totalChargeCurrentLabel.redraw(0,0,5,5,true);
-				log.log(Level.WARNING, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
+				log.log(Level.FINE, "charge = " + AkkuMasterC4Dialog.this.totalChargeCurrentLabel + ", discharge = " + AkkuMasterC4Dialog.this.totalDischargeCurrentLabel);
 			}
 		});
 	}

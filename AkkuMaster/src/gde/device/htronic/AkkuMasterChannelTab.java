@@ -702,7 +702,7 @@ public class AkkuMasterChannelTab {
 	 * @param processName
 	 */
 	private void updateCurrentStatus() {
-		log.log(Level.WARNING, "'" + AkkuMasterChannelTab.this.processName.trim() + "' - " + AkkuMasterChannelTab.this.isChargeCurrentAdded + ", " + AkkuMasterChannelTab.this.isDischargeCurrentAdded);
+		log.log(Level.FINE, "'" + AkkuMasterChannelTab.this.processName.trim() + "' - " + AkkuMasterChannelTab.this.isChargeCurrentAdded + ", " + AkkuMasterChannelTab.this.isDischargeCurrentAdded);
 		//charge
 		if (AkkuMasterChannelTab.this.processName.trim().equalsIgnoreCase(Messages.getString(MessageIds.GDE_MSGT1126).trim())) {
 			if(this.isChargeCurrentAdded == false) {
@@ -743,7 +743,7 @@ public class AkkuMasterChannelTab {
 				this.isDischargeCurrentAdded = false;
 			}
 		}
-		log.log(Level.WARNING, "'" + AkkuMasterChannelTab.this.processName.trim() + "' - " + AkkuMasterChannelTab.this.isChargeCurrentAdded + ", " + AkkuMasterChannelTab.this.isDischargeCurrentAdded);
+		log.log(Level.FINE, "'" + AkkuMasterChannelTab.this.processName.trim() + "' - " + AkkuMasterChannelTab.this.isChargeCurrentAdded + ", " + AkkuMasterChannelTab.this.isDischargeCurrentAdded);
 	}
 
 	/**
