@@ -1,7 +1,5 @@
 ﻿Development backlog: loose collection of open work items to be done in future
  
-UniLog Firmware update M-Link support
-
 check group membership on UNIX systems (uucp for serial port locking)
  
 documentation: How to create a device plug-in 
