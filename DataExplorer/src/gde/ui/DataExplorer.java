@@ -1539,10 +1539,10 @@ public class DataExplorer extends Composite {
 	}
 	
 	/**
-	 * update graphics catptions (header and description)
+	 * update graphics captions (header and description)
 	 */
 	public void updateGraphicsCaptions() {
-		this.graphicsTabItem.updateCaptions();
+		if (this.graphicsTabItem != null) this.graphicsTabItem.updateCaptions();
 	}
 
 	/**
