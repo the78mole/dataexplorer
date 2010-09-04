@@ -678,5 +678,14 @@
 			</batchtest>
 		</junit>
 	</target>
+	
+	<target name="signature" description="create and verify gpg signature and verify">
+		<echo>find . -name "*" -exec gpg -b --use-agent {} \;</echo>
+		<echo>find . -name "*.sig" -exec gpg --verify {} \;</echo>
+	</target>
+
+	<target name="rsync" description="copy new release content while deleting old once">
+		<echo>rsync -vr --delete install/ brueg@dl.sv.nongnu.org:/releases/dataexplorer/</echo>
+	</target>
 
 </project>
