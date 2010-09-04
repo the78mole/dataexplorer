@@ -1,12 +1,28 @@
 Development history / change log, please read from bottom up
 
-add sample udev rule files to GNU/Linux binaries
-add WStech setup tool as additional tabulator
-enhance IDevice interface to allow extra device dependent tabulator
-add WStech LinkVario
-create extra WStechVario plug-in
+Version 2.40 - 04 Sep 2010
+
 fix Info.plist for Mac OS
+update UniLog to suport firmeware 1.13 with M-Link configuration
+update WStech online help VarioTool
+fix MAC OS link problem by defining simple link files as workaround
+stabilize GNU/Linux 64 bit serial read
+show delta values during delta measurement
+implement KML and GPX export and enable export using file -> export menu
+fix update problem while changing or updating object key
+enable deep re-naming of object keys (include object meta data and update of all data files)
+refine display of AkkuMaster's total charge/discharge current
+WStechVario add default record name to messages
+update online help / users documentation
+
+Version 2.30		06 Jul 2010
+
+add WStech LinkVario while create extra WStechVario plug-in
 update GNU/Linux application register function
+add sample udev rule files to GNU/Linux binaries
+enhance IDevice interface to allow extra device dependent tabulator
+add WStech DataVario setup tool as additional tabulator
+add WStech LinkVario setup tool as additional tabulator
 
 Version 2.20		30 Mar 2010
 
