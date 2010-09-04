@@ -26,6 +26,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for gde.junit");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(CleanupTestTemp.class);
 		suite.addTestSuite(TestFileReaderWriter.class);
 		suite.addTestSuite(TestMathUtils.class);
 		suite.addTestSuite(JarInspectAndExportTest.class);
