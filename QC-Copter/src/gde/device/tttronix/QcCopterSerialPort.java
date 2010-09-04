@@ -73,6 +73,9 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 			
 			data = new byte[this.deviceConfig.getDataBlockSize()];
 			data = this.read(data, 3000);
+			
+			//check data for content
+			
 			// synchronize received data to begin of sent data 
 			while (data[0] != STX) {  //&& data[this.dataSize - 1] != ETX) {
 				this.isInSync = false;
