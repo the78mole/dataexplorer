@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V10.xsd">
     <Device>
-        <name implementation="QcCopter">QuadroControl II/XS</name>
+        <name implementation="QcCopter">QuadroControl II XS</name>
         <manufacturer>tt-tronix</manufacturer>
         <manufacturerURL>http://www.qc-copter.de</manufacturerURL>
         <group>multimeter</group>
@@ -22,10 +22,10 @@
         <name>Time</name>
         <symbol>t</symbol>
         <unit>msec</unit>
-        <timeStep>1000.0</timeStep>
+        <timeStep>100.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="61" type="BINARY"/>
+        <format size="64" type="BINARY"/>
         <checkSum type="ADD" format="BINARY"/>
         <timeUnit>sec</timeUnit>
         <separator>semicolon</separator>

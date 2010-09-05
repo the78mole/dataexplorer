@@ -135,7 +135,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
 	public int getLovDataByteSize() {
-		return 4;  //TODO sometimes first 4 bytes give the length of data + 4 bytes for number
+		return 86;  //TODO sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
 
 	/**
@@ -289,56 +289,16 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 		int offset = 0;
 		int progressCycle = 0;
 		int lovDataSize = this.getLovDataByteSize();
-		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0; 
+		byte[] convertBuffer = new byte[deviceDataBufferSize];
+
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+
+		for (int i = 0; i < recordDataSize; i++) {
+			System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+			recordSet.addPoints(convertDataBytes(points, convertBuffer));
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
+		}
 		
-		if (dataBuffer[0] == 0x7B) {
-			byte[] convertBuffer = new byte[deviceDataBufferSize];
-			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-
-			for (int i = 0; i < recordDataSize; i++) {
-				System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
-				recordSet.addPoints(convertDataBytes(points, convertBuffer));
-
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
-			}
-			
-			recordSet.setTimeStep_ms(this.getAverageTimeStep_ms() != null ? this.getAverageTimeStep_ms() : 1478); // no average time available, use a hard coded one
-		}
-		else { // none constant time steps
-			byte[] sizeBuffer = new byte[4];
-			byte[] convertBuffer = new byte[deviceDataBufferSize];
-			
-			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-			for (int i = 0; i < recordDataSize; i++) {
-				System.arraycopy(dataBuffer, offset, sizeBuffer, 0, 4);
-				lovDataSize = 4 + LogViewReader.parse2Int(sizeBuffer);
-				System.arraycopy(dataBuffer, offset + 4, convertBuffer, 0, deviceDataBufferSize);
-				recordSet.addPoints(convertDataBytes(points, convertBuffer));
-				offset += lovDataSize;
-				
-				StringBuilder sb = new StringBuilder();
-				byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize - 4];
-				//sb.append(timeBuffer.length).append(" - ");
-				System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
-				String timeStamp = new String(timeBuffer).substring(0, timeBuffer.length-8)+"0000000000";
-				long dateTime = new Long(timeStamp.substring(6,17));
-				log.log(Level.FINEST, timeStamp + " " + timeStamp.substring(6,17) + " " + dateTime);
-				sb.append(dateTime);
-				//System.arraycopy(dataBuffer, offset - 4, sizeBuffer, 0, 4);
-				//sb.append(" ? ").append(LogViewReader.parse2Int(sizeBuffer));
-				deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime)/1000 - 217; // value 217 is a compromis manual selected
-				sb.append(" - ").append(deltaTime);
-				sb.append(" - ").append(sumTimeDelta += deltaTime);
-				log.log(Level.FINER, sb.toString());
-				lastDateTime = dateTime;
-				
-				recordSet.addTimeStep_ms(sumTimeDelta);
-
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
-			}
-//			recordSet.setTimeStep_ms((double)sumTimeDelta/recordDataSize);
-//			log.log(Level.FINE, sumTimeDelta/recordDataSize + " " + sumTimeDelta);
-		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
@@ -349,15 +309,16 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
+		int dataBufferSize = dataBuffer.length;
 		//TODO check if calculation is OK
-		for (int i=0, j=0; i<points.length - 4; ++i, j+=3) {
+		for (int i=0; i<points.length; ++i) {
 			//DBx_0 = 94 + [ A7 A6 A5 A4 A3 A2 ]
 			//DBx_1 = 94 + [ A1 A0 B7 B6 B5 ]
 			//DBx_2 = 94 + [ B4 B3 B2 B1 B0 ]
-			int DBx_0 = 94 + (dataBuffer[i*j] & 0xF8);
-			int DBx_1 = 94 + (dataBuffer[i*j+1] & 0x02) + (dataBuffer[i*j+2] & 0xE0); 
-			int DBx_2 = 94 + (dataBuffer[i*j+2] & 0x1F); 
-			points[i]  = DBx_0 + DBx_1 + DBx_2; 
+			int DBx_0 = ((dataBuffer[1+i*3]   & 0xFF) - 94);
+			int DBx_1 = ((dataBuffer[1+i*3+1] & 0xFF) - 94); 
+			int DBx_2 = ((dataBuffer[1+i*3+2] & 0xFF) - 94); 
+			points[i]  = (dataBuffer[1+i*3] & 0x80) != 0 ? (((DBx_0 & 0x3F) << 10) | ((DBx_1 & 0x1F) << 5) | (DBx_2 & 0x1F)) * -1 : ((DBx_0 & 0x3F) << 10) | ((DBx_1 & 0x1F) << 5) | (DBx_2 & 0x1F); 
 		}
 
 		return points;
