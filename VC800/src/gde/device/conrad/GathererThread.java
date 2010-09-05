@@ -22,6 +22,8 @@ import java.util.HashMap;
 import gde.log.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.swt.SWT;
+
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
@@ -195,11 +197,11 @@ public class GathererThread extends Thread {
 			catch (Throwable e) {
 				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
 				if (e instanceof TimeOutException) {
-					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1502));
+					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1500));
 					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1500));
+						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1502), SWT.COLOR_RED);
 						stopDataGatheringThread(false);
 					}
 				}
