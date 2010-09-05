@@ -1135,6 +1135,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			// in-activate and remove failed device (XML) from potential devices list 
 			this.selectedActiveDeviceConfig.setUsed(false);
 			this.selectedActiveDeviceConfig.storeDeviceProperties();
+			selectedDeviceName = this.selectedActiveDeviceConfig.getName(); 
 			this.activeDevices.remove(selectedDeviceName);
 			this.deviceConfigurations.remove(selectedDeviceName);
 			if (this.activeDevices.size() > 0) {
