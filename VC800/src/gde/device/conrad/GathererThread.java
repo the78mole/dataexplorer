@@ -106,6 +106,7 @@ public class GathererThread extends Thread {
 
 		this.isCollectDataStopped = false;
 		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry " + "initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
+		this.application.setStatusMessage(""); //$NON-NLS-1$
 
 		while (!this.isCollectDataStopped) {
 			try {
@@ -201,7 +202,7 @@ public class GathererThread extends Thread {
 					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
-						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1502), SWT.COLOR_RED);
+						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1501), SWT.COLOR_RED);
 						stopDataGatheringThread(false);
 					}
 				}
@@ -212,7 +213,6 @@ public class GathererThread extends Thread {
 			}
 		}
 		configData.clear();
-		this.application.setStatusMessage(""); //$NON-NLS-1$
 		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 	}
 
