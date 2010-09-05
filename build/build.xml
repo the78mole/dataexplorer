@@ -277,7 +277,7 @@
 			<include name="LiPoWatch/build/*.jar" />
 			<include name="CSV2SerialAdapter/build/*.jar" />
 			<include name="WStechVario/build/*.jar" />
-			<include name="QC-Copter/build/*.jar" />
+			<!-- include name="QC-Copter/build/*.jar" /-->
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
