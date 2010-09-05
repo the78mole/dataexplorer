@@ -75,8 +75,9 @@ public class LogViewReader {
 		deviceMap.put("lipowatch", "LiPoWatch"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech datavario", "DataVario"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech datavario duo", "DataVarioDuo"); //$NON-NLS-1$ //$NON-NLS-2$
-		deviceMap.put("wstech linkvario", "DataVario"); //$NON-NLS-1$ //$NON-NLS-2$
-		deviceMap.put("wstech linkvario duo", "DataVarioDuo"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("wstech linkvario", "LinkaVario"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("wstech linkvario duo", "LinkVario"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("qc copter", "QuadroControl II XS"); //$NON-NLS-1$ //$NON-NLS-2$
 		// add more supported devices here, key in lower case
 	}
 
