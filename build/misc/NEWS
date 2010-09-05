@@ -13,3 +13,4 @@ GNU DataExplorer - News - comes with version 2.41
 11) WStechVario add default record name to messages
 12) update online help / users documentation
 13) fix serial read function timeout for UNIX based systems
+14) fix status messages VC80X

@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 2.41 - 05 Sep 2010
 
 fix serial read function timeout for UNIX based systems
+fix status messages VC80X
 
 Version 2.40 - 04 Sep 2010
 
