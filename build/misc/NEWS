@@ -14,3 +14,5 @@ GNU DataExplorer - News - comes with version 2.41
 12) update online help / users documentation
 13) fix serial read function timeout for UNIX based systems
 14) fix status messages VC80X
+15) fix update of active devices while ClassNotFound occurs for devices where implementation and name does not match 
+
