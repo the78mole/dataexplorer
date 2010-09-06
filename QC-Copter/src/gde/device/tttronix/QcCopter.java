@@ -38,6 +38,7 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
+import gde.utils.Checksum;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -284,7 +285,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = this.getDataBlockSize(); // const.
+		int deviceDataBufferSize = this.getLovDataByteSize(); //this.getDataBlockSize(); // const.
 		int[] points = new int[this.getNumberOfMeasurements(1)];
 		int offset = 0;
 		int progressCycle = 0;
@@ -309,17 +310,45 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
-		int dataBufferSize = dataBuffer.length;
-		//TODO check if calculation is OK
-		for (int i=0; i<points.length; ++i) {
+		int checkSum = 0;
+		for (int i=0, j=0; j<points.length; ++i, ++j) {
 			//DBx_0 = 94 + [ A7 A6 A5 A4 A3 A2 ]
 			//DBx_1 = 94 + [ A1 A0 B7 B6 B5 ]
-			//DBx_2 = 94 + [ B4 B3 B2 B1 B0 ]
-			int DBx_0 = ((dataBuffer[1+i*3]   & 0xFF) - 94);
-			int DBx_1 = ((dataBuffer[1+i*3+1] & 0xFF) - 94); 
-			int DBx_2 = ((dataBuffer[1+i*3+2] & 0xFF) - 94); 
-			points[i]  = (dataBuffer[1+i*3] & 0x80) != 0 ? (((DBx_0 & 0x3F) << 10) | ((DBx_1 & 0x1F) << 5) | (DBx_2 & 0x1F)) * -1 : ((DBx_0 & 0x3F) << 10) | ((DBx_1 & 0x1F) << 5) | (DBx_2 & 0x1F); 
+			//DBx_2 = 94 + [ B4 B3 B2 B1 B0 
+			log.log(Level.WARNING, i + "; " + dataBuffer[1+i*3] + "; " + dataBuffer[1+i*3+1] + "; " + dataBuffer[1+i*3+2]);
+			checkSum += Checksum.ADD(new byte[] {dataBuffer[1+i*3], dataBuffer[1+i*3+1], dataBuffer[1+i*3+2]}, 3);;
+      //puffer_ausgabe[pt++] = '^' + (byte1 >> 2);   
+      //puffer_ausgabe[pt++] = '^' + (((byte1 & 0x03) << 3) | ((byte2 & 0xE0) >> 5));
+      //puffer_ausgabe[pt++] = '^' + ( byte2 & 0x1F);			
+			int DBx_1 = dataBuffer[1+i*3]   - 94;
+			int DBx_2 = dataBuffer[1+i*3+1] - 94;
+			int DBx_3 = dataBuffer[1+i*3+2] - 94;
+			log.log(Level.WARNING, i + "; " + DBx_1 + "; " + DBx_2 + "; " + DBx_3);
+			byte byte1 = (byte) (((DBx_1 & 0x3F) << 2) | ((DBx_2 & 0x1F >> 3))); 
+			byte byte2 = (byte) (((DBx_2 & 0xE0) << 5) | (DBx_3 & 0x1F)); 
+			
+			log.log(Level.WARNING, i + "; " + j + "; " + (1+i*3) + "; " + (1+i*3+1) + "; " + (1+i*3+2));
+			if (i < 10 || i > 12 ) {
+				//points[j] = ((DBx_1 & 0x3F) << 10) | ((DBx_2 & 0x1F) << 5) | (DBx_3 & 0x1F);
+				points[j] = ((byte1 & 0x00FF) << 8) | (byte2 & 0x00FF);
+				points[j] = DBx_1 < 0 ? -1 * points[j] : points[j];
+				
+			}
+			else { 
+				if (i==10) { //battery voltage unsigned
+					points[j] = ((DBx_1 & 0x3F) << 10) | ((DBx_2 & 0x1F) << 5) | (DBx_3 & 0x1F);
+				}
+				else { // motor uint8
+					points[j] = ((DBx_1 & 0x3F) << 2) | ((DBx_2 & 0x18) >> 3);
+					++j;
+					points[j] = ((DBx_2 & 0x03) << 5) | (DBx_3 & 0x1F);
+				}
+			}
 		}
+
+		log.log(Level.WARNING, checkSum + "; " + ( (((dataBuffer[58] - 94) & 0x3F) << 6) | (dataBuffer[59] - 94) & 0x3F) );
+		//puffer_ausgabe[i++] = '^' + (psumme >> 6);
+    //puffer_ausgabe[i++] = '^' + (psumme & 0x3F);
 
 		return points;
 	}
@@ -380,25 +409,15 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	public int[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
 		int[] dataTableRow = new int[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
-			String[] recordNames = recordSet.getRecordNames();
-			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
+			String[] recordNames = recordSet.getRecordNames();				
 			int numberRecords = recordNames.length;			
+			dataTableRow[0] = (int)recordSet.getTime_ms(rowIndex); // time msec
 
-			dataTableRow[0] = (int)recordSet.getTime_ms(rowIndex);
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
-				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				if (j != 7 && j != 8) {
-					dataTableRow[j + 1] = Double.valueOf((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor) * 1000.0).intValue();
-				}
-				else {
-					double value = record.get(rowIndex) / 1000;
-					int grad = ((int) (value / 1000));
-					double minuten = (value - (((int) (value / 1000)) * 1000)) / 10;
-					dataTableRow[j + 1] = Double.valueOf((grad + minuten / 60) * 1000.0).intValue();
-				}
+				dataTableRow[j+1] = Double.valueOf(((record.get(rowIndex)/1000.0) - reduction) * factor * 1000.0).intValue();				
 			}
 		}
 		catch (RuntimeException e) {
@@ -413,39 +432,12 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
-		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
-		if (record.getOrdinal() == 1) { // 1=Höhe
-			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
-			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
-			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+		double newValue = (value - reduction) * factor + offset;
 
-			try {
-				if (subtractFirst) {
-					reduction = record.getFirst().intValue() / 1000.0;
-				}
-				else if (subtractLast) {
-					reduction = record.getLast().intValue() / 1000.0;
-				}
-			}
-			catch (Throwable e) {
-				reduction = 0;
-			}
-		}
-
-		double newValue = 0;
-		if (record.getOrdinal() == 7 || record.getOrdinal() == 8) { // 7=GPS-Länge 8=GPS-Breite 
-			int grad = ((int)(value / 1000));
-			double minuten = (value - (grad*1000))/10; //(value - (((int)(value / 1000))*1000))/10;
-			newValue = grad + minuten/60;
-		}
-		else {
-			newValue = (value - reduction) * factor + offset;
-		}
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
@@ -456,39 +448,12 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
-		if (record.getOrdinal() == 1) { // 1=Höhe
-			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
-			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
-			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+		double newValue = (value - offset) / factor + reduction;
 
-			try {
-				if (subtractFirst) {
-					reduction = record.getFirst().intValue() / 1000.0;
-				}
-				else if (subtractLast) {
-					reduction = record.getLast().intValue() / 1000.0;
-				}
-			}
-			catch (Throwable e) {
-				reduction = 0;
-			}
-		}
-
-		double newValue = 0;
-		if (record.getOrdinal() == 7 || record.getOrdinal() == 8) { // 7=GPS-Länge 8=GPS-Breite 
-			int grad = (int)value;
-			double minuten =  (value - grad) / 60;
-			newValue = grad + minuten/60;
-		}
-		else {
-			newValue = (value - offset) / factor + reduction;
-		}
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
