@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V10.xsd">
     <Device>
-        <name implementation="QcCopter">QuadroControl</name>
+        <name implementation="gde.device.tttronix.QcCopter">QuadroControl</name>
         <manufacturer>tt-tronix</manufacturer>
         <manufacturerURL>http://www.qc-copter.de</manufacturerURL>
         <group>multimeter</group>
         <image>QC-Copter.png</image>
-        <usage>false</usage>
+        <usage>true</usage>
     </Device>
     <SerialPort>
         <port>-</port>
@@ -15,96 +15,102 @@
         <stopBits>STOPBITS_1</stopBits>
         <parity>PARITY_NONE</parity>
         <flowControlMode>FLOWCONTROL_RTSCTS_OUT</flowControlMode>
-        <isRTS>true</isRTS>
-        <isDTR>true</isDTR>
+        <isRTS>false</isRTS>
+        <isDTR>false</isDTR>
     </SerialPort>
     <TimeBase>
         <name>Time</name>
         <symbol>t</symbol>
         <unit>msec</unit>
-        <timeStep>100.0</timeStep>
+        <timeStep>0.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="61" type="BINARY"/>
+        <format size="62" type="BINARY"/>
         <checkSum type="ADD" format="BINARY"/>
-        <timeUnit>sec</timeUnit>
-        <separator>semicolon</separator>
-        <leader>$</leader>
-        <trailer>0D0A</trailer>
     </DataBlock>
     <State>
-        <property description="Bezeichnung für Lesevorgang" type="Integer" value="1" name="lesen"/>
+        <property type="Integer" value="1" name="simulation"/>
     </State>
-    <Channel type="TYPE_CONFIG" name="normal">
+    <Channel type="TYPE_CONFIG" name="config">
         <Measurement>
-            <name>Roll Integral</name>
+            <name>Roll-Integral</name>
             <symbol>Ri</symbol>
-            <unit></unit>
+            <unit>°</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Factor to measurement value" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>Roll Winkel</name>
+            <name>Roll-Winkel</name>
             <symbol>Rw</symbol>
             <unit>°</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Factor to measurement value" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>Nick Integral</name>
+            <name>Nick-Integral</name>
             <symbol>Ni</symbol>
-            <unit></unit>
+            <unit>°</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Factor to measurement value" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>Nick Winkel</name>
+            <name>Nick-Winkel</name>
             <symbol>N°</symbol>
             <unit>°</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
+            <property description="Factor to measurement value" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>Gyro Roll</name>
+            <name>Gyro-Roll</name>
             <symbol>Rg</symbol>
-            <unit></unit>
-            <active>false</active>
+            <unit>i</unit>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Factor to measurement value" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>Gyro Nick</name>
+            <name>Gyro-Nick</name>
             <symbol>Gn</symbol>
-            <unit></unit>
-            <active>false</active>
+            <unit>i</unit>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Factor to measurement value" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>Gyro Gier</name>
+            <name>Gyro-Gier</name>
             <symbol>Gg</symbol>
-            <unit></unit>
-            <active>false</active>
+            <unit>i</unit>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Factor to measurement value" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>ACC Roll</name>
+            <name>ACC-Roll</name>
             <symbol>Ar</symbol>
-            <unit></unit>
-            <active>false</active>
+            <unit>z</unit>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Factor to measurement value" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>ACC Nick</name>
+            <name>ACC-Nick</name>
             <symbol>An</symbol>
-            <unit></unit>
-            <active>false</active>
+            <unit>z</unit>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Factor to measurement value" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>ACC Z</name>
+            <name>ACC-Z</name>
             <symbol>Az</symbol>
-            <unit></unit>
-            <active>false</active>
+            <unit>z</unit>
+            <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Factor to measurement value" type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
             <name>Akkuspannung</name>
@@ -112,74 +118,75 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Double" value="0.001" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>Motor VR/V</name>
+            <name>Motor-VR/V</name>
             <symbol>Mvr</symbol>
-            <unit>V</unit>
+            <unit>1/min</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Motor VL/V</name>
+            <name>Motor-VL/V</name>
             <symbol>Mvlr</symbol>
-            <unit>V</unit>
+            <unit>1/min</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Motor HL/L</name>
+            <name>Motor-HL/L</name>
             <symbol>Mhl</symbol>
-            <unit>V</unit>
+            <unit>1/min</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Motor HR/H</name>
+            <name>Motor-HR/H</name>
             <symbol>Mhr</symbol>
-            <unit>V</unit>
+            <unit>1/min</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>User-Daten 0</name>
-            <symbol>D0</symbol>
-            <unit>V</unit>
+            <symbol>Du</symbol>
+            <unit>x</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>User-Daten 1</name>
-            <symbol>D1</symbol>
-            <unit>V</unit>
+            <symbol>Du</symbol>
+            <unit>x</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>User-Daten 2</name>
-            <symbol>D2</symbol>
-            <unit>V</unit>
+            <symbol>Du</symbol>
+            <unit>x</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>User-Daten 3</name>
-            <symbol>D3</symbol>
-            <unit>V</unit>
+            <symbol>Du</symbol>
+            <unit>x</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>User-Daten 4</name>
-            <symbol>D4</symbol>
-            <unit>V</unit>
+            <symbol>Du</symbol>
+            <unit>x</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>User-Daten 5</name>
-            <symbol>D5</symbol>
-            <unit>V</unit>
+            <symbol>Du</symbol>
+            <unit>x</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>

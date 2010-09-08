@@ -27,13 +27,10 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
-import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
-import gde.device.PropertyType;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
-import gde.io.LogViewReader;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.serial.DeviceSerialPort;
@@ -285,18 +282,39 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = this.getLovDataByteSize(); //this.getDataBlockSize(); // const.
+		int deviceDataBufferSize = this.getDataBlockSize();
 		int[] points = new int[this.getNumberOfMeasurements(1)];
 		int offset = 0;
 		int progressCycle = 0;
 		int lovDataSize = this.getLovDataByteSize();
 		byte[] convertBuffer = new byte[deviceDataBufferSize];
+		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0; 
 
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 		for (int i = 0; i < recordDataSize; i++) {
-			System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
-			recordSet.addPoints(convertDataBytes(points, convertBuffer));
+			//prepare databuffer for conversion
+			System.arraycopy(dataBuffer, offset, convertBuffer, 0, deviceDataBufferSize);
+			//recordSet.addPoints(convertDataBytes(points, convertBuffer));
+			offset += lovDataSize;
+			
+			//prepare time calculation while individual time steps gets recorded
+			byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize];
+			System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
+			long dateTime = lastDateTime+11700;
+//			try {
+//				dateTime = Long.parseLong((new String(timeBuffer).trim() + "0000000000").substring(6, 16)); //10 digits
+//			}
+//			catch (NumberFormatException e) {
+//				// ignore
+//			}
+			deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime)/117; 
+			log.log(Level.FINE, String.format("%d; %4d ms - %d : %s", i, deltaTime, dateTime, new String(timeBuffer).trim()));
+			sumTimeDelta += deltaTime;
+			lastDateTime = dateTime;
+			
+			recordSet.addPoints(convertDataBytes(points, convertBuffer), sumTimeDelta);
+
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		
@@ -310,46 +328,39 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
-		int checkSum = 0;
 		for (int i=0, j=0; j<points.length; ++i, ++j) {
 			//DBx_0 = 94 + [ A7 A6 A5 A4 A3 A2 ]
 			//DBx_1 = 94 + [ A1 A0 B7 B6 B5 ]
-			//DBx_2 = 94 + [ B4 B3 B2 B1 B0 
-			log.log(Level.WARNING, i + "; " + dataBuffer[1+i*3] + "; " + dataBuffer[1+i*3+1] + "; " + dataBuffer[1+i*3+2]);
-			checkSum += Checksum.ADD(new byte[] {dataBuffer[1+i*3], dataBuffer[1+i*3+1], dataBuffer[1+i*3+2]}, 3);;
-      //puffer_ausgabe[pt++] = '^' + (byte1 >> 2);   
-      //puffer_ausgabe[pt++] = '^' + (((byte1 & 0x03) << 3) | ((byte2 & 0xE0) >> 5));
-      //puffer_ausgabe[pt++] = '^' + ( byte2 & 0x1F);			
-			int DBx_1 = dataBuffer[1+i*3]   - 94;
-			int DBx_2 = dataBuffer[1+i*3+1] - 94;
-			int DBx_3 = dataBuffer[1+i*3+2] - 94;
-			log.log(Level.WARNING, i + "; " + DBx_1 + "; " + DBx_2 + "; " + DBx_3);
-			byte byte1 = (byte) (((DBx_1 & 0x3F) << 2) | ((DBx_2 & 0x1F >> 3))); 
-			byte byte2 = (byte) (((DBx_2 & 0xE0) << 5) | (DBx_3 & 0x1F)); 
+			//DBx_2 = 94 + [ B4 B3 B2 B1 B0 ]
+			int DBx_1 = (dataBuffer[1+i*3]   & 0xFF) - 94;
+			int DBx_2 = (dataBuffer[1+i*3+1] & 0xFF) - 94;
+			int DBx_3 = (dataBuffer[1+i*3+2] & 0xFF) - 94;
+			//log.log(Level.WARNING, i + "; " + j + "; " + (1+i*3) + "; " + (1+i*3+1) + "; " + (1+i*3+2));
+			//log.log(Level.WARNING, i + "; " + j + ": " + DBx_1 + "; " + DBx_2 + "; " + DBx_3);
+			//byte byte1 = (byte) (((DBx_1 & 0x3F) << 2) | ((DBx_2 & 0x1F >> 3))); 
+			//byte byte2 = (byte) (((DBx_2 & 0xE0) << 5) | (DBx_3 & 0x1F)); 
 			
-			log.log(Level.WARNING, i + "; " + j + "; " + (1+i*3) + "; " + (1+i*3+1) + "; " + (1+i*3+2));
-			if (i < 10 || i > 12 ) {
-				//points[j] = ((DBx_1 & 0x3F) << 10) | ((DBx_2 & 0x1F) << 5) | (DBx_3 & 0x1F);
-				points[j] = ((byte1 & 0x00FF) << 8) | (byte2 & 0x00FF);
-				points[j] = DBx_1 < 0 ? -1 * points[j] : points[j];
+			//log.log(Level.WARNING, i + "; " + j + ": " + (1+i*3) + "; " + (1+i*3+1) + "; " + (1+i*3+2));
+			if (i <= 10 || i > 12 ) {
+				points[j] = ((DBx_3 & 0x001F) << 11) | ((DBx_2 & 0x0007) << 8)  | ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
+
+				if ((points[j] & 0x00008000) > 0)
+					points[j] = (0xFFFF0000 | points[j]) * 1000;				
+				else 
+					points[j] *= 1000;
 				
+//				if(points[j] < -250000 || points[j] < 250000) {
+//					log.log(Level.WARNING, ""+points[j]);
+//				}
 			}
-			else { 
-				if (i==10) { //battery voltage unsigned
-					points[j] = ((DBx_1 & 0x3F) << 10) | ((DBx_2 & 0x1F) << 5) | (DBx_3 & 0x1F);
-				}
-				else { // motor uint8
-					points[j] = ((DBx_1 & 0x3F) << 2) | ((DBx_2 & 0x18) >> 3);
-					++j;
-					points[j] = ((DBx_2 & 0x03) << 5) | (DBx_3 & 0x1F);
-				}
+			else { // motor uint8
+				points[j] = (((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3)) * 1000;
+				++j;
+				points[j] = (((DBx_3 & 0x001F) << 11) | ((DBx_2 & 0x0007) << 8)) * 1000;
 			}
 		}
 
-		log.log(Level.WARNING, checkSum + "; " + ( (((dataBuffer[58] - 94) & 0x3F) << 6) | (dataBuffer[59] - 94) & 0x3F) );
-		//puffer_ausgabe[i++] = '^' + (psumme >> 6);
-    //puffer_ausgabe[i++] = '^' + (psumme & 0x3F);
-
+		log.log(Level.FINER, "CheckSum = " + (Checksum.ADD(dataBuffer, 1, 57)) + " = " + ( (((dataBuffer[58]&0xFF) - 94) << 6) | (((dataBuffer[59]&0xFF) - 94) & 0x3F) ) );
 		return points;
 	}
 	
