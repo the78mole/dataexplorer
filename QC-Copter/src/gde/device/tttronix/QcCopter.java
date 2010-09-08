@@ -301,14 +301,14 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 			//prepare time calculation while individual time steps gets recorded
 			byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize];
 			System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
-			long dateTime = lastDateTime+11700;
+			long dateTime = lastDateTime+11600;
 //			try {
 //				dateTime = Long.parseLong((new String(timeBuffer).trim() + "0000000000").substring(6, 16)); //10 digits
 //			}
 //			catch (NumberFormatException e) {
 //				// ignore
 //			}
-			deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime)/117; 
+			deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime)/116; 
 			log.log(Level.FINE, String.format("%d; %4d ms - %d : %s", i, deltaTime, dateTime, new String(timeBuffer).trim()));
 			sumTimeDelta += deltaTime;
 			lastDateTime = dateTime;
@@ -345,18 +345,16 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 				points[j] = ((DBx_3 & 0x001F) << 11) | ((DBx_2 & 0x0007) << 8)  | ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
 
 				if ((points[j] & 0x00008000) > 0)
-					points[j] = (0xFFFF0000 | points[j]) * 1000;				
-				else 
-					points[j] *= 1000;
+					points[j] = (0xFFFF0000 | points[j]);				
 				
 //				if(points[j] < -250000 || points[j] < 250000) {
 //					log.log(Level.WARNING, ""+points[j]);
 //				}
 			}
 			else { // motor uint8
-				points[j] = (((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3)) * 1000;
+				points[j] = (((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3));
 				++j;
-				points[j] = (((DBx_3 & 0x001F) << 11) | ((DBx_2 & 0x0007) << 8)) * 1000;
+				points[j] = (((DBx_3 & 0x001F) << 11) | ((DBx_2 & 0x0007) << 8));
 			}
 		}
 
