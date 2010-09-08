@@ -277,7 +277,7 @@
 			<include name="LiPoWatch/build/*.jar" />
 			<include name="CSV2SerialAdapter/build/*.jar" />
 			<include name="WStechVario/build/*.jar" />
-			<!-- include name="QC-Copter/build/*.jar" /-->
+			<include name="QC-Copter/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
@@ -680,8 +680,8 @@
 	</target>
 	
 	<target name="signature" description="create and verify gpg signature and verify">
-		<echo>find . -name "*" -exec gpg -b --use-agent {} \;</echo>
-		<echo>find . -name "*.sig" -exec gpg --verify {} \;</echo>
+		<echo>find . -name "*" -type f -exec gpg -b --use-agent {} \;</echo>
+		<echo>find . -name "*.sig" -type f -exec gpg --verify {} \;</echo>
 	</target>
 
 	<target name="rsync" description="copy new release content while deleting old once">
