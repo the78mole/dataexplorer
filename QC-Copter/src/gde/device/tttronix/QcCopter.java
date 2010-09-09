@@ -288,7 +288,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 		int progressCycle = 0;
 		int lovDataSize = this.getLovDataByteSize();
 		byte[] convertBuffer = new byte[deviceDataBufferSize];
-		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0; 
+		double lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0; 
 
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
@@ -301,15 +301,15 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 			//prepare time calculation while individual time steps gets recorded
 			byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize];
 			System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
-			long dateTime = lastDateTime+11600;
-//			try {
-//				dateTime = Long.parseLong((new String(timeBuffer).trim() + "0000000000").substring(6, 16)); //10 digits
-//			}
-//			catch (NumberFormatException e) {
-//				// ignore
-//			}
-			deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime)/116; 
-			log.log(Level.FINE, String.format("%d; %4d ms - %d : %s", i, deltaTime, dateTime, new String(timeBuffer).trim()));
+			long dateTime = (long) (lastDateTime+11650);
+			try {
+				dateTime = Long.parseLong((new String(timeBuffer).trim() + "0000000000").substring(6, 16)); //10 digits
+			}
+			catch (NumberFormatException e) {
+				// ignore
+			}
+			deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime)/116.5; 
+			log.log(Level.FINE, String.format("%d; %4.1fd ms - %d : %s", i, deltaTime, dateTime, new String(timeBuffer).trim()));
 			sumTimeDelta += deltaTime;
 			lastDateTime = dateTime;
 			
@@ -335,27 +335,23 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 			int DBx_1 = (dataBuffer[1+i*3]   & 0xFF) - 94;
 			int DBx_2 = (dataBuffer[1+i*3+1] & 0xFF) - 94;
 			int DBx_3 = (dataBuffer[1+i*3+2] & 0xFF) - 94;
-			//log.log(Level.WARNING, i + "; " + j + "; " + (1+i*3) + "; " + (1+i*3+1) + "; " + (1+i*3+2));
-			//log.log(Level.WARNING, i + "; " + j + ": " + DBx_1 + "; " + DBx_2 + "; " + DBx_3);
-			//byte byte1 = (byte) (((DBx_1 & 0x3F) << 2) | ((DBx_2 & 0x1F >> 3))); 
-			//byte byte2 = (byte) (((DBx_2 & 0xE0) << 5) | (DBx_3 & 0x1F)); 
+			log.log(Level.FINE, i + "; " + j + "; " + (1+i*3) + "; " + (1+i*3+1) + "; " + (1+i*3+2));
+			log.log(Level.FINE, i + "; " + j + ": " + DBx_1 + "; " + DBx_2 + "; " + DBx_3);
 			
-			//log.log(Level.WARNING, i + "; " + j + ": " + (1+i*3) + "; " + (1+i*3+1) + "; " + (1+i*3+2));
 			if (i <= 10 || i > 12 ) {
-				points[j] = ((DBx_3 & 0x001F) << 11) | ((DBx_2 & 0x0007) << 8)  | ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
+				points[j] = ((DBx_2 & 0x0007) << 13) | ((DBx_3 & 0x001F) << 8)  | ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
 
-				if ((points[j] & 0x00008000) > 0)
+				if (i != 10 && (points[j] & 0x00008000) > 0) // i==10 battery voltage uint16
 					points[j] = (0xFFFF0000 | points[j]);				
-				
-//				if(points[j] < -250000 || points[j] < 250000) {
-//					log.log(Level.WARNING, ""+points[j]);
-//				}
 			}
 			else { // motor uint8
-				points[j] = (((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3));
+				points[j] = ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
 				++j;
-				points[j] = (((DBx_3 & 0x001F) << 11) | ((DBx_2 & 0x0007) << 8));
+				points[j] = ((DBx_2 & 0x0007) << 13) | ((DBx_3 & 0x001F) << 8);
 			}
+			
+			//to enable third decimal place
+			points[j] *= 1000;
 		}
 
 		log.log(Level.FINER, "CheckSum = " + (Checksum.ADD(dataBuffer, 1, 57)) + " = " + ( (((dataBuffer[58]&0xFF) - 94) << 6) | (((dataBuffer[59]&0xFF) - 94) & 0x3F) ) );
@@ -397,7 +393,9 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 			
-			points = convertDataBytes(points, convertBuffer);
+			for (int j = 0; j < points.length; j++) {
+				points[j] = (((convertBuffer[j * 4] & 0xff) << 24) + ((convertBuffer[1+(j * 4)] & 0xff) << 16) + ((convertBuffer[2+(j * 4)] & 0xff) << 8) + ((convertBuffer[3+(j * 4)] & 0xff) << 0));
+			}
 			
 			if(recordSet.isTimeStepConstant()) 
 				recordSet.addPoints(points);
