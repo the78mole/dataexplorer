@@ -70,8 +70,6 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				this.open();
 				isPortOpenedByMe = true;
 			}
-			
-			data = new byte[this.deviceConfig.getDataBlockSize()];
 			data = this.read(data, 3000);
 			
 			//check data for content
@@ -94,9 +92,8 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 					break;
 			}
 
-			StringBuilder sb;
 			if (log.isLoggable(Level.FINER)) {
-				sb = new StringBuilder();
+				StringBuilder sb = new StringBuilder();
 				for (byte b : data) {
 					sb.append(String.format("0x%02x ,", b)); //$NON-NLS-1$
 				}
@@ -107,7 +104,7 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				this.xferErrors++;
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.xferErrors); //$NON-NLS-1$
 				//TODO retry or skip in case of xfer errors
-				//data = getData();
+				data = getData();
 			}
 		}
 		catch (Exception e) {
@@ -121,6 +118,48 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				this.close();
 		}
 		return data;
+	}
+
+	/**
+	 * receive terminal data using stable counter which sends data back to gatherer thread while dialog is open
+	 * @return String containing gathered data 
+	 * @throws IOException
+	 */
+	public synchronized String getTerminalData() throws Exception {
+		final String $METHOD_NAME = "getTerminalData";
+		String returnString = "\n     ->waiting for terminal data<- \n";
+
+		boolean isPortOpenedByMe = false;
+		try {
+			if (!this.isConnected()) {
+				this.open();
+				isPortOpenedByMe = true;
+			}
+			
+			byte[] data = new byte[200];
+			waitForStableReceiveBuffer(20, 2000, 200);// stable counter max 3000/4 = 750
+			data = this.read(data, 1000); 
+			
+			if (log.isLoggable(Level.FINER)) {
+				StringBuilder sb = new StringBuilder();
+				for (byte b : data) {
+					sb.append(String.format("%c", (char)b)); //$NON-NLS-1$
+				}
+				log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, sb.toString());
+			}
+			returnString = data.length > 0 ? new String(data) : "\n     ->waiting for terminal data<- \n";
+		}
+		catch (Exception e) {
+			if (!(e instanceof TimeOutException)) {
+				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			}
+			throw e;
+		}
+		finally {
+			if (isPortOpenedByMe) 
+				this.close();
+		}
+		return returnString;
 	}
 
 	/**

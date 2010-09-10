@@ -225,7 +225,9 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 					if (activChannel != null) {
 						this.getDialog().dataGatherThread = new GathererThread(this.application, this, this.serialPort, activChannel.getNumber(), this.getDialog());
 						try {
-							this.getDialog().dataGatherThread.start();
+							if (this.getDialog().dataGatherThread != null) {
+								this.getDialog().dataGatherThread.start();
+							}
 						}
 						catch (RuntimeException e) {
 							log.log(Level.SEVERE, e.getMessage(), e);

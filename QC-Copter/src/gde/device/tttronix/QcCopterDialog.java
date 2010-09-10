@@ -24,7 +24,11 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
+import gde.exception.ApplicationConfigurationException;
+import gde.exception.SerialPortException;
+import gde.log.Level;
 import gde.messages.Messages;
+import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
 import java.util.ArrayList;
@@ -43,9 +47,13 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * Dialog class to enable visualization control
@@ -54,7 +62,12 @@ import org.eclipse.swt.widgets.Shell;
 public class QcCopterDialog extends DeviceDialog {
 	final static Logger		log								= Logger.getLogger(QcCopterDialog.class.getName());
 
-	CTabFolder						tabFolder;
+	CTabFolder								tabFolder;
+	final List<CTabItem>			configurations		= new ArrayList<CTabItem>();
+	Text											terminalText;
+	Composite									terminalComposite;
+	CTabItem									terminalTabItem;
+
 	Button								closeButton;
 	Button								saveButton;
 	GathererThread				dataGatherThread;
@@ -64,7 +77,6 @@ public class QcCopterDialog extends DeviceDialog {
 	final Settings							settings;					// application configuration settings
 
 	int										measurementsCount	= 0;
-	final List<CTabItem>	configurations		= new ArrayList<CTabItem>();
 
 	/**
 	 * default constructor initialize all variables required
@@ -73,64 +85,65 @@ public class QcCopterDialog extends DeviceDialog {
 	 */
 	public QcCopterDialog(Shell parent, QcCopter useDevice) {
 		super(parent);
-		this.device = useDevice;
-		this.serialPort = useDevice.getSerialPort();
-		this.settings = Settings.getInstance();
-		for (int i = 1; i <= this.device.getChannelCount(); i++) {
-			int actualMeasurementCount = this.device.getMeasurementNames(i).length;
-			this.measurementsCount = actualMeasurementCount > this.measurementsCount ? actualMeasurementCount : this.measurementsCount;
+		device = useDevice;
+		serialPort = useDevice.getSerialPort();
+		settings = Settings.getInstance();
+		for (int i = 1; i <= device.getChannelCount(); i++) {
+			int actualMeasurementCount = device.getMeasurementNames(i).length;
+			measurementsCount = actualMeasurementCount > measurementsCount ? actualMeasurementCount : measurementsCount;
 		}
 	}
 
 	@Override
 	public void open() {
 		try {
-			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
-			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
+			shellAlpha = Settings.getInstance().getDialogAlphaValue();
+			isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-			log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
-			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
-				if (this.settings.isDeviceDialogsModal())
-					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
-				else if (this.settings.isDeviceDialogsOnTop())
-					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM | SWT.ON_TOP);
+			log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((dialogShell == null) ? "null" : dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			if (dialogShell == null || dialogShell.isDisposed()) {
+				if (settings.isDeviceDialogsModal())
+					dialogShell = new Shell(application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
+				else if (settings.isDeviceDialogsOnTop())
+					dialogShell = new Shell(application.getDisplay(), SWT.DIALOG_TRIM | SWT.ON_TOP);
 				else
-					this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);
+					dialogShell = new Shell(application.getDisplay(), SWT.DIALOG_TRIM);
 
-				SWTResourceManager.registerResourceUser(this.dialogShell);
-				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
+				SWTResourceManager.registerResourceUser(dialogShell);
+				if (isAlphaEnabled) dialogShell.setAlpha(254);
 
 				FormLayout dialogShellLayout = new FormLayout();
-				this.dialogShell.setLayout(dialogShellLayout);
-				this.dialogShell.layout();
+				dialogShell.setLayout(dialogShellLayout);
+				dialogShell.layout();
 				//dialogShell.pack();
-				this.dialogShell.setSize(310, 10 + 30 + 90 + this.measurementsCount * 30 + 55);
-				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
-				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
-				this.dialogShell.addDisposeListener(new DisposeListener() {
+				dialogShell.setSize(600, 10 + 90 + measurementsCount * 30 / 2 + 55);
+				//dialogShell.setSize(600, 10 + 40 + 90 + measurementsCount * 30 / 2 + 55);
+				dialogShell.setText(device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
+				dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+				dialogShell.addDisposeListener(new DisposeListener() {
 					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-						if (QcCopterDialog.this.device.isChangePropery()) {
+						if (device.isChangePropery()) {
 							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041);
-							if (QcCopterDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
+							if (application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
 								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
-								QcCopterDialog.this.device.storeDeviceProperties();
+								device.storeDeviceProperties();
 								setClosePossible(true);
 							}
 						}
 					}
 				});
-				this.dialogShell.addHelpListener(new HelpListener() {
+				dialogShell.addHelpListener(new HelpListener() {
 					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						QcCopterDialog.this.application.openHelpDialog("WStechVario", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						application.openHelpDialog("WStechVario", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				// enable fade in/out alpha blending (do not fade-in on top)
-//				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+//				dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 //					@Override
 //					public void mouseEnter(MouseEvent evt) {
 //						log.log(java.util.logging.Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
@@ -149,47 +162,71 @@ public class QcCopterDialog extends DeviceDialog {
 //					}
 //				});
 				{
-					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
+					tabFolder = new CTabFolder(dialogShell, SWT.NONE);
 					{
-						for (int i = 0; i < this.device.getChannelCount(); i++) {
-							this.configurations.add(new QcCopterTabItem(this.tabFolder, this, (i + 1), this.device));
+						terminalTabItem = new CTabItem(tabFolder, SWT.NONE);
+						terminalTabItem.setText("Terminal");
+						{
+							terminalComposite = new Composite(tabFolder, SWT.NONE);
+							GridLayout terminalCompositeLayout = new GridLayout();
+							terminalComposite.setLayout(terminalCompositeLayout);
+							terminalTabItem.setControl(terminalComposite);
+							//terminalComposite.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+							{
+								terminalText = new Text(terminalComposite, SWT.MULTI | SWT.LEFT | SWT.WRAP | SWT.BORDER);
+								GridData terminalTextLData = new GridData();
+								terminalTextLData.widthHint = 410;
+								terminalTextLData.heightHint = 300;
+								terminalTextLData.grabExcessHorizontalSpace = true;
+								terminalTextLData.grabExcessVerticalSpace = true;
+								terminalTextLData.verticalAlignment = GridData.CENTER;
+								terminalTextLData.horizontalAlignment = GridData.CENTER;
+								terminalText.setLayoutData(terminalTextLData);
+								terminalText.setText("01234567890123456789012345678901234567890\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
+								terminalText.setFont(SWTResourceManager.getFont("Lucida Console", 11, 1, false, false));
+							}
 						}
 					}
 					{
-						this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+						for (int i = 0; i < device.getChannelCount(); i++) {
+							configurations.add(new QcCopterTabItem(tabFolder, this, (i + 1), device));
+						}
+					}
+					{
+						saveButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData saveButtonLData = new FormData();
 						saveButtonLData.width = 120;
 						saveButtonLData.height = 30;
 						saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
-						saveButtonLData.left = new FormAttachment(0, 1000, 15);
-						this.saveButton.setLayoutData(saveButtonLData);
-						this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.saveButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0486));
-						this.saveButton.setEnabled(false);
-						this.saveButton.addSelectionListener(new SelectionAdapter() {
+						saveButtonLData.left = new FormAttachment(0, 1000, 55);
+						saveButton.setLayoutData(saveButtonLData);
+						saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						saveButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0486));
+						saveButton.setEnabled(false);
+						saveButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								QcCopterDialog.this.device.storeDeviceProperties();
-								QcCopterDialog.this.saveButton.setEnabled(false);
+								device.storeDeviceProperties();
+								saveButton.setEnabled(false);
 							}
 						});
 					}
 					{
-						this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+						closeButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData closeButtonLData = new FormData();
 						closeButtonLData.width = 120;
 						closeButtonLData.height = 30;
-						closeButtonLData.right = new FormAttachment(1000, 1000, -15);
+						closeButtonLData.right = new FormAttachment(1000, 1000, -55);
 						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
-						this.closeButton.setLayoutData(closeButtonLData);
-						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0485));
-						this.closeButton.addSelectionListener(new SelectionAdapter() {
+						closeButton.setLayoutData(closeButtonLData);
+						closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0485));
+						closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								QcCopterDialog.this.dialogShell.dispose();
+								dialogShell.dispose();
 							}
 						});
 					}
@@ -198,40 +235,41 @@ public class QcCopterDialog extends DeviceDialog {
 					tabFolderLData.left = new FormAttachment(0, 1000, 0);
 					tabFolderLData.right = new FormAttachment(1000, 1000, 0);
 					tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
-					this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.tabFolder.setLayoutData(tabFolderLData);
-					this.tabFolder.addSelectionListener(new SelectionAdapter() {
+					tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					tabFolder.setLayoutData(tabFolderLData);
+					tabFolder.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
-							int channelNumber = QcCopterDialog.this.tabFolder.getSelectionIndex();
-							if (channelNumber >= 0 && channelNumber <= QcCopterDialog.this.device.getChannelCount()) { // enable other tabs for future use
-								channelNumber += 1;
-								String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText(); //$NON-NLS-1$
-								Channels channels = Channels.getInstance();
-								Channel activeChannel = channels.getActiveChannel();
-								if (activeChannel != null) {
-									log.log(java.util.logging.Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
-									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-									if (activeRecordSet != null && activeChannel.getNumber() != channelNumber) {
-										int answer = QcCopterDialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1901));
-										if (answer == SWT.YES) {
-											String recordSetKey = activeRecordSet.getName();
-											Channel tmpChannel = channels.get(channelNumber);
-											if (tmpChannel != null) {
-												log.log(java.util.logging.Level.FINE,
-														"move record set " + recordSetKey + " to channel/configuration " + channelNumber + GDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
-												tmpChannel.put(recordSetKey, activeRecordSet.clone(channelNumber));
-												activeChannel.remove(recordSetKey);
-												channels.switchChannel(channelNumber, recordSetKey);
-												RecordSet newActiveRecordSet = channels.get(channelNumber).getActiveRecordSet();
-												if (newActiveRecordSet != null) {
-													QcCopterDialog.this.device.updateVisibilityStatus(newActiveRecordSet);
-													QcCopterDialog.this.device.makeInActiveDisplayable(newActiveRecordSet);
+							if (tabFolder.getSelectionIndex() > 0) {
+								int channelNumber = tabFolder.getSelectionIndex() - 1;
+								if (channelNumber >= 0 && channelNumber <= device.getChannelCount()) { // enable other tabs for future use
+									channelNumber += 1;
+									String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText(); //$NON-NLS-1$
+									Channels channels = Channels.getInstance();
+									Channel activeChannel = channels.getActiveChannel();
+									if (activeChannel != null) {
+										log.log(java.util.logging.Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+										RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+										if (activeRecordSet != null && activeChannel.getNumber() != channelNumber) {
+											int answer = application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1901));
+											if (answer == SWT.YES) {
+												String recordSetKey = activeRecordSet.getName();
+												Channel tmpChannel = channels.get(channelNumber);
+												if (tmpChannel != null) {
+													log.log(java.util.logging.Level.FINE, "move record set " + recordSetKey + " to channel/configuration " + channelNumber + GDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+													tmpChannel.put(recordSetKey, activeRecordSet.clone(channelNumber));
+													activeChannel.remove(recordSetKey);
+													channels.switchChannel(channelNumber, recordSetKey);
+													RecordSet newActiveRecordSet = channels.get(channelNumber).getActiveRecordSet();
+													if (newActiveRecordSet != null) {
+														device.updateVisibilityStatus(newActiveRecordSet);
+														device.makeInActiveDisplayable(newActiveRecordSet);
+													}
 												}
 											}
+											application.updateCurveSelectorTable();
 										}
-										QcCopterDialog.this.application.updateCurveSelectorTable();
 									}
 								}
 							}
@@ -240,21 +278,38 @@ public class QcCopterDialog extends DeviceDialog {
 				}
 
 				try {
-					this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
+					tabFolder.setSelection(0);
+					Channel activChannel = Channels.getInstance().getActiveChannel();
+					if (activChannel != null) {
+						dataGatherThread = new GathererThread(application, device, this.serialPort, activChannel.getNumber(), this);
+						dataGatherThread.start();
+					}
+				}
+				catch (SerialPortException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					this.application.openMessageDialog(this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+				}
+				catch (ApplicationConfigurationException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					this.application.openMessageDialog(this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+					this.application.getDeviceSelectionDialog().open();
 				}
 				catch (RuntimeException e) {
-					this.tabFolder.setSelection(0);
+					log.log(Level.SEVERE, e.getMessage(), e);
+				}
+				catch (Throwable e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
 				}
 
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
-				this.dialogShell.open();
+				dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
+				dialogShell.open();
 			}
 			else {
-				this.dialogShell.setVisible(true);
-				this.dialogShell.setActive();
+				dialogShell.setVisible(true);
+				dialogShell.setActive();
 			}
-			Display display = this.dialogShell.getDisplay();
-			while (!this.dialogShell.isDisposed()) {
+			Display display = dialogShell.getDisplay();
+			while (!dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
 			}
 		}
@@ -268,13 +323,24 @@ public class QcCopterDialog extends DeviceDialog {
 	 */
 	@Override
 	public void enableSaveButton(boolean enable) {
-		this.saveButton.setEnabled(enable);
+		saveButton.setEnabled(enable);
 	}
 
 	/**
 	 * @return the tabFolder selection index
 	 */
 	public Integer getTabFolderSelectionIndex() {
-		return this.tabFolder.getSelectionIndex();
+		return tabFolder.getSelectionIndex();
+	}
+	
+	public void setTerminalText(final String newText) {
+		DataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				if (!dialogShell.isDisposed()) {
+					terminalText.setText(newText);
+					terminalText.update();
+				}
+			}
+		});
 	}
 }

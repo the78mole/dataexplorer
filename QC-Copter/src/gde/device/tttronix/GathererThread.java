@@ -86,7 +86,6 @@ public class GathererThread extends Thread {
 		final String $METHOD_NAME = "run"; //$NON-NLS-1$
 		RecordSet recordSet = null;
 		int[] points = new int[this.device.getMeasurementNames(this.channelNumber).length];
-		boolean isProgrammExecuting = false;
 		long startCycleTime = 0;
 		long tmpCycleTime = 0;
 		long measurementCount = 0;
@@ -99,12 +98,17 @@ public class GathererThread extends Thread {
 
 		while (!this.isCollectDataStopped) {
 			try {
-				// get data from device
-				dataBuffer = this.serialPort.getData();
 
-				// check if device is ready for data capturing
+				// check if device is ready for data capturing or terminal open
 				// else wait for 180 seconds max. for actions
-				if (isProgrammExecuting) {
+				if (this.dialog != null && !this.dialog.isDisposed()) {
+					//dialog terminal is open
+					this.dialog.setTerminalText(this.serialPort.getTerminalData());					
+				}
+				else if (this.dialog != null && this.dialog.isDisposed()) {
+					//get flight simulation data from device
+					dataBuffer = this.serialPort.getData();
+					
 					// check if a record set matching for re-use is available and prepare a new if required
 					if (this.channel.size() == 0 || recordSet == null || !this.recordSetKey.endsWith(" " + processName)) { //$NON-NLS-1$
 						this.application.setStatusMessage(""); //$NON-NLS-1$
@@ -155,14 +159,13 @@ public class GathererThread extends Thread {
 
 					if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(false);
-						isProgrammExecuting = false;
 						recordSet = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // WAIT_TIME_RETRYS * receive timeout sec timeout = 180 sec
 						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGT1902));
 					}
 					else if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1900));
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW1900));
 						stopDataGatheringThread(false, null);
 					}
 				}
@@ -173,8 +176,12 @@ public class GathererThread extends Thread {
 			}
 			catch (Throwable e) {
 				// this case will be reached while data gathering enabled, but no data will be received
-				if (e instanceof TimeOutException && !isProgrammExecuting) {
+				if (e instanceof TimeOutException) {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1900));
+					if (this.dialog != null && !this.dialog.isDisposed()) {
+						//dialog terminal is open
+						this.dialog.setTerminalText(Messages.getString(MessageIds.GDE_MSGI1900));					
+					}
 					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
