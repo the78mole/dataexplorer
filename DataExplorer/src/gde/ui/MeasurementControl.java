@@ -54,13 +54,22 @@ public class MeasurementControl extends Composite {
 	Label													measurementSymbolLabel;
 
 	final IDevice									device;																										// get device specific things, get serial port, ...
-	final DataExplorer	application;																								// interaction with application instance
+	final DataExplorer						application;																							// interaction with application instance
 	final Channels								channels;																									// interaction with channels, source of all records
 	final DeviceDialog						dialog;
 	final MeasurementType					measurementType;
 	final int											ordinal;
 
-	public MeasurementControl(Composite parentComposite, DeviceDialog parentDialog, int useOrdinal, MeasurementType useMeasurementType, IDevice useDevice) {
+	/**
+	 * create a check button to activate measurement while displaying name, symbol and unit
+	 * @param parentComposite
+	 * @param parentDialog
+	 * @param useOrdinal
+	 * @param useMeasurementType
+	 * @param useDevice
+	 * @param horizontalSpan
+	 */
+	public MeasurementControl(Composite parentComposite, DeviceDialog parentDialog, int useOrdinal, MeasurementType useMeasurementType, IDevice useDevice, int horizontalSpan) {
 		super(parentComposite, SWT.NONE);
 		this.dialog = parentDialog;
 		this.ordinal = useOrdinal;
@@ -71,6 +80,7 @@ public class MeasurementControl extends Composite {
 
 		RowLayout thisLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 		GridData thisLData = new GridData();
+		thisLData.horizontalSpan = horizontalSpan;
 		thisLData.horizontalAlignment = GridData.BEGINNING;
 		thisLData.verticalAlignment = GridData.BEGINNING;
 		thisLData.heightHint = 25;
