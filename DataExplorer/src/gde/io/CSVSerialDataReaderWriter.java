@@ -179,7 +179,6 @@ public class CSVSerialDataReaderWriter {
 						}
 						//recordSet.setTimeStep_ms(device.getTimeStep_ms()); // set -1 for none constant time step between measurement points
 						activeChannel.put(recordSetName, recordSet);
-						activeChannel.applyTemplate(recordSetName, true);
 					}
 
 					if (isRaw)
@@ -189,6 +188,7 @@ public class CSVSerialDataReaderWriter {
 				}
 
 				activeChannel.setActiveRecordSet(recordSetName);
+				activeChannel.applyTemplate(recordSetName, true);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName));
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);

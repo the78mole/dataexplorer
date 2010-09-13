@@ -82,11 +82,16 @@ public class DataParser {
 			for (int i = 0; i < this.size; i++) { 
 				strValue = strValues[i+3].trim();
 				try {
-					long tmpValue = strValue.length() > 0 ? Integer.parseInt(strValue) : 0;
-					if (tmpValue > Integer.MAX_VALUE/1000 || tmpValue < Integer.MIN_VALUE/1000)
-						this.values[i] = Integer.parseInt(strValue);
-					else
-						this.values[i] = Integer.parseInt(strValue)*1000;
+					long tmpValue = strValue.length() > 0 ? Long.parseLong(strValue) : 0;
+					if (tmpValue < Integer.MAX_VALUE/1000 && tmpValue > Integer.MIN_VALUE/1000)
+						this.values[i] = (int) (tmpValue*1000); // enable 3 positions after decimal place
+					else // needs special processing with factor, ...
+						if (tmpValue < Integer.MAX_VALUE || tmpValue > Integer.MIN_VALUE) {
+							this.values[i] = (int) tmpValue;
+						}
+						else {
+							this.values[i] = (int) (tmpValue/1000);
+						}
 				}
 				catch (NumberFormatException e) {
 					this.values[i] = 0;
