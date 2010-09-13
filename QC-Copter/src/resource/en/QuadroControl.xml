@@ -40,7 +40,7 @@
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Roll-Winkel</name>
+            <name>Roll-Angle</name>
             <symbol>Rw</symbol>
             <unit>°</unit>
             <active>true</active>
@@ -54,7 +54,7 @@
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Nick-Winkel</name>
+            <name>Nick-Angle</name>
             <symbol>N°</symbol>
             <unit>°</unit>
             <active>true</active>
@@ -75,7 +75,7 @@
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Gyro-Gier</name>
+            <name>Gyro-Yaw</name>
             <symbol>Gg</symbol>
             <unit>i</unit>
             <active>true</active>
@@ -103,12 +103,12 @@
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Akkuspannung</name>
+            <name>Battery-Voltage</name>
             <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property description="Factor to measurement value" type="Double" value="0.023" name="factor"/>
+            <property description="Factor to measurement value" type="Double" value="2.0" name="factor"/>
         </Measurement>
         <Measurement>
             <name>Motor-VR/V</name>
@@ -139,42 +139,42 @@
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>User-Daten 0</name>
+            <name>User-Data 0</name>
             <symbol>Du</symbol>
             <unit>x</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>User-Daten 1</name>
+            <name>User-Data 1</name>
             <symbol>Du</symbol>
             <unit>x</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>User-Daten 2</name>
+            <name>User-Data 2</name>
             <symbol>Du</symbol>
             <unit>x</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>User-Daten 3</name>
+            <name>User-Data 3</name>
             <symbol>Du</symbol>
             <unit>x</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>User-Daten 4</name>
+            <name>User-Data 4</name>
             <symbol>Du</symbol>
             <unit>x</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>User-Daten 5</name>
+            <name>User-Data 5</name>
             <symbol>Du</symbol>
             <unit>x</unit>
             <active>false</active>

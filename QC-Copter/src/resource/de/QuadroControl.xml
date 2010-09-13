@@ -108,7 +108,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property description="Factor to measurement value" type="Double" value="0.023" name="factor"/>
+            <property description="Factor to measurement value" type="Double" value="2.0" name="factor"/>
         </Measurement>
         <Measurement>
             <name>Motor-VR/V</name>

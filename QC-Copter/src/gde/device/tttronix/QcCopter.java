@@ -345,15 +345,13 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 
 				if (i != 10 && (points[j] & 0x00008000) > 0) // i==10 battery voltage uint16
 					points[j] = (0xFFFF0000 | points[j]);				
+
 			}
 			else { // motor uint8
 				points[j] = ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
 				++j;
 				points[j] = ((DBx_2 & 0x0007) << 13) | ((DBx_3 & 0x001F) << 8);
 			}
-			
-			//to enable third decimal place
-			points[j] *= 1000;
 		}
 
 		log.log(Level.FINER, "CheckSum = " + (Checksum.ADD(dataBuffer, 1, 57)) + " = " + ( (((dataBuffer[58]&0xFF) - 94) << 6) | (((dataBuffer[59]&0xFF) - 94) & 0x3F) ) );
@@ -441,11 +439,15 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
+		double newValue = 0.0;
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
-		double newValue = (value - reduction) * factor + offset;
+		if (record.getOrdinal() == 10)
+			newValue = ((value - reduction) * factor + offset) * 10.0;
+		else
+			newValue = ((value - reduction) * factor + offset) * 1000.0;
 
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
@@ -457,11 +459,15 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
+		double newValue = 0.0;
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
-		double newValue = (value - offset) / factor + reduction;
+		if (record.getOrdinal() == 10)
+			newValue = ((value - offset) / factor + reduction) / 10.0;
+		else
+			newValue = ((value - offset) / factor + reduction) / 1000.0;
 
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
