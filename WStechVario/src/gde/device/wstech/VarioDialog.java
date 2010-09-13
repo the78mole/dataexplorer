@@ -111,7 +111,7 @@ public class VarioDialog extends DeviceDialog {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (VarioDialog.this.device.isChangePropery()) {
-							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041);
+							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { VarioDialog.this.device.getPropertiesFileName() });
 							if (VarioDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
 								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								VarioDialog.this.device.storeDeviceProperties();

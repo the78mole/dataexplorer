@@ -135,7 +135,7 @@ public class VarioTabItem extends CTabItem {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); 
 						if (VarioTabItem.this.isVisibilityChanged) {
-							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041);
+							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { VarioTabItem.this.device.getPropertiesFileName() });
 							if (VarioTabItem.this.application.openYesNoMessageDialog(VarioTabItem.this.dialog.getDialogShell(), msg) == SWT.YES) {
 								log.log(java.util.logging.Level.FINE, "SWT.YES"); 
 								VarioTabItem.this.device.storeDeviceProperties();
