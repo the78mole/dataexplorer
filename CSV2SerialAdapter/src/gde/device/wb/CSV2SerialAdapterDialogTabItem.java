@@ -135,7 +135,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (CSV2SerialAdapterDialogTabItem.this.isVisibilityChanged) {
-							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041);
+							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] {CSV2SerialAdapterDialogTabItem.this.device.getPropertiesFileName()});
 							if (CSV2SerialAdapterDialogTabItem.this.application.openYesNoMessageDialog(CSV2SerialAdapterDialogTabItem.this.dialog.getDialogShell(), msg) == SWT.YES) {
 								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								CSV2SerialAdapterDialogTabItem.this.device.storeDeviceProperties();

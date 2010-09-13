@@ -111,7 +111,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (CSV2SerialAdapterDialog.this.device.isChangePropery()) {
-							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041);
+							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] {CSV2SerialAdapterDialog.this.device.getPropertiesFileName()});
 							if (CSV2SerialAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
 								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								CSV2SerialAdapterDialog.this.device.storeDeviceProperties();
