@@ -125,15 +125,10 @@ public class FileHandler {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		FileDialog csvFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, getFileNameProposal());
+		FileDialog csvFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, getFileNameProposal());
 		String recordSetKey = activeRecordSet.getName();
-		String csvFilePath = csvFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
-
-		if (!csvFilePath.endsWith(GDE.FILE_ENDING_DOT_CSV)) { //check and correct file ending
-			csvFilePath = csvFilePath.substring(0, csvFilePath.lastIndexOf(GDE.STRING_DOT) > csvFilePath.length() - 5 ? csvFilePath.lastIndexOf(GDE.STRING_DOT) : csvFilePath.length()) + GDE.FILE_ENDING_DOT_CSV;
-		}
-
-		if (csvFilePath.length() > 4) { // file name has a reasonable length
+		String csvFilePath = csvFileDialog.open();
+		if (csvFilePath != null && csvFilePath.length() > 4) { // file name has a reasonable length
 			if (FileUtils.checkFileExist(csvFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { csvFilePath }))) {
 				return;
 			}
@@ -289,41 +284,37 @@ public class FileHandler {
 			return;
 		}
 
-		String filePath;
-		FileDialog fileDialog;
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath;
 		if (!FileUtils.checkDirectoryAndCreate(path)) {
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
 		}
+		FileDialog fileDialog;
+		String osdFilePath;
 		if (fileName == null || fileName.length() < 5 || fileName.equals(getFileNameProposal())) {
-			fileDialog = this.application.openFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD }, path + GDE.FILE_SEPARATOR_UNIX, getFileNameProposal());
-			filePath = fileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fileDialog.getFileName();
+			fileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD }, path + GDE.FILE_SEPARATOR_UNIX, getFileNameProposal());
+			osdFilePath = fileDialog.open();
 		}
 		else {
-			filePath = path + GDE.FILE_SEPARATOR_UNIX + fileName; // including ending ".osd"
-		}
-		
-		if (!filePath.endsWith(GDE.FILE_ENDING_DOT_OSD)) { //check and correct file ending
-			filePath = filePath.substring(0, filePath.lastIndexOf(GDE.STRING_DOT) > filePath.length() - 5 ? filePath.lastIndexOf(GDE.STRING_DOT) : filePath.length()) + GDE.FILE_ENDING_DOT_OSD;
+			osdFilePath = path + GDE.FILE_SEPARATOR_UNIX + fileName; // including ending ".osd"
 		}
 
-		if (filePath.length() > 4 && !filePath.endsWith(getFileNameProposal())) { // file name has a reasonable length
-			while (filePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_OSD) || filePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOV)) {
-				filePath = filePath.substring(0, filePath.lastIndexOf('.'));
+		if (osdFilePath != null && osdFilePath.length() > 4 && !osdFilePath.endsWith(getFileNameProposal())) { // file name has a reasonable length
+			while (osdFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_OSD) || osdFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOV)) {
+				osdFilePath = osdFilePath.substring(0, osdFilePath.lastIndexOf('.'));
 			}
-			filePath = (filePath + GDE.FILE_ENDING_DOT_OSD).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
-			if (FileUtils.checkFileExist(filePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0013, new Object[] { filePath }))) {
+			osdFilePath = (osdFilePath + GDE.FILE_ENDING_DOT_OSD).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
+			if (FileUtils.checkFileExist(osdFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0013, new Object[] { osdFilePath }))) {
 				return;
 			}
 
 			try {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-				FileUtils.renameFile(filePath, GDE.FILE_ENDING_BAK); // rename existing file to *.bak
-				OsdReaderWriter.write(filePath, activeChannel, GDE.DATA_EXPLORER_FILE_VERSION_INT);
-				activeChannel.setFileName(filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
+				FileUtils.renameFile(osdFilePath, GDE.FILE_ENDING_BAK); // rename existing file to *.bak
+				OsdReaderWriter.write(osdFilePath, activeChannel, GDE.DATA_EXPLORER_FILE_VERSION_INT);
+				activeChannel.setFileName(osdFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
 				activeChannel.setSaved(true);
 			}
 			catch (Exception e) {
@@ -332,7 +323,7 @@ public class FileHandler {
 			}
 
 			this.application.enableMenuActions(true);
-			this.application.updateSubHistoryMenuItem(filePath);
+			this.application.updateSubHistoryMenuItem(osdFilePath);
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
 	}
@@ -418,14 +409,10 @@ public class FileHandler {
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
 		String fileName = activeChannel.getFileName();
-		fileName = fileName.substring(0, fileName.indexOf("."));
-		FileDialog kmlFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_KML }, path, fileName.length() > 4 ? fileName : getFileNameProposal());
-		String kmlFilePath = kmlFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + kmlFileDialog.getFileName();
-		if (!kmlFilePath.endsWith(GDE.FILE_ENDING_DOT_KML)) {
-			kmlFilePath = kmlFilePath.substring(0, kmlFilePath.lastIndexOf(GDE.STRING_DOT) > kmlFilePath.length() - 5 ? kmlFilePath.lastIndexOf(GDE.STRING_DOT) : kmlFilePath.length()) + GDE.FILE_ENDING_DOT_KML;
-		}
-
-		if (kmlFileDialog.getFileName().endsWith(GDE.FILE_ENDING_DOT_KML) ? kmlFileDialog.getFileName().length() > 4 : kmlFileDialog.getFileName().length() > 1) { // file name has a reasonable length
+		fileName = fileName != null ? fileName.substring(0, fileName.indexOf(".")) : "";
+		FileDialog kmlFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_KML }, path, fileName.length() > 4 ? fileName : getFileNameProposal());
+		String kmlFilePath = kmlFileDialog.open();
+		if (kmlFilePath != null && kmlFileDialog.getFileName().length() > 4) {
 			if (FileUtils.checkFileExist(kmlFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { kmlFilePath }))) {
 				return;
 			}
@@ -471,14 +458,10 @@ public class FileHandler {
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
 		String fileName = activeChannel.getFileName();
-		fileName = fileName.substring(0, fileName.indexOf("."));
-		FileDialog gpxFileDialog = this.application.openFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName.length() > 4 ? fileName : getFileNameProposal());
-		String gpxFilePath = gpxFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + gpxFileDialog.getFileName();
-		if (!gpxFilePath.endsWith(GDE.FILE_ENDING_DOT_GPX)) {
-			gpxFilePath = gpxFilePath.substring(0, gpxFilePath.lastIndexOf(GDE.STRING_DOT) > gpxFilePath.length() - 5 ? gpxFilePath.lastIndexOf(GDE.STRING_DOT) : gpxFilePath.length()) + GDE.FILE_ENDING_DOT_GPX;
-		}
-
-		if (gpxFileDialog.getFileName().endsWith(GDE.FILE_ENDING_DOT_GPX) ? gpxFileDialog.getFileName().length() > 4 : gpxFileDialog.getFileName().length() > 1) { // file name has a reasonable length
+		fileName = fileName != null ? fileName.substring(0, fileName.indexOf(".")) : "";
+		FileDialog gpxFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName.length() > 4 ? fileName : getFileNameProposal());
+		String gpxFilePath = gpxFileDialog.open();
+		if (gpxFilePath != null && gpxFilePath.length() > 4) {
 			if (FileUtils.checkFileExist(gpxFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { gpxFilePath }))) {
 				return;
 			}

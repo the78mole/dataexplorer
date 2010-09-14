@@ -590,11 +590,14 @@ public class MenuBar {
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								GraphicsTemplate template = activeChannel.getTemplate();
-								FileDialog fileDialog = MenuBar.this.application.openFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
+								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
 										.getGraphicsTemplatePath(), template.getDefaultFileName());
-								MenuBar.log.log(Level.FINE, "templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
-								template.setNewFileName(fileDialog.getFileName());
-								activeChannel.saveTemplate();
+								String templateFilePath = fileDialog.open();
+								if (templateFilePath != null && templateFilePath.length() > 4) {
+									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFilePath); //$NON-NLS-1$
+									template.setNewFileName(templateFilePath);
+									activeChannel.saveTemplate();
+								}
 							}
 						}
 					});

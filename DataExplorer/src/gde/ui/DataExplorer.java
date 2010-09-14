@@ -1457,7 +1457,7 @@ public class DataExplorer extends Composite {
 		return fileOpenDialog;
 	}
 
-	public FileDialog openFileSaveDialog(String name, String[] extensions, String path, String fileName) {
+	public FileDialog prepareFileSaveDialog(String name, String[] extensions, String path, String fileName) {
 		final String $METHOD_NAME = "openFileSaveDialog"; //$NON-NLS-1$
 		FileDialog fileSaveDialog = new FileDialog(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.SAVE);
 		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
@@ -1470,7 +1470,6 @@ public class DataExplorer extends Composite {
 		}
 		if (path != null) fileSaveDialog.setFilterPath(path);
 		fileSaveDialog.setFileName(fileName != null && fileName.length() > 5 ? fileName : GDE.STRING_EMPTY);
-		fileSaveDialog.open();
 		return fileSaveDialog;
 	}
 
