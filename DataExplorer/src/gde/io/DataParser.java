@@ -85,7 +85,7 @@ public class DataParser {
 					long tmpValue = strValue.length() > 0 ? Long.parseLong(strValue) : 0;
 					if (tmpValue < Integer.MAX_VALUE/1000 && tmpValue > Integer.MIN_VALUE/1000)
 						this.values[i] = (int) (tmpValue*1000); // enable 3 positions after decimal place
-					else // needs special processing with factor, ...
+					else // needs special processing within IDevice.translateValue(), IDevice.reverseTranslateValue()
 						if (tmpValue < Integer.MAX_VALUE || tmpValue > Integer.MIN_VALUE) {
 							this.values[i] = (int) tmpValue;
 						}
