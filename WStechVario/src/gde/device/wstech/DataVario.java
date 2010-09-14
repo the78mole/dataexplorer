@@ -435,10 +435,10 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 
 			try {
 				if (subtractFirst) {
-					reduction = record.getFirst().intValue() / 1000.0;
+					reduction = record.getFirst() / 1000.0;
 				}
 				else if (subtractLast) {
-					reduction = record.getLast().intValue() / 1000.0;
+					reduction = record.getLast() / 1000.0;
 				}
 			}
 			catch (Throwable e) {
@@ -478,10 +478,10 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 
 			try {
 				if (subtractFirst) {
-					reduction = record.getFirst().intValue() / 1000.0;
+					reduction = record.getFirst() / 1000.0;
 				}
 				else if (subtractLast) {
-					reduction = record.getLast().intValue() / 1000.0;
+					reduction = record.getLast() / 1000.0;
 				}
 			}
 			catch (Throwable e) {

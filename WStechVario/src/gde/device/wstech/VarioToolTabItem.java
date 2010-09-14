@@ -2316,44 +2316,46 @@ public class VarioToolTabItem extends CTabItem {
 	}
 
 	void saveSetup() {
-		FileDialog fileDialog = this.application.openFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] { GDE.FILE_ENDING_HEX, GDE.FILE_ENDING_STAR }, this.device
+		FileDialog fileDialog = this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] { GDE.FILE_ENDING_HEX, GDE.FILE_ENDING_STAR }, this.device
 				.getDataBlockPreferredDataLocation(), this.getDefaultFileName());
 		VarioToolTabItem.log.log(Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
-		File setupFile = new File(fileDialog.getFilterPath() + GDE.FILE_SEPARATOR + fileDialog.getFileName());
-		byte[] buffer = new byte[20];
-
-		try {
-			if (this.isDataVarioTool) {
-				buffer[0] = (byte) (this.setupValue0 & 0xFF);
+		String setupFilePath = fileDialog.open();
+		if (setupFilePath != null && setupFilePath.length() > 4) {
+			File setupFile = new File(setupFilePath);
+			byte[] buffer = new byte[20];
+			try {
+				if (this.isDataVarioTool) {
+					buffer[0] = (byte) (this.setupValue0 & 0xFF);
+				}
+				else {
+					buffer[0] = (byte) (this.setupValue19 & 0xFF);
+				}
+				buffer[1] = (byte) (this.setupValue1 & 0xFF);
+				buffer[2] = (byte) (this.setupValue2 & 0xFF);
+				buffer[3] = (byte) (this.setupValue3 & 0xFF);
+				buffer[4] = (byte) (this.setupValue4 & 0xFF);
+				buffer[5] = (byte) (this.setupValue5 & 0xFF);
+				buffer[6] = (byte) (this.setupValue6 & 0xFF);
+				buffer[7] = (byte) (this.setupValue7 & 0xFF);
+				buffer[8] = (byte) (this.setupValue8 & 0xFF);
+				buffer[9] = (byte) (this.setupValue9 & 0xFF);
+				buffer[10] = (byte) (this.setupValue10 & 0xFF);
+				buffer[11] = (byte) (this.setupValue11 & 0xFF);
+				buffer[12] = (byte) (this.setupValue12 & 0xFF);
+				buffer[13] = (byte) (this.setupValue13 & 0xFF);
+				buffer[14] = (byte) (this.setupValue14 & 0xFF);
+				buffer[15] = (byte) (this.setupValue15 & 0xFF);
+				buffer[16] = (byte) (this.setupValue16 & 0xFF);
+				buffer[17] = (byte) (this.setupValue17 & 0xFF);
+				buffer[18] = (byte) (this.setupValue18 & 0xFF);
+				FileOutputStream file_out = new FileOutputStream(setupFile);
+				DataOutputStream data_out = new DataOutputStream(file_out);
+				data_out.write(buffer);
+				data_out.close();
 			}
-			else {
-				buffer[0] = (byte) (this.setupValue19 & 0xFF);
+			catch (Exception e) {
+				VarioToolTabItem.log.log(Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
 			}
-			buffer[1] = (byte) (this.setupValue1 & 0xFF);
-			buffer[2] = (byte) (this.setupValue2 & 0xFF);
-			buffer[3] = (byte) (this.setupValue3 & 0xFF);
-			buffer[4] = (byte) (this.setupValue4 & 0xFF);
-			buffer[5] = (byte) (this.setupValue5 & 0xFF);
-			buffer[6] = (byte) (this.setupValue6 & 0xFF);
-			buffer[7] = (byte) (this.setupValue7 & 0xFF);
-			buffer[8] = (byte) (this.setupValue8 & 0xFF);
-			buffer[9] = (byte) (this.setupValue9 & 0xFF);
-			buffer[10] = (byte) (this.setupValue10 & 0xFF);
-			buffer[11] = (byte) (this.setupValue11 & 0xFF);
-			buffer[12] = (byte) (this.setupValue12 & 0xFF);
-			buffer[13] = (byte) (this.setupValue13 & 0xFF);
-			buffer[14] = (byte) (this.setupValue14 & 0xFF);
-			buffer[15] = (byte) (this.setupValue15 & 0xFF);
-			buffer[16] = (byte) (this.setupValue16 & 0xFF);
-			buffer[17] = (byte) (this.setupValue17 & 0xFF);
-			buffer[18] = (byte) (this.setupValue18 & 0xFF);
-			FileOutputStream file_out = new FileOutputStream(setupFile);
-			DataOutputStream data_out = new DataOutputStream(file_out);
-			data_out.write(buffer);
-			data_out.close();
-		}
-		catch (Exception e) {
-			VarioToolTabItem.log.log(Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
