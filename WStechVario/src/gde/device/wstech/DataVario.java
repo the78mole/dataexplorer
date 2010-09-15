@@ -449,8 +449,8 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		double newValue = 0;
 		if (record.getOrdinal() == 7 || record.getOrdinal() == 8) { // 7=GPS-Länge 8=GPS-Breite 
 			int grad = ((int)(value / 1000));
-			double minuten = (value - (grad*1000))/10; //(value - (((int)(value / 1000))*1000))/10;
-			newValue = grad + minuten/60;
+			double minuten = (value - (grad*1000.0))/10.0;
+			newValue = grad + minuten/60.0;
 		}
 		else {
 			newValue = (value - reduction) * factor + offset;
@@ -493,7 +493,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		if (record.getOrdinal() == 7 || record.getOrdinal() == 8) { // 7=GPS-Länge 8=GPS-Breite 
 			int grad = (int)value;
 			double minuten =  (value - grad*1.0) * 60.0;
-			newValue = (grad + minuten/100.0)*1000;
+			newValue = (grad + minuten/100.0)*1000.0;
 		}
 		else {
 			newValue = (value - offset) / factor + reduction;
