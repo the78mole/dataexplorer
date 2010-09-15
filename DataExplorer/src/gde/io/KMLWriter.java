@@ -125,10 +125,11 @@ public class KMLWriter {
 						
 						height0 = isRelative ? device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) : 0;
 					}
+					double height = device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0;
 					// add data entries, translate according device and measurement unit
 					sb.append(String.format(Locale.ENGLISH, "\t\t\t%.7f,", device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0)))
 						.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0)))
-						.append(String.format(Locale.ENGLISH, "%.0f", device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0)).append(GDE.LINE_SEPARATOR);
+						.append(String.format(Locale.ENGLISH, "%.0f", height < 0 ? 0 : height)).append(GDE.LINE_SEPARATOR);
 	
 					writer.write(sb.toString());
 					sb = new StringBuilder();

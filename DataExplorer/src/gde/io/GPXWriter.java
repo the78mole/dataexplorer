@@ -142,11 +142,13 @@ public class GPXWriter {
 						gpsHeight0 = isRelative ? (int)device.translateValue(recordGPSHeight, recordGPSHeight.get(i)/1000.0) : 0;
 						isHeight0Calculated = true;
 					}
+					double height = device.translateValue(recordGPSHeight, recordGPSHeight.get(i) / 1000.0) - gpsHeight0;
+					
 					// add data entries, translate according device and measurement unit
 					sb.append(String.format(Locale.ENGLISH, trkpt, 
 							device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0),
 							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0),
-							device.translateValue(recordGPSHeight, recordGPSHeight.get(i) / 1000.0 - gpsHeight0),
+							height < 0 ? 0 : height,
 							new SimpleDateFormat("yyyy-MM-dd").format(date + i * 1000),
 							new SimpleDateFormat("HH:mm:ss").format(date + i * 1000),
 							recordSet.getTime(i)/1000/10,
