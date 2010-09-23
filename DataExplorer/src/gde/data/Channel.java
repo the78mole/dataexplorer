@@ -428,7 +428,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		RecordSet newActiveRecordSet = this.get(recordSetKey);
 		if (newActiveRecordSet != null) {
 			this.activeRecordSet = newActiveRecordSet;
-			this.activeRecordSet.check4SyncableRecords();
+//			this.activeRecordSet.check4SyncableRecords();
 		}
 	}
 	

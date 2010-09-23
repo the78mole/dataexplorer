@@ -93,8 +93,7 @@ public class DigitalDisplay extends Composite {
 							if (record != null) {
 								log.log(Level.FINE, "update label for " + DigitalDisplay.this.recordKey); //$NON-NLS-1$
 								DigitalDisplay.this.textDigitalLabel.setText(activeRecordSet.get(DigitalDisplay.this.recordKey).getName() + " [ " + activeRecordSet.get(DigitalDisplay.this.recordKey).getUnit() + " ]");
-
-								DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
+								DecimalFormat df = record.getDecimalFormat();
 								String actualValue = df.format(DigitalDisplay.this.device.translateValue(record, (record.lastElement() / 1000.0)));
 								String maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
 								String minValue = Messages.getString(MessageIds.GDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
@@ -150,7 +149,7 @@ public class DigitalDisplay extends Composite {
 						if (activeRecordSet != null) {
 							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
 							if (record != null) {
-								DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
+								DecimalFormat df = record.getDecimalFormat();
 								String actualValue = df.format(DigitalDisplay.this.device.translateValue(record, (record.lastElement() / 1000.0)));
 								log.log(Level.FINE, DigitalDisplay.this.recordKey + " actualValue=" + actualValue);
 								DigitalDisplay.this.actualDigitalLabel.setForeground(record.getColor());
@@ -180,7 +179,7 @@ public class DigitalDisplay extends Composite {
 						if (activeRecordSet != null) {
 							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
 							if (record != null) {
-								DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
+								DecimalFormat df = record.getDecimalFormat();
 								String minValue = Messages.getString(MessageIds.GDE_MSGT0237) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMinValue() / 1000.0)));
 								log.log(Level.FINE, DigitalDisplay.this.recordKey + " minValue=" + minValue);
 								DigitalDisplay.this.minDigitalLabel.setText(minValue);
@@ -204,7 +203,7 @@ public class DigitalDisplay extends Composite {
 						if (activeRecordSet != null) {
 							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
 							if (record != null) {
-								DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
+								DecimalFormat df = record.getDecimalFormat();
 								String maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + df.format(DigitalDisplay.this.device.translateValue(record, (record.getMaxValue() / 1000.0)));
 								log.log(Level.FINE, DigitalDisplay.this.recordKey + " maxValue=" + maxValue);
 								DigitalDisplay.this.maxDigitalLabel.setText(maxValue);

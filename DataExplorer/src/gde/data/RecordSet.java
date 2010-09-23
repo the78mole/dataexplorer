@@ -18,30 +18,17 @@
 ****************************************************************************************/
 package gde.data;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Rectangle;
-
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.DataTypes;
-import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
-import gde.device.StatisticsType;
 import gde.device.TriggerType;
 import gde.exception.DataInconsitsentException;
 import gde.io.LogViewReader;
 import gde.io.OsdReaderWriter;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -51,6 +38,15 @@ import gde.utils.CalculationThread;
 import gde.utils.CellVoltageValues;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
+
+import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * RecordSet class holds all the data records for the configured measurement of a device
@@ -82,17 +78,10 @@ public class RecordSet extends HashMap<String, Record> {
 	Rectangle											drawAreaBounds;																																// draw area in display pixel
 
 	// sync enabled records
-	Vector<String>								potentialSyncableRecords			= new Vector<String>();													//collection of record keys where scales might be synchronized
-	Vector<String>								syncableRecords								= new Vector<String>();													//collection of potential syncable and displayable record keys
-	boolean												isSyncableChecked							= false;
-	boolean												isSyncRequested								= false;
-	int														syncMin												= 0;
-	int														syncMax												= 0;
-	boolean												syncScalePositionLeft					= false;
+	HashMap<Integer,Vector<Record>>	scaleSyncedRecords					= new HashMap<Integer,Vector<Record>>(2);				//collection of record keys where scales might be synchronized
 	
 	//for compare set x min/max and y max (time) might be different
 	boolean												isCompareSet									= false;
-//	int														maxSize												= 0;								//number of data point * time step = total time
 	double												maxTime												= 0.0;							//compare set -> each record will have its own timeSteps_ms, 
 																																									//so the biggest record in view point of time will define the time scale
 	double												maxValue											= Integer.MIN_VALUE;
@@ -143,11 +132,11 @@ public class RecordSet extends HashMap<String, Record> {
 	int[] 												voltageLimits									= CellVoltageValues.getVoltageLimits(); 			  // voltage limits for LiXx cells, initial LiPo
 	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";										// each main tickmark //$NON-NLS-1$		
 	
-	boolean												isSyncRecordSelected					= false;
-	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
+//	boolean												isSyncRecordSelected					= false;
+//	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
 	
 	private final String[]				propertyKeys									= new String[] { TIME_STEP_MS, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE,
-			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, VOLTAGE_LIMITS, SYNC_RECORD_SELECTED	};
+			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, VOLTAGE_LIMITS	};
 
 	int														configuredDisplayable					= 0;																						// number of record which must be displayable before table calculation begins
 
@@ -326,13 +315,6 @@ public class RecordSet extends HashMap<String, Record> {
 		this.channels = recordSet.channels;
 		this.parent = recordSet.parent;
 
-		if (recordSet.isSyncableChecked) {
-			String syncRecordName = recordSet.getSyncableName();
-			if (syncRecordName.length() > 5) { // " 1..2"
-				this.remove(syncRecordName);
-			}
-		}
-
 		this.recordNames = recordSet.getRecordNames().clone(); // copy record names without possible syncableName
 
 		// update child records
@@ -349,7 +331,6 @@ public class RecordSet extends HashMap<String, Record> {
 		else {
 			this.timeStep_ms = null;
 		}
-
 		
 		this.description = recordSet.description;
 		this.isSaved = false;
@@ -440,20 +421,7 @@ public class RecordSet extends HashMap<String, Record> {
 		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
 		if (points.length == this.size()) {
 			for (int i = 0; i < points.length; i++) {
-				this.getRecord(this.recordNames[i]).add(points[i]);
-				
-				// check if record synchronization is activated and update syncMin/syncMax
-				if (this.syncableRecords.contains(this.recordNames[i])) {
-					if (this.syncMin == 0 && this.syncMax == 0) {
-						this.syncMin = points[i];
-						this.syncMax = points[i];
-					}
-					else {
-						if (points[i] < this.syncMin) 			this.syncMin = points[i];
-						else if (points[i] > this.syncMax) 	this.syncMax = points[i];
-					}
-					if (this.isSyncRequested) this.updateSyncRecordScale();	
-				}
+				this.getRecord(this.recordNames[i]).add(points[i]);				
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				StringBuilder sb = new StringBuilder();
@@ -462,6 +430,7 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
+			this.syncScaleOfSyncableRecords(false);
 		}
 		else
 			throw new DataInconsitsentException(Messages.getString(MessageIds.GDE_MSGE0035, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME})); //$NON-NLS-1$
@@ -498,6 +467,7 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
+			this.syncScaleOfSyncableRecords(false);
 		}
 		else
 			throw new DataInconsitsentException(Messages.getString(MessageIds.GDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}));
@@ -581,12 +551,12 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return String[] containing record names 
 	 */
 	public String[] getRecordNames() {
-		Vector<String> recordNamesVector = new Vector<String>();
-		String syncPlaceholdername = this.getSyncableName();
-		for (String recordName : this.recordNames) {
-			if (!recordName.equals(syncPlaceholdername)) recordNamesVector.add(recordName);
-		}
-		return recordNamesVector.toArray(new String[0]).clone();
+//		Vector<String> recordNamesVector = new Vector<String>();
+//		String syncPlaceholdername = this.getSyncableName();
+//		for (String recordName : this.recordNames) {
+//			if (!recordName.equals(syncPlaceholdername)) recordNamesVector.add(recordName);
+//		}
+		return this.recordNames.clone();
 	}
 
 	/**
@@ -829,7 +799,7 @@ public class RecordSet extends HashMap<String, Record> {
 		if (isLeft) {
 			for (String recordName : this.recordNames) {
 				Record tmpRecord = this.get(recordName);
-				if (tmpRecord.isPositionLeft && tmpRecord.isVisible && (tmpRecord.isDisplayable && !tmpRecord.isScaleSynced || tmpRecord.isSyncPlaceholder)) ++value;
+				if (tmpRecord.isPositionLeft && tmpRecord.isScaleVisible()) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
 		}
@@ -837,7 +807,7 @@ public class RecordSet extends HashMap<String, Record> {
 			for (String recordName : this.recordNames) {
 				log.log(Level.FINER, "record name = " + recordName); //$NON-NLS-1$
 				Record tmpRecord = this.get(recordName);
-				if (!tmpRecord.isPositionLeft && tmpRecord.isVisible && (tmpRecord.isDisplayable && !tmpRecord.isScaleSynced || tmpRecord.isSyncPlaceholder)) ++value;
+				if (!tmpRecord.isPositionLeft && tmpRecord.isScaleVisible()) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
 		}
@@ -1013,11 +983,8 @@ public class RecordSet extends HashMap<String, Record> {
 	 * set all records from this record to displayable
 	 */
 	public void setAllDisplayable() {
-		String syncableRecordKey = this.getSyncableName();
 		for (String recordKey : this.recordNames) {
-			if (!recordKey.equals(syncableRecordKey)) {
-				this.get(recordKey).setDisplayable(true);
-			}
+			this.get(recordKey).setDisplayable(true);
 		}
 	}
 
@@ -1025,13 +992,10 @@ public class RecordSet extends HashMap<String, Record> {
 	 * force enable all records to be displayed and active if none calculation, this is used for unknown data import or unknown configurations
 	 */
 	public void setAllVisibleAndDisplayable() {
-		String syncableRecordKey = this.getSyncableName();
 		for (String recordKey : this.recordNames) {
-			if (!recordKey.equals(syncableRecordKey)) {
 				Record record = this.get(recordKey);
 				record.setVisible(true);
 				record.setDisplayable(true);
-			}
 		}
 		for (String recordKey : this.getNoneCalculationRecordNames()) {
 			this.get(recordKey).setActive(true);
@@ -1220,9 +1184,9 @@ public class RecordSet extends HashMap<String, Record> {
 					record.zoomTimeOffset = 0.0;
 					record.drawTimeWidth = record.getMaxTime_ms();
 					//log.log(Level.INFO, this.name + "this.getMaxTime_ms() = " + record.drawTimeWidth);
-					record.minZoomScaleValue	= record.minScaleValue;
-					record.maxZoomScaleValue	= record.maxScaleValue;
-					log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(record.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(record.drawTimeWidth));
+					record.minZoomScaleValue = record.minScaleValue;
+					record.maxZoomScaleValue = record.maxScaleValue;
+					log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(record.zoomTimeOffset) + " drawTimeWidth " + TimeLine.getFomatedTimeWithUnit(record.drawTimeWidth));
 				}
 			}
 		}
@@ -1510,13 +1474,6 @@ public class RecordSet extends HashMap<String, Record> {
 			gridRecordName = this.realSize() == 0 ? GDE.STRING_DASH : this.getFirstRecordName();
 			log.log(Level.FINE, "gridRecordName = " + gridRecordName);
 		}
-		if (this.isSyncRequested && isSyncRecordIncluded) {
-			for (String syncableRecordName : this.syncableRecords) {
-				if (gridRecordName.equals(syncableRecordName)) {
-					gridRecordName = this.getSyncableName();
-				}
-			}
-		}			
 		return gridRecordName;
 	}
 
@@ -1531,7 +1488,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param newHorizontalGridRecordOrdinal of the horizontal grid record name to set
 	 */
 	public void setHorizontalGridRecordOrdinal(int newHorizontalGridRecordOrdinal) {
-		this.horizontalGridRecordOrdinal = newHorizontalGridRecordOrdinal;
+		this.horizontalGridRecordOrdinal = this.isOneOfSyncableRecord(this.get(newHorizontalGridRecordOrdinal)) ? this.getSyncMasterRecordOrdinal(this.get(newHorizontalGridRecordOrdinal)) : newHorizontalGridRecordOrdinal;
 	}
 
 	/**
@@ -1539,11 +1496,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public boolean isRecalculation() {
 		return this.isRecalculation;
-	}
-
-	@Deprecated
-	public int getRecordNamesLength() {
-		return (this.getSyncableName().equals("") ? this.recordNames.length : this.recordNames.length-1);
 	}
 
 	public String getFirstRecordName() {
@@ -1590,7 +1542,7 @@ public class RecordSet extends HashMap<String, Record> {
 		sb.append(HORIZONTAL_GRID_COLOR).append(GDE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(GDE.STRING_COMMA).append(this.horizontalGridColor.getGreen())
 				.append(GDE.STRING_COMMA).append(this.horizontalGridColor.getBlue()).append(Record.DELIMITER);
 		
-		sb.append(SYNC_RECORD_SELECTED).append(GDE.STRING_EQUAL).append(this.isSyncRecordSelected).append(Record.DELIMITER);
+//		sb.append(SYNC_RECORD_SELECTED).append(GDE.STRING_EQUAL).append(this.isSyncRecordSelected).append(Record.DELIMITER);
 
 		sb.append(VOLTAGE_LIMITS).append(GDE.STRING_EQUAL);
 		for (int value : this.voltageLimits) {
@@ -1650,8 +1602,8 @@ public class RecordSet extends HashMap<String, Record> {
 				this.horizontalGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(GDE.STRING_COMMA)[0]), new Integer(tmpValue.split(GDE.STRING_COMMA)[1]), new Integer(tmpValue
 						.split(GDE.STRING_COMMA)[2]));
 				
-			tmpValue = recordSetProps.get(SYNC_RECORD_SELECTED);
-			if (tmpValue != null && tmpValue.length() > 0) this.isSyncRecordSelected = Boolean.valueOf(tmpValue.trim());
+//			tmpValue = recordSetProps.get(SYNC_RECORD_SELECTED);
+//			if (tmpValue != null && tmpValue.length() > 0) this.isSyncRecordSelected = Boolean.valueOf(tmpValue.trim());
 			
 			tmpValue = recordSetProps.get(VOLTAGE_LIMITS);
 			if (tmpValue != null && tmpValue.length() > 0) {
@@ -1709,153 +1661,197 @@ public class RecordSet extends HashMap<String, Record> {
 		return this.changeCounter;
 	}
 
-	/**
-	 * find syncable record names, checking for 
-	 * <ol>
-	 * <li>equal first word in record names "CellVoltage" of CellVoltage 1"
-	 * <li>equal measurement units (from device properties)
-	 * </ol>
-	 * do not care about symbols
-	 */
-	void check4SyncableRecords() {
-		this.potentialSyncableRecords = new Vector<String>();
+//	/**
+//	 * find syncable record names, checking for 
+//	 * <ol>
+//	 * <li>equal first word in record names "CellVoltage" of CellVoltage 1"
+//	 * <li>equal measurement units (from device properties)
+//	 * </ol>
+//	 * do not care about symbols
+//	 */
+//	void check4SyncableRecords() {
+//		this.potentialSyncableRecords = new HashMap<String, Vector<Record>>();
+//
+//		for (int i = 0; i < (this.syncableRecords.size() > 0 ? this.recordNames.length-1 : this.recordNames.length); i++) {
+//			if (this.recordNames.length > 1 
+//					&& i > 0 
+//					&& !this.recordNames[i].contains("..") //$NON-NLS-1$ CellVoltage 1..2
+//					&& this.recordNames[i - 1].split(" ")[0].equals(this.recordNames[i].split(" ")[0]) //$NON-NLS-1$ //$NON-NLS-2$
+//					&& this.device.getMeasurement(this.parent.number, i - 1).getUnit().equals(this.device.getMeasurement(this.parent.number, i).getUnit())) {
+//				if (this.potentialSyncableRecords.isEmpty()) {
+//					this.potentialSyncableRecords.add(this.recordNames[i - 1]);
+//				}
+//				this.potentialSyncableRecords.add(this.recordNames[i]);
+//			}
+//		}
+//
+//		log.log(Level.FINER, this.potentialSyncableRecords.toString());
+//	}
 
-		for (int i = 0; i < (this.syncableRecords.size() > 0 ? this.recordNames.length-1 : this.recordNames.length); i++) {
-			if (this.recordNames.length > 1 
-					&& i > 0 
-					&& !this.recordNames[i].contains("..") //$NON-NLS-1$ CellVoltage 1..2
-					&& this.recordNames[i - 1].split(" ")[0].equals(this.recordNames[i].split(" ")[0]) //$NON-NLS-1$ //$NON-NLS-2$
-					&& this.device.getMeasurement(this.parent.number, i - 1).getUnit().equals(this.device.getMeasurement(this.parent.number, i).getUnit())) {
-				if (this.potentialSyncableRecords.isEmpty()) {
-					this.potentialSyncableRecords.add(this.recordNames[i - 1]);
+//	/**
+//	 * find syncable and displayable record names and place the record names in a vector 
+//	 * @param forceRenew - true will recreate syncableRecordsVector
+//	 */
+//	public boolean isSyncableDisplayableRecords(boolean forceRenew) {
+//		if (forceRenew || !this.isSyncableChecked) {
+//			String oldSyncName = this.getSyncableName();
+//			if (this.containsKey(oldSyncName)) {
+//				this.removeRecordName(oldSyncName);
+//				this.remove(oldSyncName);
+//			}
+//			this.syncableRecords = new Vector<String>();
+//			for (String syncableRecordKey : this.potentialSyncableRecords) {
+//				Record record = this.get(syncableRecordKey);
+//				if (record != null && record.isDisplayable && record.size() > 2) this.syncableRecords.add(syncableRecordKey);
+//			}
+//
+//			if (!this.syncableRecords.isEmpty()) {
+//				//create a new record with syncableName to hold the data for drawing the scale
+//				String syncRecName = this.getSyncableName();
+//				String symbol = this.get(this.syncableRecords.firstElement()).getSymbol() + ".." + this.syncableRecords.lastElement().split(" ")[1]; //$NON-NLS-1$ //$NON-NLS-2$
+//				String unit = this.get(this.syncableRecords.firstElement()).getUnit();
+//				List<PropertyType> properties = new ArrayList<PropertyType>(this.device.getProperties(this.parent.number, this.get(this.syncableRecords.firstElement()).ordinal));
+//				DeviceConfiguration.addProperty(properties, IDevice.OFFSET, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getOffset());
+//				DeviceConfiguration.addProperty(properties, IDevice.FACTOR, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getFactor());
+//				DeviceConfiguration.addProperty(properties, IDevice.REDUCTION, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getReduction());
+//				Record tmpRecord = new Record(this.device, this.realSize(), syncRecName, symbol, unit, false, new StatisticsType(), properties, 0);
+//				tmpRecord.isSyncPlaceholder = true;
+//				tmpRecord.isPositionLeft = this.get(this.syncableRecords.firstElement()).isPositionLeft; // use fist sync record for scale position
+//				tmpRecord.isVisible = this.isSyncRecordSelected;
+//				tmpRecord.df = new DecimalFormat("0.00"); //$NON-NLS-1$
+//				this.put(syncRecName, tmpRecord);
+//				this.addRecordName(syncRecName);
+//				this.setSyncRequested(this.isSyncRecordSelected, false);
+//
+//				this.isSyncableChecked = true;
+//				log.log(Level.FINER, "syncableRecords = " + this.syncableRecords.toString()); //$NON-NLS-1$
+//			}
+//		}
+//
+//		return !this.syncableRecords.isEmpty();
+//	}
+
+	/**
+	 * @return the Vector containing the slave records sync by the master name
+	 */
+	public Vector<Record> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
+		return this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
+	}
+	
+	public void syncScaleOfSyncableRecords(boolean force) {
+		if (force) {
+			this.scaleSyncedRecords = new HashMap<Integer, Vector<Record>>(2);
+		}
+		for (int i = 0; i < this.size(); i++) {
+			PropertyType syncProperty = this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+			boolean isSyncableRecordContent = this.get(i).minValue != this.get(i).maxValue;// do not use 0 values for min/max calculation
+			if (isSyncableRecordContent && syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY) ) { 
+				int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
+				if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
+					this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
+					this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
+					this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
+					this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
 				}
-				this.potentialSyncableRecords.add(this.recordNames[i]);
+				if (!this.scaleSyncedRecords.get(syncMasterRecordOrdinal).contains(this.get(i))) {
+					this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(i));
+				}
+				this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
+				this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);
+				this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_SCALE_POSITION);
 			}
 		}
-
-		log.log(Level.FINER, this.potentialSyncableRecords.toString());
-	}
-
-	/**
-	 * find syncable and displayable record names and place the record names in a vector 
-	 * @param forceRenew - true will recreate syncableRecordsVector
-	 */
-	public boolean isSyncableDisplayableRecords(boolean forceRenew) {
-		if (forceRenew || !this.isSyncableChecked) {
-			String oldSyncName = this.getSyncableName();
-			if (this.containsKey(oldSyncName)) {
-				this.removeRecordName(oldSyncName);
-				this.remove(oldSyncName);
-			}
-			this.syncableRecords = new Vector<String>();
-			for (String syncableRecordKey : this.potentialSyncableRecords) {
-				Record record = this.get(syncableRecordKey);
-				if (record != null && record.isDisplayable && record.size() > 2) this.syncableRecords.add(syncableRecordKey);
-			}
-
-			if (!this.syncableRecords.isEmpty()) {
-				//create a new record with syncableName to hold the data for drawing the scale
-				String syncRecName = this.getSyncableName();
-				String symbol = this.get(this.syncableRecords.firstElement()).getSymbol() + ".." + this.syncableRecords.lastElement().split(" ")[1]; //$NON-NLS-1$ //$NON-NLS-2$
-				String unit = this.get(this.syncableRecords.firstElement()).getUnit();
-				List<PropertyType> properties = new ArrayList<PropertyType>(this.device.getProperties(this.parent.number, this.get(this.syncableRecords.firstElement()).ordinal));
-				DeviceConfiguration.addProperty(properties, IDevice.OFFSET, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getOffset());
-				DeviceConfiguration.addProperty(properties, IDevice.FACTOR, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getFactor());
-				DeviceConfiguration.addProperty(properties, IDevice.REDUCTION, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getReduction());
-				Record tmpRecord = new Record(this.device, this.realSize(), syncRecName, symbol, unit, false, new StatisticsType(), properties, 0);
-				tmpRecord.isSyncPlaceholder = true;
-				tmpRecord.isPositionLeft = this.get(this.syncableRecords.firstElement()).isPositionLeft; // use fist sync record for scale position
-				tmpRecord.isVisible = this.isSyncRecordSelected;
-				tmpRecord.df = new DecimalFormat("0.00"); //$NON-NLS-1$
-				this.put(syncRecName, tmpRecord);
-				this.addRecordName(syncRecName);
-				this.setSyncRequested(this.isSyncRecordSelected, false);
-
-				this.isSyncableChecked = true;
-				log.log(Level.FINER, "syncableRecords = " + this.syncableRecords.toString()); //$NON-NLS-1$
-			}
-		}
-
-		return !this.syncableRecords.isEmpty();
-	}
-
-	/**
-	 * method to query syncable record name stem
-	 * @return syncable record name stem or empty sting
-	 */
-	public String getSyncableName() {
-		return this.syncableRecords.isEmpty() ? GDE.STRING_EMPTY : this.syncableRecords.firstElement() + ".." + this.syncableRecords.lastElement().split(GDE.STRING_BLANK)[1]; //$NON-NLS-1$
-	}
-
-	public void syncScaleOfSyncableRecords() {
-		// find min/max
-		for (String syncableRecordKey : this.syncableRecords) {
-			Record record = this.get(syncableRecordKey);
-			if (record != null) {
-				int tmpMin = record.getMinValue();
-				int tmpMax = record.getMaxValue();
-				log.log(Level.FINE, syncableRecordKey + " tmpMin = " + tmpMin / 1000.0 + "; tmpMax = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
-				if (this.syncMin == 0 && this.syncMax == 0) {
-					this.syncMin = tmpMin;
-					this.syncMax = tmpMax;
-				}
-				else {
-					if (tmpMin < this.syncMin) this.syncMin = tmpMin;
-					if (tmpMax > this.syncMax) this.syncMax = tmpMax;
+		
+		if (log.isLoggable(Level.FINE)) {
+			StringBuilder sb = new StringBuilder();
+			for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
+				sb.append(syncRecordOrdinal).append(GDE.STRING_COLON);
+				for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+					sb.append(tmpRecord.name).append(GDE.STRING_SEMICOLON);
 				}
 			}
+			log.log(Level.FINE, sb.toString());
 		}
-		log.log(Level.FINE, "syncMin = " + this.syncMin / 1000.0 + "; syncMax = " + this.syncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
-
-		updateSyncRecordScale();
+		if (this.scaleSyncedRecords.size() > 0) {
+			updateSyncRecordScale();
+		}
 	}
 
 	/**
-	 * update the scale values from sync record 
+	 * update the scale values from sync record if visible
 	 * and update referenced records to enable drawing of curve, set min/max
 	 */
-	void updateSyncRecordScale() {
-		Record syncPlaceholderRecord = this.get(this.getSyncableName());
-		if (syncPlaceholderRecord != null) {
-			syncPlaceholderRecord.setMinMax(this.syncMin, this.syncMax);
-			syncPlaceholderRecord.setScopeMinMax(this.syncMin, this.syncMax);
-			syncPlaceholderRecord.minDisplayValue = syncPlaceholderRecord.minZoomScaleValue = this.syncMin / 1000.0;
-			syncPlaceholderRecord.maxDisplayValue = syncPlaceholderRecord.maxZoomScaleValue = this.syncMax / 1000.0;
-
-			// update referenced record to enable drawing of curve, set min/max
-			for (String syncableRecordKey : this.syncableRecords) {
-				Record record = this.get(syncableRecordKey);
-				if (record != null) {
-					record.minDisplayValue = this.syncMin / 1000.0;
-					record.maxDisplayValue = this.syncMax / 1000.0;
-					record.setScaleSynced(true);
+	public void updateSyncRecordScale() {
+		for (int syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
+			int tmpSyncMin = Integer.MAX_VALUE; 
+			int tmpSyncMax = Integer.MIN_VALUE;
+			log.log(Level.FINE, this.get(syncRecordOrdinal).name + " syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+				if (tmpRecord.isVisible) {
+					int tmpMin = tmpRecord.getMinValue();
+					int tmpMax = tmpRecord.getMaxValue();
+					if (tmpMin != 0 && tmpMax != 0) {
+						log.log(Level.FINE, tmpRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+						if (tmpMin < tmpSyncMin) tmpSyncMin = tmpMin;
+						if (tmpMax > tmpSyncMax) tmpSyncMax = tmpMax;
+					}
 				}
 			}
+			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+				if (this.isScopeMode) {
+					tmpRecord.scopeMin = tmpSyncMin;
+					tmpRecord.scopeMax = tmpSyncMax;
+				}
+				else {
+					tmpRecord.syncMinValue = tmpSyncMin;
+					tmpRecord.syncMaxValue = tmpSyncMax;
+				}
+			}
+			log.log(Level.FINE, this.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
 	/**
-	 * update the display scale values, only called for records which have synced scale
-	 * setting display values directly requires to have the scale drawn previously, this will set adapted display values
+	 * synchronize scale properties of master and slave scale synchronized records 
 	 */
-	public void updateSyncedScaleValues() {
-		Record tmpRecord = this.get(this.getSyncableName());
-		if (tmpRecord != null) {
-			for (String syncedRecordName : this.syncableRecords) {
-				Record record = this.get(syncedRecordName);
-				if (record != null) {
-					record.minDisplayValue = tmpRecord.minDisplayValue;
-					record.maxDisplayValue = tmpRecord.maxDisplayValue;
+	public void syncMasterSlaveRecords(Record queryRecord, int type) {
+		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
+			if (this.scaleSyncedRecords.get(syncRecordOrdinal).contains(queryRecord)) {
+				switch (type) {
+				case Record.TYPE_AXIS_END_VALUES:
+					boolean tmpIsRoundout = queryRecord.isRoundOut;
+					boolean tmpIsStartpointZero = queryRecord.isStartpointZero;
+					boolean tmpIsStartEndDefined = queryRecord.isStartEndDefined;
+					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+						tmpRecord.isRoundOut = tmpIsRoundout;
+						tmpRecord.isStartpointZero = tmpIsStartpointZero;
+						tmpRecord.isStartEndDefined = tmpIsStartEndDefined;
+					}
+					break;
+				case Record.TYPE_AXIS_NUMBER_FORMAT:
+					DecimalFormat tmpDf = queryRecord.df;
+					int numberFormat = queryRecord.numberFormat;
+					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+						tmpRecord.df = (DecimalFormat) tmpDf.clone();
+						tmpRecord.numberFormat = numberFormat;
+					}
+					break;
+				case Record.TYPE_AXIS_SCALE_POSITION:
+					boolean tmpIsPositionLeft = queryRecord.isPositionLeft;
+					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+						tmpRecord.isPositionLeft = tmpIsPositionLeft;
+					}
+					break;
 				}
-			}
+			}				
 		}
 	}
 
 	/**
 	 * @return true only if both isSyncableSynced && isOneSyncableVisible are true
 	 */
-	public boolean isSyncableSynced() {
-		return this.isSyncRequested && isOneSyncableVisible();
+	public boolean hasSynchronizedRecords() {
+		return !this.scaleSyncedRecords.isEmpty();
 	}
 
 	/**
@@ -1864,9 +1860,26 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public boolean isOneSyncableVisible() {
 		boolean isOneSynceableVisible = false;
-		for (String syncableRecordKey : this.potentialSyncableRecords) {
-			Record record = this.get(syncableRecordKey);
-			if (record != null && record.isVisible) {
+		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
+			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+				if (tmpRecord != null && tmpRecord.isVisible) {
+					isOneSynceableVisible = true;
+					break;
+				}
+			}
+		}
+		return isOneSynceableVisible;
+	}
+
+	/**
+	 * query if one of the syncable records is switched visible
+	 * @param syncMasterOrdinal the record name of the sync master record 
+	 * @return true if one of the syncable records is visible
+	 */
+	public boolean isOneSyncableVisible(int syncMasterOrdinal) {
+		boolean isOneSynceableVisible = false;
+		for (Record tmpRecord : this.scaleSyncedRecords.get(syncMasterOrdinal)) {
+			if (tmpRecord != null && tmpRecord.isVisible) {
 				isOneSynceableVisible = true;
 				break;
 			}
@@ -1874,67 +1887,40 @@ public class RecordSet extends HashMap<String, Record> {
 		return isOneSynceableVisible;
 	}
 
-	/**
-	 * synchronize the scales of all syncable records
-	 * @param enable the isSyncableSynced to set
-	 * @param countAsChange 
-	 */
-	public void setSyncRequested(boolean enable, boolean countAsChange) {
-		this.isSyncRequested = enable;
- 
-		if (countAsChange)
-			this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-		
-		if (enable) {
-			this.syncScaleOfSyncableRecords();
-		}
-		else {
-			for (String recordName : this.syncableRecords) {
-				this.get(recordName).setScaleSynced(false);
-			}
-		}
-		this.get(this.getSyncableName()).isVisible = this.isSyncRequested();
-	}
-
-	/**
-	 * overwritten size method to care about added sync record (placeholder)
-	 */
-	public int size() {
-		return this.syncableRecords.isEmpty() ? super.size() : super.size() - 1;
-	}
-	
 	public int realSize() {
 		return super.size();
 	}
 
 	/**
-	 * @return the isSyncRequested
-	 */
-	public boolean isSyncRequested() {
-		return this.isSyncRequested;
-	}
-
-	/**
-	 * @return the syncableRecords
-	 */
-	public Vector<String> getSyncableRecords() {
-		return this.syncableRecords;
-	}
-	
-	/**
-	 * @return the sync place holder record, null if no syncable records exist
-	 */
-	Record getSyncRecord() {
-		return this.get(this.getSyncableName());
-	}
-	
-	/**
 	 * query if the given record key is one of syncable records
-	 * @param queryRecordKey the record key to be used for the query
+	 * @param queryRecord the record key to be used for the query
 	 * @return true if syncable records contains queryRecordKey
 	 */
-	public boolean isOneOfSyncableRecord(String queryRecordKey) {
-		return this.syncableRecords.contains(queryRecordKey);
+	public boolean isOneOfSyncableRecord(Record queryRecord) {
+		boolean isContained = false;
+		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
+			if (this.scaleSyncedRecords.get(syncRecordOrdinal).contains(queryRecord)) {
+				isContained = true;
+				break;
+			}				
+		}
+		return isContained;
+	}
+	
+	/**
+	 * query the synchronization master record where the given record key is one of synchronizable records
+	 * @param queryRecord the record key to be used for the query
+	 * @return the synchronization master record name
+	 */
+	public int getSyncMasterRecordOrdinal(Record queryRecord) {
+		int syncMasterRecordOrdinal = -1;
+		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
+			if (this.scaleSyncedRecords.get(syncRecordOrdinal).contains(queryRecord)) {
+				syncMasterRecordOrdinal = syncRecordOrdinal;
+				break;
+			}				
+		}
+		return syncMasterRecordOrdinal;
 	}
 
 	/**
@@ -2056,33 +2042,8 @@ public class RecordSet extends HashMap<String, Record> {
 					record.setScopeMinMax(min, max);
 				}
 			}
-			if (this.isSyncRequested) {
-				this.syncMin = this.syncMax = 0;
-				this.syncScaleOfSyncableRecords();
-			}
-		}
-	}
-
-	/**
-	 * @param enable the isSyncRecordSelected to set
-	 */
-	public void setSyncRecordSelected(boolean enable) {
-		this.isSyncRecordSelected = enable;
-	}
-	
-	/**
-	 * synchronize the scale number format for compare set only
-	 * @param sourceRecordKey
-	 * @param newNumberFormat
-	 */
-	public void syncScaleNumberFormat(String sourceRecordKey, int newNumberFormat) {
-		if (this.isCompareSet) {
-			Record srcRecord = this.get(sourceRecordKey);
-			for (String tmpRecordKey : this.keySet()) {
-				Record tmpRecord = this.get(tmpRecordKey);
-				if (!tmpRecordKey.equals(sourceRecordKey)) {
-					tmpRecord.df = (DecimalFormat)srcRecord.df.clone();
-				}
+			if (!this.scaleSyncedRecords.isEmpty()) {
+				this.syncScaleOfSyncableRecords(true);
 			}
 		}
 	}

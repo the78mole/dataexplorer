@@ -51,6 +51,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.device.DesktopPropertyTypes;
 import gde.device.IDevice;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -467,37 +468,49 @@ public class CellVoltageWindow extends CTabItem {
 	/**
 	 * check cell voltage availability and build cell voltage array
 	 */
-	void updateCellVoltageVector() {
+	boolean updateCellVoltageVector() {
+		boolean isCellVoltageChanged = false;
+		Vector<Integer> tmpCellVoltageVector = new Vector<Integer>(2);
+		if (this.voltageVector.size() > 0) {
+			for (CellInfo cellInfo : this.voltageVector) {
+				tmpCellVoltageVector.add(cellInfo.getVoltage());
+			}
+		}		
 		this.voltageVector = new Vector<CellInfo>();
+		
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
-			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested() && recordSet.isSyncableDisplayableRecords(false) && this.coverComposite.isVisible()) {
+			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested() && this.coverComposite.isVisible()) {
 				int cellCount = this.voltageAvg = 0;
-				String[] activeRecordKeys = recordSet.getSyncableRecords().toArray(new String[0]);
-				for (String recordKey : activeRecordKeys) {
-					Record record = recordSet.get(recordKey);
-					int index = record.getName().length();
-					//log.log(Level.INFO, "record " + record.getName() + " symbol " + record.getSymbol() + " - " + record.getName().substring(index-1, index));
-					// algorithm to check if a measurement is a single cell voltage is check match of last character symbol and name U1-Voltage1
-					if (record.getSymbol().endsWith(record.getName().substring(index - 1))) { // better use a property to flag as single cell voltage
+				int cellVoltageReferenceMasterOrdinal = recordSet.getDevice().getDesktopTargetReferenceOrdinal(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB);
+				if (cellVoltageReferenceMasterOrdinal >= 0 && recordSet.getScaleSyncedRecords(cellVoltageReferenceMasterOrdinal) != null) {
+					for (Record record : recordSet.getScaleSyncedRecords(cellVoltageReferenceMasterOrdinal)) {
+						log.log(Level.FINE, "record " + record.getName() + " symbol " + record.getSymbol());
 						if (record.getLast() >= 0) { // last value is current value
 							this.voltageVector.add(new CellInfo(record.getLast(), record.getName(), record.getUnit()));
 							this.voltageAvg += record.getLast();
 							cellCount++;
 						}
-						//log.log(Level.FINE, "record.getLast() " + record.getLast());
+					}
+					// add test values here
+					//cellCount = addCellVoltages4Test(new int[] {2500, 3500, 3200, 4250}, "ZellenSpannung");
+					//cellCount = addCellVoltages4Test(new int[] {2500, 3500, 3200, 4250}, "CellVoltage");
+					//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "ZellenSpannung");
+					//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "CellVoltage");
+					if (cellCount > 0) this.voltageAvg = this.voltageAvg / cellCount;
+					//log.log(Level.FINE, "cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
+
+					//check if voltage values are changed
+					for (int i = 0; i < tmpCellVoltageVector.size() && i < this.voltageVector.size(); i++) {
+						if (tmpCellVoltageVector.get(i) != this.voltageVector.get(i).getVoltage()) {
+							isCellVoltageChanged = true;
+							log.log(Level.FINER, "updateCellVoltageVector -> changed"); //$NON-NLS-1$
+							break;
+						}
 					}
 				}
-				// add test values here
-				//cellCount = addCellVoltages4Test(new int[] {2500, 3500, 3200, 4250}, "ZellenSpannung");
-				//cellCount = addCellVoltages4Test(new int[] {2500, 3500, 3200, 4250}, "CellVoltage");
-				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "ZellenSpannung");
-				//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "CellVoltage");
-
-				if (cellCount > 0) this.voltageAvg = this.voltageAvg / cellCount;
-				//log.log(Level.FINE, "cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
 			}
 		}
 		if (log.isLoggable(Level.FINE)) {
@@ -507,6 +520,7 @@ public class CellVoltageWindow extends CTabItem {
 			}
 			log.log(Level.FINE, "updateCellVoltageVector -> " + sb.toString()); //$NON-NLS-1$
 		}
+		return isCellVoltageChanged;
 	}
 
 	/**
@@ -555,7 +569,7 @@ public class CellVoltageWindow extends CTabItem {
 	 * 
 	 */
 	void updateAndResize() {
-		updateCellVoltageVector();
+		boolean isSomeVoltagechanged = updateCellVoltageVector();
 		Point mainSize = CellVoltageWindow.this.cellVoltageMainComposite.getSize();
 		log.log(Level.FINE, "mainSize = " + mainSize.toString());
 		if (this.voltageVector.size() > 0) {
@@ -572,7 +586,7 @@ public class CellVoltageWindow extends CTabItem {
 			CellVoltageWindow.this.coverComposite.setSize(0, 0);
 			clearVoltageAndCapacity();
 		}
-		update(false);
+		update(isSomeVoltagechanged);
 	}
 
 	/**

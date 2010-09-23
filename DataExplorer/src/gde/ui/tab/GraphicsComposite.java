@@ -426,30 +426,13 @@ public class GraphicsComposite extends Composite {
 		int numberCurvesLeft = 0;
 		for (String recordKey : recordSet.getRecordNames()) {
 			Record tmpRecord = recordSet.getRecord(recordKey);
-			if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
-				log.log(Level.FINE, "==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (tmpRecord != null && tmpRecord.isScaleVisible()) {
+				log.log(Level.FINER, "==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				if (tmpRecord.isPositionLeft())
 					numberCurvesLeft++;
 				else
 					numberCurvesRight++;
 			}
-		}
-		//correct scales and scale position according synced scales requirements
-		if (recordSet.isSyncableSynced()) {
-			for (String recordKey : recordSet.getSyncableRecords()) {
-				Record tmpRecord = recordSet.getRecord(recordKey);
-				if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
-					log.log(Level.FINE, "==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					if (tmpRecord.isPositionLeft())
-						numberCurvesLeft--;
-					else
-						numberCurvesRight--;
-				}
-			}
-			if (recordSet.get(recordSet.getSyncableName()).isPositionLeft())
-				numberCurvesLeft++;
-			else
-				numberCurvesRight++;
 		}
 		//correct scales and scale position according compare set requirements
 		if (recordSet.isCompareSet()) {
@@ -531,19 +514,14 @@ public class GraphicsComposite extends Composite {
 			}
 		}
 
-		//draw the scale for all synchronized records
-		if (recordSet.isSyncableSynced()) {
-			CurveUtils.drawScale(recordSet.get(recordSet.getSyncableName()), gc, x0, y0, width, height, dataScaleWidth);
-			recordSet.updateSyncedScaleValues();
-		}
-		
 		// draw each record using sorted record set names
 		long startTime = new Date().getTime();
+		recordSet.updateSyncRecordScale();
 		for (String record : recordNames) {
 			Record actualRecord = recordSet.getRecord(record);
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			log.log(Level.FINE, "drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			if (isActualRecordEnabled && !actualRecord.isScaleSynced()) 
+			if (actualRecord.isScaleVisible()) 
 				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
 
 			if (isCurveGridEnabled && record.equals(curveGridRecordName)) // check for activated horizontal grid
@@ -1503,7 +1481,15 @@ public class GraphicsComposite extends Composite {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			String fileComment = this.graphicsHeader.getText();
-			fileComment = fileComment.substring(0, fileComment.indexOf(GDE.STRING_MESSAGE_CONCAT));
+			if (fileComment.indexOf(GDE.STRING_MESSAGE_CONCAT) > 1) {
+				fileComment = fileComment.substring(0, fileComment.indexOf(GDE.STRING_MESSAGE_CONCAT));
+			}
+			else {
+				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+				if (activeRecordSet != null && fileComment.indexOf(activeRecordSet.getName()) > 1) {
+					fileComment = fileComment.substring(0, fileComment.indexOf(activeRecordSet.getName()));
+				}
+			}
 			activeChannel.setFileDescription(fileComment);
 			activeChannel.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 		}

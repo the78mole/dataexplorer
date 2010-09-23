@@ -54,14 +54,14 @@ public class CurveUtils {
 		int numberTicks = 10, miniticks = 5;
 
 		log.log(Level.FINER, "x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		if (record.isEmpty() && !record.isDisplayable() && !record.isSyncPlaceholder()) return; // nothing to display
+		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
 		String recordName = isCompareSet ? record.getKeyName() : record.getName();
 		log.log(Level.FINE, "drawing record =" + recordName + " isCompareSet = " + isCompareSet); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//Draw the curve
 		//(yMaxValue - yMinValue) defines the area to be used for the curve
-		double yMaxValue = record.getMaxValue() / 1000.0;
-		double yMinValue = record.getMinValue() / 1000.0;
+		double yMaxValue = (record.isScaleSynced() ? record.getSyncMaxValue() : record.getMaxValue()) / 1000.0;
+		double yMinValue = (record.isScaleSynced() ? record.getSyncMinValue() : record.getMinValue()) / 1000.0;
 		log.log(Level.FINE, "unmodified yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// yMinValueDisplay and yMaxValueDisplay used for scales and adapted values device and measure unit dependent
@@ -139,7 +139,7 @@ public class CurveUtils {
 		record.setMinScaleValue(yMinValueDisplay);
 		record.setMaxScaleValue(yMaxValueDisplay);
 		log.log(Level.FINE, "scale  -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-		String graphText = recordName + "   " + record.getSymbol() + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		String graphText = (record.isScaleSyncMaster() ? record.getSyncMasterName()	: recordName) + "   " + record.getSymbol() + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// adapt number space calculation to real displayed max number
 		//Point pt = gc.textExtent(df.format(yMaxValueDisplay));

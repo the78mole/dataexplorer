@@ -83,8 +83,6 @@ public class CurveSelectorContextMenu {
 	String 												recordNameKey = null;
 	String 												recordNameMeasurement = GDE.STRING_BLANK;
 	boolean 											isWindowTypeCompare = false;
-	boolean												isSyncPlaceholder = false; // the sync placeholder record
-	boolean												isScaleSynced = false; // scale sync for syncable records is requested
 	
 	public CurveSelectorContextMenu() {
 		super();
@@ -102,12 +100,7 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.selectedItem != null) {
 						log.log(Level.FINER, CurveSelectorContextMenu.this.selectedItem.toString());
 						if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-							CurveSelectorContextMenu.this.isSyncPlaceholder = Boolean.valueOf("" + CurveSelectorContextMenu.this.selectedItem.getData(DataExplorer.RECORD_SYNC_PLACEHOLDER));
-							CurveSelectorContextMenu.this.isScaleSynced = Boolean.valueOf("" + CurveSelectorContextMenu.this.selectedItem.getData(DataExplorer.RECORD_SYNC_PLACEHOLDER));
 							CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
-							if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
-								CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.recordNameKey.substring(CurveSelectorContextMenu.this.recordNameKey.indexOf(' ')).trim();
-							}
 							log.log(Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
 							CurveSelectorContextMenu.this.isWindowTypeCompare = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE);
 							CurveSelectorContextMenu.this.recordSet = CurveSelectorContextMenu.this.isWindowTypeCompare 
@@ -121,14 +114,8 @@ public class CurveSelectorContextMenu {
 									CurveSelectorContextMenu.this.actualRecord = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey);
 									if (CurveSelectorContextMenu.this.actualRecord != null) {
 										CurveSelectorContextMenu.this.recordName.setText(">>>>  " + CurveSelectorContextMenu.this.recordNameKey + "  <<<<"); //$NON-NLS-1$ //$NON-NLS-2$
-										if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
-											CurveSelectorContextMenu.this.lineVisible.setText("Sync " + CurveSelectorContextMenu.this.recordSet.getSyncableName());
-											CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.recordSet.isSyncableSynced();
-										}
-										else {
-											CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.GDE_MSGT0085));
-											CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.actualRecord.isVisible();
-										}
+										CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.GDE_MSGT0085));
+										CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.actualRecord.isVisible();
 										CurveSelectorContextMenu.this.lineVisible.setSelection(CurveSelectorContextMenu.this.isRecordVisible);
 										// check measurement selections
 										//deltaMeasure.setSelection(recordSet.isDeltaMeasurementMode(recordNameKey));
@@ -140,25 +127,6 @@ public class CurveSelectorContextMenu {
 									else {
 										return; // actual record is null, record related operations not possible
 									}
-								}
-								// check sync placeholder record
-								if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
-									CurveSelectorContextMenu.this.lineColor.setEnabled(false);
-									CurveSelectorContextMenu.this.lineType.setEnabled(false);
-									CurveSelectorContextMenu.this.lineWidth.setEnabled(false);
-									CurveSelectorContextMenu.this.horizontalGrid.setEnabled(false);
-									CurveSelectorContextMenu.this.measurement.setEnabled(false);
-									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
-									if (!CurveSelectorContextMenu.this.isRecordVisible) {
-										CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
-										CurveSelectorContextMenu.this.axisNumberFormat.setEnabled(false);
-									}
-								}
-								// check for scale synced
-								if (CurveSelectorContextMenu.this.actualRecord.isScaleSynced()) {
-									CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
-									CurveSelectorContextMenu.this.axisNumberFormat.setEnabled(false);
-									CurveSelectorContextMenu.this.axisPosition.setEnabled(false);
 								}
 								// check zoom mode
 								if (CurveSelectorContextMenu.this.recordSet.isZoomMode()) {
@@ -218,13 +186,9 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "lineVisibler Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						boolean checked = CurveSelectorContextMenu.this.lineVisible.getSelection();
-						if (CurveSelectorContextMenu.this.isSyncPlaceholder) {
-							CurveSelectorContextMenu.this.recordSet.setSyncRequested(checked, true);
-						}
-						else {
-							CurveSelectorContextMenu.this.actualRecord.setVisible(checked);
-						}
+						CurveSelectorContextMenu.this.actualRecord.setVisible(checked);
 						CurveSelectorContextMenu.this.selectedItem.setChecked(checked);
+						CurveSelectorContextMenu.this.recordSet.syncScaleOfSyncableRecords(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
@@ -489,6 +453,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
 							CurveSelectorContextMenu.this.actualRecord.setStartEndDefined(false, 0, 0);
 						}
+						actualRecord.getParent().syncMasterSlaveRecords(actualRecord, Record.TYPE_AXIS_END_VALUES);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -511,6 +476,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
 							CurveSelectorContextMenu.this.actualRecord.setStartEndDefined(false, 0, 0);
 						}
+						actualRecord.getParent().syncMasterSlaveRecords(actualRecord, Record.TYPE_AXIS_END_VALUES);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -534,6 +500,7 @@ public class CurveSelectorContextMenu {
 						double[] oldMinMax = {record.getMinScaleValue(), record.getMaxScaleValue()};
 						double[] newMinMax = CurveSelectorContextMenu.this.axisEndValuesDialog.open(oldMinMax);
 						record.setStartEndDefined(true, newMinMax[0], newMinMax[1]);
+						actualRecord.getParent().syncMasterSlaveRecords(actualRecord, Record.TYPE_AXIS_END_VALUES);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.isActiveEnValueDialog = false;
@@ -604,6 +571,7 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "axisNumberFormatAuto " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.actualRecord.setNumberFormat(-1);
+						actualRecord.getParent().syncMasterSlaveRecords(actualRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -617,6 +585,7 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "axisNumberFormat0 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.actualRecord.setNumberFormat(0);
+						actualRecord.getParent().syncMasterSlaveRecords(actualRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -630,6 +599,7 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "axisNumberFormat1 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.actualRecord.setNumberFormat(1);
+						actualRecord.getParent().syncMasterSlaveRecords(actualRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -643,6 +613,7 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "axisNumberFormat2 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.actualRecord.setNumberFormat(2);
+						actualRecord.getParent().syncMasterSlaveRecords(actualRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -656,6 +627,7 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "axisNumberFormat3 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.actualRecord.setNumberFormat(3);
+						actualRecord.getParent().syncMasterSlaveRecords(actualRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -695,6 +667,7 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "axisPositionLeft Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.actualRecord.setPositionLeft(true);
+						actualRecord.getParent().syncMasterSlaveRecords(actualRecord, Record.TYPE_AXIS_SCALE_POSITION);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -708,6 +681,7 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "axisPositionRight Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.actualRecord.setPositionLeft(false);
+						actualRecord.getParent().syncMasterSlaveRecords(actualRecord, Record.TYPE_AXIS_SCALE_POSITION);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();

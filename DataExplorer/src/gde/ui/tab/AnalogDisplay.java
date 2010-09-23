@@ -158,9 +158,9 @@ public class AnalogDisplay extends Composite {
 			this.tachoImageBounds = ((Canvas) evt.widget).getClientArea();
 
 			// get min max values and check if this has been changed
-			double tmpMinValue = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getMinValue() : this.record.getMinValue();
+			double tmpMinValue = this.record.getMinValue();
 			tmpMinValue = this.device.translateValue(this.record, tmpMinValue / 1000.0);
-			double tmpMaxValue = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getMaxValue() : this.record.getMaxValue();
+			double tmpMaxValue = this.record.getMaxValue();
 			tmpMaxValue = this.device.translateValue(this.record, tmpMaxValue / 1000.0);
 			double deltaScale = tmpMaxValue - tmpMinValue;
 			tmpMinValue = MathUtils.roundDown(tmpMinValue, deltaScale);
@@ -207,7 +207,7 @@ public class AnalogDisplay extends Composite {
 			int tickRadius = this.radius + 2;
 			int dxr, dxtick, dyr, dytick, dxtext, dytext;
 			this.tachoImageGC.setLineWidth(2);
-			DecimalFormat df = record.isScaleSynced() ? record.getParent().get(record.getParent().getSyncableName()).getDecimalFormat() : record.getDecimalFormat();
+			DecimalFormat df = record.getDecimalFormat();
 			for (int i = 0; i <= numberTicks; ++i) {
 				double angle = this.angleStart + i * angleSteps; // -20, 0, 20, 40, ...
 				dxr = Double.valueOf(tickRadius * Math.cos(angle * Math.PI / 180)).intValue();

@@ -156,7 +156,7 @@ public class TimeSteps extends Vector<Integer> {
 			maxTime = this.get(0)/10.0; 
 		}
 		else {
-			maxTime = this.lastElement()/10.0;
+			maxTime = this.elementCount > 1 ? this.lastElement()/10.0 : 0.0;
 		}
 		//return isConstant ? this.get(0)*this.parent.realSize()/10.0 : this.lastElement()/10.0;
 		return maxTime;

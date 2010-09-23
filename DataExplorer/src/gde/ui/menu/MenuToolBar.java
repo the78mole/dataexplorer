@@ -1279,13 +1279,13 @@ public class MenuToolBar {
 		this.cutRightItem.setEnabled(false);
 		this.scopePointsCombo.setEnabled(this.isScopePointsCombo);
 		this.scopePointsCombo.select(0);
-		Channel activeChannel = this.channels.getActiveChannel();
-		if (activeChannel != null) {
-			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet != null && activeRecordSet.isSyncRequested()) {
-				activeRecordSet.setSyncRequested(true, false);
-			}
-		}
+//		Channel activeChannel = this.channels.getActiveChannel();
+//		if (activeChannel != null) {
+//			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+//			if (activeRecordSet != null && activeRecordSet.isSyncRequested()) {
+//				activeRecordSet.setSyncRequested(true, false);
+//			}
+//		}
 	}
 	
 	/**

@@ -18,6 +18,21 @@
 ****************************************************************************************/
 package gde.ui.dialog;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.exception.NotSupportedException;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.serial.DeviceSerialPort;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
@@ -57,21 +72,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.xml.sax.SAXParseException;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.exception.NotSupportedException;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
 
 /**
  * Dialog class to select the device to be used
@@ -940,7 +940,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						this.dataBitsSelectLabel.setText(GDE.STRING_BLANK + this.selectedActiveDeviceConfig.getDataBits().toString().split(GDE.STRING_UNDER_BAR)[1]);
 						this.stopBitsSelectLabel.setText(GDE.STRING_BLANK + this.selectedActiveDeviceConfig.getStopBits().toString().split(GDE.STRING_UNDER_BAR)[1]);
 						this.paritySelectLabel.setText(GDE.STRING_BLANK + this.selectedActiveDeviceConfig.getParity().toString().split(GDE.STRING_UNDER_BAR)[1]);
-						this.flowControlSelectLabel.setText(GDE.STRING_BLANK + this.selectedActiveDeviceConfig.getFlowCtrlMode().toString().split(GDE.STRING_UNDER_BAR)[1]);
+						this.flowControlSelectLabel.setText(GDE.STRING_BLANK + this.selectedActiveDeviceConfig.getFlowCtrlModeString().split(GDE.STRING_UNDER_BAR)[1]);
 						this.dtrCheckBox.setSelection(this.selectedActiveDeviceConfig.isDTR());
 						this.rtsCheckBox.setSelection(this.selectedActiveDeviceConfig.isRTS());
 					}

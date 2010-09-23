@@ -178,24 +178,25 @@ public class SelectorComposite extends Composite {
 									item.setData(DataExplorer.OLD_STATE, false);
 									item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
 								}
+								activeRecord.getParent().syncScaleOfSyncableRecords(true);
 							}
-							else {
-								log.log(Level.FINER, "GraphicsWindow.type = " + SelectorComposite.this.windowType + " recordName = \"" + recordName + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								RecordSet activeRecordSet = SelectorComposite.this.channels.getActiveChannel() != null ? SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet() : null;
-								RecordSet recordSet = SelectorComposite.this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet : SelectorComposite.this.application.getCompareSet();
-								if (recordSet != null && recordSet.size() > 0) {
-									if (item.getChecked()) {
-										item.setData(DataExplorer.OLD_STATE, true);
-										recordSet.setSyncRequested(true, true);
-										recordSet.setSyncRecordSelected(true);
-									}
-									else {
-										item.setData(DataExplorer.OLD_STATE, false);
-										recordSet.setSyncRequested(false, true);
-										recordSet.setSyncRecordSelected(false);
-									}
-								}
-							}
+//							else {
+//								log.log(Level.FINER, "GraphicsWindow.type = " + SelectorComposite.this.windowType + " recordName = \"" + recordName + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//								RecordSet activeRecordSet = SelectorComposite.this.channels.getActiveChannel() != null ? SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet() : null;
+//								RecordSet recordSet = SelectorComposite.this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet : SelectorComposite.this.application.getCompareSet();
+//								if (recordSet != null && recordSet.size() > 0) {
+//									if (item.getChecked()) {
+//										item.setData(DataExplorer.OLD_STATE, true);
+//										recordSet.setSyncRequested(true, true);
+//										recordSet.setSyncRecordSelected(true);
+//									}
+//									else {
+//										item.setData(DataExplorer.OLD_STATE, false);
+//										recordSet.setSyncRequested(false, true);
+//										recordSet.setSyncRecordSelected(false);
+//									}
+//								}
+//							}
 							SelectorComposite.this.application.updateGraphicsWindow();
 							SelectorComposite.this.application.updateDigitalWindow();
 							SelectorComposite.this.application.updateAnalogWindow();
@@ -249,17 +250,17 @@ public class SelectorComposite extends Composite {
 						}
 					}
 				}
-				if (recordSet.isSyncableDisplayableRecords(false) && recordSet.isOneSyncableVisible() && this.windowType == GraphicsWindow.TYPE_NORMAL) {
-					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
-					item.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-					item.setText("Sync " + recordSet.getSyncableName());
-					item.setChecked(recordSet.isSyncRequested());
-					item.setData(DataExplorer.OLD_STATE, recordSet.isSyncRequested());
-					item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
-					item.setData(DataExplorer.RECORD_SYNC_PLACEHOLDER, true);
-					textSize = item.getText().length() * 7;
-					if (itemWidth < (textSize+checkBoxWidth)) itemWidth = textSize+checkBoxWidth;
-				}
+//				if (recordSet.isSyncableDisplayableRecords(false) && recordSet.isOneSyncableVisible() && this.windowType == GraphicsWindow.TYPE_NORMAL) {
+//					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
+//					item.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+//					item.setText("Sync " + recordSet.getSyncableName());
+//					item.setChecked(recordSet.isSyncRequested());
+//					item.setData(DataExplorer.OLD_STATE, recordSet.isSyncRequested());
+//					item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
+//					item.setData(DataExplorer.RECORD_SYNC_PLACEHOLDER, true);
+//					textSize = item.getText().length() * 7;
+//					if (itemWidth < (textSize+checkBoxWidth)) itemWidth = textSize+checkBoxWidth;
+//				}
 				
 				this.selectorColumnWidth = itemWidth;
 				log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$

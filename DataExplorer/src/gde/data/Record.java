@@ -36,6 +36,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import gde.GDE;
 import gde.device.DataTypes;
 import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.StatisticsType;
@@ -106,7 +107,7 @@ public class Record extends Vector<Integer> {
 			this.out = newOut;
 		}
 		/**
-		 * query if bothe values has been set
+		 * query if both values has been set
 		 */
 		public boolean isComplete() {
 			return this.in >= 0 && this.out > 0 ? true : false;
@@ -122,14 +123,16 @@ public class Record extends Vector<Integer> {
 	boolean							isRoundOut						= false;
 	boolean							isStartpointZero			= false;
 	boolean							isStartEndDefined			= false;
-	boolean							isScaleSynced					= false; // indicates if record is part of syncable records and scale sync is requested
-	boolean							isSyncPlaceholder			= false;
 	DecimalFormat				df;
 	int									numberFormat					= -1;													// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
 	int									maxValue							= 0;		 										  // max value of the curve
 	int									minValue							= 0;													// min value of the curve
 	double							maxScaleValue					= this.maxValue;							// overwrite calculated boundaries
 	double							minScaleValue					= this.minValue;
+
+	//synchronize
+	int									syncMaxValue					= 0;		 										  // max value of the curve if synced
+	int									syncMinValue					= 0;													// min value of the curve if synced
 
 	// scope view 
 	int									scopeMin							= 0;													// min value of the curve within scope display area
@@ -183,6 +186,9 @@ public class Record extends Vector<Integer> {
 	public final static String[] propertyKeys = new String[] { NAME, UNIT, SYMBOL, IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE, 
 			IS_ROUND_OUT, IS_START_POINT_ZERO, IS_START_END_DEFINED, NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE	};
 
+	public final static int	TYPE_AXIS_END_VALUES			= 0;				// defines axis end values types like isRoundout, isStartpointZero, isStartEndDefined
+	public final static int	TYPE_AXIS_NUMBER_FORMAT		= 1;				// defines axis scale values format
+	public final static int	TYPE_AXIS_SCALE_POSITION	= 2;				// defines axis scale position left or right
 
 	/**
 	 * this constructor will create an vector to hold data points in case the initial capacity is > 0
@@ -476,6 +482,13 @@ public class Record extends Vector<Integer> {
 	public String getName() {
 		return this.name;
 	}
+	
+	public String getSyncMasterName() {
+		StringBuilder sb = new StringBuilder().append(this.name.split(GDE.STRING_BLANK)[0]);
+		sb.append(GDE.STRING_BLANK).append(this.parent.scaleSyncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1 ? this.parent.scaleSyncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR).append(GDE.STRING_DOT);
+		sb.append(GDE.STRING_DOT).append(this.parent.scaleSyncedRecords.get(this.ordinal).lastElement().name.split(GDE.STRING_BLANK).length > 1 ? this.parent.scaleSyncedRecords.get(this.ordinal).lastElement().name.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
+		return sb.toString();
+	}
 
 	public void setName(String newName) {
 		if (!this.name.equals(newName)) {
@@ -639,6 +652,18 @@ public class Record extends Vector<Integer> {
 		return this.parent.isScopeMode ? this.scopeMin : 
 				this.minValue == this.maxValue ? this.minValue - 100 : 
 					this.minValue;
+	}
+
+	public int getSyncMaxValue() {
+		return this.parent.isScopeMode ? this.scopeMax : 
+				this.syncMaxValue == this.syncMinValue ? this.syncMaxValue + 100 : 
+					this.syncMaxValue;
+	}
+
+	public int getSyncMinValue() {
+		return this.parent.isScopeMode ? this.scopeMin : 
+				this.syncMinValue == this.syncMaxValue ? this.syncMinValue - 100 : 
+					this.syncMinValue;
 	}
 
 	public int getRealMaxValue() {
@@ -1004,7 +1029,7 @@ public class Record extends Vector<Integer> {
 		}
 		RecordSet compareSet = DataExplorer.getInstance().getCompareSet();
 		if (compareSet != null && compareSet.size() > 0) {
-			this.parent.syncScaleNumberFormat(this.keyName, this.numberFormat);
+			this.parent.syncMasterSlaveRecords(this, Record.TYPE_AXIS_NUMBER_FORMAT);
 		}
 	}
 
@@ -1338,8 +1363,9 @@ public class Record extends Vector<Integer> {
 	 */
 	public String getVerticalDisplayPointAsFormattedScaleValue(int yPos, Rectangle drawAreaBounds) {
 		String displayPointValue;
-		if (this.parent.isSyncRequested) {
-			Record syncRecord = this.parent.getSyncRecord();
+		PropertyType syncProperty = this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+		if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+			Record syncRecord = this.parent.get(this.ordinal);
 				displayPointValue = syncRecord.df.format(new Double(syncRecord.minDisplayValue +  ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
 		}	
 		else if(this.parent.isZoomMode)
@@ -1452,6 +1478,11 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setMinDisplayValue(double newMinDisplayValue) {
 		this.minDisplayValue = newMinDisplayValue;
+		if (this.parent.isOneOfSyncableRecord(this)) {
+			for (Record tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
+				tmpRecord.minDisplayValue = this.minDisplayValue;
+			}
+		}
 	}
 
 	/**
@@ -1459,6 +1490,11 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setMaxDisplayValue(double newMaxDisplayValue) {
 		this.maxDisplayValue = newMaxDisplayValue;
+		if (this.parent.isOneOfSyncableRecord(this)) {
+			for (Record tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
+				tmpRecord.maxDisplayValue = this.maxDisplayValue;
+			}
+		}
 	}
 
 	/**
@@ -1947,31 +1983,23 @@ public class Record extends Vector<Integer> {
 	 * @return the isScaleSynced
 	 */
 	public boolean isScaleSynced() {
-		return this.isScaleSynced;
+		return this.parent.isOneOfSyncableRecord(this);
 	}
 
 	/**
-	 * set isScaleSynced to true if the to be displaed scale is in sync with other record
-	 * @param enabled the isScaleSynced value to set
+	 * @return true if the record represents a scale synchronize master record
 	 */
-	public void setScaleSynced(boolean enabled) {
-		this.isScaleSynced = enabled;
+	public boolean isScaleSyncMaster() {
+		return this.parent.scaleSyncedRecords.containsKey(this.ordinal);
 	}
-
+	
 	/**
-	 * @return the isSyncPlaceholder
+	 * @return true if the record is the scale sync master
 	 */
-	public boolean isSyncPlaceholder() {
-		return this.isSyncPlaceholder;
+	public boolean isScaleVisible() {
+		return isScaleSyncMaster() ? this.parent.isOneSyncableVisible(this.ordinal) && this.isDisplayable : !this.parent.isOneOfSyncableRecord(this) && this.isVisible && this.isDisplayable;
 	}
-
-	/**
-	 * @param enable the value of isSyncPlaceholder to set
-	 */
-	public void setSyncPlaceholder(boolean enable) {
-		this.isSyncPlaceholder = enable;
-	}
-
+	
 	/**
 	 * set min max values for scope view (recordSet.setScopeMode())
 	 * @param newScopeMin the scopeMin to set
