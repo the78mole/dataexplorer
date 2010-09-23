@@ -352,6 +352,8 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 				++j;
 				points[j] = ((DBx_2 & 0x0007) << 13) | ((DBx_3 & 0x001F) << 8);
 			}
+			if (i != 10) points[j] *= 1000;
+			else points[j] *= 10;
 		}
 
 		log.log(Level.FINER, "CheckSum = " + (Checksum.ADD(dataBuffer, 1, 57)) + " = " + ( (((dataBuffer[58]&0xFF) - 94) << 6) | (((dataBuffer[59]&0xFF) - 94) & 0x3F) ) );
@@ -439,15 +441,11 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
-		double newValue = 0.0;
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
-		if (record.getOrdinal() == 10)
-			newValue = ((value - reduction) * factor + offset) * 10.0;
-		else
-			newValue = ((value - reduction) * factor + offset) * 1000.0;
+		double newValue = (value - reduction) * factor + offset;
 
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
@@ -459,15 +457,11 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		double newValue = 0.0;
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
-		if (record.getOrdinal() == 10)
-			newValue = ((value - offset) / factor + reduction) / 10.0;
-		else
-			newValue = ((value - offset) / factor + reduction) / 1000.0;
+		double newValue = (value - offset) / factor + reduction;
 
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
