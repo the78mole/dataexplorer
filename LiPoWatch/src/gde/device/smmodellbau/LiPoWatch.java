@@ -372,7 +372,6 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 			if (hasReasonableData) ++displayableCounter;
 			LiPoWatch.log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + (hasReasonableData)); //$NON-NLS-1$
 		}
-		recordSet.isSyncableDisplayableRecords(true);
 		recordSet.setConfiguredDisplayable(displayableCounter);
 
 		if (LiPoWatch.log.isLoggable(Level.FINE)) {

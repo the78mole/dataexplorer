@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V10.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V11.xsd">
     <Device>
         <name>LiPoWatch</name>
         <manufacturer>SM-Modellbau</manufacturer>
@@ -61,114 +61,128 @@
         </Measurement>
         <Measurement>
             <name>Zellenspannung 1</name>
-            <symbol>U1</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 2</name>
-            <symbol>U2</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 3</name>
-            <symbol>U3</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+       </Measurement>
         <Measurement>
             <name>Zellenspannung 4</name>
-            <symbol>U4</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 5</name>
-            <symbol>U5</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 6</name>
-            <symbol>U6</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 7</name>
-            <symbol>U7</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 8</name>
-            <symbol>U8</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 9</name>
-            <symbol>U9</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 10</name>
-            <symbol>U10</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 11</name>
-            <symbol>U11</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 12</name>
-            <symbol>U12</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 13</name>
-            <symbol>U13</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 14</name>
-            <symbol>U14</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Zellenspannung 15</name>
-            <symbol>U15</symbol>
+            <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
     </Channel>
     <Desktop>
         <property type="Boolean" value="false" name="table_tab"/>
         <property type="Boolean" value="true" name="digital_tab"/>
         <property type="Boolean" value="true" name="analog_tab"/>
-        <property type="Boolean" value="true" name="voltage_per_cell_tab"/>
+        <property target_reference_ordinal="4" type="Boolean" value="true" name="voltage_per_cell_tab"/>
     </Desktop>
 </DeviceProperties>
