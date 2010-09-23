@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V10.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V11.xsd">
     <Device>
         <name implementation="gde.device.tttronix.QcCopter">QuadroControl</name>
         <manufacturer>tt-tronix</manufacturer>
@@ -14,7 +14,7 @@
         <dataBits>DATABITS_8</dataBits>
         <stopBits>STOPBITS_1</stopBits>
         <parity>PARITY_NONE</parity>
-        <flowControlMode>FLOWCONTROL_RTSCTS_OUT</flowControlMode>
+        <flowControlMode>FLOWCONTROL_HARDWARE</flowControlMode>
         <isRTS>false</isRTS>
         <isDTR>false</isDTR>
     </SerialPort>
@@ -22,7 +22,7 @@
         <name>Time</name>
         <symbol>t</symbol>
         <unit>msec</unit>
-        <timeStep>0.0</timeStep>
+        <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
         <format size="62" type="BINARY"/>
@@ -31,76 +31,82 @@
     <State>
         <property type="Integer" value="1" name="Simulation"/>
     </State>
-    <Channel type="TYPE_CONFIG" name="Konfig">
+    <Channel type="TYPE_CONFIG" name="Konfig 1">
         <Measurement>
-            <name>Roll-Integral</name>
-            <symbol>Ri</symbol>
+            <name>Roll Integral</name>
+            <symbol>R</symbol>
             <unit>°</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Roll-Winkel</name>
-            <symbol>Rw</symbol>
+            <name>Roll Winkel</name>
+            <symbol>R</symbol>
+            <unit>°</unit>
+            <active>true</active>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="0" name="scale_sync_ref_ordinal"/>
+        </Measurement>
+        <Measurement>
+            <name>Nick Integral</name>
+            <symbol>N</symbol>
             <unit>°</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Nick-Integral</name>
-            <symbol>Ni</symbol>
-            <unit>°</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Nick-Winkel</name>
-            <symbol>N°</symbol>
+            <name>Nick Winkel</name>
+            <symbol>N</symbol>
             <unit>°</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
+            <property type="Integer" value="2" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>Gyro-Roll</name>
-            <symbol>Rg</symbol>
+            <name>Gyro Roll</name>
+            <symbol>R</symbol>
             <unit>i</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Gyro-Nick</name>
-            <symbol>Gn</symbol>
+            <name>Gyro Nick</name>
+            <symbol>G</symbol>
             <unit>i</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>Gyro-Gier</name>
-            <symbol>Gg</symbol>
+            <name>Gyro Gier</name>
+            <symbol>G</symbol>
             <unit>i</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>ACC-Roll</name>
-            <symbol>Ar</symbol>
+            <name>ACC Roll</name>
+            <symbol>A</symbol>
             <unit>z</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>ACC-Nick</name>
-            <symbol>An</symbol>
+            <name>ACC Nick</name>
+            <symbol>A</symbol>
             <unit>z</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>ACC-Z</name>
-            <symbol>Az</symbol>
+            <name>ACC Z</name>
+            <symbol>A</symbol>
             <unit>z</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Akkuspannung</name>
@@ -118,25 +124,28 @@
             <statistics sigma="true" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Motor-VL/V</name>
-            <symbol>Mvlr</symbol>
+            <name>Motor VL</name>
+            <symbol>M</symbol>
             <unit>1/min</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>Motor-HL/L</name>
-            <symbol>Mhl</symbol>
+            <name>Motor HL</name>
+            <symbol>M</symbol>
             <unit>1/min</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>Motor-HR/H</name>
-            <symbol>Mhr</symbol>
+            <name>Motor HR</name>
+            <symbol>M</symbol>
             <unit>1/min</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>User-Daten 0</name>
