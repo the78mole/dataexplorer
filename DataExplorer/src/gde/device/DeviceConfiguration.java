@@ -420,8 +420,16 @@ public class DeviceConfiguration {
 		this.serialPort.setStopBits(enumOrdinal);
 	}
 
-	public FlowControlTypes getFlowCtrlMode() {
+	public int getFlowCtrlMode() {
 		return this.serialPort.getFlowControlMode();
+	}
+
+	public int getFlowCtrlModeOrdinal() {
+		return this.serialPort.getFlowControlModeOrdinal();
+	}
+
+	public String getFlowCtrlModeString() {
+		return this.serialPort.getFlowControlModeString();
 	}
 
 	public void setFlowCtrlMode(FlowControlTypes value) {
@@ -967,6 +975,15 @@ public class DeviceConfiguration {
 			property.setValue(GDE.STRING_EMPTY + enable);
 		}
 		this.isChangePropery = true;
+	}
+	
+	/**
+	 * query if the target measurement reference ordinal used by the given desktop type
+	 * @return the target measurement reference ordinal, -1 if reference ordinal not set
+	 */
+	public int getDesktopTargetReferenceOrdinal(DesktopPropertyTypes desktopPropertyType) {
+		PropertyType property = this.getDesktopProperty(desktopPropertyType);
+		return property != null ? property.getTargetReferenceOrdinal() : -1; 
 	}
 	
 	/**

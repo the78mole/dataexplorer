@@ -60,7 +60,7 @@ public class GDE {
 	// ****** begin global constants section *******
 	public static final String		GDE_VERSION												= "Version 2.42";						//$NON-NLS-1$
 	public static final String		GDE_NAME_LONG											= "DataExplorer";	//$NON-NLS-1$
-	public final static String		DEVICE_PROPERTIES_XSD_VERSION			= "_V10"; 									//$NON-NLS-1$
+	public final static String		DEVICE_PROPERTIES_XSD_VERSION			= "_V11"; 									//$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION		= "_V04"; 									//$NON-NLS-1$
 	
 	public static final boolean		IS_WINDOWS								= System.getProperty("os.name").toLowerCase().startsWith("windows");//$NON-NLS-1$

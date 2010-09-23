@@ -263,7 +263,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 			this.serialPort = (SerialPort) portId.open("DataExplorer", 10000); //$NON-NLS-1$
 			// set port parameters
 			this.serialPort.setSerialPortParams(this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits().ordinal()+5, this.deviceConfig.getStopBits().ordinal()+1, this.deviceConfig.getParity().ordinal());
-			this.serialPort.setFlowControlMode(this.deviceConfig.getFlowCtrlMode().ordinal());
+			this.serialPort.setFlowControlMode(this.deviceConfig.getFlowCtrlMode());
 			this.serialPort.setInputBufferSize(1024);
 			this.serialPort.setOutputBufferSize(512);
 			this.serialPort.setRTS(this.deviceConfig.isRTS());

@@ -202,8 +202,30 @@ public class SerialPortType {
      *     {@link FlowControlTypes }
      *     
      */
-    public FlowControlTypes getFlowControlMode() {
-        return this.flowControlMode;
+    public int getFlowControlMode() {
+    	switch (this.flowControlMode) {
+    	default:
+			case FLOWCONTROL_NONE:
+        return gnu.io.SerialPort.FLOWCONTROL_NONE;
+			case FLOWCONTROL_XON_XOFF:
+        return gnu.io.SerialPort.FLOWCONTROL_XONXOFF_IN | gnu.io.SerialPort.FLOWCONTROL_XONXOFF_OUT;
+			case FLOWCONTROL_HARDWARE:
+        return gnu.io.SerialPort.FLOWCONTROL_RTSCTS_IN | gnu.io.SerialPort.FLOWCONTROL_RTSCTS_OUT;
+			}
+    }
+    
+    /**
+     * @return the flow control mode enumeration ordinal
+     */
+    public int getFlowControlModeOrdinal() {
+    	return this.flowControlMode.ordinal();
+    }
+    
+    /**
+     * @return the flow control mode as string
+     */
+    public String getFlowControlModeString() {
+    	return this.flowControlMode.toString();
     }
 
     /**

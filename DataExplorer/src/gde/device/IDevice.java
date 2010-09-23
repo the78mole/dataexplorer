@@ -169,6 +169,12 @@ public interface IDevice {
 	public void setVoltagePerCellTabRequested(boolean enable);
 
 	/**
+	 * query if the target measurement reference ordinal used by the given desktop type
+	 * @return the target measurement reference ordinal, -1 if reference ordinal not set
+	 */
+	public int getDesktopTargetReferenceOrdinal(DesktopPropertyTypes desktopPropertyType);
+
+	/**
 	 * @return time step in ms
 	 */
 	public double getTimeStep_ms();
@@ -221,7 +227,7 @@ public interface IDevice {
 	/**
 	 * @return the flow control configuration of the device
 	 */
-	public FlowControlTypes getFlowCtrlMode();
+	public int getFlowCtrlMode();
 	
 	/**
 	 * @return the parity bit configuration of the device

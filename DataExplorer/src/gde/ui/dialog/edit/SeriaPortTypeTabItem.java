@@ -531,7 +531,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 		this.dataBitsIndex = deviceConfig.getDataBits().ordinal();
 		this.stopBitsIndex = deviceConfig.getStopBits().ordinal();
 		this.parityIndex = deviceConfig.getParity().ordinal();
-		this.flowControlIndex = deviceConfig.getFlowCtrlMode().ordinal();
+		this.flowControlIndex = deviceConfig.getFlowCtrlModeOrdinal();
 		this.isRTS = deviceConfig.isRTS();
 		this.isDTR = deviceConfig.isDTR();
 
