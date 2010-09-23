@@ -40,7 +40,6 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
@@ -1772,7 +1771,7 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupButton17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.setupButton17.setText(Messages.getString(MessageIds.GDE_MSGT1874));
 							RowData setupButton17LData = new RowData();
-							setupButton17LData.width = 460;
+							setupButton17LData.width = 465;
 							setupButton17LData.height = 18;
 							this.setupButton17.setLayoutData(setupButton17LData);
 							this.setupButton17.setSelection((this.setupValue17 & 0x80) == 0x80);
@@ -1793,7 +1792,7 @@ public class VarioToolTabItem extends CTabItem {
 						}
 						{
 							RowData setupSlider17LData = new RowData();
-							setupSlider17LData.width = 139;
+							setupSlider17LData.width = 140;
 							setupSlider17LData.height = 18;
 							this.setupSlider17 = new Slider(this.setupGroup17, SWT.BORDER);
 							this.setupSlider17.setLayoutData(setupSlider17LData);
@@ -1820,7 +1819,7 @@ public class VarioToolTabItem extends CTabItem {
 						{
 							this.setupLabel17a = new CLabel(this.setupGroup17, SWT.RIGHT);
 							RowData setupLabel17aLData = new RowData();
-							setupLabel17aLData.width = 66;
+							setupLabel17aLData.width = 65;
 							setupLabel17aLData.height = 18;
 							this.setupLabel17a.setLayoutData(setupLabel17aLData);
 							this.setupLabel17a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1829,7 +1828,7 @@ public class VarioToolTabItem extends CTabItem {
 						{
 							this.setupText17 = new Text(this.setupGroup17, SWT.CENTER | SWT.BORDER);
 							RowData setupText17LData = new RowData();
-							setupText17LData.width = 29;
+							setupText17LData.width = 30;
 							setupText17LData.height = 12;
 							this.setupText17.setLayoutData(setupText17LData);
 							this.setupText17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1838,20 +1837,11 @@ public class VarioToolTabItem extends CTabItem {
 						{
 							this.setupLabel17b = new CLabel(this.setupGroup17, SWT.LEFT);
 							RowData setupLabel17bLData = new RowData();
-							setupLabel17bLData.width = 24;
+							setupLabel17bLData.width = 210;
 							setupLabel17bLData.height = 18;
 							this.setupLabel17b.setLayoutData(setupLabel17bLData);
 							this.setupLabel17b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.setupLabel17b.setText(Messages.getString(MessageIds.GDE_MSGT1876));
-						}
-						{
-							this.setupLabel17c = new CLabel(this.setupGroup17, SWT.NONE);
-							RowData setupLabel17cLData = new RowData();
-							setupLabel17cLData.width = 194;
-							setupLabel17cLData.height = 18;
-							this.setupLabel17c.setLayoutData(setupLabel17cLData);
-							this.setupLabel17c.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupLabel17c.setText(Messages.getString(MessageIds.GDE_MSGT1877));
 						}
 						this.setupGroup17.layout();
 						this.setupGroup17.setMenu(this.popupmenu);
@@ -1864,21 +1854,40 @@ public class VarioToolTabItem extends CTabItem {
 						this.setupGroup18.setText(Messages.getString(MessageIds.GDE_MSGT1878));
 						this.setupGroup18.setBounds(505, 687, 490, 71);
 						{
-							this.fillComposite = new Composite(this.setupGroup18, SWT.NONE);
-							GridLayout fillCompositeLayout = new GridLayout();
-							fillCompositeLayout.makeColumnsEqualWidth = true;
-							this.fillComposite.setLayout(fillCompositeLayout);
-							RowData fillCompositeLData = new RowData();
-							fillCompositeLData.width = 460;
-							fillCompositeLData.height = 12;
-							this.fillComposite.setLayoutData(fillCompositeLData);
+							new CLabel(this.setupGroup18, SWT.NONE).setSize(5, 18);
+						}
+						{
+							this.setupButton18 = new Button(this.setupGroup18, SWT.CHECK | SWT.LEFT);
+							this.setupButton18.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.setupButton18.setText(Messages.getString(MessageIds.GDE_MSGT1881));
+							RowData setupButton18LData = new RowData();
+							setupButton18LData.width = 470;
+							setupButton18LData.height = 18;
+							this.setupButton18.setLayoutData(setupButton18LData);
+							this.setupButton18.setSelection(this.setupValue18 == 0);
+							this.setupButton18.addSelectionListener(new SelectionAdapter() {
+								public void widgetSelected(SelectionEvent evt) {
+									VarioToolTabItem.log.log(Level.FINEST, "setupButton18.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (VarioToolTabItem.this.setupButton18.getSelection()) {
+										VarioToolTabItem.this.setupValue18 = 0;
+										VarioToolTabItem.this.setupText18.setText(GDE.STRING_EMPTY);
+										VarioToolTabItem.this.setupSlider18.setEnabled(false);
+									}
+									else {
+										VarioToolTabItem.this.setupValue18 = 20;
+										VarioToolTabItem.this.setupText18.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue18);
+										VarioToolTabItem.this.setupSlider18.setEnabled(true);
+										VarioToolTabItem.this.setupSlider18.setSelection(VarioToolTabItem.this.setupValue18);
+									}
+								}
+							});
 						}
 						{
 							new CLabel(this.setupGroup18, SWT.NONE).setSize(5, 18);
 						}
 						{
 							RowData setupSlider18LData = new RowData();
-							setupSlider18LData.width = 160;
+							setupSlider18LData.width = 140;
 							setupSlider18LData.height = 18;
 							this.setupSlider18 = new Slider(this.setupGroup18, SWT.BORDER);
 							this.setupSlider18.setLayoutData(setupSlider18LData);
@@ -1906,7 +1915,7 @@ public class VarioToolTabItem extends CTabItem {
 						{
 							this.setupLabel18a = new CLabel(this.setupGroup18, SWT.RIGHT);
 							RowData setupLabel18aLData = new RowData();
-							setupLabel18aLData.width = 60;
+							setupLabel18aLData.width = 55;
 							setupLabel18aLData.height = 18;
 							this.setupLabel18a.setLayoutData(setupLabel18aLData);
 							this.setupLabel18a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1915,7 +1924,7 @@ public class VarioToolTabItem extends CTabItem {
 						{
 							this.setupText18 = new Text(this.setupGroup18, SWT.CENTER | SWT.BORDER);
 							RowData setupText18LData = new RowData();
-							setupText18LData.width = 35;
+							setupText18LData.width = 25;
 							setupText18LData.height = 12;
 							this.setupText18.setLayoutData(setupText18LData);
 							this.setupText18.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1926,37 +1935,11 @@ public class VarioToolTabItem extends CTabItem {
 						{
 							this.setupLabel18b = new CLabel(this.setupGroup18, SWT.LEFT);
 							RowData setupLabel18bLData = new RowData();
-							setupLabel18bLData.width = 43;
+							setupLabel18bLData.width = 230;
 							setupLabel18bLData.height = 16;
 							this.setupLabel18b.setLayoutData(setupLabel18bLData);
 							this.setupLabel18b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.setupLabel18b.setText(Messages.getString(MessageIds.GDE_MSGT1880));
-						}
-						{
-							this.setupButton18 = new Button(this.setupGroup18, SWT.CHECK | SWT.LEFT);
-							this.setupButton18.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupButton18.setText(Messages.getString(MessageIds.GDE_MSGT1881));
-							RowData setupButton18LData = new RowData();
-							setupButton18LData.width = 144;
-							setupButton18LData.height = 20;
-							this.setupButton18.setLayoutData(setupButton18LData);
-							this.setupButton18.setSelection(this.setupValue18 == 0);
-							this.setupButton18.addSelectionListener(new SelectionAdapter() {
-								public void widgetSelected(SelectionEvent evt) {
-									VarioToolTabItem.log.log(Level.FINEST, "setupButton18.widgetSelected, event=" + evt); //$NON-NLS-1$
-									if (VarioToolTabItem.this.setupButton18.getSelection()) {
-										VarioToolTabItem.this.setupValue18 = 0;
-										VarioToolTabItem.this.setupText18.setText(GDE.STRING_EMPTY);
-										VarioToolTabItem.this.setupSlider18.setEnabled(false);
-									}
-									else {
-										VarioToolTabItem.this.setupValue18 = 20;
-										VarioToolTabItem.this.setupText18.setText(GDE.STRING_EMPTY + VarioToolTabItem.this.setupValue18);
-										VarioToolTabItem.this.setupSlider18.setEnabled(true);
-										VarioToolTabItem.this.setupSlider18.setSelection(VarioToolTabItem.this.setupValue18);
-									}
-								}
-							});
 						}
 						this.setupGroup18.layout();
 						this.setupGroup18.setMenu(this.popupmenu);
