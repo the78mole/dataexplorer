@@ -518,7 +518,6 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				record.setDisplayable(record.getOrdinal() <= 5 || hasReasonableData);
 				log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + (record.getOrdinal() <= 5 || hasReasonableData));
 		}
-		recordSet.isSyncableDisplayableRecords(true);
 		
 		if (log.isLoggable(Level.FINE)) {
 			for (String recordKey : recordKeys) {
