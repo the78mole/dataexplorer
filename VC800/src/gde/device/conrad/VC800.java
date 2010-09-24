@@ -136,7 +136,6 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 */
 	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {		
-		int offset = 0;
 		int lovDataSize = this.getLovDataByteSize();
 		int deviceDataBufferSize = 8;
 		byte[] convertBuffer = new byte[deviceDataBufferSize];
@@ -146,7 +145,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
 		for (int i = 0; i < recordDataSize; i++) { 
-			System.arraycopy(dataBuffer, offset + i*lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+			System.arraycopy(dataBuffer, i*lovDataSize, convertBuffer, 0, deviceDataBufferSize);
 			recordSet.addPoints(convertDataBytes(points, convertBuffer));
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
