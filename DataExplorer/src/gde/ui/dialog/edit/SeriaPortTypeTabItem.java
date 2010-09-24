@@ -353,7 +353,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 									SeriaPortTypeTabItem.this.WTOCharDelayTime = 0;
 									SeriaPortTypeTabItem.this.WTOExtraDelayTime = 0;
 								}
-								SeriaPortTypeTabItem.this.timeOutComposite.redraw();
+								SeriaPortTypeTabItem.this.enableTimeout();
 							}
 						});
 					}
@@ -584,6 +584,10 @@ public class SeriaPortTypeTabItem extends CTabItem {
 		SeriaPortTypeTabItem.this._WTOExtraDelayTimeText.setText(GDE.STRING_EMPTY + SeriaPortTypeTabItem.this.WTOExtraDelayTime);
 
 		SeriaPortTypeTabItem.this.timeOutButton.setSelection(SeriaPortTypeTabItem.this.useTimeOut);
+		enableTimeout();
+	}
+
+	private void enableTimeout() {
 		if (SeriaPortTypeTabItem.this.timeOutButton.getSelection()) {
 			SeriaPortTypeTabItem.this._RTOCharDelayTimeLabel.setEnabled(true);
 			SeriaPortTypeTabItem.this._RTOCharDelayTimeText.setEnabled(true);

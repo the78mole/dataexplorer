@@ -268,7 +268,7 @@ public class SettingsDialog extends Dialog {
 								this.defaultDataPathAdjustButton = new Button(this.defaultDataPathGroup, SWT.PUSH | SWT.CENTER);
 								this.defaultDataPathAdjustButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.defaultDataPathAdjustButton.setText(". . . "); //$NON-NLS-1$
-								this.defaultDataPathAdjustButton.setBounds(405, GDE.IS_MAC_COCOA ? 14 : 24, 30, 20);
+								this.defaultDataPathAdjustButton.setBounds(405, GDE.IS_MAC_COCOA ? 14 : 24, GDE.IS_MAC ? 50 : 30, 20);
 								this.defaultDataPathAdjustButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {

@@ -411,7 +411,7 @@ public class DevicePropertiesEditor extends Composite {
 				this.deviceFileNameSelectionButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0484));
 				//this.deviceFileNameSelectionButton.setBounds(580, 10, 30, 20);
 				fd = new FormData();
-				fd.width = 30;
+				fd.width = GDE.IS_MAC ? 40 : 30;
 				fd.height = 22;
 				fd.top = new FormAttachment(0, 1000, 12);
 				fd.right = new FormAttachment(1000, 1000, -25);
@@ -1870,5 +1870,12 @@ public class DevicePropertiesEditor extends Composite {
 		DevicePropertiesEditor.this.preferredFileExtensionText.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled && DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
 		DevicePropertiesEditor.this.preferredFileExtensionText.setText(DevicePropertiesEditor.this.dataBlockOptionalFileExtention == null ? GDE.STRING_EMPTY
 				: DevicePropertiesEditor.this.dataBlockOptionalFileExtention);
-}
+	}
+
+	/**
+	 * @return the getMeasurementNames from the first channel/configuration
+	 */
+	public String[] getMeasurementNames() {
+		return this.deviceConfig != null ? this.deviceConfig.getMeasurementNames(1): new String[0];
+	}
 }

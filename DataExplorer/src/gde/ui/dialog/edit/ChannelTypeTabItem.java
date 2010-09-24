@@ -356,4 +356,11 @@ public class ChannelTypeTabItem extends CTabItem {
 			ChannelTypeTabItem.this.channelConfigText.setText(ChannelTypeTabItem.this.channelConfigName);
 		}
 	}
+
+	/**
+	 * @return the measurementsTabFolder
+	 */
+	public CTabFolder getMeasurementsTabFolder() {
+		return measurementsTabFolder;
+	}
 }
