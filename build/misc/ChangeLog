@@ -4,6 +4,7 @@ fix handing of file dialog while cancel operation
 update to DeviceProperties XSD V11
 update scale synchronization > 1  measurement type
 fix error setup 18 DataVarioTool/LinkVarioTool
+update data table preparation, value digits depends on measurement
 
 Version 2.41 - 05 Sep 2010
 
