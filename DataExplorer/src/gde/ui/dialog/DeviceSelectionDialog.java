@@ -131,7 +131,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 	TreeMap<String, DeviceConfiguration>	deviceConfigurations;
 	Vector<String>												activeDevices;
-	final DataExplorer					application;
+	final DataExplorer										application;
 	final Settings												settings;
 	String																activeDeviceName;
 	DeviceConfiguration										selectedActiveDeviceConfig;
@@ -190,7 +190,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						this.selectedActiveDeviceConfig = devConfig;
 					}
 					// add the active once into the active device vector
-					if (devConfig.isUsed()) this.activeDevices.add(devConfig.getName());
+					if (devConfig.isUsed() && !this.activeDevices.contains(devConfig.getName())) this.activeDevices.add(devConfig.getName());
 
 					// store all device configurations in a map					
 					String keyString;
@@ -865,7 +865,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			//get sorted devices list and activeDevices array in sync
 			this.activeDevices.removeAllElements();
 			for (String device : list) {
-				this.activeDevices.add(device);
+				if (!this.activeDevices.contains(device)) this.activeDevices.add(device);
 			}
 			if (list.length > 0) {
 				this.activeDeviceName = (this.selectedActiveDeviceConfig == null) ? this.activeDevices.firstElement() : this.selectedActiveDeviceConfig.getName();
@@ -1029,7 +1029,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	public void setupDevice(String newDeviceName) throws NotSupportedException {
 		int selection = this.activeDevices.indexOf(newDeviceName);
 		if (selection != -1 || getDevices().keySet().contains(newDeviceName)) {
-			this.activeDevices.add(newDeviceName);
+			if (!this.activeDevices.contains(newDeviceName)) 
+				this.activeDevices.add(newDeviceName);
 			DeviceConfiguration tmpDeviceConfig = this.getDevices().get(newDeviceName);
 			tmpDeviceConfig.setUsed(true);
 			setActiveConfig(tmpDeviceConfig);
