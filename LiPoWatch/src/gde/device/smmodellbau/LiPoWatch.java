@@ -283,23 +283,26 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	public int[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
-		int[] dataTableRow = new int[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
+	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
+		String[] dataTableRow = new String[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
 			String[] recordNames = recordSet.getRecordNames();	// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 			int numberRecords = recordNames.length;			
 
-			dataTableRow[0] = (int)recordSet.getTime_ms(rowIndex);
+			dataTableRow[0] = String.format("%.2f", (recordSet.getTime_ms(rowIndex) / 1000.0));
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				switch (j) {
 				case 3: //3=temperature analog outlet
 					double offset = record.getOffset(); // != 0 if curve has an defined offset
 					double factor = record.getFactor(); // != 1 if a unit translation is required
-					dataTableRow[j + 1] = Double.valueOf(((offset + record.get(rowIndex) / 1000.0) * factor) * 1000.0).intValue();
+					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + record.get(rowIndex) / 1000.0) * factor);
 					break;
 				default:
-					dataTableRow[j + 1] = record.get(rowIndex);
+					if(j > 3 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
+						dataTableRow[j + 1] = String.format("%.3f", (record.get(rowIndex) / 1000.0));
+					else
+						dataTableRow[j + 1] = record.getDecimalFormat().format(record.get(rowIndex) / 1000.0);
 					break;
 				}
 			}
