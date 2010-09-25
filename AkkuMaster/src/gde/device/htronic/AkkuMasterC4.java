@@ -238,16 +238,16 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	public int[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
-		int[] dataTableRow = new int[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
+	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
+		String[] dataTableRow = new String[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
 			String[] recordNames = recordSet.getRecordNames();  // 0=Spannung, 1=Höhe, 2=Steigung
 			int numberRecords = recordNames.length;			
 
-			dataTableRow[0] = (int)recordSet.getTime_ms(rowIndex);
+			dataTableRow[0] = String.format("%.1f", (recordSet.getTime_ms(rowIndex) / 1000.0));
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
-				dataTableRow[j+1] = record.get(rowIndex);
+				dataTableRow[j + 1] = record.getDecimalFormat().format(record.get(rowIndex) / 1000.0);
 			}
 		}
 		catch (RuntimeException e) {
