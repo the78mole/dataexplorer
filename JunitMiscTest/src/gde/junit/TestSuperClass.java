@@ -251,23 +251,6 @@ public class TestSuperClass extends TestCase {
 					numberCurvesRight++;
 			}
 		}
-		//correct scales and scale position according synced scales requirements
-		if (recordSet.isSyncableSynced()) {
-			for (String recordKey : recordSet.getSyncableRecords()) {
-				Record tmpRecord = recordSet.getRecord(recordKey);
-				if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
-					//System.out.println("==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					if (tmpRecord.isPositionLeft())
-						numberCurvesLeft--;
-					else
-						numberCurvesRight--;
-				}
-			}
-			if (recordSet.get(recordSet.getSyncableName()).isPositionLeft())
-				numberCurvesLeft++;
-			else
-				numberCurvesRight++;
-		}
 		//correct scales and scale position according compare set requirements
 		if (recordSet.isCompareSet()) {
 			numberCurvesLeft = 1; //numberCurvesLeft > 0 ? 1 : 0;
@@ -348,19 +331,12 @@ public class TestSuperClass extends TestCase {
 			}
 		}
 
-		//draw the scale for all synchronized records
-		if (recordSet.isSyncableSynced()) {
-			CurveUtils.drawScale(recordSet.get(recordSet.getSyncableName()), gc, x0, y0, width, height, dataScaleWidth);
-			recordSet.updateSyncedScaleValues();
-		}
-		
 		// draw each record using sorted record set names
-		//long startTime = new Date().getTime();
+		recordSet.updateSyncRecordScale();
 		for (String record : recordNames) {
 			Record actualRecord = recordSet.getRecord(record);
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable() && actualRecord.realSize() > 0;
-			//System.out.println("drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			if (isActualRecordEnabled && !actualRecord.isScaleSynced()) 
+			if (actualRecord.isScaleVisible()) 
 				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
 
 			if (isCurveGridEnabled && record.equals(curveGridRecordName)) // check for activated horizontal grid
@@ -383,8 +359,7 @@ public class TestSuperClass extends TestCase {
 			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_RED));
 			gc.drawText(strStartTime, 10, yPosition - point.y / 2);
 		}
-		//System.out.println("draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));		
-		}
+	}
 
 	/**
 	 * draw vertical (time) grid lines according the vector defined during drawing of time scale
