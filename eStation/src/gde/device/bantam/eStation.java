@@ -417,44 +417,23 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	public int[] prepareDataTableRow(RecordSet recordSet, int[][] dataTable, int rowIndex) {
-		try {
-			String[] recordNames = recordSet.getRecordNames();				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
-			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
-			int numberRecords = recordNames.length;			
-
-			for (int j = 0; j < numberRecords; j++) {
-				Record record = recordSet.get(recordNames[j]);
-				double reduction = record.getReduction();
-				double factor = record.getFactor(); // != 1 if a unit translation is required
-				dataTable[rowIndex][j+1] = Double.valueOf(((record.get(rowIndex)/1000.0) - reduction) * factor * 1000.0).intValue();				
-			}
-			dataTable[rowIndex][0] = (int)recordSet.getTime_ms(rowIndex);
-		}
-		catch (RuntimeException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-		}
-		return dataTable[rowIndex];		
-	}
-
-	/**
-	 * function to prepare a data table row of record set while translating available measurement values
-	 * @return pointer to filled data table row with formated values
-	 */
-	public int[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
-		int[] dataTableRow = new int[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
+	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
+		String[] dataTableRow = new String[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
 			String[] recordNames = recordSet.getRecordNames();				
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
 			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
 			int numberRecords = recordNames.length;			
-			dataTableRow[0] = (int)recordSet.getTime_ms(rowIndex); // time msec
-
+			
+			dataTableRow[0] = String.format("%.3f", (recordSet.getTime_ms(rowIndex) / 1000.0));
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				dataTableRow[j+1] = Double.valueOf(((record.get(rowIndex)/1000.0) - reduction) * factor * 1000.0).intValue();				
+				if(j > 5 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
+					dataTableRow[j + 1] = String.format("%.3f", (((record.get(rowIndex) / 1000.0) - reduction) * factor));
+				else
+					dataTableRow[j + 1] = record.getDecimalFormat().format((((record.get(rowIndex) / 1000.0) - reduction) * factor));
 			}
 		}
 		catch (RuntimeException e) {
