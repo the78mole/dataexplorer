@@ -386,27 +386,28 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	public int[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
-		int[] dataTableRow = new int[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
+	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
+		String[] dataTableRow = new String[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
 			String[] recordNames = recordSet.getRecordNames();
 			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
 			int numberRecords = recordNames.length;			
 
-			dataTableRow[0] = (int)recordSet.getTime_ms(rowIndex);
+			dataTableRow[0] = String.format("%.1f", (recordSet.getTime_ms(rowIndex) / 1000.0));
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				if (j != 7 && j != 8) {
-					dataTableRow[j + 1] = Double.valueOf((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor) * 1000.0).intValue();
+					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
 				}
 				else {
-					double value = record.get(rowIndex) / 1000;
-					int grad = ((int) (value / 1000));
-					double minuten = (value - (((int) (value / 1000)) * 1000)) / 10;
-					dataTableRow[j + 1] = Double.valueOf((grad + minuten / 60) * 1000.0).intValue();
+					dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
+//					double value = record.get(rowIndex) / 1000;
+//					int grad = ((int) (value / 1000));
+//					double minuten = (value - (((int) (value / 1000)) * 1000)) / 10;
+//					dataTableRow[j + 1] = Double.valueOf((grad + minuten / 60) * 1000.0).intValue();
 				}
 			}
 		}
