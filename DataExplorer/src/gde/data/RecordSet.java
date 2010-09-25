@@ -56,7 +56,6 @@ public class RecordSet extends HashMap<String, Record> {
 	final static String						$CLASS_NAME 									= RecordSet.class.getName();
 	final static long							serialVersionUID							= 26031957;
 	final static Logger						log														= Logger.getLogger(RecordSet.class.getName());
-	final DecimalFormat						df														= new DecimalFormat("0.000");										//$NON-NLS-1$
 
 	TimeSteps											timeStep_ms;
 
@@ -487,17 +486,12 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * get all calculated and formated data table points of a given index, decimal format is "0.000"
+	 * get all calculated and formated data table points of a given index
 	 * @param index of the data points
 	 * @return formatted values as string array including time
 	 */
 	public String[] getDataTableRow(int index) {
-		int[] tmpValues = this.device.prepareDataTableRow(this, index);
-		String[] strValues = new String[tmpValues.length];
-		for (int i = 0; i < strValues.length; i++) {
-			strValues[i] = this.df.format(tmpValues[i] / 1000.0);
-		}
-		return strValues;
+		return this.device.prepareDataTableRow(this, index);
 	}
 
 	/**
@@ -1660,76 +1654,6 @@ public class RecordSet extends HashMap<String, Record> {
 	public int getChangeCounter() {
 		return this.changeCounter;
 	}
-
-//	/**
-//	 * find syncable record names, checking for 
-//	 * <ol>
-//	 * <li>equal first word in record names "CellVoltage" of CellVoltage 1"
-//	 * <li>equal measurement units (from device properties)
-//	 * </ol>
-//	 * do not care about symbols
-//	 */
-//	void check4SyncableRecords() {
-//		this.potentialSyncableRecords = new HashMap<String, Vector<Record>>();
-//
-//		for (int i = 0; i < (this.syncableRecords.size() > 0 ? this.recordNames.length-1 : this.recordNames.length); i++) {
-//			if (this.recordNames.length > 1 
-//					&& i > 0 
-//					&& !this.recordNames[i].contains("..") //$NON-NLS-1$ CellVoltage 1..2
-//					&& this.recordNames[i - 1].split(" ")[0].equals(this.recordNames[i].split(" ")[0]) //$NON-NLS-1$ //$NON-NLS-2$
-//					&& this.device.getMeasurement(this.parent.number, i - 1).getUnit().equals(this.device.getMeasurement(this.parent.number, i).getUnit())) {
-//				if (this.potentialSyncableRecords.isEmpty()) {
-//					this.potentialSyncableRecords.add(this.recordNames[i - 1]);
-//				}
-//				this.potentialSyncableRecords.add(this.recordNames[i]);
-//			}
-//		}
-//
-//		log.log(Level.FINER, this.potentialSyncableRecords.toString());
-//	}
-
-//	/**
-//	 * find syncable and displayable record names and place the record names in a vector 
-//	 * @param forceRenew - true will recreate syncableRecordsVector
-//	 */
-//	public boolean isSyncableDisplayableRecords(boolean forceRenew) {
-//		if (forceRenew || !this.isSyncableChecked) {
-//			String oldSyncName = this.getSyncableName();
-//			if (this.containsKey(oldSyncName)) {
-//				this.removeRecordName(oldSyncName);
-//				this.remove(oldSyncName);
-//			}
-//			this.syncableRecords = new Vector<String>();
-//			for (String syncableRecordKey : this.potentialSyncableRecords) {
-//				Record record = this.get(syncableRecordKey);
-//				if (record != null && record.isDisplayable && record.size() > 2) this.syncableRecords.add(syncableRecordKey);
-//			}
-//
-//			if (!this.syncableRecords.isEmpty()) {
-//				//create a new record with syncableName to hold the data for drawing the scale
-//				String syncRecName = this.getSyncableName();
-//				String symbol = this.get(this.syncableRecords.firstElement()).getSymbol() + ".." + this.syncableRecords.lastElement().split(" ")[1]; //$NON-NLS-1$ //$NON-NLS-2$
-//				String unit = this.get(this.syncableRecords.firstElement()).getUnit();
-//				List<PropertyType> properties = new ArrayList<PropertyType>(this.device.getProperties(this.parent.number, this.get(this.syncableRecords.firstElement()).ordinal));
-//				DeviceConfiguration.addProperty(properties, IDevice.OFFSET, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getOffset());
-//				DeviceConfiguration.addProperty(properties, IDevice.FACTOR, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getFactor());
-//				DeviceConfiguration.addProperty(properties, IDevice.REDUCTION, DataTypes.DOUBLE, this.get(this.syncableRecords.firstElement()).getReduction());
-//				Record tmpRecord = new Record(this.device, this.realSize(), syncRecName, symbol, unit, false, new StatisticsType(), properties, 0);
-//				tmpRecord.isSyncPlaceholder = true;
-//				tmpRecord.isPositionLeft = this.get(this.syncableRecords.firstElement()).isPositionLeft; // use fist sync record for scale position
-//				tmpRecord.isVisible = this.isSyncRecordSelected;
-//				tmpRecord.df = new DecimalFormat("0.00"); //$NON-NLS-1$
-//				this.put(syncRecName, tmpRecord);
-//				this.addRecordName(syncRecName);
-//				this.setSyncRequested(this.isSyncRecordSelected, false);
-//
-//				this.isSyncableChecked = true;
-//				log.log(Level.FINER, "syncableRecords = " + this.syncableRecords.toString()); //$NON-NLS-1$
-//			}
-//		}
-//
-//		return !this.syncableRecords.isEmpty();
-//	}
 
 	/**
 	 * @return the Vector containing the slave records sync by the master name

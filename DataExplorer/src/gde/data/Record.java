@@ -1148,8 +1148,10 @@ public class Record extends Vector<Integer> {
 	 */
 	public int[] findBoundingIndexes(double time_ms) {
 		int[] indexs = this.timeStep_ms == null ? this.parent.timeStep_ms.findBoundingIndexes(time_ms) : this.timeStep_ms.findBoundingIndexes(time_ms);
-		indexs[0] = indexs[0] > this.elementCount-1 ? this.elementCount-1 : indexs[0];
-		indexs[1] = indexs[1] > this.elementCount-1 ? this.elementCount-1 : indexs[1];
+		if (this.elementCount > 0) {
+			indexs[0] = indexs[0] > this.elementCount - 1 ? this.elementCount - 1 : indexs[0];
+			indexs[1] = indexs[1] > this.elementCount - 1 ? this.elementCount - 1 : indexs[1];
+		}
 		return indexs;
 	}
 

@@ -399,25 +399,23 @@ public class CSVReaderWriter {
 			if (application.getStatusBar() != null) application.setProgress(progressCycle, sThreadId);
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
+				String[] row = recordSet.getDataTableRow(i);
+
 				// add time entry
-				sb.append((df3.format((recordSet.getTime_ms(i) / 1000.0))).replace('.', decimalSeparator)).append(separator).append(' ');
+				sb.append(row[0].replace('.', decimalSeparator)).append(separator).append(GDE.STRING_BLANK);
 				// add data entries
 				for (int j = 0; j < recordNames.length; j++) {
-					Record record = recordSet.getRecord(recordNames[j]);
-					if (record == null)
-						throw new Exception(Messages.getString(MessageIds.GDE_MSGE0005, new Object[]{recordNames[j], recordSet.getChannelConfigName()}));
-
 					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), j);
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation())
-							if (record.getParent().isRaw())
-								sb.append(df3.format((record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
+							if (recordSet.isRaw())
+								sb.append(row[j + 1].replace('.', decimalSeparator)).append(separator);
 							else
-								sb.append(df3.format(device.reverseTranslateValue(record, record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
+								sb.append(row[j + 1].replace('.', decimalSeparator)).append(separator);
 					}
 					else
 						// translate according device and measurement unit
-						sb.append(df3.format(device.translateValue(record, record.get(i)/1000.0)).replace('.', decimalSeparator)).append(separator);
+						sb.append(row[j + 1].replace('.', decimalSeparator)).append(separator);
 				}
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
 				writer.write(sb.toString());

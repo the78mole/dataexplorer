@@ -173,7 +173,7 @@ public class TimeSteps extends Vector<Integer> {
 	public int[] findBoundingIndexes(double time_ms) {
 		//log.log(Level.INFO, "time_ms = " + time_ms);
 		int index1 = 0, index2 = 0;
-		if (time_ms > 0) {
+		if (time_ms > 0 && elementCount > 0) {
 			if (isConstant) {
 				double position = time_ms / (this.get(0) / 10.0);
 				index1 = (int) position;
