@@ -195,13 +195,18 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		//do not forget to make record displayable -> record.setDisplayable(true);
 		
 		//for the moment there are no calculations necessary
-		//String[] recordNames = recordSet.getRecordNames();
-		//for (int i=0; i<recordNames.length; ++i) {
-		//	MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), i);
-		//	if (measurement.isCalculation()) {
-		//		log.log(Level.FINE, "do calculation for " + recordNames[i]); //$NON-NLS-1$
-		//	}
-		//}
+//		Record velocity = recordSet.get(5);
+//		Record height = recordSet.get(1);
+//		Record gpsVelocity = recordSet.get(10);
+//		
+//		velocity.clear();
+//		velocity.add(gpsVelocity.get(0));
+//		for (int i=1; i<recordSet.get(1).realSize(); ++i) {
+//			double deltaTimeSec = (recordSet.getTime_ms(i) - recordSet.getTime_ms(i-1)) / 1000.0;
+//			deltaTimeSec = deltaTimeSec > 0 ? deltaTimeSec : 1;
+//			double deltaHeightVelocity = ((height.get(i)/10000.0)-(height.get(i-1)/10000.0)) / deltaTimeSec * 3.6;
+//			velocity.add(Double.valueOf(Math.sqrt(Math.pow((gpsVelocity.get(i)/1000.0), 2) + Math.pow(deltaHeightVelocity, 2)) * 1000).intValue());
+//		}
 	}
 
 	/**
