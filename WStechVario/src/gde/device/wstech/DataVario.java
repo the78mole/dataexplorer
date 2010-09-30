@@ -207,6 +207,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 //			double deltaHeightVelocity = ((height.get(i)/10000.0)-(height.get(i-1)/10000.0)) / deltaTimeSec * 3.6;
 //			velocity.add(Double.valueOf(Math.sqrt(Math.pow((gpsVelocity.get(i)/1000.0), 2) + Math.pow(deltaHeightVelocity, 2)) * 1000).intValue());
 //		}
+		this.application.updateStatisticsData();
 	}
 
 	/**
@@ -408,11 +409,11 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
 				}
 				else {
-					dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
-//					double value = record.get(rowIndex) / 1000;
-//					int grad = ((int) (value / 1000));
-//					double minuten = (value - (((int) (value / 1000)) * 1000)) / 10;
-//					dataTableRow[j + 1] = Double.valueOf((grad + minuten / 60) * 1000.0).intValue();
+					//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
+					double value = (record.get(rowIndex) / 1000000.0);
+					int grad = (int)value;
+					double minuten = (value - grad) * 100;
+					dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60));
 				}
 			}
 		}
@@ -520,7 +521,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * specific curve calculated from point combinations or other specific dialog
 	 * As default the function should return null which stands for no device custom tab item.  
 	 */
-	public CTabItem getCustomTabItem() {
+	public CTabItem getUtilityDeviceTabItem() {
 		return new VarioToolTabItem(this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount(), this, true);
 	}
 	

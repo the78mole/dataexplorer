@@ -319,9 +319,11 @@
 		</Measurement>
 	</Channel>
 	<Desktop>
-		<property type="Boolean" value="true" name="table_tab"/>
-		<property type="Boolean" value="true" name="digital_tab"/>
-		<property type="Boolean" value="true" name="analog_tab"/>
-		<property type="Boolean" value="false" name="voltage_per_cell_tab"/>
+		<property value="true" name="table_tab"/>
+		<property value="true" name="digital_tab"/>
+		<property value="true" name="analog_tab"/>
+		<property value="false" name="voltage_per_cell_tab"/>
+        <property value="true" name="utility_device_tab"/>
+        <property value="false" name="utility_garphics_tab"/>
 	</Desktop>
 </DeviceProperties>

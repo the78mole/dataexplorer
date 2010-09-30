@@ -86,7 +86,7 @@ public class LinkVario extends DataVario {
 	 * specific curve calculated from point combinations or other specific dialog
 	 * As default the function should return null which stands for no device custom tab item.  
 	 */
-	public CTabItem getCustomTabItem() {
+	public CTabItem getUtilityDeviceTabItem() {
 		return new VarioToolTabItem(this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount(), this, false);
 	}
 	
