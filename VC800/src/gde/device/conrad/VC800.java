@@ -468,7 +468,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * specific curve calculated from point combinations or other specific dialog
 	 * As default the function should return null which stands for no device custom tab item.  
 	 */
-	public CTabItem getCustomTabItem() {
+	public CTabItem getUtilityDeviceTabItem() {
 		return null;
 	}
 }
