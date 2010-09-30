@@ -12,7 +12,7 @@
         <port>-</port>
         <baudeRate>57600</baudeRate>
         <dataBits>DATABITS_8</dataBits>
-        <stopBits>STOPBITS_1</stopBits>
+        <stopBits>STOPBITS_2</stopBits>
         <parity>PARITY_NONE</parity>
         <flowControlMode>FLOWCONTROL_HARDWARE</flowControlMode>
         <isRTS>false</isRTS>
@@ -114,7 +114,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property description="Factor to measurement value" type="Double" value="2.0" name="factor"/>
+            <property description="Factor to measurement value 12V == 609" type="Double" value="0.0197" name="factor"/>
         </Measurement>
         <Measurement>
             <name>Motor-VR/V</name>

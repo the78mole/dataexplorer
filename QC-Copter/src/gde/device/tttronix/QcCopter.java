@@ -352,8 +352,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 				++j;
 				points[j] = ((DBx_2 & 0x0007) << 13) | ((DBx_3 & 0x001F) << 8);
 			}
-			if (i != 10) points[j] *= 1000;
-			else points[j] *= 10;
+			points[j] *= 1000;
 		}
 
 		log.log(Level.FINER, "CheckSum = " + (Checksum.ADD(dataBuffer, 1, 57)) + " = " + ( (((dataBuffer[58]&0xFF) - 94) << 6) | (((dataBuffer[59]&0xFF) - 94) & 0x3F) ) );
