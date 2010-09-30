@@ -482,7 +482,7 @@ public class CellVoltageWindow extends CTabItem {
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
-			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested() && this.coverComposite.isVisible()) {
+			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested()) {
 				int cellCount = this.voltageAvg = 0;
 				int cellVoltageReferenceMasterOrdinal = recordSet.getDevice().getDesktopTargetReferenceOrdinal(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB);
 				if (cellVoltageReferenceMasterOrdinal >= 0 && recordSet.getScaleSyncedRecords(cellVoltageReferenceMasterOrdinal) != null) {

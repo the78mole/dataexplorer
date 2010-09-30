@@ -68,9 +68,8 @@ public class PropertyTypeTabItem extends CTabItem {
 	Label													typeLabel;
 	Label													valueLabel;
 	Label													descriptionLabel;
-	Label													attributeLabel;
 	Text													nameText, valueText, descriptionText;
-	CCombo												typeCombo, valueCombo, nameCombo, attributeCombo;
+	CCombo												typeCombo, valueCombo, nameCombo;
 	KeyAdapter										valueKeyListener;
 	VerifyListener								valueVerifyListener;
 
@@ -272,14 +271,6 @@ public class PropertyTypeTabItem extends CTabItem {
 				this.descriptionLabel.setBounds(5, 92, 80, 20);
 			}
 			{
-				if (this.tabName.equals(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.value())) {
-					this.attributeLabel = new Label(this.propertyTypeComposite, SWT.RIGHT);
-					this.attributeLabel.setText(Messages.getString(MessageIds.GDE_MSGT0598));
-					this.attributeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.attributeLabel.setBounds(5, 135, 80, 40);
-				}
-			}
-			{
 				this.nameText = new Text(this.propertyTypeComposite, SWT.BORDER);
 				this.nameText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.nameText.setBounds(90, 10, 200, 20);
@@ -407,7 +398,7 @@ public class PropertyTypeTabItem extends CTabItem {
 			{
 				this.descriptionText = new Text(this.propertyTypeComposite, SWT.LEFT | SWT.WRAP | SWT.BORDER);
 				this.descriptionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.descriptionText.setBounds(90, 92, 200, 45);
+				this.descriptionText.setBounds(90, 92, 200, 55);
 				this.descriptionText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
@@ -419,28 +410,6 @@ public class PropertyTypeTabItem extends CTabItem {
 						}
 					}
 				});
-			}
-			{
-				if (this.tabName.equals(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.value())) {
-					this.attributeCombo = new CCombo(this.propertyTypeComposite, SWT.BORDER);
-					this.attributeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.attributeCombo.setBounds(90, 145, 120, 20);
-					this.attributeCombo.setEditable(false);
-					this.attributeCombo.setBackground(DataExplorer.COLOR_WHITE);
-					this.attributeCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "attributeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (PropertyTypeTabItem.this.deviceConfig != null) {
-								PropertyTypeTabItem.this.propertyType.setTargetReferenceOrdinal(PropertyTypeTabItem.this.attributeCombo.getSelectionIndex());
-							}
-							if (PropertyTypeTabItem.this.deviceConfig != null) {
-								PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
-								PropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
-							}
-						}
-					});
-				}
 			}
 			this.propertyTypeComposite.layout();
 			initialize();
@@ -487,12 +456,6 @@ public class PropertyTypeTabItem extends CTabItem {
 				this.typeCombo.select(0);
 			}
 			this.descriptionText.setText(this.propertyType.getDescription());
-			
-			if (this.tabName.equals(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.value()) && this.attributeCombo != null) {
-					this.attributeCombo.setItems(DevicePropertiesEditor.getInstance().getMeasurementNames());
-					if (this.propertyType.getTargetReferenceOrdinal() != null && this.propertyType.getTargetReferenceOrdinal() <= this.attributeCombo.getItems().length )
-						this.attributeCombo.select(this.propertyType.getTargetReferenceOrdinal());
-			}
 		}
 		else {
 			this.nameText.setText(GDE.STRING_EMPTY);

@@ -572,12 +572,12 @@ public class DeviceConfiguration {
 	 * @param dektopType
 	 * @return property of the queried type or null if not defined
 	 */
-	public PropertyType getDesktopProperty(DesktopPropertyTypes dektopType) {
-		PropertyType property = null;
+	public DesktopPropertyType getDesktopProperty(DesktopPropertyTypes dektopType) {
+		DesktopPropertyType property = null;
 		if (this.desktop != null) {
-			List<PropertyType> properties = this.desktop.getProperty();
-			for (PropertyType propertyType : properties) {
-				if (propertyType.getName().equals(dektopType.value())) {
+			List<DesktopPropertyType> properties = this.desktop.getProperty();
+			for (DesktopPropertyType propertyType : properties) {
+				if (propertyType.getName().equals(dektopType)) {
 					property = propertyType;
 					break;
 				}
@@ -886,8 +886,8 @@ public class DeviceConfiguration {
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isTableTabRequested() {
-		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB);
-		return Boolean.valueOf(property != null ? property.getValue() : null); 
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB);
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
 	}
 	
 	/**
@@ -895,12 +895,12 @@ public class DeviceConfiguration {
 	 * @param enable
 	 */
 	public void setTableTabRequested(boolean enable) {
-		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB);
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB);
 		if (property == null) {
-			createDesktopProperty(DesktopPropertyTypes.TABLE_TAB.name(), DataTypes.BOOLEAN, enable);
+			createDesktopProperty(DesktopPropertyTypes.TABLE_TAB.name(), enable);
 		}
 		else {
-			property.setValue(GDE.STRING_EMPTY + enable);
+			property.setValue(enable);
 		}
 		this.isChangePropery = true;
 	}
@@ -910,8 +910,8 @@ public class DeviceConfiguration {
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isDigitalTabRequested() {
-		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB);
-		return Boolean.valueOf(property != null ? property.getValue() : null); 
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB);
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
 	}
 	
 	/**
@@ -919,12 +919,12 @@ public class DeviceConfiguration {
 	 * @param enable
 	 */
 	public void setDigitalTabRequested(boolean enable) {
-		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB);
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB);
 		if (property == null) {
-			createDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB.name(), DataTypes.BOOLEAN, enable);
+			createDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB.name(), enable);
 		}
 		else {
-			property.setValue(GDE.STRING_EMPTY + enable);
+			property.setValue(enable);
 		}
 		this.isChangePropery = true;
 	}
@@ -934,8 +934,8 @@ public class DeviceConfiguration {
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isAnalogTabRequested() {
-		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB);
-		return Boolean.valueOf(property != null ? property.getValue() : null); 
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB);
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
 	}
 	
 	/**
@@ -943,12 +943,12 @@ public class DeviceConfiguration {
 	 * @param enable
 	 */
 	public void setAnalogTabRequested(boolean enable) {
-		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB);
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB);
 		if (property == null) {
-			createDesktopProperty(DesktopPropertyTypes.ANALOG_TAB.name(), DataTypes.BOOLEAN, enable);
+			createDesktopProperty(DesktopPropertyTypes.ANALOG_TAB.name(), enable);
 		}
 		else {
-			property.setValue(GDE.STRING_EMPTY + enable);
+			property.setValue(enable);
 		}
 		this.isChangePropery = true;
 	}
@@ -958,23 +958,42 @@ public class DeviceConfiguration {
 	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
 	 */
 	public boolean isVoltagePerCellTabRequested() {
-		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB);
-		return Boolean.valueOf(property != null ? property.getValue() : null); 
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB);
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
 	}
 	
 	/**
 	 * set the DesktopType.TYPE_VOLTAGE_PER_CELL_TAB property to the given value
 	 * @param enable
 	 */
+	@Deprecated
 	public void setVoltagePerCellTabRequested(boolean enable) {
-		PropertyType property = this.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB);
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB);
 		if (property == null) {
-			createDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.name(), DataTypes.BOOLEAN, enable);
+			createDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.name(), enable);
 		}
 		else {
-			property.setValue(GDE.STRING_EMPTY + enable);
+			property.setValue(enable);
 		}
 		this.isChangePropery = true;
+	}
+	
+	/**
+	 * query if the utility graphics tabulator should be displayed and updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isUtilityGraphicsTabRequested() {
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.UTILITY_GRAPHICS_TAB);
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
+	}
+	
+	/**
+	 * query if the utility device tabulator should be displayed and updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isUtilityDeviceTabRequested() {
+		DesktopPropertyType property = this.getDesktopProperty(DesktopPropertyTypes.UTILITY_DEVICE_TAB);
+		return Boolean.valueOf(property != null ? property.isValue() : Boolean.FALSE); 
 	}
 	
 	/**
@@ -982,7 +1001,7 @@ public class DeviceConfiguration {
 	 * @return the target measurement reference ordinal, -1 if reference ordinal not set
 	 */
 	public int getDesktopTargetReferenceOrdinal(DesktopPropertyTypes desktopPropertyType) {
-		PropertyType property = this.getDesktopProperty(desktopPropertyType);
+		DesktopPropertyType property = this.getDesktopProperty(desktopPropertyType);
 		return property != null ? property.getTargetReferenceOrdinal() : -1; 
 	}
 	
@@ -1815,12 +1834,11 @@ public class DeviceConfiguration {
 	 * @param type
 	 * @param value
 	 */
-	private void createDesktopProperty(String propertyKey, DataTypes type, Object value) {
+	private void createDesktopProperty(String propertyKey, Boolean value) {
 		ObjectFactory factory = new ObjectFactory();
-		PropertyType newProperty = factory.createPropertyType();
-		newProperty.setName(propertyKey);
-		newProperty.setType(type);
-		newProperty.setValue(GDE.STRING_EMPTY + value);
+		DesktopPropertyType newProperty = factory.createDesktopPropertyType();
+		newProperty.setName(DesktopPropertyTypes.fromValue(propertyKey));
+		newProperty.setValue(value);
 		
 		if (this.desktop == null) {
 			this.desktop = factory.createDesktopType();

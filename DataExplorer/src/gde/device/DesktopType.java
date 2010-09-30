@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class DesktopType {
 
-    protected List<PropertyType> property;
+    protected List<DesktopPropertyType> property;
 
     /**
      * Gets the value of the property property.
@@ -64,9 +64,9 @@ public class DesktopType {
      * 
      * 
      */
-    public List<PropertyType> getProperty() {
+    public List<DesktopPropertyType> getProperty() {
         if (property == null) {
-            property = new ArrayList<PropertyType>();
+            property = new ArrayList<DesktopPropertyType>();
         }
         return this.property;
     }

@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="digital_tab"/>
  *     &lt;enumeration value="analog_tab"/>
  *     &lt;enumeration value="voltage_per_cell_tab"/>
+ *     &lt;enumeration value="utility_garphics_tab"/>
+ *     &lt;enumeration value="utility_device_tab"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
@@ -41,7 +43,11 @@ public enum DesktopPropertyTypes {
     @XmlEnumValue("analog_tab")
     ANALOG_TAB("analog_tab"),
     @XmlEnumValue("voltage_per_cell_tab")
-    VOLTAGE_PER_CELL_TAB("voltage_per_cell_tab");
+    VOLTAGE_PER_CELL_TAB("voltage_per_cell_tab"),
+    @XmlEnumValue("utility_garphics_tab")
+    UTILITY_GRAPHICS_TAB("utility_garphics_tab"),
+    @XmlEnumValue("utility_device_tab")
+    UTILITY_DEVICE_TAB("utility_device_tab");
     private final String value;
 
     DesktopPropertyTypes(String v) {

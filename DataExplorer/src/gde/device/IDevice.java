@@ -173,6 +173,32 @@ public interface IDevice {
 	 * @return the target measurement reference ordinal, -1 if reference ordinal not set
 	 */
 	public int getDesktopTargetReferenceOrdinal(DesktopPropertyTypes desktopPropertyType);
+	
+	/**
+	 * query if the utility graphics tabulator should be displayed and updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isUtilityGraphicsTabRequested(); 
+	
+	/**
+	 * query if the utility device tabulator should be displayed and updated
+	 * @return the value of the property, if property does not exist return false (default behavior of Boolean)
+	 */
+	public boolean isUtilityDeviceTabRequested();
+//	
+//	/**
+//	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
+//	 * specific curve calculated from point combinations or other specific dialog
+//	 * As default the function should return null which stands for no device custom tab item.  
+//	 */
+//	public CTabItem getUtilityGraphicsTabItem();
+	
+	/**
+	 * This function allows to register a device specific CTabItem to the main application tab folder to display device 
+	 * specific specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
+	 */
+	public CTabItem getUtilityDeviceTabItem();
 
 	/**
 	 * @return time step in ms
@@ -809,16 +835,4 @@ public interface IDevice {
 	 * set value of -1 to suppress this measurement
 	 */
 	public int[] getCellVoltageOrdinals();
-	
-	/**
-	 * query if an utility graphics window tab is requested
-	 */
-	public boolean isUtilityGraphicsRequested();
-	
-	/**
-	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
-	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
-	 */
-	public CTabItem getCustomTabItem();
 }

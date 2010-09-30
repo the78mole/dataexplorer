@@ -30,7 +30,6 @@ import gde.GDE;
  *       &lt;attribute name="value" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *       &lt;attribute name="type" use="required" type="{}data_types" />
  *       &lt;attribute name="description" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="target_reference_ordinal" type="{http://www.w3.org/2001/XMLSchema}integer" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -51,8 +50,6 @@ public class PropertyType {
     protected DataTypes type;
     @XmlAttribute
     protected String description;
-    @XmlAttribute(name = "target_reference_ordinal") //$NON-NLS-1$
-    protected Integer targetReferenceOrdinal;
 
     /**
      * default constructor
@@ -174,29 +171,4 @@ public class PropertyType {
     public void setDescription(String newValue) {
       this.description = newValue.trim().equals(GDE.STRING_EMPTY) ? null : newValue.trim();
     }
-
-    /**
-     * Gets the value of the targetReferenceOrdinal property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getTargetReferenceOrdinal() {
-        return targetReferenceOrdinal;
-    }
-
-    /**
-     * Sets the value of the targetReferenceOrdinal property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setTargetReferenceOrdinal(Integer value) {
-        this.targetReferenceOrdinal = value;
-    }
-
 }

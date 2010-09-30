@@ -173,7 +173,7 @@ public class DevicePropertiesEditor extends Composite {
 	CTabFolder														channelConfigInnerTabFolder;
 
 	CTabItem															destopTabItem;
-	PropertyTypeTabItem										desktopInnerTabItem1, desktopInnerTabItem2, desktopInnerTabItem3, desktopInnerTabItem4;
+	DesktopPropertyTypeTabItem						desktopInnerTabItem1, desktopInnerTabItem2, desktopInnerTabItem3, desktopInnerTabItem4, desktopInnerTabItem5, desktopInnerTabItem6;
 	Composite															desktopComposite;
 	Label																	desktopDescriptionLabel;
 	CTabFolder														desktopTabFolder;
@@ -904,16 +904,12 @@ public class DevicePropertiesEditor extends Composite {
 							this.desktopTabFolder.setLayout(appDesktopTabCompositeLayout);
 							this.desktopTabFolder.setBounds(135, 68, 360, 196);
 							{
-								this.desktopInnerTabItem1 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.TABLE_TAB.value(), null);
-							}
-							{
-								this.desktopInnerTabItem2 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.DIGITAL_TAB.value(), null);
-							}
-							{
-								this.desktopInnerTabItem3 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.ANALOG_TAB.value(), null);
-							}
-							{
-								this.desktopInnerTabItem4 = new PropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.value(), null);
+								this.desktopInnerTabItem1 = new DesktopPropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.TABLE_TAB.value(), null);
+								this.desktopInnerTabItem2 = new DesktopPropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.DIGITAL_TAB.value(), null);
+								this.desktopInnerTabItem3 = new DesktopPropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.ANALOG_TAB.value(), null);
+								this.desktopInnerTabItem4 = new DesktopPropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.value(), null);
+								this.desktopInnerTabItem5 = new DesktopPropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.UTILITY_DEVICE_TAB.value(), null);
+								this.desktopInnerTabItem6 = new DesktopPropertyTypeTabItem(this.desktopTabFolder, SWT.NONE, DesktopPropertyTypes.UTILITY_GRAPHICS_TAB.value(), null);
 							}
 							this.desktopTabFolder.setSelection(0);
 						}
@@ -1724,14 +1720,12 @@ public class DevicePropertiesEditor extends Composite {
 					//ChannelType end
 
 					//DesktopType begin
-					DevicePropertiesEditor.this.desktopInnerTabItem1.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB),
-							false, null, null, true);
-					DevicePropertiesEditor.this.desktopInnerTabItem2.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig
-							.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB), false, null, null, true);
-					DevicePropertiesEditor.this.desktopInnerTabItem3.setProperty(DevicePropertiesEditor.this.deviceConfig,
-							DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB), false, null, null, true);
-					DevicePropertiesEditor.this.desktopInnerTabItem4.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig
-							.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB), false, null, null, true);
+					DevicePropertiesEditor.this.desktopInnerTabItem1.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB));
+					DevicePropertiesEditor.this.desktopInnerTabItem2.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB));
+					DevicePropertiesEditor.this.desktopInnerTabItem3.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB));
+					DevicePropertiesEditor.this.desktopInnerTabItem4.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB));
+					DevicePropertiesEditor.this.desktopInnerTabItem5.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.UTILITY_DEVICE_TAB));
+					DevicePropertiesEditor.this.desktopInnerTabItem6.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.UTILITY_GRAPHICS_TAB));
 					DevicePropertiesEditor.this.desktopTabFolder.setSelection(0);
 					//DesktopType end
 				}
