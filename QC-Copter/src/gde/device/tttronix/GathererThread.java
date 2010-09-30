@@ -90,6 +90,7 @@ public class GathererThread extends Thread {
 		long tmpCycleTime = 0;
 		long measurementCount = 0;
 		byte[] dataBuffer = null;
+		boolean isTerminalDataRecived = false;
 
 		this.isCollectDataStopped = false;
 		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
@@ -103,7 +104,14 @@ public class GathererThread extends Thread {
 				// else wait for 180 seconds max. for actions
 				if (this.dialog != null && !this.dialog.isDisposed()) {
 					//dialog terminal is open
-					this.dialog.setTerminalText(this.serialPort.getTerminalData());					
+					String returnString = this.serialPort.getTerminalData();
+					if (returnString.length() > 5) {
+						isTerminalDataRecived = true;
+						this.dialog.setTerminalText(returnString);
+					}
+					else if (!isTerminalDataRecived) {
+						this.dialog.setTerminalText(Messages.getString(MessageIds.GDE_MSGI1900));
+					}
 				}
 				else if (this.dialog != null && this.dialog.isDisposed()) {
 					//get flight simulation data from device

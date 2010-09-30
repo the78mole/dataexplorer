@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.device.tttronix;
 
+import gde.GDE;
 import gde.device.DeviceConfiguration;
 import gde.exception.TimeOutException;
 import gde.log.Level;
@@ -70,12 +71,11 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				this.open();
 				isPortOpenedByMe = true;
 			}
-			data = this.read(data, 3000);
+			data = this.read(data, 1500);
 			
 			//check data for content
-			
 			// synchronize received data to begin of sent data 
-			while (data[0] != STX) {  //&& data[this.dataSize - 1] != ETX) {
+			while (containsSTX(data) && data[0] != STX) {  //&& data[this.dataSize - 1] != ETX) {
 				this.isInSync = false;
 				for (int i = 1; i < data.length; i++) {
 					if(data[i] == STX){
@@ -119,6 +119,21 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 		}
 		return data;
 	}
+	
+	/**
+	 * check if received data contains STX which
+	 * @return true if one byte of data represent STX else false
+	 */
+	boolean containsSTX(byte[] data) {
+		boolean isContained = false;
+		for (int i = 0; i < data.length; i++) {
+			if (data[i] == STX) {
+				isContained = true;
+				break;
+			}
+		}
+		return isContained;
+	}
 
 	/**
 	 * receive terminal data using stable counter which sends data back to gatherer thread while dialog is open
@@ -127,7 +142,7 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 	 */
 	public synchronized String getTerminalData() throws Exception {
 		final String $METHOD_NAME = "getTerminalData";
-		String returnString = "\n     ->waiting for terminal data<- \n";
+		String returnString = GDE.STRING_EMPTY;
 
 		boolean isPortOpenedByMe = false;
 		try {
@@ -147,13 +162,11 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				}
 				log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
-			returnString = data.length > 0 ? new String(data) : "\n     ->waiting for terminal data<- \n";
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
 				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
-			throw e;
 		}
 		finally {
 			if (isPortOpenedByMe) 
