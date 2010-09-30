@@ -48,9 +48,9 @@
         </Measurement>
     </Channel>
     <Desktop>
-		<property type="Boolean" value="false" name="table_tab"/>
-		<property type="Boolean" value="false" name="voltage_per_cell_tab"/>
-		<property type="Boolean" value="false" name="analog_tab"/>
-		<property type="Boolean" value="false" name="digital_tab"/>
+		<property value="false" name="table_tab"/>
+		<property value="false" name="voltage_per_cell_tab"/>
+		<property value="false" name="analog_tab"/>
+		<property value="false" name="digital_tab"/>
     </Desktop>
 </DeviceProperties>
