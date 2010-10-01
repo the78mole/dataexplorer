@@ -18,6 +18,19 @@
 ****************************************************************************************/
 package gde.ui.dialog.edit;
 
+import gde.GDE;
+import gde.device.DataTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.ObjectFactory;
+import gde.device.PropertyType;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -38,20 +51,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
-
-import gde.GDE;
-import gde.device.DataTypes;
-import gde.device.DesktopPropertyTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.MeasurementPropertyTypes;
-import gde.device.ObjectFactory;
-import gde.device.PropertyType;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
 
 /**
  * Composite to wrap XML PropertyType enable to edit existing and create new device property files 
@@ -176,7 +175,10 @@ public class PropertyTypeTabItem extends CTabItem {
 		if (PropertyTypeTabItem.this.propertyType.getType() == DataTypes.BOOLEAN) {
 			this.valueText.setVisible(false);
 			this.valueCombo.setVisible(true);
-			PropertyTypeTabItem.this.valueCombo.select(this.propertyType.getValue().equals(GDE.STRING_TRUE) ? 0 : 1);
+		}
+		else if (PropertyTypeTabItem.this.propertyType.getName().equals(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())) {
+			this.valueText.setVisible(false);
+			this.valueCombo.setVisible(true);
 		}
 		else {
 			this.valueCombo.setVisible(false);
@@ -370,10 +372,8 @@ public class PropertyTypeTabItem extends CTabItem {
 							// mode state type is Integer and can not be modified by combo selection
 
 							// check type values for DesktopTypes
-							String guessDesktopTypeName = PropertyTypeTabItem.this.propertyType.getName();
-							if (guessDesktopTypeName.equals(DesktopPropertyTypes.TABLE_TAB.value()) || guessDesktopTypeName.equals(DesktopPropertyTypes.DIGITAL_TAB.value())
-									|| guessDesktopTypeName.equals(DesktopPropertyTypes.ANALOG_TAB.value()) || guessDesktopTypeName.equals(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB.value())) {
-								PropertyTypeTabItem.this.deviceConfig.setTableTabRequested(Boolean.parseBoolean(PropertyTypeTabItem.this.valueCombo.getText()));
+							if (PropertyTypeTabItem.this.propertyType.getName().equals(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())) {
+								PropertyTypeTabItem.this.propertyType.setValue(GDE.STRING_EMPTY + PropertyTypeTabItem.this.valueCombo.getSelectionIndex());
 							}
 							else {
 								try { //check for valid and known DataType
@@ -445,6 +445,12 @@ public class PropertyTypeTabItem extends CTabItem {
 					this.valueCombo.setVisible(true);
 					int selectionIndex = this.propertyType.getValue().equals(this.valueCombo.getItems()[0]) ? 0 : 1;
 					this.valueCombo.select(selectionIndex);
+				}
+				else if (PropertyTypeTabItem.this.propertyType.getName().equals(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())) {
+					this.valueText.setVisible(false);
+					this.valueCombo.setVisible(true);
+					this.valueCombo.setItems(DevicePropertiesEditor.getInstance().getMeasurementNames());
+					this.valueCombo.select(Integer.valueOf(this.propertyType.getValue()));
 				}
 				else {
 					this.valueText.setVisible(true);

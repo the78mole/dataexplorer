@@ -19,13 +19,10 @@
 package gde.ui.dialog.edit;
 
 import gde.GDE;
-import gde.device.DataTypes;
 import gde.device.DesktopPropertyType;
 import gde.device.DesktopPropertyTypes;
 import gde.device.DeviceConfiguration;
-import gde.device.MeasurementPropertyTypes;
 import gde.device.ObjectFactory;
-import gde.device.PropertyType;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -144,44 +141,8 @@ public class DesktopPropertyTypeTabItem extends CTabItem {
 		this.valueCombo.setVisible(true);
 		this.valueCombo.select(this.propertyType.isValue() == true ? 0 : 1);
 			
-		this.descriptionText.setText(this.propertyType.getDescription());
+		this.descriptionText.setText(this.propertyType.getDescription() != null ? this.propertyType.getDescription() : GDE.STRING_EMPTY);
 		this.enableContextMenu(true);
-	}
-
-	/**
-	 * find the DataTypes items and return as String[]
-	 * @param property
-	 * @param dataTypeItems
-	 * @return string array of property keys
-	 */
-	public static String[] getDataTypesItems(PropertyType property, String[] dataTypeItems) {
-		if (!MeasurementPropertyTypes.isNoneSpecified(property.getName())) {
-			switch (MeasurementPropertyTypes.fromValue(property.getName())) {
-			case OFFSET:
-			case FACTOR:
-			case REDUCTION:
-			case REVOLUTION_FACTOR:
-				dataTypeItems = new String[] { DataTypes.DOUBLE.value() };
-				break;
-			case REGRESSION_INTERVAL_SEC:
-			case NUMBER_MOTOR:
-			case NUMBER_CELLS:
-			case PROP_N_100_W:
-			case SCALE_SYNC_REF_ORDINAL:
-				dataTypeItems = new String[] { DataTypes.INTEGER.value() };
-				break;
-			case REGRESSION_TYPE_CURVE:
-			case REGRESSION_TYPE_LINEAR:
-				dataTypeItems = new String[] { DataTypes.STRING.value() };
-				break;
-			case IS_INVERT_CURRENT:
-			case DO_SUBTRACT_FIRST:
-			case DO_SUBTRACT_LAST:
-				dataTypeItems = new String[] { DataTypes.BOOLEAN.value() };
-				break;
-			}
-		}
-		return dataTypeItems == null ? new String[] { GDE.STRING_EMPTY } : dataTypeItems;
 	}
 
 	private void initGUI() {

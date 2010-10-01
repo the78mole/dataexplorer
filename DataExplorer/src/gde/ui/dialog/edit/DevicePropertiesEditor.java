@@ -18,6 +18,31 @@
 ****************************************************************************************/
 package gde.ui.dialog.edit;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.device.CheckSumTypes;
+import gde.device.CommaSeparatorTypes;
+import gde.device.DataTypes;
+import gde.device.DesktopPropertyTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.DeviceTypes;
+import gde.device.FormatTypes;
+import gde.device.LineEndingTypes;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.ObjectFactory;
+import gde.device.PropertyType;
+import gde.device.TimeUnitTypes;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.dialog.HelpInfoDialog;
+import gde.utils.FileUtils;
+import gde.utils.StringHelper;
+import gde.utils.WebBrowser;
+
 import java.io.File;
 import java.util.Locale;
 import java.util.logging.ConsoleHandler;
@@ -62,31 +87,6 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.xml.sax.SAXParseException;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.device.CheckSumTypes;
-import gde.device.CommaSeparatorTypes;
-import gde.device.DataTypes;
-import gde.device.DesktopPropertyTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.DeviceTypes;
-import gde.device.FormatTypes;
-import gde.device.LineEndingTypes;
-import gde.device.MeasurementPropertyTypes;
-import gde.device.ObjectFactory;
-import gde.device.PropertyType;
-import gde.device.TimeUnitTypes;
-import gde.log.Level;
-import gde.log.LogFormatter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.dialog.HelpInfoDialog;
-import gde.utils.FileUtils;
-import gde.utils.StringHelper;
-import gde.utils.WebBrowser;
 
 /**
  * Dialog class enable to edit existing and create new device property files 
@@ -1720,13 +1720,12 @@ public class DevicePropertiesEditor extends Composite {
 					//ChannelType end
 
 					//DesktopType begin
-					DevicePropertiesEditor.this.desktopInnerTabItem1.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB));
-					DevicePropertiesEditor.this.desktopInnerTabItem2.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB));
-					DevicePropertiesEditor.this.desktopInnerTabItem3.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB));
-					DevicePropertiesEditor.this.desktopInnerTabItem4.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB));
-					DevicePropertiesEditor.this.desktopInnerTabItem5.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.UTILITY_DEVICE_TAB));
-					DevicePropertiesEditor.this.desktopInnerTabItem6.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.UTILITY_GRAPHICS_TAB));
-					DevicePropertiesEditor.this.desktopTabFolder.setSelection(0);
+						DevicePropertiesEditor.this.desktopInnerTabItem1.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.TABLE_TAB));
+						DevicePropertiesEditor.this.desktopInnerTabItem2.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.DIGITAL_TAB));
+						DevicePropertiesEditor.this.desktopInnerTabItem3.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.ANALOG_TAB));
+						DevicePropertiesEditor.this.desktopInnerTabItem4.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB));
+						DevicePropertiesEditor.this.desktopInnerTabItem5.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.UTILITY_DEVICE_TAB));
+						DevicePropertiesEditor.this.desktopInnerTabItem6.setProperty(DevicePropertiesEditor.this.deviceConfig, DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.UTILITY_GRAPHICS_TAB));
 					//DesktopType end
 				}
 				catch (Throwable e) {

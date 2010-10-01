@@ -582,6 +582,16 @@ public class DeviceConfiguration {
 					break;
 				}
 			}
+			if (property == null) {
+				property = new ObjectFactory().createDesktopPropertyType();
+				property.setName(dektopType);
+				property.setValue(false);
+				property.setDescription(dektopType.name());
+				if (dektopType.equals(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB)) {
+					property.setTargetReferenceOrdinal(0);
+				}
+				properties.add(property);
+			}
 		}
 		return property;
 	}
