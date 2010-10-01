@@ -1792,7 +1792,7 @@ public class VarioToolTabItem extends CTabItem {
 						}
 						{
 							RowData setupSlider17LData = new RowData();
-							setupSlider17LData.width = 140;
+							setupSlider17LData.width = 160;
 							setupSlider17LData.height = 18;
 							this.setupSlider17 = new Slider(this.setupGroup17, SWT.BORDER);
 							this.setupSlider17.setLayoutData(setupSlider17LData);
@@ -1819,7 +1819,7 @@ public class VarioToolTabItem extends CTabItem {
 						{
 							this.setupLabel17a = new CLabel(this.setupGroup17, SWT.RIGHT);
 							RowData setupLabel17aLData = new RowData();
-							setupLabel17aLData.width = 65;
+							setupLabel17aLData.width = 25;
 							setupLabel17aLData.height = 18;
 							this.setupLabel17a.setLayoutData(setupLabel17aLData);
 							this.setupLabel17a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1828,7 +1828,7 @@ public class VarioToolTabItem extends CTabItem {
 						{
 							this.setupText17 = new Text(this.setupGroup17, SWT.CENTER | SWT.BORDER);
 							RowData setupText17LData = new RowData();
-							setupText17LData.width = 30;
+							setupText17LData.width = 25;
 							setupText17LData.height = 12;
 							this.setupText17.setLayoutData(setupText17LData);
 							this.setupText17.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1837,7 +1837,7 @@ public class VarioToolTabItem extends CTabItem {
 						{
 							this.setupLabel17b = new CLabel(this.setupGroup17, SWT.LEFT);
 							RowData setupLabel17bLData = new RowData();
-							setupLabel17bLData.width = 210;
+							setupLabel17bLData.width = 240;
 							setupLabel17bLData.height = 18;
 							this.setupLabel17b.setLayoutData(setupLabel17bLData);
 							this.setupLabel17b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1887,7 +1887,7 @@ public class VarioToolTabItem extends CTabItem {
 						}
 						{
 							RowData setupSlider18LData = new RowData();
-							setupSlider18LData.width = 140;
+							setupSlider18LData.width = 160;
 							setupSlider18LData.height = 18;
 							this.setupSlider18 = new Slider(this.setupGroup18, SWT.BORDER);
 							this.setupSlider18.setLayoutData(setupSlider18LData);
@@ -1915,7 +1915,7 @@ public class VarioToolTabItem extends CTabItem {
 						{
 							this.setupLabel18a = new CLabel(this.setupGroup18, SWT.RIGHT);
 							RowData setupLabel18aLData = new RowData();
-							setupLabel18aLData.width = 55;
+							setupLabel18aLData.width = 25;
 							setupLabel18aLData.height = 18;
 							this.setupLabel18a.setLayoutData(setupLabel18aLData);
 							this.setupLabel18a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1935,7 +1935,7 @@ public class VarioToolTabItem extends CTabItem {
 						{
 							this.setupLabel18b = new CLabel(this.setupGroup18, SWT.LEFT);
 							RowData setupLabel18bLData = new RowData();
-							setupLabel18bLData.width = 230;
+							setupLabel18bLData.width = 240;
 							setupLabel18bLData.height = 16;
 							this.setupLabel18b.setLayoutData(setupLabel18bLData);
 							this.setupLabel18b.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
