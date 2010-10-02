@@ -118,7 +118,7 @@ public class FileCommentWindow extends CTabItem {
 		this.commentMainComposite.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
 				log.log(Level.FINER, "commentMainComposite.helpRequested " + evt); //$NON-NLS-1$
-				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_92.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		{
@@ -147,7 +147,7 @@ public class FileCommentWindow extends CTabItem {
 			this.fileCommentText.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "fileCommentText.helpRequested " + evt); //$NON-NLS-1$
-					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_92.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.fileCommentText.addKeyListener(new KeyAdapter() {
@@ -182,7 +182,7 @@ public class FileCommentWindow extends CTabItem {
 			this.recordCommentTable.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINER, "recordCommentTable.helpRequested " + evt); //$NON-NLS-1$
-					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_92.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 

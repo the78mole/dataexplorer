@@ -200,6 +200,23 @@ public class GraphicsComposite extends Composite {
 				}
 			}
 		});
+		this.addHelpListener(new HelpListener() {
+			public void helpRequested(HelpEvent evt) {
+				log.log(Level.FINER, "GraphicsComposite.helpRequested " + evt); 			//$NON-NLS-1$
+				switch (GraphicsComposite.this.windowType) {
+				default:
+				case GraphicsWindow.TYPE_NORMAL:
+					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+					break;
+				case GraphicsWindow.TYPE_COMPARE:
+					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_91.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+					break;
+				case GraphicsWindow.TYPE_UTIL:
+					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+					break;
+				}
+			}
+		});
 		{
 			this.graphicsHeader = new Text(this, SWT.SINGLE | SWT.CENTER);
 			this.graphicsHeader.setFont(SWTResourceManager.getFont(this.application, 12, SWT.BOLD));

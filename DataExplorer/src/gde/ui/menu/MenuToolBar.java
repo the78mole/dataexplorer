@@ -37,6 +37,7 @@ import gde.ui.SWTResourceManager;
 import gde.ui.dialog.DeviceSelectionDialog;
 import gde.ui.dialog.PrintSelectionDialog;
 import gde.ui.tab.GraphicsComposite;
+import gde.ui.tab.GraphicsWindow;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyScanner;
 
@@ -45,6 +46,7 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -53,6 +55,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
@@ -108,6 +111,10 @@ public class MenuToolBar {
 	CCombo												channelSelectCombo, recordSelectCombo;
 	Point													channelSelectSize = new Point(180, GDE.IS_LINUX ? 22 : 20);
 	Point													recordSelectSize = new Point(260, GDE.IS_LINUX ? 22 : 20);
+
+	CoolItem											helpCoolItem;
+	ToolBar												helpToolBar;
+	ToolItem											helpToolItem;
 	
 	final DataExplorer	application;
 	final Channels								channels;
@@ -949,6 +956,50 @@ public class MenuToolBar {
 			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		}
+		{ // begin help cool item
+			this.helpCoolItem = new CoolItem(this.coolBar, SWT.NONE);
+			{ // begin file tool bar
+				this.helpToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.helpCoolItem.setControl(this.helpToolBar);
+				{
+					this.helpToolItem = new ToolItem(this.helpToolBar, SWT.NONE);
+					this.helpToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0050));
+					this.helpToolItem.setImage(SWTResourceManager.getImage("gde/resource/Question.gif")); //$NON-NLS-1$
+					this.helpToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
+					this.helpToolItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "helpToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+								if (MenuToolBar.this.application.getActiveDevice().getDialog() != null && !MenuToolBar.this.application.getActiveDevice().getDialog().isDisposed()) {
+									MenuToolBar.this.application.getActiveDevice().getDialog().getDialogShell().getShell().notifyListeners(SWT.Help, new Event());
+								}
+								else {
+									for (CTabItem tabItem : MenuToolBar.this.application.getTabFolder().getItems()) {
+										if (!tabItem.isDisposed()&& tabItem.getControl().isVisible()) {
+											if (tabItem.getControl().isListening(SWT.Help)) {
+												tabItem.getControl().notifyListeners(SWT.Help, new Event());
+												break;
+											}
+											else if (tabItem instanceof GraphicsWindow) {
+												((GraphicsWindow)tabItem).getGraphicsComposite().notifyListeners(SWT.Help, new Event());
+											}
+											else if (tabItem.getText().endsWith("Tool")) { //DataVarioTool, LinkVarioTool
+												if (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().isUtilityDeviceTabRequested()) {
+													MenuToolBar.this.application.openHelpDialog("WStechVario", "HelpInfo.html"); 	//$NON-NLS-1$
+												}
+											}
+										}
+									}
+								}
+						}
+					});
+				}
+			}
+			this.toolSize = this.helpToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			this.helpCoolItem.setSize(this.toolSize.x, this.toolSize.y);
+			//this.helpCoolItem.setPreferredSize(this.size);
+			this.helpCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
+			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
+		} // end file cool item
 		
 		// set the focus controlled to an item which has no slection capability
 		this.deviceObjectToolBar.setFocus();

@@ -32,6 +32,8 @@ import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -242,6 +244,12 @@ public class ObjectDescriptionWindow extends CTabItem {
 		this.tabComposite.setLayout(composite1Layout);
 		this.tabComposite.setBackground(this.surroundingBackground);
 		this.tabComposite.setMenu(this.popupmenu);
+		this.tabComposite.addHelpListener(new HelpListener() {
+			public void helpRequested(HelpEvent evt) {
+				log.log(Level.FINER, "tabComposite.helpRequested " + evt); 			//$NON-NLS-1$
+				ObjectDescriptionWindow.this.application.openHelpDialog("", "HelpInfo_93.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+			}
+		});
 		{
 			this.headerComposite = new Composite(this.tabComposite, SWT.NONE);
 			RowLayout composite2Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
