@@ -5,4 +5,5 @@ GNU DataExplorer - News - comes with version 2.50
 3)update scale synchronization > 1  measurement type
 4)fix error setup 18 DataVarioTool/LinkVarioTool
 5)update data table preparation, value digits depends on measurement
+6)refine context sensitive help, enabled by an tool button
 
