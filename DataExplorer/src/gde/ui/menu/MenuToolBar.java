@@ -963,7 +963,7 @@ public class MenuToolBar {
 				this.helpCoolItem.setControl(this.helpToolBar);
 				{
 					this.helpToolItem = new ToolItem(this.helpToolBar, SWT.NONE);
-					this.helpToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0050));
+					this.helpToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0228));
 					this.helpToolItem.setImage(SWTResourceManager.getImage("gde/resource/Question.gif")); //$NON-NLS-1$
 					this.helpToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
 					this.helpToolItem.addSelectionListener(new SelectionAdapter() {
