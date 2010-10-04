@@ -1881,7 +1881,9 @@ public class DataExplorer extends Composite {
 	public void openHelpDialog(String deviceName, String fileName) {
 		final String $METHOD_NAME = "openHelpDialog"; //$NON-NLS-1$
 		try {
-			this.helpDialog = new HelpInfoDialog(DataExplorer.shell, SWT.NONE);
+			if (this.helpDialog == null || this.helpDialog.isDisposed()) {
+				this.helpDialog = new HelpInfoDialog(DataExplorer.shell, SWT.NONE);
+			}
 			if (GDE.IS_WINDOWS) { //$NON-NLS-1$
 				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using syle SWT.NONE (windows IE)"); //$NON-NLS-1$
 				//this.helpDialog.dispose();
