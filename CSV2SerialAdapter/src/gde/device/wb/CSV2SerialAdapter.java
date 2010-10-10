@@ -43,7 +43,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 
 /**
@@ -52,8 +52,6 @@ import org.eclipse.swt.widgets.FileDialog;
  */
 public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(CSV2SerialAdapter.class.getName());
-
-	public final static String		DEFAULT_RECORD_SET_EXTEND									= "Flugaufzeichnung"; //$NON-NLS-1$
 
 	final DataExplorer	application;
 	final CSV2SerialAdapterDialog	dialog;
@@ -433,17 +431,25 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void openCloseSerialPort() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1700), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation(), null);
-		String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
-		log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-		
-		if (fd.getFileName().length() > 4) {
-			try {
-				Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-				CSVSerialDataReaderWriter.read(selectedImportFile, this, CSV2SerialAdapter.DEFAULT_RECORD_SET_EXTEND, channelConfigNumber, true);
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1700), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation(), null, SWT.MULTI);
+		for (String tmpFileName : fd.getFileNames()) {
+			String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+			if (!selectedImportFile.endsWith(GDE.FILE_ENDING_DOT_CSV)) {
+				if (selectedImportFile.contains(GDE.STRING_DOT)) {
+					selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+				}
+				selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
 			}
-			catch (Throwable e) {
-				log.log(Level.WARNING, e.getMessage(), e);
+			log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+			
+			if (fd.getFileName().length() > 4) {
+				try {
+					Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
+					CSVSerialDataReaderWriter.read(selectedImportFile, this, GDE.STRING_EMPTY, channelConfigNumber, true);
+				}
+				catch (Throwable e) {
+					log.log(Level.WARNING, e.getMessage(), e);
+				}
 			}
 		}
 	}
@@ -455,21 +461,5 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	public int[] getCellVoltageOrdinals() {
 		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 		return new int[] {0, 3};
-	}
-	
-	/**
-	 * query if an utility graphics window tab is requested
-	 */
-	public boolean isUtilityGraphicsRequested() {
-		return false;
-	}
-	
-	/**
-	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
-	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
-	 */
-	public CTabItem getUtilityDeviceTabItem() {
-		return null;
 	}
 }
