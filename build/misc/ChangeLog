@@ -6,6 +6,10 @@ update scale synchronization > 1  measurement type
 fix error setup 18 DataVarioTool/LinkVarioTool
 update data table preparation, value digits depends on measurement
 refine context sensitive help, enabled by an tool button
+enable multiple file selection while CSV import
+sunset Mac carbon version
+introduce 64 bit Mac cocoa
+add function to launch Google Earth while exporting KML file
 
 Version 2.41 - 05 Sep 2010
 

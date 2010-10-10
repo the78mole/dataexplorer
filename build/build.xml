@@ -92,13 +92,14 @@
 		<property name="output.gnulinux64.program.devices" location="${output.gnulinux64}/DataExplorer/devices" />
 		<property name="output.gnulinux64.java.ext" location="${output.gnulinux64}/DataExplorer/java/ext" />
 
+		<!--
 		<property name="output.mac32.carbon" location="${output.dir}/Mac_32_carbon" />
 		<property name="output.mac32.carbon.bundle" location="${output.mac32.carbon}/DataExplorer.app/Contents" />
 		<property name="output.mac32.carbon.bundle.bin" location="${output.mac32.carbon.bundle}/MacOS" />
 		<property name="output.mac32.carbon.program" location="${output.mac32.carbon.bundle}/Resources" />
 		<property name="output.mac32.carbon.program.devices" location="${output.mac32.carbon.program}/devices" />
 		<property name="output.mac32.carbon.java.ext" location="${output.mac32.carbon.program}/java/ext" />
-
+		-->
 		<property name="output.mac32.cocoa" location="${output.dir}/Mac_32_cocoa" />
 		<property name="output.mac32.cocoa.bundle" location="${output.mac32.cocoa}/DataExplorer.app/Contents" />
 		<property name="output.mac32.cocoa.bundle.bin" location="${output.mac32.cocoa.bundle}/MacOS" />
@@ -137,12 +138,12 @@
 		<mkdir dir="${output.gnulinux64.program.devices}" />
 		<mkdir dir="${output.gnulinux64.java.ext}" />
 
-		<mkdir dir="${output.mac32.carbon}" />
-		<mkdir dir="${output.mac32.carbon.bundle}" />
-		<mkdir dir="${output.mac32.carbon.bundle.bin}" />
-		<mkdir dir="${output.mac32.carbon.program}" />
-		<mkdir dir="${output.mac32.carbon.program.devices}" />
-		<mkdir dir="${output.mac32.carbon.java.ext}" />
+		<mkdir dir="${output.mac32.cocoa}" />
+		<mkdir dir="${output.mac32.cocoa.bundle}" />
+		<mkdir dir="${output.mac32.cocoa.bundle.bin}" />
+		<mkdir dir="${output.mac32.cocoa.program}" />
+		<mkdir dir="${output.mac32.cocoa.program.devices}" />
+		<mkdir dir="${output.mac32.cocoa.java.ext}" />
 
 		<mkdir dir="${output.mac64.cocoa}" />
 		<mkdir dir="${output.mac64.cocoa.bundle}" />
@@ -347,16 +348,16 @@
 			</fileset>
 		</copy>
 
+		<!--
 		<copy todir="${output.mac32.carbon.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer-mime.xml" />
-			<!-- fileset file="build/misc/DataExplorer.xpm" / -->
 			<fileset file="build/misc/DataExplorer.icns" />
 			<fileset file="build/misc/DevicePropertiesEditor.icns" />
 			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
 		</copy>
 		<copy todir="${output.mac32.carbon.bundle}" flatten="yes">
-			<fileset file="build/lib/MAC/32/Info.plist" />
+			<fileset file="build/misc/Info.plist" />
 			<fileset file="build/misc/PkgInfo" />
 			<fileset file="build/misc/version.plist" />
 		</copy>
@@ -369,11 +370,11 @@
 				<patternset refid="DE_PLUGIN_JARS"/>
 			</fileset>
 		</copy>
+		-->
 
 		<copy todir="${output.mac32.cocoa.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer-mime.xml" />
-			<!-- fileset file="build/misc/DataExplorer.xpm" / -->
 			<fileset file="build/misc/DataExplorer.icns" />
 			<fileset file="build/misc/DevicePropertiesEditor.icns" />
 			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
@@ -396,7 +397,6 @@
 		<copy todir="${output.mac64.cocoa.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer-mime.xml" />
-			<!-- fileset file="build/misc/DataExplorer.xpm" / -->
 			<fileset file="build/misc/DataExplorer.icns" />
 			<fileset file="build/misc/DevicePropertiesEditor.icns" />
 			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
@@ -437,14 +437,16 @@
 			<fileset file="build/lib/GNULinux/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 		</copy>
+		<!--
 		<copy todir="${output.mac32.carbon.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/MAC/32/carbon/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 		</copy>
+		-->
 		<copy todir="${output.mac32.cocoa.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
-			<fileset file="build/lib/MAC/32/cocoa/swt.jar" />
+			<fileset file="build/lib/MAC/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 		</copy>
 		<copy todir="${output.mac64.cocoa.java.ext}" flatten="yes">
@@ -466,9 +468,11 @@
 		<copy todir="${output.gnulinux64}/DataExplorer" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
+		<!--
 		<copy todir="${output.mac32.carbon.program}" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
+		-->
 		<copy todir="${output.mac32.cocoa.program}" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
@@ -529,6 +533,7 @@
 			</tarfileset>
 		</tar>
 
+		<!--
 		<echo message="zip Mac 32 carbon application bundle" />
 		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_32_carbon.zip">
 			<zipfileset dir="${output.mac32.carbon}" casesensitive="true" filemode="755" >
@@ -540,6 +545,7 @@
 				<exclude name="**/DevicePropertiesEditorMac32"/>
 			</zipfileset>
 		</zip>
+		-->
 
 		<echo message="zip Mac 32 cocoa application bundle" />
 		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_32_cocoa.zip">

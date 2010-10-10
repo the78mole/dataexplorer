@@ -6,4 +6,10 @@ GNU DataExplorer - News - comes with version 2.50
 4)fix error setup 18 DataVarioTool/LinkVarioTool
 5)update data table preparation, value digits depends on measurement
 6)refine context sensitive help, enabled by an tool button
+7)enable multiple file selection while CSV import
+8)sunset Mac carbon version
+9)introduce 64 bit Mac cocoa
+10)add function to launch Google Earth while exporting KML file
+
+
 
