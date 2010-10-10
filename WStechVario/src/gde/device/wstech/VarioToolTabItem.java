@@ -1361,7 +1361,7 @@ public class VarioToolTabItem extends CTabItem {
 											tmpValue = 50;
 										else if (tmpValue > 500) tmpValue = 500;
 
-										VarioToolTabItem.this.setupText12.setText((tmpValue == 0) ? GDE.STRING_EMPTY : String.format("%.1f", tmpValue / 10.0));
+										VarioToolTabItem.this.setupText12.setText((tmpValue == 0) ? GDE.STRING_EMPTY : String.format("%.1f", tmpValue / 10.0)); //$NON-NLS-1$
 										VarioToolTabItem.this.setupValue12 = tmpValue * 2 / 10;
 									}
 								}
@@ -1383,7 +1383,7 @@ public class VarioToolTabItem extends CTabItem {
 							setupText12LData.height = 12;
 							this.setupText12.setLayoutData(setupText12LData);
 							this.setupText12.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.setupText12.setText((this.setupValue12 == 0) ? GDE.STRING_EMPTY : String.format("%.1f", this.setupValue12 * 5 / 10.0));
+							this.setupText12.setText((this.setupValue12 == 0) ? GDE.STRING_EMPTY : String.format("%.1f", this.setupValue12 * 5 / 10.0)); //$NON-NLS-1$
 							this.setupText12.setEditable(false);
 							this.setupText12.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 						}
@@ -1416,7 +1416,7 @@ public class VarioToolTabItem extends CTabItem {
 									}
 									else {
 										VarioToolTabItem.this.setupValue12 = 150;
-										VarioToolTabItem.this.setupText12.setText((VarioToolTabItem.this.setupValue12 == 0) ? GDE.STRING_EMPTY : String.format("%.1f", VarioToolTabItem.this.setupValue12 * 5 / 10.0));
+										VarioToolTabItem.this.setupText12.setText((VarioToolTabItem.this.setupValue12 == 0) ? GDE.STRING_EMPTY : String.format("%.1f", VarioToolTabItem.this.setupValue12 * 5 / 10.0)); //$NON-NLS-1$
 										VarioToolTabItem.this.setupSlider12.setEnabled(true);
 										VarioToolTabItem.this.setupSlider12.setSelection(VarioToolTabItem.this.setupValue12);
 									}
@@ -2160,7 +2160,7 @@ public class VarioToolTabItem extends CTabItem {
 
 	void loadSetup() {
 		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] { GDE.FILE_ENDING_STAR }, this.device
-				.getDataBlockPreferredDataLocation(), this.getDefaultFileName());
+				.getDataBlockPreferredDataLocation(), this.getDefaultFileName(), SWT.SINGLE);
 		String selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		VarioToolTabItem.log.log(Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
 
@@ -2247,7 +2247,7 @@ public class VarioToolTabItem extends CTabItem {
 				this.setupValue12 = buffer[12]; // motor battery voltage alarm level
 				this.setupSlider12.setSelection(this.setupValue12 / 2 * 10);
 				this.setupSlider12.setEnabled(this.setupValue12 != 0);
-				this.setupText12.setText((this.setupValue12 == 0) ? GDE.STRING_EMPTY : String.format("%.1f", this.setupValue12 * 5.0 / 10));
+				this.setupText12.setText((this.setupValue12 == 0) ? GDE.STRING_EMPTY : String.format("%.1f", this.setupValue12 * 5.0 / 10)); //$NON-NLS-1$
 				this.setupButton12.setSelection(this.setupValue12 == 0);
 
 				this.setupValue13 = buffer[13]; // integral vario config
@@ -2364,6 +2364,6 @@ public class VarioToolTabItem extends CTabItem {
 	 * query the supported firmware version
 	 */
 	public String getFirmwareVersion() {
-		return this.getText().startsWith("Link") ? "00x" : "50x";
+		return this.getText().startsWith("Link") ? "00x" : "50x"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

@@ -21,6 +21,8 @@ package gde.device.wstech;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
@@ -63,6 +65,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	public final static int				HEIGHT_ABSOLUTE									= 1;
 
 	final DataExplorer	application;
+	final Channels			channels;
 	final VarioDialog		dialog;
 
 	/**
@@ -76,6 +79,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		Messages.setDeviceResourceBundle("gde.device.wstech.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
+		this.channels = Channels.getInstance();
 		this.dialog = new VarioDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
@@ -93,6 +97,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		Messages.setDeviceResourceBundle("gde.device.wstech.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
+		this.channels = Channels.getInstance();
 		this.dialog = new VarioDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
@@ -232,17 +237,26 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void openCloseSerialPort() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation(), null);
-		String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
-		log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-		
-		if (fd.getFileName().length() > 4) {
-			try {
-				Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-				CSVSerialDataReaderWriter.read(selectedImportFile, this, this.getRecordSetStemName(), channelConfigNumber, true);
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, this.getDeviceConfiguration().getDataBlockPreferredDataLocation(), null, SWT.MULTI);
+		for (String tmpFileName : fd.getFileNames()) {
+			String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+			if (!selectedImportFile.endsWith(GDE.FILE_ENDING_DOT_CSV)) {
+				if (selectedImportFile.contains(GDE.STRING_DOT)) {
+					selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+				}
+				selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
 			}
-			catch (Throwable e) {
-				log.log(Level.WARNING, e.getMessage(), e);
+			log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+			
+			if (fd.getFileName().length() > 4) {
+				try {
+					Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
+					String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+					CSVSerialDataReaderWriter.read(selectedImportFile, this, recordNameExtend, channelConfigNumber, true);
+				}
+				catch (Throwable e) {
+					log.log(Level.WARNING, e.getMessage(), e);
+				}
 			}
 		}
 	}
@@ -293,7 +307,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		}
 		catch (Exception e) {
-			String msg = e.getMessage() + Messages.getString("GDE_MSGT17031"); //$NON-NLS-1$
+			String msg = e.getMessage() + Messages.getString(gde.messages.MessageIds.GDE_MSGW0543);
 			log.log(Level.WARNING, msg, e);
 			application.openMessageDialog(msg);
 			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);
@@ -399,7 +413,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
 			int numberRecords = recordNames.length;			
 
-			dataTableRow[0] = String.format("%.1f", (recordSet.getTime_ms(rowIndex) / 1000.0));
+			dataTableRow[0] = String.format("%.1f", (recordSet.getTime_ms(rowIndex) / 1000.0)); //$NON-NLS-1$
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
@@ -413,7 +427,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 					double value = (record.get(rowIndex) / 1000000.0);
 					int grad = (int)value;
 					double minuten = (value - grad) * 100;
-					dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60));
+					dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
 				}
 			}
 		}
@@ -582,7 +596,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 */
 	public void export2KML3D(int type) {
 		//ordinalLongitude, ordinalLatitude, ordinalGPSHeight, inRelative
-		new FileHandler().exportFileKML("export KML file with GPS height", 7, 8, 9, type == DataVario.HEIGHT_RELATIVE);
+		new FileHandler().exportFileKML(Messages.getString(MessageIds.GDE_MSGT1859), 7, 8, 9, type == DataVario.HEIGHT_RELATIVE);
 	}
 	
 	/**
@@ -591,6 +605,35 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 */
 	public void export2GPX(int type) {
 		//ordinalLongitude, ordinalLatitude, ordinalGPSHeight, ordinalVelocity, ordinalHeight, inRelative
-		new FileHandler().exportFileGPX("export GPX file", 7, 8, 9, 10, 1, type == DataVario.HEIGHT_RELATIVE);
+		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT1877), 7, 8, 9, 10, 1, type == DataVario.HEIGHT_RELATIVE);
 	}
+	
+	/**
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * set value of -1 to suppress this measurement
+	 */
+	public boolean isActualRecordSetWithGpsData() {
+		boolean containsGPSdata = false; 
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null) {
+				containsGPSdata = activeRecordSet.get(7).isDataContained() && activeRecordSet.get(8).isDataContained() && activeRecordSet.get(9).isDataContained();
+			}
+		}
+		return containsGPSdata;
+	}
+	
+	/**
+	 * export a file of the actual channel/record set
+	 * @return full qualified file path depending of the file ending type
+	 */
+	public String exportFile(String fileEndingType) {
+		if (fileEndingType.contains(GDE.FILE_ENDING_KML)) {
+			return new FileHandler().exportFileKML(7,8,9, true);
+		}
+		else
+			return GDE.STRING_EMPTY;
+	}
+
 }
