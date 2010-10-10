@@ -133,7 +133,7 @@ public class ApplicationLauncher {
 	 */
 	public void execute(final List<String> arguments) {
 		arguments.add(0, this.fqExecPath);
-		if (!GDE.IS_WINDOWS) {
+		if (GDE.IS_LINUX) {
 			arguments.add("&"); //$NON-NLS-1$
 		}
 		for (String string : arguments) {
