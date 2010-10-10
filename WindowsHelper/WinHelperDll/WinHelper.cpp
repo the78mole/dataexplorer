@@ -32,7 +32,17 @@
 #include <string>
 #include <swprintf.inl>
 #include <iostream>
+#include <tchar.h>
 
+#define MAX_KEY_LENGTH 255
+#define MAX_VALUE_NAME 16383
+
+/*
+using namespace std;
+using namespace System;
+using namespace System::Security;
+using namespace Microsoft::Win32;
+*/
 
 //#include <WinIoCtl.h>
 #ifndef GUID_DEVINTERFACE_COMPORT //{86E0D1E0-8089-11D0-9CE4-08003E301F73}
@@ -68,7 +78,7 @@ mt -manifest SRV2003_X64_RETAIL\WinHelper.dll.manifest -outputresource:SRV2003_X
 *****************************************************************************************************************/
 
 /*****************************************************************************************************************
-Methoid to create a windows shell link (extension lnk) using ole32 and uuid libs (hot-key specification and window type not enabled)
+Method to create a windows shell link (extension lnk) using ole32 and uuid libs (hot-key specification and window type not enabled)
 *****************************************************************************************************************/
 JNIEXPORT jstring JNICALL Java_gde_utils_WindowsHelper_createDesktopLink
   (JNIEnv *env, jclass cl, jstring jfqShellLinkPath, jstring jfqExecutablePath, jstring jexecutableArguments, jstring jworkingDirectory, jstring jfqIconPath, jint iconPosition, jstring jdescription)
@@ -204,7 +214,7 @@ JNIEXPORT jstring JNICALL Java_gde_utils_WindowsHelper_createDesktopLink
 }
 
 /*****************************************************************************************************************
-Methoid to return the contained full qualified file path from a windows shell link (extension lnk) using ole32 and uuid libs
+Method to return the contained full qualified file path from a windows shell link (extension lnk) using ole32 and uuid libs
 *****************************************************************************************************************/
 JNIEXPORT jstring JNICALL Java_gde_utils_WindowsHelper_getFilePathFromLink
   (JNIEnv *env, jclass cl, jstring jfqShellLinkPath)
@@ -306,7 +316,7 @@ JNIEXPORT jstring JNICALL Java_gde_utils_WindowsHelper_getFilePathFromLink
 
 
 /*****************************************************************************************************************
-Methoid to enumerate serial ports using ole32, uuid, setupapi libs
+Method to enumerate serial ports using ole32, uuid, setupapi libs
 *****************************************************************************************************************/
 JNIEXPORT jobjectArray JNICALL Java_gde_utils_WindowsHelper_enumerateSerialPorts
   (JNIEnv *env, jclass cl)
@@ -384,4 +394,168 @@ JNIEXPORT jobjectArray JNICALL Java_gde_utils_WindowsHelper_enumerateSerialPorts
 		}
 	}	
 	return ret;
+}
+
+void QueryKey(HKEY hKey) 
+{ 
+    TCHAR    achKey[MAX_KEY_LENGTH];   // buffer for subkey name
+    DWORD    cbName;                   // size of name string 
+    TCHAR    achClass[MAX_PATH] = TEXT("");  // buffer for class name 
+    DWORD    cchClassName = MAX_PATH;  // size of class string 
+    DWORD    cSubKeys=0;               // number of subkeys 
+    DWORD    cbMaxSubKey;              // longest subkey size 
+    DWORD    cchMaxClass;              // longest class string 
+    DWORD    cValues;              // number of values for key 
+    DWORD    cchMaxValue;          // longest value name 
+    DWORD    cbMaxValueData;       // longest value data 
+    DWORD    cbSecurityDescriptor; // size of security descriptor 
+    FILETIME ftLastWriteTime;      // last write time 
+ 
+    DWORD i, retCode; 
+ 
+    TCHAR  achValue[MAX_VALUE_NAME]; 
+    DWORD cchValue = MAX_VALUE_NAME; 
+ 
+    // Get the class name and the value count. 
+    retCode = RegQueryInfoKey(
+        hKey,                    // key handle 
+        achClass,                // buffer for class name 
+        &cchClassName,           // size of class string 
+        NULL,                    // reserved 
+        &cSubKeys,               // number of subkeys 
+        &cbMaxSubKey,            // longest subkey size 
+        &cchMaxClass,            // longest class string 
+        &cValues,                // number of values for this key 
+        &cchMaxValue,            // longest value name 
+        &cbMaxValueData,         // longest value data 
+        &cbSecurityDescriptor,   // security descriptor 
+        &ftLastWriteTime);       // last write time 
+ 
+    // Enumerate the subkeys, until RegEnumKeyEx fails.
+    
+    if (cSubKeys)
+    {
+        printf( "\nNumber of subkeys: %d\n", cSubKeys);
+
+        for (i=0; i<cSubKeys; i++) 
+        { 
+            cbName = MAX_KEY_LENGTH;
+            retCode = RegEnumKeyEx(hKey, i,
+                     achKey, 
+                     &cbName, 
+                     NULL, 
+                     NULL, 
+                     NULL, 
+                     &ftLastWriteTime); 
+            if (retCode == ERROR_SUCCESS) 
+            {
+                _tprintf(TEXT("(%d) %s\n"), i+1, achKey);
+            }
+        }
+    } 
+ 
+    // Enumerate the key values. 
+
+    if (cValues) 
+    {
+        printf( "\nNumber of values: %d\n", cValues);
+
+        for (i=0, retCode=ERROR_SUCCESS; i<cValues; i++) 
+        { 
+            cchValue = MAX_VALUE_NAME; 
+            achValue[0] = '\0'; 
+            retCode = RegEnumValue(hKey, i, 
+                achValue, 
+                &cchValue, 
+                NULL, 
+                NULL,
+                NULL,
+                NULL);
+ 
+            if (retCode == ERROR_SUCCESS ) 
+            { 
+                _tprintf(TEXT("(%d) %s\n"), i+1, achValue); 
+            } 
+        }
+    }
+}
+
+
+/*****************************************************************************************************************
+Method to return the full qualified application executable file path from the registry
+*****************************************************************************************************************/
+JNIEXPORT jstring JNICALL Java_gde_utils_WindowsHelper_findApplicationPath
+  (JNIEnv *env, jclass cl, jstring jexecuteableName)
+{	
+	const char *executeableName = env->GetStringUTFChars(jexecuteableName, 0);
+	char szSubKeyPath[MAX_PATH];
+	char szReturn[MAX_PATH];
+	WCHAR wszReturn[MAX_PATH*2];
+	WCHAR wszTemp[MAX_PATH*2];
+	
+/*	
+[HKEY_CLASSES_ROOT\Applications\googleearth.exe\shell\Open\command]
+@="C:\\Program Files\\Google\\Google Earth\\client\\googleearth.exe \"%1\""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Applications\googleearth.exe\shell\Open\command]
+@="C:\\Program Files\\Google\\Google Earth\\client\\googleearth.exe \"%1\""
+*/
+	HKEY hTestKey;
+	TCHAR  achValue[MAX_PATH]; 
+    DWORD cchValue = MAX_PATH; 
+    DWORD cchReturn = MAX_PATH; 
+
+	szReturn[0] = '\0';
+	wszReturn[0] = '\0';
+	char * regBase1 = "Applications\\";
+	char * regBase2 = "SOFTWARE\\Classes\\Applications\\";
+	char * command = "\\shell\\Open\\command";
+	
+	szSubKeyPath[0] = '\0';
+	strcat_s(szSubKeyPath, (size_t)MAX_PATH, regBase1);
+	strcat_s(szSubKeyPath, (size_t)MAX_PATH, executeableName);
+	strcat_s(szSubKeyPath, (size_t)MAX_PATH, command);
+	//printf("registry key = %s\n", szSubKeyPath);	    
+	MultiByteToWideChar(CP_UTF8, 0, szSubKeyPath, -1, wszTemp, sizeof(wszTemp)); // Ensure string is Unicode.
+	
+	if( RegOpenKeyEx( HKEY_CLASSES_ROOT, wszTemp, 0, KEY_READ, &hTestKey) == ERROR_SUCCESS )  {
+   		//printf("query the value\n");
+		RegEnumValue(hTestKey, 0, 
+                achValue, 
+                &cchValue, 
+                NULL, 
+                NULL,
+                (LPBYTE)wszReturn,
+                &cchReturn);
+   		RegCloseKey(hTestKey);
+   	}
+	else {
+		achValue[0] = '\0'; 
+		cchValue = MAX_PATH; 
+		cchReturn = MAX_PATH; 
+		szSubKeyPath[0] = '\0';
+		strcat_s(szSubKeyPath, (size_t)MAX_PATH, regBase2);
+		strcat_s(szSubKeyPath, (size_t)MAX_PATH, executeableName);
+		strcat_s(szSubKeyPath, (size_t)MAX_PATH, command);
+		//printf("registry key = %s\n", szSubKeyPath);	    
+		MultiByteToWideChar(CP_UTF8, 0, szSubKeyPath, -1, wszTemp, sizeof(wszTemp)); // Ensure string is Unicode.
+		if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, wszTemp, 0, KEY_READ, &hTestKey) == ERROR_SUCCESS )  {
+			//printf("query the value\n");
+			RegEnumValue(hTestKey, 0, 
+		            achValue, 
+		            &cchValue, 
+		            NULL, 
+		            NULL,
+		            (LPBYTE)wszReturn,
+		            &cchReturn);
+			RegCloseKey(hTestKey);
+		}
+	}	
+   
+   	if(sizeof(wszReturn) > sizeof(executeableName)*2) {
+		WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)wszReturn, -1, szReturn, (sizeof(szReturn) - sizeof(char)), NULL, NULL);
+		//printf("executable path = '%s'\n", szReturn);
+	}
+	env->ReleaseStringUTFChars(jexecuteableName, executeableName);
+	return env->NewStringUTF(szReturn);
 }

@@ -49,6 +49,14 @@ JNIEXPORT jstring JNICALL Java_gde_utils_WindowsHelper_getFilePathFromLink
 JNIEXPORT jobjectArray JNICALL Java_gde_utils_WindowsHelper_enumerateSerialPorts
   (JNIEnv *, jclass);
 
+/*
+ * Class:     de_utils_WindowsHelper
+ * Method:    findApplicationPath
+ * Signature: (Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_gde_utils_WindowsHelper_findApplicationPath
+  (JNIEnv *, jclass, jstring);
+
 #ifdef __cplusplus
 }
 #endif
