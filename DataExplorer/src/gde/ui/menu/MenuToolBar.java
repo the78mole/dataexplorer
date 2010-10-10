@@ -38,9 +38,12 @@ import gde.ui.dialog.DeviceSelectionDialog;
 import gde.ui.dialog.PrintSelectionDialog;
 import gde.ui.tab.GraphicsComposite;
 import gde.ui.tab.GraphicsWindow;
+import gde.utils.ApplicationLauncher;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyScanner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -115,6 +118,10 @@ public class MenuToolBar {
 	CoolItem											helpCoolItem;
 	ToolBar												helpToolBar;
 	ToolItem											helpToolItem;
+	
+	CoolItem											googleEarthCoolItem;
+	ToolBar												googleEarthToolBar;
+	ToolItem											googleEarthToolItem;
 	
 	final DataExplorer	application;
 	final Channels								channels;
@@ -956,6 +963,44 @@ public class MenuToolBar {
 			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		}
+		
+		{ // begin google earth cool item
+			this.googleEarthCoolItem = new CoolItem(this.coolBar, SWT.NONE);
+			{ // begin file tool bar
+				this.googleEarthToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.googleEarthCoolItem.setControl(this.googleEarthToolBar);
+				{
+					this.googleEarthToolItem = new ToolItem(this.googleEarthToolBar, SWT.NONE);
+					this.googleEarthToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0229));
+					this.googleEarthToolItem.setImage(SWTResourceManager.getImage("gde/resource/Earth.gif")); //$NON-NLS-1$
+					this.googleEarthToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/EarthHot.gif")); //$NON-NLS-1$
+					this.googleEarthToolItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/EarthDisabled.gif")); //$NON-NLS-1$
+					this.googleEarthToolItem.setEnabled(false);
+					this.googleEarthToolItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "googleEarthToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							String kmlFilePath = MenuToolBar.this.application.getActiveDevice().exportFile(GDE.FILE_ENDING_KML);
+							if (kmlFilePath.length() > 4) {
+								List<String> argumentList = new ArrayList<String>();
+								argumentList.add(kmlFilePath);
+								if (GDE.IS_MAC)
+									new ApplicationLauncher("Google Earth").execute(argumentList); //$NON-NLS-1$
+								else if (GDE.IS_LINUX)
+									new ApplicationLauncher("googleearth").execute(argumentList); //$NON-NLS-1$
+								else
+									new ApplicationLauncher("googleearth.exe").execute(argumentList); //$NON-NLS-1$
+							}
+						}
+					});
+				}
+			}
+			this.toolSize = this.googleEarthToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			this.googleEarthCoolItem.setSize(this.toolSize.x, this.toolSize.y);
+			//this.googleEarthCoolItem.setPreferredSize(this.size);
+			this.googleEarthCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
+			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
+		} // end google earth cool item
+
 		{ // begin help cool item
 			this.helpCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin file tool bar
@@ -982,9 +1027,9 @@ public class MenuToolBar {
 											else if (tabItem instanceof GraphicsWindow) {
 												((GraphicsWindow)tabItem).getGraphicsComposite().notifyListeners(SWT.Help, new Event());
 											}
-											else if (tabItem.getText().endsWith("Tool")) { //DataVarioTool, LinkVarioTool
+											else if (tabItem.getText().endsWith("Tool")) { //DataVarioTool, LinkVarioTool //$NON-NLS-1$
 												if (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().isUtilityDeviceTabRequested()) {
-													MenuToolBar.this.application.openHelpDialog("WStechVario", "HelpInfo.html"); 	//$NON-NLS-1$
+													MenuToolBar.this.application.openHelpDialog("WStechVario", "HelpInfo.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
 												}
 											}
 										}
@@ -999,7 +1044,7 @@ public class MenuToolBar {
 			//this.helpCoolItem.setPreferredSize(this.size);
 			this.helpCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
-		} // end file cool item
+		} // end help cool item
 		
 		// set the focus controlled to an item which has no slection capability
 		this.deviceObjectToolBar.setFocus();
@@ -1474,5 +1519,13 @@ public class MenuToolBar {
 	public void enableScopePointsCombo(boolean enabled) {
 		this.isScopePointsCombo = enabled;
 		this.scopePointsCombo.setEnabled(enabled);
+	}
+	
+	/**
+	 * switch enable the google earth tool item, if enabled KML export with google earth launch could be executed
+	 * this functions queries the actual device with actual record set for GPS data
+	 */
+	public void updateGoogleEarthToolItem() {
+		this.googleEarthToolItem.setEnabled(this.application.getActiveDevice().isActualRecordSetWithGpsData());
 	}
 }

@@ -24,12 +24,14 @@ import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -53,6 +55,7 @@ import gde.ui.dialog.DeviceSelectionDialog;
 import gde.ui.dialog.PrintSelectionDialog;
 import gde.ui.dialog.edit.DevicePropertiesEditor;
 import gde.ui.tab.GraphicsComposite;
+import gde.ui.tab.GraphicsWindow;
 
 /**
  * menu bar implementation class for the DataExplorer
@@ -609,7 +612,7 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
-									.getGraphicsTemplatePath(), null);
+									.getGraphicsTemplatePath(), null, SWT.SINGLE);
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							GraphicsTemplate template = activeChannel.getTemplate();
 							template.setNewFileName(fileDialog.getFileName());
@@ -712,9 +715,29 @@ public class MenuBar {
 					this.contentsMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0044)); 
 					this.contentsMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "contentsMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo.html");  //$NON-NLS-1$
-						}
+							log.log(Level.FINEST, "contentsMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (MenuBar.this.application.getActiveDevice().getDialog() != null && !MenuBar.this.application.getActiveDevice().getDialog().isDisposed()) {
+								MenuBar.this.application.getActiveDevice().getDialog().getDialogShell().getShell().notifyListeners(SWT.Help, new Event());
+							}
+							else {
+								for (CTabItem tabItem : MenuBar.this.application.getTabFolder().getItems()) {
+									if (!tabItem.isDisposed()&& tabItem.getControl().isVisible()) {
+										if (tabItem.getControl().isListening(SWT.Help)) {
+											tabItem.getControl().notifyListeners(SWT.Help, new Event());
+											break;
+										}
+										else if (tabItem instanceof GraphicsWindow) {
+											((GraphicsWindow)tabItem).getGraphicsComposite().notifyListeners(SWT.Help, new Event());
+										}
+										else if (tabItem.getText().endsWith("Tool")) { //DataVarioTool, LinkVarioTool //$NON-NLS-1$
+											if (MenuBar.this.application.getActiveDevice() != null && MenuBar.this.application.getActiveDevice().isUtilityDeviceTabRequested()) {
+												MenuBar.this.application.openHelpDialog("WStechVario", "HelpInfo.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+											}
+										}
+									}
+								}
+							}
+					}
 					});
 				}
 				{

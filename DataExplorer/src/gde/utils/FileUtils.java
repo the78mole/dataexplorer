@@ -180,13 +180,13 @@ public class FileUtils {
 				List<File> files = FileUtils.getFileListing(dir);
 				for (File file : files) {
 					if (file.canWrite()) {
-						file.delete();
+						log.log(Level.INFO, file.getAbsolutePath() + " deletion " + file.delete());
 					}
 					else {
 						log.log(Level.WARNING, "no delete permission on " + file.getAbsolutePath()); //$NON-NLS-1$
 					}
 				}
-				dir.delete();
+				log.log(Level.INFO, dir.getAbsolutePath() + " deletion " + dir.delete());
 			}
 			catch (Exception e) {
 				if (e instanceof FileNotFoundException) {
@@ -211,6 +211,16 @@ public class FileUtils {
 	public static boolean checkFileExist(final String fullQualifiedFileName) {
 		File file = new File(fullQualifiedFileName);
 		return file.exists() && !file.isDirectory();
+	}
+	
+	/**
+	 * check if a directory exist, the file path given must fully qualified
+	 * @param fullQualifiedFileName
+	 * @return true if file exist
+	 */
+	public static boolean checkDirectoryExist(final String fullQualifiedFileName) {
+		File file = new File(fullQualifiedFileName);
+		return file.exists() && file.isDirectory();
 	}
 	
 	/**
@@ -241,10 +251,12 @@ public class FileUtils {
 	 */
 	public static void cleanFile(String fullQualifiedFilePath) {
 	    
-		if (FileUtils.checkFileExist(fullQualifiedFilePath)) {
+		if (FileUtils.checkFileExist(fullQualifiedFilePath) || FileUtils.checkDirectoryExist(fullQualifiedFilePath)) {
 		    File fileToBeDeleted = new File(fullQualifiedFilePath);
 			if (!fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite()) 
 				fileToBeDeleted.delete();
+			else if(fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite())
+				FileUtils.deleteDirectory(fileToBeDeleted.getAbsolutePath());
 			else
 				log.log(Level.WARNING, fileToBeDeleted.getAbsolutePath() + " is a directory or no delete permission !" ); //$NON-NLS-1$
 		}
@@ -266,22 +278,22 @@ public class FileUtils {
 		}
 		if (fileNamesWildCard.size() > 0) {
 			for (String fileName : fileNamesWildCard) {
-				String startSignature = fileName.substring(0, fileName.indexOf(GDE.STRING_STAR));
-				String endingSignature = fileName.substring(fileName.lastIndexOf(GDE.STRING_STAR)+1);
 				try {
+					String startSignature = fileName.substring(0, fileName.indexOf(GDE.STRING_STAR));
+					String endingSignature = fileName.substring(fileName.lastIndexOf(GDE.STRING_STAR) + 1);
 					List<File> fileList = FileUtils.getFileListingNoSort(new File(fileBasePath));
 					for (File file : fileList) {
 						String tmpFileName = file.getName();
 						log.log(Level.FINE, "evaluating " + tmpFileName); //$NON-NLS-1$
-						if ( (startSignature.length() == 0 && endingSignature.length() != 0 && tmpFileName.endsWith(endingSignature)) 	// "*register.sh"
-							|| (startSignature.length() != 0 && tmpFileName.startsWith(startSignature) && endingSignature.length() == 0) 	// "bootstrap.log*"
-							|| (startSignature.length() != 0 && tmpFileName.startsWith(startSignature) && endingSignature.length() != 0 && tmpFileName.endsWith(endingSignature))) {  // "swt*448.dll"
+						if ((startSignature.length() == 0 && endingSignature.length() != 0 && tmpFileName.endsWith(endingSignature)) // "*register.sh"
+								|| (startSignature.length() != 0 && tmpFileName.startsWith(startSignature) && endingSignature.length() == 0) // "bootstrap.log*"
+								|| (startSignature.length() != 0 && tmpFileName.startsWith(startSignature) && endingSignature.length() != 0 && tmpFileName.endsWith(endingSignature))) { // "swt*448.dll"
 							log.log(Level.FINE, "deleting " + tmpFileName); //$NON-NLS-1$
 							FileUtils.cleanFile(fileBasePath + tmpFileName);
 						}
 					}
 				}
-				catch (FileNotFoundException e) {
+				catch (Exception e) {
 					log.log(Level.WARNING, e.getMessage(), e);
 				}
 			}

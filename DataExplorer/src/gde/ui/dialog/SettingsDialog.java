@@ -262,7 +262,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.defaultDataPath = new Text(this.defaultDataPathGroup, SWT.BORDER);
 								this.defaultDataPath.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.defaultDataPath.setBounds(107, GDE.IS_MAC_COCOA ? 14 : 24, 295, GDE.IS_LINUX ? 22 : GDE.IS_MAC_CARBON ? 30 : 20);
+								this.defaultDataPath.setBounds(107, GDE.IS_MAC_COCOA ? 14 : 24, 295, GDE.IS_LINUX ? 22 : 20);
 							}
 							{
 								this.defaultDataPathAdjustButton = new Button(this.defaultDataPathGroup, SWT.PUSH | SWT.CENTER);
@@ -495,7 +495,7 @@ public class SettingsDialog extends Dialog {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "enableBlackListButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-										System.clearProperty("gnu.io.rxtx.SerialPorts");
+										System.clearProperty("gnu.io.rxtx.SerialPorts"); //$NON-NLS-1$
 										if (SettingsDialog.this.enableBlackListButton.getSelection()) {
 											SettingsDialog.this.settings.setSerialPortBlackListEnabled(true);
 											SettingsDialog.this.serialPortBlackList.setEditable(true);
@@ -517,18 +517,18 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortBlackList.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.serialPortBlackList.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0337));
-								this.serialPortBlackList.setBounds(260, GDE.IS_MAC_COCOA ? 24 : 34, 181, GDE.IS_LINUX ? 22 : GDE.IS_MAC_CARBON ? 30 : 20);
+								this.serialPortBlackList.setBounds(260, GDE.IS_MAC_COCOA ? 24 : 34, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
-										log.log(Level.FINEST, ""+StringHelper.verifyPortInput(e.text.trim()));
+										log.log(Level.FINEST, GDE.STRING_EMPTY+StringHelper.verifyPortInput(e.text.trim()));
 										e.doit = StringHelper.verifyPortInput(e.text.trim());
 									}
 								});
 								this.serialPortBlackList.addKeyListener(new KeyAdapter() {
 									@Override
 									public void keyReleased(KeyEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "serialPortBlackList.keyReleased, event=" + evt);
+										SettingsDialog.log.log(Level.FINEST, "serialPortBlackList.keyReleased, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSerialPortBlackList(SettingsDialog.this.serialPortBlackList.getText());
 									}
 								});
@@ -557,7 +557,7 @@ public class SettingsDialog extends Dialog {
 											SettingsDialog.this.settings.setSerialPortWhiteListEnabled(false);
 											SettingsDialog.this.serialPortWhiteList.setEditable(false);
 											SettingsDialog.this.serialPortWhiteList.setEnabled(false);
-											System.clearProperty("gnu.io.rxtx.SerialPorts");
+											System.clearProperty("gnu.io.rxtx.SerialPorts"); //$NON-NLS-1$
 										}
 									}
 								});
@@ -566,18 +566,18 @@ public class SettingsDialog extends Dialog {
 								this.serialPortWhiteList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortWhiteList.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.serialPortWhiteList.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0339));
-								this.serialPortWhiteList.setBounds(260, GDE.IS_MAC_COCOA ? 47 : 57, 181, GDE.IS_LINUX ? 22 : GDE.IS_MAC_CARBON ? 30 : 20);
+								this.serialPortWhiteList.setBounds(260, GDE.IS_MAC_COCOA ? 47 : 57, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortWhiteList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
-										//log.log(Level.FINEST, ""+StringHelper.verifyPortInput(e.text));
+										//log.log(Level.FINEST, GDE.STRING_EMPTY+StringHelper.verifyPortInput(e.text));
 										//e.doit = StringHelper.verifyPortInput(e.text);
 									}
 								});
 								this.serialPortWhiteList.addKeyListener(new KeyAdapter() {
 									@Override
 									public void keyReleased(KeyEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "serialPortWhiteList.keyReleased, event=" + evt);
+										SettingsDialog.log.log(Level.FINEST, "serialPortWhiteList.keyReleased, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSerialPortWhiteList(SettingsDialog.this.serialPortWhiteList.getText());
 									}
 								});
@@ -749,7 +749,7 @@ public class SettingsDialog extends Dialog {
 								this.scanObjectKeysButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "scanObjectKeysButton.widgetSelected, event=" + evt);
+										SettingsDialog.log.log(Level.FINEST, "scanObjectKeysButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										final ObjectKeyScanner objLnkSearch = new ObjectKeyScanner();
 										objLnkSearch.setSearchForKeys(true);
 										objLnkSearch.start();
@@ -785,7 +785,7 @@ public class SettingsDialog extends Dialog {
 								this.cleanObjectReferecesButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "cleanObjectReferecesButton.widgetSelected, event=" + evt);
+										SettingsDialog.log.log(Level.FINEST, "cleanObjectReferecesButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										new Thread() {
 											@Override
 											public void run() {
@@ -822,7 +822,7 @@ public class SettingsDialog extends Dialog {
 								this.resourceConsumptionButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "resourceConsumptionButton.widgetSelected, event=" + evt);
+										SettingsDialog.log.log(Level.FINEST, "resourceConsumptionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SWTResourceManager.listResourceStatus();
 									}
 								});
@@ -1092,14 +1092,14 @@ public class SettingsDialog extends Dialog {
 					// check if black or white list enabled and some chars typed but not accepted
 					if (SettingsDialog.this.settings.isSerialPortBlackListEnabled()) {
 						SettingsDialog.this.settings.setSerialPortBlackList(SettingsDialog.this.serialPortBlackList.getText());
-						System.clearProperty("gnu.io.rxtx.SerialPorts");
+						System.clearProperty("gnu.io.rxtx.SerialPorts"); //$NON-NLS-1$
 					}
 					else if (SettingsDialog.this.settings.isSerialPortWhiteListEnabled()) {
 						SettingsDialog.this.settings.setSerialPortWhiteList(SettingsDialog.this.serialPortWhiteList.getText());
 						//System.setProperty("gnu.io.rxtx.SerialPorts", "COMx"); set by setSerialPortWhiteList()
 					}
 					else {
-						System.clearProperty("gnu.io.rxtx.SerialPorts");
+						System.clearProperty("gnu.io.rxtx.SerialPorts"); //$NON-NLS-1$
 					}
 					// check for changed local
 					if (SettingsDialog.this.isLocaleLanguageChanged) {

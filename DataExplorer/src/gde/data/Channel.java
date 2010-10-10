@@ -491,6 +491,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.checkAllDisplayable(); // updates graphics window
 			
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
+			this.application.getMenuToolBar().updateGoogleEarthToolItem();
 			this.application.cleanHeaderAndCommentInGraphicsWindow();
 			this.application.updateGraphicsWindow();
 			this.application.updateStatisticsData();

@@ -58,17 +58,20 @@ public class GDE {
 
 	
 	// ****** begin global constants section *******
-	public static final String		GDE_VERSION												= "Version 2.42";						//$NON-NLS-1$
+	public static final String		GDE_VERSION												= "Version 2.43";						//$NON-NLS-1$
 	public static final String		GDE_NAME_LONG											= "DataExplorer";	//$NON-NLS-1$
 	public final static String		DEVICE_PROPERTIES_XSD_VERSION			= "_V11"; 									//$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION		= "_V04"; 									//$NON-NLS-1$
 	
-	public static final boolean		IS_WINDOWS								= System.getProperty("os.name").toLowerCase().startsWith("windows");//$NON-NLS-1$
-	public static final boolean		IS_LINUX									= System.getProperty("os.name").toLowerCase().startsWith("linux");	//$NON-NLS-1$
-	public static final boolean		IS_MAC										= System.getProperty("os.name").toLowerCase().startsWith("mac");		//$NON-NLS-1$
-	public static final boolean		IS_MAC_CARBON							= GDE.IS_MAC && System.getProperty("DO_NOT_USE_CARBON") == null && SWT.getPlatform().toLowerCase().startsWith("carbon");		//$NON-NLS-1$
-	public static final boolean		IS_MAC_COCOA							= GDE.IS_MAC && System.getProperty("DO_NOT_USE_COCOA") == null && SWT.getPlatform().toLowerCase().startsWith("cocoa");		//$NON-NLS-1$
-	public static final boolean		IS_ARCH_DATA_MODEL_64			= System.getProperty("sun.arch.data.model").equals("64");		//$NON-NLS-1$
+	public static final boolean		IS_WINDOWS								= System.getProperty("os.name").toLowerCase().startsWith("windows");//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean		IS_LINUX									= System.getProperty("os.name").toLowerCase().startsWith("linux");	//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean		IS_MAC										= System.getProperty("os.name").toLowerCase().startsWith("mac");		//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean		IS_MAC_COCOA							= GDE.IS_MAC && System.getProperty("DO_NOT_USE_COCOA") == null && SWT.getPlatform().toLowerCase().startsWith("cocoa");		//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean		IS_ARCH_DATA_MODEL_64			= System.getProperty("sun.arch.data.model").equals("64");		//$NON-NLS-1$ //$NON-NLS-2$
+	
+	public static final String		STRING_DOT_MAC_APP_BASE_PATH	= "/Applications/"; 				//$NON-NLS-1$
+	public static final String		STRING_DOT_MAC_APP_EXE_PATH		= "/Contents/MacOS/"; 			//$NON-NLS-1$
+	public static final String		STRING_DOT_MAC_APP_OPEN				= "open";										//$NON-NLS-1$
 	
 	public static final String		STRING_BASE_PACKAGE				= "gde"; //$NON-NLS-1$
 	public final static int				WIDGET_FONT_SIZE					= GDE.IS_LINUX ? 8 : GDE.IS_MAC ? 12 : 9;
@@ -81,8 +84,8 @@ public class GDE {
 	public static final String		FILE_SEPARATOR_WINDOWS		= "\\";																															//$NON-NLS-1$
 	public static final String		FILE_SEPARATOR						= System.getProperty("file.separator");															//$NON-NLS-1$
 	public static final String		JAVA_IO_TMPDIR						= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR)//$NON-NLS-1$
-																															? System.getProperty("java.io.tmpdir") 
-																															: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;								
+																															? System.getProperty("java.io.tmpdir")  //$NON-NLS-1$
+																															: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;								 //$NON-NLS-1$
 																															
 
 	public final static int				SIZE_BYTES_INTEGER				= Integer.SIZE / 8;			// 32 bits / 8 bits per byte 
@@ -113,6 +116,8 @@ public class GDE {
 	public static final String		STRING_PLUS								= "+"; 					//$NON-NLS-1$
 	public static final String		STRING_TRUE								= "true"; 			//$NON-NLS-1$
 	public static final String		STRING_FALSE							= "false"; 			//$NON-NLS-1$
+	public static final String		STRING_SINGLE_QUOAT				= "'"; 					//$NON-NLS-1$
+	public static final String		STRING_DOT_APP						= ".app"; 			//$NON-NLS-1$
 	
 	public static final String[]	STRING_ARRAY_TRUE_FALSE		= new String[] { "true", "false" }; 	//$NON-NLS-1$ //$NON-NLS-2$
 	
@@ -143,6 +148,7 @@ public class GDE {
 	public static final String		FILE_ENDING_DOT_HEX				= ".hex";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_KML				= ".kml";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_GPX				= ".gpx";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_DOT_EXE				= ".exe";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_LOV						= "lov";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_OSD						= "osd";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_CSV						= "csv";	//$NON-NLS-1$
@@ -156,6 +162,7 @@ public class GDE {
 	public static final String		FILE_ENDING_GPX						= "gpx";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR					= "*";		//$NON-NLS-1$
 	public static final String		FILE_ENDING_HEX						= "hex";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_EXE						= "exe";	//$NON-NLS-1$
 
 	public final static String		LINE_SEPARATOR						= System.getProperty("line.separator"); // is OS dependent //$NON-NLS-1$
 
@@ -233,7 +240,7 @@ public class GDE {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final String $METHOD_NAME = "main";
+		final String $METHOD_NAME = "main"; //$NON-NLS-1$
 		String inputFilePath = STRING_EMPTY;
 		try {
 			GDE.initLogger();
@@ -252,7 +259,7 @@ public class GDE {
 
 			DataExplorer application = DataExplorer.getInstance();
 			for (int i=0; i<args.length; ++i) {
-				log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "commandline arg[" + i + "] = " + args[i]);//$NON-NLS-1$ $NON-NLS-2$
+				log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "commandline arg[" + i + "] = " + args[i]);//$NON-NLS-1$ //$NON-NLS-2$ $NON-NLS-2$
 			}
 			if (args.length > 0) {
 				args[0] = args[0].trim();
@@ -263,14 +270,14 @@ public class GDE {
 			}
 			
 	    // list system properties
-			StringBuilder sb = new StringBuilder().append("Environment : \n");
+			StringBuilder sb = new StringBuilder().append("Environment : \n"); //$NON-NLS-1$
 			Properties props = System.getProperties();
 	    Enumeration<?> e = props.propertyNames();
 	    while (e.hasMoreElements()) {
 	    	String propName = (String)e.nextElement();
-	    	sb.append(propName).append(" = ").append(props.get(propName)).append("\n");
+	    	sb.append(propName).append(" = ").append(props.get(propName)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	    }
-	    sb.append("SWT.PLATFORM = ").append(SWT.getPlatform()).append("\n");
+	    sb.append("SWT.PLATFORM = ").append(SWT.getPlatform()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	    log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, sb.toString());
 
 			application.execute(inputFilePath);
@@ -294,7 +301,7 @@ public class GDE {
 	 * @throws ClassNotFoundException 
 	 */
 	public static ClassLoader getClassLoader() throws MalformedURLException, URISyntaxException, ApplicationConfigurationException {
-		final String $METHOD_NAME = "getClassLoader";
+		final String $METHOD_NAME = "getClassLoader"; //$NON-NLS-1$
 		String basePath;
 		final Vector<URL> urls = new Vector<URL>();
 		URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
@@ -345,7 +352,7 @@ public class GDE {
     URL[] urls = ((URLClassLoader)GDE.getClassLoader()).getURLs();
 
     StringBuilder sb = new StringBuilder(); //.append(GDE.class.getProtectionDomain().getCodeSource().getLocation().getFile());
-    String pathSeparator = System.getProperty("path.separator");
+    String pathSeparator = System.getProperty("path.separator"); //$NON-NLS-1$
     for(URL url : urls) {
         sb.append(pathSeparator).append(url.getFile());
     }  

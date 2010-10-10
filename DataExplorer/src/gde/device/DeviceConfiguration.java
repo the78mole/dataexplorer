@@ -18,6 +18,16 @@
 ****************************************************************************************/
 package gde.device;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.CalculationThread;
+import gde.utils.StringHelper;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -37,15 +47,7 @@ import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.log.Level;
-import gde.log.LogFormatter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.utils.CalculationThread;
-import gde.utils.StringHelper;
+import org.eclipse.swt.custom.CTabItem;
 
 /**
  * Device Configuration class makes the parsed DeviceProperties XML accessible for the application
@@ -796,7 +798,7 @@ public class DeviceConfiguration {
 	}
 	
 	public String getDataBlockLeader() {
-		return this.dataBlock != null ? this.dataBlock.getLeader() : "$";
+		return this.dataBlock != null ? this.dataBlock.getLeader() : "$"; //$NON-NLS-1$
 	}
 
 	public void setDataBlockLeader(String value) {
@@ -808,7 +810,7 @@ public class DeviceConfiguration {
 	}
 	
 	public byte[] getDataBlockEnding() {
-		return this.dataBlock != null ? this.dataBlock.getTrailer() : new HexBinaryAdapter().unmarshal("0D0A");
+		return this.dataBlock != null ? this.dataBlock.getTrailer() : new HexBinaryAdapter().unmarshal("0D0A"); //$NON-NLS-1$
 	}
 
 	public String getDataBlockEndingLineEndingType() {
@@ -885,7 +887,7 @@ public class DeviceConfiguration {
 				this.dataBlock.setPreferredFileExtention(null);
 			}
 			else {
-				value = "*." + value;
+				value = "*." + value; //$NON-NLS-1$
 			}
 		} 
 		this.dataBlock.setPreferredFileExtention(value != null && isValidExt ? value : this.dataBlock.getPreferredFileExtention());
@@ -1890,5 +1892,52 @@ public class DeviceConfiguration {
 	public CalculationThread getCalculationThread() {
 		return this.calculationThread;
 	}
-
+	
+	/**
+	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
+	 * set value of -1 to suppress this measurement
+	 */
+	public int[] getCellVoltageOrdinals() {
+		return new int[] {-1, -1};
+	}
+	
+	/**
+	 * query if an utility graphics window tab is requested
+	 */
+	public boolean isUtilityGraphicsRequested() {
+		return false;
+	}
+	
+	/**
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * specific curve calculated from point combinations or other specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
+	 */
+	public CTabItem getUtilityDeviceTabItem() {
+		return null;
+	}
+	
+	/**
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * set value of -1 to suppress this measurement
+	 */
+	public boolean isActualRecordSetWithGpsData() {
+		return false;
+	}
+	
+	/**
+	 * export a file of the actual channel/record set
+	 * @return full qualified file path depending of the file ending type
+	 */
+	public String exportFile(String fileEndingType) {
+		return GDE.STRING_EMPTY;
+	}
+	
+	/**
+	 * query the jar name of the active device implementation
+	 * @return jar name of the active device
+	 */
+	public String getJarName() {
+		return this.getClass().getProtectionDomain().toString();
+	}
 }

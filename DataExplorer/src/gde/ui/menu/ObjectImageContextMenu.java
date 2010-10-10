@@ -60,7 +60,7 @@ public class ObjectImageContextMenu {
 			public void handleEvent(Event e) {
 				ObjectImageContextMenu.log.log(Level.FINEST, "newItem action performed! " + e); //$NON-NLS-1$
 				FileDialog imgFileDialog = ObjectImageContextMenu.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0431), new String[] { GDE.FILE_ENDING_STAR_JPG, GDE.FILE_ENDING_STAR_PNG,
-						GDE.FILE_ENDING_STAR_GIF }, Settings.getInstance().getDataFilePath(), null);
+						GDE.FILE_ENDING_STAR_GIF }, Settings.getInstance().getDataFilePath(), null, SWT.SINGLE);
 				String imgFilePath = imgFileDialog.getFilterPath();
 				ObjectImageContextMenu.log.log(Level.FINE, "imgFilePath = " + imgFilePath); //$NON-NLS-1$
 				if (imgFileDialog.getFileName().length() > 4) {

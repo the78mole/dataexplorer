@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import gde.GDE;
@@ -63,7 +64,12 @@ public class CSVSerialDataReaderWriter {
 	
 
 	/**
-	 * read the selected CSV file
+	 * read the selected CSV file and parse
+	 * @param filePath
+	 * @param device
+	 * @param recordNameExtend
+	 * @param channelConfigNumber
+	 * @param isRaw
 	 * @return record set created
 	 * @throws NotSupportedFileFormatException 
 	 * @throws MissMatchDeviceException 
@@ -71,7 +77,7 @@ public class CSVSerialDataReaderWriter {
 	 * @throws DataInconsitsentException 
 	 * @throws DataTypeException 
 	 */
-	public static RecordSet read(String filePath, IDevice device, String recordSetNameExtend, Integer channelConfigNumber, boolean isRaw) throws NotSupportedFileFormatException, IOException, DataInconsitsentException, DataTypeException {
+	public static RecordSet read(String filePath, IDevice device, String recordNameExtend, Integer channelConfigNumber, boolean isRaw) throws NotSupportedFileFormatException, IOException, DataInconsitsentException, DataTypeException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		String line = GDE.STRING_STAR;
 		RecordSet recordSet = null;
@@ -79,6 +85,7 @@ public class CSVSerialDataReaderWriter {
 		Channel activeChannel = null;
 		int lineNumber = 0;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
+		String recordSetNameExtend = device.getRecordSetStemName();
 
 		try {
 			if (channelConfigNumber == null)
@@ -130,14 +137,18 @@ public class CSVSerialDataReaderWriter {
 					if (device.getStateType() == null) 
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] {device.getPropertiesFileName()})); 
 					try {
+						
 						recordSetNameExtend = device.getStateType().getProperty().get(data.state - 1).getName(); // state name
+						if (recordNameExtend.length() > 0) {
+							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
+						}
 					}
 					catch (Exception e) {
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0044, new Object[] {data.state, filePath, device.getPropertiesFileName()})); 
 					}
 
 					//detect states where a new record set has to be created
-					if (recordSet == null || !recordSet.getName().endsWith(recordSetNameExtend) || lastRecordNumber != data.recordNumber) {
+					if (recordSet == null || !recordSet.getName().contains(recordSetNameExtend) || lastRecordNumber != data.recordNumber) {
 						
 						if (recordSet != null) { // apply something to previous record set
 							//check reasonable size of data points
@@ -158,7 +169,7 @@ public class CSVSerialDataReaderWriter {
 
 						recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), isRaw, true);
 						recordSetName = recordSet.getName(); // cut/correct length
-						String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified());
+						String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
 						boolean isOutdated = false;
 						try {
 							isOutdated = Integer.parseInt(dateTime.split(GDE.STRING_DASH)[0]) <= 2000;
@@ -166,8 +177,11 @@ public class CSVSerialDataReaderWriter {
 						catch (Exception e) {
 							// ignore and state as not outdated
 						}
-						if (!dateTime.startsWith("2000-01-01") || !isOutdated) {
+						if (!isOutdated) {
 							recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+						}
+						else {
+							recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
 						}
 
 						// make all records displayable while absolute data

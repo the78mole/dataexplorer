@@ -46,23 +46,23 @@ import java.util.logging.Logger;
 public class GPXWriter {
 	static Logger					log			= Logger.getLogger(GPXWriter.class.getName());
 	
-	static final String header = "<?xml version=\"1.0\" standalone=\"yes\" ?>" + GDE.LINE_SEPARATOR
-		+ "<gpx version=\"1.1\" creator=\"DataExplorer\" xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">" + GDE.LINE_SEPARATOR;
+	static final String header = "<?xml version=\"1.0\" standalone=\"yes\" ?>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "<gpx version=\"1.1\" creator=\"DataExplorer\" xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 
-	static final String leader = "<trk>" + GDE.LINE_SEPARATOR
-		+ "<name>%s</name>" + GDE.LINE_SEPARATOR
-		+ "<number>%d</number>" + GDE.LINE_SEPARATOR
-		+ "<trkseg>" + GDE.LINE_SEPARATOR;
+	static final String leader = "<trk>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "<name>%s</name>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "<number>%d</number>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "<trkseg>" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 	
-	static final String trkpt = "<trkpt lat=\"%.7f\" lon=\"%.7f\">" + GDE.LINE_SEPARATOR
-		+ "<ele>%.0f</ele>" + GDE.LINE_SEPARATOR
-		+ "<time>%sT%sZ</time>" + GDE.LINE_SEPARATOR
-		+ "<name>t:%ss   v=%.1fkm/h   h=%.1fm</name>" + GDE.LINE_SEPARATOR
-		+ "</trkpt>";
+	static final String trkpt = "<trkpt lat=\"%.7f\" lon=\"%.7f\">" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "<ele>%.0f</ele>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "<time>%sT%sZ</time>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "<name>t:%ss   v=%.1fkm/h   h=%.1fm</name>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "</trkpt>"; //$NON-NLS-1$
 
-	static final String trailer ="</trkseg>" + GDE.LINE_SEPARATOR
-		+ "</trk>" + GDE.LINE_SEPARATOR
-		+ "</gpx>" + GDE.LINE_SEPARATOR;
+	static final String trailer ="</trkseg>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "</trk>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "</gpx>" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 
 	final static DataExplorer			application	= DataExplorer.getInstance();
 	final static Channels					channels		= Channels.getInstance();
@@ -81,7 +81,7 @@ public class GPXWriter {
 	 */
 	public static void write(RecordSet recordSet, String filePath, int ordinalLongitude, int ordinalLatitude, int ordinalGPSHeight, int ordinalVelocity, int ordinalHeight, boolean isRelative) throws Exception {
 		BufferedWriter writer = null;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		StringBuilder	sb = new StringBuilder();
 		int gpsHeight0 = 0;
 		
@@ -133,7 +133,7 @@ public class GPXWriter {
 			}
 
 			if (recordLongitude == null || recordLatitude == null || recordGPSHeight == null)
-				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0005, new Object[] { "Longitude, Latitude, Height", recordSet.getChannelConfigName() }));
+				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0005, new Object[] { Messages.getString(MessageIds.GDE_MSGT0599), recordSet.getChannelConfigName() }));
 
 			boolean isHeight0Calculated = false;
 			for (int i = 0; i < recordEntries; i++) {
@@ -149,8 +149,8 @@ public class GPXWriter {
 							device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0),
 							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0),
 							height < 0 ? 0 : height,
-							new SimpleDateFormat("yyyy-MM-dd").format(date + i * 1000),
-							new SimpleDateFormat("HH:mm:ss").format(date + i * 1000),
+							new SimpleDateFormat("yyyy-MM-dd").format(date + i * 1000), //$NON-NLS-1$
+							new SimpleDateFormat("HH:mm:ss").format(date + i * 1000), //$NON-NLS-1$
 							recordSet.getTime(i)/1000/10,
 							device.translateValue(recordVelocity, recordVelocity.get(i) / 1000.0), 
 							device.translateValue(recordHeight, recordHeight.get(i) / 1000.0))).append(GDE.LINE_SEPARATOR);

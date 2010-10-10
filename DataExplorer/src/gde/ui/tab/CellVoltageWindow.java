@@ -20,6 +20,8 @@ package gde.ui.tab;
 
 import java.text.DecimalFormat;
 import java.util.Vector;
+
+import gde.GDE;
 import gde.log.Level;
 import java.util.logging.Logger;
 
@@ -163,7 +165,7 @@ public class CellVoltageWindow extends CTabItem {
 			this.cellVoltageMainComposite.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "cellVoltageMainComposite.helpRequested " + evt); //$NON-NLS-1$
-					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.cellVoltageMainComposite.addPaintListener(new PaintListener() {
@@ -184,21 +186,21 @@ public class CellVoltageWindow extends CTabItem {
 			this.voltageLimitsSelection.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "voltageLimitsSelection.helpRequested " + evt); //$NON-NLS-1$
-					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					DataExplorer.getInstance().openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.voltageLimitsSelection.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
 					log.logp(Level.FINEST, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$
-					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liPoLimits));
+					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liPoLimits));
 					CellVoltageWindow.this.liPoButton.setSelection(CellVoltageValues.compareVoltageLimits(CellVoltageValues.liPoLimits));
-					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liIoLimits));
+					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liIoLimits));
 					CellVoltageWindow.this.liIoButton.setSelection(CellVoltageValues.compareVoltageLimits(CellVoltageValues.liIoLimits));
-					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liFeLimits));
+					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.liFeLimits));
 					CellVoltageWindow.this.liFeButton.setSelection(CellVoltageValues.compareVoltageLimits(CellVoltageValues.liFeLimits));
-					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+CellVoltageValues.compareVoltageLimits(CellVoltageValues.niMhLimits));
+					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, GDE.STRING_EMPTY+CellVoltageValues.compareVoltageLimits(CellVoltageValues.niMhLimits));
 					CellVoltageWindow.this.niMhButton.setSelection(CellVoltageValues.compareVoltageLimits(CellVoltageValues.niMhLimits));
-					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, ""+!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection()));
+					log.logp(Level.FINE, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME, GDE.STRING_EMPTY+!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection()));
 					CellVoltageWindow.this.individualButton.setSelection(!(CellVoltageWindow.this.liPoButton.getSelection() || CellVoltageWindow.this.liIoButton.getSelection() || CellVoltageWindow.this.liFeButton.getSelection() || CellVoltageWindow.this.niMhButton.getSelection()));
 				}
 			});
@@ -487,7 +489,7 @@ public class CellVoltageWindow extends CTabItem {
 				int cellVoltageReferenceMasterOrdinal = recordSet.getDevice().getDesktopTargetReferenceOrdinal(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB);
 				if (cellVoltageReferenceMasterOrdinal >= 0 && recordSet.getScaleSyncedRecords(cellVoltageReferenceMasterOrdinal) != null) {
 					for (Record record : recordSet.getScaleSyncedRecords(cellVoltageReferenceMasterOrdinal)) {
-						log.log(Level.FINE, "record " + record.getName() + " symbol " + record.getSymbol());
+						log.log(Level.FINE, "record " + record.getName() + " symbol " + record.getSymbol()); //$NON-NLS-1$ //$NON-NLS-2$
 						if (record.getLast() >= 0) { // last value is current value
 							this.voltageVector.add(new CellInfo(record.getLast(), record.getName(), record.getUnit()));
 							this.voltageAvg += record.getLast();
@@ -571,13 +573,13 @@ public class CellVoltageWindow extends CTabItem {
 	void updateAndResize() {
 		boolean isSomeVoltagechanged = updateCellVoltageVector();
 		Point mainSize = CellVoltageWindow.this.cellVoltageMainComposite.getSize();
-		log.log(Level.FINE, "mainSize = " + mainSize.toString());
+		log.log(Level.FINE, "mainSize = " + mainSize.toString()); //$NON-NLS-1$
 		if (this.voltageVector.size() > 0) {
 			int cellWidth = mainSize.x / 6;
 			int x = (6 - CellVoltageWindow.this.voltageVector.size()) * cellWidth / 2;
 			int width = mainSize.x - (2 * x);
 			Rectangle bounds = new Rectangle(x, 45, width, mainSize.y - 100);
-			log.log(Level.FINE, "cover bounds = " + bounds.toString());
+			log.log(Level.FINE, "cover bounds = " + bounds.toString()); //$NON-NLS-1$
 			CellVoltageWindow.this.coverComposite.setBounds(bounds);
 			CellVoltageWindow.this.digitalComposite.setBounds((mainSize.x - 350) / 2, mainSize.y - 50, 350, 50);
 
@@ -616,13 +618,13 @@ public class CellVoltageWindow extends CTabItem {
 				Record record_U = activeRecordSet.getRecord(recordKeys[this.firstMeasurement]); // voltage U
 				if (record_U != null) {
 					CellVoltageWindow.this.voltageValue.setForeground(record_U.getColor());
-					CellVoltageWindow.this.voltageValue.setText(new DecimalFormat("0.00").format(device.translateValue(record_U, (record_U.getLast() / 1000.0))));
+					CellVoltageWindow.this.voltageValue.setText(new DecimalFormat("0.00").format(device.translateValue(record_U, (record_U.getLast() / 1000.0)))); //$NON-NLS-1$
 					CellVoltageWindow.this.voltageUnit.setText("[" + record_U.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				Record record_C = activeRecordSet.getRecord(recordKeys[this.secondMeasurement]); // capacitiy C
 				if (record_C != null) {
 					CellVoltageWindow.this.capacitiyValue.setForeground(record_C.getColor());
-					CellVoltageWindow.this.capacitiyValue.setText(new DecimalFormat("0").format(device.translateValue(record_C, (record_C.getLast() / 1000.0))));
+					CellVoltageWindow.this.capacitiyValue.setText(new DecimalFormat("0").format(device.translateValue(record_C, (record_C.getLast() / 1000.0)))); //$NON-NLS-1$
 					CellVoltageWindow.this.capacityUnit.setText("[" + record_C.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
@@ -639,10 +641,10 @@ public class CellVoltageWindow extends CTabItem {
 	 * 
 	 */
 	void clearVoltageAndCapacity() {
-		CellVoltageWindow.this.voltageValue.setText(""); //$NON-NLS-1$
-		CellVoltageWindow.this.voltageUnit.setText(""); //$NON-NLS-1$
-		CellVoltageWindow.this.capacitiyValue.setText(""); //$NON-NLS-1$
-		CellVoltageWindow.this.capacityUnit.setText(""); //$NON-NLS-1$
+		CellVoltageWindow.this.voltageValue.setText(GDE.STRING_EMPTY);
+		CellVoltageWindow.this.voltageUnit.setText(GDE.STRING_EMPTY);
+		CellVoltageWindow.this.capacitiyValue.setText(GDE.STRING_EMPTY);
+		CellVoltageWindow.this.capacityUnit.setText(GDE.STRING_EMPTY); 
 	}
 
 	/**

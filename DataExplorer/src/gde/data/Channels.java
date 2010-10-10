@@ -90,17 +90,17 @@ public class Channels extends HashMap<Integer, Channel> {
 		
 		if (channelName != null && channelName.length() > 5) {
 			// "2 : Outlet", use the first digit to calculate the channel number
-			if (channelName.contains(":") && channelName.split(GDE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(GDE.STRING_COLON)[0].trim().charAt(0))) {
+			if (channelName.contains(GDE.STRING_COLON) && channelName.split(GDE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(GDE.STRING_COLON)[0].trim().charAt(0))) {
 				return new Integer(channelName.split(GDE.STRING_COLON)[0].trim());
 			}
 			else // old file contnet "Outlet 2" use the last digit to calculate the channel number
-				if (channelName.contains(" ") && channelName.split(" ").length > 1 && Character.isDigit(channelName.split(" ")[1].trim().charAt(0))) {
-					return new Integer(channelName.split(" ")[1].trim());
+				if (channelName.contains(GDE.STRING_BLANK) && channelName.split(GDE.STRING_BLANK).length > 1 && Character.isDigit(channelName.split(GDE.STRING_BLANK)[1].trim().charAt(0))) {
+					return new Integer(channelName.split(GDE.STRING_BLANK)[1].trim());
 			}
 			else {
 				for (String name : this.getChannelNames()) {
 					// try name matching "Outlet"
-					if (name.split(GDE.STRING_COLON)[1].trim().equals(channelName) || name.split(GDE.STRING_COLON)[1].trim().split(" ")[0].trim().equals(channelName)) {
+					if (name.split(GDE.STRING_COLON)[1].trim().equals(channelName) || name.split(GDE.STRING_COLON)[1].trim().split(GDE.STRING_BLANK)[0].trim().equals(channelName)) {
 						break;
 					}
 					++searchedNumber;
@@ -198,6 +198,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				//this.application.getMenuToolBar().updateObjectSelector();
 				this.application.getMenuToolBar().updateChannelSelector();
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
+				this.application.getMenuToolBar().updateGoogleEarthToolItem();
 				this.application.updateGraphicsWindow();
 				this.application.updateStatisticsData();
 				this.application.updateDataTable(recordSetKey, true);

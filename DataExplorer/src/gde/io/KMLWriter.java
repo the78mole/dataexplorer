@@ -44,34 +44,34 @@ import java.util.logging.Logger;
 public class KMLWriter {
 	static Logger					log			= Logger.getLogger(KMLWriter.class.getName());
 	
-	static final String header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + GDE.LINE_SEPARATOR 
-		+ "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\">" + GDE.LINE_SEPARATOR  + GDE.LINE_SEPARATOR;
+	static final String header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + GDE.LINE_SEPARATOR  //$NON-NLS-1$
+		+ "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\">" + GDE.LINE_SEPARATOR  + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 
-	static final String leader = "<Placemark>"  + GDE.LINE_SEPARATOR
-		+ "\t<name>gx:%s</name>"  + GDE.LINE_SEPARATOR
-	  + "\t<LookAt>" + GDE.LINE_SEPARATOR
-    + "\t\t<longitude>%.7f</longitude>" + GDE.LINE_SEPARATOR
-    + "\t\t<latitude>%.7f</latitude>" + GDE.LINE_SEPARATOR
-    + "\t\t<heading>%d</heading>" + GDE.LINE_SEPARATOR
-    + "\t\t<tilt>%d</tilt>" + GDE.LINE_SEPARATOR
-    + "\t\t<range>%d</range>" + GDE.LINE_SEPARATOR
-    + "\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>" + GDE.LINE_SEPARATOR
-    + "\t</LookAt>" + GDE.LINE_SEPARATOR
-		+ "\t<Style>" + GDE.LINE_SEPARATOR
-		+ "\t\t<LineStyle>" + GDE.LINE_SEPARATOR
-		+ "\t\t\t<color>%s</color>" + GDE.LINE_SEPARATOR
-		+ "\t\t\t<width>%d</width>" + GDE.LINE_SEPARATOR
-		+ "\t\t</LineStyle>" + GDE.LINE_SEPARATOR
-		+ "\t</Style>" + GDE.LINE_SEPARATOR
-		+ "\t<LineString>" + GDE.LINE_SEPARATOR
-    + "\t\t<extrude>%d</extrude>" + GDE.LINE_SEPARATOR
-    + "\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>" + GDE.LINE_SEPARATOR
-    + "\t\t<coordinates>" + GDE.LINE_SEPARATOR;
+	static final String leader = "<Placemark>"  + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "\t<name>gx:%s</name>"  + GDE.LINE_SEPARATOR //$NON-NLS-1$
+	  + "\t<LookAt>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+    + "\t\t<longitude>%.7f</longitude>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+    + "\t\t<latitude>%.7f</latitude>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+    + "\t\t<heading>%d</heading>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+    + "\t\t<tilt>%d</tilt>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+    + "\t\t<range>%d</range>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+    + "\t\t<gx:altitudeMode>relativeToGround</gx:altitudeMode>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+    + "\t</LookAt>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "\t<Style>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "\t\t<LineStyle>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "\t\t\t<color>%s</color>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "\t\t\t<width>%d</width>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "\t\t</LineStyle>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "\t</Style>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "\t<LineString>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+    + "\t\t<extrude>%d</extrude>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+    + "\t\t<gx:altitudeMode>relativeToGround</gx:altitudeMode>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+    + "\t\t<coordinates>" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 	
-	static final String trailer ="\t\t</coordinates>" + GDE.LINE_SEPARATOR
-		+ "\t</LineString>" + GDE.LINE_SEPARATOR
-		+ "</Placemark>" + GDE.LINE_SEPARATOR
-		+ "</kml>" + GDE.LINE_SEPARATOR;
+	static final String trailer ="\t\t</coordinates>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "\t</LineString>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "</Placemark>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+		+ "</kml>" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 
 	final static DataExplorer			application	= DataExplorer.getInstance();
 	final static Channels					channels		= Channels.getInstance();
@@ -88,7 +88,7 @@ public class KMLWriter {
 	 */
 	public static void write(RecordSet recordSet, String filePath, int ordinalLongitude, int ordinalLatitude, int ordinalHeight, boolean isRelative) throws Exception {
 		BufferedWriter writer = null;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		StringBuilder	sb = new StringBuilder();
 		double height0 = 0;
 		
@@ -110,7 +110,7 @@ public class KMLWriter {
 			Record recordHeight = recordSet.getRecord(recordNames[ordinalHeight]);
 
 			if (recordLongitude == null || recordLatitude == null || recordHeight == null)
-				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0005, new Object[] { "Longitude, Latitude, Height", recordSet.getChannelConfigName() }));
+				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0005, new Object[] { Messages.getString(MessageIds.GDE_MSGT0599), recordSet.getChannelConfigName() })); //$NON-NLS-1$
 
 			boolean isLeaderWritten = false;
 			for (int i = 0; i < recordEntries; i++) {
@@ -120,16 +120,16 @@ public class KMLWriter {
 						writer.write(String.format(Locale.ENGLISH, leader, recordSet.getName(),
 								device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), 
 								device.translateValue(recordLongitude, recordLatitude.get(i) / 1000.0), 
-								-50, 70, 1000, "ff00ff00", 2, 0));
+								-50, 70, 1000, "ff00ff00", 2, 0)); //$NON-NLS-1$
 						isLeaderWritten = true;
 						
 						height0 = isRelative ? device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) : 0;
 					}
 					double height = device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0;
 					// add data entries, translate according device and measurement unit
-					sb.append(String.format(Locale.ENGLISH, "\t\t\t%.7f,", device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0)))
-						.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0)))
-						.append(String.format(Locale.ENGLISH, "%.0f", height < 0 ? 0 : height)).append(GDE.LINE_SEPARATOR);
+					sb.append(String.format(Locale.ENGLISH, "\t\t\t%.7f,", device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0))) //$NON-NLS-1$
+						.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0))) //$NON-NLS-1$
+						.append(String.format(Locale.ENGLISH, "%.0f", height < 0 ? 0 : height)).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
 	
 					writer.write(sb.toString());
 					sb = new StringBuilder();

@@ -75,7 +75,7 @@ public class FileHandler {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, null);
+		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, null, SWT.SINGLE);
 		if (csvFileDialog.getFileName().length() > 4) {
 			final String csvFilePath = csvFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
 
@@ -179,7 +179,7 @@ public class FileHandler {
 					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
 				}
 			}
-			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD, GDE.FILE_ENDING_STAR_LOV }, path, null);
+			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD, GDE.FILE_ENDING_STAR_LOV }, path, null, SWT.SINGLE);
 			if (openFileDialog.getFileName().length() > 4) {
 				String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 
@@ -408,8 +408,19 @@ public class FileHandler {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		String fileName = activeChannel.getFileName();
-		fileName = fileName != null ? fileName.substring(0, fileName.indexOf(".")) : "";
+		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal() : activeChannel.getFileName();
+		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
+		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
+			try {
+				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.STRING_LEFT_BRACKET)+1, activeRecordSet.getName().lastIndexOf(GDE.STRING_RIGHT_BRACKET));
+				if (!fileName.contains(GDE.STRING_EMPTY + Integer.parseInt(flightNumber))) {
+					fileName = fileName + GDE.STRING_UNDER_BAR + flightNumber;
+				}
+			}
+			catch (NumberFormatException e) {
+				// ignore
+			}
+		}
 		FileDialog kmlFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_KML }, path, fileName.length() > 4 ? fileName : getFileNameProposal());
 		String kmlFilePath = kmlFileDialog.open();
 		if (kmlFilePath != null && kmlFileDialog.getFileName().length() > 4) {
@@ -429,6 +440,62 @@ public class FileHandler {
 			this.application.enableMenuActions(true);
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
+	}
+
+	/**
+	 * handles the export of an KML file without using a file dialog
+	 * @param dialogName
+	 * @param ordinalLongitude
+	 * @param ordinalLatitude
+	 * @param ordinalHeight
+	 * @param isRelative
+	 * @return full qualified file path to the exported KML file
+	 */
+	public String exportFileKML(final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final boolean isRelative) {
+		String kmlFilePath = GDE.STRING_EMPTY;
+		final Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel == null) {
+			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005));
+			return GDE.STRING_EMPTY;
+		}
+		RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+		if (activeRecordSet == null) {
+			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005));
+			return GDE.STRING_EMPTY;
+		}
+
+		Settings deviceSetting = Settings.getInstance();
+		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		FileUtils.checkDirectoryAndCreate(path);
+		String fileName = path + (activeChannel.getFileName() == null ? this.getFileNameProposal() : activeChannel.getFileName());
+		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
+		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
+			try {
+				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.STRING_LEFT_BRACKET)+1, activeRecordSet.getName().lastIndexOf(GDE.STRING_RIGHT_BRACKET));
+				if (!fileName.contains(GDE.STRING_EMPTY + Integer.parseInt(flightNumber))) {
+					fileName = fileName + GDE.STRING_UNDER_BAR + flightNumber;
+				}
+			}
+			catch (NumberFormatException e) {
+				// ignore
+			}
+		}
+		kmlFilePath = fileName + GDE.FILE_ENDING_DOT_KML;
+		if (kmlFilePath != null && kmlFilePath.length() > 4) {
+			try {
+				this.application.enableMenuActions(false);
+				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+				KMLWriter.write(activeRecordSet, kmlFilePath, ordinalLongitude, ordinalLatitude, ordinalHeight, isRelative);
+			}
+			catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+				this.application.openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			}
+			this.application.enableMenuActions(true);
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+		}
+		return kmlFilePath;
 	}
 
 	/**
@@ -457,8 +524,19 @@ public class FileHandler {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		String fileName = activeChannel.getFileName();
-		fileName = fileName != null ? fileName.substring(0, fileName.indexOf(".")) : "";
+		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal() : activeChannel.getFileName();
+		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
+		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
+			try {
+				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.STRING_LEFT_BRACKET)+1, activeRecordSet.getName().lastIndexOf(GDE.STRING_RIGHT_BRACKET));
+				if (!fileName.contains(GDE.STRING_EMPTY + Integer.parseInt(flightNumber))) {
+					fileName = fileName + GDE.STRING_UNDER_BAR + flightNumber;
+				}
+			}
+			catch (NumberFormatException e) {
+				// ignore
+			}
+		}
 		FileDialog gpxFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName.length() > 4 ? fileName : getFileNameProposal());
 		String gpxFilePath = gpxFileDialog.open();
 		if (gpxFilePath != null && gpxFilePath.length() > 4) {

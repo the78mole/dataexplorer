@@ -320,11 +320,11 @@ public class DataExplorer extends Composite {
 		try {
 			//cleanup possible old files and native libraries
 			if (GDE.IS_WINDOWS) 
-				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "WinHelper*.dll", "Register*.exe", "swt*3448.dll", "rxtxSerial.dll"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "WinHelper*.dll", "Register*.exe", "swtlib-"+GDE.BIT_MODE, "rxtxSerial.dll"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			else if (GDE.IS_LINUX)
-				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "*register.sh", "libswt*3448.so", "librxtxSerial.so"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "*register.sh", "swtlib-"+GDE.BIT_MODE, "librxtxSerial.so"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			else if (GDE.IS_MAC)
-				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "librxtxSerial.jnilib"}); //$NON-NLS-1$
+				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "swtlib-"+GDE.BIT_MODE, "librxtxSerial.jnilib"}); //$NON-NLS-1$ //$NON-NLS-2$
 
 			//init settings
 			this.settings = Settings.getInstance();
@@ -431,7 +431,7 @@ public class DataExplorer extends Composite {
 	private void postInitGUI(final String inputFilePath) {
 		final String $METHOD_NAME = "postInitGUI"; //$NON-NLS-1$
 		try {
-			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init tabs");
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init tabs"); //$NON-NLS-1$
 			this.statisticsTabItem = new StatisticsWindow(this.displayTab, SWT.NONE);
 			this.statisticsTabItem.create();
 
@@ -444,7 +444,7 @@ public class DataExplorer extends Composite {
 
 			this.setObjectDescriptionTabVisible(this.menuToolBar.isObjectoriented());
 			
-			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init listener");
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init listener"); //$NON-NLS-1$
 			shell.addListener(SWT.Close, new Listener() {
 				public void handleEvent(Event evt) {
 					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, DataExplorer.shell.getLocation().toString() + "event = " + evt); //$NON-NLS-1$
@@ -617,7 +617,7 @@ public class DataExplorer extends Composite {
 				}
 			});
 
-			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init help listener");
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init help listener"); //$NON-NLS-1$
 			if (this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged()) this.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$
@@ -664,7 +664,7 @@ public class DataExplorer extends Composite {
 					this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0046));
 				else if (GDE.IS_LINUX && !OperatingSystemHelper.isUucpMember()) 
 					this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0045));
-				this.settings.setProperty(Settings.IS_LOCK_UUCP_HINTED, "true");
+				this.settings.setProperty(Settings.IS_LOCK_UUCP_HINTED, "true"); //$NON-NLS-1$
 			}
 
 			// check initial application settings
@@ -1440,9 +1440,9 @@ public class DataExplorer extends Composite {
 		}
 	}
 
-	public FileDialog openFileOpenDialog(String name, String[] extensions, String path, String fileName) {
+	public FileDialog openFileOpenDialog(String name, String[] extensions, String path, String fileName, int addStyle) {
 		final String $METHOD_NAME = "openFileOpenDialog"; //$NON-NLS-1$
-		FileDialog fileOpenDialog = new FileDialog(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.OPEN);
+		FileDialog fileOpenDialog = new FileDialog(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);
 		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
@@ -2385,7 +2385,7 @@ public class DataExplorer extends Composite {
 	public UtilGraphicsWindow setUtilGraphicsWindowVisible(boolean visible) {
 		if (visible) {
 			if (this.utilGraphicsTabItem == null || this.utilGraphicsTabItem.isDisposed()) {
-				this.utilGraphicsTabItem = new UtilGraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_UTIL, "Utility Graphics", this.displayTab.getItemCount());
+				this.utilGraphicsTabItem = new UtilGraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_UTIL, "Utility Graphics", this.displayTab.getItemCount()); //$NON-NLS-1$
 				this.utilGraphicsTabItem.create();
 			}
 		}

@@ -835,4 +835,22 @@ public interface IDevice {
 	 * set value of -1 to suppress this measurement
 	 */
 	public int[] getCellVoltageOrdinals();
+	
+	/**
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * @return true|false
+	 */
+	public boolean isActualRecordSetWithGpsData();
+	
+	/**
+	 * export a file of the actual channel/record set
+	 * @return full qualified file path depending of the file ending type
+	 */
+	public String exportFile(String fileEndingType);
+	
+	/**
+	 * query the jar name of the active device implementation
+	 * @return jar name of the active device
+	 */
+	public String getJarName();
 }
