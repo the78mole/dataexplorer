@@ -236,7 +236,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 	}
 
 	/**
-	 * test reading OSD files from directories used by OSDE application and writes OSD files to %TEMP%\Write_1_OSD
+	 * test reading OSD files from directories used by GDE application and writes OSD files to %TEMP%\Write_1_OSD
 	 * all consitent files must red without failures, 
 	 * the written files might different due to code updates (add/change properties)
 	 */
