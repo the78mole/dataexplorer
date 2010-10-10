@@ -42,8 +42,6 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.swt.custom.CTabItem;
-
 /**
  * eStation base device class
  * @author Winfried Brügmann
@@ -645,21 +643,5 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public int[] getCellVoltageOrdinals() {
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
 		return new int[] {0, 2};
-	}
-	
-	/**
-	 * query if an utility graphics window tab is requested
-	 */
-	public boolean isUtilityGraphicsRequested() {
-		return false;
-	}
-	
-	/**
-	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
-	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
-	 */
-	public CTabItem getUtilityDeviceTabItem() {
-		return null;
 	}
 }
