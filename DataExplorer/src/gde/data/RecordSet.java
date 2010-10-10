@@ -245,7 +245,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 			tmpRecord.statistics = this.device.getMeasurementStatistic(channelConfigurationNumber, i);
 			if (tmpRecord.statistics == null)
-				log.log(Level.WARNING, "tmpRecord.statistics == null");
+				log.log(Level.WARNING, "tmpRecord.statistics == null"); //$NON-NLS-1$
 			TriggerType tmpTrigger = tmpRecord.statistics != null ? tmpRecord.statistics.getTrigger() : null;
 			tmpRecord.triggerIsGreater = tmpTrigger != null ? tmpTrigger.isGreater() : null;
 			tmpRecord.triggerLevel = tmpTrigger != null ? tmpTrigger.getLevel() : null;
@@ -1180,7 +1180,7 @@ public class RecordSet extends HashMap<String, Record> {
 					//log.log(Level.INFO, this.name + "this.getMaxTime_ms() = " + record.drawTimeWidth);
 					record.minZoomScaleValue = record.minScaleValue;
 					record.maxZoomScaleValue = record.maxScaleValue;
-					log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(record.zoomTimeOffset) + " drawTimeWidth " + TimeLine.getFomatedTimeWithUnit(record.drawTimeWidth));
+					log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(record.zoomTimeOffset) + " drawTimeWidth " + TimeLine.getFomatedTimeWithUnit(record.drawTimeWidth)); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
@@ -1466,7 +1466,7 @@ public class RecordSet extends HashMap<String, Record> {
 		? GDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
 		if (this.isCompareSet) {
 			gridRecordName = this.realSize() == 0 ? GDE.STRING_DASH : this.getFirstRecordName();
-			log.log(Level.FINE, "gridRecordName = " + gridRecordName);
+			log.log(Level.FINE, "gridRecordName = " + gridRecordName); //$NON-NLS-1$
 		}
 		return gridRecordName;
 	}
@@ -1663,41 +1663,47 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 	
 	public void syncScaleOfSyncableRecords(boolean force) {
-		if (force) {
-			this.scaleSyncedRecords = new HashMap<Integer, Vector<Record>>(2);
-		}
-		for (int i = 0; i < this.size(); i++) {
-			PropertyType syncProperty = this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-			boolean isSyncableRecordContent = this.get(i).minValue != this.get(i).maxValue;// do not use 0 values for min/max calculation
-			if (isSyncableRecordContent && syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY) ) { 
-				int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
-				if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
-					this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
-					this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
-					this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
-					this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
-				}
-				if (!this.scaleSyncedRecords.get(syncMasterRecordOrdinal).contains(this.get(i))) {
-					this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(i));
-				}
-				this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
-				this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);
-				this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_SCALE_POSITION);
+		if (this.get(0).realSize() > 1) { //more than one data point
+			if (force) {
+				this.scaleSyncedRecords = new HashMap<Integer, Vector<Record>>(2);
 			}
-		}
-		
-		if (log.isLoggable(Level.FINE)) {
-			StringBuilder sb = new StringBuilder();
-			for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-				sb.append(syncRecordOrdinal).append(GDE.STRING_COLON);
-				for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-					sb.append(tmpRecord.name).append(GDE.STRING_SEMICOLON);
+			for (int i = 0; i < this.size(); i++) {
+				PropertyType syncProperty = this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+				if (this.get(i).isDataContained() && syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+					int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
+					if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
+						this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
+						this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
+						this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
+						this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
+					}
+					if (!this.scaleSyncedRecords.get(syncMasterRecordOrdinal).contains(this.get(i))) {
+						if ((i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
+							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(i));
+						else
+							//sort while add
+							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add((i - syncMasterRecordOrdinal), this.get(i));
+
+						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
+						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);
+						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_SCALE_POSITION);
+						log.log(Level.FINE, "add " + this.get(i).name);
+					}
 				}
 			}
-			log.log(Level.FINE, sb.toString());
-		}
-		if (this.scaleSyncedRecords.size() > 0) {
-			updateSyncRecordScale();
+			if (log.isLoggable(Level.FINE)) {
+				StringBuilder sb = new StringBuilder();
+				for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
+					sb.append(syncRecordOrdinal).append(GDE.STRING_COLON);
+					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+						sb.append(tmpRecord.name).append(GDE.STRING_SEMICOLON);
+					}
+				}
+				log.log(Level.FINE, sb.toString());
+			}
+			if (this.scaleSyncedRecords.size() > 0) {
+				updateSyncRecordScale();
+			}
 		}
 	}
 

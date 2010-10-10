@@ -1332,7 +1332,7 @@ public class Record extends Vector<Integer> {
 		try {
 			double tmpTimeValue = this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms();
 			int[] indexs = this.findBoundingIndexes(tmpTimeValue);
-			log.log(Level.FINE, tmpTimeValue + "; " + indexs[0] + "; " + indexs[1]);
+			log.log(Level.FINE, tmpTimeValue + "; " + indexs[0] + "; " + indexs[1]); //$NON-NLS-1$ //$NON-NLS-2$
 			if (indexs[0] == indexs[1]) {
 				pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue)).intValue();
 			}
@@ -1352,7 +1352,7 @@ public class Record extends Vector<Integer> {
 //			log.log(Level.WARNING, "pointPosY < 0");
 		}
 		catch (RuntimeException e) {
-			log.log(Level.WARNING, e.getMessage() + " xPos = " + xPos, e);
+			log.log(Level.WARNING, e.getMessage() + " xPos = " + xPos, e); //$NON-NLS-1$
 		}
 		return pointPosY > this.parent.drawAreaBounds.height ? this.parent.drawAreaBounds.height : pointPosY < 0 ? 0 : pointPosY;
 	}
@@ -1437,7 +1437,7 @@ public class Record extends Vector<Integer> {
 		this.zoomTimeOffset = this.getHorizontalDisplayPointTime_ms(zoomBounds.x) + this.getDrawTimeOffset_ms();
 		this.drawTimeWidth = this.getHorizontalDisplayPointTime_ms(zoomBounds.width-1);
 		this.zoomOffset = this.findBestIndex(this.zoomTimeOffset);
-		log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth));
+		log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		this.minZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.y, this.parent.drawAreaBounds);
 		this.maxZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
@@ -1721,7 +1721,7 @@ public class Record extends Vector<Integer> {
 				String value = prop.split(GDE.STRING_EQUAL)[1];
 				if (value != null && value.length() > 0) tmpProperty.setValue(value.trim());
 				this.properties.add(tmpProperty);
-				if (log.isLoggable(Level.FINE)) sb.append(propName).append(" = ").append(value);
+				if (log.isLoggable(Level.FINE)) sb.append(propName).append(" = ").append(value); //$NON-NLS-1$
 			}
 		}
 		log.log(Level.FINE, sb.toString());
@@ -2040,6 +2040,10 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public boolean isDataContained() {
+		return this.realSize() > 2 && (this.maxValue != 0 || this.minValue != this.maxValue || this.minValue != 0);
 	}
 }
 
