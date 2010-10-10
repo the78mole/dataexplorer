@@ -44,8 +44,6 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.swt.custom.CTabItem;
-
 /**
  * Class to implement QC-Copter device
  * @author Winfried Brügmann
@@ -260,16 +258,6 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 			}
 		}
 	}
-	
-	/**
-	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
-	 * set value of -1 to suppress this measurement
-	 */
-	public int[] getCellVoltageOrdinals() {
-		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
-		return new int[] {0, 3};
-	}
-	
 
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
@@ -465,21 +453,5 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
-	}
-	
-	/**
-	 * query if an utility graphics window tab is requested
-	 */
-	public boolean isUtilityGraphicsRequested() {
-		return false;
-	}
-	
-	/**
-	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
-	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
-	 */
-	public CTabItem getUtilityDeviceTabItem() {
-		return null;
 	}
 }
