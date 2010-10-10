@@ -38,8 +38,6 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.swt.custom.CTabItem;
-
 /**
  * AkkuMaster C4 device class implementation
  * @author Winfried Brügmann
@@ -373,28 +371,4 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 			}
 		}
 	}	
-	
-	/**
-	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
-	 * set value of -1 to suppress this measurement
-	 */
-	public int[] getCellVoltageOrdinals() {
-		return new int[] {-1, -1};
-	}
-	
-	/**
-	 * query if an utility graphics window tab is requested
-	 */
-	public boolean isUtilityGraphicsRequested() {
-		return false;
-	}
-	
-	/**
-	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
-	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
-	 */
-	public CTabItem getUtilityDeviceTabItem() {
-		return null;
-	}
 }
