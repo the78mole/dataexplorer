@@ -50,7 +50,7 @@ public class ReverseCorrectMessagesIds {
 	+ "# GDE_MSGW0000 -> warning messages \n" 
 	+ "# GDE_MSGI0000 -> info messages \n" 
 	+ "# GDE_MSGT0000 -> normal text \n"
-	+ "# range 0000 to 1000 reserved for base OSDE code \n" 
+	+ "# range 0000 to 1000 reserved for base GDE code \n" 
 	+ "# range 1001 to 1099 Sample + Simulator \n" 
 	+ "# range 1100 to 1199 AkkuMaster device \n" 
 	+ "# range 1200 to 1299 Picolario device \n"
@@ -73,8 +73,8 @@ public class ReverseCorrectMessagesIds {
 	final static String	begin_GDE_MSGT		= "# begin GDE_MSGT0000 -> normal text \n";
 	final static String	end_GDE_MSGT			= "# end GDE_MSGT0000 -> normal text \n\n";
 	final static String	skipLine					= " \n";
-	final static String	range_OSDE				= "# range 0000 to 1000 reserved for base OSDE code \n";
-	static boolean isRanageOSDE = false;
+	final static String	range_GDE				= "# range 0000 to 1000 reserved for base GDE code \n";
+	static boolean isRanageGDE = false;
 	final static String range_Sample			= "# range 1001 to 1099 Sample + Simulator \n"; 
 	static boolean isRanageSample = false;
 	final static String	range_AkkuMaster	= "# range 1100 to 1199 AkkuMaster device \n";
@@ -122,7 +122,7 @@ public class ReverseCorrectMessagesIds {
 		}
 		writer.write(end_GDE_MSGE);
 		readerIds.reset();
-		isRanageOSDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
+		isRanageGDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
 
 		//GDE_MSGW*
 		writer.write(begin_GDE_MSGW);
@@ -139,7 +139,7 @@ public class ReverseCorrectMessagesIds {
 		}
 		writer.write(end_GDE_MSGW);
 		readerIds.reset();
-		isRanageOSDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
+		isRanageGDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
 
 		//GDE_MSGI*
 		writer.write(begin_GDE_MSGI);
@@ -157,7 +157,7 @@ public class ReverseCorrectMessagesIds {
 		}
 		writer.write(end_GDE_MSGI);
 		readerIds.reset();
-		isRanageOSDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
+		isRanageGDE = isRanageAkkuMaster = isRanagePicolario = isRanageUniLog = isRanageeStation = false;
 
 		//GDE_MSGT*
 		writer.write(begin_GDE_MSGT);
@@ -195,8 +195,8 @@ public class ReverseCorrectMessagesIds {
 	 */
 	private static void writeRangeMark(BufferedWriter writer, int range) throws IOException {
 		if (range < 1000) {
-			if (!isRanageOSDE) writer.write(range_OSDE);
-			isRanageOSDE = true;
+			if (!isRanageGDE) writer.write(range_GDE);
+			isRanageGDE = true;
 		}
 		else if (range >= 1001 && range < 1099) {
 			if (!isRanageSample) writer.write(range_Sample);

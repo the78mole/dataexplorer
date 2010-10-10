@@ -172,7 +172,7 @@ public class LogViewReader {
 //					recordSet.setTimeStep_ms(new Double(recordSetInfo.get(RecordSet.TIME_STEP_MS).trim()).doubleValue());
 //				}
 //				catch (NumberFormatException e) { 
-//					//ignore and use OSDE value }
+//					//ignore and use GDE value }
 //				}
 				//recordSet.setObjectKey(recordSetInfo.get(GDE.OBJECT_KEY));
 
@@ -1703,7 +1703,7 @@ public class LogViewReader {
 	}
 	
 	/**
-	 * map LogView device names with OSDE device names if possible
+	 * map LogView device names with GDE device names if possible
 	 * @param deviceName
 	 * @return
 	 * @throws NotSupportedException 

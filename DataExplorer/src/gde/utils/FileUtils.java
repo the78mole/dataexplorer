@@ -269,7 +269,7 @@ public class FileUtils {
 		fileBasePath = fileBasePath.endsWith(GDE.FILE_SEPARATOR_UNIX) ? fileBasePath : fileBasePath + GDE.FILE_SEPARATOR_UNIX;
 		Vector<String> fileNamesWildCard = new Vector<String>();
 		for (String fileName : fileNames) {
-			if (fileName.length() > 4 && !fileName.contains(GDE.STRING_STAR)) { // "a.csv"
+			if (fileName.length() >= 3 && !fileName.contains(GDE.STRING_STAR)) { // "a.csv" "GDE", "OSDE"
 				FileUtils.cleanFile(fileBasePath + fileName);
 			}
 			else {
@@ -278,6 +278,7 @@ public class FileUtils {
 		}
 		if (fileNamesWildCard.size() > 0) {
 			for (String fileName : fileNamesWildCard) {
+				log.log(Level.FINE, "fileName = '" +fileName + "'");
 				try {
 					String startSignature = fileName.substring(0, fileName.indexOf(GDE.STRING_STAR));
 					String endingSignature = fileName.substring(fileName.lastIndexOf(GDE.STRING_STAR) + 1);
@@ -616,10 +617,10 @@ public class FileUtils {
 			}
 			else 
 			{
-				if (DataExplorer.application != null) { // started within OSDE
+				if (DataExplorer.application != null) { // started within GDE
 					log.log(Level.INFO, "started within DataExplorer"); //$NON-NLS-1$
 				}
-				else { // started outside OSDE
+				else { // started outside GDE
 					log.log(Level.INFO, "started outside DataExplorer"); //$NON-NLS-1$
 					try {
 						Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
@@ -733,10 +734,10 @@ public class FileUtils {
 			}
 			else 
 			{
-				if (DataExplorer.application != null) { // started within OSDE
+				if (DataExplorer.application != null) { // started within GDE
 					log.log(Level.INFO, "started within DataExplorer"); //$NON-NLS-1$
 				}
-				else { // started outside OSDE
+				else { // started outside GDE
 					log.log(Level.INFO, "started outside DataExplorer"); //$NON-NLS-1$
 					try {
 						Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
@@ -992,7 +993,7 @@ public class FileUtils {
 				basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);  //$NON-NLS-1$//$NON-NLS-2$
 			}
 		}
-		log.log(Level.FINE, "OSDE base path = " + basePath); //$NON-NLS-1$
+		log.log(Level.FINE, "GDE base path = " + basePath); //$NON-NLS-1$
 		return basePath;
 	}
 

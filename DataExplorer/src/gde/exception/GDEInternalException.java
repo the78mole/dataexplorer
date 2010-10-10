@@ -22,13 +22,13 @@ package gde.exception;
  * Exception class to be used if the application runs into wrong condition due to internal error
  * @author Winfried Brügmann
  */
-public class OSDEInternalException extends Exception {
+public class GDEInternalException extends Exception {
 	static final long serialVersionUID = 26031957;
 
 	/**
 	 * @param message
 	 */
-	public OSDEInternalException(String message) {
+	public GDEInternalException(String message) {
 		super(message);
 	}
 
@@ -36,7 +36,7 @@ public class OSDEInternalException extends Exception {
 	 * @param message
 	 * @param cause
 	 */
-	public OSDEInternalException(String message, Throwable cause) {
+	public GDEInternalException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

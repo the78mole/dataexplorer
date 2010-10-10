@@ -28,7 +28,7 @@ import gde.device.ChannelTypes;
 import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.exception.NotSupportedFileFormatException;
-import gde.exception.OSDEInternalException;
+import gde.exception.GDEInternalException;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -528,7 +528,7 @@ public class OsdReaderWriter {
 			}
 		}
 		else {
-			OSDEInternalException e = new OSDEInternalException(Messages.getString(MessageIds.GDE_MSGE0009) + activeChannel + ", " + fullQualifiedFilePath + ", " + useVersion); //$NON-NLS-1$
+			GDEInternalException e = new GDEInternalException(Messages.getString(MessageIds.GDE_MSGE0009) + activeChannel + ", " + fullQualifiedFilePath + ", " + useVersion); //$NON-NLS-1$
 			DataExplorer.getInstance().openMessageDialogAsync(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}

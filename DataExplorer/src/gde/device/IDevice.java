@@ -708,14 +708,14 @@ public interface IDevice {
 	public String getRecordSetStemName();
 	
 	/**
-	 * load the mapping exist between lov file configuration keys and OSDE keys
+	 * load the mapping exist between lov file configuration keys and GDE keys
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap);
 
 	/**
-	 * convert record logview config data to OSDE config keys into records section
+	 * convert record logview config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
 	 * @param channelNumber

@@ -320,11 +320,11 @@ public class DataExplorer extends Composite {
 		try {
 			//cleanup possible old files and native libraries
 			if (GDE.IS_WINDOWS) 
-				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "WinHelper*.dll", "Register*.exe", "swtlib-"+GDE.BIT_MODE, "rxtxSerial.dll"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"OSDE", "swt*3448.dll", "GDE", "bootstrap.log.*", "WinHelper*.dll", "Register*.exe", "swtlib-"+GDE.BIT_MODE, "rxtxSerial.dll"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			else if (GDE.IS_LINUX)
-				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "*register.sh", "swtlib-"+GDE.BIT_MODE, "librxtxSerial.so"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"OSDE", "swt*3448.dll", "GDE", "bootstrap.log.*", "*register.sh", "swtlib-"+GDE.BIT_MODE, "librxtxSerial.so"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			else if (GDE.IS_MAC)
-				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "swtlib-"+GDE.BIT_MODE, "librxtxSerial.jnilib"}); //$NON-NLS-1$ //$NON-NLS-2$
+				FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"OSDE", "GDE", "bootstrap.log.*", "swtlib-"+GDE.BIT_MODE, "librxtxSerial.jnilib"}); //$NON-NLS-1$ //$NON-NLS-2$
 
 			//init settings
 			this.settings = Settings.getInstance();

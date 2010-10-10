@@ -49,7 +49,7 @@ import gde.ui.DataExplorer;
  * class with less import statements hosting the main method to build a controlled classpath
  *  - to be independent of external specified environment like CLASSPATH
  *  - to be independent from JRE updates
- *  - class defines also generic constants used for DataExplorer (OSDE)
+ *  - class defines also generic constants used for DataExplorer (GDE)
  */
 public class GDE {
 	final static String $CLASS_NAME = GDE.class.getName();
@@ -59,7 +59,8 @@ public class GDE {
 	
 	// ****** begin global constants section *******
 	public static final String		GDE_VERSION												= "Version 2.43";						//$NON-NLS-1$
-	public static final String		GDE_NAME_LONG											= "DataExplorer";	//$NON-NLS-1$
+	public static final String		GDE_NAME_SHORT										= "GDE";										//$NON-NLS-1$
+	public static final String		GDE_NAME_LONG											= "DataExplorer";						//$NON-NLS-1$
 	public final static String		DEVICE_PROPERTIES_XSD_VERSION			= "_V11"; 									//$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION		= "_V04"; 									//$NON-NLS-1$
 	

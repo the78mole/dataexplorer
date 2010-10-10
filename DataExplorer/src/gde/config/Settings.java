@@ -170,7 +170,7 @@ public class Settings extends Properties {
 	public static final String		LOCALE_IN_USE									= "locale_in_use"; //$NON-NLS-1$
 	public static final String		LOCALE_CHANGED								= "locale_changed"; //$NON-NLS-1$
 	public static final String		IS_DESKTOP_SHORTCUT_CREATED		= "is_desktop_shotcut_created"; //$NON-NLS-1$
-	public static final String		IS_APPL_REGISTERED						= "is_OSDE_registered"; //$NON-NLS-1$
+	public static final String		IS_APPL_REGISTERED						= "is_GDE_registered"; //$NON-NLS-1$
 	public static final String		IS_LOCK_UUCP_HINTED						= "is_lock_uucp_hinted"; //$NON-NLS-1$
 
 	public final static String		GRID_DASH_STYLE								= "grid_dash_style"; //$NON-NLS-1$
