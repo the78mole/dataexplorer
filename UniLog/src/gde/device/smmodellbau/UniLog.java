@@ -171,7 +171,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * load the mapping exist between lov file configuration keys and OSDE keys
+	 * load the mapping exist between lov file configuration keys and GDE keys
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
@@ -211,7 +211,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	}
 	
 	/**
-	 * convert record LogView config data to OSDE config keys into records section
+	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
 	 * @param channelNumber 
