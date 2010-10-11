@@ -60,11 +60,14 @@ public class ApplicationLauncher {
 					}
 
 					String path = WindowsHelper.findApplicationPath(executeableName);
-					path = path.substring(0, path.toLowerCase().indexOf(GDE.FILE_ENDING_EXE)+4);
-					if (path.startsWith("\"")) { //$NON-NLS-1$
-						path = path.substring(1);
+					log.log(Level.WARNING, "path = " + path);
+					if (path.length() > 4) {
+						path = path.substring(0, path.toLowerCase().indexOf(GDE.FILE_ENDING_EXE) + 4);
+						if (path.startsWith("\"")) { //$NON-NLS-1$
+							path = path.substring(1);
+						}
+						fqExecPath = path;
 					}
-					fqExecPath = path;
 				}
 				else if (GDE.IS_LINUX) {
 					searchLocation = Messages.getString(MessageIds.GDE_MSGT0601);
@@ -94,7 +97,9 @@ public class ApplicationLauncher {
 					besr.close();
 					bisr.close();
 					
-					fqExecPath = sb.toString();
+					if (sb.length() > 4) {
+						fqExecPath = sb.toString();
+					}
 				}
 				else if (GDE.IS_MAC) {
 					
@@ -117,8 +122,10 @@ public class ApplicationLauncher {
 			if (fqExecPath.length() < executeableName.length()) {
 				DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT0603, new String[] { executeableName, searchLocation }));
 			}
-			if (GDE.IS_MAC) {
-				fqExecPath = GDE.STRING_DOT_MAC_APP_OPEN;
+			else {
+				if (GDE.IS_MAC) {
+					fqExecPath = GDE.STRING_DOT_MAC_APP_OPEN;
+				}
 			}
 		}
 		catch (Exception e) {
@@ -132,40 +139,49 @@ public class ApplicationLauncher {
 	 * @param arguments
 	 */
 	public void execute(final List<String> arguments) {
-		arguments.add(0, this.fqExecPath);
-		if (GDE.IS_LINUX) {
-			arguments.add("&"); //$NON-NLS-1$
-		}
-		for (String string : arguments) {
-			log.log(Level.WARNING, GDE.STRING_SINGLE_QUOAT + string + GDE.STRING_SINGLE_QUOAT);
-		}
-		Thread thread = new Thread() {
-			public void run() {
-				try {
-					Process process = new ProcessBuilder(arguments).start(); //$NON-NLS-1$ //$NON-NLS-2$
-					process.waitFor();
-					BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
-					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					String line;
-					while ((line = bisr.readLine()) != null) {
-						log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
-					}
-					while ((line = besr.readLine()) != null) {
-						log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
-					}
-					if (process.exitValue() != 0) {
-						String msg = "failed to execute \"" + arguments + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-						log.log(Level.SEVERE, msg);
-					}
-					besr.close();
-					bisr.close();
-				}
-				catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					DataExplorer.getInstance().openMessageDialogAsync(e.getMessage());
-				}
+		if (this.isLaunchable()) {
+			arguments.add(0, this.fqExecPath);
+			if (GDE.IS_LINUX) {
+				arguments.add("&"); //$NON-NLS-1$
 			}
-		};
-		thread.start();
+			for (String string : arguments) {
+				log.log(Level.WARNING, GDE.STRING_SINGLE_QUOAT + string + GDE.STRING_SINGLE_QUOAT);
+			}
+			Thread thread = new Thread() {
+				public void run() {
+					try {
+						Process process = new ProcessBuilder(arguments).start(); //$NON-NLS-1$ //$NON-NLS-2$
+						process.waitFor();
+						BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+						BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+						String line;
+						while ((line = bisr.readLine()) != null) {
+							log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
+						}
+						while ((line = besr.readLine()) != null) {
+							log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
+						}
+						if (process.exitValue() != 0) {
+							String msg = "failed to execute \"" + arguments + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+							log.log(Level.SEVERE, msg);
+						}
+						besr.close();
+						bisr.close();
+					}
+					catch (Exception e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+						DataExplorer.getInstance().openMessageDialogAsync(e.getMessage());
+					}
+				}
+			};
+			thread.start();
+		}
+	}
+	
+	/**
+	 * @return true if full qualified file path length >= 4
+	 */
+	public boolean isLaunchable() {
+		return this.fqExecPath.length() >= 4;
 	}
 }
