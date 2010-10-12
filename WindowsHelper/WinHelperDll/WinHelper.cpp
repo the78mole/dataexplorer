@@ -485,19 +485,19 @@ void QueryKey(HKEY hKey)
 Method to return the full qualified application executable file path from the registry
 *****************************************************************************************************************/
 JNIEXPORT jstring JNICALL Java_gde_utils_WindowsHelper_findApplicationPath
-  (JNIEnv *env, jclass cl, jstring jexecuteableName)
+  (JNIEnv *env, jclass cl, jstring jSearchName)
 {	
-	const char *executeableName = env->GetStringUTFChars(jexecuteableName, 0);
+	const char *searchName = env->GetStringUTFChars(jSearchName, 0);
 	char szSubKeyPath[MAX_PATH];
 	char szReturn[MAX_PATH];
 	WCHAR wszReturn[MAX_PATH*2];
 	WCHAR wszTemp[MAX_PATH*2];
 	
 /*	
-[HKEY_CLASSES_ROOT\Applications\googleearth.exe\shell\Open\command]
+[HKEY_CLASSES_ROOT\Google Earth.kmlfile\shell\Open\command]
 @="C:\\Program Files\\Google\\Google Earth\\client\\googleearth.exe \"%1\""
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Applications\googleearth.exe\shell\Open\command]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Google Earth.kmlfile\shell\Open\command]
 @="C:\\Program Files\\Google\\Google Earth\\client\\googleearth.exe \"%1\""
 */
 	HKEY hTestKey;
@@ -507,13 +507,13 @@ JNIEXPORT jstring JNICALL Java_gde_utils_WindowsHelper_findApplicationPath
 
 	szReturn[0] = '\0';
 	wszReturn[0] = '\0';
-	char * regBase1 = "Applications\\";
-	char * regBase2 = "SOFTWARE\\Classes\\Applications\\";
+	//char * regBase1 = "";
+	char * regBase2 = "SOFTWARE\\Classes\\";
 	char * command = "\\shell\\Open\\command";
 	
 	szSubKeyPath[0] = '\0';
-	strcat_s(szSubKeyPath, (size_t)MAX_PATH, regBase1);
-	strcat_s(szSubKeyPath, (size_t)MAX_PATH, executeableName);
+	//strcat_s(szSubKeyPath, (size_t)MAX_PATH, regBase1);
+	strcat_s(szSubKeyPath, (size_t)MAX_PATH, searchName);
 	strcat_s(szSubKeyPath, (size_t)MAX_PATH, command);
 	//printf("registry key = %s\n", szSubKeyPath);	    
 	MultiByteToWideChar(CP_UTF8, 0, szSubKeyPath, -1, wszTemp, sizeof(wszTemp)); // Ensure string is Unicode.
@@ -535,7 +535,7 @@ JNIEXPORT jstring JNICALL Java_gde_utils_WindowsHelper_findApplicationPath
 		cchReturn = MAX_PATH; 
 		szSubKeyPath[0] = '\0';
 		strcat_s(szSubKeyPath, (size_t)MAX_PATH, regBase2);
-		strcat_s(szSubKeyPath, (size_t)MAX_PATH, executeableName);
+		strcat_s(szSubKeyPath, (size_t)MAX_PATH, searchName);
 		strcat_s(szSubKeyPath, (size_t)MAX_PATH, command);
 		//printf("registry key = %s\n", szSubKeyPath);	    
 		MultiByteToWideChar(CP_UTF8, 0, szSubKeyPath, -1, wszTemp, sizeof(wszTemp)); // Ensure string is Unicode.
@@ -552,10 +552,10 @@ JNIEXPORT jstring JNICALL Java_gde_utils_WindowsHelper_findApplicationPath
 		}
 	}	
    
-   	if(sizeof(wszReturn) > sizeof(executeableName)*2) {
+   	if(sizeof(wszReturn) > sizeof(searchName)*2) {
 		WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)wszReturn, -1, szReturn, (sizeof(szReturn) - sizeof(char)), NULL, NULL);
 		//printf("executable path = '%s'\n", szReturn);
 	}
-	env->ReleaseStringUTFChars(jexecuteableName, executeableName);
+	env->ReleaseStringUTFChars(jSearchName, searchName);
 	return env->NewStringUTF(szReturn);
 }
