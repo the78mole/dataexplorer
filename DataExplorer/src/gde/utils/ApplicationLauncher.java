@@ -42,41 +42,30 @@ public class ApplicationLauncher {
 	/**
 	 * constructor where the path to the executable will be figured out if not given
 	 */
-	public ApplicationLauncher(String executeableName) {
-		String searchLocation = GDE.STRING_EMPTY;
+	public ApplicationLauncher(String searchExecutableKey, String searchLocationInfo) {
 		try {
-			log.log(Level.FINE, "executeableName = '" + executeableName + GDE.STRING_SINGLE_QUOAT); //$NON-NLS-1$
+			log.log(Level.FINE, "executeableName = '" + searchExecutableKey + GDE.STRING_SINGLE_QUOAT); //$NON-NLS-1$
 			
-			if (executeableName != null && executeableName.length() > 4) {
-				executeableName = executeableName.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-				if (executeableName.contains(GDE.FILE_SEPARATOR_UNIX)) {
-					executeableName = executeableName.substring(executeableName.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
+			if (searchExecutableKey != null && searchExecutableKey.length() > 4) {
+				searchExecutableKey = searchExecutableKey.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				if (searchExecutableKey.contains(GDE.FILE_SEPARATOR_UNIX)) {
+					searchExecutableKey = searchExecutableKey.substring(searchExecutableKey.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
 				}
 
 				if (GDE.IS_WINDOWS) {
-					searchLocation = Messages.getString(MessageIds.GDE_MSGT0600);
-					if (!executeableName.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_EXE)) {
-						executeableName = executeableName + GDE.FILE_ENDING_DOT_EXE;
-					}
-
-					String path = WindowsHelper.findApplicationPath(executeableName);
-					log.log(Level.WARNING, "path = " + path);
+					String path = WindowsHelper.findApplicationPath(searchExecutableKey);
 					if (path.length() > 4) {
-						path = path.substring(0, path.toLowerCase().indexOf(GDE.FILE_ENDING_EXE) + 4);
-						if (path.startsWith("\"")) { //$NON-NLS-1$
-							path = path.substring(1);
-						}
-						fqExecPath = path;
+					path = path.substring(0, path.toLowerCase().indexOf(GDE.FILE_ENDING_EXE)+4);
+					if (path.startsWith("\"")) { //$NON-NLS-1$
+						path = path.substring(1);
+					}
+					fqExecPath = path;
 					}
 				}
 				else if (GDE.IS_LINUX) {
-					searchLocation = Messages.getString(MessageIds.GDE_MSGT0601);
-					if (executeableName.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_EXE)) {
-						executeableName = executeableName.substring(0, executeableName.indexOf(GDE.FILE_ENDING_EXE));
-					}
 					List<String> command = new ArrayList<String>();
 					command.add(Messages.getString(MessageIds.GDE_MSGT0602));
-					command.add(executeableName);
+					command.add(searchExecutableKey);
 					StringBuilder sb = new StringBuilder();
 					Process process = new ProcessBuilder(command).start(); //$NON-NLS-1$ //$NON-NLS-2$
 					process.waitFor();
@@ -101,26 +90,21 @@ public class ApplicationLauncher {
 						fqExecPath = sb.toString();
 					}
 				}
-				else if (GDE.IS_MAC) {
-					
-					if (executeableName.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_EXE)) {
-						executeableName = executeableName.substring(0, executeableName.indexOf(GDE.FILE_ENDING_DOT_EXE));
+				else if (GDE.IS_MAC) {				
+					if (searchExecutableKey.toLowerCase().endsWith(GDE.STRING_DOT_APP)) {
+						searchExecutableKey = searchExecutableKey.substring(0, searchExecutableKey.indexOf(GDE.STRING_DOT_APP));
 					}
-					if (executeableName.toLowerCase().endsWith(GDE.STRING_DOT_APP)) {
-						executeableName = executeableName.substring(0, executeableName.indexOf(GDE.STRING_DOT_APP));
-					}
-					String appDirectory = GDE.STRING_DOT_MAC_APP_BASE_PATH + executeableName + GDE.STRING_DOT_APP;
-					searchLocation = appDirectory;
+					String appDirectory = searchLocationInfo;
 					if ((new File(appDirectory)).exists()) {
-						String macExecPath = appDirectory + GDE.STRING_DOT_MAC_APP_EXE_PATH + executeableName;
+						String macExecPath = appDirectory + GDE.STRING_DOT_MAC_APP_EXE_PATH + searchExecutableKey;
 						if (FileUtils.checkFileExist(macExecPath)) {
 							fqExecPath = macExecPath;
 						}
 					}
 				}
 			}
-			if (fqExecPath.length() < executeableName.length()) {
-				DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT0603, new String[] { executeableName, searchLocation }));
+			if (fqExecPath.length() < searchExecutableKey.length()) {
+				DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT0603, new String[] { searchExecutableKey, searchLocationInfo }));
 			}
 			else {
 				if (GDE.IS_MAC) {
@@ -140,44 +124,43 @@ public class ApplicationLauncher {
 	 */
 	public void execute(final List<String> arguments) {
 		if (this.isLaunchable()) {
-			arguments.add(0, this.fqExecPath);
-			if (GDE.IS_LINUX) {
-				arguments.add("&"); //$NON-NLS-1$
-			}
-			for (String string : arguments) {
-				log.log(Level.WARNING, GDE.STRING_SINGLE_QUOAT + string + GDE.STRING_SINGLE_QUOAT);
-			}
-			Thread thread = new Thread() {
-				public void run() {
-					try {
-						Process process = new ProcessBuilder(arguments).start(); //$NON-NLS-1$ //$NON-NLS-2$
-						process.waitFor();
-						BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
-						BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-						String line;
-						while ((line = bisr.readLine()) != null) {
-							log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
-						}
-						while ((line = besr.readLine()) != null) {
-							log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
-						}
-						if (process.exitValue() != 0) {
-							String msg = "failed to execute \"" + arguments + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-							log.log(Level.SEVERE, msg);
-						}
-						besr.close();
-						bisr.close();
-					}
-					catch (Exception e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
-						DataExplorer.getInstance().openMessageDialogAsync(e.getMessage());
-					}
-				}
-			};
-			thread.start();
+		arguments.add(0, this.fqExecPath);
+		if (GDE.IS_LINUX) {
+			arguments.add("&"); //$NON-NLS-1$
 		}
+		for (String string : arguments) {
+			log.log(Level.FINE, GDE.STRING_SINGLE_QUOAT + string + GDE.STRING_SINGLE_QUOAT);
+		}
+		Thread thread = new Thread() {
+			public void run() {
+				try {
+					Process process = new ProcessBuilder(arguments).start(); //$NON-NLS-1$ //$NON-NLS-2$
+					process.waitFor();
+					BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					String line;
+					while ((line = bisr.readLine()) != null) {
+						log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
+					}
+					while ((line = besr.readLine()) != null) {
+						log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
+					}
+					if (process.exitValue() != 0) {
+						String msg = "failed to execute \"" + arguments + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
+						log.log(Level.SEVERE, msg);
+					}
+					besr.close();
+					bisr.close();
+				}
+				catch (Exception e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					DataExplorer.getInstance().openMessageDialogAsync(e.getMessage());
+				}
+			}
+		};
+		thread.start();
 	}
-	
+}
 	/**
 	 * @return true if full qualified file path length >= 4
 	 */

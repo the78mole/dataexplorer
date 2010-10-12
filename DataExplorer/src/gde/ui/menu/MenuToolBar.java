@@ -984,11 +984,11 @@ public class MenuToolBar {
 								List<String> argumentList = new ArrayList<String>();
 								argumentList.add(kmlFilePath);
 								if (GDE.IS_MAC)
-									new ApplicationLauncher("Google Earth").execute(argumentList); //$NON-NLS-1$
+									new ApplicationLauncher("Google Earth", GDE.STRING_DOT_MAC_APP_BASE_PATH + "Google Earth" + GDE.STRING_DOT_APP).execute(argumentList); //$NON-NLS-1$ //$NON-NLS-2$
 								else if (GDE.IS_LINUX)
-									new ApplicationLauncher("googleearth").execute(argumentList); //$NON-NLS-1$
-								else
-									new ApplicationLauncher("googleearth.exe").execute(argumentList); //$NON-NLS-1$
+									new ApplicationLauncher("googleearth", Messages.getString(MessageIds.GDE_MSGT0601)).execute(argumentList); //$NON-NLS-1$
+								else //GDE.IS_WINDOWS
+									new ApplicationLauncher("Google Earth.kmlfile", Messages.getString(MessageIds.GDE_MSGT0600)).execute(argumentList); //$NON-NLS-1$
 							}
 						}
 					});
