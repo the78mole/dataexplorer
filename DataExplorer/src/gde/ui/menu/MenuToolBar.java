@@ -979,16 +979,19 @@ public class MenuToolBar {
 					this.googleEarthToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "googleEarthToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							String kmlFilePath = MenuToolBar.this.application.getActiveDevice().exportFile(GDE.FILE_ENDING_KML);
-							if (kmlFilePath.length() > 4) {
+							ApplicationLauncher launcher;
+							if (GDE.IS_MAC)
+								launcher = new ApplicationLauncher("Google Earth", "Google Earth", GDE.STRING_DOT_MAC_APP_BASE_PATH + "Google Earth" + GDE.STRING_DOT_APP); //$NON-NLS-1$ //$NON-NLS-2$
+							else if (GDE.IS_LINUX)
+								launcher = new ApplicationLauncher("googleearth", "googleearth", Messages.getString(MessageIds.GDE_MSGT0601)); //$NON-NLS-1$
+							else //GDE.IS_WINDOWS
+								launcher = new ApplicationLauncher("googleearth.exe", "Google Earth.kmlfile", Messages.getString(MessageIds.GDE_MSGT0600)); //$NON-NLS-1$
+
+							if (launcher.isLaunchable()) {
+								String kmlFilePath = MenuToolBar.this.application.getActiveDevice().exportFile(GDE.FILE_ENDING_KML);
 								List<String> argumentList = new ArrayList<String>();
 								argumentList.add(kmlFilePath);
-								if (GDE.IS_MAC)
-									new ApplicationLauncher("Google Earth", GDE.STRING_DOT_MAC_APP_BASE_PATH + "Google Earth" + GDE.STRING_DOT_APP).execute(argumentList); //$NON-NLS-1$ //$NON-NLS-2$
-								else if (GDE.IS_LINUX)
-									new ApplicationLauncher("googleearth", Messages.getString(MessageIds.GDE_MSGT0601)).execute(argumentList); //$NON-NLS-1$
-								else //GDE.IS_WINDOWS
-									new ApplicationLauncher("Google Earth.kmlfile", Messages.getString(MessageIds.GDE_MSGT0600)).execute(argumentList); //$NON-NLS-1$
+								launcher.execute(argumentList);
 							}
 						}
 					});
@@ -1526,6 +1529,15 @@ public class MenuToolBar {
 	 * this functions queries the actual device with actual record set for GPS data
 	 */
 	public void updateGoogleEarthToolItem() {
-		this.googleEarthToolItem.setEnabled(this.application.getActiveDevice().isActualRecordSetWithGpsData());
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			this.googleEarthToolItem.setEnabled(this.application.getActiveDevice().isActualRecordSetWithGpsData());
+		}
+		else {
+			DataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					MenuToolBar.this.googleEarthToolItem.setEnabled(MenuToolBar.this.application.getActiveDevice().isActualRecordSetWithGpsData());
+				}
+			});
+		}
 	}
 }

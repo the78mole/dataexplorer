@@ -42,7 +42,7 @@ public class ApplicationLauncher {
 	/**
 	 * constructor where the path to the executable will be figured out if not given
 	 */
-	public ApplicationLauncher(String searchExecutableKey, String searchLocationInfo) {
+	public ApplicationLauncher(String executable, String searchExecutableKey, String searchLocationInfo) {
 		try {
 			log.log(Level.FINE, "executeableName = '" + searchExecutableKey + GDE.STRING_SINGLE_QUOAT); //$NON-NLS-1$
 			
@@ -55,11 +55,11 @@ public class ApplicationLauncher {
 				if (GDE.IS_WINDOWS) {
 					String path = WindowsHelper.findApplicationPath(searchExecutableKey);
 					if (path.length() > 4) {
-					path = path.substring(0, path.toLowerCase().indexOf(GDE.FILE_ENDING_EXE)+4);
-					if (path.startsWith("\"")) { //$NON-NLS-1$
-						path = path.substring(1);
-					}
-					fqExecPath = path;
+						path = path.substring(0, path.toLowerCase().indexOf(GDE.FILE_ENDING_EXE) + 4);
+						if (path.startsWith("\"")) { //$NON-NLS-1$
+							path = path.substring(1);
+						}
+						fqExecPath = path;
 					}
 				}
 				else if (GDE.IS_LINUX) {
@@ -103,8 +103,8 @@ public class ApplicationLauncher {
 					}
 				}
 			}
-			if (fqExecPath.length() < searchExecutableKey.length()) {
-				DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT0603, new String[] { searchExecutableKey, searchLocationInfo }));
+			if (!fqExecPath.contains(executable)) {
+				DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT0603, new String[] { executable, searchLocationInfo, searchExecutableKey }));
 			}
 			else {
 				if (GDE.IS_MAC) {
