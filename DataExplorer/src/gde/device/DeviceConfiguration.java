@@ -142,6 +142,15 @@ public class DeviceConfiguration {
 		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
 
 		this.settings = Settings.getInstance();
+
+		while (this.settings.isXsdThreadAlive() || this.settings.getUnmarshaller() == null) {
+			try {
+				Thread.sleep(250);
+			}
+			catch (InterruptedException e) {
+				// ignore
+			}
+		}
 		this.unmarshaller = this.settings.getUnmarshaller();
 		this.marshaller = this.settings.getMarshaller();
 

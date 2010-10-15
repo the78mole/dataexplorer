@@ -140,7 +140,7 @@ public class DataExplorer extends Composite {
 	public final static String		COMPARE_RECORD_SET								= "compare_set"; //$NON-NLS-1$
 	public final static String		UTILITY_RECORD_SET								= "utility_set"; //$NON-NLS-1$
 
-	public static DataExplorer	application								= null;
+	public static DataExplorer						application								= null;
 	public final static Display						display										= Display.getDefault();
 	public final static Shell							shell											= new Shell(display);
 
