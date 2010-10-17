@@ -158,9 +158,9 @@ public class AnalogDisplay extends Composite {
 			this.tachoImageBounds = ((Canvas) evt.widget).getClientArea();
 
 			// get min max values and check if this has been changed
-			double tmpMinValue = this.record.getMinValue();
+			double tmpMinValue = this.record.isScaleSynced() ? this.record.getSyncMinValue() : this.record.getMinValue();
 			tmpMinValue = this.device.translateValue(this.record, tmpMinValue / 1000.0);
-			double tmpMaxValue = this.record.getMaxValue();
+			double tmpMaxValue = this.record.isScaleSynced() ? this.record.getSyncMaxValue() : this.record.getMaxValue();
 			tmpMaxValue = this.device.translateValue(this.record, tmpMaxValue / 1000.0);
 			double deltaScale = tmpMaxValue - tmpMinValue;
 			tmpMinValue = MathUtils.roundDown(tmpMinValue, deltaScale);
