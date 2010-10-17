@@ -618,7 +618,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				containsGPSdata = activeRecordSet.get(7).isDataContained() && activeRecordSet.get(8).isDataContained() && activeRecordSet.get(9).isDataContained();
+				containsGPSdata = activeRecordSet.get(7).hasReasonableData() && activeRecordSet.get(8).hasReasonableData() && activeRecordSet.get(9).hasReasonableData();
 			}
 		}
 		return containsGPSdata;
