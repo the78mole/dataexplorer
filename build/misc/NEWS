@@ -9,8 +9,9 @@ GNU DataExplorer - News - comes with version 2.50
 7)enable multiple file selection while CSV import
 8)sunset Mac carbon version
 9)introduce 64 bit Mac cocoa
-10)add function to launch Google Earth while exporting KML file
-11)add ToolItem to launch context sensitive help
+10)replace Mac libserial.jnilib with previous version build for 32/64 bit Intel/PCC
+11)add function to launch Google Earth while exporting KML file
+12)add ToolItem to launch context sensitive help
 
 
 

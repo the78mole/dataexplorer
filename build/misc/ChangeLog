@@ -9,6 +9,7 @@ refine context sensitive help, enabled by an tool button
 enable multiple file selection while CSV import
 sunset Mac carbon version
 introduce 64 bit Mac cocoa
+replace Mac libserial.jnilib with previous version build for 32/64 bit Intel/PCC
 add function to launch Google Earth while exporting KML file
 add ToolItem to launch context sensitive help
 
