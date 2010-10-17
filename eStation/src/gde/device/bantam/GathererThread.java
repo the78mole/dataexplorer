@@ -183,9 +183,11 @@ public class GathererThread extends Thread {
 					
 					//switch off single cell voltage lines if no cell voltages is available
 					for (int i = posCells + this.numberBatteryCells; !isConfigUpdated && i < points.length; i++) {
-						recordSet.get(recordKeys[i]).setActive(false);
-						recordSet.get(recordKeys[i]).setDisplayable(false);
-						recordSet.get(recordKeys[i]).setVisible(false);
+						Record tmpRecord = recordSet.get(recordKeys[i]);
+						tmpRecord.setActive(false);
+						tmpRecord.setDisplayable(false);
+						tmpRecord.setVisible(false);
+						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "switch off record = " + tmpRecord.getName()); //$NON-NLS-1$
 					}
 					isConfigUpdated = true;
 					//OsdReaderWriter.write("E:\\Temp\\not.osd", this.channel, 1);

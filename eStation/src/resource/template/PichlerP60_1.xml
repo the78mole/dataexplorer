@@ -73,7 +73,7 @@
 <entry key="6_defMinValue">3.0</entry>
 <entry key="6_isPositionLeft">false</entry>
 <entry key="6_isRoundOut">false</entry>
-<entry key="6_isStartEndDefined">true</entry>
+<entry key="6_isStartEndDefined">false</entry>
 <entry key="6_isStartpointZero">false</entry>
 <entry key="6_isVisible">true</entry>
 <entry key="6_lineStyle">1</entry>
@@ -84,7 +84,7 @@
 <entry key="7_defMinValue">3.0</entry>
 <entry key="7_isPositionLeft">false</entry>
 <entry key="7_isRoundOut">false</entry>
-<entry key="7_isStartEndDefined">true</entry>
+<entry key="7_isStartEndDefined">false</entry>
 <entry key="7_isStartpointZero">false</entry>
 <entry key="7_isVisible">true</entry>
 <entry key="7_lineStyle">1</entry>
@@ -95,7 +95,7 @@
 <entry key="8_defMinValue">3.0</entry>
 <entry key="8_isPositionLeft">false</entry>
 <entry key="8_isRoundOut">false</entry>
-<entry key="8_isStartEndDefined">true</entry>
+<entry key="8_isStartEndDefined">false</entry>
 <entry key="8_isStartpointZero">false</entry>
 <entry key="8_isVisible">true</entry>
 <entry key="8_lineStyle">1</entry>
@@ -106,7 +106,7 @@
 <entry key="9_defMinValue">3.0</entry>
 <entry key="9_isPositionLeft">false</entry>
 <entry key="9_isRoundOut">false</entry>
-<entry key="9_isStartEndDefined">true</entry>
+<entry key="9_isStartEndDefined">false</entry>
 <entry key="9_isStartpointZero">false</entry>
 <entry key="9_isVisible">true</entry>
 <entry key="9_lineStyle">1</entry>
@@ -117,9 +117,9 @@
 <entry key="10_defMinValue">3.0</entry>
 <entry key="10_isPositionLeft">false</entry>
 <entry key="10_isRoundOut">false</entry>
-<entry key="10_isStartEndDefined">true</entry>
+<entry key="10_isStartEndDefined">false</entry>
 <entry key="10_isStartpointZero">false</entry>
-<entry key="10_isVisible">false</entry>
+<entry key="10_isVisible">true</entry>
 <entry key="10_lineStyle">1</entry>
 <entry key="10_lineWidth">1</entry>
 <entry key="10_numberFormat">-1</entry>
@@ -128,15 +128,15 @@
 <entry key="11_defMinValue">3.0</entry>
 <entry key="11_isPositionLeft">false</entry>
 <entry key="11_isRoundOut">false</entry>
-<entry key="11_isStartEndDefined">true</entry>
+<entry key="11_isStartEndDefined">false</entry>
 <entry key="11_isStartpointZero">false</entry>
-<entry key="11_isVisible">false</entry>
+<entry key="11_isVisible">true</entry>
 <entry key="11_lineStyle">1</entry>
 <entry key="11_lineWidth">1</entry>
 <entry key="11_numberFormat">-1</entry>
 <entry key="RecordSet_horizontalGridColor">192,192,192</entry>
 <entry key="RecordSet_horizontalGridLineStyle">2</entry>
-<entry key="RecordSet_horizontalGridRecordOrdinal">0</entry>
+<entry key="RecordSet_horizontalGridRecordOrdinal">6</entry>
 <entry key="RecordSet_horizontalGridType">1</entry>
 <entry key="RecordSet_timeGridColor">192,192,192</entry>
 <entry key="RecordSet_timeGridLineStyle">3</entry>
