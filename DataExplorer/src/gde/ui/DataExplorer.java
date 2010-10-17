@@ -618,12 +618,6 @@ public class DataExplorer extends Composite {
 			});
 
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init help listener"); //$NON-NLS-1$
-			if (this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged()) this.addHelpListener(new HelpListener() {
-				public void helpRequested(HelpEvent evt) {
-					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$
-					DataExplorer.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo.html"); //$NON-NLS-1$
-				}
-			});
 			this.menuCoolBar.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$

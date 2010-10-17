@@ -1423,11 +1423,14 @@ public class GraphicsComposite extends Composite {
 	}
 
 	public void updateRecordSetComment() {
-		RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-		if (recordSet != null) {
-			isRecordCommentChanged = false;
-			recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
-			recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+		Channel activeChannel = GraphicsComposite.this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet recordSet = activeChannel.getActiveRecordSet();
+			if (recordSet != null) {
+				isRecordCommentChanged = false;
+				recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
+				recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
+			}
 		}
 	}
 
