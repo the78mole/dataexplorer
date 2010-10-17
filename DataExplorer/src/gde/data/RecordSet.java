@@ -1669,7 +1669,8 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 			for (int i = 0; i < this.size(); i++) {
 				PropertyType syncProperty = this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-				if (this.get(i).isDataContained() && syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+				Record tmpRecord = this.get(i);
+				if (tmpRecord.hasReasonableData() && syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
 					int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
 					if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
 						this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
@@ -1677,17 +1678,17 @@ public class RecordSet extends HashMap<String, Record> {
 						this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
 						this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
 					}
-					if (!this.scaleSyncedRecords.get(syncMasterRecordOrdinal).contains(this.get(i))) {
+					if (!this.scaleSyncedRecords.get(syncMasterRecordOrdinal).contains(tmpRecord)) {
 						if ((i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
-							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(i));
+							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
 						else
 							//sort while add
-							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add((i - syncMasterRecordOrdinal), this.get(i));
+							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add((i - syncMasterRecordOrdinal), tmpRecord);
 
 						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
 						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);
 						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_SCALE_POSITION);
-						log.log(Level.FINE, "add " + this.get(i).name);
+						log.log(Level.FINE, "add " + tmpRecord.name);
 					}
 				}
 			}
@@ -1744,14 +1745,14 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * synchronize scale properties of master and slave scale synchronized records 
 	 */
-	public void syncMasterSlaveRecords(Record queryRecord, int type) {
+	public void syncMasterSlaveRecords(Record syncInputRecord, int type) {
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			if (this.scaleSyncedRecords.get(syncRecordOrdinal).contains(queryRecord)) {
+			if (this.scaleSyncedRecords.get(syncRecordOrdinal).contains(syncInputRecord)) {
 				switch (type) {
 				case Record.TYPE_AXIS_END_VALUES:
-					boolean tmpIsRoundout = queryRecord.isRoundOut;
-					boolean tmpIsStartpointZero = queryRecord.isStartpointZero;
-					boolean tmpIsStartEndDefined = queryRecord.isStartEndDefined;
+					boolean tmpIsRoundout = syncInputRecord.isRoundOut;
+					boolean tmpIsStartpointZero = syncInputRecord.isStartpointZero;
+					boolean tmpIsStartEndDefined = syncInputRecord.isStartEndDefined;
 					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						tmpRecord.isRoundOut = tmpIsRoundout;
 						tmpRecord.isStartpointZero = tmpIsStartpointZero;
@@ -1759,15 +1760,15 @@ public class RecordSet extends HashMap<String, Record> {
 					}
 					break;
 				case Record.TYPE_AXIS_NUMBER_FORMAT:
-					DecimalFormat tmpDf = queryRecord.df;
-					int numberFormat = queryRecord.numberFormat;
+					DecimalFormat tmpDf = syncInputRecord.df;
+					int numberFormat = syncInputRecord.numberFormat;
 					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						tmpRecord.df = (DecimalFormat) tmpDf.clone();
 						tmpRecord.numberFormat = numberFormat;
 					}
 					break;
 				case Record.TYPE_AXIS_SCALE_POSITION:
-					boolean tmpIsPositionLeft = queryRecord.isPositionLeft;
+					boolean tmpIsPositionLeft = syncInputRecord.isPositionLeft;
 					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						tmpRecord.isPositionLeft = tmpIsPositionLeft;
 					}

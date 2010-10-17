@@ -2042,8 +2042,11 @@ public class Record extends Vector<Integer> {
 		this.description = description;
 	}
 	
-	public boolean isDataContained() {
-		return this.realSize() > 2 && (this.maxValue != 0 || this.minValue != this.maxValue || this.minValue != 0);
+	/**
+	 * @return true if the record contained reasonable date which can be displayed
+	 */
+	public boolean hasReasonableData() {
+		return this.maxValue != 0 || this.minValue != this.maxValue;
 	}
 }
 
