@@ -27,6 +27,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -42,7 +43,7 @@ import gde.utils.FileUtils;
  * simple HTTP browser to display help info material
  * @author Winfried Brügmann
  */
-public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
+public class HelpInfoDialog extends Dialog {
 	final static Logger	log	= Logger.getLogger(HelpInfoDialog.class.getName());
 
 	Shell		dialogShell;
@@ -74,7 +75,7 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.jpg")); //$NON-NLS-1$
 
 			this.textBrowser = new Browser(this.dialogShell, style);
-			openURL(deviceName, fileName, style);
+			openURL(deviceName, fileName);
 
 			this.dialogShell.layout();
 			this.dialogShell.pack();
@@ -85,10 +86,16 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.open();
 		}
 		else {
+			openURL(deviceName, fileName);
+			
+			int width = this.primaryMonitorBounds.width / 4 * 3;
+			this.dialogShell.setSize(width, (this.primaryMonitorBounds.height * 95 / 100));
+			this.dialogShell.setLocation(this.primaryMonitorBounds.width - width, 0);
+			this.dialogShell.setMinimized(false);
 			this.dialogShell.setVisible(true);
-			this.dialogShell.setActive();
-			openURL(deviceName, fileName, style);
+			this.dialogShell.forceActive();
 		}
+		System.out.println(this.dialogShell.getClientArea());
 		Display display = this.dialogShell.getDisplay();
 		while (!this.dialogShell.isDisposed()) {
 			if (!display.readAndDispatch()) display.sleep();
@@ -99,7 +106,7 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 	 * @param deviceName
 	 * @param fileName
 	 */
-	private void openURL(String deviceName, String fileName, int style) {
+	private void openURL(String deviceName, String fileName) {
 		String jarBasePath = FileUtils.getJarBasePath() + "/";
 		String jarName = GDE.GDE_NAME_LONG + GDE.FILE_ENDING_DOT_JAR;
 		String helpDir = "help" + GDE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + GDE.FILE_SEPARATOR;
@@ -118,12 +125,7 @@ public class HelpInfoDialog extends org.eclipse.swt.widgets.Dialog {
 			String stringUrl = targetDir + helpDir + fileName;
 			log.log(Level.FINE, "stringUrl = " + "file:///" + stringUrl); //$NON-NLS-1$ //$NON-NLS-2$
 			
-			if (style == SWT.MOZILLA) {
-				this.textBrowser.setUrl("file:///" + stringUrl); //$NON-NLS-1$
-			}
-			else { // windows SWT.NONE
-				this.textBrowser.setUrl(stringUrl);
-			}
+			this.textBrowser.setUrl("file:///" + stringUrl); //$NON-NLS-1$
 		}
 		catch (IOException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
