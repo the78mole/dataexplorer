@@ -193,7 +193,7 @@ public class GathererThread extends Thread {
 			}
 			catch (DataInconsitsentException e) {
 				log.log(Level.SEVERE, Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME }));
-				cleanup();
+				postCleanup();
 			}
 			catch (Throwable e) {
 				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
@@ -236,7 +236,7 @@ public class GathererThread extends Thread {
 			if (enableEndMessage) this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1501));
 		}
 		else {
-			cleanup();
+			postCleanup();
 		}
 	}
 
@@ -258,7 +258,7 @@ public class GathererThread extends Thread {
 	/**
 	 * cleanup all allocated resources and display the message
 	 */
-	void cleanup() {
+	void postCleanup() {
 		if (this.channel.get(this.recordSetKey) != null) {
 			this.channel.get(this.recordSetKey).clear();
 			this.channel.remove(this.recordSetKey);
