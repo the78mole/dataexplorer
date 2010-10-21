@@ -1827,7 +1827,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param queryRecord the record key to be used for the query
 	 * @return true if syncable records contains queryRecordKey
 	 */
-	public boolean isOneOfSyncableRecord(Record queryRecord) {
+	public synchronized boolean isOneOfSyncableRecord(Record queryRecord) {
 		boolean isContained = false;
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
 			if (this.scaleSyncedRecords.get(syncRecordOrdinal).contains(queryRecord)) {
