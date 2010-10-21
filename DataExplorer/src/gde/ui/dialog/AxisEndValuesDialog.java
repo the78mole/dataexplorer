@@ -18,7 +18,13 @@
 ****************************************************************************************/
 package gde.ui.dialog;
 
+import gde.GDE;
 import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -40,12 +46,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-
-import gde.GDE;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 /**
  * Dialog class to adjust the measurement scale end values
@@ -121,6 +121,8 @@ public class AxisEndValuesDialog extends Dialog {
 					catch (NumberFormatException e) {
 						log.log(Level.WARNING, e.getMessage(), e);
 					}
+					
+					AxisEndValuesDialog.this.application.resetShellIcon();
 				}
 			});
 			this.dialogShell.addPaintListener(new PaintListener() {

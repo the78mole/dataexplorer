@@ -106,7 +106,7 @@ public class MenuBar {
 	int														iconSet = DeviceSerialPort.ICON_SET_OPEN_CLOSE; 
 	
 	final Menu										parent;
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final Channels								channels;
 	final FileHandler							fileHandler;
 
@@ -701,15 +701,10 @@ public class MenuBar {
 		}
 		{
 			this.helpMenuItem = new MenuItem(this.parent, SWT.CASCADE);
-			this.helpMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0043)); 
-			this.helpMenuItem.addHelpListener(new HelpListener() {
-				public void helpRequested(HelpEvent evt) {
-					MenuBar.log.log(Level.FINE, "helpMenuItem.helpRequested, event=" + evt); //$NON-NLS-1$
-					MenuBar.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_34.html"); //$NON-NLS-1$
-				}
-			});
+			this.helpMenuItem.setText((GDE.IS_MAC ? GDE.STRING_DOT : GDE.STRING_EMPTY) + Messages.getString(MessageIds.GDE_MSGT0043)); 
 			{
 				this.helpMenu = new Menu(this.helpMenuItem);
+				this.helpMenuItem.setMenu(this.helpMenu);
 				{
 					this.contentsMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
 					this.contentsMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0044)); 
@@ -760,7 +755,6 @@ public class MenuBar {
 						}
 					});
 				}
-				this.helpMenuItem.setMenu(this.helpMenu);
 			}
 		}
 	}

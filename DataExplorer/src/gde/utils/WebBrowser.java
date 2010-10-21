@@ -48,7 +48,7 @@ public class WebBrowser {
 		log.log(Level.FINE, "basePath = " + basePath + " jarName = " + jarName); //$NON-NLS-1$
 		
 		try {
-			String targetDir = GDE.JAVA_IO_TMPDIR + GDE.GDE_NAME_SHORT + GDE.FILE_SEPARATOR;
+			String targetDir = GDE.JAVA_IO_TMPDIR + GDE.NAME_SHORT + GDE.FILE_SEPARATOR;
 			String helpDir = "help" + GDE.FILE_SEPARATOR + Settings.getInstance().getLocale().getLanguage() + GDE.FILE_SEPARATOR;
 			FileUtils.extractDir(new JarFile(basePath + jarName), helpDir, targetDir, "555");
 			

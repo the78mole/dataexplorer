@@ -71,8 +71,8 @@ public class HelpInfoDialog extends Dialog {
 			this.dialogShell = new Shell(new Shell(Display.getDefault()), SWT.SHELL_TRIM);
 			FillLayout dialogShellLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.dialogShell.setLayout(dialogShellLayout);
-			this.dialogShell.setText(GDE.GDE_NAME_LONG + Messages.getString(MessageIds.GDE_MSGT0192));
-			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.jpg")); //$NON-NLS-1$
+			this.dialogShell.setText(GDE.NAME_LONG + Messages.getString(MessageIds.GDE_MSGT0192));
+			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.png")); //$NON-NLS-1$
 
 			this.textBrowser = new Browser(this.dialogShell, style);
 			openURL(deviceName, fileName);
@@ -95,7 +95,6 @@ public class HelpInfoDialog extends Dialog {
 			this.dialogShell.setVisible(true);
 			this.dialogShell.forceActive();
 		}
-		System.out.println(this.dialogShell.getClientArea());
 		Display display = this.dialogShell.getDisplay();
 		while (!this.dialogShell.isDisposed()) {
 			if (!display.readAndDispatch()) display.sleep();
@@ -108,7 +107,7 @@ public class HelpInfoDialog extends Dialog {
 	 */
 	private void openURL(String deviceName, String fileName) {
 		String jarBasePath = FileUtils.getJarBasePath() + "/";
-		String jarName = GDE.GDE_NAME_LONG + GDE.FILE_ENDING_DOT_JAR;
+		String jarName = GDE.NAME_LONG + GDE.FILE_ENDING_DOT_JAR;
 		String helpDir = "help" + GDE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + GDE.FILE_SEPARATOR;
 		String targetDir = GDE.JAVA_IO_TMPDIR + (GDE.IS_WINDOWS ? "" : GDE.FILE_SEPARATOR) + "GDE" + GDE.FILE_SEPARATOR;
 		

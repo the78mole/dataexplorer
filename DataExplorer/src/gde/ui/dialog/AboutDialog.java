@@ -77,7 +77,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 		try {
 			Shell parent = getParent();
 			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
-			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.jpg")); //$NON-NLS-1$
+			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.png")); //$NON-NLS-1$
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			this.dialogShell.setLayout(new FormLayout());
 			this.dialogShell.layout();
@@ -112,7 +112,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.version = new Label(this.dialogShell, SWT.CENTER);
 				this.version.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 				this.version.setLayoutData(versionLData);
-				this.version.setText(GDE.GDE_VERSION);
+				this.version.setText(GDE.VERSION);
 				this.version.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 			}
 			{

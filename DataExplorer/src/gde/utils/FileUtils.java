@@ -661,7 +661,7 @@ public class FileUtils {
 	public static void updateJarContent(String deviceJarPath, String tmpDeviceJarPath, String addJarEntryName, Image deviceImage, Shell messageBoxShell) throws IOException, FileNotFoundException {
 		if (FileUtils.checkFileExist(tmpDeviceJarPath)) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
-			mBox.setText(GDE.GDE_NAME_LONG);
+			mBox.setText(GDE.NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.GDE_MSGI0043, new String[] {tmpDeviceJarPath}));
 			int ret = mBox.open();
 			if (SWT.CANCEL == ret)
@@ -705,7 +705,7 @@ public class FileUtils {
 		File tmpFile = new File(tmpDeviceJarPath);
 		if (tmpFile.exists()) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
-			mBox.setText(GDE.GDE_NAME_LONG);
+			mBox.setText(GDE.NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.GDE_MSGI0044, new String[] {tmpDeviceJarPath})); 
 			mBox.open();
 		}
@@ -835,7 +835,7 @@ public class FileUtils {
 	public static void updateJarContent(String deviceJarPath, String tmpDeviceJarPath, String addJarEntryName, String addJarFileName, Shell messageBoxShell) throws IOException, FileNotFoundException {
 		if (FileUtils.checkFileExist(tmpDeviceJarPath)) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.CANCEL	| SWT.ICON_QUESTION);
-			mBox.setText(GDE.GDE_NAME_LONG);
+			mBox.setText(GDE.NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.GDE_MSGI0043, new String[] {tmpDeviceJarPath}));
 			int ret = mBox.open();
 			if (SWT.CANCEL == ret)
@@ -882,7 +882,7 @@ public class FileUtils {
 		File tmpFile = new File(tmpDeviceJarPath);
 		if (tmpFile.exists()) {
 			MessageBox mBox = new MessageBox(messageBoxShell, SWT.OK);
-			mBox.setText(GDE.GDE_NAME_LONG);
+			mBox.setText(GDE.NAME_LONG);
 			mBox.setMessage(Messages.getString(MessageIds.GDE_MSGI0044, new String[] {tmpDeviceJarPath})); 
 			mBox.open();
 		}
@@ -984,7 +984,7 @@ public class FileUtils {
 			basePath = url.getFile().substring(GDE.IS_WINDOWS ? 1 : 0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
 				+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
-				+ "/" + GDE.GDE_NAME_LONG; // + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
+				+ "/" + GDE.NAME_LONG; // + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else { // started outside java -jar *.jar
 			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
@@ -1015,7 +1015,7 @@ public class FileUtils {
 				//targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
 				jarPath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
 					+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
-					+ "/" + GDE.GDE_NAME_LONG + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
+					+ "/" + GDE.NAME_LONG + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (Exception e) {
 				e.printStackTrace(System.err);
@@ -1193,5 +1193,37 @@ public class FileUtils {
 		if (!directory.canRead()) {
 			throw new IllegalArgumentException("Directory cannot be read: " + directory); //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * cleanup possible old files like log file, native libraries
+	 */
+	public static void cleanupPre() {
+		if (GDE.IS_WINDOWS) 
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "WinHelper*.dll", "Register*.exe", "rxtxSerial.dll"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		else if (GDE.IS_LINUX)
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "*register.sh", "librxtxSerial.so"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		else if (GDE.IS_MAC)
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "librxtxSerial.jnilib"}); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * cleanup possible old files like log file, native libraries
+	 */
+	public static void cleanupPost() {
+		Thread postCleanup = new Thread() {
+			public void run() {
+				//long 	StartTime 	= new Date().getTime();
+				if (GDE.IS_WINDOWS) 
+					FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"OSDE", "swt*3448.dll", "GDE", "WinHelper*.dll", "swtlib-"+GDE.BIT_MODE, }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				else if (GDE.IS_LINUX)
+					FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"OSDE", "swt*3448.dll", "GDE", "*register.sh", "swtlib-"+GDE.BIT_MODE}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				else if (GDE.IS_MAC)
+					FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"OSDE", "GDE", "swtlib-"+GDE.BIT_MODE}); //$NON-NLS-1$ //$NON-NLS-2$
+
+				//System.out.println(GDE.NAME_LONG + ": clean post time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		};
+		postCleanup.start();
 	}
 }

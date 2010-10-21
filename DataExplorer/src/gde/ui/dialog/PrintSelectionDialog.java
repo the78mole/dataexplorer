@@ -42,6 +42,8 @@ import javax.print.attribute.standard.JobName;
 import javax.print.attribute.standard.OrientationRequested;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -120,6 +122,13 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(400, 320);
+			this.dialogShell.addDisposeListener(new DisposeListener() {
+				
+				@Override
+				public void widgetDisposed(DisposeEvent arg0) {
+					PrintSelectionDialog.this.application.resetShellIcon();				
+				}
+			});
 			{
 				this.headerButton = new Button(this.dialogShell, SWT.CHECK | SWT.LEFT);
 				this.headerButton.setText(Messages.getString(MessageIds.GDE_MSGT0456));
@@ -360,7 +369,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 				//prepare the page layout
 				PrintRequestAttributeSet printAttrSet = new HashPrintRequestAttributeSet();
-				printAttrSet.add(new JobName(GDE.GDE_NAME_LONG, Settings.getInstance().getLocale()));
+				printAttrSet.add(new JobName(GDE.NAME_LONG, Settings.getInstance().getLocale()));
 				switch (orientation) {
 				case PageFormat.LANDSCAPE:
 					printAttrSet.add(OrientationRequested.LANDSCAPE);
@@ -387,10 +396,10 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					Channel activeChannel = Channels.getInstance().getActiveChannel();
 					if (activeChannel != null) {
 						fileName = activeChannel.getFileName();
-						fileName = fileName == null ? GDE.GDE_NAME_LONG + GDE.STRING_MESSAGE_CONCAT : fileName + GDE.STRING_MESSAGE_CONCAT;
+						fileName = fileName == null ? GDE.NAME_LONG + GDE.STRING_MESSAGE_CONCAT : fileName + GDE.STRING_MESSAGE_CONCAT;
 					}
 					else {
-						fileName = GDE.GDE_NAME_LONG + GDE.STRING_MESSAGE_CONCAT;
+						fileName = GDE.NAME_LONG + GDE.STRING_MESSAGE_CONCAT;
 					}
 
 

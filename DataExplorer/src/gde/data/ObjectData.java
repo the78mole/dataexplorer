@@ -254,7 +254,7 @@ public class ObjectData {
 	public void print() {
 		StyledTextPrintOptions options = new StyledTextPrintOptions();
 		options.header = StyledTextPrintOptions.SEPARATOR + this.fullQualifiedObjectFilePath + StyledTextPrintOptions.SEPARATOR;
-		options.footer = StyledTextPrintOptions.SEPARATOR + StyledTextPrintOptions.PAGE_TAG + StyledTextPrintOptions.SEPARATOR + GDE.GDE_NAME_LONG;
+		options.footer = StyledTextPrintOptions.SEPARATOR + StyledTextPrintOptions.PAGE_TAG + StyledTextPrintOptions.SEPARATOR + GDE.NAME_LONG;
 		options.printLineBackground = true;
 		options.printTextBackground = true;
 		options.printTextFontStyle = true;

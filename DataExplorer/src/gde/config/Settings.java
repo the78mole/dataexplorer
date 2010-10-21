@@ -213,10 +213,10 @@ public class Settings extends Properties {
 		if (Settings.instance == null) {
 			try {
 				Settings.instance = new Settings();
-				log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
+				log.logp(Level.TIME, $CLASS_NAME, $METHOD_NAME, "init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (Exception e) {
-				log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 		}
 		return Settings.instance;
@@ -232,17 +232,17 @@ public class Settings extends Properties {
 		final String $METHOD_NAME = "Settings"; //$NON-NLS-1$
 
 		if (GDE.IS_WINDOWS) { //$NON-NLS-1$
-			this.applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + GDE.GDE_NAME_LONG).replace("\\", GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
-			this.settingsFilePath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + GDE.GDE_NAME_LONG + ".properties"; //$NON-NLS-1$
+			this.applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG).replace("\\", GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
+			this.settingsFilePath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + ".properties"; //$NON-NLS-1$
 		}
 		else if (GDE.IS_LINUX) { //$NON-NLS-1$ //$NON-NLS-2$
-			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "." + GDE.GDE_NAME_LONG; //$NON-NLS-1$ //$NON-NLS-2$
-			this.settingsFilePath = this.applHomePath  + GDE.FILE_SEPARATOR_UNIX  + GDE.GDE_NAME_LONG + ".properties"; //$NON-NLS-1$
+			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "." + GDE.NAME_LONG; //$NON-NLS-1$ //$NON-NLS-2$
+			this.settingsFilePath = this.applHomePath  + GDE.FILE_SEPARATOR_UNIX  + GDE.NAME_LONG + ".properties"; //$NON-NLS-1$
 		}
 		// OPET - start - add
 		else if (GDE.IS_MAC) { //$NON-NLS-1$ //$NON-NLS-2$
 			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX + "DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
-			this.settingsFilePath = this.applHomePath  + GDE.FILE_SEPARATOR_UNIX + GDE.GDE_NAME_LONG + ".properties"; //$NON-NLS-1$
+			this.settingsFilePath = this.applHomePath  + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + ".properties"; //$NON-NLS-1$
 		}
 		// OPET - end
 		else {
@@ -269,9 +269,9 @@ public class Settings extends Properties {
 				}
 			}
 		};
-		
-		this.load();
 
+		this.load();
+		
 		// check existens of application home directory, check XSD version, copy all device XML+XSD and image files
 		FileUtils.checkDirectoryAndCreate(this.applHomePath);
 		String devicePropertiesTargetpath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + DEVICE_PROPERTIES_DIR_NAME;
@@ -283,14 +283,15 @@ public class Settings extends Properties {
 		else {	// execute every time application starts to enable update from added plug-in
 			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true);
 		}
-		xsdThread.start(); // wait to start the thread until the device XMLs are getting updated
+
+		xsdThread.start(); // wait to start the thread until the device XMLs are getting updated, locale switch comes with hte same XSD
 
 		// locale settings has been changed, replacement of device property files required
 		if (this.getLocaleChanged() && !this.isDevicePropertiesUpdated) {
 			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, false);
 			this.isDevicePropertiesReplaced = true;
 		}
-
+		
 		String templateDirectory = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + GRAPHICS_TEMPLATES_DIR_NAME;
 		if (!FileUtils.checkDirectoryAndCreate(templateDirectory, GRAPHICS_TEMPLATES_XSD_NAME)) { // there is no old XSD version
 			FileUtils.extract(this.getClass(), GRAPHICS_TEMPLATES_XSD_NAME, PATH_RESOURCE, templateDirectory, PERMISSION_555);

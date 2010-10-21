@@ -262,6 +262,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							handleAutoOpenAfterClose();
 						}
 					});
+					DeviceSelectionDialog.this.application.resetShellIcon();
 					DeviceSelectionDialog.log.log(Level.FINE, "disposed"); //$NON-NLS-1$
 				}
 

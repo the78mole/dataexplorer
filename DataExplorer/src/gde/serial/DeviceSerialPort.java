@@ -145,7 +145,7 @@ public abstract class DeviceSerialPort implements SerialPortEventListener {
 						if (commPortIdentifier.getPortType() == CommPortIdentifier.PORT_SERIAL && !commPortIdentifier.isCurrentlyOwned()) {
 							try {
 								if (doAvialabilityCheck) {
-									((SerialPort) commPortIdentifier.open(GDE.GDE_NAME_LONG, 10000)).close();
+									((SerialPort) commPortIdentifier.open(GDE.NAME_LONG, 10000)).close();
 								}
 								availablePorts.add(serialPortStr);
 								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$

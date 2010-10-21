@@ -306,7 +306,7 @@ public class DevicePropertiesEditor extends Composite {
 
 	public int openYesNoMessageDialog(final String message) {
 		MessageBox yesNoMessageDialog = new MessageBox(DevicePropertiesEditor.dialogShell, SWT.PRIMARY_MODAL | SWT.YES | SWT.NO | SWT.ICON_QUESTION);
-		yesNoMessageDialog.setText(GDE.GDE_NAME_LONG);
+		yesNoMessageDialog.setText(GDE.NAME_LONG);
 		yesNoMessageDialog.setMessage(message);
 		return yesNoMessageDialog.open();
 	}
@@ -1554,13 +1554,13 @@ public class DevicePropertiesEditor extends Composite {
 	private String getDevicesPath() {
 		String applHomePath = GDE.STRING_EMPTY;
 		if (GDE.IS_WINDOWS) {
-			applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + GDE.GDE_NAME_LONG + GDE.FILE_SEPARATOR_UNIX).replace("\\", GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$ 
+			applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + GDE.FILE_SEPARATOR_UNIX).replace("\\", GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$ 
 		}
 		else if (GDE.IS_LINUX) {
-			applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "." + GDE.GDE_NAME_LONG + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+			applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "." + GDE.NAME_LONG + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else if (GDE.IS_MAC) {
-			applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX + GDE.GDE_NAME_LONG + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+			applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
 			log.log(Level.SEVERE, Messages.getString(MessageIds.GDE_MSGW0001));
@@ -1759,7 +1759,7 @@ public class DevicePropertiesEditor extends Composite {
 			messageDialog.setMessage(messages[1]);
 		}
 		else {
-			messageDialog.setText(GDE.GDE_NAME_LONG);
+			messageDialog.setText(GDE.NAME_LONG);
 			messageDialog.setMessage(errorMessage);
 		}
 		messageDialog.open();

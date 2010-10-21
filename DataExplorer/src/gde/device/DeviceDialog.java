@@ -94,6 +94,8 @@ public abstract class DeviceDialog extends Dialog {
 			if (!this.application.isDisposed()) this.application.setStatusMessage(""); //$NON-NLS-1$
 		}
 		else if (!this.application.isDisposed()) this.application.setStatusMessage(this.disposeDisabledMessage, SWT.COLOR_RED);
+		
+		this.application.resetShellIcon();
 	}
 
 	public void close() {
