@@ -417,10 +417,10 @@ public class TestSuperClass extends TestCase {
 		else {
 			String srcDataPath = this.getLoaderPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 			if (srcDataPath.endsWith("bin/")) { // running inside eclipse
-				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.GDE_NAME_LONG)) + "DataFilesTestSamples/" + GDE.GDE_NAME_LONG  ;
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG  ;
 			}
 			else {
-				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf("build")) + "DataFilesTestSamples/" + GDE.GDE_NAME_LONG  ;
+				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf("build")) + "DataFilesTestSamples/" + GDE.NAME_LONG  ;
 			}
 			this.dataPath = new File(srcDataPath); ///usr/src/dataexplorer-2.23-src/build/target/<os_arch>/DataExplorer/DataExplorer.jar
 		}
