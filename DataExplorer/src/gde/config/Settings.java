@@ -75,64 +75,66 @@ public class Settings extends Properties {
 	private final static long		serialVersionUID						= 26031957;
 	final static Logger					log													= Logger.getLogger(Settings.class.getName());
 	final static String $CLASS_NAME = Settings.class.getName();
+	
+	private static Settings	instance											= null;	// singelton
 
 	// JAXB XML environment
-	private Schema											schema;
-	private JAXBContext									jc;
-	private Unmarshaller								unmarshaller;
-	private Marshaller									marshaller;
-	private String											xmlBasePath;
-	private Thread 											xsdThread;
+	Schema											schema;
+	JAXBContext									jc;
+	Unmarshaller								unmarshaller;
+	Marshaller									marshaller;
+	String											xmlBasePath;
+	Thread 											xsdThread;
 
-	public  static final String	EMPTY												= "---"; //$NON-NLS-1$
-	public  static final String EMPTY_SIGNATURE 						= EMPTY + GDE.STRING_SEMICOLON + EMPTY + GDE.STRING_SEMICOLON + EMPTY;
-	private static final String	UNIX_PORT_DEV_TTY						= "/dev/tty";
-	private static final String	WINDOWS_PORT_COM						= "COM";
-	private static final String	PERMISSION_555							= "555";
-	private static final String	PATH_RESOURCE								= "resource/";
-	private static final String PATH_RESOURCE_TEMPLATE 			= "resource/template/";
+	public static final String	EMPTY								= "---"; //$NON-NLS-1$
+	public static final String EMPTY_SIGNATURE 			= EMPTY + GDE.STRING_SEMICOLON + EMPTY + GDE.STRING_SEMICOLON + EMPTY;
+	static final String	UNIX_PORT_DEV_TTY						= "/dev/tty";
+	static final String	WINDOWS_PORT_COM						= "COM";
+	static final String	PERMISSION_555							= "555";
+	static final String	PATH_RESOURCE								= "resource/";
+	static final String PATH_RESOURCE_TEMPLATE 			= "resource/template/";
 
-	private final static String		HEADER_TEXT										= "# -- DataExplorer Settings File -- "; //$NON-NLS-1$
-	private final static String		DEVICE_BLOCK									= "#[Actual-Device-Port-Settings]";																				// Picolario;Renschler;COM2 //$NON-NLS-1$
-	private final static String		WINDOW_BLOCK									= "#[Window-Settings]"; //$NON-NLS-1$
-	private final static String		WINDOW_LEFT										= "window_left"; //$NON-NLS-1$
-	private final static String		WINDOW_TOP										= "window_top"; //$NON-NLS-1$
-	private final static String		WINDOW_WIDTH									= "window_width"; //$NON-NLS-1$
-	private final static String		WINDOW_HEIGHT									= "window_height"; //$NON-NLS-1$
-	private final static String		COOLBAR_ORDER									= "coolbar_order"; //$NON-NLS-1$
-	private final static String		COOLBAR_WRAPS									= "coolbar_wraps"; //$NON-NLS-1$
-	private final static String		COOLBAR_SIZES									= "coolbar_sizes"; //$NON-NLS-1$
-	private final static String		RECORD_COMMENT_VISIBLE				= "record_comment_visible"; //$NON-NLS-1$
-	private final static String		GRAPHICS_HEADER_VISIBLE				= "graphics_header_visible"; //$NON-NLS-1$
-	private final static String		GRAPHICS_AREA_BACKGROUND			= "graphics_area_background"; //$NON-NLS-1$
-	private final static String		GRAPHICS_SURROUND_BACKGRD			= "graphics_surround_backgrd"; //$NON-NLS-1$
-	private final static String		GRAPHICS_BORDER_COLOR					= "graphics_border_color"; //$NON-NLS-1$
-	private final static String		COMPARE_AREA_BACKGROUND				= "compare_area_background"; //$NON-NLS-1$
-	private final static String		COMPARE_SURROUND_BACKGRD			= "compare_surround_backgrd"; //$NON-NLS-1$
-	private final static String		COMPARE_BORDER_COLOR					= "compare_border_color"; //$NON-NLS-1$
-	private final static String		STATISTICS_INNER_BACKGROUND		= "statistics_inner_background"; //$NON-NLS-1$
-	private final static String		STATISTICS_SURROUND_BACKGRD		= "statistics_surround_backgrd"; //$NON-NLS-1$
-	private final static String		ANALOG_INNER_BACKGROUND				= "analog_inner_background"; //$NON-NLS-1$
-	private final static String		ANALOG_SURROUND_BACKGRD				= "analog_surround_backgrd"; //$NON-NLS-1$
-	private final static String		DIGITAL_INNER_BACKGROUND			= "digital_inner_background"; //$NON-NLS-1$
-	private final static String		DIGITAL_SURROUND_BACKGRD			= "digital_surround_backgrd"; //$NON-NLS-1$
-	private final static String		CELL_VOLTAGE_INNER_BACKGROUND	= "cell_voltage_inner_background"; //$NON-NLS-1$
-	private final static String		CELL_VOLTAGE_SURROUND_BACKGRD	= "cell_voltage_surround_backgrd"; //$NON-NLS-1$
-	private final static String		FILE_COMMENT_INNER_BACKGROUND	= "file_comment_inner_background"; //$NON-NLS-1$
-	private final static String		FILE_COMMENT_SURROUND_BACKGRD	= "file_comment_surround_backgrd"; //$NON-NLS-1$
-	private final static String		OBJECT_DESC_INNER_BACKGROUND	= "object_desciption_inner_background"; //$NON-NLS-1$
-	private final static String		OBJECT_DESC_SURROUND_BACKGRD	= "object_desciption_surround_backgrd"; //$NON-NLS-1$
+	final static String		HEADER_TEXT										= "# -- DataExplorer Settings File -- "; //$NON-NLS-1$
+	final static String		DEVICE_BLOCK									= "#[Actual-Device-Port-Settings]";																				// Picolario;Renschler;COM2 //$NON-NLS-1$
+	final static String		WINDOW_BLOCK									= "#[Window-Settings]"; //$NON-NLS-1$
+	final static String		WINDOW_LEFT										= "window_left"; //$NON-NLS-1$
+	final static String		WINDOW_TOP										= "window_top"; //$NON-NLS-1$
+	final static String		WINDOW_WIDTH									= "window_width"; //$NON-NLS-1$
+	final static String		WINDOW_HEIGHT									= "window_height"; //$NON-NLS-1$
+	final static String		COOLBAR_ORDER									= "coolbar_order"; //$NON-NLS-1$
+	final static String		COOLBAR_WRAPS									= "coolbar_wraps"; //$NON-NLS-1$
+	final static String		COOLBAR_SIZES									= "coolbar_sizes"; //$NON-NLS-1$
+	final static String		RECORD_COMMENT_VISIBLE				= "record_comment_visible"; //$NON-NLS-1$
+	final static String		GRAPHICS_HEADER_VISIBLE				= "graphics_header_visible"; //$NON-NLS-1$
+	final static String		GRAPHICS_AREA_BACKGROUND			= "graphics_area_background"; //$NON-NLS-1$
+	final static String		GRAPHICS_SURROUND_BACKGRD			= "graphics_surround_backgrd"; //$NON-NLS-1$
+	final static String		GRAPHICS_BORDER_COLOR					= "graphics_border_color"; //$NON-NLS-1$
+	final static String		COMPARE_AREA_BACKGROUND				= "compare_area_background"; //$NON-NLS-1$
+	final static String		COMPARE_SURROUND_BACKGRD			= "compare_surround_backgrd"; //$NON-NLS-1$
+	final static String		COMPARE_BORDER_COLOR					= "compare_border_color"; //$NON-NLS-1$
+	final static String		STATISTICS_INNER_BACKGROUND		= "statistics_inner_background"; //$NON-NLS-1$
+	final static String		STATISTICS_SURROUND_BACKGRD		= "statistics_surround_backgrd"; //$NON-NLS-1$
+	final static String		ANALOG_INNER_BACKGROUND				= "analog_inner_background"; //$NON-NLS-1$
+	final static String		ANALOG_SURROUND_BACKGRD				= "analog_surround_backgrd"; //$NON-NLS-1$
+	final static String		DIGITAL_INNER_BACKGROUND			= "digital_inner_background"; //$NON-NLS-1$
+	final static String		DIGITAL_SURROUND_BACKGRD			= "digital_surround_backgrd"; //$NON-NLS-1$
+	final static String		CELL_VOLTAGE_INNER_BACKGROUND	= "cell_voltage_inner_background"; //$NON-NLS-1$
+	final static String		CELL_VOLTAGE_SURROUND_BACKGRD	= "cell_voltage_surround_backgrd"; //$NON-NLS-1$
+	final static String		FILE_COMMENT_INNER_BACKGROUND	= "file_comment_inner_background"; //$NON-NLS-1$
+	final static String		FILE_COMMENT_SURROUND_BACKGRD	= "file_comment_surround_backgrd"; //$NON-NLS-1$
+	final static String		OBJECT_DESC_INNER_BACKGROUND	= "object_desciption_inner_background"; //$NON-NLS-1$
+	final static String		OBJECT_DESC_SURROUND_BACKGRD	= "object_desciption_surround_backgrd"; //$NON-NLS-1$
 
-	private final static String		FILE_HISTORY_BLOCK						= "#[File-History-List]"; //$NON-NLS-1$
-	private final static String		FILE_HISTORY_BEGIN						= "history_file_"; //$NON-NLS-1$
-	private List<String>					fileHistory										= new ArrayList<String>();
+	final static String		FILE_HISTORY_BLOCK						= "#[File-History-List]"; //$NON-NLS-1$
+	final static String		FILE_HISTORY_BEGIN						= "history_file_"; //$NON-NLS-1$
+	List<String>					fileHistory										= new ArrayList<String>();
 
-	private final static String		APPL_BLOCK										= "#[Program-Settings]"; //$NON-NLS-1$
-	private final static String		TABLE_BLOCK										= "#[Table-Settings]"; //$NON-NLS-1$
-	private final static String		LOGGING_BLOCK									= "#[Logging-Settings]"; //$NON-NLS-1$
-	private final static String		LOG_PATH											= "Logs"; //$NON-NLS-1$
-	private final static String		LOG_FILE											= "trace.log"; //$NON-NLS-1$
-	private final static String		SERIAL_LOG_FILE								= "serial.log"; //$NON-NLS-1$
+	final static String		APPL_BLOCK										= "#[Program-Settings]"; //$NON-NLS-1$
+	final static String		TABLE_BLOCK										= "#[Table-Settings]"; //$NON-NLS-1$
+	final static String		LOGGING_BLOCK									= "#[Logging-Settings]"; //$NON-NLS-1$
+	final static String		LOG_PATH											= "Logs"; //$NON-NLS-1$
+	final static String		LOG_FILE											= "trace.log"; //$NON-NLS-1$
+	final static String		SERIAL_LOG_FILE								= "serial.log"; //$NON-NLS-1$
 	public final static String[]	LOGGING_LEVEL									= new String[] { "SEVERE", "WARNING", "TIME", "INFO", "FINE", "FINER", "FINEST" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 	public final static String		ACTIVE_DEVICE									= "active_device"; //$NON-NLS-1$
@@ -185,21 +187,20 @@ public class Settings extends Properties {
 	public final static String		GRAPHICS_TEMPLATES_XSD_NAME		= "GraphicsTemplates" + GDE.GRAPHICS_TEMPLATES_XSD_VERSION + GDE.FILE_ENDING_DOT_XSD; //$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_EXTENSION	= GDE.FILE_ENDING_STAR_XML;
 
-	private static Settings	instance											= null;	// singelton
-	private BufferedReader	reader;																// to read the application settings
-	private BufferedWriter	writer;																// to write the application settings
+	BufferedReader	reader;																// to read the application settings
+	BufferedWriter	writer;																// to write the application settings
 
-	private boolean 				isDevicePropertiesUpdated			= false;
-	private boolean 				isDevicePropertiesReplaced		= false;
-	private boolean 				isGraphicsTemplateUpdated			= false;
+	boolean 				isDevicePropertiesUpdated			= false;
+	boolean 				isDevicePropertiesReplaced		= false;
+	boolean 				isGraphicsTemplateUpdated			= false;
 
 
-	private Rectangle				window;
-	private String					cbOrder;
+	Rectangle				window;
+	String					cbOrder;
 	private	String					cbWraps;
-	private String					cbSizes;
-	private String					settingsFilePath;											// full qualified path to settings file
-	private String					applHomePath;													// default path to application home directory
+	String					cbSizes;
+	String					settingsFilePath;											// full qualified path to settings file
+	String					applHomePath;													// default path to application home directory
 	Comparator<String> 			comparator 										= new RecordSetNameComparator(); //used to sort object key list
 
 	/**
@@ -275,6 +276,7 @@ public class Settings extends Properties {
 		// check existens of application home directory, check XSD version, copy all device XML+XSD and image files
 		FileUtils.checkDirectoryAndCreate(this.applHomePath);
 		String devicePropertiesTargetpath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + DEVICE_PROPERTIES_DIR_NAME;
+		devicePropertiesTargetpath = devicePropertiesTargetpath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 		if (!FileUtils.checkDirectoryAndCreate(devicePropertiesTargetpath, DEVICE_PROPERTIES_XSD_NAME)) {
 			FileUtils.extract(this.getClass(), DEVICE_PROPERTIES_XSD_NAME, PATH_RESOURCE, devicePropertiesTargetpath, PERMISSION_555);
 			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true);

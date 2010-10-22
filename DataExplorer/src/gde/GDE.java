@@ -245,7 +245,7 @@ public class GDE {
 		String inputFilePath = STRING_EMPTY;
 		try {
 			GDE.initLogger();
-			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "DataExplorer " + VERSION); //$NON-NLS-1$
+			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, GDE.NAME_LONG + GDE.STRING_BLANK + VERSION); //$NON-NLS-1$
 			
 			//build the main thread context classloader to enable dynamic plugin class loading 
 			Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
@@ -310,6 +310,7 @@ public class GDE {
 		if (url.getPath().endsWith(FILE_SEPARATOR_UNIX)) { // running inside Eclipse
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "started inside Eclipse"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
+			basePath = basePath.replace(STRING_URL_BLANK, STRING_BLANK);
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "basePath = " + basePath); //$NON-NLS-1$
 			File file = new File(basePath);
 			String[] files = file.list();

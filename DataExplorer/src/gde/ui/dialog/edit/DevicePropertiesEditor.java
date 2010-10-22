@@ -41,7 +41,6 @@ import gde.ui.SWTResourceManager;
 import gde.ui.dialog.HelpInfoDialog;
 import gde.utils.FileUtils;
 import gde.utils.StringHelper;
-import gde.utils.WebBrowser;
 
 import java.io.File;
 import java.util.Locale;
@@ -1771,35 +1770,6 @@ public class DevicePropertiesEditor extends Composite {
 	 */
 	public void enableSaveButton(boolean enable) {
 		this.saveButton.setEnabled(enable);
-	}
-
-	/**
-	 * open the dialog and displays content of given HTML file 
-	 * @param deviceName blank means main DevicePropertiesEditor
-	 * @param fileName the help HTML file
-	 */
-	public void openHelpDialog(String deviceName, String fileName) {
-		final String $METHOD_NAME = "openHelpDialog"; //$NON-NLS-1$
-		try {
-			this.helpDialog = new HelpInfoDialog(DevicePropertiesEditor.dialogShell, SWT.MODELESS);
-			if (GDE.IS_WINDOWS) { //$NON-NLS-1$
-				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using syle SWT.NONE (windows IE)"); //$NON-NLS-1$
-				//this.helpDialog.dispose();
-				this.helpDialog.open(deviceName, fileName, SWT.NONE);
-			}
-			else {
-				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using syle SWT.MOZILLA (xulrunner)"); //$NON-NLS-1$
-				this.helpDialog.open(deviceName, fileName, SWT.MOZILLA);
-			}
-		}
-		catch (Error e) {
-			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using OS registered web browser"); //$NON-NLS-1$
-			WebBrowser.openURL(deviceName, fileName);
-			openWarningMessageBox(Messages.getString(MessageIds.GDE_MSGI0025));
-		}
-		catch (Throwable t) {
-			openWarningMessageBox(Messages.getString(MessageIds.GDE_MSGE0007) + t.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + t.getMessage());
-		}
 	}
 
 	/**

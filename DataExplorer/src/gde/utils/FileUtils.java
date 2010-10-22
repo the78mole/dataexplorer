@@ -755,8 +755,7 @@ public class FileUtils {
 //					deviceJarPath = "c:\\Program Files\\DataExplorer\\devices\\Simulator.jar";
 //				}
 
-				tmpDeviceJarPath = deviceJarPath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-				tmpDeviceJarPath = GDE.JAVA_IO_TMPDIR + tmpDeviceJarPath.substring(tmpDeviceJarPath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1, tmpDeviceJarPath.length());
+				tmpDeviceJarPath = GDE.JAVA_IO_TMPDIR + deviceJarPath.substring(deviceJarPath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1, deviceJarPath.length());
 				log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
 
 				FileUtils.updateJarContent(deviceJarPath, tmpDeviceJarPath, addJarEntryName, devicePropsFileName, DevicePropertiesEditor.dialogShell);
@@ -819,6 +818,7 @@ public class FileUtils {
 		else
 			throw new NoClassDefFoundError(Messages.getString(MessageIds.GDE_MSGE0016));
 		
+		deviceJarPath = deviceJarPath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath); //$NON-NLS-1$
 		return deviceJarPath;
 	}
@@ -982,6 +982,7 @@ public class FileUtils {
 			String bitmode = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
 			bitmode = bitmode != null && bitmode.length() == 2 ? bitmode : System.getProperty("com.ibm.vm.bitmode"); //$NON-NLS-1$
 			basePath = url.getFile().substring(GDE.IS_WINDOWS ? 1 : 0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
+			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			basePath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
 				+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
 				+ "/" + GDE.NAME_LONG; // + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
@@ -989,9 +990,7 @@ public class FileUtils {
 		else { // started outside java -jar *.jar
 			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf("/") + 1); //$NON-NLS-1$
-			if (GDE.IS_WINDOWS) { //$NON-NLS-1$
-				basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);  //$NON-NLS-1$//$NON-NLS-2$
-			}
+			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK); 
 		}
 		log.log(Level.FINE, "GDE base path = " + basePath); //$NON-NLS-1$
 		return basePath;
