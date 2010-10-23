@@ -985,7 +985,7 @@ public class FileUtils {
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			basePath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
 				+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
-				+ "/" + GDE.NAME_LONG; // + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
+				+ (GDE.IS_MAC ? "_cocoa" : GDE.STRING_EMPTY) + "/" + GDE.NAME_LONG + (GDE.IS_MAC ? ".app/Contents/Resources" : GDE.STRING_EMPTY); // + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else { // started outside java -jar *.jar
 			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
@@ -1008,13 +1008,14 @@ public class FileUtils {
 		if (url.getPath().endsWith("/")) { // running inside Eclipse //$NON-NLS-1$
 			log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
+			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
 				//jarPath = basePath + "build" + GDE.FILE_SEPARATOR_UNIX + "target" + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME; //$NON-NLS-1$ //$NON-NLS-2$
 				//targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
 				jarPath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
 					+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
-					+ "/" + GDE.NAME_LONG + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
+					+ (GDE.IS_MAC ? "_cocoa" : GDE.STRING_EMPTY) + "/" + GDE.NAME_LONG + (GDE.IS_MAC ? ".app/Contents/Resources" : GDE.STRING_EMPTY) + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (Exception e) {
 				e.printStackTrace(System.err);
@@ -1023,9 +1024,7 @@ public class FileUtils {
 		else { // started outside java -jar *.jar
 			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf("/") + 1); //$NON-NLS-1$
-			if (GDE.IS_WINDOWS) { //$NON-NLS-1$
-				basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
-			}
+			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
 				//jarPath = basePath + Settings.DEVICE_PROPERTIES_DIR_NAME;
