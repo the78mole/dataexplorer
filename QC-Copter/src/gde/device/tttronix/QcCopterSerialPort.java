@@ -20,6 +20,7 @@ package gde.device.tttronix;
 
 import gde.GDE;
 import gde.device.DeviceConfiguration;
+import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.serial.DeviceSerialPort;
@@ -30,7 +31,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
- * eStation serial port implementation
+ * QC-Copter or QuadroConrtol serial port implementation
  * @author Winfried Brügmann
  */
 public class QcCopterSerialPort extends DeviceSerialPort {
@@ -73,38 +74,45 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 			}
 			data = this.read(data, 1500);
 			
-			//check data for content
-			// synchronize received data to begin of sent data 
-			while (containsSTX(data) && data[0] != STX) {  //&& data[this.dataSize - 1] != ETX) {
-				this.isInSync = false;
-				for (int i = 1; i < data.length; i++) {
-					if(data[i] == STX){
-						System.arraycopy(data, i, data, 0, this.dataSize-i);
-						data = new byte[i];
-						data = this.read(data, 1000);
-						System.arraycopy(data, 0, data, this.dataSize-i, i);
-						this.isInSync = true;
-						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
-						break; //sync
+			//check data for valid content
+			if (containsSTX(data)) {
+				//synchronize received data to begin of sent data 
+				while (data[0] != STX) { 
+					this.isInSync = false;
+					for (int i = 1; i < data.length; i++) {
+						if(data[i] == STX){
+							System.arraycopy(data, i, data, 0, this.dataSize-i);
+							byte []tmpdata = new byte[i];
+							tmpdata = this.read(tmpdata, 1000);
+							System.arraycopy(tmpdata, 0, data, this.dataSize-i, i);
+							this.isInSync = true;
+							log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+							break; //sync
+						}
 					}
+					if(this.isInSync)
+						break;
 				}
-				if(this.isInSync)
-					break;
-			}
 
-			if (log.isLoggable(Level.FINER)) {
-				StringBuilder sb = new StringBuilder();
-				for (byte b : data) {
-					sb.append(String.format("0x%02x ,", b)); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) {
+					StringBuilder sb = new StringBuilder();
+					for (byte b : data) {
+						sb.append(String.format("0x%02x ,", b)); //$NON-NLS-1$
+					}
+					log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, sb.toString());
 				}
-				log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, sb.toString());
+				
+				if (!isChecksumOK(data)) {
+					this.xferErrors++;
+					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.xferErrors); //$NON-NLS-1$
+					if (this.xferErrors > 3) { //retry or skip in case of xfer errors
+						throw new SerialPortException("still receiving invalid data afer 3 re-tries, please check port configuration or mode!");
+					}
+					data = getData();
+				}
 			}
-			
-			if (!isChecksumOK(data)) {
-				this.xferErrors++;
-				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.xferErrors); //$NON-NLS-1$
-				//TODO retry or skip in case of xfer errors
-				data = getData();
+			else { // only flight simulation data contains STX, so this must be configuration menu string
+				throw new SerialPortException("receiving invalid flight simulation data, please check port configuration or mode!");
 			}
 		}
 		catch (Exception e) {
@@ -143,6 +151,7 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 	public synchronized String getTerminalData() throws Exception {
 		final String $METHOD_NAME = "getTerminalData";
 		String returnString = GDE.STRING_EMPTY;
+		int timeout_ms = 2000;
 
 		boolean isPortOpenedByMe = false;
 		try {
@@ -151,9 +160,18 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				isPortOpenedByMe = true;
 			}
 			
-			byte[] data = new byte[200];
-			waitForStableReceiveBuffer(20, 2000, 200);// stable counter max 3000/4 = 750
-			data = this.read(data, 1000); 
+			int size = waitForStableReceiveBuffer(345, timeout_ms, 200);// stable counter max 3000/4 = 750
+			log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "receive buffer data size = " + size);
+			byte[] data = new byte[size];
+			if (size > 350) {// could only be flight simulation data, switch into flight simulation recording mode
+				throw new SerialPortException($METHOD_NAME + " - receiving more data than expected!");
+			}
+			else if (size == 0) {
+				Thread.sleep(timeout_ms);
+			}
+			else {
+				returnString = new String(data = this.read(data, timeout_ms)); 
+			}
 			
 			if (log.isLoggable(Level.FINER)) {
 				StringBuilder sb = new StringBuilder();
@@ -166,6 +184,7 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
 				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				throw e;
 			}
 		}
 		finally {

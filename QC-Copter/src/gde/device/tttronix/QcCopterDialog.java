@@ -278,11 +278,16 @@ public class QcCopterDialog extends DeviceDialog {
 				}
 
 				try {
-					this.tabFolder.setSelection(0);
 					Channel activChannel = Channels.getInstance().getActiveChannel();
 					if (activChannel != null) {
-						this.dataGatherThread = new GathererThread(this.application, this.device, this.serialPort, activChannel.getNumber(), this);
-						this.dataGatherThread.start();
+						RecordSet activeRecordSet = activChannel.getActiveRecordSet();
+						if (activeRecordSet != null) {
+							this.tabFolder.setSelection(activeRecordSet.getChannelConfigNumber());
+						}
+						else {
+							this.dataGatherThread = new GathererThread(this.application, this.device, this.serialPort, activChannel.getNumber(), this);
+							this.dataGatherThread.start();
+						}
 					}
 				}
 				catch (SerialPortException e) {

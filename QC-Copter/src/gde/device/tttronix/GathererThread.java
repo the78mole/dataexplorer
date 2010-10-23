@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.device.tttronix;
 
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -104,7 +105,19 @@ public class GathererThread extends Thread {
 				// else wait for 180 seconds max. for actions
 				if (this.dialog != null && !this.dialog.isDisposed()) {
 					//dialog terminal is open
-					String returnString = this.serialPort.getTerminalData();
+					String returnString = GDE.STRING_EMPTY;
+					try {
+						returnString = this.serialPort.getTerminalData();
+					}
+					catch (SerialPortException e) {
+						if (e.getMessage().startsWith("getTerminalData")) {
+							this.application.openMessageDialogAsync(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+							this.dialog.dispose();
+						}
+						else {
+							throw e;
+						}
+					}
 					if (returnString.length() > 5) {
 						isTerminalDataRecived = true;
 						this.dialog.setTerminalText(returnString);
@@ -130,6 +143,7 @@ public class GathererThread extends Thread {
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
 						recordSet = this.channel.get(this.recordSetKey);
 						recordSet.setAllDisplayable();
+						this.device.updateVisibilityStatus(recordSet);
 						//recordSet.addTimeStep_ms(0.0);
 						this.channel.applyTemplate(this.recordSetKey, false);
 						// switch the active record set if the current record set is child of active channel
