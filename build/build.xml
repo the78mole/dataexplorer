@@ -92,27 +92,19 @@
 		<property name="output.gnulinux64.program.devices" location="${output.gnulinux64}/DataExplorer/devices" />
 		<property name="output.gnulinux64.java.ext" location="${output.gnulinux64}/DataExplorer/java/ext" />
 
-		<!--
-		<property name="output.mac32.carbon" location="${output.dir}/Mac_32_carbon" />
-		<property name="output.mac32.carbon.bundle" location="${output.mac32.carbon}/DataExplorer.app/Contents" />
-		<property name="output.mac32.carbon.bundle.bin" location="${output.mac32.carbon.bundle}/MacOS" />
-		<property name="output.mac32.carbon.program" location="${output.mac32.carbon.bundle}/Resources" />
-		<property name="output.mac32.carbon.program.devices" location="${output.mac32.carbon.program}/devices" />
-		<property name="output.mac32.carbon.java.ext" location="${output.mac32.carbon.program}/java/ext" />
-		-->
-		<property name="output.mac32.cocoa" location="${output.dir}/Mac_32_cocoa" />
-		<property name="output.mac32.cocoa.bundle" location="${output.mac32.cocoa}/DataExplorer.app/Contents" />
-		<property name="output.mac32.cocoa.bundle.bin" location="${output.mac32.cocoa.bundle}/MacOS" />
-		<property name="output.mac32.cocoa.program" location="${output.mac32.cocoa.bundle}/Resources" />
-		<property name="output.mac32.cocoa.program.devices" location="${output.mac32.cocoa.program}/devices" />
-		<property name="output.mac32.cocoa.java.ext" location="${output.mac32.cocoa.program}/java/ext" />
+		<property name="output.mac32" location="${output.dir}/Mac_32" />
+		<property name="output.mac32.bundle" location="${output.mac32}/DataExplorer.app/Contents" />
+		<property name="output.mac32.bundle.bin" location="${output.mac32.bundle}/MacOS" />
+		<property name="output.mac32.program" location="${output.mac32.bundle}/Resources" />
+		<property name="output.mac32.program.devices" location="${output.mac32.program}/devices" />
+		<property name="output.mac32.java.ext" location="${output.mac32.program}/java/ext" />
 
-		<property name="output.mac64.cocoa" location="${output.dir}/Mac_64_cocoa" />
-		<property name="output.mac64.cocoa.bundle" location="${output.mac64.cocoa}/DataExplorer.app/Contents" />
-		<property name="output.mac64.cocoa.bundle.bin" location="${output.mac64.cocoa.bundle}/MacOS" />
-		<property name="output.mac64.cocoa.program" location="${output.mac64.cocoa.bundle}/Resources" />
-		<property name="output.mac64.cocoa.program.devices" location="${output.mac64.cocoa.program}/devices" />
-		<property name="output.mac64.cocoa.java.ext" location="${output.mac64.cocoa.program}/java/ext" />
+		<property name="output.mac64" location="${output.dir}/Mac_64" />
+		<property name="output.mac64.bundle" location="${output.mac64}/DataExplorer.app/Contents" />
+		<property name="output.mac64.bundle.bin" location="${output.mac64.bundle}/MacOS" />
+		<property name="output.mac64.program" location="${output.mac64.bundle}/Resources" />
+		<property name="output.mac64.program.devices" location="${output.mac64.program}/devices" />
+		<property name="output.mac64.java.ext" location="${output.mac64.program}/java/ext" />
 
 		<!-- create output directory structure -->
 		<mkdir dir="${output.dir}" />
@@ -138,19 +130,19 @@
 		<mkdir dir="${output.gnulinux64.program.devices}" />
 		<mkdir dir="${output.gnulinux64.java.ext}" />
 
-		<mkdir dir="${output.mac32.cocoa}" />
-		<mkdir dir="${output.mac32.cocoa.bundle}" />
-		<mkdir dir="${output.mac32.cocoa.bundle.bin}" />
-		<mkdir dir="${output.mac32.cocoa.program}" />
-		<mkdir dir="${output.mac32.cocoa.program.devices}" />
-		<mkdir dir="${output.mac32.cocoa.java.ext}" />
+		<mkdir dir="${output.mac32}" />
+		<mkdir dir="${output.mac32.bundle}" />
+		<mkdir dir="${output.mac32.bundle.bin}" />
+		<mkdir dir="${output.mac32.program}" />
+		<mkdir dir="${output.mac32.program.devices}" />
+		<mkdir dir="${output.mac32.java.ext}" />
 
-		<mkdir dir="${output.mac64.cocoa}" />
-		<mkdir dir="${output.mac64.cocoa.bundle}" />
-		<mkdir dir="${output.mac64.cocoa.bundle.bin}" />
-		<mkdir dir="${output.mac64.cocoa.program}" />
-		<mkdir dir="${output.mac64.cocoa.program.devices}" />
-		<mkdir dir="${output.mac64.cocoa.java.ext}" />
+		<mkdir dir="${output.mac64}" />
+		<mkdir dir="${output.mac64.bundle}" />
+		<mkdir dir="${output.mac64.bundle.bin}" />
+		<mkdir dir="${output.mac64.program}" />
+		<mkdir dir="${output.mac64.program.devices}" />
+		<mkdir dir="${output.mac64.java.ext}" />
 
 		<!-- create src directory varaible -->
 		<property name="source.dir" location="${basedir}" />
@@ -348,69 +340,45 @@
 			</fileset>
 		</copy>
 
-		<!--
-		<copy todir="${output.mac32.carbon.program}" flatten="yes">
+		<copy todir="${output.mac32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer-mime.xml" />
 			<fileset file="build/misc/DataExplorer.icns" />
 			<fileset file="build/misc/DevicePropertiesEditor.icns" />
 			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
 		</copy>
-		<copy todir="${output.mac32.carbon.bundle}" flatten="yes">
-			<fileset file="build/misc/Info.plist" />
-			<fileset file="build/misc/PkgInfo" />
-			<fileset file="build/misc/version.plist" />
-		</copy>
-		<copy todir="${output.mac32.carbon.bundle.bin}" flatten="yes">
-			<fileset file="build/misc/DataExplorerMac32" />
-			<fileset file="build/misc/DevicePropertiesEditorMac32" />
-		</copy>
-		<copy todir="${output.mac32.carbon.program.devices}" flatten="yes">
-			<fileset dir="${basedir}" >
-				<patternset refid="DE_PLUGIN_JARS"/>
-			</fileset>
-		</copy>
-		-->
-
-		<copy todir="${output.mac32.cocoa.program}" flatten="yes">
-			<fileset file="DataExplorer/build/*.jar" />
-			<fileset file="build/misc/DataExplorer-mime.xml" />
-			<fileset file="build/misc/DataExplorer.icns" />
-			<fileset file="build/misc/DevicePropertiesEditor.icns" />
-			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
-		</copy>
-		<copy todir="${output.mac32.cocoa.bundle}" flatten="yes">
+		<copy todir="${output.mac32.bundle}" flatten="yes">
 			<fileset file="build/lib/MAC/32/Info.plist" />
 			<fileset file="build/misc/PkgInfo" />
 			<fileset file="build/misc/version.plist" />
 		</copy>
-		<copy todir="${output.mac32.cocoa.bundle.bin}" flatten="yes">
+		<copy todir="${output.mac32.bundle.bin}" flatten="yes">
 			<fileset file="build/misc/DataExplorerMac32" />
 			<fileset file="build/misc/DevicePropertiesEditorMac32" />
 		</copy>
-		<copy todir="${output.mac32.cocoa.program.devices}" flatten="yes">
+		<copy todir="${output.mac32.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
 				<patternset refid="DE_PLUGIN_JARS"/>
 			</fileset>
 		</copy>
 
-		<copy todir="${output.mac64.cocoa.program}" flatten="yes">
+		<copy todir="${output.mac64.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer-mime.xml" />
 			<fileset file="build/misc/DataExplorer.icns" />
 			<fileset file="build/misc/DevicePropertiesEditor.icns" />
 			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
 		</copy>
-		<copy todir="${output.mac64.cocoa.bundle}" flatten="yes">
+		<copy todir="${output.mac64.bundle}" flatten="yes">
 			<fileset file="build/lib/MAC/64/Info.plist" />
 			<fileset file="build/misc/PkgInfo" />
 			<fileset file="build/misc/version.plist" />
 		</copy>
-		<copy todir="${output.mac64.cocoa.bundle.bin}" flatten="yes">
+		<copy todir="${output.mac64.bundle.bin}" flatten="yes">
 			<fileset file="build/misc/DataExplorerMac64" />
 			<fileset file="build/misc/DevicePropertiesEditorMac64" />
 		</copy>
-		<copy todir="${output.mac64.cocoa.program.devices}" flatten="yes">
+		<copy todir="${output.mac64.program.devices}" flatten="yes">
 			<fileset dir="${basedir}" >
 				<patternset refid="DE_PLUGIN_JARS"/>
 			</fileset>
@@ -437,19 +405,12 @@
 			<fileset file="build/lib/GNULinux/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 		</copy>
-		<!--
-		<copy todir="${output.mac32.carbon.java.ext}" flatten="yes">
-			<fileset file="build/lib/RXTXcomm.jar" />
-			<fileset file="build/lib/MAC/32/carbon/swt.jar" />
-			<fileset file="build/misc/*.LICENSE" />
-		</copy>
-		-->
-		<copy todir="${output.mac32.cocoa.java.ext}" flatten="yes">
+		<copy todir="${output.mac32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/MAC/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 		</copy>
-		<copy todir="${output.mac64.cocoa.java.ext}" flatten="yes">
+		<copy todir="${output.mac64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/MAC/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
@@ -473,10 +434,10 @@
 			<fileset file="build/misc/README.*" />
 		</copy>
 		-->
-		<copy todir="${output.mac32.cocoa.program}" flatten="yes">
+		<copy todir="${output.mac32.program}" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
-		<copy todir="${output.mac64.cocoa.program}" flatten="yes">
+		<copy todir="${output.mac64.program}" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
 
@@ -533,27 +494,13 @@
 			</tarfileset>
 		</tar>
 
-		<!--
-		<echo message="zip Mac 32 carbon application bundle" />
-		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_32_carbon.zip">
-			<zipfileset dir="${output.mac32.carbon}" casesensitive="true" filemode="755" >
-				<include name="**/DataExplorerMac32"/>
-				<include name="**/DevicePropertiesEditorMac32"/>
-			</zipfileset>
-			<zipfileset dir="${output.mac32.carbon}" casesensitive="true" >
-				<exclude name="**/DataExplorerMac32"/>
-				<exclude name="**/DevicePropertiesEditorMac32"/>
-			</zipfileset>
-		</zip>
-		-->
-
 		<echo message="zip Mac 32 cocoa application bundle" />
 		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_32_cocoa.zip">
-			<zipfileset dir="${output.mac32.cocoa}" casesensitive="true" filemode="755" >
+			<zipfileset dir="${output.mac32}" casesensitive="true" filemode="755" >
 				<include name="**/DataExplorerMac32"/>
 				<include name="**/DevicePropertiesEditorMac32"/>
 			</zipfileset>
-			<zipfileset dir="${output.mac32.cocoa}" casesensitive="true" >
+			<zipfileset dir="${output.mac32}" casesensitive="true" >
 				<exclude name="**/DataExplorerMac32"/>
 				<exclude name="**/DevicePropertiesEditorMac32"/>
 			</zipfileset>
@@ -561,11 +508,11 @@
 
 		<echo message="zip Mac 64 cocoa application bundle" />
 		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_64_cocoa.zip">
-			<zipfileset dir="${output.mac64.cocoa}" casesensitive="true" filemode="755" >
+			<zipfileset dir="${output.mac64}" casesensitive="true" filemode="755" >
 				<include name="**/DataExplorerMac64"/>
 				<include name="**/DevicePropertiesEditorMac64"/>
 			</zipfileset>
-			<zipfileset dir="${output.mac64.cocoa}" casesensitive="true" >
+			<zipfileset dir="${output.mac64}" casesensitive="true" >
 				<exclude name="**/DataExplorerMac64"/>
 				<exclude name="**/DevicePropertiesEditorMac64"/>
 			</zipfileset>

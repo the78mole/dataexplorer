@@ -12,6 +12,8 @@ introduce 64 bit Mac cocoa
 replace Mac libserial.jnilib with previous version build for 32/64 bit Intel/PCC
 add function to launch Google Earth while exporting KML file
 add ToolItem to launch context sensitive help
+update VC80x to use variable time steps
+update AkkuMaster C4 prevent closing tool box while active
 
 Version 2.41 - 05 Sep 2010
 
