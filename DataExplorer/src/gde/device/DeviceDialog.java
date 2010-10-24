@@ -91,11 +91,13 @@ public abstract class DeviceDialog extends Dialog {
 	public void dispose() {
 		if (this.isClosePossible) {
 			this.dialogShell.dispose();
-			if (!this.application.isDisposed()) this.application.setStatusMessage(""); //$NON-NLS-1$
+			if (!this.application.isDisposed()) 
+				this.application.setStatusMessage(""); //$NON-NLS-1$
+			
+			this.application.resetShellIcon();
 		}
-		else if (!this.application.isDisposed()) this.application.setStatusMessage(this.disposeDisabledMessage, SWT.COLOR_RED);
-		
-		this.application.resetShellIcon();
+		else if (!this.application.isDisposed()) 
+			this.application.setStatusMessage(this.disposeDisabledMessage, SWT.COLOR_RED);
 	}
 
 	public void close() {
