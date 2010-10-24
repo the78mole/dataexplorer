@@ -18,16 +18,22 @@
 ****************************************************************************************/
 package gde.device.htronic;
 
-import java.util.HashMap;
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channels;
+import gde.device.DeviceDialog;
 import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -39,17 +45,11 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channels;
-import gde.device.DeviceDialog;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 /**
  * Dialog class for device AkkuMaster C4
@@ -358,14 +358,23 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					}
 				});
 			}
-			this.dialogShell.addDisposeListener(new DisposeListener() {
-				public void widgetDisposed(DisposeEvent evt) {
+			this.dialogShell.getShell().addListener (SWT.Close, new Listener() {			
+				@Override
+				public void handleEvent (Event evt) {		
 					AkkuMasterC4Dialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-					if (AkkuMasterC4Dialog.this.serialPort != null && AkkuMasterC4Dialog.this.serialPort.isConnected()) {
-						AkkuMasterC4Dialog.this.serialPort.close();
+					if (!(getChannelTab(1).isDataColletionActive() || getChannelTab(2).isDataColletionActive() || getChannelTab(3).isDataColletionActive() || getChannelTab(4).isDataColletionActive())) {
+						//all gatherer thread are stopped
+						if (AkkuMasterC4Dialog.this.serialPort != null && AkkuMasterC4Dialog.this.serialPort.isConnected()) {
+							AkkuMasterC4Dialog.this.serialPort.close();
+						}
+
+						Thread thread = AkkuMasterC4Dialog.this.versionThread;
+						if (thread != null && thread.isAlive()) thread.interrupt();
+						AkkuMasterC4Dialog.this.dispose();
 					}
-					Thread thread = AkkuMasterC4Dialog.this.versionThread;
-					if (thread != null && thread.isAlive()) thread.interrupt();
+					else {
+						evt.doit = false;
+					}
 				}
 			});
 			this.dialogShell.addHelpListener(new HelpListener() {
