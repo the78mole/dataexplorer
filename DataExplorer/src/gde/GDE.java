@@ -70,10 +70,6 @@ public class GDE {
 	public static final boolean		IS_MAC_COCOA							= GDE.IS_MAC && System.getProperty("DO_NOT_USE_COCOA") == null && SWT.getPlatform().toLowerCase().startsWith("cocoa");		//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean		IS_ARCH_DATA_MODEL_64			= System.getProperty("sun.arch.data.model").equals("64");		//$NON-NLS-1$ //$NON-NLS-2$
 	
-	public static final String		STRING_DOT_MAC_APP_BASE_PATH	= "/Applications/"; 				//$NON-NLS-1$
-	public static final String		STRING_DOT_MAC_APP_EXE_PATH		= "/Contents/MacOS/"; 			//$NON-NLS-1$
-	public static final String		STRING_DOT_MAC_APP_OPEN				= "open";										//$NON-NLS-1$
-	
 	public static final String		STRING_BASE_PACKAGE				= "gde"; //$NON-NLS-1$
 	public final static int				WIDGET_FONT_SIZE					= GDE.IS_LINUX ? 8 : GDE.IS_MAC ? 12 : 9;
 	public final static String		WIDGET_FONT_NAME					= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : "Sans Serif"; 					//$NON-NLS-1$ //$NON-NLS-2$
@@ -84,9 +80,9 @@ public class GDE {
 	public static final String		FILE_SEPARATOR_UNIX				= "/";																															//$NON-NLS-1$
 	public static final String		FILE_SEPARATOR_WINDOWS		= "\\";																															//$NON-NLS-1$
 	public static final String		FILE_SEPARATOR						= System.getProperty("file.separator");															//$NON-NLS-1$
-	public static final String		JAVA_IO_TMPDIR						= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR)//$NON-NLS-1$
+	public static final String		JAVA_IO_TMPDIR						= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR)	//$NON-NLS-1$
 																															? System.getProperty("java.io.tmpdir")  //$NON-NLS-1$
-																															: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;								 //$NON-NLS-1$
+																															: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;		//$NON-NLS-1$
 																															
 
 	public final static int				SIZE_BYTES_INTEGER				= Integer.SIZE / 8;			// 32 bits / 8 bits per byte 
@@ -118,9 +114,14 @@ public class GDE {
 	public static final String		STRING_TRUE								= "true"; 			//$NON-NLS-1$
 	public static final String		STRING_FALSE							= "false"; 			//$NON-NLS-1$
 	public static final String		STRING_SINGLE_QUOAT				= "'"; 					//$NON-NLS-1$
-	public static final String		STRING_DOT_APP						= ".app"; 			//$NON-NLS-1$
 	
 	public static final String[]	STRING_ARRAY_TRUE_FALSE		= new String[] { "true", "false" }; 	//$NON-NLS-1$ //$NON-NLS-2$
+	
+	public static final String		STRING_MAC_APP_BASE_PATH	= "/Applications/"; 									//$NON-NLS-1$
+	public static final String		STRING_MAC_DOT_APP				= ".app"; 														//$NON-NLS-1$
+	public static final String		STRING_MAC_APP_EXE_PATH		= "/Contents/MacOS/"; 								//$NON-NLS-1$
+	public static final String		STRING_MAC_APP_RES_PATH		= "/Contents/Resources"; 							//$NON-NLS-1$
+	public static final String		STRING_MAC_APP_OPEN				= "open";															//$NON-NLS-1$
 	
 	public static final String		FILE_ENDING_STAR_LOV			= "*.lov";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_OSD			= "*.osd";//$NON-NLS-1$
@@ -131,7 +132,7 @@ public class GDE {
 	public static final String		FILE_ENDING_STAR_XML			= "*.xml";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_KML			= "*.kml";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_GPX			= "*.gpx";//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_STAR			= "*.*";//$NON-NLS-1$
+	public static final String		FILE_ENDING_STAR_STAR			= "*.*";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_JAR				= ".jar";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_LOV				= ".lov";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_OSD				= ".osd";	//$NON-NLS-1$

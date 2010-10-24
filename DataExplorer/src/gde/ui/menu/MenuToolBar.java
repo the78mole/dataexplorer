@@ -981,7 +981,7 @@ public class MenuToolBar {
 							log.log(Level.FINEST, "googleEarthToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							ApplicationLauncher launcher;
 							if (GDE.IS_MAC)
-								launcher = new ApplicationLauncher("Google Earth", "Google Earth", GDE.STRING_DOT_MAC_APP_BASE_PATH + "Google Earth" + GDE.STRING_DOT_APP); //$NON-NLS-1$ //$NON-NLS-2$
+								launcher = new ApplicationLauncher("Google Earth", "Google Earth", GDE.STRING_MAC_APP_BASE_PATH + "Google Earth" + GDE.STRING_MAC_DOT_APP); //$NON-NLS-1$ //$NON-NLS-2$
 							else if (GDE.IS_LINUX)
 								launcher = new ApplicationLauncher("googleearth", "googleearth", Messages.getString(MessageIds.GDE_MSGT0601)); //$NON-NLS-1$
 							else //GDE.IS_WINDOWS

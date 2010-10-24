@@ -985,7 +985,7 @@ public class FileUtils {
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			basePath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
 				+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
-				+ (GDE.IS_MAC ? "_cocoa" : GDE.STRING_EMPTY) + "/" + GDE.NAME_LONG + (GDE.IS_MAC ? ".app/Contents/Resources" : GDE.STRING_EMPTY); // + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
+				+ GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY); // + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else { // started outside java -jar *.jar
 			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
@@ -1015,7 +1015,7 @@ public class FileUtils {
 				//targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
 				jarPath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
 					+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
-					+ (GDE.IS_MAC ? "_cocoa" : GDE.STRING_EMPTY) + "/" + GDE.NAME_LONG + (GDE.IS_MAC ? ".app/Contents/Resources" : GDE.STRING_EMPTY) + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
+					+ GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY) + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (Exception e) {
 				e.printStackTrace(System.err);

@@ -91,12 +91,12 @@ public class ApplicationLauncher {
 					}
 				}
 				else if (GDE.IS_MAC) {				
-					if (searchExecutableKey.toLowerCase().endsWith(GDE.STRING_DOT_APP)) {
-						searchExecutableKey = searchExecutableKey.substring(0, searchExecutableKey.indexOf(GDE.STRING_DOT_APP));
+					if (searchExecutableKey.toLowerCase().endsWith(GDE.STRING_MAC_DOT_APP)) {
+						searchExecutableKey = searchExecutableKey.substring(0, searchExecutableKey.indexOf(GDE.STRING_MAC_DOT_APP));
 					}
 					String appDirectory = searchLocationInfo;
 					if ((new File(appDirectory)).exists()) {
-						String macExecPath = appDirectory + GDE.STRING_DOT_MAC_APP_EXE_PATH + searchExecutableKey;
+						String macExecPath = appDirectory + GDE.STRING_MAC_APP_EXE_PATH + searchExecutableKey;
 						if (FileUtils.checkFileExist(macExecPath)) {
 							fqExecPath = macExecPath;
 						}
@@ -108,7 +108,7 @@ public class ApplicationLauncher {
 			}
 			else {
 				if (GDE.IS_MAC) {
-					fqExecPath = GDE.STRING_DOT_MAC_APP_OPEN;
+					fqExecPath = GDE.STRING_MAC_APP_OPEN;
 				}
 			}
 		}
