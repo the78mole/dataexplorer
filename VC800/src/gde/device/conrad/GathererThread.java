@@ -18,12 +18,6 @@
 ****************************************************************************************/
 package gde.device.conrad;
 
-import java.util.HashMap;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
@@ -32,8 +26,14 @@ import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+
+import java.util.HashMap;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
 
 
 /**
@@ -89,18 +89,12 @@ public class GathererThread extends Thread {
 	public void run() {
 		final String $METHOD_NAME = "run"; //$NON-NLS-1$
 
-		final int FILTER_TIME_DELTA_MS = 200; // definition of the time delta in msec
-
-		RecordSet recordSet = null, oldRecordSet = null;
+		RecordSet recordSet = null;
 		int[] points = new int[this.device.getMeasurementNames(this.channelNumber).length];
 		final HashMap<String, String>	configData = this.dialog.getConfigData();
 		long startCycleTime = 0;
 		long tmpCycleTime = 0;
-		long sumCycleTime = 0;
-		long deltaTime = 0;
 		long measurementCount = 0;
-		double newTimeStep_ms = 0;
-		StringBuilder sb = new StringBuilder();
 		byte[] dataBuffer = null;
 		String m_unit = "", old_unit = ""; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -113,35 +107,6 @@ public class GathererThread extends Thread {
 				// get data from device
 				dataBuffer = this.serialPort.getData();
 
-				// calculate time step average to enable adjustment
-				tmpCycleTime = System.currentTimeMillis();
-				if (recordSet != null && recordSet != oldRecordSet) {
-					++measurementCount;
-					deltaTime = startCycleTime > 0 ? tmpCycleTime - startCycleTime : 350;
-					log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, String.format("%.0f > %d > %.0f", (newTimeStep_ms + FILTER_TIME_DELTA_MS), deltaTime, //$NON-NLS-1$
-							(newTimeStep_ms - FILTER_TIME_DELTA_MS)));
-					if ((deltaTime < newTimeStep_ms + FILTER_TIME_DELTA_MS && deltaTime > newTimeStep_ms - FILTER_TIME_DELTA_MS) || newTimeStep_ms == 0) { // delta ~ 10 %
-						if (log.isLoggable(Level.FINER)) sb.append(", ").append(deltaTime); //$NON-NLS-1$
-						sumCycleTime += deltaTime;
-					}
-					else {
-						log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "deltaTime = " + deltaTime); //$NON-NLS-1$
-						--measurementCount;
-					}
-					if (measurementCount % 10 == 0) {
-						newTimeStep_ms = ((int)(10.0 * sumCycleTime / measurementCount))/10.0;
-						this.device.setTimeStep_ms(newTimeStep_ms);
-						recordSet.setTimeStep_ms(newTimeStep_ms);
-						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "newTimeStep_ms = " + newTimeStep_ms + sb.toString()); //$NON-NLS-1$
-						sb = new StringBuilder();
-					}
-				}
-				else {
-					sumCycleTime = 0;
-					measurementCount = 0;
-				}
-				startCycleTime = tmpCycleTime;
-				
 				this.device.getMeasurementInfo(dataBuffer, configData);
 				m_unit = configData.get(VC800.INPUT_UNIT);
 				String processName = this.device.getMode(dataBuffer);
@@ -170,18 +135,22 @@ public class GathererThread extends Thread {
 						if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {
 							this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
 						}
-						oldRecordSet = recordSet;
+						measurementCount = 0;
 						old_unit = m_unit;
 					}
 					// prepare the data for adding to record set
-					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
+					tmpCycleTime = System.nanoTime()/1000000;
+					if (measurementCount++ == 0) {
+						startCycleTime = tmpCycleTime;
+					}
+					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
 
 					if (recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 						DataExplorer.display.asyncExec(new Runnable() {
 							public void run() {
 								GathererThread.this.application.updateGraphicsWindow();
 								GathererThread.this.application.updateStatisticsData();
-								//GathererThread.this.application.updateDataTable(GathererThread.this.recordSetKey);
+								GathererThread.this.application.updateDataTable(recordSetKey, false);
 								GathererThread.this.application.updateDigitalWindowChilds();
 								GathererThread.this.application.updateAnalogWindowChilds();
 								//GathererThread.this.application.updateCellVoltageChilds();

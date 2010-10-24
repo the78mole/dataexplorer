@@ -36,6 +36,7 @@ import gde.ui.DataExplorer;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -196,12 +197,30 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
+		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
+		int timeStampBufferSize = 0;
+		if(!recordSet.isTimeStepConstant()) {
+			timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
+			byte[] timeStampBuffer = new byte[timeStampBufferSize];
+			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
+
+			for (int i = 0; i < recordDataSize; i++) {
+				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8) + ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
+			}
+		}
+		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
+		
 		for (int i = 0; i < recordDataSize; i++) {
-			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
+			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize);
+			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
-			recordSet.addPoints(points);
+
+			if(recordSet.isTimeStepConstant()) 
+				recordSet.addPoints(points);
+			else
+				recordSet.addPoints(points, timeStamps.get(i)/10.0);
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
