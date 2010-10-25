@@ -701,7 +701,7 @@ public class MenuBar {
 		}
 		{
 			this.helpMenuItem = new MenuItem(this.parent, SWT.CASCADE);
-			this.helpMenuItem.setText((GDE.IS_MAC ? GDE.STRING_DOT : GDE.STRING_EMPTY) + Messages.getString(MessageIds.GDE_MSGT0043)); 
+			this.helpMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0043)); 
 			{
 				this.helpMenu = new Menu(this.helpMenuItem);
 				this.helpMenuItem.setMenu(this.helpMenu);
