@@ -822,7 +822,7 @@ public class Record extends Vector<Integer> {
 		int tmpSize = elementCount;
 		
 		if (this.parent.isZoomMode) // record -> recordSet.isZoomMode
-			tmpSize = this.findBestIndex(this.zoomTimeOffset + this.drawTimeWidth) - this.findBestIndex(this.zoomTimeOffset);
+			tmpSize = this.findBestIndex(this.zoomTimeOffset + this.drawTimeWidth) - this.zoomOffset;
 		else if (this.parent.isScopeMode)
 			tmpSize = this.parent.scopeModeSize;
 		

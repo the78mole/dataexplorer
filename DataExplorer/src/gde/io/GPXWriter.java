@@ -96,7 +96,8 @@ public class GPXWriter {
 
 			// write data
 			String[] recordNames = recordSet.getRecordNames();
-			int recordEntries = recordSet.getRecordDataSize(true);
+			int realDataSize = recordSet.getRecordDataSize(true);
+			int dataSize = recordSet.getRecordDataSize(false);
 			int progressCycle = 0;
 			if (application.getStatusBar() != null) application.setProgress(progressCycle, sThreadId);
 			Record recordLongitude = recordSet.getRecord(recordNames[ordinalLongitude]);
@@ -136,37 +137,39 @@ public class GPXWriter {
 				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0005, new Object[] { Messages.getString(MessageIds.GDE_MSGT0599), recordSet.getChannelConfigName() }));
 
 			boolean isHeight0Calculated = false;
-			for (int i = 0; i < recordEntries; i++) {
-				if (recordLongitude.get(i) != 0 && recordLatitude.get(i) != 0) {
+			for (int i = 0; i < realDataSize; i++) {
+				if (recordLongitude.realGet(i) != 0 && recordLatitude.realGet(i) != 0) {
 					if (!isHeight0Calculated) {
-						gpsHeight0 = isRelative ? (int)device.translateValue(recordGPSHeight, recordGPSHeight.get(i)/1000.0) : 0;
+						gpsHeight0 = isRelative ? (int)device.translateValue(recordGPSHeight, recordGPSHeight.realGet(i)/1000.0) : 0;
 						isHeight0Calculated = true;
 					}
-					double height = device.translateValue(recordGPSHeight, recordGPSHeight.get(i) / 1000.0) - gpsHeight0;
-					
-					// add data entries, translate according device and measurement unit
-					sb.append(String.format(Locale.ENGLISH, trkpt, 
-							device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0),
-							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0),
-							height < 0 ? 0 : height,
-							new SimpleDateFormat("yyyy-MM-dd").format(date + i * 1000), //$NON-NLS-1$
-							new SimpleDateFormat("HH:mm:ss").format(date + i * 1000), //$NON-NLS-1$
-							recordSet.getTime(i)/1000/10,
-							device.translateValue(recordVelocity, recordVelocity.get(i) / 1000.0), 
-							device.translateValue(recordHeight, recordHeight.get(i) / 1000.0))).append(GDE.LINE_SEPARATOR);
-	
-					writer.write(sb.toString());
-					sb = new StringBuilder();
-
-					if (application.getStatusBar() != null && i % 50 == 0) application.setProgress(((++progressCycle * 5000) / recordEntries), sThreadId);
-					log.log(Level.FINE, "data line = " + sb.toString()); //$NON-NLS-1$
 				}
+			}
+			for (int i = 0; isHeight0Calculated && i < dataSize; i++) {
+				double height = device.translateValue(recordGPSHeight, recordGPSHeight.get(i) / 1000.0) - gpsHeight0;
+				
+				// add data entries, translate according device and measurement unit
+				sb.append(String.format(Locale.ENGLISH, trkpt, 
+						device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0),
+						device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0),
+						height < 0 ? 0 : height,
+						new SimpleDateFormat("yyyy-MM-dd").format(date + i * 1000), //$NON-NLS-1$
+						new SimpleDateFormat("HH:mm:ss").format(date + i * 1000), //$NON-NLS-1$
+						recordSet.getTime(i)/1000/10,
+						device.translateValue(recordVelocity, recordVelocity.get(i) / 1000.0), 
+						device.translateValue(recordHeight, recordHeight.get(i) / 1000.0))).append(GDE.LINE_SEPARATOR);
+
+				writer.write(sb.toString());
+
+				if (application.getStatusBar() != null && i % 50 == 0) application.setProgress(((++progressCycle * 5000) / realDataSize), sThreadId);
+				log.log(Level.FINE, "data line = " + sb.toString()); //$NON-NLS-1$
+				sb = new StringBuilder();
 			}
 			sb = null;
 
 			writer.write(trailer);
 
-			log.log(Level.TIME, "KML file = " + filePath + " written successfuly" //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.TIME, "GPX file = " + filePath + " written successfuly" //$NON-NLS-1$ //$NON-NLS-2$
 					+ "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));//$NON-NLS-1$ //$NON-NLS-2$
 
 			writer.flush();

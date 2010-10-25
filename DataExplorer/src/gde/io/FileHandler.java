@@ -448,10 +448,10 @@ public class FileHandler {
 	 * @param ordinalLongitude
 	 * @param ordinalLatitude
 	 * @param ordinalHeight
-	 * @param isRelative
+	 * @param isHeightRelative
 	 * @return full qualified file path to the exported KML file
 	 */
-	public String exportFileKML(final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final boolean isRelative) {
+	public String exportFileKML(final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final boolean isHeightRelative) {
 		String kmlFilePath = GDE.STRING_EMPTY;
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
@@ -486,7 +486,7 @@ public class FileHandler {
 			try {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-				KMLWriter.write(activeRecordSet, kmlFilePath, ordinalLongitude, ordinalLatitude, ordinalHeight, isRelative);
+				KMLWriter.write(activeRecordSet, kmlFilePath, ordinalLongitude, ordinalLatitude, ordinalHeight, isHeightRelative);
 			}
 			catch (Exception e) {
 				log.log(Level.WARNING, e.getMessage(), e);

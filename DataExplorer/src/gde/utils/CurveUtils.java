@@ -188,9 +188,8 @@ public class CurveUtils {
 	 * @param width
 	 * @param height
 	 * @param isCompareSet
-	 * @param isZoomMode
 	 */
-	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet, boolean isZoomMode) {
+	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet) {
 		log.log(Level.FINE, record.getName()+ String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
 		log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
 

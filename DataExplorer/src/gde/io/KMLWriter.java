@@ -83,10 +83,10 @@ public class KMLWriter {
 	 * @param ordinalLongitude
 	 * @param ordinalLatitude
 	 * @param ordinalHeight
-	 * @param isRelative
+	 * @param isHeightRelative
 	 * @throws Exception
 	 */
-	public static void write(RecordSet recordSet, String filePath, int ordinalLongitude, int ordinalLatitude, int ordinalHeight, boolean isRelative) throws Exception {
+	public static void write(RecordSet recordSet, String filePath, int ordinalLongitude, int ordinalLatitude, int ordinalHeight, boolean isHeightRelative) throws Exception {
 		BufferedWriter writer = null;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		StringBuilder	sb = new StringBuilder();
@@ -102,7 +102,8 @@ public class KMLWriter {
 
 			// write data
 			String[] recordNames = recordSet.getRecordNames();
-			int recordEntries = recordSet.getRecordDataSize(true);
+			int realDataSize = recordSet.getRecordDataSize(true);
+			int dataSize = recordSet.getRecordDataSize(false);
 			int progressCycle = 0;
 			if (application.getStatusBar() != null) application.setProgress(progressCycle, sThreadId);
 			Record recordLongitude = recordSet.getRecord(recordNames[ordinalLongitude]);
@@ -113,30 +114,32 @@ public class KMLWriter {
 				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0005, new Object[] { Messages.getString(MessageIds.GDE_MSGT0599), recordSet.getChannelConfigName() })); //$NON-NLS-1$
 
 			boolean isLeaderWritten = false;
-			for (int i = 0; i < recordEntries; i++) {
-				if (recordLongitude.get(i) != 0 && recordLatitude.get(i) != 0) {
+			for (int i = 0; i < realDataSize; i++) {
+				if (recordLongitude.realGet(i) != 0 && recordLatitude.realGet(i) != 0) {
 					if (!isLeaderWritten) {
 						// longitude, latitude, heading, tilt, range, lineColor, lineWidth, extrude
 						writer.write(String.format(Locale.ENGLISH, leader, recordSet.getName(),
-								device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), 
-								device.translateValue(recordLongitude, recordLatitude.get(i) / 1000.0), 
+								device.translateValue(recordLongitude, recordLongitude.realGet(i) / 1000.0), 
+								device.translateValue(recordLongitude, recordLatitude.realGet(i) / 1000.0), 
 								-50, 70, 1000, "ff00ff00", 2, 0)); //$NON-NLS-1$
 						isLeaderWritten = true;
 						
-						height0 = isRelative ? device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) : 0;
+						height0 = isHeightRelative ? device.translateValue(recordHeight, recordHeight.realGet(i) / 1000.0) : 0;
 					}
-					double height = device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0;
-					// add data entries, translate according device and measurement unit
-					sb.append(String.format(Locale.ENGLISH, "\t\t\t%.7f,", device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0))) //$NON-NLS-1$
-						.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0))) //$NON-NLS-1$
-						.append(String.format(Locale.ENGLISH, "%.0f", height < 0 ? 0 : height)).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
-	
-					writer.write(sb.toString());
-					sb = new StringBuilder();
-
-					if (application.getStatusBar() != null && i % 50 == 0) application.setProgress(((++progressCycle * 5000) / recordEntries), sThreadId);
-					log.log(Level.FINE, "data line = " + sb.toString()); //$NON-NLS-1$
 				}
+			}
+			for (int i = 0; isLeaderWritten && i < dataSize; i++) {
+				double height = device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0;
+				// add data entries, translate according device and measurement unit
+				sb.append(String.format(Locale.ENGLISH, "\t\t\t%.7f,", device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0))) //$NON-NLS-1$
+					.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0))) //$NON-NLS-1$
+					.append(String.format(Locale.ENGLISH, "%.0f", height < 0 ? 0 : height)).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
+
+				writer.write(sb.toString());
+
+				if (application.getStatusBar() != null && i % 50 == 0) application.setProgress(((++progressCycle * 5000) / dataSize), sThreadId);
+				log.log(Level.FINER, "data line = " + sb.toString()); //$NON-NLS-1$
+				sb = new StringBuilder();
 			}
 			sb = null;
 
