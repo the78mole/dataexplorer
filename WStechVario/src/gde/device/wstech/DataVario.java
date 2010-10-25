@@ -629,11 +629,15 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @return full qualified file path depending of the file ending type
 	 */
 	public String exportFile(String fileEndingType) {
-		if (fileEndingType.contains(GDE.FILE_ENDING_KML)) {
-			return new FileHandler().exportFileKML(7,8,9, true);
+		String exportFileName = GDE.STRING_EMPTY;
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KML)) {
+				exportFileName = new FileHandler().exportFileKML(7, 8, 9, true);
+			}
 		}
-		else
-			return GDE.STRING_EMPTY;
+		return exportFileName;
 	}
 
 }
