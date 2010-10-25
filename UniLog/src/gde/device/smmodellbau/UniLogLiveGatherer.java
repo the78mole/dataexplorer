@@ -18,23 +18,22 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
-import gde.log.Level;
-import java.util.logging.Logger;
-
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.PropertyType;
 import gde.device.smmodellbau.unilog.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.exception.TimeOutException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Logger;
 
 /**
  * Thread implementation to gather data from UniLog device
@@ -209,22 +208,6 @@ public class UniLogLiveGatherer extends Thread {
 		}
 		else {
 			cleanup(recordSetKey, null);
-		}
-	}
-
-	/**
-	 * @param recordSet
-	 * @param displayableCounter
-	 * @return
-	 */
-	private void updateActiveState(RecordSet recordSet) {
-		// check if measurements isActive == false and set to isDisplayable == false
-		for (String element : recordSet.getRecordNames()) {
-			Record record = recordSet.get(element);
-			if (!record.isActive()) {
-				record.setDisplayable(false);
-				record.setVisible(false);
-			}
 		}
 	}
 
