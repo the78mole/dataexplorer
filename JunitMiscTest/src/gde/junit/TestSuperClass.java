@@ -346,7 +346,7 @@ public class TestSuperClass extends TestCase {
 				//gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 				//gc.drawRectangle(x0, y0-height, width, height);
 				gc.setClipping(x0-1, y0-height-1, width+2, height+2);
-				CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet(), recordSet.isZoomMode());
+				CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet());
 				gc.setClipping(bounds);
 			}
 		}
