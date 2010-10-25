@@ -116,6 +116,7 @@ public class UniLogDataGatherer extends Thread {
 
 				recordSet = channel.get(recordSetKey); // record set where the data is added
 				this.device.updateInitialRecordSetComment(recordSet);
+				channel.applyTemplate(recordSetKey, true);
 				
 
 				int[] points = new int[recordSet.realSize()];
@@ -171,7 +172,6 @@ public class UniLogDataGatherer extends Thread {
 	 * @param recordSet
 	 */
 	private void finalizeRecordSet(Channel channel, String recordSetKey, RecordSet recordSet) {
-		this.device.updateVisibilityStatus(recordSet);
 		this.device.makeInActiveDisplayable(recordSet);
 		channel.applyTemplate(recordSetKey, true);
 		this.application.updateStatisticsData();

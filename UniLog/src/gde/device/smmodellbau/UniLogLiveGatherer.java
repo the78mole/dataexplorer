@@ -120,9 +120,9 @@ public class UniLogLiveGatherer extends Thread {
 		this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, this.channelNumber, true, false));
 		log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 		final RecordSet recordSet = this.channel.get(recordSetKey);
+		this.channel.applyTemplate(recordSetKey, true);
 		this.device.updateInitialRecordSetComment(recordSet);
 		recordSet.setTimeStep_ms(this.timeStep_ms);
-		updateActiveState(recordSet);
 		final int[] points = new int[recordSet.size()];
 		final UniLog usedDevice = this.device;
 
