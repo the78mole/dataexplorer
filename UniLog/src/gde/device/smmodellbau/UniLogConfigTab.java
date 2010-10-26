@@ -18,23 +18,6 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Text;
-
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -49,6 +32,23 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.CalculationThread;
+
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * Configuration tab container, adjustment of all active and dependent measurements
@@ -174,16 +174,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			FillLayout thisLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.setLayout(thisLayout);
 			this.setSize(630, 340);
-			this.addFocusListener(new FocusListener() {			
-				@Override
-				public void focusLost(FocusEvent evt) {
-				}			
-				@Override
-				public void focusGained(FocusEvent evt) {
-					System.out.println("UnilofConfigTab.focusGained() " + evt);
-					
-				}
-			});
 			this.addMouseTrackListener(this.dialog.mouseTrackerEnterFadeOut);
 			{
 				this.setLayout(null);
@@ -194,12 +184,12 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					this.powerGroup.setText(Messages.getString(MessageIds.GDE_MSGT1336));
 					this.powerGroup.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1337));
 					this.powerGroup.addMouseTrackListener(this.device.getDialog().mouseTrackerEnterFadeOut);
-//					this.powerGroup.addPaintListener(new PaintListener() {
-//						public void paintControl(PaintEvent evt) {
-//							log.log(Level.FINEST, "powerGroup.paintControl, event=" + evt); //$NON-NLS-1$
-//							initialize();
-//						}
-//					});
+					this.powerGroup.addPaintListener(new PaintListener() {
+						public void paintControl(PaintEvent evt) {
+							log.log(Level.FINEST, "powerGroup.paintControl, event=" + evt); //$NON-NLS-1$
+							initialize();
+						}
+					});
 					{
 						this.reveiverVoltageButton = new Button(this.powerGroup, SWT.CHECK | SWT.LEFT);
 						this.reveiverVoltageButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
