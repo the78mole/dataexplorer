@@ -24,6 +24,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -172,6 +174,16 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			FillLayout thisLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.setLayout(thisLayout);
 			this.setSize(630, 340);
+			this.addFocusListener(new FocusListener() {			
+				@Override
+				public void focusLost(FocusEvent evt) {
+				}			
+				@Override
+				public void focusGained(FocusEvent evt) {
+					System.out.println("UnilofConfigTab.focusGained() " + evt);
+					
+				}
+			});
 			this.addMouseTrackListener(this.dialog.mouseTrackerEnterFadeOut);
 			{
 				this.setLayout(null);
@@ -741,7 +753,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a1Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
 						this.a1Button.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a1Button.setBounds(4, GDE.IS_MAC_COCOA ? 30 : 45, 36, 20);
+						this.a1Button.setBounds(2, GDE.IS_MAC_COCOA ? 30 : 45, 38, 20);
 						this.a1Button.setText(Messages.getString(MessageIds.GDE_MSGT1357));
 						this.a1Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -813,7 +825,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a2Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
 						this.a2Button.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a2Button.setBounds(4, GDE.IS_MAC_COCOA ? 55 : 70, 36, GDE.IS_LINUX ? 22 : 20);
+						this.a2Button.setBounds(2, GDE.IS_MAC_COCOA ? 55 : 70, 38, GDE.IS_LINUX ? 22 : 20);
 						this.a2Button.setText(Messages.getString(MessageIds.GDE_MSGT1359));
 						this.a2Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
@@ -885,7 +897,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					{
 						this.a3Button = new Button(this.axModusGroup, SWT.CHECK | SWT.LEFT);
 						this.a3Button.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.a3Button.setBounds(4, GDE.IS_MAC_COCOA ? 80 : 95, 36, 20);
+						this.a3Button.setBounds(2, GDE.IS_MAC_COCOA ? 80 : 95, 38, 20);
 						this.a3Button.setText(Messages.getString(MessageIds.GDE_MSGT1361));
 						this.a3Button.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
