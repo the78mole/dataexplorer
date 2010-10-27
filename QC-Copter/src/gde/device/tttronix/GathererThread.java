@@ -112,7 +112,11 @@ public class GathererThread extends Thread {
 					catch (SerialPortException e) {
 						if (e.getMessage().startsWith("getTerminalData")) {
 							this.application.openMessageDialogAsync(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
-							this.dialog.dispose();
+							DataExplorer.display.asyncExec(new Runnable() {
+								public void run() {
+									GathererThread.this.dialog.dispose();
+								}
+							});
 						}
 						else {
 							throw e;
