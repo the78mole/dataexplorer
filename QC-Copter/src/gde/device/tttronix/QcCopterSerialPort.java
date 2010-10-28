@@ -43,6 +43,8 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 	final byte STX = 0x02;
 	final byte ETX = 0x03;
 	final int  dataSize;
+	final int  terminalDataSize = 345; // configuration menu string
+	int retrys = 0; // re-try temporary error counter
 	
 	final DeviceConfiguration deviceConfig;
 	
@@ -104,15 +106,21 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				
 				if (!isChecksumOK(data)) {
 					this.xferErrors++;
+					this.retrys++;
 					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.xferErrors); //$NON-NLS-1$
-					if (this.xferErrors > 3) { //retry or skip in case of xfer errors
+					if (this.retrys > 3) { //retry or skip in case of xfer errors
 						throw new SerialPortException("still receiving invalid data afer 3 re-tries, please check port configuration or mode!");
 					}
 					data = getData();
 				}
+				this.retrys = 0;
 			}
 			else { // only flight simulation data contains STX, so this must be configuration menu string
-				throw new SerialPortException("receiving invalid flight simulation data, please check port configuration or mode!");
+				this.retrys++;
+				if (this.retrys >= 4) { //345/dataSize = 5,5
+					this.retrys = 0;
+					throw new SerialPortException("receiving invalid flight simulation data, please check port configuration or mode!");
+				}
 			}
 		}
 		catch (Exception e) {
@@ -163,7 +171,7 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 			int size = waitForStableReceiveBuffer(345, timeout_ms, 200);// stable counter max 3000/4 = 750
 			log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "receive buffer data size = " + size);
 			byte[] data = new byte[size];
-			if (size > 350) {// could only be flight simulation data, switch into flight simulation recording mode
+			if (size >= 372) {// 6*42 could only be flight simulation data, switch into flight simulation recording mode
 				throw new SerialPortException($METHOD_NAME + " - receiving more data than expected!");
 			}
 			else if (size == 0) {
