@@ -793,7 +793,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										{
 											this.loggingGroup = new Group(this.liveDataCaptureGroup, SWT.NONE);
 											this.loggingGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-											this.loggingGroup.setBounds(12, 56, 202, 63);
+											this.loggingGroup.setBounds(12, GDE.IS_MAC_COCOA ? 40 : 56, 202, 63);
 											this.loggingGroup.setText(Messages.getString(MessageIds.GDE_MSGT1660));
 											this.loggingGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 											{
