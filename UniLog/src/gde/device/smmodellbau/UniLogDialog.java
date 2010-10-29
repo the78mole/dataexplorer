@@ -1180,7 +1180,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.loggingGroup = new Group(this.liveDataCaptureGroup, SWT.NONE);
 									this.loggingGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.loggingGroup.setBounds(25, 70, 228, 70);
+									this.loggingGroup.setBounds(25, GDE.IS_MAC_COCOA ? 55 : 70, 228, 70);
 									this.loggingGroup.setText(Messages.getString(MessageIds.GDE_MSGT1332));
 									this.loggingGroup.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1383));
 									this.loggingGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
