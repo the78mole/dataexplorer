@@ -150,7 +150,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
 	public int getLovDataByteSize() {
-		return 32;
+		return 37;
 	}
 
 	/**
@@ -164,27 +164,25 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int timeStep_ms = 0;
-		int size = this.getLovDataByteSize();
-		byte[] readBuffer = new byte[size];
 		int[] points = new int[this.getNumberOfMeasurements(1)];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
+		int offset = 0; //offset data pointer while non constant data length
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
-		for (int i = 2; i < recordDataSize; i++) { // skip UniLog min/max line
-
-			System.arraycopy(dataBuffer, i * size, readBuffer, 0, size);
-
-			// time milli seconds
-			if (timeStep_ms == 0) { // set time step for this record set
-				timeStep_ms = timeStep_ms + ((readBuffer[3] & 0xFF) << 24) + ((readBuffer[2] & 0xFF) << 16) + ((readBuffer[1] & 0xFF) << 8) + (readBuffer[0] & 0xFF); //TODO
-				if (timeStep_ms != 0) {
-					recordSet.setTimeStep_ms(timeStep_ms);
-					LiPoWatch.log.log(Level.FINE, "timeStep_ms = " + timeStep_ms); //$NON-NLS-1$
-				}
-			}
+		for (int i = 0; i < recordDataSize; i++) { 
+//			length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
+//			tmp2ReadBuffer = new byte[length-1];
+//			this.read(tmp2ReadBuffer, 4000);		
+//			readBuffer = new byte[length];
+//			readBuffer[0] = tmp1ReadBuffer[0];
+//			System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
+			int length = (dataBuffer[offset] & 0x7F);
+			byte[] readBuffer = new byte[length];
+			
+			System.arraycopy(dataBuffer, offset+4, readBuffer, 0, length);
 			recordSet.addPoints(convertDataBytes(points, readBuffer));
+			offset += (length+4);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
