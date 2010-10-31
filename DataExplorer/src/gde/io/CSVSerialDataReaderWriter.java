@@ -229,7 +229,7 @@ public class CSVSerialDataReaderWriter {
 				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 			}
 			// now display the error message
-			String msg = Messages.getString(MessageIds.GDE_MSGE0045, new Object[] {e.getMessage(), lineNumber});
+			String msg = filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGE0045, new Object[] {e.getMessage(), lineNumber});
 			log.log(Level.WARNING, msg, e);
 			application.openMessageDialog(msg);
 		}
