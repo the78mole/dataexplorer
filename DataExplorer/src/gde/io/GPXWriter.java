@@ -137,7 +137,8 @@ public class GPXWriter {
 				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0005, new Object[] { Messages.getString(MessageIds.GDE_MSGT0599), recordSet.getChannelConfigName() }));
 
 			boolean isHeight0Calculated = false;
-			for (int i = 0; i < realDataSize; i++) {
+			int i = 0;
+			for (; i < realDataSize; i++) {
 				if (recordLongitude.realGet(i) != 0 && recordLatitude.realGet(i) != 0) {
 					if (!isHeight0Calculated) {
 						gpsHeight0 = isRelative ? (int)device.translateValue(recordGPSHeight, recordGPSHeight.realGet(i)/1000.0) : 0;
@@ -145,7 +146,7 @@ public class GPXWriter {
 					}
 				}
 			}
-			for (int i = 0; isHeight0Calculated && i < dataSize; i++) {
+			for (i = recordSet.isZoomMode() ? 0 : i; isHeight0Calculated && i < dataSize; i++) {
 				double height = device.translateValue(recordGPSHeight, recordGPSHeight.get(i) / 1000.0) - gpsHeight0;
 				
 				// add data entries, translate according device and measurement unit

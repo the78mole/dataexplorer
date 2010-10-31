@@ -38,6 +38,9 @@ import gde.GDE;
  *     &lt;enumeration value="number_motor"/>
  *     &lt;enumeration value="revolution_factor"/>
  *     &lt;enumeration value="scale_sync_ref_ordinal"/>
+ *     &lt;enumeration value="google_earth_velocity_avg_limit_factor"/>
+ *     &lt;enumeration value="google_earth_velocity_lower_limit"/>
+ *     &lt;enumeration value="google_earth_velocity_upper_limit"/>
  *     &lt;enumeration value="none_specified"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
@@ -78,6 +81,12 @@ public enum MeasurementPropertyTypes {
     REVOLUTION_FACTOR("revolution_factor"),
     @XmlEnumValue("scale_sync_ref_ordinal")
     SCALE_SYNC_REF_ORDINAL("scale_sync_ref_ordinal"),
+    @XmlEnumValue("google_earth_velocity_avg_limit_factor")
+    GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR("google_earth_velocity_avg_limit_factor"),
+    @XmlEnumValue("google_earth_velocity_lower_limit")
+    GOOGLE_EARTH_VELOCITY_LOWER_LIMIT("google_earth_velocity_lower_limit"),
+    @XmlEnumValue("google_earth_velocity_upper_limit")
+    GOOGLE_EARTH_VELOCITY_UPPER_LIMIT("google_earth_velocity_upper_limit"),
     @XmlEnumValue("none_specified")
     NONE_SPECIFIED("none_specified");
     private final String value;

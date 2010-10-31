@@ -36,6 +36,7 @@ import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 
 import gde.data.RecordSet;
 import gde.exception.ApplicationConfigurationException;
@@ -258,6 +259,9 @@ public class GDE {
 			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Class object loaded successfully");
 			//Object o = c.getMethod("getInstance", new Class[0]).invoke(null, new Object[0]);
 			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Class instance loaded successfully");
+			
+			Display.setAppName(GDE.NAME_LONG);
+			Display.setAppVersion(GDE.VERSION);
 
 			DataExplorer application = DataExplorer.getInstance();
 			for (int i=0; i<args.length; ++i) {
