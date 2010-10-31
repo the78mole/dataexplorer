@@ -148,7 +148,7 @@ public class LinkVario extends DataVario {
 	 */
 	public void export2KML3D(int type) {
 		//ordinalLongitude, ordinalLatitude, ordinalGPSHeight, inRelative
-		new FileHandler().exportFileKML("export KML file with GPS height", 7, 8, 9, type == DataVario.HEIGHT_RELATIVE);
+		new FileHandler().exportFileKML("export KML file with GPS height", 7, 8, 9, 10, type == DataVario.HEIGHT_RELATIVE);
 	}
 	
 	/**

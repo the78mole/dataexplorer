@@ -596,7 +596,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 */
 	public void export2KML3D(int type) {
 		//ordinalLongitude, ordinalLatitude, ordinalGPSHeight, inRelative
-		new FileHandler().exportFileKML(Messages.getString(MessageIds.GDE_MSGT1859), 7, 8, 9, type == DataVario.HEIGHT_RELATIVE);
+		new FileHandler().exportFileKML(Messages.getString(MessageIds.GDE_MSGT1859), 7, 8, 9, 10, type == DataVario.HEIGHT_RELATIVE);
 	}
 	
 	/**
@@ -634,7 +634,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KML)) {
-				exportFileName = new FileHandler().exportFileKML(7, 8, 9, true);
+				exportFileName = new FileHandler().exportFileKML(7, 8, 9, 10, true);
 			}
 		}
 		return exportFileName;

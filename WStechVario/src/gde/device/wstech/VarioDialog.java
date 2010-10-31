@@ -118,6 +118,7 @@ public class VarioDialog extends DeviceDialog {
 								setClosePossible(true);
 							}
 						}
+						VarioDialog.this.dispose();
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
