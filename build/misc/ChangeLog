@@ -15,7 +15,8 @@ add ToolItem to launch context sensitive help
 update VC80x to use variable time steps
 update AkkuMaster C4 prevent closing tool box while active
 fix LiPoWatch lov file reader
-add QuadroControl plug-in
+add QC-Copter QuadroControl plug-in
+enable velocity limits declaration for KML
 
 Version 2.41 - 05 Sep 2010
 
