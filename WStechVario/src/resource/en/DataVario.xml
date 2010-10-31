@@ -104,6 +104,8 @@
 			<unit>km/h</unit>
 			<active>false</active>
 			<statistics sigma="false" avg="false" max="true" min="true"/>
+            <property description="Google Earth lower vlocity limit" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
+            <property description="Google Earth upper velocity limit" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
 		</Measurement>
 		<Measurement>
 			<name>Climb</name>
@@ -199,6 +201,8 @@
 			<unit>km/h</unit>
 			<active>true</active>
 			<statistics sigma="false" avg="true" max="true" min="true"/>
+            <property description="Google Earth lower vlocity limit" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
+            <property description="Google Earth upper velocity limit" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
 		</Measurement>
 		<Measurement>
 			<name>Climb</name>
@@ -298,6 +302,8 @@
 			<unit>km/h</unit>
 			<active>false</active>
 			<statistics comment="Values referencing trigger" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+            <property description="Google Earth lower vlocity limit" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
+            <property description="Google Earth upper velocity limit" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
 		</Measurement>
 		<Measurement>
 			<name>Climb</name>
