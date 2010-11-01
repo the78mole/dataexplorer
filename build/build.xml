@@ -93,6 +93,7 @@
 		<property name="output.gnulinux64.java.ext" location="${output.gnulinux64}/DataExplorer/java/ext" />
 
 		<property name="output.mac32" location="${output.dir}/Mac_32" />
+		<property name="output.mac32.app" location="${output.mac32}/DataExplorer.app" />
 		<property name="output.mac32.bundle" location="${output.mac32}/DataExplorer.app/Contents" />
 		<property name="output.mac32.bundle.bin" location="${output.mac32.bundle}/MacOS" />
 		<property name="output.mac32.program" location="${output.mac32.bundle}/Resources" />
@@ -100,6 +101,7 @@
 		<property name="output.mac32.java.ext" location="${output.mac32.program}/java/ext" />
 
 		<property name="output.mac64" location="${output.dir}/Mac_64" />
+		<property name="output.mac64.app" location="${output.mac64}/DataExplorer.app" />
 		<property name="output.mac64.bundle" location="${output.mac64}/DataExplorer.app/Contents" />
 		<property name="output.mac64.bundle.bin" location="${output.mac64.bundle}/MacOS" />
 		<property name="output.mac64.program" location="${output.mac64.bundle}/Resources" />
@@ -345,7 +347,6 @@
 			<fileset file="build/misc/DataExplorer-mime.xml" />
 			<fileset file="build/misc/DataExplorer.icns" />
 			<fileset file="build/misc/DevicePropertiesEditor.icns" />
-			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
 		</copy>
 		<copy todir="${output.mac32.bundle}" flatten="yes">
 			<fileset file="build/lib/MAC/32/Info.plist" />
@@ -367,7 +368,6 @@
 			<fileset file="build/misc/DataExplorer-mime.xml" />
 			<fileset file="build/misc/DataExplorer.icns" />
 			<fileset file="build/misc/DevicePropertiesEditor.icns" />
-			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
 		</copy>
 		<copy todir="${output.mac64.bundle}" flatten="yes">
 			<fileset file="build/lib/MAC/64/Info.plist" />
@@ -429,16 +429,13 @@
 		<copy todir="${output.gnulinux64}/DataExplorer" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
-		<!--
-		<copy todir="${output.mac32.carbon.program}" flatten="yes">
+		<copy todir="${output.mac32.app}" flatten="yes">
 			<fileset file="build/misc/README.*" />
+			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
 		</copy>
-		-->
-		<copy todir="${output.mac32.program}" flatten="yes">
+		<copy todir="${output.mac64.app}" flatten="yes">
 			<fileset file="build/misc/README.*" />
-		</copy>
-		<copy todir="${output.mac64.program}" flatten="yes">
-			<fileset file="build/misc/README.*" />
+			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
 		</copy>
 
 	</target>
