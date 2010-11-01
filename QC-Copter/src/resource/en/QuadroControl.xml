@@ -4,7 +4,7 @@
         <name implementation="gde.device.tttronix.QcCopter">QuadroControl</name>
         <manufacturer>tt-tronix</manufacturer>
         <manufacturerURL>http://www.qc-copter.de</manufacturerURL>
-        <group>multimeter</group>
+        <group>control-unit</group>
         <image>QuadroControl.png</image>
         <usage>false</usage>
     </Device>
