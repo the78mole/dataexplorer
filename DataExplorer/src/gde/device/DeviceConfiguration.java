@@ -259,7 +259,7 @@ public class DeviceConfiguration {
 	}
 
 	public void setUsed(boolean value) {
-		this.isChangePropery = this.device.isUsage() != value;
+		this.isChangePropery = this.isChangePropery != true ? this.device.isUsage() != value : this.isChangePropery;
 		this.device.setUsage(value);
 	}
 
