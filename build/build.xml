@@ -32,31 +32,31 @@
 	</target>
 
 	<!-- initialize build OS name which set the lib path to swt.jar -->
-	<target name="init_OS" >
+	<target name="init_OS">
 		<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
 		<condition property="build.os.shortname" value="GNULinux">
-			<os name="Linux"/>
+			<os name="Linux" />
 		</condition>
 
 		<condition property="build.os.shortname" value="Windows">
-			<os name="Windows XP"/>
+			<os name="Windows XP" />
 		</condition>
 		<condition property="build.os.shortname" value="Windows">
-			<os name="Windows VISTA"/>
+			<os name="Windows VISTA" />
 		</condition>
 		<condition property="build.os.shortname" value="Windows">
-			<os name="Windows 2003"/>
+			<os name="Windows 2003" />
 		</condition>
 
 		<condition property="build.os.shortname" value="MAC">
-			<os name="Mac OS"/>
+			<os name="Mac OS" />
 		</condition>
 		<condition property="build.os.shortname" value="MAC">
-			<os name="Mac OS X"/>
+			<os name="Mac OS X" />
 		</condition>
 
-		<echo message="OS short name = ${build.os.shortname}"/>
+		<echo message="OS short name = ${build.os.shortname}" />
 	</target>
 
 	<!-- init -->
@@ -154,15 +154,15 @@
 	<target name="clean" depends="init">
 		<delete dir="${output.dir}" />
 
-		<ant antfile="build.xml" target="clean" dir="DataExplorer" inheritall="true"/>
-		<ant antfile="build.xml" target="clean" dir="Picolario" inheritall="true"/>
-		<ant antfile="build.xml" target="clean" dir="AkkuMaster" inheritall="true"/>
-		<ant antfile="build.xml" target="clean" dir="Simulator" inheritall="true"/>
-		<ant antfile="build.xml" target="clean" dir="UniLog" inheritall="true"/>
-		<ant antfile="build.xml" target="clean" dir="eStation" inheritall="true"/>
-		<ant antfile="build.xml" target="clean" dir="VC800" inheritall="true"/>
-		<ant antfile="build.xml" target="clean" dir="LiPoWatch" inheritall="true"/>
-		<ant antfile="build.xml" target="clean" dir="CSV2SerialAdapter" inheritall="true"/>
+		<ant antfile="build.xml" target="clean" dir="DataExplorer" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="Picolario" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="AkkuMaster" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="Simulator" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="UniLog" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="eStation" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="VC800" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="LiPoWatch" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="CSV2SerialAdapter" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -171,76 +171,76 @@
 		<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
 		<condition property="isGNULinux">
-			<os name="Linux"/>
+			<os name="Linux" />
 		</condition>
-		<antcall target="GNULinux"/>
+		<antcall target="GNULinux" />
 		<condition property="isWindows">
-			<os name="Windows XP"/>
-		</condition>
-		<condition property="isWindows">
-			<os name="Windows VISTA"/>
+			<os name="Windows XP" />
 		</condition>
 		<condition property="isWindows">
-			<os name="Windows 2003"/>
+			<os name="Windows VISTA" />
 		</condition>
-		<antcall target="Windows"/>
+		<condition property="isWindows">
+			<os name="Windows 2003" />
+		</condition>
+		<antcall target="Windows" />
 		<condition property="isMAC">
-			<os name="Mac OS"/>
+			<os name="Mac OS" />
 		</condition>
 		<condition property="isMAC">
-			<os name="Mac OS X"/>
+			<os name="Mac OS X" />
 		</condition>
-		<antcall target="MAC"/>
+		<antcall target="MAC" />
 
-		<echo message="OS short name = ${build.os.shortname}"/>
+		<echo message="OS short name = ${build.os.shortname}" />
 	</target>
 
-	<target name="Windows" if="isWindows" >
+	<target name="Windows" if="isWindows">
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-		<antcall target="WindowsDefault"/>
-		<antcall target="WindowsPrefix"/>
+		<antcall target="WindowsDefault" />
+		<antcall target="WindowsPrefix" />
 	</target>
 	<target name="WindowsDefault" unless="prefix">
 		<echo message="installing to ${install.dir.windows}" />
-		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir.windows}" overwrite="true"/>
+		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir.windows}" overwrite="true" />
 	</target>
 	<target name="WindowsPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
-		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${prefix}" overwrite="true"/>
+		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${prefix}" overwrite="true" />
 	</target>
 
 	<target name="GNULinux" if="isGNULinux">
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-		<antcall target="GNULinuxDefault"/>
-		<antcall target="GNULinuxPrefix"/>
+		<antcall target="GNULinuxDefault" />
+		<antcall target="GNULinuxPrefix" />
 	</target>
 	<target name="GNULinuxDefault" unless="prefix">
 		<echo message="installing to ${install.dir.gnulinux}" />
-		<exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.gnulinux}"/>
+		<exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.gnulinux}" />
 	</target>
 	<target name="GNULinuxPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
-		<exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${prefix}"/>
+		<exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${prefix}" />
 	</target>
 
 	<target name="MAC" if="isMAC">
 		<echo message="${os.name} ${os.arch} ${sun.arch.data.model}" />
-		<antcall target="MacDefault"/>
-		<antcall target="MacPrefix"/>
+		<antcall target="MacDefault" />
+		<antcall target="MacPrefix" />
 	</target>
 	<target name="MacDefault" unless="prefix">
 		<echo message="installing to ${install.dir.mac}" />
-		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${install.dir.mac}" overwrite="true"/>
+		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${install.dir.mac}" overwrite="true" />
 	</target>
 	<target name="MacPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
-		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${prefix}" overwrite="true"/>
+		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${prefix}" overwrite="true" />
 	</target>
 
 	<target name="check_prefix">
 		<condition property="isPrefix">
 			<not>
-				<equals arg1="prefix" arg2=""/>
+				<equals arg1="prefix" arg2="" />
 			</not>
 		</condition>
 	</target>
@@ -252,16 +252,16 @@
 		<ant antfile="build.xml" target="package" dir="AkkuMaster" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="Simulator" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="UniLog" inheritall="true" />
-		<ant antfile="build.xml" target="package" dir="eStation" inheritall="true"/>
-		<ant antfile="build.xml" target="package" dir="VC800" inheritall="true"/>
-		<ant antfile="build.xml" target="package" dir="LiPoWatch" inheritall="true"/>
-		<ant antfile="build.xml" target="package" dir="CSV2SerialAdapter" inheritall="true"/>
-		<ant antfile="build.xml" target="package" dir="WStechVario" inheritall="true"/>
-		<ant antfile="build.xml" target="package" dir="QC-Copter" inheritall="true"/>
+		<ant antfile="build.xml" target="package" dir="eStation" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="VC800" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="LiPoWatch" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="CSV2SerialAdapter" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="WStechVario" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="QC-Copter" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
-	<fileset dir="${basedir}" >
+	<fileset dir="${basedir}">
 		<patternset id="DE_PLUGIN_JARS">
 			<include name="Picolario/build/*.jar" />
 			<include name="AkkuMaster/build/*.jar" />
@@ -289,9 +289,9 @@
             <fileset file="build/misc/DevicePropertiesEditor.ico" />
             -->
 		</copy>
-		<copy todir="${output.windows32.program.devices}" flatten="yes" >
-			<fileset dir="${basedir}" >
-				<patternset refid="DE_PLUGIN_JARS"/>
+		<copy todir="${output.windows32.program.devices}" flatten="yes">
+			<fileset dir="${basedir}">
+				<patternset refid="DE_PLUGIN_JARS" />
 			</fileset>
 		</copy>
 
@@ -305,8 +305,8 @@
             -->
 		</copy>
 		<copy todir="${output.windows64.program.devices}" flatten="yes">
-			<fileset dir="${basedir}" >
-				<patternset refid="DE_PLUGIN_JARS"/>
+			<fileset dir="${basedir}">
+				<patternset refid="DE_PLUGIN_JARS" />
 			</fileset>
 		</copy>
 
@@ -321,8 +321,8 @@
 			<fileset file="build/misc/DevicePropertiesEditor.desktop" />
 		</copy>
 		<copy todir="${output.gnulinux32.program.devices}" flatten="yes">
-			<fileset dir="${basedir}" >
-				<patternset refid="DE_PLUGIN_JARS"/>
+			<fileset dir="${basedir}">
+				<patternset refid="DE_PLUGIN_JARS" />
 			</fileset>
 		</copy>
 
@@ -337,8 +337,8 @@
 			<fileset file="build/misc/DevicePropertiesEditor.desktop" />
 		</copy>
 		<copy todir="${output.gnulinux64.program.devices}" flatten="yes">
-			<fileset dir="${basedir}" >
-				<patternset refid="DE_PLUGIN_JARS"/>
+			<fileset dir="${basedir}">
+				<patternset refid="DE_PLUGIN_JARS" />
 			</fileset>
 		</copy>
 
@@ -358,8 +358,8 @@
 			<fileset file="build/misc/DevicePropertiesEditorMac32" />
 		</copy>
 		<copy todir="${output.mac32.program.devices}" flatten="yes">
-			<fileset dir="${basedir}" >
-				<patternset refid="DE_PLUGIN_JARS"/>
+			<fileset dir="${basedir}">
+				<patternset refid="DE_PLUGIN_JARS" />
 			</fileset>
 		</copy>
 
@@ -379,8 +379,8 @@
 			<fileset file="build/misc/DevicePropertiesEditorMac64" />
 		</copy>
 		<copy todir="${output.mac64.program.devices}" flatten="yes">
-			<fileset dir="${basedir}" >
-				<patternset refid="DE_PLUGIN_JARS"/>
+			<fileset dir="${basedir}">
+				<patternset refid="DE_PLUGIN_JARS" />
 			</fileset>
 		</copy>
 
@@ -455,154 +455,159 @@
 
 		<echo message="tar GNULinux 32 bit files" />
 		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-bin_GNULinux_x86_32.tar.gz" compression="gzip">
-			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="755" >
-				<include name="*/DataExplorer"/>
-				<include name="*/DevicePropertiesEditor"/>
+			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="755">
+				<include name="*/DataExplorer" />
+				<include name="*/DevicePropertiesEditor" />
 			</tarfileset>
-			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="766" >
-				<include name="*/DataExplorer.desktop"/>
-				<include name="*/DevicePropertiesEditor.desktop"/>
+			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="766">
+				<include name="*/DataExplorer.desktop" />
+				<include name="*/DevicePropertiesEditor.desktop" />
 			</tarfileset>
-			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="644" >
-				<include name="**"/>
-				<exclude name="*/DataExplorer"/>
-				<exclude name="*/DevicePropertiesEditor"/>
-				<exclude name="*/DataExplorer.desktop"/>
-				<exclude name="*/DevicePropertiesEditor.desktop"/>
+			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="644">
+				<include name="**" />
+				<exclude name="*/DataExplorer" />
+				<exclude name="*/DevicePropertiesEditor" />
+				<exclude name="*/DataExplorer.desktop" />
+				<exclude name="*/DevicePropertiesEditor.desktop" />
 			</tarfileset>
 		</tar>
 
 		<echo message="tar GNULinux 64 bit files" />
 		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-bin_GNULinux_x86_64.tar.gz" compression="gzip">
-			<tarfileset dir="${output.gnulinux64}" casesensitive="true" mode="755" >
-				<include name="*/DataExplorer"/>
-				<include name="*/DevicePropertiesEditor"/>
+			<tarfileset dir="${output.gnulinux64}" casesensitive="true" mode="755">
+				<include name="*/DataExplorer" />
+				<include name="*/DevicePropertiesEditor" />
 			</tarfileset>
-			<tarfileset dir="${output.gnulinux64}" casesensitive="true" mode="766" >
-				<include name="*/DataExplorer.desktop"/>
-				<include name="*/DevicePropertiesEditor.desktop"/>
+			<tarfileset dir="${output.gnulinux64}" casesensitive="true" mode="766">
+				<include name="*/DataExplorer.desktop" />
+				<include name="*/DevicePropertiesEditor.desktop" />
 			</tarfileset>
-			<tarfileset dir="${output.gnulinux64}" casesensitive="true" >
-				<include name="**"/>
-				<exclude name="*/DataExplorer"/>
-				<exclude name="*/DevicePropertiesEditor"/>
-				<exclude name="*/DataExplorer.desktop"/>
-				<exclude name="*/DevicePropertiesEditor.desktop"/>
+			<tarfileset dir="${output.gnulinux64}" casesensitive="true">
+				<include name="**" />
+				<exclude name="*/DataExplorer" />
+				<exclude name="*/DevicePropertiesEditor" />
+				<exclude name="*/DataExplorer.desktop" />
+				<exclude name="*/DevicePropertiesEditor.desktop" />
 			</tarfileset>
 		</tar>
 
 		<echo message="zip Mac 32 cocoa application bundle" />
 		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_32_cocoa.zip">
-			<zipfileset dir="${output.mac32}" casesensitive="true" filemode="755" >
-				<include name="**/DataExplorerMac32"/>
-				<include name="**/DevicePropertiesEditorMac32"/>
+			<zipfileset dir="${output.mac32}" casesensitive="true" filemode="755">
+				<include name="**/DataExplorerMac32" />
+				<include name="**/DevicePropertiesEditorMac32" />
 			</zipfileset>
-			<zipfileset dir="${output.mac32}" casesensitive="true" >
-				<exclude name="**/DataExplorerMac32"/>
-				<exclude name="**/DevicePropertiesEditorMac32"/>
+			<zipfileset dir="${output.mac32}" casesensitive="true">
+				<exclude name="**/DataExplorerMac32" />
+				<exclude name="**/DevicePropertiesEditorMac32" />
 			</zipfileset>
 		</zip>
 
 		<echo message="zip Mac 64 cocoa application bundle" />
 		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_64_cocoa.zip">
-			<zipfileset dir="${output.mac64}" casesensitive="true" filemode="755" >
-				<include name="**/DataExplorerMac64"/>
-				<include name="**/DevicePropertiesEditorMac64"/>
+			<zipfileset dir="${output.mac64}" casesensitive="true" filemode="755">
+				<include name="**/DataExplorerMac64" />
+				<include name="**/DevicePropertiesEditorMac64" />
 			</zipfileset>
-			<zipfileset dir="${output.mac64}" casesensitive="true" >
-				<exclude name="**/DataExplorerMac64"/>
-				<exclude name="**/DevicePropertiesEditorMac64"/>
+			<zipfileset dir="${output.mac64}" casesensitive="true">
+				<exclude name="**/DataExplorerMac64" />
+				<exclude name="**/DevicePropertiesEditorMac64" />
 			</zipfileset>
 		</zip>
 	</target>
 
 	<target name="backupDataFilesWindows" description="pack personal data files">
 		<tar destfile="F:/DataExplorerFiles.tar.gz" compression="gzip">
-			<tarfileset dir="D:/Documents/Person" casesensitive="true" >
-				<include name="DataExplorer/**"/>
-				<include name="DataExplorer/**/*.zip"/>
-				<exclude name="DataExplorer/**/*.pdf"/>
-				<exclude name="DataExplorer/**/*.gz"/>
-				<exclude name="DataExplorer/**/*.bak"/>
-				<include name="LogView/**"/>
-				<exclude name="LogView/**/*.bak"/>
-				<exclude name="LogView/**/*.BAK"/>
-				<exclude name="LogView/**.zip"/>
-				<exclude name="LogView/**.pdf"/>
-				<include name="LogViewOBJ/**"/>
-				<exclude name="LogViewOBJ/**/*.bak"/>
-				<exclude name="LogViewOBJ/**/*.BAK"/>
+			<tarfileset dir="D:/Documents/Person" casesensitive="true">
+				<include name="DataExplorer/**" />
+				<include name="DataExplorer/**/*.zip" />
+				<exclude name="DataExplorer/**/*.pdf" />
+				<exclude name="DataExplorer/**/*.gz" />
+				<exclude name="DataExplorer/**/*.bak" />
+				<include name="LogView/**" />
+				<exclude name="LogView/**/*.bak" />
+				<exclude name="LogView/**/*.BAK" />
+				<exclude name="LogView/**.zip" />
+				<exclude name="LogView/**.pdf" />
+				<include name="LogViewOBJ/**" />
+				<exclude name="LogViewOBJ/**/*.bak" />
+				<exclude name="LogViewOBJ/**/*.BAK" />
 			</tarfileset>
 		</tar>
 	</target>
 
 	<target name="clean_source">
-		<delete file="${build.target.dir}/dataexplorer-${version.num}-src.zip"/>
+		<delete file="${build.target.dir}/dataexplorer-${version.num}-src.zip" />
 	</target>
 
 	<target name="source_package" depends="init" description="builds the source distribution package to run configure and make">
 		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-src.tar.gz" compression="gzip">
 			<tarfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
-				<include name="**/src/**"/>
-				<include name="**/build.xml"/>
-				<exclude name="**/CVS/**"/>
-				<include name="build/lib/**"/>
-				<include name="build/misc/**"/>
-				<include name="build/build.properties"/>
-				<include name="WindowsHelper/**"/>
-				<include name="thirdparty/**"/>
-				<exclude name="DataFilesTestSamples/**"/>
+				<include name="**/src/**" />
+				<include name="**/build.xml" />
+				<exclude name="**/CVS/**" />
+				<include name="build/lib/**" />
+				<include name="build/misc/**" />
+				<include name="build/build.properties" />
+				<include name="WindowsHelper/**" />
+				<include name="thirdparty/**" />
+				<include name="DataFilesTestSamples/**" />
+				<exclude name="web*/**" />
+				<exclude name="lwjgl-2.5/**" />
+				<exclude name="Swt*/**" />
+				<exclude name="SWT*/**" />
+				<exclude name="launch4j/**" />
 				<exclude name="COPYING" />
-				<exclude name="READ*"/>
-				<exclude name="*.LICENSE"/>
-				<exclude name="AUTHORS"/>
-				<exclude name="Changelog"/>
-				<exclude name="NEWS"/>
-				<exclude name="Backlog"/>
-				<exclude name="PROBLEMS"/>
-				<exclude name="Makefile.in"/>
-				<exclude name="configure"/>
-				<exclude name="install-sh"/>
-				<exclude name="build/misc/GNU*"/>
-				<exclude name="build/misc/maintain*"/>
-				<exclude name="build/misc/*.LICENSE"/>
-				<exclude name="build/misc/*.pdf"/>
-				<exclude name="build/misc/Url*"/>
-				<exclude name="**/Thumbs.db"/>
-				<exclude name="SWT*/**"/>
-				<exclude name="JAXB*/**"/>
-				<exclude name="launch4j/**"/>
-				<exclude name="Port*/**"/>
-				<exclude name="Print*/**"/>
-				<exclude name="RXTXcomm*/**"/>
+				<exclude name="READ*" />
+				<exclude name="*.LICENSE" />
+				<exclude name="AUTHORS" />
+				<exclude name="Changelog" />
+				<exclude name="NEWS" />
+				<exclude name="Backlog" />
+				<exclude name="PROBLEMS" />
+				<exclude name="Makefile.in" />
+				<exclude name="configure" />
+				<exclude name="install-sh" />
+				<exclude name="build/misc/GNU*" />
+				<exclude name="build/misc/maintain*" />
+				<exclude name="build/misc/*.LICENSE" />
+				<exclude name="build/misc/*.pdf" />
+				<exclude name="build/misc/Url*" />
+				<exclude name="**/Thumbs.db" />
+				<exclude name="SWT*/**" />
+				<exclude name="JAXB*/**" />
+				<exclude name="launch4j/**" />
+				<exclude name="Port*/**" />
+				<exclude name="Print*/**" />
+				<exclude name="RXTXcomm*/**" />
 			</tarfileset>
 			<tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
 				<include name="COPYING" />
-				<include name="READ*"/>
-				<include name="LICENSING.txt"/>
-				<include name="*.LICENSE"/>
-				<include name="AUTHORS"/>
-				<include name="INSTALL"/>
-				<include name="Changelog"/>
-				<include name="NEWS"/>
-				<include name="Backlog"/>
-				<include name="PROBLEMS"/>
-				<include name="configure.ac"/>
-				<include name="Makefile.in"/>
+				<include name="READ*" />
+				<include name="LICENSING.txt" />
+				<include name="*.LICENSE" />
+				<include name="AUTHORS" />
+				<include name="INSTALL" />
+				<include name="Changelog" />
+				<include name="NEWS" />
+				<include name="Backlog" />
+				<include name="PROBLEMS" />
+				<include name="configure.ac" />
+				<include name="Makefile.in" />
 			</tarfileset>
 			<tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="744">
-				<include name="configure"/>
-				<include name="install-sh"/>
+				<include name="configure" />
+				<include name="install-sh" />
 			</tarfileset>
 			<tarfileset dir="${basedir}/DataExplorer/doc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
-				<include name="*.odt"/>
-				<include name="*.pdf"/>
-				<include name="design/*.pdf"/>
+				<include name="*.odt" />
+				<include name="*.pdf" />
+				<include name="design/*.pdf" />
 			</tarfileset>
 			<tarfileset dir="${basedir}/RXTXcomm" casesensitive="true" prefix="dataexplorer-${version.num}/thirdparty/rxtx-2.2pre2" filemode="444">
-				<include name="**/**"/>
-				<exclude name="**/CVS/**"/>
-				<exclude name="**/bin/**"/>
+				<include name="**/**" />
+				<exclude name="**/CVS/**" />
+				<exclude name="**/bin/**" />
 			</tarfileset>
 		</tar>
 	</target>
@@ -613,22 +618,22 @@
 		<echo message="path=${basedir}/build/target/${build.os.shortname}_${sun.arch.data.model}/DataExplorer/DataExplorer.jar" />
 		<junit printsummary="yes" haltonfailure="no" showoutput="true">
 			<classpath>
-				<pathelement path="${java.home}/bin/rt.jar"/>
-				<pathelement path="${basedir}/thirdparty/Junit3/junit.jar"/>
-				<pathelement path="${basedir}/build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar"/>
-				<pathelement path="${basedir}/build/lib/RXTXcomm.jar"/>
-				<pathelement path="${basedir}/build/target/${build.os.shortname}_${sun.arch.data.model}/DataExplorer/DataExplorer.jar"/>
-				<pathelement location="${basedir}/JunitMiscTest/bin"/>
+				<pathelement path="${java.home}/bin/rt.jar" />
+				<pathelement path="${basedir}/thirdparty/Junit3/junit.jar" />
+				<pathelement path="${basedir}/build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
+				<pathelement path="${basedir}/build/lib/RXTXcomm.jar" />
+				<pathelement path="${basedir}/build/target/${build.os.shortname}_${sun.arch.data.model}/DataExplorer/DataExplorer.jar" />
+				<pathelement location="${basedir}/JunitMiscTest/bin" />
 			</classpath>
-			<formatter type="plain"/>
-			<batchtest fork="yes" >
+			<formatter type="plain" />
+			<batchtest fork="yes">
 				<fileset dir="${basedir}/JunitMiscTest/src">
-					<include name="**/AllTests.java"/>
+					<include name="**/AllTests.java" />
 				</fileset>
 			</batchtest>
 		</junit>
 	</target>
-	
+
 	<target name="signature" description="create and verify gpg signature and verify">
 		<echo>find . -name "*" -type f -exec gpg -b --use-agent {} \;</echo>
 		<echo>find . -name "*.sig" -type f -exec gpg --verify {} \;</echo>
