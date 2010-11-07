@@ -8,11 +8,11 @@
 
 package gde.device;
 
+import gde.GDE;
+
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
-
-import gde.GDE;
 
 
 /**
@@ -41,6 +41,9 @@ import gde.GDE;
  *     &lt;enumeration value="google_earth_velocity_avg_limit_factor"/>
  *     &lt;enumeration value="google_earth_velocity_lower_limit"/>
  *     &lt;enumeration value="google_earth_velocity_upper_limit"/>
+ *     &lt;enumeration value="google_earth_within_limits_color"/>
+ *     &lt;enumeration value="google_earth_lower_limit_color"/>
+ *     &lt;enumeration value="google_earth_upper_limit_color"/>
  *     &lt;enumeration value="none_specified"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
@@ -87,6 +90,12 @@ public enum MeasurementPropertyTypes {
     GOOGLE_EARTH_VELOCITY_LOWER_LIMIT("google_earth_velocity_lower_limit"),
     @XmlEnumValue("google_earth_velocity_upper_limit")
     GOOGLE_EARTH_VELOCITY_UPPER_LIMIT("google_earth_velocity_upper_limit"),
+    @XmlEnumValue("google_earth_within_limits_color")
+    GOOGLE_EARTH_WITHIN_LIMITS_COLOR("google_earth_within_limits_color"),
+    @XmlEnumValue("google_earth_lower_limit_color")
+    GOOGLE_EARTH_LOWER_LIMIT_COLOR("google_earth_lower_limit_color"),
+    @XmlEnumValue("google_earth_upper_limit_color")
+    GOOGLE_EARTH_UPPER_LIMIT_COLOR("google_earth_upper_limit_color"),
     @XmlEnumValue("none_specified")
     NONE_SPECIFIED("none_specified");
     private final String value;

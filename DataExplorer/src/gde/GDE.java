@@ -59,7 +59,7 @@ public class GDE {
 
 	
 	// ****** begin global constants section *******
-	public static final String		VERSION														= "Version 2.50";						//$NON-NLS-1$
+	public static final String		VERSION														= "Version 2.51";						//$NON-NLS-1$
 	public static final String		NAME_SHORT												= "GDE";										//$NON-NLS-1$
 	public static final String		NAME_LONG													= "DataExplorer";						//$NON-NLS-1$
 	public final static String		DEVICE_PROPERTIES_XSD_VERSION			= "_V11"; 									//$NON-NLS-1$
@@ -152,6 +152,7 @@ public class GDE {
 	public static final String		FILE_ENDING_DOT_KML				= ".kml";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_GPX				= ".gpx";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_EXE				= ".exe";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_DOT_INI				= ".ini";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_LOV						= "lov";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_OSD						= "osd";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_CSV						= "csv";	//$NON-NLS-1$
@@ -166,6 +167,7 @@ public class GDE {
 	public static final String		FILE_ENDING_STAR					= "*";		//$NON-NLS-1$
 	public static final String		FILE_ENDING_HEX						= "hex";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_EXE						= "exe";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_INI						= "ini";	//$NON-NLS-1$
 
 	public final static String		LINE_SEPARATOR						= System.getProperty("line.separator"); // is OS dependent //$NON-NLS-1$
 

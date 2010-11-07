@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -259,7 +260,7 @@ public class DeviceConfiguration {
 	}
 
 	public void setUsed(boolean value) {
-		this.isChangePropery = this.isChangePropery != true ? this.device.isUsage() != value : this.isChangePropery;
+		this.isChangePropery = true;
 		this.device.setUsage(value);
 	}
 
@@ -1519,6 +1520,27 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * remove property with given channel configuration key, measurement key and property type key
+	 * @param channelConfigNumber
+	 * @param measurementOrdinal
+	 * @param propertyKey
+	 */
+	public void removeMeasruementProperty(int channelConfigNumber, int measurementOrdinal, String propertyKey) {
+		MeasurementType measurementType = this.getMeasurement(channelConfigNumber, measurementOrdinal);
+		if (measurementType != null) {
+			List<PropertyType> properties = measurementType.getProperty();
+			Iterator<PropertyType> iter = properties.iterator();
+			while (iter.hasNext()) {
+				PropertyType propertyType = (PropertyType) iter.next();
+				if (propertyType.getName().equals(propertyKey)) {
+					iter.remove();
+					break;
+				}
+			}
+		}
+	}
+
+	/**
 	 * get property with given channel configuration key, measurement key and property type key (IDevice.OFFSET, ...)
 	 * @param channelConfigKey
 	 * @param measurementOrdinal
@@ -1785,13 +1807,23 @@ public class DeviceConfiguration {
 	 */
 	public void setMeasurementPropertyValue(int channelConfigNumber, int measurementOrdinal, String propertyKey, DataTypes type, Object value) {
 		this.isChangePropery = true;
-		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, propertyKey);
-		if (property == null) {
-			createProperty(channelConfigNumber, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT)); //$NON-NLS-1$
+		if (value != null) {
+			PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, propertyKey);
+			if (property == null) {
+				if (type == DataTypes.STRING)
+					createProperty(channelConfigNumber, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value));
+				else
+					createProperty(channelConfigNumber, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
+			}
+			else {
+				if (type == DataTypes.STRING)
+					property.setValue((GDE.STRING_EMPTY + value));
+				else
+					property.setValue((GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
+			}
 		}
-		else {
-			property.setValue((GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
-		}
+		else 
+			this.removeMeasruementProperty(channelConfigNumber, measurementOrdinal, propertyKey);
 	}
 	
 	/**
@@ -1948,5 +1980,12 @@ public class DeviceConfiguration {
 	 */
 	public String getJarName() {
 		return this.getClass().getProtectionDomain().toString();
+	}
+	
+	/**
+	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
+	 */
+	public Integer getGPS2KMLMeasurementOrdinal() {
+		return null;
 	}
 }

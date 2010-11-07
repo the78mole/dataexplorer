@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.data.ObjectData;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
@@ -2428,5 +2429,43 @@ public class DataExplorer extends Composite {
 				shell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.png")); //$NON-NLS-1$
 			}
 		});
+	}
+
+	/**
+	 * @return the object data from the objectDescriptionTabItem
+	 */
+	public ObjectData getObject() {
+		return this.objectDescriptionTabItem.getObject();
+	}
+	
+	/**
+	 * @return the active record set or null
+	 */
+	public RecordSet getActiveRecordSet() {
+		RecordSet activeRecordSet = null;
+		Channel activeChannnel = this.channels.getActiveChannel();
+		if(activeChannnel != null)
+			activeRecordSet = activeChannnel.getActiveRecordSet();
+		
+		return activeRecordSet;
+	}
+	
+	/**
+	 * @return the number of the active channel or null
+	 */
+	public Integer getActiveChannelNumber() {
+		Integer activeChannelNumber = null;
+		Channel activeChannnel = this.channels.getActiveChannel();
+		if(activeChannnel != null)
+			activeChannelNumber = activeChannnel.getNumber();
+		
+		return activeChannelNumber;
+	}
+	
+	/**
+	 * @return the active channel or null
+	 */
+	public Channel getActiveChannel() {
+		return this.channels.getActiveChannel();
 	}
 }

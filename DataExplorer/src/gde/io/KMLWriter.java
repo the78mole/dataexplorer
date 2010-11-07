@@ -147,13 +147,25 @@ public class KMLWriter {
 			PropertyType propertyUpperLimit = recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity, MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value());
 			int velocityLowerLimit = (int) (propertyAvg != null ? velocityAvg/Double.valueOf(propertyAvg.getValue()) : propertyLowerLimit != null ? Integer.valueOf(propertyLowerLimit.getValue()) : 0);
 			int velocityUpperLimit = (int) (propertyAvg != null ? velocityAvg*Double.valueOf(propertyAvg.getValue()) : propertyLowerLimit != null ? Integer.valueOf(propertyUpperLimit.getValue()) : 500);;			
+
+			PropertyType propertyWithinLimitsColor = recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity, MeasurementPropertyTypes.GOOGLE_EARTH_WITHIN_LIMITS_COLOR.value());
+			PropertyType propertyLowerLimitColor = recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity, MeasurementPropertyTypes.GOOGLE_EARTH_LOWER_LIMIT_COLOR.value());
+			PropertyType propertyUpperLimitColor = recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity, MeasurementPropertyTypes.GOOGLE_EARTH_UPPER_LIMIT_COLOR.value());
+			String[] colorRGB = propertyWithinLimitsColor.getValue().split(GDE.STRING_COMMA);
+			String withinLimitsColor = propertyWithinLimitsColor != null ? String.format("ff%02x%02x%02x", Integer.parseInt(colorRGB[2]), Integer.parseInt(colorRGB[1]), Integer.parseInt(colorRGB[0])) : "ff0000ff";
+			colorRGB = propertyLowerLimitColor.getValue().split(GDE.STRING_COMMA);
+			String lowerLimitColor = propertyLowerLimitColor != null ? String.format("ff%02x%02x%02x", Integer.parseInt(colorRGB[2]), Integer.parseInt(colorRGB[1]), Integer.parseInt(colorRGB[0])) : "ff00ff00";
+			colorRGB = propertyUpperLimitColor.getValue().split(GDE.STRING_COMMA);
+			String upperLimitColor = propertyUpperLimitColor != null ? String.format("ff%02x%02x%02x", Integer.parseInt(colorRGB[2]), Integer.parseInt(colorRGB[1]), Integer.parseInt(colorRGB[0])) : "ff00ffff";
+			String[] velocityColors = new String[] {lowerLimitColor, withinLimitsColor, upperLimitColor};
+				
 			String initialPlacemarkName = Messages.getString(MessageIds.GDE_MSGT0604, new Object[] {velocityLowerLimit, velocityUnit});
-			writer.write(String.format(Locale.ENGLISH, leader, initialPlacemarkName, "ff0000ff", 2, 0));//$NON-NLS-1$		
+			writer.write(String.format(Locale.ENGLISH, leader, initialPlacemarkName, lowerLimitColor, 2, 0));//$NON-NLS-1$		
 			for (i = recordSet.isZoomMode() ? 0 : i; isPositionWritten && i < dataSize; i++) {
 				
 				int velocity = (int)device.translateValue(recordVelocity, recordVelocity.get(i) / 1000.0);
 				if (!((velocity < velocityLowerLimit && velocityRange == 0) || (velocity >= velocityLowerLimit && velocity <= velocityUpperLimit && velocityRange == 1) || (velocity > velocityUpperLimit && velocityRange == 2))) {
-					velocityRange = switchColor(writer, recordVelocity, velocity, velocityLowerLimit, velocityUpperLimit, velocityRange, velocityUnit);
+					velocityRange = switchColor(writer, recordVelocity, velocity, velocityLowerLimit, velocityUpperLimit, velocityColors, velocityRange, velocityUnit);
 
 					//re-write last coordinates
 					double height = device.translateValue(recordHeight, recordHeight.get(i-1) / 1000.0) - height0;
@@ -212,30 +224,33 @@ public class KMLWriter {
 	 * @param writer
 	 * @param velocityRecord
 	 * @param actualVelocity
+	 * @param velocityLowerLimit
+	 * @param velocityUpperLimit
+	 * @param velocitColors {lowerLimitColor, withinLimitsColor, upperLimitColor) 
 	 * @param velocityRange
 	 * @param velocityUnit
 	 * @return
 	 * @throws IOException
 	 */
-	public static int switchColor(BufferedWriter writer, Record velocityRecord, int actualVelocity, int velocityLowerLimit, int velocityUpperLimit, int velocityRange, String velocityUnit)
+	public static int switchColor(BufferedWriter writer, Record velocityRecord, int actualVelocity, int velocityLowerLimit, int velocityUpperLimit, String[] velocitColors, int velocityRange, String velocityUnit)
 			throws IOException {
 
 		if (actualVelocity < velocityLowerLimit) {
 			String placemarkName0 = Messages.getString(MessageIds.GDE_MSGT0604, new Object[] { velocityLowerLimit, velocityUnit });
 			writer.write(trailer);
-			writer.write(String.format(Locale.ENGLISH, leader, placemarkName0, "ff0000ff", 2, 0));//$NON-NLS-1$		
+			writer.write(String.format(Locale.ENGLISH, leader, placemarkName0, velocitColors[0], 2, 0));//$NON-NLS-1$		
 			velocityRange = 0;
 		}
 		else if (actualVelocity >= velocityLowerLimit && actualVelocity <= velocityUpperLimit) {
 			String placemarkName1 = Messages.getString(MessageIds.GDE_MSGT0605, new Object[] { velocityLowerLimit, velocityUpperLimit, velocityUnit });
 			writer.write(trailer);
-			writer.write(String.format(Locale.ENGLISH, leader, placemarkName1, "ff00ff00", 2, 0));//$NON-NLS-1$		
+			writer.write(String.format(Locale.ENGLISH, leader, placemarkName1, velocitColors[1], 2, 0));//$NON-NLS-1$		
 			velocityRange = 1;
 		}
 		else if (actualVelocity > velocityUpperLimit) {
 			String placemarkName2 = Messages.getString(MessageIds.GDE_MSGT0606, new Object[] { velocityUpperLimit, velocityUnit });
 			writer.write(trailer);
-			writer.write(String.format(Locale.ENGLISH, leader, placemarkName2, "ff00ffff", 2, 0));//$NON-NLS-1$		
+			writer.write(String.format(Locale.ENGLISH, leader, placemarkName2, velocitColors[2], 2, 0));//$NON-NLS-1$		
 			velocityRange = 2;
 		}
 		return velocityRange;

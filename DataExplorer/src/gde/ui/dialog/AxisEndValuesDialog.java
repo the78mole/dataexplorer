@@ -101,7 +101,6 @@ public class AxisEndValuesDialog extends Dialog {
 			this.dialogShell.setSize(345, 272);
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0151));
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/Measure.gif")); //$NON-NLS-1$
-			this.dialogShell.setLocation(100, 100);
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$

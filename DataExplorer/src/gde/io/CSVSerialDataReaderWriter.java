@@ -154,8 +154,8 @@ public class CSVSerialDataReaderWriter {
 							//check reasonable size of data points
 							if (recordSet.get(0).realSize() < 3) {
 								activeChannel.remove(recordSetName);
-								log.log(Level.WARNING, "remove record set with < 3 data points"); //$NON-NLS-1$
-								application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0040));
+								log.log(Level.WARNING, filePath + " - remove record set with < 3 data points"); //$NON-NLS-1$
+								//application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0040));
 
 							}
 							else {

@@ -18,6 +18,16 @@
 ****************************************************************************************/
 package gde.io;
 
+import gde.GDE;
+import gde.data.ObjectData;
+import gde.exception.ApplicationConfigurationException;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,8 +35,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.Properties;
 import java.util.Vector;
-import gde.log.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -39,15 +49,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
-
-import gde.GDE;
-import gde.data.ObjectData;
-import gde.exception.ApplicationConfigurationException;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
 
 /**
  * @author Winfried Brügmann
@@ -145,6 +146,14 @@ public class ObjectDataReaderWriter {
 						InputStream inZip = zipFile.getInputStream(entry);
 						ImageLoader imageLoader = new ImageLoader();
 						this.objectData.setImage(SWTResourceManager.getImage(imageLoader.load(inZip)[0], imageKey, 400, 300, true));
+						inZip.close();
+					}
+					else if (entry.getName().endsWith(GDE.FILE_ENDING_DOT_INI)) {
+						//configuration file
+						InputStream inZip = zipFile.getInputStream(entry);
+						Properties properties = new Properties();
+						properties.load(inZip);
+						this.objectData.setProperties(properties);
 						inZip.close();
 					}
 					else {
@@ -301,7 +310,13 @@ public class ObjectDataReaderWriter {
 				ObjectDataReaderWriter.log.log(Level.FINE, text);
 			}
 			write(outZip, ObjectDataReaderWriter.END_STYLES + GDE.STRING_NEW_LINE);
+			outZip.closeEntry();
 			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.END_STYLES);
+
+			outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + GDE.FILE_ENDING_DOT_INI));
+			this.objectData.getProperties().store(outZip, "GPS velocity limits and colors"); //$NON-NLS-1$
+			outZip.closeEntry();
+
 			outZip.flush();
 			outZip.close();
 		}

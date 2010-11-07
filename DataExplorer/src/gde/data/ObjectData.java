@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.data;
 
+import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -57,6 +58,7 @@ public class ObjectData {
 	String							activationDate;
 	String							status;
 	Image								image;
+	Properties					properties;
 	int									imageWidth = 400;
 	int									imageHeight = 300;
 	String							styledText;
@@ -315,5 +317,19 @@ public class ObjectData {
 	 */
 	public String getFullQualifiedObjectFilePath() {
 		return this.fullQualifiedObjectFilePath;
+	}
+
+	/**
+	 * @return the properties
+	 */
+	public Properties getProperties() {
+		return properties;
+	}
+
+	/**
+	 * @param newProperties the properties to set
+	 */
+	public void setProperties(Properties newProperties) {
+		this.properties = (Properties) newProperties.clone();
 	}
 }

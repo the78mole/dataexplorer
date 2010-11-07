@@ -35,6 +35,7 @@ import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.dialog.DeviceSelectionDialog;
+import gde.ui.dialog.GoogleEarthCustomizingDialog;
 import gde.ui.dialog.PrintSelectionDialog;
 import gde.ui.tab.GraphicsComposite;
 import gde.ui.tab.GraphicsWindow;
@@ -121,7 +122,7 @@ public class MenuToolBar {
 	
 	CoolItem											googleEarthCoolItem;
 	ToolBar												googleEarthToolBar;
-	ToolItem											googleEarthToolItem;
+	ToolItem											googleEarthToolItem, googleEarthConfigToolItem;
 	
 	final DataExplorer	application;
 	final Channels								channels;
@@ -996,6 +997,20 @@ public class MenuToolBar {
 						}
 					});
 				}
+				{
+					this.googleEarthConfigToolItem = new ToolItem(this.googleEarthToolBar, SWT.NONE);
+					this.googleEarthConfigToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0281));
+					this.googleEarthConfigToolItem.setImage(SWTResourceManager.getImage("gde/resource/EarthConfig.gif")); //$NON-NLS-1$
+					this.googleEarthConfigToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/EarthConfigHot.gif")); //$NON-NLS-1$
+					this.googleEarthConfigToolItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/EarthConfigDisabled.gif")); //$NON-NLS-1$
+					this.googleEarthConfigToolItem.setEnabled(false);
+					this.googleEarthConfigToolItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "googleEarthConfigToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							new GoogleEarthCustomizingDialog(application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL).open();
+						}
+					});
+				}
 			}
 			this.toolSize = this.googleEarthToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 			this.googleEarthCoolItem.setSize(this.toolSize.x, this.toolSize.y);
@@ -1525,17 +1540,19 @@ public class MenuToolBar {
 	}
 	
 	/**
-	 * switch enable the google earth tool item, if enabled KML export with google earth launch could be executed
+	 * switch enable the Google Earth tool item, if enabled KML export with Google Earth launch could be executed
 	 * this functions queries the actual device with actual record set for GPS data
 	 */
 	public void updateGoogleEarthToolItem() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			this.googleEarthToolItem.setEnabled(this.application.getActiveDevice().isActualRecordSetWithGpsData());
+			this.googleEarthConfigToolItem.setEnabled(this.application.getActiveDevice().isActualRecordSetWithGpsData());
 		}
 		else {
 			DataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
 					MenuToolBar.this.googleEarthToolItem.setEnabled(MenuToolBar.this.application.getActiveDevice().isActualRecordSetWithGpsData());
+					MenuToolBar.this.googleEarthConfigToolItem.setEnabled(MenuToolBar.this.application.getActiveDevice().isActualRecordSetWithGpsData());
 				}
 			});
 		}

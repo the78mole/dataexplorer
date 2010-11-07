@@ -853,4 +853,9 @@ public interface IDevice {
 	 * @return jar name of the active device
 	 */
 	public String getJarName();
+	
+	/**
+	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
+	 */
+	public Integer getGPS2KMLMeasurementOrdinal();
 }

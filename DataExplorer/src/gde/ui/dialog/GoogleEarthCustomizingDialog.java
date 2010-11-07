@@ -1,0 +1,580 @@
+/**************************************************************************************
+  	This file is part of GNU DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright (c) 2010 Winfried Bruegmann
+****************************************************************************************/
+package gde.ui.dialog;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.ObjectData;
+import gde.device.DataTypes;
+import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.PropertyType;
+import gde.log.Level;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
+
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
+/**
+ * this dialog enable to modify speed limits and associated colors of the KML track
+ */
+public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog {
+	final static Logger log = Logger.getLogger(GoogleEarthCustomizingDialog.class.getName());
+	final DataExplorer  application;
+	final Settings			settings;
+	final IDevice				device;
+
+	Shell dialogShell;
+	Composite colorComposite;
+	Text upperLimitText;
+	CLabel upperLimitLabel;
+	Text avgFactorText;
+	CLabel averageFactorLabel;
+	Composite fillerComposite;
+	Text lowerLimitText;
+	CLabel lowerLimitLabel;
+	Button upperLimitButton;
+	Button withinLimitsButton;
+	Button lowerLimitButton;
+	Composite limitComposite;
+	Button closeButton;
+	Composite compositeUpper;
+	Composite compositeWithin;
+	Composite compositeLower;
+	
+	int upperLimitVelocity = 100;
+	int lowerLimitVelocity = 20;
+	double avgLimitFactor = 2.0;
+	RGB withinLimitsColor = SWTResourceManager.getColor(0, 255, 0).getRGB();
+	RGB lowerLimitColor = SWTResourceManager.getColor(255, 0, 0).getRGB();
+	RGB upperLimitColor = SWTResourceManager.getColor(128, 128, 0).getRGB();
+	
+	/**
+	* Auto-generated main method to display this 
+	* org.eclipse.swt.widgets.Dialog inside a new Shell.
+	*/
+	public static void main(String[] args) {
+		try {
+			Display display = Display.getDefault();
+			Shell shell = new Shell(display);
+			GoogleEarthCustomizingDialog inst = new GoogleEarthCustomizingDialog(shell, SWT.NULL);
+			inst.open();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public GoogleEarthCustomizingDialog(Shell parent, int style) {
+		super(parent, style);
+		this.application = DataExplorer.getInstance();
+		this.settings = Settings.getInstance();
+		this.device = this.application.getActiveDevice();
+	}
+
+	public void open() {
+		try {
+			Shell parent = getParent();
+			dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+
+			{
+				//Register as a resource user - SWTResourceManager will
+				//handle the obtaining and disposing of resources
+				SWTResourceManager.registerResourceUser(dialogShell);
+			}
+			
+			dialogShell.setText("Color and Velocity Configuration");
+			dialogShell.setLayout( new FormLayout());
+			dialogShell.layout();
+			dialogShell.pack();			
+			dialogShell.setSize(312, 199);
+			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/EarthConfigHot.gif")); //$NON-NLS-1$
+			dialogShell.addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(DisposeEvent evt) {
+					log.log(Level.FINEST,  "dialogShell.widgetDisposed, event="+evt);
+					makePersistent();
+					application.resetShellIcon();
+				}
+			});
+			{
+				colorComposite = new Composite(dialogShell, SWT.NONE);
+				RowLayout compositeLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
+				colorComposite.setLayout(compositeLayout);
+				FormData colorCompositeLData = new FormData();
+				colorCompositeLData.width = 150;
+				colorCompositeLData.height = 120;
+				colorCompositeLData.right =  new FormAttachment(501, 1000, 0);
+				colorCompositeLData.bottom =  new FormAttachment(711, 1000, 0);
+				colorCompositeLData.left =  new FormAttachment(0, 1000, 0);
+				colorCompositeLData.top =  new FormAttachment(0, 1000, 0);
+				colorComposite.setLayoutData(colorCompositeLData);
+				{
+					RowData composite1LData = new RowData();
+					composite1LData.width = 145;
+					composite1LData.height = 32;
+					compositeLower = new Composite(colorComposite, SWT.NONE);
+					GridLayout composite1Layout = new GridLayout();
+					composite1Layout.makeColumnsEqualWidth = true;
+					compositeLower.setLayout(composite1Layout);
+					compositeLower.setLayoutData(composite1LData);
+					{
+						lowerLimitButton = new Button(compositeLower, SWT.PUSH | SWT.CENTER);
+						GridData lowerLimitButtonLData = new GridData();
+						lowerLimitButtonLData.widthHint = 130;
+						lowerLimitButtonLData.heightHint = 20;
+						lowerLimitButtonLData.horizontalAlignment = GridData.CENTER;
+						lowerLimitButton.setLayoutData(lowerLimitButtonLData);
+						lowerLimitButton.setText("below limit");
+						lowerLimitButton.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								log.log(Level.FINEST,  "lowerLimitButton.widgetSelected, event="+evt);
+								lowerLimitColor = application.openColorDialog();
+								compositeLower.setBackground(SWTResourceManager.getColor(lowerLimitColor.red, lowerLimitColor.green, lowerLimitColor.blue));							
+							}
+						});
+					}
+				}
+				{
+					fillerComposite = new Composite(colorComposite, SWT.NONE);
+					RowData fillerComposite_RALData = new RowData();
+					fillerComposite_RALData.width = 145;
+					fillerComposite_RALData.height = 2;
+					fillerComposite.setLayoutData(fillerComposite_RALData);
+				}
+				{
+					RowData composite2LData = new RowData();
+					composite2LData.width = 145;
+					composite2LData.height = 32;
+					compositeWithin = new Composite(colorComposite, SWT.NONE);
+					GridLayout composite2Layout = new GridLayout();
+					composite2Layout.makeColumnsEqualWidth = true;
+					compositeWithin.setLayout(composite2Layout);
+					compositeWithin.setLayoutData(composite2LData);
+					{
+						withinLimitsButton = new Button(compositeWithin, SWT.PUSH | SWT.CENTER);
+						withinLimitsButton.setText("within limit");
+						GridData withinLimitsButtonLData = new GridData();
+						withinLimitsButtonLData.horizontalAlignment = GridData.CENTER;
+						withinLimitsButtonLData.widthHint = 130;
+						withinLimitsButtonLData.heightHint = 20;
+						withinLimitsButton.setLayoutData(withinLimitsButtonLData);
+						withinLimitsButton.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								log.log(Level.FINEST,  "withinLimitsButton.widgetSelected, event="+evt);
+								withinLimitsColor = application.openColorDialog();
+								compositeWithin.setBackground(SWTResourceManager.getColor(withinLimitsColor.red, withinLimitsColor.green, withinLimitsColor.blue));
+							}
+						});
+					}
+				}
+				{
+					fillerComposite = new Composite(colorComposite, SWT.NONE);
+					RowData fillerComposite_RA1LData = new RowData();
+					fillerComposite_RA1LData.width = 145;
+					fillerComposite_RA1LData.height = 2;
+					fillerComposite.setLayoutData(fillerComposite_RA1LData);
+				}
+				{
+					RowData composite3LData = new RowData();
+					composite3LData.width = 145;
+					composite3LData.height = 32;
+					compositeUpper = new Composite(colorComposite, SWT.NONE);
+					GridLayout composite3Layout = new GridLayout();
+					composite3Layout.makeColumnsEqualWidth = true;
+					compositeUpper.setLayout(composite3Layout);
+					compositeUpper.setLayoutData(composite3LData);
+					{
+						upperLimitButton = new Button(compositeUpper, SWT.PUSH | SWT.CENTER);
+						GridData upperLimitButtonLData = new GridData();
+						upperLimitButtonLData.widthHint = 130;
+						upperLimitButtonLData.heightHint = 20;
+						upperLimitButtonLData.horizontalAlignment = GridData.CENTER;
+						upperLimitButton.setLayoutData(upperLimitButtonLData);
+						upperLimitButton.setText("obove limit");
+						upperLimitButton.addSelectionListener(new SelectionAdapter() {
+							public void widgetSelected(SelectionEvent evt) {
+								log.log(Level.FINEST,  "upperLimitButton.widgetSelected, event="+evt);
+								upperLimitColor = application.openColorDialog();
+								compositeUpper.setBackground(SWTResourceManager.getColor(upperLimitColor.red, upperLimitColor.green, upperLimitColor.blue));
+							}
+						});
+					}
+				}
+				colorComposite.layout();
+			}
+			{
+				limitComposite = new Composite(dialogShell, SWT.NONE);
+				RowLayout limitCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+				limitComposite.setLayout(limitCompositeLayout);
+				FormData limitCompositeLData = new FormData();
+				limitCompositeLData.width = 150;
+				limitCompositeLData.height = 120;
+				limitCompositeLData.left =  new FormAttachment(501, 1000, 0);
+				limitCompositeLData.bottom =  new FormAttachment(711, 1000, 0);
+				limitCompositeLData.right =  new FormAttachment(1000, 1000, 0);
+				limitCompositeLData.top =  new FormAttachment(0, 1000, 0);
+				limitComposite.setLayoutData(limitCompositeLData);
+				{
+					fillerComposite = new Composite(limitComposite, SWT.NONE);
+					RowData composite_IL2LData = new RowData();
+					composite_IL2LData.width = 145;
+					composite_IL2LData.height = 15;
+					fillerComposite.setLayoutData(composite_IL2LData);
+				}
+				{
+					lowerLimitLabel = new CLabel(limitComposite, SWT.NONE);
+					RowData lowerLimitLabelLData = new RowData();
+					lowerLimitLabelLData.width = 75;
+					lowerLimitLabelLData.height = 22;
+					lowerLimitLabel.setLayoutData(lowerLimitLabelLData);
+					lowerLimitLabel.setText("lower limit");
+				}
+				{
+					lowerLimitText = new Text(limitComposite, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
+					RowData lowerLimitTextLData = new RowData();
+					lowerLimitTextLData.width = 50;
+					lowerLimitTextLData.height = 16;
+					lowerLimitText.setLayoutData(lowerLimitTextLData);
+					lowerLimitText.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent evt) {
+							log.log(Level.FINEST,  "lowerLimitText.verifyText, event="+evt);
+							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
+						}
+					});
+				}
+				{
+					averageFactorLabel = new CLabel(limitComposite, SWT.NONE);
+					RowData averageFactorLabelLData = new RowData();
+					averageFactorLabelLData.width = 75;
+					averageFactorLabelLData.height = 22;
+					averageFactorLabel.setLayoutData(averageFactorLabelLData);
+					averageFactorLabel.setText("avg factor");
+				}
+				{
+					avgFactorText = new Text(limitComposite, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
+					RowData avgFactorTextLData = new RowData();
+					avgFactorTextLData.width = 50;
+					avgFactorTextLData.height = 16;
+					avgFactorText.setLayoutData(avgFactorTextLData);
+					avgFactorText.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent evt) {
+							log.log(Level.FINEST,  "avgFactorText.verifyText, event="+evt);
+							evt.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, evt.text);
+						}
+					});
+				}
+				{
+					upperLimitLabel = new CLabel(limitComposite, SWT.NONE);
+					RowData upperLimitLabelLData = new RowData();
+					upperLimitLabelLData.width = 75;
+					upperLimitLabelLData.height = 22;
+					upperLimitLabel.setLayoutData(upperLimitLabelLData);
+					upperLimitLabel.setText("upper limit");
+				}
+				{
+					upperLimitText = new Text(limitComposite, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
+					RowData upperLimitTextLData = new RowData();
+					upperLimitTextLData.width = 50;
+					upperLimitTextLData.height = 16;
+					upperLimitText.setLayoutData(upperLimitTextLData);
+					upperLimitText.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent evt) {
+							log.log(Level.FINEST,  "upperLimitText.verifyText, event="+evt);
+							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
+						}
+					});
+				}
+				limitComposite.pack();
+				limitComposite.layout();
+			}
+			{
+				closeButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
+				closeButton.setText("close");
+				FormData closeButtonLData = new FormData();
+				closeButtonLData.width = 160;
+				closeButtonLData.height = 25;
+				closeButtonLData.top =  new FormAttachment(782, 1000, 0);
+				closeButtonLData.left =  new FormAttachment(0, 1000, 65);
+				closeButtonLData.right =  new FormAttachment(1000, 1000, -79);
+				closeButtonLData.bottom =  new FormAttachment(1000, 1000, -12);
+				closeButton.setLayoutData(closeButtonLData);
+				closeButton.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						log.log(Level.FINEST, "closeButton.widgetSelected, event="+evt);
+						dialogShell.dispose();
+					}
+				});
+			}
+			initialize();
+			this.dialogShell.setLocation(getParent().toDisplay(350, 50));
+			dialogShell.open();
+			Display display = dialogShell.getDisplay();
+			while (!dialogShell.isDisposed()) {
+				if (!display.readAndDispatch())
+					display.sleep();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	void initialize() {
+		lowerLimitVelocity = 20;
+		avgLimitFactor = 0.0;
+		upperLimitVelocity = 100;
+		withinLimitsColor = SWTResourceManager.getColor(0, 255, 0).getRGB();
+		lowerLimitColor = SWTResourceManager.getColor(255, 0, 0).getRGB();
+		upperLimitColor = SWTResourceManager.getColor(255, 255, 0).getRGB();
+
+		if (application.isObjectoriented()) {
+			ObjectData object = application.getObject();
+			Properties properties = object.getProperties();
+			if (properties != null) {
+				try {
+					avgLimitFactor = Double.parseDouble(((String) properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value())).trim());
+				}
+				catch (Exception e) {
+					// ignore
+				}
+				try {
+					System.out.println("#"+properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value())+"#");
+					lowerLimitVelocity = Integer.parseInt(((String) properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value())).trim());
+				}
+				catch (Exception e) {
+					// ignore
+				}
+				try {
+					upperLimitVelocity = Integer.parseInt(((String) properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value())).trim());
+				}
+				catch (Exception e) {
+					// ignore
+				}
+				int r, g, b;
+				try {
+					String color = (String) properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_WITHIN_LIMITS_COLOR.value());
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					withinLimitsColor = SWTResourceManager.getColor(r, g, b).getRGB();
+				}
+				catch (Exception e) {
+					// ignore
+				}
+				try {
+					String color = (String) properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_LOWER_LIMIT_COLOR.value());
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					lowerLimitColor = SWTResourceManager.getColor(r, g, b).getRGB();
+				}
+				catch (Exception e) {
+					// ignore
+				}
+				try {
+					String color = (String) properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_UPPER_LIMIT_COLOR.value());
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					upperLimitColor = SWTResourceManager.getColor(r, g, b).getRGB();
+				}
+				catch (Exception e) {
+					// ignore
+				}
+			}
+		}
+		else { //device oriented
+			Integer activeChannelNumber = application.getActiveChannelNumber();
+			Integer measurementOrdinal = device.getGPS2KMLMeasurementOrdinal();
+			if(activeChannelNumber != null && measurementOrdinal != null) {
+				PropertyType property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value());
+				if (property != null) {
+					try {
+						avgLimitFactor = Double.parseDouble(property.getValue());
+					}
+					catch (NumberFormatException e) {
+						// ignore
+					}
+				}
+				property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value());
+				if (property != null) {
+					try {
+						lowerLimitVelocity = Integer.parseInt(property.getValue());
+					}
+					catch (Exception e) {
+						// ignore
+					}
+				}
+				property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value());
+				if (property != null) {
+					try {
+						upperLimitVelocity = Integer.parseInt(property.getValue());
+					}
+					catch (Exception e) {
+						// ignore
+					}
+				}
+				int r, g, b;
+				property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_WITHIN_LIMITS_COLOR.value());
+				if (property != null) {
+					try {
+						String color = property.getValue();
+						r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+						g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+						b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+						withinLimitsColor = SWTResourceManager.getColor(r, g, b).getRGB();
+					}
+					catch (Exception e) {
+						// ignore
+					}
+				}
+				property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_LOWER_LIMIT_COLOR.value());
+				if (property != null) {
+					try {
+						String color = property.getValue();
+						r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+						g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+						b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+						lowerLimitColor = SWTResourceManager.getColor(r, g, b).getRGB();
+					}
+					catch (Exception e) {
+						// ignore
+					}
+				}
+				property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_UPPER_LIMIT_COLOR.value());
+				if (property != null) {
+					try {
+						String color = property.getValue();
+						r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+						g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+						b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+						upperLimitColor = SWTResourceManager.getColor(r, g, b).getRGB();
+					}
+					catch (Exception e) {
+						// ignore
+					}
+				}
+			}
+		}
+		
+		lowerLimitText.setText(GDE.STRING_EMPTY + lowerLimitVelocity);
+	  avgFactorText.setText(String.format("%.1f", avgLimitFactor));
+		upperLimitText.setText(GDE.STRING_EMPTY + upperLimitVelocity);
+		compositeLower.setBackground(SWTResourceManager.getColor(lowerLimitColor.red,lowerLimitColor.green,lowerLimitColor.blue));
+		compositeWithin.setBackground(SWTResourceManager.getColor(withinLimitsColor.red,withinLimitsColor.green,withinLimitsColor.blue));
+		compositeUpper.setBackground(SWTResourceManager.getColor(upperLimitColor.red,upperLimitColor.green,upperLimitColor.blue));
+
+		if(avgLimitFactor > 0) {
+			lowerLimitText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+		  avgFactorText.setBackground(DataExplorer.COLOR_WHITE);
+			upperLimitText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+		}
+		else {
+			lowerLimitText.setBackground(DataExplorer.COLOR_WHITE);
+		  avgFactorText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+			upperLimitText.setBackground(DataExplorer.COLOR_WHITE);
+		}
+	}
+
+	void makePersistent() {
+		lowerLimitVelocity = Integer.parseInt(lowerLimitText.getText());
+		avgLimitFactor = Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT));
+		upperLimitVelocity = Integer.parseInt(upperLimitText.getText());
+
+		if (application.isObjectoriented()) {
+			ObjectData object = application.getObject();
+			if (object != null) {
+				Properties properties = object.getProperties();
+				if (properties == null) {
+					properties = new Properties();
+					object.setProperties(properties);
+				}
+				if(avgLimitFactor > 0) {
+					properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value(), GDE.STRING_BLANK + avgLimitFactor);
+					if (properties.containsKey(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value())) properties.remove(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value());
+					if (properties.containsKey(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value())) properties.remove(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value());
+				}
+				else {
+					if (properties.containsKey(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value())) properties.remove(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value());
+					properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value(), GDE.STRING_BLANK + lowerLimitVelocity);
+					properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value(), GDE.STRING_BLANK + upperLimitVelocity);
+				}
+				properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_WITHIN_LIMITS_COLOR.value(), withinLimitsColor.red + GDE.STRING_COMMA + withinLimitsColor.green + GDE.STRING_COMMA	+ withinLimitsColor.blue);
+				properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_LOWER_LIMIT_COLOR.value(), lowerLimitColor.red + GDE.STRING_COMMA + lowerLimitColor.green + GDE.STRING_COMMA	+ lowerLimitColor.blue);
+				properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_UPPER_LIMIT_COLOR.value(), upperLimitColor.red + GDE.STRING_COMMA + upperLimitColor.green + GDE.STRING_COMMA	+ upperLimitColor.blue);
+			}
+			object.save();
+		}
+		else { //device oriented
+			Integer activeChannelNumber = application.getActiveChannelNumber();
+			Integer measurementOrdinal = device.getGPS2KMLMeasurementOrdinal();
+			if(activeChannelNumber != null && measurementOrdinal != null) {
+				if(avgLimitFactor > 0) {
+					device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value(), DataTypes.DOUBLE, avgLimitFactor);
+					device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value(), DataTypes.INTEGER, null);
+					device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value(), DataTypes.INTEGER, null);
+				}
+				else {
+					device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value(), DataTypes.DOUBLE, null);
+					device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value(), DataTypes.INTEGER, lowerLimitVelocity);
+					device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value(), DataTypes.INTEGER, upperLimitVelocity);
+				}
+				device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_WITHIN_LIMITS_COLOR.value(), DataTypes.STRING, withinLimitsColor.red + GDE.STRING_COMMA + withinLimitsColor.green + GDE.STRING_COMMA + withinLimitsColor.blue);
+				device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_LOWER_LIMIT_COLOR.value(), DataTypes.STRING, lowerLimitColor.red + GDE.STRING_COMMA + lowerLimitColor.green + GDE.STRING_COMMA + lowerLimitColor.blue);
+				device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_UPPER_LIMIT_COLOR.value(), DataTypes.STRING, upperLimitColor.red + GDE.STRING_COMMA + upperLimitColor.green + GDE.STRING_COMMA + upperLimitColor.blue);
+			}
+			device.storeDeviceProperties();
+		}
+	}
+}

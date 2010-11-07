@@ -1044,7 +1044,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			if (!this.activeDevices.contains(newDeviceName)) 
 				this.activeDevices.add(newDeviceName);
 			DeviceConfiguration tmpDeviceConfig = this.getDevices().get(newDeviceName);
-			tmpDeviceConfig.setUsed(true);
+			if (!tmpDeviceConfig.isUsed()) tmpDeviceConfig.setUsed(true);
 			setActiveConfig(tmpDeviceConfig);
 			setupDevice();
 		}
