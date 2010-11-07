@@ -1243,7 +1243,7 @@ public class FileUtils {
 			if (GDE.IS_WINDOWS)
 				new ProcessBuilder("cmd", "/C", System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java", "-classpath", jarFilePath, "gde.utils.FileUtils").start(); //$NON-NLS-1$ //$NON-NLS-2$
 			else
-				new ProcessBuilder(System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java", "-classpath", jarFilePath, "gde.utils.FileUtils", "&").start(); //$NON-NLS-1$ //$NON-NLS-2$
+				new ProcessBuilder("java", "-classpath", jarFilePath, "gde.utils.FileUtils", "&").start(); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, "failed executing: " + command); //$NON-NLS-1$
