@@ -1,5 +1,10 @@
 Development history / change log, please read from bottom up
 
+
+add a configuration dialog for GPS/KML velocity limits and colors
+
+Version 2.50 - 01 Nov 2010
+
 fix handing of file dialog while cancel operation
 update to DeviceProperties XSD V11
 update scale synchronization > 1  measurement type

@@ -1,23 +1,7 @@
-GNU DataExplorer - News - comes with version 2.50
+GNU DataExplorer - News - comes with version 2.60
 
-1)fix handing of file dialog while cancel operation
-2)update to DeviceProperties XSD V11
-3)update scale synchronization > 1  measurement type
-4)fix error setup 18 DataVarioTool/LinkVarioTool
-5)update data table preparation, value digits depends on measurement
-6)refine context sensitive help, enabled by an tool button
-7)enable multiple file selection while CSV import
-8)sunset Mac carbon version
-9)introduce 64 bit Mac cocoa
-10)replace Mac libserial.jnilib with previous version build for 32/64 bit Intel/PCC
-11)add function to launch Google Earth while exporting KML file
-12)add ToolItem to launch context sensitive help
-13)update VC80x to use variable time steps
-14)update AkkuMaster C4 prevent closing tool box while active
-15)fix LiPoWatch lov file reader
-16)add QC-Copter QuadroControl plug-in
-17)enable velocity limits declaration for KML
-
+1)add a configuration dialog for GPS/KML velocity limits and colors
+2)
 
 
 
