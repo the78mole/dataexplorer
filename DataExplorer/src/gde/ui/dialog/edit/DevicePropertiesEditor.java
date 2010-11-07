@@ -263,6 +263,7 @@ public class DevicePropertiesEditor extends Composite {
 			while (!DevicePropertiesEditor.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
 			}
+			DataExplorer.getInstance().resetShellIcon();
 		}
 		catch (Throwable e) {
 			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
