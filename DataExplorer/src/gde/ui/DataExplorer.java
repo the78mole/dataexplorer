@@ -387,6 +387,9 @@ public class DataExplorer extends Composite {
 			log.log(Level.SEVERE, t.getMessage(), t);
 			t.printStackTrace(System.err);
 		}
+		
+		//cleanup out dated resources
+		FileUtils.cleanupPost();
 	}
 
 	/**
@@ -490,9 +493,6 @@ public class DataExplorer extends Composite {
 					
 					// finally save application settings
 					DataExplorer.application.settings.store();
-					
-					//cleanup outdated resources
-					FileUtils.cleanupPost();
 				}
 			});
 			this.menuCoolBar.addControlListener(new ControlAdapter() {
@@ -2378,7 +2378,7 @@ public class DataExplorer extends Composite {
 	public UtilGraphicsWindow setUtilGraphicsWindowVisible(boolean visible) {
 		if (visible) {
 			if (this.utilGraphicsTabItem == null || this.utilGraphicsTabItem.isDisposed()) {
-				this.utilGraphicsTabItem = new UtilGraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_UTIL, "Utility Graphics", this.displayTab.getItemCount()); //$NON-NLS-1$
+				this.utilGraphicsTabItem = new UtilGraphicsWindow(this.displayTab, SWT.NONE, GraphicsWindow.TYPE_UTIL, Messages.getString(MessageIds.GDE_MSGT0282), this.displayTab.getItemCount()); //$NON-NLS-1$
 				this.utilGraphicsTabItem.create();
 			}
 		}

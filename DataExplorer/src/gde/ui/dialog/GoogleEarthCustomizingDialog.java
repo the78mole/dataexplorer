@@ -21,11 +21,14 @@ package gde.ui.dialog;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.ObjectData;
+import gde.data.RecordSet;
 import gde.device.DataTypes;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
 import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.StringHelper;
@@ -37,6 +40,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
@@ -135,7 +140,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				SWTResourceManager.registerResourceUser(dialogShell);
 			}
 			
-			dialogShell.setText("Color and Velocity Configuration");
+			dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0283));
 			dialogShell.setLayout( new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();			
@@ -143,7 +148,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/EarthConfigHot.gif")); //$NON-NLS-1$
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
-					log.log(Level.FINEST,  "dialogShell.widgetDisposed, event="+evt);
+					log.log(Level.FINEST,  "dialogShell.widgetDisposed, event="+evt); //$NON-NLS-1$
 					makePersistent();
 					application.resetShellIcon();
 				}
@@ -176,10 +181,11 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 						lowerLimitButtonLData.heightHint = 20;
 						lowerLimitButtonLData.horizontalAlignment = GridData.CENTER;
 						lowerLimitButton.setLayoutData(lowerLimitButtonLData);
-						lowerLimitButton.setText("below limit");
+						lowerLimitButton.setText(Messages.getString(MessageIds.GDE_MSGT0289));
+						lowerLimitButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0293));
 						lowerLimitButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST,  "lowerLimitButton.widgetSelected, event="+evt);
+								log.log(Level.FINEST,  "lowerLimitButton.widgetSelected, event="+evt); //$NON-NLS-1$
 								lowerLimitColor = application.openColorDialog();
 								compositeLower.setBackground(SWTResourceManager.getColor(lowerLimitColor.red, lowerLimitColor.green, lowerLimitColor.blue));							
 							}
@@ -204,15 +210,16 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					compositeWithin.setLayoutData(composite2LData);
 					{
 						withinLimitsButton = new Button(compositeWithin, SWT.PUSH | SWT.CENTER);
-						withinLimitsButton.setText("within limit");
+						withinLimitsButton.setText(Messages.getString(MessageIds.GDE_MSGT0294));
 						GridData withinLimitsButtonLData = new GridData();
 						withinLimitsButtonLData.horizontalAlignment = GridData.CENTER;
 						withinLimitsButtonLData.widthHint = 130;
 						withinLimitsButtonLData.heightHint = 20;
 						withinLimitsButton.setLayoutData(withinLimitsButtonLData);
+						withinLimitsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0295));
 						withinLimitsButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST,  "withinLimitsButton.widgetSelected, event="+evt);
+								log.log(Level.FINEST,  "withinLimitsButton.widgetSelected, event="+evt); //$NON-NLS-1$
 								withinLimitsColor = application.openColorDialog();
 								compositeWithin.setBackground(SWTResourceManager.getColor(withinLimitsColor.red, withinLimitsColor.green, withinLimitsColor.blue));
 							}
@@ -242,10 +249,11 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 						upperLimitButtonLData.heightHint = 20;
 						upperLimitButtonLData.horizontalAlignment = GridData.CENTER;
 						upperLimitButton.setLayoutData(upperLimitButtonLData);
-						upperLimitButton.setText("obove limit");
+						upperLimitButton.setText(Messages.getString(MessageIds.GDE_MSGT0296));
+						upperLimitButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0297));
 						upperLimitButton.addSelectionListener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST,  "upperLimitButton.widgetSelected, event="+evt);
+								log.log(Level.FINEST,  "upperLimitButton.widgetSelected, event="+evt); //$NON-NLS-1$
 								upperLimitColor = application.openColorDialog();
 								compositeUpper.setBackground(SWTResourceManager.getColor(upperLimitColor.red, upperLimitColor.green, upperLimitColor.blue));
 							}
@@ -276,20 +284,21 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				{
 					lowerLimitLabel = new CLabel(limitComposite, SWT.NONE);
 					RowData lowerLimitLabelLData = new RowData();
-					lowerLimitLabelLData.width = 75;
+					lowerLimitLabelLData.width = 95;
 					lowerLimitLabelLData.height = 22;
 					lowerLimitLabel.setLayoutData(lowerLimitLabelLData);
-					lowerLimitLabel.setText("lower limit");
+					lowerLimitLabel.setText(Messages.getString(MessageIds.GDE_MSGT0284));
+					lowerLimitLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0285));
 				}
 				{
 					lowerLimitText = new Text(limitComposite, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
 					RowData lowerLimitTextLData = new RowData();
-					lowerLimitTextLData.width = 50;
+					lowerLimitTextLData.width = 30;
 					lowerLimitTextLData.height = 16;
 					lowerLimitText.setLayoutData(lowerLimitTextLData);
 					lowerLimitText.addVerifyListener(new VerifyListener() {
 						public void verifyText(VerifyEvent evt) {
-							log.log(Level.FINEST,  "lowerLimitText.verifyText, event="+evt);
+							log.log(Level.FINEST,  "lowerLimitText.verifyText, event="+evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
 						}
 					});
@@ -297,41 +306,72 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				{
 					averageFactorLabel = new CLabel(limitComposite, SWT.NONE);
 					RowData averageFactorLabelLData = new RowData();
-					averageFactorLabelLData.width = 75;
+					averageFactorLabelLData.width = 95;
 					averageFactorLabelLData.height = 22;
 					averageFactorLabel.setLayoutData(averageFactorLabelLData);
-					averageFactorLabel.setText("avg factor");
+					averageFactorLabel.setText(Messages.getString(MessageIds.GDE_MSGT0286));
+					averageFactorLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0287));
 				}
 				{
 					avgFactorText = new Text(limitComposite, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
 					RowData avgFactorTextLData = new RowData();
-					avgFactorTextLData.width = 50;
+					avgFactorTextLData.width = 30;
 					avgFactorTextLData.height = 16;
 					avgFactorText.setLayoutData(avgFactorTextLData);
 					avgFactorText.addVerifyListener(new VerifyListener() {
 						public void verifyText(VerifyEvent evt) {
-							log.log(Level.FINEST,  "avgFactorText.verifyText, event="+evt);
+							log.log(Level.FINEST,  "avgFactorText.verifyText, event="+evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, evt.text);
+						}
+					});
+					avgFactorText.addKeyListener(new KeyAdapter() {
+						public void keyReleased(KeyEvent arg0) {
+							Integer measurementOrdinal = device.getGPS2KMLMeasurementOrdinal();
+							RecordSet activeRecordSet = application.getActiveRecordSet();
+							if (activeRecordSet != null && measurementOrdinal != null) {
+								int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000);
+								try {
+									double factor = Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT));
+									if (factor >= 1) {
+										lowerLimitText.setText(String.format("%d", (int) (avgValue / factor))); //$NON-NLS-1$
+										upperLimitText.setText(String.format("%d", (int) (avgValue * factor))); //$NON-NLS-1$
+										lowerLimitText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+									  avgFactorText.setBackground(DataExplorer.COLOR_WHITE);
+										upperLimitText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+									}
+									else {
+										lowerLimitText.setText(GDE.STRING_EMPTY + lowerLimitVelocity); 
+										upperLimitText.setText(GDE.STRING_EMPTY + upperLimitVelocity);
+										lowerLimitText.setBackground(DataExplorer.COLOR_WHITE);
+									  avgFactorText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+										upperLimitText.setBackground(DataExplorer.COLOR_WHITE);
+									}
+								}
+								catch (Exception e) {
+									// ignore
+								}
+							}						
 						}
 					});
 				}
 				{
 					upperLimitLabel = new CLabel(limitComposite, SWT.NONE);
 					RowData upperLimitLabelLData = new RowData();
-					upperLimitLabelLData.width = 75;
+					upperLimitLabelLData.width = 95;
 					upperLimitLabelLData.height = 22;
 					upperLimitLabel.setLayoutData(upperLimitLabelLData);
-					upperLimitLabel.setText("upper limit");
+					upperLimitLabel.setText(Messages.getString(MessageIds.GDE_MSGT0288));
+					upperLimitLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0290));
 				}
 				{
 					upperLimitText = new Text(limitComposite, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
 					RowData upperLimitTextLData = new RowData();
-					upperLimitTextLData.width = 50;
+					upperLimitTextLData.width = 30;
 					upperLimitTextLData.height = 16;
 					upperLimitText.setLayoutData(upperLimitTextLData);
 					upperLimitText.addVerifyListener(new VerifyListener() {
 						public void verifyText(VerifyEvent evt) {
-							log.log(Level.FINEST,  "upperLimitText.verifyText, event="+evt);
+							log.log(Level.FINEST,  "upperLimitText.verifyText, event="+evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
 						}
 					});
@@ -341,7 +381,8 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			}
 			{
 				closeButton = new Button(dialogShell, SWT.PUSH | SWT.CENTER);
-				closeButton.setText("close");
+				closeButton.setText(Messages.getString(MessageIds.GDE_MSGT0291));
+				closeButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0292));
 				FormData closeButtonLData = new FormData();
 				closeButtonLData.width = 160;
 				closeButtonLData.height = 25;
@@ -352,7 +393,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				closeButton.setLayoutData(closeButtonLData);
 				closeButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "closeButton.widgetSelected, event="+evt);
+						log.log(Level.FINEST, "closeButton.widgetSelected, event="+evt); //$NON-NLS-1$
 						dialogShell.dispose();
 					}
 				});
@@ -389,7 +430,6 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					// ignore
 				}
 				try {
-					System.out.println("#"+properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value())+"#");
 					lowerLimitVelocity = Integer.parseInt(((String) properties.get(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value())).trim());
 				}
 				catch (Exception e) {
@@ -509,13 +549,25 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 		}
 		
 		lowerLimitText.setText(GDE.STRING_EMPTY + lowerLimitVelocity);
-	  avgFactorText.setText(String.format("%.1f", avgLimitFactor));
+	  avgFactorText.setText(String.format("%.1f", avgLimitFactor)); //$NON-NLS-1$
 		upperLimitText.setText(GDE.STRING_EMPTY + upperLimitVelocity);
 		compositeLower.setBackground(SWTResourceManager.getColor(lowerLimitColor.red,lowerLimitColor.green,lowerLimitColor.blue));
 		compositeWithin.setBackground(SWTResourceManager.getColor(withinLimitsColor.red,withinLimitsColor.green,withinLimitsColor.blue));
 		compositeUpper.setBackground(SWTResourceManager.getColor(upperLimitColor.red,upperLimitColor.green,upperLimitColor.blue));
 
-		if(avgLimitFactor > 0) {
+		if(avgLimitFactor >= 1) {
+			Integer measurementOrdinal = device.getGPS2KMLMeasurementOrdinal();
+			RecordSet activeRecordSet = application.getActiveRecordSet();
+			if (activeRecordSet != null && measurementOrdinal != null) {
+				int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000);
+				try {
+					lowerLimitText.setText(String.format("%d", (int)(avgValue/Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT))))); //$NON-NLS-1$
+					upperLimitText.setText(String.format("%d", (int)(avgValue*Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT))))); //$NON-NLS-1$
+				}
+				catch (Exception e) {
+					// ignore
+				}
+			}
 			lowerLimitText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 		  avgFactorText.setBackground(DataExplorer.COLOR_WHITE);
 			upperLimitText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
@@ -560,7 +612,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			Integer activeChannelNumber = application.getActiveChannelNumber();
 			Integer measurementOrdinal = device.getGPS2KMLMeasurementOrdinal();
 			if(activeChannelNumber != null && measurementOrdinal != null) {
-				if(avgLimitFactor > 0) {
+				if(avgLimitFactor >= 1) {
 					device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value(), DataTypes.DOUBLE, avgLimitFactor);
 					device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value(), DataTypes.INTEGER, null);
 					device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value(), DataTypes.INTEGER, null);

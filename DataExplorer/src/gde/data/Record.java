@@ -1795,7 +1795,7 @@ public class Record extends Vector<Integer> {
 	 * calculates the avgValue
 	 */
 	public synchronized void setAvgValue() {
-		if (super.size() >= 2) {
+		if (this.size() >= 2) {
 			long sum = 0;
 			int zeroCount = 0;
 			for (Integer xi : this) {
@@ -1806,7 +1806,7 @@ public class Record extends Vector<Integer> {
 					zeroCount++;
 				}
 			}
-			this.avgValue = (this.realSize()-zeroCount) != 0 ? Long.valueOf(sum / (this.realSize()-zeroCount)).intValue() : 0;
+			this.avgValue = (this.size()-zeroCount) != 0 ? Long.valueOf(sum / (this.size()-zeroCount)).intValue() : 0;
 		}
 	}
 	

@@ -177,8 +177,7 @@ public class FileUtils {
 			exist = true;
 			
 			try {
-				List<File> files = FileUtils.getFileListing(dir);
-				for (File file : files) {
+				for (File file : FileUtils.getFileListing(dir)) {
 					if (file.canWrite()) {
 						log.log(Level.INFO, file.getAbsolutePath() + " deletion " + file.delete());
 					}
@@ -186,7 +185,12 @@ public class FileUtils {
 						log.log(Level.WARNING, "no delete permission on " + file.getAbsolutePath()); //$NON-NLS-1$
 					}
 				}
-				log.log(Level.INFO, dir.getAbsolutePath() + " deletion " + dir.delete());
+				for (File directory : FileUtils.getDirListing(dir)) {
+					if (!(directory.canWrite() && deleteDirectory(directory.getAbsolutePath()))) {
+						log.log(Level.WARNING, "no delete permission on " + directory.getAbsolutePath()); //$NON-NLS-1$
+					}
+				}
+				log.log(Level.WARNING, dir.getAbsolutePath() + " deletion " + dir.delete());
 			}
 			catch (Exception e) {
 				if (e instanceof FileNotFoundException) {
@@ -269,7 +273,7 @@ public class FileUtils {
 		fileBasePath = fileBasePath.endsWith(GDE.FILE_SEPARATOR_UNIX) ? fileBasePath : fileBasePath + GDE.FILE_SEPARATOR_UNIX;
 		Vector<String> fileNamesWildCard = new Vector<String>();
 		for (String fileName : fileNames) {
-			if (fileName.length() >= 3 && !fileName.contains(GDE.STRING_STAR)) { // "a.csv" "GDE", "OSDE"
+			if (fileName.length() >= 2 && !fileName.contains(GDE.STRING_STAR)) { // "a.csv" "GDE", "OSDE"
 				FileUtils.cleanFile(fileBasePath + fileName);
 			}
 			else {
@@ -919,23 +923,6 @@ public class FileUtils {
 	}
 	
 	/**
-	 * small java based file re-namer
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			if (args.length < 2 || args[0].equals(args[1])) {
-				System.out.println("Usage: java -classpath DataExplorer.jar gde.util.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName"); //$NON-NLS-1$
-			}
-			Thread.sleep(1000);
-			rename(args[0].replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX), args[1].replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * rename a file while deleting the source file name and rename target to source
 	 * @param sourceFullQualifiedFileName
 	 * @param targetFullQualifiedFileName
@@ -1149,9 +1136,22 @@ public class FileUtils {
 	}
 
 	/**
-	* Recursively walk a directory tree and return a List of all Files found;
+	  * Recursively walk a directory tree and return a List of all files found.
+	  * @param rootDirectory is a valid directory
+	  * @return List<File> sorted using File.compareTo()
+	  * @throws FileNotFoundException
+	  */
+	public static List<File> getDirListing(File rootDirectory) throws FileNotFoundException {
+		validateDirectory(rootDirectory);
+		List<File> result = getDirListingNoSort(rootDirectory);
+		Collections.sort(result);
+		return result;
+	}
+
+	/**
+	 * Recursively walk a directory tree and return a List of all Files found;
 	 * @param rootDirectory
-	* @return List<File>
+	 * @return List<File>
 	 * @throws FileNotFoundException
 	 */
 	private static List<File> getFileListingNoSort(File rootDirectory) throws FileNotFoundException {
@@ -1161,6 +1161,31 @@ public class FileUtils {
 			List<File> filesDirs = Arrays.asList(filesAndDirs);
 			for (File file : filesDirs) {
 				if (file.isFile()) {
+					result.add(file);
+				}
+				else { // isDirectory()
+					//recursive walk by calling itself
+					List<File> deeperList = getFileListingNoSort(file);
+					result.addAll(deeperList);
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Recursively walk a directory tree and return a List of all Files found;
+	 * @param rootDirectory
+	 * @return List<File>
+	 * @throws FileNotFoundException
+	 */
+	private static List<File> getDirListingNoSort(File rootDirectory) throws FileNotFoundException {
+		List<File> result = new ArrayList<File>();
+		if (rootDirectory.isDirectory() && rootDirectory.canRead()) {
+			File[] filesAndDirs = rootDirectory.listFiles();
+			List<File> filesDirs = Arrays.asList(filesAndDirs);
+			for (File file : filesDirs) {
+				if (file.isDirectory()) {
 					result.add(file);
 				}
 				else { // isDirectory()
@@ -1209,19 +1234,36 @@ public class FileUtils {
 	 * cleanup possible old files like log file, native libraries
 	 */
 	public static void cleanupPost() {
-		Thread postCleanup = new Thread() {
-			public void run() {
-				//long 	StartTime 	= new Date().getTime();
-				if (GDE.IS_WINDOWS) 
-					FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"OSDE", "swt*3448.dll", "GDE", "WinHelper*.dll", "swtlib-"+GDE.BIT_MODE, }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-				else if (GDE.IS_LINUX)
-					FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"OSDE", "swt*3448.dll", "GDE", "*register.sh", "swtlib-"+GDE.BIT_MODE}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				else if (GDE.IS_MAC)
-					FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"OSDE", "GDE", "swtlib-"+GDE.BIT_MODE}); //$NON-NLS-1$ //$NON-NLS-2$
+		String jarBasePath = FileUtils.getJarBasePath();
+		String jarFilePath = jarBasePath + "/DataExplorer.jar"; //$NON-NLS-1$
 
-				//System.out.println(GDE.NAME_LONG + ": clean post time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-		};
-		postCleanup.start();
+		String command = System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java -classpath " + jarFilePath + " gde.utils.FileUtils"; //$NON-NLS-1$
+		log.log(Level.TIME, "executing: " + command); //$NON-NLS-1$
+		try {
+			if (GDE.IS_WINDOWS)
+				new ProcessBuilder("cmd", "/C", System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java", "-classpath", jarFilePath, "gde.utils.FileUtils").start(); //$NON-NLS-1$ //$NON-NLS-2$
+			else
+				new ProcessBuilder(System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java", "-classpath", jarFilePath, "gde.utils.FileUtils", "&").start(); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, "failed executing: " + command); //$NON-NLS-1$
+		}
+	}
+	/**
+	 * main method to execute post execution cleanup, called by cleanupPost()
+	 */
+	public static void main(String[] args) {
+		try {
+			Thread.sleep(1000);
+		}
+		catch (InterruptedException e) {
+			// ignore
+		}
+		if (GDE.IS_WINDOWS) 
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "WinHelper*.dll", "swtlib-"+GDE.BIT_MODE, }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		else if (GDE.IS_LINUX)
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "*register.sh", "swtlib-"+GDE.BIT_MODE}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		else if (GDE.IS_MAC)
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "GDE", "swtlib-"+GDE.BIT_MODE}); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
