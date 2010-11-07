@@ -378,6 +378,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 
 			for (int i = 0; i < recordDataSize; i++) {
 				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8) + ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
+				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
 			}
 		}
 		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
@@ -406,7 +407,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			else
 				recordSet.addPoints(points, timeStamps.get(i)/10.0);
 			
-			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
