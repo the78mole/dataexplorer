@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V11.xsd">
+    <Device>
+        <name implementation="CSV2SerialAdapter">CSV2Serial1</name>
+        <manufacturer>WB</manufacturer>
+        <manufacturerURL>http://www.bruegmaenner.de/DataExplorer</manufacturerURL>
+        <group>logger</group>
+        <image>CSV2SerialAdapter.png</image>
+        <usage>false</usage>
+    </Device>
+    <TimeBase>
+        <name>Time</name>
+        <symbol>t</symbol>
+        <unit>msec</unit>
+        <timeStep>-1.0</timeStep>
+    </TimeBase>
+    <DataBlock>
+        <format size="13" type="TEXT"/>
+		<timeUnit>sec</timeUnit>
+		<separator>semicolon</separator>
+		<leader>$</leader>
+		<trailer>0D0A</trailer>
+        <preferredFileExtention>*.csv</preferredFileExtention>
+    </DataBlock>
+    <State>
+        <property description="" type="Integer" value="01" name="Datenaufzeichnung"/>
+    </State>
+    <Channel type="TYPE_CONFIG" name="Thermik">
+        <Measurement>
+            <name>EmpfSpannung</name>
+            <symbol>Ue</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
+        </Measurement>
+        <Measurement>
+            <name>Höhe</name>
+            <symbol>h</symbol>
+            <unit>m</unit>
+            <active>true</active>
+            <statistics ratioText="verbrauchte Akkukapazität/Höhenmeter" ratioRefOrdinal="4" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sumTriggerText="Erreicht Motorhöhe" sumByTriggerRefOrdinal="2" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>MotorStrom</name>
+            <symbol>I</symbol>
+            <unit>A</unit>
+            <active>true</active>
+            <statistics sumTriggerTimeText="Motorlaufzeit" sigma="false" avg="false" max="true" min="true">
+                <trigger comment="Trigger: MotorStrom &gt; 3 A; &gt; 5 sek." minTimeSec="5" isGreater="true" level="3000"/>
+            </statistics>
+        </Measurement>
+        <Measurement>
+            <name>MotorSpannung</name>
+            <symbol>U</symbol>
+            <unit>mV</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
+        </Measurement>
+        <Measurement>
+            <name>MotorAkkuKapazität</name>
+            <symbol>C</symbol>
+            <unit>mAh</unit>
+            <active>true</active>
+            <statistics ratioRefOrdinal="1" sumTriggerText="Verbrauchte Motorakkukapazität" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
+        </Measurement>
+        <Measurement>
+            <name>Geschwindigkeit</name>
+            <symbol>V</symbol>
+            <unit>km/h</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Temperatur</name>
+            <symbol>T</symbol>
+            <unit>°C</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Längengrad</name>
+            <symbol>L</symbol>
+            <unit>°</unit>
+            <active>true</active>
+        </Measurement>
+        <Measurement>
+            <name>Breitengrad</name>
+            <symbol>B</symbol>
+            <unit>°</unit>
+            <active>true</active>
+        </Measurement>
+        <Measurement>
+            <name>GPS-Höhe</name>
+            <symbol>h</symbol>
+            <unit>m</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>GPS-Geschwindigkeit</name>
+            <symbol>V</symbol>
+            <unit>km/h</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Steigen</name>
+            <symbol>Vs</symbol>
+            <unit>m/s</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <property type="Double" value="0.02" name="factor"/>
+        </Measurement>
+        <Measurement>
+            <name>ServoImpuls</name>
+            <symbol>St</symbol>
+            <unit>µs</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
+        </Measurement>
+    </Channel>
+    <Desktop>
+        <property value="true" name="table_tab"/>
+        <property value="true" name="digital_tab"/>
+        <property value="true" name="analog_tab"/>
+        <property value="true" name="voltage_per_cell_tab"/>
+    </Desktop>
+</DeviceProperties>
