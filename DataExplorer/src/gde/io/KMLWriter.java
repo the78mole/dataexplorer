@@ -216,7 +216,6 @@ public class KMLWriter {
 				PropertyType propertyUpperLimit = recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity, MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value());
 				velocityLowerLimit = (int) (propertyAvg != null ? velocityAvg / Double.valueOf(propertyAvg.getValue()) : propertyLowerLimit != null ? Integer.valueOf(propertyLowerLimit.getValue()) : 0);
 				velocityUpperLimit = (int) (propertyAvg != null ? velocityAvg * Double.valueOf(propertyAvg.getValue()) : propertyLowerLimit != null ? Integer.valueOf(propertyUpperLimit.getValue()) : 500);
-				;
 
 				PropertyType propertyWithinLimitsColor = recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity, MeasurementPropertyTypes.GOOGLE_EARTH_WITHIN_LIMITS_COLOR.value());
 				PropertyType propertyLowerLimitColor = recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity, MeasurementPropertyTypes.GOOGLE_EARTH_LOWER_LIMIT_COLOR.value());
