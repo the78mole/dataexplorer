@@ -220,11 +220,11 @@ public class KMLWriter {
 				PropertyType propertyWithinLimitsColor = recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity, MeasurementPropertyTypes.GOOGLE_EARTH_WITHIN_LIMITS_COLOR.value());
 				PropertyType propertyLowerLimitColor = recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity, MeasurementPropertyTypes.GOOGLE_EARTH_LOWER_LIMIT_COLOR.value());
 				PropertyType propertyUpperLimitColor = recordVelocity.getDevice().getMeasruementProperty(recordSet.getChannelConfigNumber(), ordinalVelocity, MeasurementPropertyTypes.GOOGLE_EARTH_UPPER_LIMIT_COLOR.value());
-				String[] colorRGB = propertyWithinLimitsColor.getValue().split(GDE.STRING_COMMA);
+				String[] colorRGB = propertyWithinLimitsColor != null ? propertyWithinLimitsColor.getValue().split(GDE.STRING_COMMA) : new String[3];
 				withinLimitsColor = propertyWithinLimitsColor != null ? String.format("ff%02x%02x%02x", Integer.parseInt(colorRGB[2]), Integer.parseInt(colorRGB[1]), Integer.parseInt(colorRGB[0])) : "ff0000ff"; //$NON-NLS-1$ //$NON-NLS-2$
-				colorRGB = propertyLowerLimitColor.getValue().split(GDE.STRING_COMMA);
+				colorRGB = propertyWithinLimitsColor != null ? propertyLowerLimitColor.getValue().split(GDE.STRING_COMMA) : new String[3];
 				lowerLimitColor = propertyLowerLimitColor != null ? String.format("ff%02x%02x%02x", Integer.parseInt(colorRGB[2]), Integer.parseInt(colorRGB[1]), Integer.parseInt(colorRGB[0])) : "ff00ff00"; //$NON-NLS-1$ //$NON-NLS-2$
-				colorRGB = propertyUpperLimitColor.getValue().split(GDE.STRING_COMMA);
+				colorRGB = propertyWithinLimitsColor != null ? propertyUpperLimitColor.getValue().split(GDE.STRING_COMMA) : new String[3];
 				upperLimitColor = propertyUpperLimitColor != null ? String.format("ff%02x%02x%02x", Integer.parseInt(colorRGB[2]), Integer.parseInt(colorRGB[1]), Integer.parseInt(colorRGB[0])) : "ff00ffff"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			String[] velocityColors = new String[] { lowerLimitColor, withinLimitsColor, upperLimitColor };
