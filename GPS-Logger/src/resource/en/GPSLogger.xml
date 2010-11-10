@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V11.xsd">
     <Device>
-        <name implementation="CSV2SerialAdapter">CSV2Serial1</name>
-        <manufacturer>WB</manufacturer>
-        <manufacturerURL>http://www.bruegmaenner.de/DataExplorer</manufacturerURL>
+        <name implementation="GPSLogger">GPS-Logger</name>
+        <manufacturer>SM-Modellbau</manufacturer>
+        <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
-        <image>CSV2SerialAdapter.png</image>
-        <usage>false</usage>
+        <image></image>
+        <usage>true</usage>
     </Device>
     <TimeBase>
         <name>Time</name>
@@ -15,110 +15,299 @@
         <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="13" type="TEXT"/>
-		<timeUnit>sec</timeUnit>
-		<separator>semicolon</separator>
-		<leader>$</leader>
-		<trailer>0D0A</trailer>
-        <preferredFileExtention>*.csv</preferredFileExtention>
+        <format size="39" type="TEXT"/>
+        <checkSum type="XOR"/>
+        <timeUnit>sec</timeUnit>
+        <separator>comma</separator>
+        <leader>$</leader>
+        <trailer>0D0A</trailer>
+        <preferredDataLocation>F:\Documents\DataExplorer\GPS-Logger</preferredDataLocation>
+        <preferredFileExtention>*.nmea</preferredFileExtention>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="data record"/>
+        <property description="" type="Integer" value="01" name="Datenaufzeichnung"/>
     </State>
-    <Channel type="TYPE_CONFIG" name="Thermal">
+    <Channel type="TYPE_CONFIG" name="Thermik">
         <Measurement>
-            <name>RecVoltage</name>
-            <symbol>Ur</symbol>
-            <unit>V</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>Height</name>
-            <symbol>h</symbol>
-            <unit>m</unit>
-            <active>true</active>
-            <statistics ratioText="Used capacity/height" ratioRefOrdinal="4" countTriggerText="Number climbs" countByTrigger="true" sumTriggerText="Reached motor height" sumByTriggerRefOrdinal="2" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>MotorCurrent</name>
-            <symbol>I</symbol>
-            <unit>A</unit>
-            <active>true</active>
-            <statistics sumTriggerTimeText="Motor runtime" sigma="false" avg="false" max="true" min="true">
-                <trigger comment="Trigger: Motor current &gt; 3 A; &gt; 5 sek." minTimeSec="5" isGreater="true" level="3000"/>
-            </statistics>
-        </Measurement>
-        <Measurement>
-            <name>MotorVoltage</name>
-            <symbol>U</symbol>
-            <unit>mV</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>MotorBatteryCapacity</name>
-            <symbol>C</symbol>
-            <unit>mAh</unit>
-            <active>true</active>
-            <statistics ratioRefOrdinal="1" sumTriggerText="Used battery capacity" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
-        </Measurement>
-        <Measurement>
-            <name>Velocity</name>
-            <symbol>V</symbol>
-            <unit>km/h</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Temperature</name>
-            <symbol>T</symbol>
-            <unit>°C</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Longitude</name>
-            <symbol>L</symbol>
-            <unit>°</unit>
-            <active>true</active>
-        </Measurement>
-        <Measurement>
-            <name>Latitude</name>
+            <name>Breitengrad</name>
             <symbol>B</symbol>
             <unit>°</unit>
-            <active>true</active>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>GPS-Height</name>
+            <name>Längengrad</name>
+            <symbol>L</symbol>
+            <unit>°</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Höhe</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>GPS-Velocity</name>
-            <symbol>V</symbol>
+            <name>#Satellit</name>
+            <symbol>#</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>PDOP</name>
+            <symbol>p</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>HDOP</name>
+            <symbol>ph</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>VDOP</name>
+            <symbol>pv</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Geschwindigkeit</name>
+            <symbol>v</symbol>
             <unit>km/h</unit>
             <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+            <property type="Double" value="1.4" name="google_earth_velocity_avg_limit_factor"/>
+            <property type="String" value="255,255,0" name="google_earth_within_limits_color"/>
+            <property type="String" value="0,255,0" name="google_earth_lower_limit_color"/>
+            <property type="String" value="255,0,128" name="google_earth_upper_limit_color"/>
         </Measurement>
         <Measurement>
-            <name>Climb</name>
-            <symbol>Vc</symbol>
-            <unit>m/sec</unit>
+            <name>HöheRelaiv</name>
+            <symbol>h</symbol>
+            <unit>m</unit>
             <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property type="Double" value="0.02" name="factor"/>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>ServoImpuls</name>
-            <symbol>si</symbol>
-            <unit>µs</unit>
+            <name>Steigen</name>
+            <symbol>Vs</symbol>
+            <unit>m/s</unit>
             <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+            <property type="Double" value="2.0" name="google_earth_velocity_avg_limit_factor"/>
+            <property type="String" value="255,255,0" name="google_earth_within_limits_color"/>
+            <property type="String" value="0,255,0" name="google_earth_lower_limit_color"/>
+            <property type="String" value="255,0,0" name="google_earth_upper_limit_color"/>
+        </Measurement>
+        <Measurement>
+            <name>SpannungRx</name>
+            <symbol>u</symbol>
+            <unit>V</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Strecke</name>
+            <symbol>l</symbol>
+            <unit>m</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>AbstandStart</name>
+            <symbol>d</symbol>
+            <unit>m</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>WinkelStart</name>
+            <symbol>w</symbol>
+            <unit>°</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Gleitzahl</name>
+            <symbol>1/n</symbol>
+            <unit>m</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>SpannungUL</name>
+            <symbol>U</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>StromUL</name>
+            <symbol>I</symbol>
+            <unit>a</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>LeistungUL</name>
+            <symbol>P</symbol>
+            <unit>A</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>DrehzahlUL</name>
+            <symbol>rpm</symbol>
+            <unit>1/min</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>SpannungRxUL</name>
+            <symbol>Urx</symbol>
+            <unit>V</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>HöheUL</name>
+            <symbol>h</symbol>
+            <unit>m</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Analog1UL</name>
+            <symbol>A1</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Analog2UL</name>
+            <symbol>A2</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Analog3UL</name>
+            <symbol>A3</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add00</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add01</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add02</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add03</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add04</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add05</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add06</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add07</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add08</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add09</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add10</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add11</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add12</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add13</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>add14</name>
+            <symbol>x</symbol>
+            <unit>-</unit>
+            <active>false</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
     </Channel>
     <Desktop>
@@ -126,5 +315,7 @@
         <property value="true" name="digital_tab"/>
         <property value="true" name="analog_tab"/>
         <property value="true" name="voltage_per_cell_tab"/>
+        <property description="UTILITY_GRAPHICS_TAB" value="false" name="utility_garphics_tab"/>
+        <property description="UTILITY_DEVICE_TAB" value="false" name="utility_device_tab"/>
     </Desktop>
 </DeviceProperties>

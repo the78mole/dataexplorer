@@ -21,6 +21,8 @@ package gde.device.smmodellbau;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
@@ -30,8 +32,9 @@ import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.smmodellbau.gpslogger.MessageIds;
 import gde.exception.DataInconsitsentException;
-import gde.io.CSVSerialDataReaderWriter;
-import gde.io.DataParser;
+import gde.io.FileHandler;
+import gde.io.NMEAParser;
+import gde.io.NMEAReaderWriter;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.serial.DeviceSerialPort;
@@ -46,7 +49,11 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -56,6 +63,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(GPSLogger.class.getName());
 
 	final DataExplorer	application;
+	final Channels			channels;
 	final GPSLoggerDialog	dialog;
 
 	/**
@@ -69,6 +77,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		Messages.setDeviceResourceBundle("gde.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
+		this.channels = Channels.getInstance();
 		this.dialog = new GPSLoggerDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
 	}
@@ -83,6 +92,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		Messages.setDeviceResourceBundle("gde.device.wb.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
+		this.channels = Channels.getInstance();
 		this.dialog = new GPSLoggerDialog(this.application.getShell(), this);
 		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
 	}
@@ -136,7 +146,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
-		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), this.getDataBlockSize());
+		NMEAParser data = new  NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), this.getDataBlockSize());
 		int[] startLength = new int[] {0,0};
 		byte[] lineBuffer = null;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -148,8 +158,9 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				setDataLineStartAndLength(dataBuffer, startLength);
 				lineBuffer = new byte[startLength[1]];
 				System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
-				//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
-				data.parse(new String(lineBuffer));
+				//0=latitude 1=longitude 2=altitude 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocityKnots 8=velocityKmh 9=height 10=climb 11=voltageRx 12=distanceTotal 13=distanceStart 14=directionStart 15=glideRatio
+				//16=voltage 17=current 18=power 19=revolution 20=voltageRx 21=height 22=A1 23=A2 24=A3 25=? 26=? 28=? 29=? 30=?
+				//TODO data.parse(new String(lineBuffer));
 
 				recordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms());
 
@@ -288,25 +299,35 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
-		
-		PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
-		boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-		property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
-		boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 
-		try {
-			if (subtractFirst) {
-				reduction = record.getFirst() / 1000.0;
+		if (record.getOrdinal() == 1) { // 1=Höhe
+			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
+			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
+			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+
+			try {
+				if (subtractFirst) {
+					reduction = record.getFirst() / 1000.0;
+				}
+				else if (subtractLast) {
+					reduction = record.getLast() / 1000.0;
+				}
 			}
-			else if (subtractLast) {
-				reduction = record.getLast() / 1000.0;
+			catch (Throwable e) {
+				reduction = 0;
 			}
 		}
-		catch (Throwable e) {
-			reduction = 0;
-		}
 
-		double newValue = (value - reduction) * factor + offset;
+		double newValue = 0;
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
+			int grad = ((int)(value / 1000));
+			double minuten = (value - (grad*1000.0))/10.0;
+			newValue = grad + minuten/60.0;
+		}
+		else {
+			newValue = (value - reduction) * factor + offset;
+		}
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
@@ -321,25 +342,35 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
-		PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
-		boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-		property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
-		boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+		if (record.getOrdinal() == 1) { // 1=Höhe
+			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
+			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
+			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 
-		try {
-			if (subtractFirst) {
-				reduction = record.getFirst() / 1000.0;
+			try {
+				if (subtractFirst) {
+					reduction = record.getFirst() / 1000.0;
+				}
+				else if (subtractLast) {
+					reduction = record.getLast() / 1000.0;
+				}
 			}
-			else if (subtractLast) {
-				reduction = record.getLast() / 1000.0;
+			catch (Throwable e) {
+				reduction = 0;
 			}
 		}
-		catch (Throwable e) {
-			reduction = 0;
-		}
 
-		double newValue = (value - offset) / factor + reduction;
-		log.log(Level.FINER, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		double newValue = 0;
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
+			int grad = (int)value;
+			double minuten =  (value - grad*1.0) * 60.0;
+			newValue = (grad + minuten/100.0)*1000.0;
+		}
+		else {
+			newValue = (value - offset) / factor + reduction;
+		}
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -367,11 +398,12 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			log.log(Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
 			
 			// update active state and displayable state if configuration switched with other names
-			if (record.isActive() != measurement.isActive()) {
+			boolean hasReasonableData = record.getRealMaxValue() != 0 || record.getRealMinValue() != record.getRealMaxValue();
+			if ((hasReasonableData && record.isActive()) != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
-				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.WARNING, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}	
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -390,17 +422,6 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		//add implementation where data point are calculated
-		//do not forget to make record displayable -> record.setDisplayable(true);
-		
-		//for the moment there are no calculations necessary
-		//String[] recordNames = recordSet.getRecordNames();
-		//for (int i=0; i<recordNames.length; ++i) {
-		//	MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), i);
-		//	if (measurement.isCalculation()) {
-		//		log.log(Level.FINE, "do calculation for " + recordNames[i]); //$NON-NLS-1$
-		//	}
-		//}
 		this.application.updateStatisticsData();
 	}
 
@@ -440,18 +461,18 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1700), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, searchDirectory, null, SWT.MULTI);
 		for (String tmpFileName : fd.getFileNames()) {
 			String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-			if (!selectedImportFile.endsWith(GDE.FILE_ENDING_DOT_CSV)) {
+			if (!selectedImportFile.endsWith(GDE.FILE_ENDING_DOT_NMEA)) {
 				if (selectedImportFile.contains(GDE.STRING_DOT)) {
 					selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
 				}
-				selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
+				selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_NMEA;
 			}
 			log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 			
 			if (fd.getFileName().length() > 4) {
 				try {
 					Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-					CSVSerialDataReaderWriter.read(selectedImportFile, this, GDE.STRING_EMPTY, channelConfigNumber, true);
+					NMEAReaderWriter.read(selectedImportFile, this, GDE.STRING_EMPTY, channelConfigNumber);
 				}
 				catch (Throwable e) {
 					log.log(Level.WARNING, e.getMessage(), e);
@@ -460,12 +481,112 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		}
 	}
 	
+	
 	/**
-	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
+	 * update the file menu by adding two new entries to export KML/GPX files
+	 * @param exportMenue
+	 */
+	public void updateFileMenu(Menu exportMenue) {
+		MenuItem											convertKLM3DRelativeItem;
+		MenuItem											convertKLM3DAbsoluteItem;
+		MenuItem											convert2GPXRelativeItem;
+		MenuItem											convert2GPXAbsoluteItem;
+		
+		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+			new MenuItem(exportMenue, SWT.SEPARATOR);
+
+			convertKLM3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKLM3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT1895));
+			convertKLM3DRelativeItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "convertKLM3DRelativeItem action performed! " + e); //$NON-NLS-1$
+					export2KML3D(DeviceConfiguration.HEIGHT_RELATIVE);
+				}
+			});
+
+			convertKLM3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKLM3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1896));
+			convertKLM3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					export2KML3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
+				}
+			});
+
+			convert2GPXRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
+			convert2GPXRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT1897));
+			convert2GPXRelativeItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "convert2GPXRelativeItem action performed! " + e); //$NON-NLS-1$
+					export2GPX(DeviceConfiguration.HEIGHT_RELATIVE);
+				}
+			});
+
+			convert2GPXAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+			convert2GPXAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1898));
+			convert2GPXAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "convert2GPXAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					export2GPX(DeviceConfiguration.HEIGHT_ABSOLUTE);
+				}
+			});
+		}
+	}
+
+	/**
+	 * exports the actual displayed data set to KML file format
+	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
+	 */
+	public void export2KML3D(int type) {
+		//ordinalLongitude, ordinalLatitude, ordinalGPSHeight, inRelative
+		new FileHandler().exportFileKML(Messages.getString(MessageIds.GDE_MSGT1859), 1, 0, 2, 7, type == DeviceConfiguration.HEIGHT_RELATIVE);
+	}
+	
+	/**
+	 * exports the actual displayed data set to GPX file format
+	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
+	 */
+	public void export2GPX(int type) {
+		//ordinalLongitude, ordinalLatitude, ordinalGPSHeight, ordinalVelocity, ordinalHeight, inRelative
+		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT1877), 1, 0, 2, 7, 8, type == DeviceConfiguration.HEIGHT_RELATIVE);
+	}
+	
+	/**
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
 	 * set value of -1 to suppress this measurement
 	 */
-	public int[] getCellVoltageOrdinals() {
-		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
-		return new int[] {0, 3};
+	public boolean isActualRecordSetWithGpsData() {
+		boolean containsGPSdata = false; 
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null) {
+				containsGPSdata = activeRecordSet.get(0).hasReasonableData() && activeRecordSet.get(1).hasReasonableData() && activeRecordSet.get(2).hasReasonableData();
+			}
+		}
+		return containsGPSdata;
+	}
+	
+	/**
+	 * export a file of the actual channel/record set
+	 * @return full qualified file path depending of the file ending type
+	 */
+	public String exportFile(String fileEndingType) {
+		String exportFileName = GDE.STRING_EMPTY;
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KML)) {
+				exportFileName = new FileHandler().exportFileKML(1, 0, 2, 7, true);
+			}
+		}
+		return exportFileName;
+	}
+
+	/**
+	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
+	 */
+	public Integer getGPS2KMLMeasurementOrdinal() {
+		return 7; 
 	}
 }
