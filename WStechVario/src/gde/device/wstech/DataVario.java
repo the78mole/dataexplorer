@@ -62,9 +62,6 @@ import org.eclipse.swt.widgets.MenuItem;
 public class DataVario  extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(DataVario.class.getName());
 
-	public final static int				HEIGHT_RELATIVE									= 0;
-	public final static int				HEIGHT_ABSOLUTE									= 1;
-
 	final DataExplorer	application;
 	final Channels			channels;
 	final VarioDialog		dialog;
