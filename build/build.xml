@@ -163,6 +163,9 @@
 		<ant antfile="build.xml" target="clean" dir="VC800" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="LiPoWatch" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="CSV2SerialAdapter" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="WStechVario" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="QC-Copter" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="GPS-Logger" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -258,6 +261,7 @@
 		<ant antfile="build.xml" target="package" dir="CSV2SerialAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="WStechVario" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="QC-Copter" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="GPS-Logger" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -273,6 +277,7 @@
 			<include name="CSV2SerialAdapter/build/*.jar" />
 			<include name="WStechVario/build/*.jar" />
 			<include name="QC-Copter/build/*.jar" />
+			<include name="GPS-Logger/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
