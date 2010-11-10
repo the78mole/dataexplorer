@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.Vector;
 import gde.log.Level;
 import java.util.logging.Logger;
@@ -402,41 +403,42 @@ public class Record extends Vector<Integer> {
 		case 4: // fünfte Kurve
 			this.color = SWTResourceManager.getColor(64, 0, 64); //(SWT.COLOR_CYAN));
 			break;
-		case 5: // erste Kurve
+		case 5: // sechste Kurve
 			this.color = SWTResourceManager.getColor(0, 128, 128); //(SWT.COLOR_DARK_YELLOW));
 			break;
-		case 6: // erste Kurve
+		case 6: // Kurve
 			this.color = SWTResourceManager.getColor(128, 128, 0);
 			break;
-		case 7: // erste Kurve
+		case 7: // Kurve
 			this.color = SWTResourceManager.getColor(128, 0, 128);
 			break;
-		case 8: // erste Kurve
+		case 8: // Kurve
 			this.color = SWTResourceManager.getColor(0, 128, 255);
 			break;
-		case 9: // erste Kurve
+		case 9: // Kurve
 			this.color = SWTResourceManager.getColor(128, 255, 0);
 			break;
-		case 10: // erste Kurve
+		case 10: // Kurve
 			this.color = SWTResourceManager.getColor(255, 0, 128);
 			break;
-		case 11: // erste Kurve
+		case 11: // Kurve
 			this.color = SWTResourceManager.getColor(0, 64, 128);
 			break;
-		case 12: // erste Kurve
+		case 12: // Kurve
 			this.color = SWTResourceManager.getColor(64, 128, 0);
 			break;
-		case 13: // erste Kurve
+		case 13: // Kurve
 			this.color = SWTResourceManager.getColor(128, 0, 64);
 			break;
-		case 14: // erste Kurve
+		case 14: // Kurve
 			this.color = SWTResourceManager.getColor(128, 64, 0);
 			break;
-		case 15: // erste Kurve
+		case 15: // Kurve
 			this.color = SWTResourceManager.getColor(0, 128, 64);
 			break;
 		default:
-			this.color = SWTResourceManager.getColor(128, 255, 128); //(SWT.COLOR_GREEN));
+			Random rand = new Random();
+			this.color = SWTResourceManager.getColor(rand.nextInt()&0xff, rand.nextInt()&0xff, rand.nextInt()&0xff); //(SWT.COLOR_GREEN));
 			break;
 		}
 		// set position defaults

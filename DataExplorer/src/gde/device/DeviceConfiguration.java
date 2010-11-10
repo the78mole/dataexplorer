@@ -74,6 +74,7 @@ public class DeviceConfiguration {
 	private DesktopType												desktop;
 	private boolean														isChangePropery						= false;
 
+	public final static int										DEVICE_TYPE_UNDEFINED			= 0;
 	public final static int										DEVICE_TYPE_CHARGER				= 1;
 	public final static int										DEVICE_TYPE_LOGGER				= 2;
 	public final static int										DEVICE_TYPE_BALANCER			= 3;
@@ -82,6 +83,12 @@ public class DeviceConfiguration {
 	public final static int										DEVICE_TYPE_GPS						= 5;
 	public final static int										DEVICE_TYPE_RECEIVER			= 7;
 	public final static int										DEVICE_TYPE_MULTIMETER		= 8;
+	public final static int										DEVICE_TYPE_CONTROLLER		= 9;
+	
+	public final static int										HEIGHT_RELATIVE						= 0;
+	public final static int										HEIGHT_ABSOLUTE						= 1;
+
+
 	
 	protected 					CalculationThread			calculationThread 				= null; // universal device calculation thread (slope)
 
