@@ -172,7 +172,12 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 			log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "receive buffer data size = " + size);
 			byte[] data = new byte[size];
 			if (size >= 372) {// 6*42 could only be flight simulation data, switch into flight simulation recording mode
-				throw new SerialPortException($METHOD_NAME + " - receiving more data than expected!");
+				data = this.read(data, timeout_ms);
+				byte[] checkSTX = new byte[62];
+				System.arraycopy(data, size-63, checkSTX, 0, 62);
+				if(containsSTX(checkSTX)) {
+					returnString = new String("...receiving flight data!\n Close Device ToolBox.\n");
+				}
 			}
 			else if (size == 0) {
 				Thread.sleep(timeout_ms);

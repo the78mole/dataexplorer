@@ -106,22 +106,8 @@ public class GathererThread extends Thread {
 				if (this.dialog != null && !this.dialog.isDisposed()) {
 					//dialog terminal is open
 					String returnString = GDE.STRING_EMPTY;
-					try {
-						returnString = this.serialPort.getTerminalData();
-					}
-					catch (SerialPortException e) {
-						if (e.getMessage().startsWith("getTerminalData")) {
-							this.application.openMessageDialogAsync(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
-							DataExplorer.display.asyncExec(new Runnable() {
-								public void run() {
-									GathererThread.this.dialog.dispose();
-								}
-							});
-						}
-						else {
-							throw e;
-						}
-					}
+					returnString = this.serialPort.getTerminalData();
+
 					if (returnString.length() > 5) {
 						isTerminalDataRecived = true;
 						this.dialog.setTerminalText(returnString);
@@ -147,7 +133,7 @@ public class GathererThread extends Thread {
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
 						recordSet = this.channel.get(this.recordSetKey);
 						recordSet.setAllDisplayable();
-						this.device.updateVisibilityStatus(recordSet);
+						this.device.updateVisibilityStatus(recordSet, true);
 						//recordSet.addTimeStep_ms(0.0);
 						this.channel.applyTemplate(this.recordSetKey, false);
 						// switch the active record set if the current record set is child of active channel
@@ -273,7 +259,7 @@ public class GathererThread extends Thread {
 
 		RecordSet tmpRecordSet = this.channel.get(this.recordSetKey);
 		if (tmpRecordSet != null) {
-			this.device.updateVisibilityStatus(tmpRecordSet);
+			this.device.updateVisibilityStatus(tmpRecordSet, true);
 			this.device.makeInActiveDisplayable(tmpRecordSet);
 			this.application.updateStatisticsData();
 			this.application.updateDataTable(this.recordSetKey, false);

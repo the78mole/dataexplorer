@@ -104,7 +104,7 @@ public class QcCopterTabItem extends CTabItem {
 		{
 			//measurements
 			for (int i = 0; i < this.device.getChannelMeasuremts(this.channelConfigNumber).size(); i++) {
-				this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, i==10?2:1));
+				this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, i==10?2:1));
 			}
 		}
 //		{

@@ -263,7 +263,7 @@ public class QcCopterDialog extends DeviceDialog {
 													channels.switchChannel(channelNumber, recordSetKey);
 													RecordSet newActiveRecordSet = channels.get(channelNumber).getActiveRecordSet();
 													if (newActiveRecordSet != null) {
-														QcCopterDialog.this.device.updateVisibilityStatus(newActiveRecordSet);
+														QcCopterDialog.this.device.updateVisibilityStatus(newActiveRecordSet, true);
 														QcCopterDialog.this.device.makeInActiveDisplayable(newActiveRecordSet);
 													}
 												}
