@@ -481,7 +481,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
-	public void updateVisibilityStatus(RecordSet recordSet) {
+	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		String[] recordKeys = recordSet.getRecordNames();
 
 		//recordSet.setAllVisibleAndDisplayable();

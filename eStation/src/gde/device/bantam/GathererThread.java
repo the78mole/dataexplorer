@@ -297,7 +297,7 @@ public class GathererThread extends Thread {
 
 		RecordSet tmpRecordSet = this.channel.get(this.recordSetKey);
 		if (tmpRecordSet != null) {
-			this.device.updateVisibilityStatus(tmpRecordSet);
+			this.device.updateVisibilityStatus(tmpRecordSet, true);
 			this.device.makeInActiveDisplayable(tmpRecordSet);
 			this.application.updateStatisticsData();
 			this.application.updateDataTable(this.recordSetKey, false);
