@@ -146,7 +146,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
-		NMEAParser data = new  NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), this.getDataBlockSize());
+		NMEAParser data = new  NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), this.getDataBlockSize(), this, this.channels.getActiveChannelNumber());
 		int[] startLength = new int[] {0,0};
 		byte[] lineBuffer = null;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -166,7 +166,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 			}
-			this.updateVisibilityStatus(recordSet);
+			this.updateVisibilityStatus(recordSet, true);
 			if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		}
 		catch (Exception e) {
@@ -261,7 +261,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
-		this.updateVisibilityStatus(recordSet);
+		this.updateVisibilityStatus(recordSet, true);
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
@@ -382,7 +382,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
-	public void updateVisibilityStatus(RecordSet recordSet) {
+	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
 		Record record;
@@ -398,13 +398,16 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			log.log(Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
 			
 			// update active state and displayable state if configuration switched with other names
-			boolean hasReasonableData = record.getRealMaxValue() != 0 || record.getRealMinValue() != record.getRealMaxValue();
-			if ((hasReasonableData && record.isActive()) != measurement.isActive()) {
+			if (record.isActive() != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
-				log.log(Level.WARNING, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}	
+			if(includeReasonableDataCheck) {
+				record.setDisplayable(record.hasReasonableData());
+				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ //$NON-NLS-2$				
+			}
 
 			if (record.isActive() && record.isDisplayable()) {
 				log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
@@ -471,8 +474,9 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			
 			if (fd.getFileName().length() > 4) {
 				try {
-					Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-					NMEAReaderWriter.read(selectedImportFile, this, GDE.STRING_EMPTY, channelConfigNumber);
+					Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? 1 : null;
+					String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+					NMEAReaderWriter.read(selectedImportFile, this, recordNameExtend, channelConfigNumber);
 				}
 				catch (Throwable e) {
 					log.log(Level.WARNING, e.getMessage(), e);
@@ -480,7 +484,6 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			}
 		}
 	}
-	
 	
 	/**
 	 * update the file menu by adding two new entries to export KML/GPX files

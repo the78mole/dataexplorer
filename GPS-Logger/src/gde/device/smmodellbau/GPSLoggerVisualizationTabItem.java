@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2009,2010 Winfried Bruegmann
+    Copyright (c) 2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
@@ -43,14 +43,15 @@ import gde.device.smmodellbau.gpslogger.MessageIds;
 import gde.messages.Messages;
 import gde.ui.MeasurementControl;
 import gde.ui.DataExplorer;
+import gde.ui.MeasurementControlConfigurable;
 import gde.ui.SWTResourceManager;
 
 /**
  * This class represents a tab item of a universal record visualization control
  * @author Winfried Brügmann
  */
-public class GPSLoggerDialogTabItem extends CTabItem {
-	final static Logger							log									= Logger.getLogger(GPSLoggerDialogTabItem.class.getName());
+public class GPSLoggerVisualizationTabItem extends CTabItem {
+	final static Logger							log									= Logger.getLogger(GPSLoggerVisualizationTabItem.class.getName());
 
 	Composite												measurementComposite;
 	Button													measurement;
@@ -64,14 +65,16 @@ public class GPSLoggerDialogTabItem extends CTabItem {
 	boolean													isVisibilityChanged	= false;
 
 	final CTabFolder								parent;
-	final IDevice										device;																																								// get device specific things, get serial port, ...
-	final DataExplorer		application;																																						// interaction with application instance
-	final Channels									channels;																																							// interaction with channels, source of all records
-	final GPSLoggerDialog		dialog;
+	final IDevice										device;																								// get device specific things, get serial port, ...
+	final DataExplorer							application;																					// interaction with application instance
+	final Channels									channels;																							// interaction with channels, source of all records
+	final GPSLoggerDialog						dialog;
 	final int												channelConfigNumber;
-	final List<MeasurementControl>	measurementTypes		= new ArrayList<MeasurementControl>();
+	final int												measurementCount;
+	final int 											measurementOffset;
+	final List<Composite>	measurementTypes		= new ArrayList<Composite>();
 
-	public GPSLoggerDialogTabItem(CTabFolder parentTabFolder, GPSLoggerDialog parentDialog, int useChannelConfigNumber, IDevice useDevice) {
+	public GPSLoggerVisualizationTabItem(CTabFolder parentTabFolder, GPSLoggerDialog parentDialog, int useChannelConfigNumber, IDevice useDevice, String useTabName, int useMeasurementOffset, int useMeasurementCount) {
 		super(parentTabFolder, SWT.NONE);
 		this.parent = parentTabFolder;
 		this.dialog = parentDialog;
@@ -79,7 +82,10 @@ public class GPSLoggerDialogTabItem extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.channelConfigNumber = useChannelConfigNumber;
-		this.setText(this.device.getChannelName(this.channelConfigNumber));
+		this.measurementOffset = useMeasurementOffset;
+		this.measurementCount = useMeasurementCount;
+		this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		this.setText(useTabName);
 
 		create();
 	}
@@ -91,29 +97,25 @@ public class GPSLoggerDialogTabItem extends CTabItem {
 		this.mainTabComposite.setLayout(mainTabCompositeLayout);
 		this.setControl(this.mainTabComposite);
 		{
-			this.tabItemLabel = new Label(this.mainTabComposite, SWT.CENTER);
-			GridData tabItemLabelLData = new GridData();
-			tabItemLabelLData.horizontalAlignment = GridData.BEGINNING;
-			tabItemLabelLData.verticalAlignment = GridData.BEGINNING;
-			tabItemLabelLData.heightHint = 30;
-			tabItemLabelLData.widthHint = 292;
-			this.tabItemLabel.setLayoutData(tabItemLabelLData);
-			this.tabItemLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+2, SWT.BOLD));
-			this.tabItemLabel.setText(Messages.getString(MessageIds.GDE_MSGT1701));
-		}
-		{
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-			for (int i = 0; i < this.device.getChannelMeasuremts(this.channelConfigNumber).size(); i++) {
-				this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1));
+			for (int i = this.measurementOffset; i < this.measurementOffset+this.measurementCount; i++) {
+				if (this.getText().startsWith("M-Link")) {
+					this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), "_ML"));
+				}
+				else if (this.getText().startsWith("UniLog") && i >= this.measurementOffset+this.measurementCount-3) {
+					this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1, "A" + (i - 20),"_UL"));
+				}
+				else {
+					this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1));
+				}
 			}
 		}
 		{
 			this.buttonComposite = new Composite(this.mainTabComposite, SWT.NONE);
 			GridData buttonCompositeLData = new GridData();
 			buttonCompositeLData.verticalAlignment = GridData.BEGINNING;
-			buttonCompositeLData.horizontalAlignment = GridData.BEGINNING;
+			buttonCompositeLData.horizontalAlignment = GridData.CENTER;
 			buttonCompositeLData.heightHint = 60;
-			buttonCompositeLData.grabExcessHorizontalSpace = true;
 			this.buttonComposite.setLayoutData(buttonCompositeLData);
 			FormLayout buttonCompositeLayout = new FormLayout();
 			this.buttonComposite.setLayout(buttonCompositeLayout);
@@ -135,14 +137,14 @@ public class GPSLoggerDialogTabItem extends CTabItem {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-						if (GPSLoggerDialogTabItem.this.isVisibilityChanged) {
-							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] {GPSLoggerDialogTabItem.this.device.getPropertiesFileName()});
-							if (GPSLoggerDialogTabItem.this.application.openYesNoMessageDialog(GPSLoggerDialogTabItem.this.dialog.getDialogShell(), msg) == SWT.YES) {
+						if (GPSLoggerVisualizationTabItem.this.isVisibilityChanged) {
+							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] {GPSLoggerVisualizationTabItem.this.device.getPropertiesFileName()});
+							if (GPSLoggerVisualizationTabItem.this.application.openYesNoMessageDialog(GPSLoggerVisualizationTabItem.this.dialog.getDialogShell(), msg) == SWT.YES) {
 								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
-								GPSLoggerDialogTabItem.this.device.storeDeviceProperties();
+								GPSLoggerVisualizationTabItem.this.device.storeDeviceProperties();
 							}
 						}
-						GPSLoggerDialogTabItem.this.device.openCloseSerialPort();
+						GPSLoggerVisualizationTabItem.this.device.openCloseSerialPort();
 					}
 				});
 			}

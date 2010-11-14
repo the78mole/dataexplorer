@@ -14,9 +14,16 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2009,2010 Winfried Bruegmann
+    Copyright (c) 2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.device.DeviceDialog;
+import gde.device.IDevice;
+import gde.messages.Messages;
+import gde.ui.SWTResourceManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,17 +45,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.device.DeviceDialog;
-import gde.device.IDevice;
-import gde.device.smmodellbau.gpslogger.MessageIds;
-import gde.messages.Messages;
-import gde.ui.SWTResourceManager;
-
 /**
  * Dialog class to enable visualization control
  * @author Winfried Brügmann
@@ -56,9 +52,12 @@ import gde.ui.SWTResourceManager;
 public class GPSLoggerDialog extends DeviceDialog {
 	final static Logger		log								= Logger.getLogger(GPSLoggerDialog.class.getName());
 
-	CTabFolder						tabFolder;
+	CTabFolder						tabFolder, subTabFolder1, subTabFolder2;
+	CTabItem 							visualizationTabItem, configurationTabItem;
 	Button								closeButton;
 	Button								saveButton;
+
+	CTabItem 							gpsLoggerTabItem, telemetryTabItem;
 
 	final IDevice					device;																																				// get device specific things, get serial port, ...
 	final Settings				settings;																																			// application configuration settings
@@ -76,8 +75,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 		this.device = useDevice;
 		this.settings = Settings.getInstance();
 		for (int i = 1; i <= this.device.getChannelCount(); i++) {
-			int actualMeasurementCount = this.device.getMeasurementNames(i).length;
-			this.measurementsCount = actualMeasurementCount > this.measurementsCount ? actualMeasurementCount : this.measurementsCount;
+			this.measurementsCount = 15; //15 measurements are displayed as maximum per visualization tab
 		}
 	}
 
@@ -103,7 +101,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				//dialogShell.pack();
-				this.dialogShell.setSize(310, 10 + 30 + 90 + this.measurementsCount * 30 + 55);
+				this.dialogShell.setSize(350, 10 + 30 + 90 + this.measurementsCount * 30 + 55);
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -125,7 +123,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						GPSLoggerDialog.this.application.openHelpDialog("CSV2SerialAdapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						GPSLoggerDialog.this.application.openHelpDialog("GPS-Logger", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				// enable fade in/out alpha blending (do not fade-in on top)
@@ -149,103 +147,97 @@ public class GPSLoggerDialog extends DeviceDialog {
 //				});
 				{
 					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
+					this.tabFolder.setSimple(false);
 					{
-						for (int i = 0; i < this.device.getChannelCount(); i++) {
-							this.configurations.add(new GPSLoggerDialogTabItem(this.tabFolder, this, (i + 1), this.device));
-						}
-					}
-					{
-						this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-						FormData saveButtonLData = new FormData();
-						saveButtonLData.width = 120;
-						saveButtonLData.height = 30;
-						saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
-						saveButtonLData.left = new FormAttachment(0, 1000, 15);
-						this.saveButton.setLayoutData(saveButtonLData);
-						this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.saveButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0486));
-						this.saveButton.setEnabled(false);
-						this.saveButton.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent evt) {
-								log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								GPSLoggerDialog.this.device.storeDeviceProperties();
-								GPSLoggerDialog.this.saveButton.setEnabled(false);
+						visualizationTabItem = new CTabItem(tabFolder, SWT.NONE);
+						visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						visualizationTabItem.setText("Visualization Configuration");
+						{
+							subTabFolder1 = new CTabFolder(tabFolder, SWT.NONE);
+							subTabFolder1.setSimple(false);
+							visualizationTabItem.setControl(subTabFolder1);
+							{
+								this.configurations.add(new GPSLoggerVisualizationTabItem(this.subTabFolder1, this, 1, this.device, "GPS-Logger", 0, 15));
+								this.configurations.add(new GPSLoggerVisualizationTabItem(this.subTabFolder1, this, 1, this.device, "UniLog", 15, 9));
+								this.configurations.add(new GPSLoggerVisualizationTabItem(this.subTabFolder1, this, 1, this.device, "M-Link", 24, 15));
 							}
-						});
-					}
-					{
-						this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-						FormData closeButtonLData = new FormData();
-						closeButtonLData.width = 120;
-						closeButtonLData.height = 30;
-						closeButtonLData.right = new FormAttachment(1000, 1000, -15);
-						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
-						this.closeButton.setLayoutData(closeButtonLData);
-						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0485));
-						this.closeButton.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent evt) {
-								log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								GPSLoggerDialog.this.dialogShell.dispose();
-							}
-						});
-					}
-					FormData tabFolderLData = new FormData();
-					tabFolderLData.top = new FormAttachment(0, 1000, 0);
-					tabFolderLData.left = new FormAttachment(0, 1000, 0);
-					tabFolderLData.right = new FormAttachment(1000, 1000, 0);
-					tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
-					this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.tabFolder.setLayoutData(tabFolderLData);
-					this.tabFolder.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
-							int channelNumber = GPSLoggerDialog.this.tabFolder.getSelectionIndex();
-							if (channelNumber >= 0 && channelNumber <= GPSLoggerDialog.this.device.getChannelCount()) { // enable other tabs for future use
-								channelNumber += 1;
-								String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText(); //$NON-NLS-1$
-								Channels channels = Channels.getInstance();
-								Channel activeChannel = channels.getActiveChannel();
-								if (activeChannel != null) {
-									log.log(java.util.logging.Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
-									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-									if (activeRecordSet != null && activeChannel.getNumber() != channelNumber) {
-										int answer = GPSLoggerDialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1701));
-										if (answer == SWT.YES) {
-											String recordSetKey = activeRecordSet.getName();
-											Channel tmpChannel = channels.get(channelNumber);
-											if (tmpChannel != null) {
-												log.log(java.util.logging.Level.FINE,
-														"move record set " + recordSetKey + " to channel/configuration " + channelNumber + GDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
-												tmpChannel.put(recordSetKey, activeRecordSet.clone(channelNumber));
-												activeChannel.remove(recordSetKey);
-												channels.switchChannel(channelNumber, recordSetKey);
-												RecordSet newActiveRecordSet = channels.get(channelNumber).getActiveRecordSet();
-												if (newActiveRecordSet != null) {
-													GPSLoggerDialog.this.device.updateVisibilityStatus(newActiveRecordSet);
-													GPSLoggerDialog.this.device.makeInActiveDisplayable(newActiveRecordSet);
-												}
-											}
-										}
-										GPSLoggerDialog.this.application.updateCurveSelectorTable();
+							{
+								this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+								FormData saveButtonLData = new FormData();
+								saveButtonLData.width = 120;
+								saveButtonLData.height = 30;
+								saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+								saveButtonLData.left = new FormAttachment(0, 1000, 15);
+								this.saveButton.setLayoutData(saveButtonLData);
+								this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.saveButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0486));
+								this.saveButton.setEnabled(false);
+								this.saveButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										GPSLoggerDialog.this.device.storeDeviceProperties();
+										GPSLoggerDialog.this.saveButton.setEnabled(false);
 									}
-								}
+								});
+							}
+							{
+								this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+								FormData closeButtonLData = new FormData();
+								closeButtonLData.width = 120;
+								closeButtonLData.height = 30;
+								closeButtonLData.right = new FormAttachment(1000, 1000, -15);
+								closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+								this.closeButton.setLayoutData(closeButtonLData);
+								this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0485));
+								this.closeButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										GPSLoggerDialog.this.dialogShell.dispose();
+									}
+								});
+							}
+							FormData tabFolderLData = new FormData();
+							tabFolderLData.top = new FormAttachment(0, 1000, 0);
+							tabFolderLData.left = new FormAttachment(0, 1000, 0);
+							tabFolderLData.right = new FormAttachment(1000, 1000, 0);
+							tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
+							this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.tabFolder.setLayoutData(tabFolderLData);
+						}
+						subTabFolder1.setSelection(0);
+					}
+				}
+				{
+					configurationTabItem = new CTabItem(tabFolder, SWT.NONE);
+					configurationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					configurationTabItem.setText("Setup Configuration");
+					{
+						subTabFolder2 = new CTabFolder(tabFolder, SWT.NONE);
+						subTabFolder2.setSimple(false);
+						configurationTabItem.setControl(subTabFolder2);
+						{
+							{
+								gpsLoggerTabItem = new CTabItem(subTabFolder2, SWT.NONE);
+								gpsLoggerTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								gpsLoggerTabItem.setText("GPS-Logger");
+								gpsLoggerTabItem.setControl(new GPSLoggerSetupConfiguration1(subTabFolder2, SWT.None));
+							}
+							{
+								telemetryTabItem = new CTabItem(subTabFolder2, SWT.NONE);
+								telemetryTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								telemetryTabItem.setText("Telemetry");
+								telemetryTabItem.setControl(new GPSLoggerSetupConfiguration2(subTabFolder2, SWT.None));
 							}
 						}
-					});
+						subTabFolder2.setSelection(0);
+					}
 				}
+				this.tabFolder.setSelection(0);
 
-				try {
-					this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
-				}
-				catch (RuntimeException e) {
-					this.tabFolder.setSelection(0);
-				}
-
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 10));
 				this.dialogShell.open();
 			}
 			else {

@@ -25,13 +25,14 @@ package gde.device.smmodellbau.gpslogger;
 public class MessageIds { 
 
 	public final static String	GDE_MSGI1700 = "GDE_MSGI1700";
-	public final static String	GDE_MSGI1701 = "GDE_MSGI1701";
 	public final static String	GDE_MSGT1700 = "GDE_MSGT1700";
 	public final static String	GDE_MSGT1701 = "GDE_MSGT1701";
 	public final static String	GDE_MSGT1702 = "GDE_MSGT1702";
-	public final static String	GDE_MSGT1703 = "GDE_MSGT1703";
 	public final static String	GDE_MSGT1859 = "GDE_MSGT1859";
 	public final static String	GDE_MSGT1877 = "GDE_MSGT1877";
+	public final static String	GDE_MSGT1892 = "GDE_MSGT1892";
+	public final static String	GDE_MSGT1893 = "GDE_MSGT1893";
+	public final static String	GDE_MSGT1894 = "GDE_MSGT1894";
 	public final static String	GDE_MSGT1895 = "GDE_MSGT1895";
 	public final static String	GDE_MSGT1896 = "GDE_MSGT1896";
 	public final static String	GDE_MSGT1897 = "GDE_MSGT1897";
