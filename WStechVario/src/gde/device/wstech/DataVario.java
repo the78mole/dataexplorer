@@ -155,7 +155,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
-	public void updateVisibilityStatus(RecordSet recordSet) {
+	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
 		Record record;
@@ -177,6 +177,10 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 				record.setDisplayable(measurement.isActive());
 				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}	
+			if(includeReasonableDataCheck) {
+				record.setDisplayable(record.hasReasonableData());
+				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ //$NON-NLS-2$				
+			}
 
 			if (record.isActive() && record.isDisplayable()) {
 				log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
@@ -305,7 +309,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 			}
-			this.updateVisibilityStatus(recordSet);
+			this.updateVisibilityStatus(recordSet, true);
 			if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		}
 		catch (Exception e) {
@@ -400,7 +404,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
-		this.updateVisibilityStatus(recordSet);
+		this.updateVisibilityStatus(recordSet, true);
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 

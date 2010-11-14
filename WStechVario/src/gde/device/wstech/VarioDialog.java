@@ -225,7 +225,7 @@ public class VarioDialog extends DeviceDialog {
 												channels.switchChannel(channelNumber, recordSetKey);
 												RecordSet newActiveRecordSet = channels.get(channelNumber).getActiveRecordSet();
 												if (newActiveRecordSet != null) {
-													VarioDialog.this.device.updateVisibilityStatus(newActiveRecordSet);
+													VarioDialog.this.device.updateVisibilityStatus(newActiveRecordSet, false);
 													VarioDialog.this.device.makeInActiveDisplayable(newActiveRecordSet);
 												}
 											}

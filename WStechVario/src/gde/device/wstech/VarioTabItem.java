@@ -103,7 +103,7 @@ public class VarioTabItem extends CTabItem {
 		{
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 			for (int i = 0; i < this.device.getChannelMeasuremts(this.channelConfigNumber).size(); i++) {
-				this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1));
+				this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1));
 			}
 		}
 		{
