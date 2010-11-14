@@ -183,7 +183,7 @@ public class LiPoWatchDataGatherer extends Thread {
 	 * @param recordSet
 	 */
 	private void finalizeRecordSet(Channel channel, String recordSetKey, RecordSet recordSet) {
-		this.device.updateVisibilityStatus(recordSet);
+		this.device.updateVisibilityStatus(recordSet, true);
 		this.device.makeInActiveDisplayable(recordSet);
 		channel.applyTemplate(recordSetKey, true);
 		this.application.updateStatisticsData();

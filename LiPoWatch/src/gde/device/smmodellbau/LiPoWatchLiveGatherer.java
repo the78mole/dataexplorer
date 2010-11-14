@@ -150,7 +150,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 						
 						if (updateViewCounter++ % 10 == 0) {
 							log.log(Level.FINE, "updateVisibilityStatus " + updateViewCounter); //$NON-NLS-1$
-							usedDevice.updateVisibilityStatus(recordSet);
+							usedDevice.updateVisibilityStatus(recordSet, true);
 						}
 						
 						if (recordSet.isChildOfActiveChannel() && recordSet.equals(LiPoWatchLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
@@ -221,7 +221,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		if (this.isPortOpenedByLiveGatherer) this.serialPort.close();
 
 		RecordSet recordSet = this.channel.get(recordSetKey);
-		this.device.updateVisibilityStatus(recordSet);
+		this.device.updateVisibilityStatus(recordSet, true);
 		this.device.makeInActiveDisplayable(recordSet);
 		this.channel.applyTemplate(recordSetKey, true);
 		this.application.updateStatisticsData();
