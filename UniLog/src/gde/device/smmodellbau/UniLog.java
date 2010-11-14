@@ -643,7 +643,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 */
-	public void updateVisibilityStatus(RecordSet recordSet) {
+	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		Record record;
 		MeasurementType measurement;

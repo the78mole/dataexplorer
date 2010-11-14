@@ -219,7 +219,7 @@ public class UniLogLiveGatherer extends Thread {
 		if (this.isPortOpenedByLiveGatherer) this.serialPort.close();
 
 		RecordSet recordSet = this.channel.get(recordSetKey);
-		this.device.updateVisibilityStatus(recordSet);
+		this.device.updateVisibilityStatus(recordSet, false);
 		this.device.makeInActiveDisplayable(recordSet);
 		this.channel.applyTemplate(recordSetKey, true);
 		this.application.updateStatisticsData();

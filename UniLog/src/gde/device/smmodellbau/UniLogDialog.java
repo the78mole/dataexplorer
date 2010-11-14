@@ -1366,7 +1366,7 @@ public class UniLogDialog extends DeviceDialog {
 											}
 											RecordSet newActiveRecordSet = channels.get(channelNumber).getActiveRecordSet();
 											if (newActiveRecordSet != null) {
-												UniLogDialog.this.device.updateVisibilityStatus(newActiveRecordSet);
+												UniLogDialog.this.device.updateVisibilityStatus(newActiveRecordSet, false);
 												UniLogDialog.this.device.makeInActiveDisplayable(newActiveRecordSet);
 												UniLogDialog.this.application.updateCurveSelectorTable();
 											}

@@ -201,7 +201,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 				{
 					RowData alarmSlider1LData = new RowData();
 					alarmSlider1LData.width = 100;
-					alarmSlider1LData.height = 22;
+					alarmSlider1LData.height = 18;
 					this.alarmSlider1 = new Slider(this.alarmGroup, SWT.NONE);
 					this.alarmSlider1.setLayoutData(alarmSlider1LData);
 					this.alarmSlider1.setMinimum(1);
@@ -257,7 +257,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 				{
 					RowData alarmSlider2LData = new RowData();
 					alarmSlider2LData.width = 100;
-					alarmSlider2LData.height = 22;
+					alarmSlider2LData.height = 18;
 					this.alarmSlider2 = new Slider(this.alarmGroup, SWT.NONE);
 					this.alarmSlider2.setLayoutData(alarmSlider2LData);
 					this.alarmSlider2.setMinimum(10);
@@ -313,7 +313,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 				{
 					RowData alarmSlider3LData = new RowData();
 					alarmSlider3LData.width = 100;
-					alarmSlider3LData.height = 22;
+					alarmSlider3LData.height = 18;
 					this.alarmSlider3 = new Slider(this.alarmGroup, SWT.NONE);
 					this.alarmSlider3.setLayoutData(alarmSlider3LData);
 					this.alarmSlider3.setMinimum(10);
@@ -369,7 +369,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 				{
 					RowData alarmSlider4LData = new RowData();
 					alarmSlider4LData.width = 100;
-					alarmSlider4LData.height = 22;
+					alarmSlider4LData.height = 18;
 					this.alarmSlider4 = new Slider(this.alarmGroup, SWT.NONE);
 					this.alarmSlider4.setLayoutData(alarmSlider4LData);
 					this.alarmSlider4.setMinimum(10);
@@ -426,7 +426,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 				{
 					RowData alarmSlider5LData = new RowData();
 					alarmSlider5LData.width = 100;
-					alarmSlider5LData.height = 22;
+					alarmSlider5LData.height = 18;
 					this.alarmSlider5 = new Slider(this.alarmGroup, SWT.NONE);
 					this.alarmSlider5.setLayoutData(alarmSlider5LData);
 					this.alarmSlider5.setMinimum(10);
@@ -488,7 +488,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 					{
 						RowData addressSlider1LData = new RowData();
 						addressSlider1LData.width = 100;
-						addressSlider1LData.height = 22;
+						addressSlider1LData.height = 18;
 						this.addressSlider1 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
 						this.addressSlider1.setLayoutData(addressSlider1LData);
 						this.addressSlider1.setMinimum(1);
@@ -526,7 +526,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 					{
 						RowData addressSlider2LData = new RowData();
 						addressSlider2LData.width = 100;
-						addressSlider2LData.height = 22;
+						addressSlider2LData.height = 18;
 						this.addressSlider2 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
 						this.addressSlider2.setLayoutData(addressSlider2LData);
 						this.addressSlider2.setMinimum(1);
@@ -564,7 +564,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 					{
 						RowData addressSlider3LData = new RowData();
 						addressSlider3LData.width = 100;
-						addressSlider3LData.height = 22;
+						addressSlider3LData.height = 18;
 						this.addressSlider3 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
 						this.addressSlider3.setLayoutData(addressSlider3LData);
 						this.addressSlider3.setMinimum(1);
@@ -602,7 +602,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 					{
 						RowData addressSlider4LData = new RowData();
 						addressSlider4LData.width = 100;
-						addressSlider4LData.height = 22;
+						addressSlider4LData.height = 18;
 						this.addressSlider4 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
 						this.addressSlider4.setLayoutData(addressSlider4LData);
 						this.addressSlider4.setMinimum(1);
@@ -640,7 +640,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 					{
 						RowData addressSlider5LData = new RowData();
 						addressSlider5LData.width = 100;
-						addressSlider5LData.height = 22;
+						addressSlider5LData.height = 18;
 						this.addressSlider5 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
 						this.addressSlider5.setLayoutData(addressSlider5LData);
 						this.addressSlider5.setMinimum(1);
@@ -696,7 +696,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 	}
 
 	/**
-	 * update the telemetrie configuration tab with values red 
+	 * update the telemetry configuration tab with values red 
 	 * @param readBuffer
 	 */
 	public void updateTelemetryConfigurationValues(byte[] readBuffer) {
