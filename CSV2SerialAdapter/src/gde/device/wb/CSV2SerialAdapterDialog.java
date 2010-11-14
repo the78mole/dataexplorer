@@ -224,7 +224,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 												channels.switchChannel(channelNumber, recordSetKey);
 												RecordSet newActiveRecordSet = channels.get(channelNumber).getActiveRecordSet();
 												if (newActiveRecordSet != null) {
-													CSV2SerialAdapterDialog.this.device.updateVisibilityStatus(newActiveRecordSet);
+													CSV2SerialAdapterDialog.this.device.updateVisibilityStatus(newActiveRecordSet, false);
 													CSV2SerialAdapterDialog.this.device.makeInActiveDisplayable(newActiveRecordSet);
 												}
 											}
