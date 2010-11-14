@@ -1418,26 +1418,26 @@ public class MenuToolBar {
 	 */
 	public int checkChannelForObjectKeyMissmatch(int actualSelectionIndex, String newObjectKey) {
 		Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
-		if (activeChannel != null && activeChannel.getActiveRecordSet() != null) {
+		if (activeChannel != null) {
 			String channelObjKey = activeChannel.getObjectKey();
-			
+
 			// check if selected key matches the existing object key or is new for this channel
 			if (!newObjectKey.equals(channelObjKey)) { // channel has a key
-				int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGT0205, new Object[] {channelObjKey, newObjectKey}));
+				int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGT0205, new Object[] { channelObjKey, newObjectKey }));
 				if (answer == SWT.YES) { //replace existing objectkey in channel
 					activeChannel.setObjectKey(newObjectKey);
 					String updateFileDescription = activeChannel.getFileDescription();
 					if (channelObjKey.length() > 1 && updateFileDescription.contains(channelObjKey)) {
-						if (newObjectKey.length() > 1){
-						updateFileDescription = updateFileDescription.substring(0, updateFileDescription.indexOf(channelObjKey))
-						+ newObjectKey + updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey)+ channelObjKey.length());
+						if (newObjectKey.length() > 1) {
+							updateFileDescription = updateFileDescription.substring(0, updateFileDescription.indexOf(channelObjKey)) + newObjectKey
+									+ updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey) + channelObjKey.length());
 						}
 						else { // newObjectKey = ""
 							updateFileDescription = updateFileDescription.substring(0, updateFileDescription.indexOf(channelObjKey) - 1)
-							+ updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey)+ channelObjKey.length());
+									+ updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey) + channelObjKey.length());
 						}
 					}
-					else if (newObjectKey.length() > 1){
+					else if (newObjectKey.length() > 1) {
 						updateFileDescription = updateFileDescription + GDE.STRING_BLANK + newObjectKey;
 					}
 					activeChannel.setFileDescription(updateFileDescription);

@@ -60,7 +60,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	String 												fileName;
 	String												fileDescription		= StringHelper.getDate();
 	boolean												isSaved = false;
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final Channels								parent;
 	Comparator<String> 						comparator = new RecordSetNameComparator();
 	
@@ -393,7 +393,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			if (this.activeRecordSet != null && doUpdateVisibilityStatus) {
-				this.activeRecordSet.device.updateVisibilityStatus(this.activeRecordSet);
+				this.activeRecordSet.device.updateVisibilityStatus(this.activeRecordSet, false);
 			}
 			if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
 				this.application.updateGraphicsWindow();

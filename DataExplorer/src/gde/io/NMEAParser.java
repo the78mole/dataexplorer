@@ -20,6 +20,7 @@ package gde.io;
 
 import gde.GDE;
 import gde.device.CheckSumTypes;
+import gde.device.IDevice;
 import gde.exception.DevicePropertiesInconsistenceException;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -52,6 +53,8 @@ public class NMEAParser {
 	final String				separator;
 	final String				leader;
 	final CheckSumTypes	checkSumType;
+	final IDevice				device;
+	final int						channelConfigNumber;
 	
 	
 	public enum NMEA {
@@ -77,12 +80,14 @@ public class NMEAParser {
 	 * @param useCheckSum , exclusive OR
 	 * @param useSize , size of the data points to be filled while parsing
 	 */
-	public NMEAParser(String useLeaderChar, String useSeparator, CheckSumTypes useCheckSum, int useSize) {
+	public NMEAParser(String useLeaderChar, String useSeparator, CheckSumTypes useCheckSum, int useSize, IDevice useDevice, int useChannelConfigNumber) {
 		this.separator = useSeparator;
 		this.leader = useLeaderChar;
 		this.checkSumType = useCheckSum;
 		this.size = useSize;
 		this.values = new int[this.size];
+		this.device = useDevice;
+		this.channelConfigNumber = useChannelConfigNumber;
 	}
 
 	public void parse(String[] inputLines) throws Exception {
@@ -751,9 +756,18 @@ public class NMEAParser {
 	 * @param strValues
 	 */
 	void parseMLINK(String[] strValues) {
-		int value;
 		for (int i = 1; i < strValues.length && i < 15; i++) {
-			this.values[23+i] = (int)(Double.parseDouble(strValues[i].trim().split(GDE.STRING_BLANK+GDE.STRING_STAR)[1])*1000.0);
+			try {
+				String[] values = strValues[i].trim().split(" |:");
+				int address = Integer.parseInt(values[0]);
+				this.values[24+address] = (int)(Double.parseDouble(values[2])*1000.0);
+				if (!this.device.getMeasurement(this.channelConfigNumber, 24+address).getUnit().equals(values[3])) {
+					this.device.getMeasurement(this.channelConfigNumber, 24+address).setUnit(values[3].contains(GDE.STRING_STAR) ? values[3].substring(0, values[3].indexOf(GDE.STRING_STAR)) : values[3]);
+				}
+			}
+			catch (NumberFormatException e) {
+				// ignore and leave value unchanged
+			}
 		}
 		// needs correlation with M-LINK configuration
 		//GPS 

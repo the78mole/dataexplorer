@@ -362,7 +362,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
 		
-		this.device.updateVisibilityStatus(this);
+		this.device.updateVisibilityStatus(this, true);
 	}
 
 	/**
@@ -1723,7 +1723,7 @@ public class RecordSet extends HashMap<String, Record> {
 				if (tmpRecord.isVisible) {
 					int tmpMin = tmpRecord.getMinValue();
 					int tmpMax = tmpRecord.getMaxValue();
-					if (tmpMin != 0 && tmpMax != 0) {
+					if (tmpMin != 0 || tmpMax != 0) {
 						log.log(Level.FINE, tmpRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 						if (tmpMin < tmpSyncMin) tmpSyncMin = tmpMin;
 						if (tmpMax > tmpSyncMax) tmpSyncMax = tmpMax;

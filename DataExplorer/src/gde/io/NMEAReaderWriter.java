@@ -115,7 +115,7 @@ public class NMEAReaderWriter {
 				int dataBlockSize = device.getDataBlockSize(); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize != dataBlockSize)  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new Object[] {filePath, measurementSize, dataBlockSize}));
-				NMEAParser data = new NMEAParser(device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize); //$NON-NLS-1$  //$NON-NLS-2$
+				NMEAParser data = new NMEAParser(device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize, device, activeChannel.getNumber()); //$NON-NLS-1$  //$NON-NLS-2$
 
 				DataInputStream binReader    = new DataInputStream(new FileInputStream(new File(filePath)));
 				byte[] buffer = new byte[1024];
@@ -214,7 +214,7 @@ public class NMEAReaderWriter {
 				activeChannel.setActiveRecordSet(recordSetName);
 				activeChannel.get(recordSetName).setRecordSetDescription(activeChannel.get(recordSetName).getRecordSetDescription() + GDE.STRING_BLANK + data.getComment());
 				activeChannel.applyTemplate(recordSetName, true);
-				device.updateVisibilityStatus(activeChannel.get(recordSetName));
+				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 
@@ -235,7 +235,7 @@ public class NMEAReaderWriter {
 			if (activeChannel != null && activeChannel.size() > 0) {
 				String recordSetName = activeChannel.getFirstRecordSetName();
 				activeChannel.setActiveRecordSet(recordSetName);
-				device.updateVisibilityStatus(activeChannel.get(recordSetName));
+				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 			}

@@ -228,7 +228,7 @@ public class LogViewReader {
 					log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 					device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, application.getStatusBar() != null);
 					log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-					device.updateVisibilityStatus(recordSet);
+					device.updateVisibilityStatus(recordSet, true);
 					if (application.getMenuToolBar() != null) {
 						channel.applyTemplate(recordSet.getName(), true);
 					}
@@ -284,7 +284,7 @@ public class LogViewReader {
 			device.addConvertedLovDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
 			log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 			
-			device.updateVisibilityStatus(recordSet);
+			device.updateVisibilityStatus(recordSet, true);
 			if (application.getMenuToolBar() != null) {
 				channels.getActiveChannel().applyTemplate(recordSet.getName(), true);
 			}

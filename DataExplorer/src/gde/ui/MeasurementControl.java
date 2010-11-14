@@ -38,6 +38,8 @@ import gde.data.RecordSet;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
 
 /**
  * This class enable control of the visualization control of record and the corresponding measurement type active status
@@ -59,19 +61,22 @@ public class MeasurementControl extends Composite {
 	final DeviceDialog						dialog;
 	final MeasurementType					measurementType;
 	final int											ordinal;
+	final int 										channelConfigNumber;
 
 	/**
 	 * create a check button to activate measurement while displaying name, symbol and unit
 	 * @param parentComposite
 	 * @param parentDialog
+	 * @param useChannelConfigNumber
 	 * @param useOrdinal
 	 * @param useMeasurementType
 	 * @param useDevice
 	 * @param horizontalSpan
 	 */
-	public MeasurementControl(Composite parentComposite, DeviceDialog parentDialog, int useOrdinal, MeasurementType useMeasurementType, IDevice useDevice, int horizontalSpan) {
+	public MeasurementControl(Composite parentComposite, DeviceDialog parentDialog, int useChannelConfigNumber, int useOrdinal, MeasurementType useMeasurementType, IDevice useDevice, int horizontalSpan) {
 		super(parentComposite, SWT.NONE);
 		this.dialog = parentDialog;
+		this.channelConfigNumber = useChannelConfigNumber;
 		this.ordinal = useOrdinal;
 		this.measurementType = useMeasurementType;
 		this.device = useDevice;
@@ -87,13 +92,14 @@ public class MeasurementControl extends Composite {
 		this.setLayoutData(thisLData);
 		this.setLayout(thisLayout);
 		{
-			this.measurement = new Button(this, SWT.CHECK | SWT.LEFT);
+			this.measurement = new Button(this, SWT.CHECK | SWT.CENTER);
 			RowData measurementLData = new RowData();
-			measurementLData.width = 180;
+			measurementLData.width = 170;
 			measurementLData.height = 20;
 			this.measurement.setLayoutData(measurementLData);
 			this.measurement.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.measurement.setText(this.measurementType.getName());
+			this.measurement.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0299));
 			this.measurement.setSelection(this.measurementType.isActive());
 			this.measurement.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -109,7 +115,7 @@ public class MeasurementControl extends Composite {
 							activeRecordSet.get(activeRecordSet.getRecordNames()[MeasurementControl.this.ordinal]).setActive(isVisible);
 							activeRecordSet.get(activeRecordSet.getRecordNames()[MeasurementControl.this.ordinal]).setVisible(isVisible);
 							activeRecordSet.get(activeRecordSet.getRecordNames()[MeasurementControl.this.ordinal]).setDisplayable(isVisible);
-							MeasurementControl.this.device.updateVisibilityStatus(activeRecordSet);
+							MeasurementControl.this.device.updateVisibilityStatus(activeRecordSet, false);
 							MeasurementControl.this.application.updateGraphicsWindow();
 						}
 					}

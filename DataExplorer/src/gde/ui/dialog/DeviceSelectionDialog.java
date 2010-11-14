@@ -391,7 +391,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								{
 									this.deviceCanvas = new Canvas(this.deviceSelectionGroup, SWT.BORDER);
 									this.deviceCanvas.setBounds(12, 70, 227, 165);
-									this.deviceCanvas.setBackgroundImage(SWTResourceManager.getImage("gde/resource/NoDevicePicture.jpg")); //$NON-NLS-1$
 								}
 								{
 									this.manufacturerDescription = new Label(this.deviceSelectionGroup, SWT.WRAP);
@@ -912,7 +911,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			if (this.selectedActiveDeviceConfig == null) {
 				DeviceSelectionDialog.log.log(Level.FINE, "activeDeviceConfig == null -> no device selected as active"); //$NON-NLS-1$
 				this.application.setActiveDevice(null);
-				this.deviceCanvas.setBackgroundImage(SWTResourceManager.getImage("gde/resource/NoDevicePicture.jpg")); //$NON-NLS-1$
 
 				this.manufacturerName.setText(Settings.EMPTY);
 				this.deviceText.setText(Settings.EMPTY);
@@ -1106,6 +1104,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				DeviceSelectionDialog.log.log(Level.FINE, "setting up channels = " + i); //$NON-NLS-1$
 
 				Channel newChannel = new Channel(activeDevice.getChannelName(i), activeDevice.getChannelTypes(i));
+				newChannel.setObjectKey(application.getObjectKey());
 				// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
 				channels.put(Integer.valueOf(i), newChannel);
 				// do not call channel.applyTemplate here, there are no record sets

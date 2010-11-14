@@ -203,7 +203,7 @@ public class CSVSerialDataReaderWriter {
 
 				activeChannel.setActiveRecordSet(recordSetName);
 				activeChannel.applyTemplate(recordSetName, true);
-				device.updateVisibilityStatus(activeChannel.get(recordSetName));
+				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 
@@ -224,7 +224,7 @@ public class CSVSerialDataReaderWriter {
 			if (activeChannel != null && activeChannel.size() > 0) {
 				String recordSetName = activeChannel.getFirstRecordSetName();
 				activeChannel.setActiveRecordSet(recordSetName);
-				device.updateVisibilityStatus(activeChannel.get(recordSetName));
+				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 			}

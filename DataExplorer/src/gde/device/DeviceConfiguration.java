@@ -310,7 +310,7 @@ public class DeviceConfiguration {
 	 * @return the device name
 	 */
 	public String getImageFileName() {
-		return this.device.getImage();
+		return this.device.getImage().length() > 0 ? this.device.getImage() : "NoDevicePicture.jpg";
 	}
 
 	/**
