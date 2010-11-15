@@ -1679,7 +1679,7 @@ public class RecordSet extends HashMap<String, Record> {
 							this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
 							this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
 						}
-						if (!this.scaleSyncedRecords.get(syncMasterRecordOrdinal).contains(tmpRecord)) {
+						if (!isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
 							if ((i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
 								this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
 							else
@@ -1708,6 +1708,26 @@ public class RecordSet extends HashMap<String, Record> {
 				updateSyncRecordScale();
 			}
 		}
+	}
+
+	/**
+	 * check if the scaleSyncedRecords vector contains the given record not using equivalent entries, like the Vector.contains() method 
+	 * @param syncMasterRecordOrdinal
+	 * @param tmpRecord
+	 * @return
+	 */
+	boolean isRecordContained(int syncMasterRecordOrdinal, Record tmpRecord) {
+		final String $METHOD_NAME = "isRecordContained";
+		boolean isContained = false;
+		this.scaleSyncedRecords.get(syncMasterRecordOrdinal).contains(tmpRecord);
+		for (Record tempRecord : this.scaleSyncedRecords.get(syncMasterRecordOrdinal)) {
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + tmpRecord.name);
+			if (tempRecord.name.equals(tmpRecord.name)) {
+				isContained = true;
+				break;
+			}
+		}
+		return isContained;
 	}
 
 	/**
