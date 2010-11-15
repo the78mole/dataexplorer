@@ -62,8 +62,6 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 	Slider							addressSlider1, addressSlider2, addressSlider3, addressSlider4, addressSlider5, addressSlider6;
 	int									addressValue1	= 3, addressValue2 = 2, addressValue3 = 5, addressValue4 = 4, addressValue5 = 6, addressValue6 = 7;
 
-	Button saveButton;
-
 	/**
 	* Auto-generated main method to display this 
 	* org.eclipse.swt.widgets.Composite inside a new Shell.
@@ -107,17 +105,251 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 	void initGUI() {
 		try {
 			this.setLayout(new FormLayout());
-			this.setSize(337, 451);
+			//this.setSize(350, 451);
+			{
+				unilogTelemtryAlarmsGroup = new Group(this, SWT.NONE);
+				RowLayout unilogTelemtryAlarmsGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+				unilogTelemtryAlarmsGroup.setLayout(unilogTelemtryAlarmsGroupLayout);
+				FormData unilogTelemtryAlarmsGroupLData = new FormData();
+				unilogTelemtryAlarmsGroupLData.width = 310;
+				unilogTelemtryAlarmsGroupLData.height = 159;
+				unilogTelemtryAlarmsGroupLData.top =  new FormAttachment(0, 1000, 12);
+				unilogTelemtryAlarmsGroupLData.left =  new FormAttachment(0, 1000, 15);
+				unilogTelemtryAlarmsGroup.setLayoutData(unilogTelemtryAlarmsGroupLData);
+				unilogTelemtryAlarmsGroup.setText("UniLog Telemetry Alarms");
+				unilogTelemtryAlarmsGroup.addHelpListener(new HelpListener() {
+					public void helpRequested(HelpEvent evt) {
+						System.out.println("unilogTelemtryAlarmsGroup.helpRequested, event="+evt);
+						//TODO add your code for unilogTelemtryAlarmsGroup.helpRequested
+					}
+				});
+				{
+					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = 299;
+					fillerCompositeRA1LData.height = 15;
+					fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = 20;
+					fillerCompositeRA1LData.height = 20;
+					fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					currentButton = new Button(unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
+					RowData currentButtonLData = new RowData();
+					currentButtonLData.width = 134;
+					currentButtonLData.height = 21;
+					currentButton.setLayoutData(currentButtonLData);
+					currentButton.setText("current");
+					currentButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("currentButton.widgetSelected, event="+evt);
+							//TODO add your code for currentButton.widgetSelected
+						}
+					});
+				}
+				{
+					RowData currentCComboLData = new RowData();
+					currentCComboLData.width = 83;
+					currentCComboLData.height = 17;
+					currentCombo = new CCombo(unilogTelemtryAlarmsGroup, SWT.BORDER);
+					currentCombo.setLayoutData(currentCComboLData);
+					currentCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("currentCCombo.widgetSelected, event="+evt);
+							//TODO add your code for currentCCombo.widgetSelected
+						}
+					});
+				}
+				{
+					currentLabel = new CLabel(unilogTelemtryAlarmsGroup, SWT.CENTER);
+					RowData currentLabelLData = new RowData();
+					currentLabelLData.width = 50;
+					currentLabelLData.height = 22;
+					currentLabel.setLayoutData(currentLabelLData);
+					currentLabel.setText("A");
+				}
+				{
+					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = 20;
+					fillerCompositeRA1LData.height = 20;
+					fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					voltageStartButton = new Button(unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
+					RowData voltageStartButtonLData = new RowData();
+					voltageStartButtonLData.width = 134;
+					voltageStartButtonLData.height = 21;
+					voltageStartButton.setLayoutData(voltageStartButtonLData);
+					voltageStartButton.setText("voltage start");
+					voltageStartButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("voltageStartButton.widgetSelected, event="+evt);
+							//TODO add your code for voltageStartButton.widgetSelected
+						}
+					});
+				}
+				{
+					RowData voltageStartCComboLData = new RowData();
+					voltageStartCComboLData.width = 83;
+					voltageStartCComboLData.height = 17;
+					voltageStartCombo = new CCombo(unilogTelemtryAlarmsGroup, SWT.BORDER);
+					voltageStartCombo.setLayoutData(voltageStartCComboLData);
+					voltageStartCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("voltageStartCCombo.widgetSelected, event="+evt);
+							//TODO add your code for voltageStartCCombo.widgetSelected
+						}
+					});
+				}
+				{
+					voltageStartLabel = new CLabel(unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
+					RowData voltageStartLabelLData = new RowData();
+					voltageStartLabelLData.width = 50;
+					voltageStartLabelLData.height = 22;
+					voltageStartLabel.setLayoutData(voltageStartLabelLData);
+					voltageStartLabel.setText("V");
+				}
+				{
+					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = 20;
+					fillerCompositeRA1LData.height = 20;
+					fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					voltageButton = new Button(unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
+					RowData voltageButtonLData = new RowData();
+					voltageButtonLData.width = 134;
+					voltageButtonLData.height = 21;
+					voltageButton.setLayoutData(voltageButtonLData);
+					voltageButton.setText("voltage");
+					voltageButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("voltageButton.widgetSelected, event="+evt);
+							//TODO add your code for voltageButton.widgetSelected
+						}
+					});
+				}
+				{
+					RowData voltageCComboLData = new RowData();
+					voltageCComboLData.width = 83;
+					voltageCComboLData.height = 17;
+					voltageCombo = new CCombo(unilogTelemtryAlarmsGroup, SWT.BORDER);
+					voltageCombo.setLayoutData(voltageCComboLData);
+					voltageCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("voltageCCombo.widgetSelected, event="+evt);
+							//TODO add your code for voltageCCombo.widgetSelected
+						}
+					});
+				}
+				{
+					RowData voltageLabelLData = new RowData();
+					voltageLabelLData.width = 50;
+					voltageLabelLData.height = 22;
+					voltageLabel = new CLabel(unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
+					voltageLabel.setLayoutData(voltageLabelLData);
+					voltageLabel.setText("V");
+				}
+				{
+					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = 20;
+					fillerCompositeRA1LData.height = 20;
+					fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					distanceButton = new Button(unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
+					RowData distanceULButtonLData = new RowData();
+					distanceULButtonLData.width = 134;
+					distanceULButtonLData.height = 21;
+					distanceButton.setLayoutData(distanceULButtonLData);
+					distanceButton.setText("distance");
+					distanceButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("distanceULButton.widgetSelected, event="+evt);
+							//TODO add your code for distanceULButton.widgetSelected
+						}
+					});
+				}
+				{
+					RowData distanceULCComboLData = new RowData();
+					distanceULCComboLData.width = 83;
+					distanceULCComboLData.height = 17;
+					distanceCombo = new CCombo(unilogTelemtryAlarmsGroup, SWT.BORDER);
+					distanceCombo.setLayoutData(distanceULCComboLData);
+					distanceCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("distanceULCCombo.widgetSelected, event="+evt);
+							//TODO add your code for distanceULCCombo.widgetSelected
+						}
+					});
+				}
+				{
+					distanceLabel = new CLabel(unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
+					RowData distanceULLabelLData = new RowData();
+					distanceULLabelLData.width = 50;
+					distanceULLabelLData.height = 22;
+					distanceLabel.setLayoutData(distanceULLabelLData);
+					distanceLabel.setText("m");
+				}
+				{
+					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = 20;
+					fillerCompositeRA1LData.height = 20;
+					fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					voltageRxButton = new Button(unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
+					RowData voltageRxULButtonLData = new RowData();
+					voltageRxULButtonLData.width = 134;
+					voltageRxULButtonLData.height = 21;
+					voltageRxButton.setLayoutData(voltageRxULButtonLData);
+					voltageRxButton.setText("voltage Rx");
+					voltageRxButton.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("voltageRxULButton.widgetSelected, event="+evt);
+							//TODO add your code for voltageRxULButton.widgetSelected
+						}
+					});
+				}
+				{
+					RowData CCombo1LData = new RowData();
+					CCombo1LData.width = 83;
+					CCombo1LData.height = 17;
+					voltageRxCombo = new CCombo(unilogTelemtryAlarmsGroup, SWT.BORDER);
+					voltageRxCombo.setLayoutData(CCombo1LData);
+					voltageRxCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("CCombo1.widgetSelected, event="+evt);
+							//TODO add your code for CCombo1.widgetSelected
+						}
+					});
+				}
+				{
+					voltageRxLabel = new CLabel(unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
+					RowData voltageRxULLabelLData = new RowData();
+					voltageRxULLabelLData.width = 50;
+					voltageRxULLabelLData.height = 22;
+					voltageRxLabel.setLayoutData(voltageRxULLabelLData);
+					voltageRxLabel.setText("V");
+				}
+			}
 			{
 				mLinkAddressesGroup = new Group(this, SWT.NONE);
 				RowLayout mLinkAddressesGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				mLinkAddressesGroup.setLayout(mLinkAddressesGroupLayout);
 				FormData mLinkAddressesGroupLData = new FormData();
-				mLinkAddressesGroupLData.left =  new FormAttachment(0, 1000, 12);
-				mLinkAddressesGroupLData.top =  new FormAttachment(0, 1000, 211);
-				mLinkAddressesGroupLData.width = 320;
+				mLinkAddressesGroupLData.top =  new FormAttachment(0, 1000, 230);
+				mLinkAddressesGroupLData.width = 310;
 				mLinkAddressesGroupLData.height = 180;
-				mLinkAddressesGroupLData.right =  new FormAttachment(1000, 1000, -12);
+				mLinkAddressesGroupLData.left =  new FormAttachment(0, 1000, 15);
 				mLinkAddressesGroup.setLayoutData(mLinkAddressesGroupLData);
 				mLinkAddressesGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				mLinkAddressesGroup.setText("M-Link Addresses");
@@ -362,260 +594,6 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 						}
 					});
 				}
-			}
-			{
-				unilogTelemtryAlarmsGroup = new Group(this, SWT.NONE);
-				RowLayout unilogTelemtryAlarmsGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				unilogTelemtryAlarmsGroup.setLayout(unilogTelemtryAlarmsGroupLayout);
-				FormData unilogTelemtryAlarmsGroupLData = new FormData();
-				unilogTelemtryAlarmsGroupLData.width = 320;
-				unilogTelemtryAlarmsGroupLData.height = 160;
-				unilogTelemtryAlarmsGroupLData.left =  new FormAttachment(0, 1000, 12);
-				unilogTelemtryAlarmsGroupLData.top =  new FormAttachment(0, 1000, 12);
-				unilogTelemtryAlarmsGroupLData.right =  new FormAttachment(1000, 1000, -12);
-				unilogTelemtryAlarmsGroup.setLayoutData(unilogTelemtryAlarmsGroupLData);
-				unilogTelemtryAlarmsGroup.setText("UniLog Telemetry Alarms");
-				unilogTelemtryAlarmsGroup.addHelpListener(new HelpListener() {
-					public void helpRequested(HelpEvent evt) {
-						System.out.println("unilogTelemtryAlarmsGroup.helpRequested, event="+evt);
-						//TODO add your code for unilogTelemtryAlarmsGroup.helpRequested
-					}
-				});
-				{
-					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
-					RowData fillerCompositeRA1LData = new RowData();
-					fillerCompositeRA1LData.width = 299;
-					fillerCompositeRA1LData.height = 15;
-					fillerComposite.setLayoutData(fillerCompositeRA1LData);
-				}
-				{
-					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
-					RowData fillerCompositeRA1LData = new RowData();
-					fillerCompositeRA1LData.width = 20;
-					fillerCompositeRA1LData.height = 20;
-					fillerComposite.setLayoutData(fillerCompositeRA1LData);
-				}
-				{
-					currentButton = new Button(unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
-					RowData currentButtonLData = new RowData();
-					currentButtonLData.width = 134;
-					currentButtonLData.height = 21;
-					currentButton.setLayoutData(currentButtonLData);
-					currentButton.setText("current");
-					currentButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("currentButton.widgetSelected, event="+evt);
-							//TODO add your code for currentButton.widgetSelected
-						}
-					});
-				}
-				{
-					RowData currentCComboLData = new RowData();
-					currentCComboLData.width = 83;
-					currentCComboLData.height = 17;
-					currentCombo = new CCombo(unilogTelemtryAlarmsGroup, SWT.BORDER);
-					currentCombo.setLayoutData(currentCComboLData);
-					currentCombo.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("currentCCombo.widgetSelected, event="+evt);
-							//TODO add your code for currentCCombo.widgetSelected
-						}
-					});
-				}
-				{
-					currentLabel = new CLabel(unilogTelemtryAlarmsGroup, SWT.CENTER);
-					RowData currentLabelLData = new RowData();
-					currentLabelLData.width = 50;
-					currentLabelLData.height = 22;
-					currentLabel.setLayoutData(currentLabelLData);
-					currentLabel.setText("A");
-				}
-				{
-					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
-					RowData fillerCompositeRA1LData = new RowData();
-					fillerCompositeRA1LData.width = 20;
-					fillerCompositeRA1LData.height = 20;
-					fillerComposite.setLayoutData(fillerCompositeRA1LData);
-				}
-				{
-					voltageStartButton = new Button(unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
-					RowData voltageStartButtonLData = new RowData();
-					voltageStartButtonLData.width = 134;
-					voltageStartButtonLData.height = 21;
-					voltageStartButton.setLayoutData(voltageStartButtonLData);
-					voltageStartButton.setText("voltage start");
-					voltageStartButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("voltageStartButton.widgetSelected, event="+evt);
-							//TODO add your code for voltageStartButton.widgetSelected
-						}
-					});
-				}
-				{
-					RowData voltageStartCComboLData = new RowData();
-					voltageStartCComboLData.width = 83;
-					voltageStartCComboLData.height = 17;
-					voltageStartCombo = new CCombo(unilogTelemtryAlarmsGroup, SWT.BORDER);
-					voltageStartCombo.setLayoutData(voltageStartCComboLData);
-					voltageStartCombo.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("voltageStartCCombo.widgetSelected, event="+evt);
-							//TODO add your code for voltageStartCCombo.widgetSelected
-						}
-					});
-				}
-				{
-					voltageStartLabel = new CLabel(unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
-					RowData voltageStartLabelLData = new RowData();
-					voltageStartLabelLData.width = 50;
-					voltageStartLabelLData.height = 22;
-					voltageStartLabel.setLayoutData(voltageStartLabelLData);
-					voltageStartLabel.setText("V");
-				}
-				{
-					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
-					RowData fillerCompositeRA1LData = new RowData();
-					fillerCompositeRA1LData.width = 20;
-					fillerCompositeRA1LData.height = 20;
-					fillerComposite.setLayoutData(fillerCompositeRA1LData);
-				}
-				{
-					voltageButton = new Button(unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
-					RowData voltageButtonLData = new RowData();
-					voltageButtonLData.width = 134;
-					voltageButtonLData.height = 21;
-					voltageButton.setLayoutData(voltageButtonLData);
-					voltageButton.setText("voltage");
-					voltageButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("voltageButton.widgetSelected, event="+evt);
-							//TODO add your code for voltageButton.widgetSelected
-						}
-					});
-				}
-				{
-					RowData voltageCComboLData = new RowData();
-					voltageCComboLData.width = 83;
-					voltageCComboLData.height = 17;
-					voltageCombo = new CCombo(unilogTelemtryAlarmsGroup, SWT.BORDER);
-					voltageCombo.setLayoutData(voltageCComboLData);
-					voltageCombo.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("voltageCCombo.widgetSelected, event="+evt);
-							//TODO add your code for voltageCCombo.widgetSelected
-						}
-					});
-				}
-				{
-					RowData voltageLabelLData = new RowData();
-					voltageLabelLData.width = 50;
-					voltageLabelLData.height = 22;
-					voltageLabel = new CLabel(unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
-					voltageLabel.setLayoutData(voltageLabelLData);
-					voltageLabel.setText("V");
-				}
-				{
-					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
-					RowData fillerCompositeRA1LData = new RowData();
-					fillerCompositeRA1LData.width = 20;
-					fillerCompositeRA1LData.height = 20;
-					fillerComposite.setLayoutData(fillerCompositeRA1LData);
-				}
-				{
-					distanceButton = new Button(unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
-					RowData distanceULButtonLData = new RowData();
-					distanceULButtonLData.width = 134;
-					distanceULButtonLData.height = 21;
-					distanceButton.setLayoutData(distanceULButtonLData);
-					distanceButton.setText("distance");
-					distanceButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("distanceULButton.widgetSelected, event="+evt);
-							//TODO add your code for distanceULButton.widgetSelected
-						}
-					});
-				}
-				{
-					RowData distanceULCComboLData = new RowData();
-					distanceULCComboLData.width = 83;
-					distanceULCComboLData.height = 17;
-					distanceCombo = new CCombo(unilogTelemtryAlarmsGroup, SWT.BORDER);
-					distanceCombo.setLayoutData(distanceULCComboLData);
-					distanceCombo.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("distanceULCCombo.widgetSelected, event="+evt);
-							//TODO add your code for distanceULCCombo.widgetSelected
-						}
-					});
-				}
-				{
-					distanceLabel = new CLabel(unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
-					RowData distanceULLabelLData = new RowData();
-					distanceULLabelLData.width = 50;
-					distanceULLabelLData.height = 22;
-					distanceLabel.setLayoutData(distanceULLabelLData);
-					distanceLabel.setText("m");
-				}
-				{
-					fillerComposite = new Composite(unilogTelemtryAlarmsGroup, SWT.NONE);
-					RowData fillerCompositeRA1LData = new RowData();
-					fillerCompositeRA1LData.width = 20;
-					fillerCompositeRA1LData.height = 20;
-					fillerComposite.setLayoutData(fillerCompositeRA1LData);
-				}
-				{
-					voltageRxButton = new Button(unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
-					RowData voltageRxULButtonLData = new RowData();
-					voltageRxULButtonLData.width = 134;
-					voltageRxULButtonLData.height = 21;
-					voltageRxButton.setLayoutData(voltageRxULButtonLData);
-					voltageRxButton.setText("voltage Rx");
-					voltageRxButton.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("voltageRxULButton.widgetSelected, event="+evt);
-							//TODO add your code for voltageRxULButton.widgetSelected
-						}
-					});
-				}
-				{
-					RowData CCombo1LData = new RowData();
-					CCombo1LData.width = 83;
-					CCombo1LData.height = 17;
-					voltageRxCombo = new CCombo(unilogTelemtryAlarmsGroup, SWT.BORDER);
-					voltageRxCombo.setLayoutData(CCombo1LData);
-					voltageRxCombo.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("CCombo1.widgetSelected, event="+evt);
-							//TODO add your code for CCombo1.widgetSelected
-						}
-					});
-				}
-				{
-					voltageRxLabel = new CLabel(unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
-					RowData voltageRxULLabelLData = new RowData();
-					voltageRxULLabelLData.width = 50;
-					voltageRxULLabelLData.height = 22;
-					voltageRxLabel.setLayoutData(voltageRxULLabelLData);
-					voltageRxLabel.setText("V");
-				}
-			}
-			{
-				saveButton = new Button(this, SWT.PUSH | SWT.CENTER);
-				saveButton.setText("save setup");
-				saveButton.setEnabled(false);
-				FormData saveButtonLData = new FormData();
-				saveButtonLData.width = 178;
-				saveButtonLData.height = 31;
-				saveButtonLData.left =  new FormAttachment(0, 1000, 80);
-				saveButtonLData.bottom =  new FormAttachment(1000, 1000, -20);
-				saveButtonLData.right =  new FormAttachment(1000, 1000, -80);
-				saveButton.setLayoutData(saveButtonLData);
-				saveButton.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent evt) {
-						System.out.println("saveButton.widgetSelected, event="+evt);
-						//TODO add your code for saveButton.widgetSelected
-					}
-				});
 			}
 			this.layout();
 		}

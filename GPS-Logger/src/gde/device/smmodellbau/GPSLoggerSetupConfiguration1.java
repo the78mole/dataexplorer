@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class GPSLoggerSetupConfiguration1 extends org.eclipse.swt.widgets.Composite {
+public class GPSLoggerSetupConfiguration1 extends Composite {
 	final static Logger	log	= Logger.getLogger(GPSLoggerSetupConfiguration1.class.getName());
 
 	Composite						fillerComposite;
@@ -58,8 +58,6 @@ public class GPSLoggerSetupConfiguration1 extends org.eclipse.swt.widgets.Compos
 	Button							heightButton, velocityButton, distanceButton, pathLengthButton, voltageRxButton;
 	CCombo							heightCombo, velocityCombo, distanceCombo, pathLengthCombo, voltageRxCombo;
 	CLabel							heightLabel, velocityLabel, distanceLabel, pathLengthLabel, voltageRxLabel;
-
-	Button saveButton;
 
 	/**
 	* Auto-generated main method to display this 
@@ -104,14 +102,191 @@ public class GPSLoggerSetupConfiguration1 extends org.eclipse.swt.widgets.Compos
 	void initGUI() {
 		try {
 			this.setLayout(new FormLayout());
-			this.setSize(337, 520);
+			//this.setSize(350, 520);
+			{
+				FormData gpsLoggerGroupLData = new FormData();
+				gpsLoggerGroupLData.left =  new FormAttachment(0, 1000, 15);
+				gpsLoggerGroupLData.top =  new FormAttachment(0, 1000, 12);
+				gpsLoggerGroupLData.width = 310;
+				gpsLoggerGroupLData.height = 250;
+				gpsLoggerGroup = new Group(this, SWT.NONE);
+				RowLayout gpsLoggerGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+				gpsLoggerGroup.setLayout(gpsLoggerGroupLayout);
+				gpsLoggerGroup.setLayoutData(gpsLoggerGroupLData);
+				gpsLoggerGroup.setText("Basic Setup");
+				gpsLoggerGroup.addHelpListener(new HelpListener() {
+					public void helpRequested(HelpEvent evt) {
+						System.out.println("gpsLoggerGroup.helpRequested, event="+evt);
+						//TODO add your code for gpsLoggerGroup.helpRequested
+					}
+				});
+				{
+					fillerComposite = new Composite(gpsLoggerGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = 299;
+					fillerCompositeRA1LData.height = 12;
+					fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					serialNumberLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
+					RowData serialNumberLabelLData = new RowData();
+					serialNumberLabelLData.width = 146;
+					serialNumberLabelLData.height = 22;
+					serialNumberLabel.setLayoutData(serialNumberLabelLData);
+					serialNumberLabel.setText("serial number");
+				}
+				{
+					RowData serialNumberTextLData = new RowData();
+					serialNumberTextLData.width = 83;
+					serialNumberTextLData.height = 16;
+					serialNumberText = new Text(gpsLoggerGroup, SWT.RIGHT | SWT.BORDER);
+					serialNumberText.setLayoutData(serialNumberTextLData);
+					serialNumberText.setEditable(false);
+				}
+				{
+					firmwareLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
+					RowData firmwareLabelLData = new RowData();
+					firmwareLabelLData.width = 146;
+					firmwareLabelLData.height = 22;
+					firmwareLabel.setLayoutData(firmwareLabelLData);
+					firmwareLabel.setText("firmware");
+				}
+				{
+					RowData firmwareTextLData = new RowData();
+					firmwareTextLData.width = 83;
+					firmwareTextLData.height = 16;
+					firmwareText = new Text(gpsLoggerGroup, SWT.RIGHT | SWT.BORDER);
+					firmwareText.setLayoutData(firmwareTextLData);
+					firmwareText.setEditable(false);
+				}
+				{
+					dataRatecLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
+					RowData dataRatecLabelLData = new RowData();
+					dataRatecLabelLData.width = 146;
+					dataRatecLabelLData.height = 22;
+					dataRatecLabel.setLayoutData(dataRatecLabelLData);
+					dataRatecLabel.setText("data rate");
+				}
+				{
+					RowData dataRateCComboLData = new RowData();
+					dataRateCComboLData.width = 66;
+					dataRateCComboLData.height = 17;
+					dataRateCombo = new CCombo(gpsLoggerGroup, SWT.BORDER);
+					dataRateCombo.setLayoutData(dataRateCComboLData);
+					dataRateCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("dataRateCCombo.widgetSelected, event="+evt);
+							//TODO add your code for dataRateCCombo.widgetSelected
+						}
+					});
+				}
+				{
+					startModusLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
+					RowData startModusLabelLData = new RowData();
+					startModusLabelLData.width = 146;
+					startModusLabelLData.height = 22;
+					startModusLabel.setLayoutData(startModusLabelLData);
+					startModusLabel.setText("start modus");
+				}
+				{
+					RowData startModusCComboLData = new RowData();
+					startModusCComboLData.width = 66;
+					startModusCComboLData.height = 17;
+					startModusCombo = new CCombo(gpsLoggerGroup, SWT.BORDER);
+					startModusCombo.setLayoutData(startModusCComboLData);
+					startModusCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("startModusCCombo.widgetSelected, event="+evt);
+							//TODO add your code for startModusCCombo.widgetSelected
+						}
+					});
+				}
+				{
+					RowData timeZoneLabelLData = new RowData();
+					timeZoneLabelLData.width = 146;
+					timeZoneLabelLData.height = 22;
+					timeZoneLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
+					timeZoneLabel.setLayoutData(timeZoneLabelLData);
+					timeZoneLabel.setText("time zone");
+				}
+				{
+					RowData timeZoneCComboLData = new RowData();
+					timeZoneCComboLData.width = 66;
+					timeZoneCComboLData.height = 17;
+					timeZoneCombo = new CCombo(gpsLoggerGroup, SWT.BORDER);
+					timeZoneCombo.setLayoutData(timeZoneCComboLData);
+					timeZoneCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("timeZoneCCombo.widgetSelected, event="+evt);
+							//TODO add your code for timeZoneCCombo.widgetSelected
+						}
+					});
+				}
+				{
+					timeZoneUnitLabel = new CLabel(gpsLoggerGroup, SWT.CENTER | SWT.EMBEDDED);
+					RowData timeZoneUnitLabelLData = new RowData();
+					timeZoneUnitLabelLData.width = 79;
+					timeZoneUnitLabelLData.height = 22;
+					timeZoneUnitLabel.setLayoutData(timeZoneUnitLabelLData);
+					timeZoneUnitLabel.setText("h");
+				}
+				{
+					varioLimitLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
+					RowData varioLimitLabelLData = new RowData();
+					varioLimitLabelLData.width = 146;
+					varioLimitLabelLData.height = 22;
+					varioLimitLabel.setLayoutData(varioLimitLabelLData);
+					varioLimitLabel.setText("vario limit");
+				}
+				{
+					RowData varioLimitCComboLData = new RowData();
+					varioLimitCComboLData.width = 66;
+					varioLimitCComboLData.height = 17;
+					varioLimitCombo = new CCombo(gpsLoggerGroup, SWT.BORDER);
+					varioLimitCombo.setLayoutData(varioLimitCComboLData);
+					varioLimitCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("varioLimitCCombo.widgetSelected, event="+evt);
+							//TODO add your code for varioLimitCCombo.widgetSelected
+						}
+					});
+				}
+				{
+					varioLimitUnitLabel = new CLabel(gpsLoggerGroup, SWT.CENTER);
+					RowData varioLimitUnitLabelLData = new RowData();
+					varioLimitUnitLabelLData.width = 79;
+					varioLimitUnitLabelLData.height = 22;
+					varioLimitUnitLabel.setLayoutData(varioLimitUnitLabelLData);
+					varioLimitUnitLabel.setText("m/s");
+				}
+				{
+					varioTonLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
+					RowData varioTonLabelLData = new RowData();
+					varioTonLabelLData.width = 146;
+					varioTonLabelLData.height = 22;
+					varioTonLabel.setLayoutData(varioTonLabelLData);
+					varioTonLabel.setText("vario tone");
+				}
+				{
+					RowData varioToneComboLData = new RowData();
+					varioToneComboLData.width = 66;
+					varioToneComboLData.height = 17;
+					varioToneCombo = new CCombo(gpsLoggerGroup, SWT.BORDER);
+					varioToneCombo.setLayoutData(varioToneComboLData);
+					varioToneCombo.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							System.out.println("varioToneCCombo.widgetSelected, event="+evt);
+							//TODO add your code for varioToneCCombo.widgetSelected
+						}
+					});
+				}
+			}
 			{
 				FormData gpsTelemertieGroupLData = new FormData();
-				gpsTelemertieGroupLData.width = 248;
-				gpsTelemertieGroupLData.height = 156;
-				gpsTelemertieGroupLData.left =  new FormAttachment(0, 1000, 12);
-				gpsTelemertieGroupLData.top =  new FormAttachment(0, 1000, 249);
-				gpsTelemertieGroupLData.right =  new FormAttachment(1000, 1000, -12);
+				gpsTelemertieGroupLData.left =  new FormAttachment(0, 1000, 16);
+				gpsTelemertieGroupLData.top =  new FormAttachment(0, 1000, 310);
+				gpsTelemertieGroupLData.width = 310;
+				gpsTelemertieGroupLData.height = 150;
 				gpsTelemertieGroup = new Group(this, SWT.NONE);
 				RowLayout gpsTelemertieGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				gpsTelemertieGroup.setLayout(gpsTelemertieGroupLayout);
@@ -340,203 +515,6 @@ public class GPSLoggerSetupConfiguration1 extends org.eclipse.swt.widgets.Compos
 					voltageRxLabel.setLayoutData(voltageRxLabelLData);
 					voltageRxLabel.setText("V");
 				}
-			}
-			{
-				FormData gpsLoggerGroupLData = new FormData();
-				gpsLoggerGroupLData.width = 320;
-				gpsLoggerGroupLData.height = 206;
-				gpsLoggerGroupLData.left =  new FormAttachment(0, 1000, 12);
-				gpsLoggerGroupLData.top =  new FormAttachment(0, 1000, 12);
-				gpsLoggerGroupLData.right =  new FormAttachment(1000, 1000, -12);
-				gpsLoggerGroup = new Group(this, SWT.NONE);
-				RowLayout gpsLoggerGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				gpsLoggerGroup.setLayout(gpsLoggerGroupLayout);
-				gpsLoggerGroup.setLayoutData(gpsLoggerGroupLData);
-				gpsLoggerGroup.setText("Basic Setup");
-				gpsLoggerGroup.addHelpListener(new HelpListener() {
-					public void helpRequested(HelpEvent evt) {
-						System.out.println("gpsLoggerGroup.helpRequested, event="+evt);
-						//TODO add your code for gpsLoggerGroup.helpRequested
-					}
-				});
-				{
-					fillerComposite = new Composite(gpsLoggerGroup, SWT.NONE);
-					RowData fillerCompositeRA1LData = new RowData();
-					fillerCompositeRA1LData.width = 299;
-					fillerCompositeRA1LData.height = 12;
-					fillerComposite.setLayoutData(fillerCompositeRA1LData);
-				}
-				{
-					serialNumberLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
-					RowData serialNumberLabelLData = new RowData();
-					serialNumberLabelLData.width = 146;
-					serialNumberLabelLData.height = 22;
-					serialNumberLabel.setLayoutData(serialNumberLabelLData);
-					serialNumberLabel.setText("serial number");
-				}
-				{
-					RowData serialNumberTextLData = new RowData();
-					serialNumberTextLData.width = 83;
-					serialNumberTextLData.height = 16;
-					serialNumberText = new Text(gpsLoggerGroup, SWT.RIGHT | SWT.BORDER);
-					serialNumberText.setLayoutData(serialNumberTextLData);
-					serialNumberText.setEditable(false);
-				}
-				{
-					firmwareLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
-					RowData firmwareLabelLData = new RowData();
-					firmwareLabelLData.width = 146;
-					firmwareLabelLData.height = 22;
-					firmwareLabel.setLayoutData(firmwareLabelLData);
-					firmwareLabel.setText("firmware");
-				}
-				{
-					RowData firmwareTextLData = new RowData();
-					firmwareTextLData.width = 83;
-					firmwareTextLData.height = 16;
-					firmwareText = new Text(gpsLoggerGroup, SWT.RIGHT | SWT.BORDER);
-					firmwareText.setLayoutData(firmwareTextLData);
-					firmwareText.setEditable(false);
-				}
-				{
-					dataRatecLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
-					RowData dataRatecLabelLData = new RowData();
-					dataRatecLabelLData.width = 146;
-					dataRatecLabelLData.height = 22;
-					dataRatecLabel.setLayoutData(dataRatecLabelLData);
-					dataRatecLabel.setText("data rate");
-				}
-				{
-					RowData dataRateCComboLData = new RowData();
-					dataRateCComboLData.width = 66;
-					dataRateCComboLData.height = 17;
-					dataRateCombo = new CCombo(gpsLoggerGroup, SWT.BORDER);
-					dataRateCombo.setLayoutData(dataRateCComboLData);
-					dataRateCombo.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("dataRateCCombo.widgetSelected, event="+evt);
-							//TODO add your code for dataRateCCombo.widgetSelected
-						}
-					});
-				}
-				{
-					startModusLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
-					RowData startModusLabelLData = new RowData();
-					startModusLabelLData.width = 146;
-					startModusLabelLData.height = 22;
-					startModusLabel.setLayoutData(startModusLabelLData);
-					startModusLabel.setText("start modus");
-				}
-				{
-					RowData startModusCComboLData = new RowData();
-					startModusCComboLData.width = 66;
-					startModusCComboLData.height = 17;
-					startModusCombo = new CCombo(gpsLoggerGroup, SWT.BORDER);
-					startModusCombo.setLayoutData(startModusCComboLData);
-					startModusCombo.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("startModusCCombo.widgetSelected, event="+evt);
-							//TODO add your code for startModusCCombo.widgetSelected
-						}
-					});
-				}
-				{
-					RowData timeZoneLabelLData = new RowData();
-					timeZoneLabelLData.width = 146;
-					timeZoneLabelLData.height = 22;
-					timeZoneLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
-					timeZoneLabel.setLayoutData(timeZoneLabelLData);
-					timeZoneLabel.setText("time zone");
-				}
-				{
-					RowData timeZoneCComboLData = new RowData();
-					timeZoneCComboLData.width = 66;
-					timeZoneCComboLData.height = 17;
-					timeZoneCombo = new CCombo(gpsLoggerGroup, SWT.BORDER);
-					timeZoneCombo.setLayoutData(timeZoneCComboLData);
-					timeZoneCombo.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("timeZoneCCombo.widgetSelected, event="+evt);
-							//TODO add your code for timeZoneCCombo.widgetSelected
-						}
-					});
-				}
-				{
-					timeZoneUnitLabel = new CLabel(gpsLoggerGroup, SWT.CENTER | SWT.EMBEDDED);
-					RowData timeZoneUnitLabelLData = new RowData();
-					timeZoneUnitLabelLData.width = 79;
-					timeZoneUnitLabelLData.height = 22;
-					timeZoneUnitLabel.setLayoutData(timeZoneUnitLabelLData);
-					timeZoneUnitLabel.setText("h");
-				}
-				{
-					varioLimitLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
-					RowData varioLimitLabelLData = new RowData();
-					varioLimitLabelLData.width = 146;
-					varioLimitLabelLData.height = 22;
-					varioLimitLabel.setLayoutData(varioLimitLabelLData);
-					varioLimitLabel.setText("vario limit");
-				}
-				{
-					RowData varioLimitCComboLData = new RowData();
-					varioLimitCComboLData.width = 66;
-					varioLimitCComboLData.height = 17;
-					varioLimitCombo = new CCombo(gpsLoggerGroup, SWT.BORDER);
-					varioLimitCombo.setLayoutData(varioLimitCComboLData);
-					varioLimitCombo.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("varioLimitCCombo.widgetSelected, event="+evt);
-							//TODO add your code for varioLimitCCombo.widgetSelected
-						}
-					});
-				}
-				{
-					varioLimitUnitLabel = new CLabel(gpsLoggerGroup, SWT.CENTER);
-					RowData varioLimitUnitLabelLData = new RowData();
-					varioLimitUnitLabelLData.width = 79;
-					varioLimitUnitLabelLData.height = 22;
-					varioLimitUnitLabel.setLayoutData(varioLimitUnitLabelLData);
-					varioLimitUnitLabel.setText("m/s");
-				}
-				{
-					varioTonLabel = new CLabel(gpsLoggerGroup, SWT.RIGHT);
-					RowData varioTonLabelLData = new RowData();
-					varioTonLabelLData.width = 146;
-					varioTonLabelLData.height = 22;
-					varioTonLabel.setLayoutData(varioTonLabelLData);
-					varioTonLabel.setText("vario tone");
-				}
-				{
-					RowData varioToneComboLData = new RowData();
-					varioToneComboLData.width = 66;
-					varioToneComboLData.height = 17;
-					varioToneCombo = new CCombo(gpsLoggerGroup, SWT.BORDER);
-					varioToneCombo.setLayoutData(varioToneComboLData);
-					varioToneCombo.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("varioToneCCombo.widgetSelected, event="+evt);
-							//TODO add your code for varioToneCCombo.widgetSelected
-						}
-					});
-				}
-			}
-			{
-				saveButton = new Button(this, SWT.PUSH | SWT.CENTER);
-				saveButton.setEnabled(false);
-				saveButton.setText("save setup");
-				FormData saveButtonLData = new FormData();
-				saveButtonLData.width = 178;
-				saveButtonLData.height = 31;
-				saveButtonLData.left =  new FormAttachment(0, 1000, 80);
-				saveButtonLData.bottom =  new FormAttachment(1000, 1000, -20);
-				saveButtonLData.right =  new FormAttachment(1000, 1000, -80);
-				saveButton.setLayoutData(saveButtonLData);
-				saveButton.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent evt) {
-						System.out.println("saveButton.widgetSelected, event="+evt);
-						//TODO add your code for saveButton.widgetSelected
-					}
-				});
 			}
 			this.layout();
 		}
