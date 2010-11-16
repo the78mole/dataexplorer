@@ -1860,7 +1860,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public boolean isOneOfSyncableRecord(Record queryRecord) {
 		boolean isContained = false;
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			if (this.scaleSyncedRecords.get(syncRecordOrdinal).contains(queryRecord)) {
+			if (this.isRecordContained(syncRecordOrdinal, queryRecord)) {
 				isContained = true;
 				break;
 			}				
