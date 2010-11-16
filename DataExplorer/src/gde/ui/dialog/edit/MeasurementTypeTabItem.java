@@ -306,6 +306,7 @@ public class MeasurementTypeTabItem extends CTabItem {
 							log.log(java.util.logging.Level.FINEST, "addMeasurementButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MeasurementTypeTabItem.this.measurementsTabFolder.getItem(MeasurementTypeTabItem.this.measurementsTabFolder.getItemCount() - 1).setShowClose(false);
 							MeasurementTypeTabItem.this.measurementsTabFolder.setSelection(MeasurementTypeTabItem.this.clone());
+							MeasurementTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 					});
 				}
@@ -326,6 +327,7 @@ public class MeasurementTypeTabItem extends CTabItem {
 							MeasurementTypeTabItem.this.measurementName = MeasurementTypeTabItem.this.measurementNameText.getText();
 							if (MeasurementTypeTabItem.this.measurementType != null) {
 								MeasurementTypeTabItem.this.measurementType.setName(MeasurementTypeTabItem.this.measurementName);
+								MeasurementTypeTabItem.this.propsEditor.enableSaveButton(true);
 							}
 							MeasurementTypeTabItem.this.setText(MeasurementTypeTabItem.this.tabName = GDE.STRING_BLANK + MeasurementTypeTabItem.this.measurementName + GDE.STRING_BLANK);
 						}
@@ -348,6 +350,7 @@ public class MeasurementTypeTabItem extends CTabItem {
 							MeasurementTypeTabItem.this.measurementSymbol = MeasurementTypeTabItem.this.measurementSymbolText.getText();
 							if (MeasurementTypeTabItem.this.measurementType != null) {
 								MeasurementTypeTabItem.this.measurementType.setSymbol(MeasurementTypeTabItem.this.measurementSymbol);
+								MeasurementTypeTabItem.this.propsEditor.enableSaveButton(true);
 							}
 						}
 					});
@@ -369,6 +372,7 @@ public class MeasurementTypeTabItem extends CTabItem {
 							MeasurementTypeTabItem.this.measurementUnit = MeasurementTypeTabItem.this.measurementUnitText.getText();
 							if (MeasurementTypeTabItem.this.measurementType != null) {
 								MeasurementTypeTabItem.this.measurementType.setUnit(MeasurementTypeTabItem.this.measurementUnit);
+								MeasurementTypeTabItem.this.propsEditor.enableSaveButton(true);
 							}
 						}
 					});
@@ -391,6 +395,7 @@ public class MeasurementTypeTabItem extends CTabItem {
 							MeasurementTypeTabItem.this.isMeasurementActive = MeasurementTypeTabItem.this.measurementActiveButton.getSelection();
 							if (MeasurementTypeTabItem.this.measurementType != null) {
 								MeasurementTypeTabItem.this.measurementType.setActive(MeasurementTypeTabItem.this.isMeasurementActive);
+								MeasurementTypeTabItem.this.propsEditor.enableSaveButton(true);
 							}
 						}
 					});
