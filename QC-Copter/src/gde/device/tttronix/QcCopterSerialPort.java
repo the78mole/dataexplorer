@@ -168,7 +168,7 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				isPortOpenedByMe = true;
 			}
 			
-			int size = waitForStableReceiveBuffer(345, timeout_ms, 200);// stable counter max 3000/4 = 750
+			int size = waitForStableReceiveBuffer(345, timeout_ms, 100);// stable counter max 3000/4 = 750
 			log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "receive buffer data size = " + size);
 			byte[] data = new byte[size];
 			if (size >= 400) {// terminal character limit
