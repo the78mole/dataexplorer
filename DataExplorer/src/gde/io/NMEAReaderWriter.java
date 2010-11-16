@@ -41,6 +41,7 @@ import gde.exception.DataTypeException;
 import gde.exception.DevicePropertiesInconsistenceException;
 import gde.exception.MissMatchDeviceException;
 import gde.exception.NotSupportedFileFormatException;
+import gde.io.NMEAParser.NMEA;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -132,7 +133,8 @@ public class NMEAReaderWriter {
 
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$		
 				Vector<String> lines = new Vector<String>();
-				line = reader.readLine();
+				while (!((line = reader.readLine()).startsWith(device.getDataBlockLeader() + NMEA.GPRMC.name())))
+						;
 				++lineNumber;
 				String signature = line.substring(0,6);
 				

@@ -295,7 +295,7 @@ public class NMEAParser {
 			int hour = Integer.parseInt(strValueTime.substring(0,2));
 			int minute = Integer.parseInt(strValueTime.substring(2,4));
 			int second = Integer.parseInt(strValueTime.substring(4,6));
-			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month, this.day, hour, minute, second);
+			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month-1, this.day, hour, minute, second);
 			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT)+1)) : 0);
 
 			if (lastTimeStamp == timeStamp) { // validate sentence  depends to same sentence set
