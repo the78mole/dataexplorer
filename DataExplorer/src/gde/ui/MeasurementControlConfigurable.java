@@ -34,6 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -55,7 +56,7 @@ public class MeasurementControlConfigurable extends Composite {
 	Composite											measurementComposite;
 	Button												measurement;
 	Text													measurementName;
-	Text													measurementUnit;
+	CLabel												measurementUnit;
 	Text													measurementSymbol;
 	Button												measurementSynch;
 	Button												inputFileButton;
@@ -164,10 +165,10 @@ public class MeasurementControlConfigurable extends Composite {
 			});
 		}
 		{
-			this.measurementUnit = new Text(this, SWT.CENTER | SWT.BORDER);
+			this.measurementUnit = new CLabel(this, SWT.CENTER);
 			RowData measurementUnitLabelLData = new RowData();
 			measurementUnitLabelLData.width = 50;
-			measurementUnitLabelLData.height = 16;
+			measurementUnitLabelLData.height = 20;
 			this.measurementUnit.setLayoutData(measurementUnitLabelLData);
 			this.measurementUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.measurementUnit.setText(GDE.STRING_LEFT_BRACKET + this.measurementType.getUnit() + GDE.STRING_RIGHT_BRACKET);

@@ -107,7 +107,6 @@ public class NMEAReaderWriter {
 					activeChannel = channels.getActiveChannel();
 				}
 				String recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
-				int lastRecordNumber = -1;
 
 				//now get all data   $1;1;0; 14780;  598;  1000;  8838;  0002
 				//$recordSetNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
@@ -166,28 +165,13 @@ public class NMEAReaderWriter {
 					}
 
 					//detect states where a new record set has to be created
-					if (recordSet == null || !recordSet.getName().contains(recordSetNameExtend) || lastRecordNumber != recordSet.size()) {
-						
-						if (recordSet != null) { // apply something to previous record set
-							//check reasonable size of data points
-							if (recordSet.get(0).realSize() < 3) {
-								activeChannel.remove(recordSetName);
-								log.log(Level.WARNING, filePath + " - remove record set with < 3 data points"); //$NON-NLS-1$
-								//application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0040));
-
-							}
-							else {
-								recordSet.checkAllDisplayable(); // raw import needs calculation of passive records
-								if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
-							}
-						}
+					if (recordSet == null || !recordSet.getName().contains(recordSetNameExtend)) {
 						//prepare new record set now
-						lastRecordNumber = recordSet == null ? 0 : recordSet.size();
 						recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 
 						recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), true, true);
 						recordSetName = recordSet.getName(); // cut/correct length
-						String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
+						String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(data.getDate()); //$NON-NLS-1$
 						boolean isOutdated = false;
 						try {
 							isOutdated = Integer.parseInt(dateTime.split(GDE.STRING_DASH)[0]) <= 2000;

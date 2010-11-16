@@ -26,6 +26,7 @@ import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.logging.Logger;
@@ -181,44 +182,45 @@ public class NMEAParser {
 			int hour = Integer.parseInt(strValueTime.substring(0,2));
 			int minute = Integer.parseInt(strValueTime.substring(2,4));
 			int second = Integer.parseInt(strValueTime.substring(4,6));
-			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month, this.day, hour, minute, second);
+			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month-1, this.day, hour, minute, second);
 			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT)+1)) : 0);
 
 			if (lastTimeStamp < timeStamp) {
 				this.time_ms = (int)(this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
 				this.lastTimeStamp = timeStamp;
 				this.date = calendar.getTime();
+				log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
 				
 				int latitude, longitude, velocity;
 				try {
 					latitude = Integer.parseInt(strValues[3].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
 				}
 				catch (NumberFormatException e) {
-					latitude = 0;
+					latitude = this.values[0];
 				}
 				try {
 					longitude = Integer.parseInt(strValues[5].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
 				}
 				catch (NumberFormatException e) {
-					longitude = 0;
+					longitude = this.values[1];
 				}
 				try {
 					velocity = (int)(Double.parseDouble(strValues[7].trim())*1852.0);
 				}
 				catch (NumberFormatException e) {
-					velocity = 0;
+					velocity = this.values[7];
 				}
 				 
 				//GPS 
-				this.values[0] = latitude;
-				this.values[1] = longitude;
-				//this.values[2] = altitudeAbs;
-				//this.values[3] = numSatelites;
-				//this.values[4] = PDOP; 
-				//this.values[5] = HDOP; 
-				//this.values[6] = VDOP;
-				this.values[7] = velocity;
-				//GPS-Logger
+				this.values[0]  = latitude;
+				this.values[1]  = longitude;
+				//this.values[2]  = altitudeAbs;
+				//this.values[3]  = numSatelites;
+			  //this.values[4]  = PDOP (dilution of precision) 
+				//this.values[5]  = HDOP (horizontal dilution of precision) 
+				//this.values[6]  = VDOP (vertical dilution of precision)
+				this.values[7]  = velocity;
+				//SMGPS
 				//this.values[8]  = altitudeRel;
 				//this.values[9]  = climb;
 				//this.values[10] = voltageRx;
@@ -302,37 +304,37 @@ public class NMEAParser {
 					latitude = this.values[0] == 0 ? Integer.parseInt(strValues[2].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY)) : this.values[0];
 				}
 				catch (NumberFormatException e) {
-					latitude = 0;
+					latitude = this.values[0];
 				}
 				try {
 					longitude = this.values[1] == 0 ? Integer.parseInt(strValues[4].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY)) : this.values[1];
 				}
 				catch (NumberFormatException e) {
-					longitude = 0;
+					longitude = this.values[1];
 				}
 				try {
 					numSatelites = Integer.parseInt(strValues[7].trim())*1000;
 				}
 				catch (NumberFormatException e) {
-					numSatelites = 0;
+					numSatelites = this.values[3];
 				}
 				try {
 					altitudeAbs = (int)(Double.parseDouble(strValues[9].trim())*1000.0);
 				}
 				catch (NumberFormatException e) {
-					altitudeAbs = 0;
+					altitudeAbs = this.values[2];
 				}
 				 
 				//GPS 
-				this.values[0] = latitude;
-				this.values[1] = longitude;
-				this.values[2] = altitudeAbs;
-				this.values[3] = numSatelites;
-				//this.values[4] = PDOP; 
-				//this.values[5] = HDOP; 
-				//this.values[6] = VDOP;
-				//this.values[7] = velocity;
-				//GPS-Logger
+				this.values[0]  = latitude;
+				this.values[1]  = longitude;
+				this.values[2]  = altitudeAbs;
+				this.values[3]  = numSatelites;
+			  //this.values[4]  = PDOP (dilution of precision) 
+				//this.values[5]  = HDOP (horizontal dilution of precision) 
+				//this.values[6]  = VDOP (vertical dilution of precision)
+				//this.values[7]  = velocity;
+				//SMGPS
 				//this.values[8]  = altitudeRel;
 				//this.values[9]  = climb;
 				//this.values[10] = voltageRx;
@@ -389,18 +391,18 @@ public class NMEAParser {
 	 */
 	void parseGSA(String[] strValues) {
 		if (strValues[1].equals("A")) { // &&  Integer.parseInt(strValues[2].trim()) > 1 &&  Integer.parseInt(strValues[strValues.length-1].substring(1).trim()) == Checksum.XOR(this.values, 0, this.size)) {
-			int PDOP, HDOP, VDOP;
+			int PDOP=this.values[4], HDOP=this.values[5], VDOP=this.values[6];
 			try {
 				PDOP = (int)(Double.parseDouble(strValues[strValues.length-3].trim())*1000.0);
 			}
 			catch (NumberFormatException e) {
-				PDOP = 0;
+				//ignore and leave value unchanged
 			}
 			try {
 				HDOP = (int)(Double.parseDouble(strValues[strValues.length-2].trim())*1000.0);
 			}
 			catch (NumberFormatException e) {
-				HDOP = 0;
+				//ignore and leave value unchanged
 			}
 			try {
 				String value = strValues[strValues.length-1].trim();
@@ -408,7 +410,7 @@ public class NMEAParser {
 				VDOP = (int)(Double.parseDouble(value)*1000.0);
 			}
 			catch (NumberFormatException e) {
-				VDOP = 0;
+				//ignore and leave value unchanged
 			}
 			 
 			//GPS 
@@ -416,11 +418,11 @@ public class NMEAParser {
 			//this.values[1]  = longitude;
 			//this.values[2]  = altitudeAbs;
 			//this.values[3]  = numSatelites;
-		  this.values[4] = PDOP; 
-			this.values[5] = HDOP; 
-			this.values[6] = VDOP;
-			//this.values[7] = velocity;
-			//GPS-Logger
+		  this.values[4]  = PDOP; // (dilution of precision) 
+			this.values[5]  = HDOP; // (horizontal dilution of precision) 
+			this.values[6]  = VDOP; // (vertical dilution of precision)
+			//this.values[7]  = velocity;
+			//SMGPS
 			//this.values[8]  = altitudeRel;
 			//this.values[9]  = climb;
 			//this.values[10] = voltageRx;
@@ -482,7 +484,7 @@ public class NMEAParser {
 					velocity = (int)(Double.parseDouble(strValues[5].trim())*1852.0);
 				}
 				catch (NumberFormatException e1) {
-					velocity = 0;
+					velocity = this.values[7];
 				}
 			}
 			 
@@ -494,8 +496,8 @@ public class NMEAParser {
 		  //this.values[4]  = PDOP (dilution of precision) 
 			//this.values[5]  = HDOP (horizontal dilution of precision) 
 			//this.values[6]  = VDOP (vertical dilution of precision)
-			this.values[7] = velocity;
-			//GPS-Logger
+			this.values[7]  = velocity;
+			//SMGPS
 			//this.values[8]  = altitudeRel;
 			//this.values[9]  = climb;
 			//this.values[10] = voltageRx;
@@ -545,48 +547,25 @@ public class NMEAParser {
 	 * @param strValues
 	 */
 	void parseSMGPS(String[] strValues) {
-		int altitudeRel, climb, voltageRx, distanceTotal, distanceStart, directionStart, glideRatio;
-		try {
-			altitudeRel = (int)(Double.parseDouble(strValues[1].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e) {
-			altitudeRel = 0;
-		}
-		try {
-			climb = (int)(Double.parseDouble(strValues[2].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e) {
-			climb = 0;
-		}
-		try {
-			voltageRx = (int)(Double.parseDouble(strValues[3].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e) {
-			voltageRx = 0;
-		}
-		try {
-			distanceTotal = (int)(Double.parseDouble(strValues[4].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e) {
-			distanceTotal = 0;
-		}
-		try {
-			distanceStart = (int)(Double.parseDouble(strValues[5].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e) {
-			distanceStart = 0;
-		}
-		try {
-			directionStart = (int)(Double.parseDouble(strValues[6].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e) {
-			directionStart = 0;
-		}
-		try {
-			glideRatio = (int)(Double.parseDouble(strValues[7].trim().split(GDE.STRING_BLANK)[0].substring(2))*1000.0);
-		}
-		catch (NumberFormatException e) {
-			glideRatio = 0;
+		for (int i = 0; i < strValues.length && i < 7; i++) {
+			try {
+				String[] values = strValues[i+1].trim().split(" |:");
+				if (i != 6) {
+					this.values[8 + i] = (int) (Double.parseDouble(values[0]) * 1000.0);
+					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals(values[1])) {
+						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(values[1].contains(GDE.STRING_STAR) ? values[1].substring(0, values[1].indexOf(GDE.STRING_STAR)) : values[1]);
+					}
+				}
+				else {
+					this.values[8 + i] = (int) (Double.parseDouble(values[1]) * 1000.0);
+					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals("m/1")) {
+						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit("m/1");
+					}
+				}
+			}
+			catch (NumberFormatException e) {
+				// ignore and leave value unchanged
+			}
 		}
 		
 		//GPS 
@@ -596,15 +575,16 @@ public class NMEAParser {
 		//this.values[3]  = numSatelites;
 	  //this.values[4]  = PDOP (dilution of precision) 
 		//this.values[5]  = HDOP (horizontal dilution of precision) 
-		//this.values[6]  = VDOP (vertical dilution of precision)
+		//this.values[6]  = VDOP (vertical dilution of precision)		
 		//this.values[7]  = velocity;
-		this.values[8]  = altitudeRel;
-		this.values[9]  = climb;
-		this.values[10] = voltageRx;
-		this.values[11] = distanceTotal;
-		this.values[12] = distanceStart;
-		this.values[13] = directionStart;
-		this.values[14] = glideRatio;
+		//SMGPS
+		//this.values[8]  = altitudeRel;
+		//this.values[9]  = climb;
+		//this.values[10] = voltageRx;
+		//this.values[11] = distanceTotal;
+		//this.values[12] = distanceStart;
+		//this.values[13] = directionStart;
+		//this.values[14] = glideRatio;
 		//Unilog
 		//this.values[15] = voltageUniLog;
 		//this.values[16] = currentUniLog;
@@ -648,62 +628,19 @@ public class NMEAParser {
 	 * @param strValues
 	 */
 	void parseUNILOG(String[] strValues) {
-		int voltageUniLog, currentUniLog, powerUniLog, revolutionUniLog, voltageRxUniLog, heightUniLog, a1UniLog, a2UniLog, a3UniLog;
-		try {
-			voltageUniLog = (int)(Double.parseDouble(strValues[1].trim().split(GDE.STRING_BLANK)[0])*1000.0);
+		for (int i = 0; i < strValues.length && i < 9; i++) {
+			try {
+				String[] values = strValues[i+1].trim().split(GDE.STRING_BLANK);
+				this.values[15+i] = (int)(Double.parseDouble(values[0])*1000.0);
+				if (!this.device.getMeasurement(this.channelConfigNumber, 15+i).getUnit().equals(values[1])) {
+					this.device.getMeasurement(this.channelConfigNumber, 15+i).setUnit(values[1].contains(GDE.STRING_STAR) ? values[1].substring(0, values[1].indexOf(GDE.STRING_STAR)) : values[1]);
+				}
+			}
+			catch (NumberFormatException e) {
+				// ignore and leave value unchanged
+			}
 		}
-		catch (NumberFormatException e1) {
-			voltageUniLog = 0;
-		}
-		try {
-			currentUniLog = (int)(Double.parseDouble(strValues[2].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e1) {
-			currentUniLog = 0;
-		}
-		try {
-			powerUniLog = (int)(Double.parseDouble(strValues[3].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e1) {
-			powerUniLog = 0;
-		}
-		try {
-			revolutionUniLog = (int)(Double.parseDouble(strValues[4].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e1) {
-			revolutionUniLog = 0;
-		}
-		try {
-			voltageRxUniLog = (int)(Double.parseDouble(strValues[5].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e1) {
-			voltageRxUniLog = 0;
-		}
-		try {
-			heightUniLog = (int)(Double.parseDouble(strValues[6].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e1) {
-			heightUniLog = 0;
-		}
-		try {
-			a1UniLog = (int)(Double.parseDouble(strValues[7].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e) {
-			a1UniLog = 0;
-		}
-		try {
-			a2UniLog = (int)(Double.parseDouble(strValues[8].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e) {
-			a2UniLog = 0;
-		}
-		try {
-			a3UniLog = (int)(Double.parseDouble(strValues[9].trim().split(GDE.STRING_BLANK)[0])*1000.0);
-		}
-		catch (NumberFormatException e) {
-			a3UniLog = 0;
-		}
-		
+
 		//GPS 
 		//this.values[0]  = latitude;
 		//this.values[1]  = longitude;
@@ -713,7 +650,7 @@ public class NMEAParser {
 		//this.values[5]  = HDOP (horizontal dilution of precision) 
 		//this.values[6]  = VDOP (vertical dilution of precision)
 		//this.values[7]  = velocity;
-		//GPS-Logger
+		//SMGPS
 		//this.values[8]  = altitudeRel;
 		//this.values[9]  = climb;
 		//this.values[10] = voltageRx;
@@ -722,15 +659,15 @@ public class NMEAParser {
 		//this.values[13] = directionStart;
 		//this.values[14] = glideRatio;
 		//Unilog
-		this.values[15] = voltageUniLog;
-		this.values[16] = currentUniLog;
-		this.values[17] = powerUniLog;
-		this.values[18] = revolutionUniLog;
-		this.values[19] = voltageRxUniLog;
-		this.values[20] = heightUniLog;
-		this.values[21] = a1UniLog;
-		this.values[22] = a2UniLog;
-		this.values[23] = a3UniLog;
+		//this.values[15] = voltageUniLog;
+		//this.values[16] = currentUniLog;
+		//this.values[17] = powerUniLog;
+		//this.values[18] = revolutionUniLog;
+		//this.values[19] = voltageRxUniLog;
+		//this.values[20] = heightUniLog;
+		//this.values[21] = a1UniLog;
+		//this.values[22] = a2UniLog;
+		//this.values[23] = a3UniLog;
 		//M-LINK
 		//this.values[24] = add00;
 		//this.values[25] = add01;
@@ -779,7 +716,7 @@ public class NMEAParser {
 		//this.values[5]  = HDOP (horizontal dilution of precision) 
 		//this.values[6]  = VDOP (vertical dilution of precision)
 		//this.values[7]  = velocity;
-		//GPS-Logger
+		//SMGPS
 		//this.values[8]  = altitudeRel;
 		//this.values[9]  = climb;
 		//this.values[10] = voltageRx;
