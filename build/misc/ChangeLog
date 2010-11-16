@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 
 add a configuration dialog for GPS/KML velocity limits and colors
 add SM GPS-Logger
+fix scale synchronization problem while same data
 
 Version 2.50 - 01 Nov 2010
 
