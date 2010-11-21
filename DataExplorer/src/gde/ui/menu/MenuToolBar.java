@@ -1423,7 +1423,7 @@ public class MenuToolBar {
 
 			// check if selected key matches the existing object key or is new for this channel
 			if (!newObjectKey.equals(channelObjKey)) { // channel has a key
-				int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGT0205, new Object[] { channelObjKey, newObjectKey }));
+				int answer = this.application.getActiveRecordSet() == null ? SWT.YES : (MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGT0205, new Object[] { channelObjKey, newObjectKey })));
 				if (answer == SWT.YES) { //replace existing objectkey in channel
 					activeChannel.setObjectKey(newObjectKey);
 					String updateFileDescription = activeChannel.getFileDescription();
