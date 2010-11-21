@@ -21,6 +21,8 @@ package gde.device.smmodellbau;
 import gde.GDE;
 import gde.data.Channels;
 import gde.device.IDevice;
+import gde.device.smmodellbau.gpslogger.MessageIds;
+import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.MeasurementControl;
 import gde.ui.MeasurementControlConfigurable;
@@ -44,35 +46,39 @@ import org.eclipse.swt.widgets.Widget;
  * @author Winfried Brügmann
  */
 public class GPSLoggerVisualizationControl extends Composite {
-	final static Logger							log									= Logger.getLogger(GPSLoggerVisualizationControl.class.getName());
+	private static final String	MLINK_EXTEND_ML			= "_ML";																														//$NON-NLS-1$
+	private static final String	UNILOG_EXTEND_UL		= "_UL";																														//$NON-NLS-1$
 
-	Composite												measurementComposite;
-	Button													measurement;
-	Button													inputFileButton;
-	Composite												buttonComposite;
-	Label														measurementUnitLabel;
-	Label														measurementSymbolLabel;
-	Label														tabItemLabel;
+	final static Logger					log									= Logger.getLogger(GPSLoggerVisualizationControl.class.getName());
 
-	boolean													isVisibilityChanged	= false;
+	Composite										measurementComposite;
+	Button											measurement;
+	Button											inputFileButton;
+	Composite										buttonComposite;
+	Label												measurementUnitLabel;
+	Label												measurementSymbolLabel;
+	Label												tabItemLabel;
 
-	final Widget										parent;
-	final IDevice										device;																								// get device specific things, get serial port, ...
-	final DataExplorer							application;																					// interaction with application instance
-	final Channels									channels;																							// interaction with channels, source of all records
-	final GPSLoggerDialog						dialog;
-	final int												channelConfigNumber;
-	final String										typeName;
-	final int												measurementCount;
-	final int 											measurementOffset;
-	final List<Composite>	measurementTypes		= new ArrayList<Composite>();
+	boolean											isVisibilityChanged	= false;
 
-	public GPSLoggerVisualizationControl(Composite parentComposite, FormData useLayoutData, GPSLoggerDialog parentDialog, int useChannelConfigNumber, IDevice useDevice, String useName, int useMeasurementOffset, int useMeasurementCount) {
+	final Widget								parent;
+	final IDevice								device;																																								// get device specific things, get serial port, ...
+	final DataExplorer					application;																																					// interaction with application instance
+	final Channels							channels;																																							// interaction with channels, source of all records
+	final GPSLoggerDialog				dialog;
+	final int										channelConfigNumber;
+	final String								typeName;
+	final int										measurementCount;
+	final int										measurementOffset;
+	final List<Composite>				measurementTypes		= new ArrayList<Composite>();
+
+	public GPSLoggerVisualizationControl(Composite parentComposite, FormData useLayoutData, GPSLoggerDialog parentDialog, int useChannelConfigNumber, IDevice useDevice, String useName,
+			int useMeasurementOffset, int useMeasurementCount) {
 		super(parentComposite, SWT.NONE);
 		this.parent = parentComposite;
 		this.dialog = parentDialog;
 		this.device = useDevice;
-		this.typeName = useName; 
+		this.typeName = useName;
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.channelConfigNumber = useChannelConfigNumber;
@@ -88,12 +94,12 @@ public class GPSLoggerVisualizationControl extends Composite {
 
 	void create() {
 		{
-			if (this.typeName.equals("GPS-Logger")) {
+			if (this.typeName.equals(Messages.getString(MessageIds.GDE_MSGT2010))) {
 				this.tabItemLabel = new Label(this, SWT.CENTER);
 				GridData tabItemLabelLData = new GridData();
 				tabItemLabelLData.horizontalAlignment = GridData.CENTER;
 				tabItemLabelLData.verticalAlignment = GridData.BEGINNING;
-				tabItemLabelLData.heightHint = 30;
+				tabItemLabelLData.heightHint = 18;
 				tabItemLabelLData.widthHint = 250;
 				this.tabItemLabel.setLayoutData(tabItemLabelLData);
 				this.tabItemLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD));
@@ -101,13 +107,18 @@ public class GPSLoggerVisualizationControl extends Composite {
 			}
 		}
 		{
-			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-			for (int i = this.measurementOffset; i < this.measurementOffset+this.measurementCount; i++) {
-				if (this.typeName.startsWith("M-Link")) {
-					this.measurementTypes.add(new MeasurementControlConfigurable(this, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), "_ML"));
+			//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+			//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+			//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
+			//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) {
+				if (this.typeName.startsWith(Messages.getString(MessageIds.GDE_MSGT2012))) {
+					this.measurementTypes.add(new MeasurementControlConfigurable(this, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device,
+							1, GDE.STRING_BLANK + (i - this.measurementOffset), GPSLoggerVisualizationControl.MLINK_EXTEND_ML));
 				}
-				else if (this.typeName.startsWith("UniLog") && i >= this.measurementOffset+this.measurementCount-3) {
-					this.measurementTypes.add(new MeasurementControlConfigurable(this, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1, "A" + (i - 20),"_UL"));
+				else if (this.typeName.startsWith(Messages.getString(MessageIds.GDE_MSGT2011)) && i >= this.measurementOffset + this.measurementCount - 3) {
+					this.measurementTypes.add(new MeasurementControlConfigurable(this, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device,
+							1, "A" + (i - 20), GPSLoggerVisualizationControl.UNILOG_EXTEND_UL)); //$NON-NLS-1$
 				}
 				else {
 					this.measurementTypes.add(new MeasurementControl(this, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1));

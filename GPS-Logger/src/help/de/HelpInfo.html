@@ -16,13 +16,13 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010 Winfried Bruegmann
+    Copyright (c) 2010 Winfried Bruegmann
 ************************************************************************************** 
 -->
 <HTML>
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-	<TITLE>DataExplorer - CSV2SerialAdapter Ger&auml;tedialog</TITLE>
+	<TITLE>DataExplorer - SM GPS-Logger Ger&auml;tedialog</TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.4  (Win32)">
 	<META NAME="CREATED" CONTENT="0;0">
 	<META NAME="CHANGEDBY" CONTENT="Winfried Br&uuml;gmann">
@@ -30,18 +30,51 @@
 </HEAD>
 <BODY LANG="de-DE" DIR="LTR">
 <DIV TYPE=HEADER>
-	<H2><FONT FACE="Arial"><FONT SIZE=4><I>CSV2SerialAdapter Ger&auml;tedialog</I></FONT></FONT></H2>
+	<H2><FONT FACE="Arial"><FONT SIZE=4><I>SM GPS-Logger Ger&auml;tedialog</I></FONT></FONT></H2>
 </DIV>
 <P>Der gezeigte Ger&auml;tedialog dient zur Konfiguration der Anzeige der ausgelesenen Daten.
-&Uuml;ber einen Dateiauswahldialog, erreichbar &uuml;ber "&ouml;ffne Datei", k&ouml;nnen auch neue Dateien Eingelesen werden.
-Da der Konfigurationsdialog dynamisch aufgebaut wird, sieht dieser für jede Gerätekonfiguration unterschiedlich aus.
-Beispielhaft sind hier zwei Dialoge gezeigt.
+Nicht selektierte Messgr&ouml;&szlig;en erscheinen dadurch nicht inder grafischen Anzeige. 
+Dadurch wird die &Uuml;bersichtlichkeit stark erh&ouml;t, zweidimensional schlecht darstellbare Kurven werden ausgeblendet.
+&Uuml;ber einen Dateiauswahldialog, erreichbar &uuml;ber "importiere Datei", k&ouml;nnen auch neue Dateien Eingelesen werden.
 </P>
-<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_1.png" NAME="HelpInfo_Bild_1" ALT="HelpInfo_Bild_1"><IMG SRC="HelpInfo_Bild_2.png" NAME="HelpInfo_Bild_2" ALT="HelpInfo_Bild_2">
-</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_1.png" NAME="HelpInfo_Bild_1" ALT="HelpInfo_Bild_1"></P>
 <P>Hinweis: Ist die Anzeige erst einmal konfiguriert, wird diese Anzeigekonfiguration auch angewendet, 
 wenn über die Kanal/Konfigurations- Auswahl in der Toolbar eine Konfiguration gewählt und dann über "importiere Datei"
 in der Toolsleiste der Dateidialog geöffnet und eine Datei eingelesen wird.
 </P>
+<P>
+Wird ein UniLog als Messaufnehmer angeschlossen werden die drei Analogeingänge mit frei konfigurierbarem Namen und Messsymbol angezeigt.
+Die Einheit, wird aus den NMEA Daten &uuml;bernommen.
+Als initiale Vorgaben sind 'Geschwindigkeit', 'Kapazität' und 'Temperatur' eingesetzt, die bei abweichender Einstellung anzupassen sind.
+In der grafischen Anzeige, bzw. dem Kurvenselektor erscheinen die Namen der Messgr&ouml;&szet&en für UniLog Messwerte immer mit angeh&auml;ngtem '_UL'.
+Sind eigene Messaufnehmer angeschlossen k&ouml;nnen &uuml;ber den Ger&auml;tekonfigurationseditor Offset, sowie Faktor angepasst werden.
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_2.png" NAME="HelpInfo_Bild_2" ALT="HelpInfo_Bild_2"></P>
+<P>
+Werden Multiplex Sensoren angeschlossen, werden die Einheiten aus den NMEA Daten &uuml;bernommen.
+Die Namen und Symbole der Messwerte m&uuml;ssen entsprechend angepasst werden.
+Die initialen Vorgaben sind her nur beispielhaft eingesetzt.
+In der grafischen Anzeige, bzw. dem Kurvenselektor erscheinen die Namen der Messgr&ouml;&szlig;en für M-Link Messwerte immer mit angeh&auml;ngtem '_ML'.
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_3.png" NAME="HelpInfo_Bild_3" ALT="HelpInfo_Bild_3"></P>
+<P>Auf der rechten Rand der Anzeigenkonfiguration befindet sich ein zus&auml;tzlicher Schalter, der eine halbautomatische synchronisation der Skalen erm&ouml;glicht. 
+Wird hier selektiert wird auf Namensgleichkeit gepr&uuml;ft, bei entsprechender &Uuml;bereinstimmung wird in der Ger&auml;tekonfigurationsdatei bei den Messwerten die entsprechende
+Eigenschaft eingesetzt. Funkioniert das nicht automatisch, bkeibt immer noch die M&ouml;glichkeit das manuell &uuml;ber den GerateKonfigurationseditor einzustellen.
+Durch Skalensynchronisation wird die verf&uuml;gbare Anzeigefl&auml;che verr&ouml;&szlig;ert und es k&ouml;nnen Messwertaufnehmer direkt verglichen werden ohnen den Kurvenvergleich zu benutzen.
+</P>
+<H3><A NAME="configuration"><FONT FACE="Arial"><FONT SIZE=3><I>Ger&auml;tekonfiguration</I></FONT></FONT></H3>
+<P>Der zweite Tabulator ermöglicht die Ger&auml;tekonfigurationsdatei einzulesen und auch zurückzuschreiben. 
+Beim Wechsel auf diesen Tabulator wird der Dateiauswahldialog angezeigt. Das kann bei Bedarf wiederholt werden oder auch abgebrochen werden.
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_4.png" NAME="HelpInfo_Bild_4" ALT="HelpInfo_Bild_4"></P>
+<P>
+Es k&ouml;nnen die entprechenden Alarme eingestellt und
+bei angeschlossenen Multiplex Sensoren können die R&uuml;ckkanaladressen hier konfiguriert werden.
+</P> 
+<P>Hinweis: Ein voreingestellter Verzeichnispfad kann &uuml;ber den Ger&auml;teeigenschafteneditor in der Sektion, Datenblock - Optionale Einst&auml;ge - Datenpfad, eingetellt werden.
+Diese Konfiguration ist dazu gedacht, den Verzeichnispfad einzustellen, der die Datendateien nach dem einstecken der SD-Karte enth&auml;lt. 
+Zum Laden der Setupdatei ist dann das 'SM GPS-Logger setup' auszuw&auml;hlen.
+</P>
+
 </BODY>
 </HTML>
