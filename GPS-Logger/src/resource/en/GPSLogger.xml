@@ -27,7 +27,7 @@
     <State>
         <property description="" type="Integer" value="01" name="flight record"/>
     </State>
-    <Channel type="TYPE_CONFIG" name="Konfiguration">
+    <Channel type="TYPE_CONFIG" name="Configuration">
         <Measurement>
             <name>Latitude</name>
             <symbol>B</symbol>
