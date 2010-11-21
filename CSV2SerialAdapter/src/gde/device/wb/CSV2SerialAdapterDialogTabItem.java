@@ -94,7 +94,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 			GridData tabItemLabelLData = new GridData();
 			tabItemLabelLData.horizontalAlignment = GridData.BEGINNING;
 			tabItemLabelLData.verticalAlignment = GridData.BEGINNING;
-			tabItemLabelLData.heightHint = 30;
+			tabItemLabelLData.heightHint = 20;
 			tabItemLabelLData.widthHint = 292;
 			this.tabItemLabel.setLayoutData(tabItemLabelLData);
 			this.tabItemLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+2, SWT.BOLD));
