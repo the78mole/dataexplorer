@@ -29,16 +29,44 @@
 <DIV TYPE=HEADER>
 	<H2><A NAME="Introduction"></A><FONT FACE="Arial"><FONT SIZE=4><I>SM GPS-Logger Device Dialog</I></FONT></FONT></H2>
 </DIV>
-<P>The device dialog is used to configure the visualization of the displayed data.
-Using the "open file" button a file selection dialog enable to open new files while applying the current visible
-visualization configuration.
-The dialog is build up dynamically and might be different for each device.
-As example two different dialogs are shown:
+<P>The below device dialog should be used to configure the visualization of measurements.
+Unchecked measurement will not be displayed. 
+This will lead to a more clear representation, curves which are hard to be interpreted in two dimensional way, may be blanked out.
+It is possible to import NMEA data files using the 'import Files' button as well.
 </P>
-<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_1.png" NAME="Image1" ALT="Image1"><IMG SRC="HelpInfo_Image_2.png" NAME="Image2" ALT="Image2">
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_1.png" NAME="HelpInfo_Image_1" ALT="HelpInfo_Image_1"></P>
+<P>Hint: The visualization configuration will be applied as well as it is closed in cases where the tool bar button is used to import the data.
 </P>
-<P>Hint: The configured visualization profile is also used if a channel/configuration is selected using the tools bar combo box
-and the data are imported with the "import file" button.
+<P>
+Is a UniLog as sensor device connected the three analog entry fields might be named freely. Same is valid for the symbol.
+The unit will be overtaken from the NMEA data.
+As initial presets 'velocity', 'capacity' and 'temperature' gets used. This has to be adapted if required.
+The scale of the graphics and the curve selector table will display updated names for the measurements. UniLog measurements has always a trailing '_UL'.
+If required an measurement offset as well as a factor can be configured using the device properties editor.
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_2.png" NAME="HelpInfo_Image_2" ALT="HelpInfo_Image_2"></P>
+<P>
+If Multiplex sensors are connected, the units are overtaken from the NMEA data as well. The names and symbols must be manually adapted.
+The initial presets are only samples.
+Multiplex M-Link sensor measurements has always a trailing '_ML'.
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_3.png" NAME="HelpInfo_Image_3" ALT="HelpInfo_Image_3"></P>
+<P>At the right hand side of the configuration panel are check boxes which enable a semi automatic scale synchronization.
+While checking measurement name will be compared to previous once and the fitting measurement ordinal will be added to the measurement configuration entry.
+Using scale synchronization will reduce the required space for scales and spend more for the graphics. 
+Overlaying curves in this matter will allow direct comparison without using the curve compare window.
+</P>
+<H3><A NAME="configuration"><FONT FACE="Arial"><FONT SIZE=3><I>Device Setup</I></FONT></FONT></H3>
+<P>The second main tabulator enables loading device setup data from file as well as change and save direct to the SD-card.
+While switching to the tab the file selection dialog will be opened. As required this can be skipped or repeated. 
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_4.png" NAME="HelpInfo_Image_4" ALT="HelpInfo_Image_4"></P>
+<P>
+It is possible to configure a number of alarm thresholds and addresses to be used for Multiplex M-Link sensors.
+</P> 
+<P>Hint: A preset directory path is configurable using the device properties editor on tab, Data Block - Optional Entries - data path.
+This configuration will position the file open dialog at the directory where the NMEA data files can directly be selected at the point where the SD-card is mounted.
+To load the setup file change into 'SM GPS-Logger setup' directory.
 </P>
 </BODY>
 </HTML>

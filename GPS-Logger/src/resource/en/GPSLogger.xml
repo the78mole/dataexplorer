@@ -17,7 +17,7 @@
     <DataBlock>
         <format size="39" type="TEXT"/>
         <checkSum type="XOR"/>
-        <timeUnit>sec</timeUnit>
+        <timeUnit>msec</timeUnit>
         <separator>comma</separator>
         <leader>$</leader>
         <trailer>0D0A</trailer>
@@ -178,7 +178,7 @@
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+            <property description="Scalesynchronisatios reference as ordinal value" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Velocity_UL</name>
@@ -186,8 +186,8 @@
             <unit>m</unit>
             <active>false</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
-            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
+            <property description="Offset to a measurement value" type="Double" value="0.0" name="offset"/>
+            <property description="Factor to a measurement value" type="Double" value="1.0" name="factor"/>
         </Measurement>
         <Measurement>
             <name>Capacity_UL</name>
@@ -213,7 +213,6 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="10" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Reception_ML</name>
@@ -235,7 +234,6 @@
             <unit>m/s</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="9" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Temperature_ML</name>
@@ -250,7 +248,6 @@
             <unit>km/h</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Direction_ML</name>
@@ -260,12 +257,11 @@
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>HeoghtRelative_ML</name>
+            <name>HeightRelative_ML</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Distance_ML</name>
@@ -273,7 +269,6 @@
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="12" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>TripLength_ML</name>
@@ -281,7 +276,6 @@
             <unit>km</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Current_ML</name>
@@ -312,12 +306,11 @@
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>HeoghtRelative 2_ML</name>
+            <name>HeightRelative 2_ML</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
         </Measurement>
     </Channel>
     <Desktop>

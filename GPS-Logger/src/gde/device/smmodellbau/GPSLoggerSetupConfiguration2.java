@@ -80,6 +80,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 			" 15.0", " 15.5", " 15.6", " 15.7", " 15.8", " 15.9", " 16.0", " 16.5", " 17.0", " 17.5", " 18.0", " 18.5", " 19.0", " 19.5", " 20.0", " 20.3", " 20.3", " 20.4", " 20.5", " 20.6", " 20.7",
 			" 21.0", " 21.5", " 22.0", " 23.0", " 24.0", " 24.5", " 24.6", " 24.7", " 24.8", " 25.0", " 30.0", " 40.0", " 50.0", " 60.0" };
 
+	final String[]					capacityValues 			= {"  250", "  500", "  750", " 1000", " 1250", " 1500", " 1750", " 2000", " 2250", " 2500", " 2750", " 3000", " 3250", " 3500", " 4000", " 5000", " 6000"};
 	final SetupReaderWriter	configuration;
 
 	/**
@@ -160,7 +161,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				{
 					this.currentButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData currentButtonLData = new RowData();
-					currentButtonLData.width = 100;
+					currentButtonLData.width = 110;
 					currentButtonLData.height = 21;
 					this.currentButton.setLayoutData(currentButtonLData);
 					this.currentButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -196,6 +197,9 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "currentCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration2.this.currentCombo.getText().trim());
+							GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm < 1 ? 1
+									: GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm > 400 ? 400 : GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm; 
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
 					this.currentCombo.addVerifyListener(new VerifyListener() {
@@ -210,6 +214,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(java.util.logging.Level.FINEST, "currentCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration2.this.currentCombo.getText().trim());
+							GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm < 1 ? 1
+									: GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm > 400 ? 400 : GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm; 
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -233,7 +239,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				{
 					this.voltageStartButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData voltageStartButtonLData = new RowData();
-					voltageStartButtonLData.width = 100;
+					voltageStartButtonLData.width = 110;
 					voltageStartButtonLData.height = 21;
 					this.voltageStartButton.setLayoutData(voltageStartButtonLData);
 					this.voltageStartButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -265,8 +271,9 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.voltageStartCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "voltageStartCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageStartCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+							GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageStartCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+							GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm < 10 ? 10 
+									: GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm > 600 ? 600 : GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm; 
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -279,8 +286,9 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.voltageStartCombo.addKeyListener(new KeyAdapter() {
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "voltageStartCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageStartCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+							GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageStartCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+							GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm < 10 ? 10 
+									: GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm > 600 ? 600 : GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm; 
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -304,7 +312,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				{
 					this.voltageButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData voltageButtonLData = new RowData();
-					voltageButtonLData.width = 100;
+					voltageButtonLData.width = 110;
 					voltageButtonLData.height = 21;
 					this.voltageButton.setLayoutData(voltageButtonLData);
 					this.voltageButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -336,8 +344,9 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.voltageCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "voltageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+							GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+							GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm < 10 ? 10 
+									: GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm > 600 ? 600 : GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm; 
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -350,8 +359,9 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.voltageCombo.addKeyListener(new KeyAdapter() {
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "voltageCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+							GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+							GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm < 10 ? 10 
+									: GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm > 600 ? 600 : GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm; 
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -375,7 +385,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				{
 					this.capacityButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData voltageRxULButtonLData = new RowData();
-					voltageRxULButtonLData.width = 100;
+					voltageRxULButtonLData.width = 110;
 					voltageRxULButtonLData.height = 21;
 					this.capacityButton.setLayoutData(voltageRxULButtonLData);
 					this.capacityButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -402,12 +412,14 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.capacityCombo = new CCombo(this.unilogTelemtryAlarmsGroup, SWT.BORDER);
 					this.capacityCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.capacityCombo.setLayoutData(CCombo1LData);
-					this.capacityCombo.setItems(this.voltageStartValues);
-					this.capacityCombo.setText(String.format(Locale.ENGLISH, "%5.1f", this.configuration.voltageUlAlarm / 10.0)); //$NON-NLS-1$
+					this.capacityCombo.setItems(this.capacityValues);
+					this.capacityCombo.setText(String.format(Locale.ENGLISH, "%5d", this.configuration.capacityUlAlarm)); //$NON-NLS-1$
 					this.capacityCombo.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "capacityCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration2.this.capacityCombo.getText().trim());
+							GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm < 100 ? 100 
+									: GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm > 30000 ? 30000 : GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm; 
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -421,6 +433,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "capacityCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration2.this.capacityCombo.getText().trim());
+							GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm < 100 ? 100 
+									: GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm > 30000 ? 30000 : GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm; 
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});

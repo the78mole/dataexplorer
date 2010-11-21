@@ -17,7 +17,7 @@
     <DataBlock>
         <format size="39" type="TEXT"/>
         <checkSum type="XOR"/>
-        <timeUnit>sec</timeUnit>
+        <timeUnit>msec</timeUnit>
         <separator>comma</separator>
         <leader>$</leader>
         <trailer>0D0A</trailer>
@@ -213,7 +213,6 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="10" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Empfang_ML</name>
@@ -235,7 +234,6 @@
             <unit>m/s</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="9" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Temperatur_ML</name>
@@ -250,7 +248,6 @@
             <unit>km/h</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Richtung_ML</name>
@@ -265,7 +262,6 @@
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>AbstandStart_ML</name>
@@ -273,7 +269,6 @@
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="12" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Strecke_ML</name>
@@ -281,7 +276,6 @@
             <unit>km</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>Strom_ML</name>
@@ -317,7 +311,6 @@
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
-            <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
         </Measurement>
     </Channel>
     <Desktop>
