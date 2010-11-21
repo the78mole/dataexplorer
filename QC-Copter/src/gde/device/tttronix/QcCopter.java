@@ -18,7 +18,6 @@
 ****************************************************************************************/
 package gde.device.tttronix;
 
-
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -48,8 +47,8 @@ import javax.xml.bind.JAXBException;
  * Class to implement QC-Copter device
  * @author Winfried Brügmann
  */
-public class QcCopter  extends DeviceConfiguration implements IDevice {
-	final static Logger						log	= Logger.getLogger(QcCopter.class.getName());
+public class QcCopter extends DeviceConfiguration implements IDevice {
+	final static Logger				log	= Logger.getLogger(QcCopter.class.getName());
 
 	final DataExplorer				application;
 	final QcCopterDialog			dialog;
@@ -94,6 +93,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * query the default stem used as record set name
 	 * @return recordSetStemName
 	 */
+	@Override
 	public String getRecordSetStemName() {
 		return Messages.getString(MessageIds.GDE_MSGT1900);
 	}
@@ -101,6 +101,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public QcCopterDialog getDialog() {
 		return this.dialog;
 	}
@@ -110,6 +111,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
+	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 		// ...
 		return lov2osdMap;
@@ -122,6 +124,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return converted configuration data
 	 */
+	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
 		return ""; //$NON-NLS-1$
@@ -130,8 +133,9 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	/**
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
+	@Override
 	public int getLovDataByteSize() {
-		return 86;  //sometimes first 4 bytes give the length of data + 4 bytes for number
+		return 86; //sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
 
 	/**
@@ -142,6 +146,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
+	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
@@ -153,24 +158,24 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordNames.length; ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
-			record = recordSet.get(recordNames[i]);		
+			record = recordSet.get(recordNames[i]);
 			measurement = this.getMeasurement(channelConfigNumber, i);
-			log.log(Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
-			
+			log.log(java.util.logging.Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
+
 			// update active state and displayable state if configuration switched with other names
 			if (record.isActive() != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
-				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
-			}	
-			if(includeReasonableDataCheck) {
+				log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ //$NON-NLS-2$				
+				log.log(java.util.logging.Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
-				log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
@@ -184,10 +189,11 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * for calculation which requires more effort or is time consuming it can call a background thread, 
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
+	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//add implementation where data point are calculated
 		//do not forget to make record displayable -> record.setDisplayable(true);
-		
+
 		//for the moment there are no calculations necessary
 		//String[] recordNames = recordSet.getRecordNames();
 		//for (int i=0; i<recordNames.length; ++i) {
@@ -201,6 +207,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the serialPort
 	 */
+	@Override
 	public QcCopterSerialPort getSerialPort() {
 		return this.serialPort;
 	}
@@ -210,15 +217,17 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
+	@Override
 	public String[] getUsedPropertyKeys() {
-		return new String[] {IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION};
+		return new String[] { IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION };
 	}
-	
+
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
+	@Override
 	public void openCloseSerialPort() {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
@@ -232,25 +241,26 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 							}
 						}
 						catch (RuntimeException e) {
-							log.log(Level.SEVERE, e.getMessage(), e);
+							log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 						}
 						catch (Throwable e) {
-							log.log(Level.SEVERE, e.getMessage(), e);
+							log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 						}
 						//if (this.getDialog().boundsComposite != null && !this.getDialog().isDisposed()) this.getDialog().boundsComposite.redraw();
 					}
 				}
 				catch (SerialPortException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+					this.application.openMessageDialog(this.dialog.getDialogShell(),
+							Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 				}
 				catch (ApplicationConfigurationException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
+					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
 				}
 				catch (Throwable e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
+					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 				}
 			}
 			else {
@@ -274,6 +284,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
+	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int deviceDataBufferSize = this.getDataBlockSize();
@@ -282,7 +293,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 		int progressCycle = 0;
 		int lovDataSize = this.getLovDataByteSize();
 		byte[] convertBuffer = new byte[deviceDataBufferSize];
-		double lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0; 
+		double lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0;
 
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
@@ -291,27 +302,27 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 			System.arraycopy(dataBuffer, offset, convertBuffer, 0, deviceDataBufferSize);
 			//recordSet.addPoints(convertDataBytes(points, convertBuffer));
 			offset += lovDataSize;
-			
+
 			//prepare time calculation while individual time steps gets recorded
 			byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize];
 			System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
-			long dateTime = (long) (lastDateTime+11650);
+			long dateTime = (long) (lastDateTime + 11650);
 			try {
-				dateTime = Long.parseLong((new String(timeBuffer).trim() + "0000000000").substring(6, 16)); //10 digits
+				dateTime = Long.parseLong((new String(timeBuffer).trim() + "0000000000").substring(6, 16)); //10 digits //$NON-NLS-1$
 			}
 			catch (NumberFormatException e) {
 				// ignore
 			}
-			deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime)/116.5; 
-			log.log(Level.FINE, String.format("%d; %4.1fd ms - %d : %s", i, deltaTime, dateTime, new String(timeBuffer).trim()));
+			deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime) / 116.5;
+			log.log(java.util.logging.Level.FINE, String.format("%d; %4.1fd ms - %d : %s", i, deltaTime, dateTime, new String(timeBuffer).trim())); //$NON-NLS-1$
 			sumTimeDelta += deltaTime;
 			lastDateTime = dateTime;
-			
+
 			recordSet.addPoints(convertDataBytes(points, convertBuffer), sumTimeDelta);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
-		
+
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 	}
 
@@ -321,22 +332,23 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
-		for (int i=0, j=0; j<points.length; ++i, ++j) {
+	@Override
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
+		for (int i = 0, j = 0; j < points.length; ++i, ++j) {
 			//DBx_0 = 94 + [ A7 A6 A5 A4 A3 A2 ]
 			//DBx_1 = 94 + [ A1 A0 B7 B6 B5 ]
 			//DBx_2 = 94 + [ B4 B3 B2 B1 B0 ]
-			int DBx_1 = (dataBuffer[1+i*3]   & 0xFF) - 94;
-			int DBx_2 = (dataBuffer[1+i*3+1] & 0xFF) - 94;
-			int DBx_3 = (dataBuffer[1+i*3+2] & 0xFF) - 94;
-			log.log(Level.FINE, i + "; " + j + "; " + (1+i*3) + "; " + (1+i*3+1) + "; " + (1+i*3+2));
-			log.log(Level.FINE, i + "; " + j + ": " + DBx_1 + "; " + DBx_2 + "; " + DBx_3);
-			
-			if (i <= 10 || i > 12 ) {
-				points[j] = ((DBx_2 & 0x0007) << 13) | ((DBx_3 & 0x001F) << 8)  | ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
+			int DBx_1 = (dataBuffer[1 + i * 3] & 0xFF) - 94;
+			int DBx_2 = (dataBuffer[1 + i * 3 + 1] & 0xFF) - 94;
+			int DBx_3 = (dataBuffer[1 + i * 3 + 2] & 0xFF) - 94;
+			log.log(java.util.logging.Level.FINE, i + "; " + j + "; " + (1 + i * 3) + "; " + (1 + i * 3 + 1) + "; " + (1 + i * 3 + 2)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			log.log(java.util.logging.Level.FINE, i + "; " + j + ": " + DBx_1 + "; " + DBx_2 + "; " + DBx_3); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+			if (i <= 10 || i > 12) {
+				points[j] = ((DBx_2 & 0x0007) << 13) | ((DBx_3 & 0x001F) << 8) | ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
 
 				if (i != 10 && (points[j] & 0x00008000) > 0) // i==10 battery voltage uint16
-					points[j] = (0xFFFF0000 | points[j]);				
+					points[j] = (0xFFFF0000 | points[j]);
 
 			}
 			else { // motor uint8
@@ -347,10 +359,10 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 			points[j] *= 1000;
 		}
 
-		log.log(Level.FINER, "CheckSum = " + (Checksum.ADD(dataBuffer, 1, 57)) + " = " + ( (((dataBuffer[58]&0xFF) - 94) << 6) | (((dataBuffer[59]&0xFF) - 94) & 0x3F) ) );
+		log.log(java.util.logging.Level.FINER, "CheckSum = " + (Checksum.ADD(dataBuffer, 1, 57)) + " = " + ((((dataBuffer[58] & 0xFF) - 94) << 6) | (((dataBuffer[59] & 0xFF) - 94) & 0x3F))); //$NON-NLS-1$ //$NON-NLS-2$
 		return points;
 	}
-	
+
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
@@ -362,41 +374,42 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
+	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
-		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
+		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-		
+
 		int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 		byte[] timeStampBuffer = new byte[timeStampBufferSize];
-		if(!recordSet.isTimeStepConstant()) {
+		if (!recordSet.isTimeStepConstant()) {
 			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
 
 			for (int i = 0; i < recordDataSize; i++) {
-				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8) + ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
+				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8)
+						+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
 			}
 		}
-		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
-		
+		log.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
+
 		for (int i = 0; i < recordDataSize; i++) {
-			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize); //$NON-NLS-1$
-			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
-			
+			log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
+			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
+
 			for (int j = 0; j < points.length; j++) {
-				points[j] = (((convertBuffer[j * 4] & 0xff) << 24) + ((convertBuffer[1+(j * 4)] & 0xff) << 16) + ((convertBuffer[2+(j * 4)] & 0xff) << 8) + ((convertBuffer[3+(j * 4)] & 0xff) << 0));
+				points[j] = (((convertBuffer[j * 4] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8) + ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
 			}
-			
-			if(recordSet.isTimeStepConstant()) 
+
+			if (recordSet.isTimeStepConstant())
 				recordSet.addPoints(points);
 			else
-				recordSet.addPoints(points, timeStamps.get(i)/10.0);
+				recordSet.addPoints(points, timeStamps.get(i) / 10.0);
 
-			
-			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		this.updateVisibilityStatus(recordSet, true);
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
@@ -406,13 +419,14 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
+	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
-		String[] dataTableRow = new String[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
+		String[] dataTableRow = new String[recordSet.size() + 1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
-			String[] recordNames = recordSet.getRecordNames();				
-			int numberRecords = recordNames.length;			
+			String[] recordNames = recordSet.getRecordNames();
+			int numberRecords = recordNames.length;
 
-			dataTableRow[0] = String.format("%.3f", (recordSet.getTime_ms(rowIndex) / 1000.0));
+			dataTableRow[0] = String.format("%.3f", (recordSet.getTime_ms(rowIndex) / 1000.0)); //$NON-NLS-1$
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
@@ -422,9 +436,9 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTableRow;		
+		return dataTableRow;
 	}
 
 	/**
@@ -432,6 +446,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double translateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -439,7 +454,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 
 		double newValue = (value - reduction) * factor + offset;
 
-		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -448,6 +463,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -455,7 +471,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 
 		double newValue = (value - offset) / factor + reduction;
 
-		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 }

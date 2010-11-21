@@ -23,6 +23,7 @@ import gde.device.DeviceConfiguration;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
+import gde.messages.Messages;
 import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
@@ -65,7 +66,7 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 	 * @throws IOException
 	 */
 	public synchronized byte[] getData() throws Exception {
-		final String $METHOD_NAME = "getData";
+		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
 		byte[] data = new byte[this.dataSize];
 
 		boolean isPortOpenedByMe = false;
@@ -109,7 +110,7 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 					this.retrys++;
 					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.xferErrors); //$NON-NLS-1$
 					if (this.retrys > 3) { //retry or skip in case of xfer errors
-						throw new SerialPortException("still receiving invalid data afer 3 re-tries, please check port configuration or mode!");
+						throw new SerialPortException(Messages.getString(MessageIds.GDE_MSGT1904));
 					}
 					data = getData();
 				}
@@ -119,7 +120,7 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				this.retrys++;
 				if (this.retrys >= 4) { //345/dataSize = 5,5
 					this.retrys = 0;
-					throw new SerialPortException("receiving invalid flight simulation data, please check port configuration or mode!");
+					throw new SerialPortException(Messages.getString(MessageIds.GDE_MSGT1905));
 				}
 			}
 		}
@@ -157,7 +158,7 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 	 * @throws IOException
 	 */
 	public synchronized String getTerminalData() throws Exception {
-		final String $METHOD_NAME = "getTerminalData";
+		final String $METHOD_NAME = "getTerminalData"; //$NON-NLS-1$
 		String returnString = GDE.STRING_EMPTY;
 		int timeout_ms = 2000;
 
@@ -169,14 +170,14 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 			}
 			
 			int size = waitForStableReceiveBuffer(345, timeout_ms, 100);// stable counter max 3000/4 = 750
-			log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "receive buffer data size = " + size);
+			log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "receive buffer data size = " + size); //$NON-NLS-1$
 			byte[] data = new byte[size];
 			if (size >= 400) {// terminal character limit
 				data = this.read(data, timeout_ms);
 				byte[] checkSTX = new byte[62];
 				System.arraycopy(data, size-63, checkSTX, 0, 62);
 				if(containsSTX(checkSTX)) {
-					returnString = new String("...receiving flight data!\n Close Device ToolBox.\n");
+					returnString = new String(Messages.getString(MessageIds.GDE_MSGT1906));
 				}
 				else {
 					returnString = new String(data);
@@ -216,8 +217,8 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 	 * @return true/false
 	 */
 	private boolean isChecksumOK(byte[] buffer) {
-		final String $METHOD_NAME = "isChecksumOK";
-		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, (Checksum.ADD(buffer, 1, 57)) + "; " + ( (((buffer[58]&0xFF) - 94) << 6) | (((buffer[59]&0xFF) - 94) & 0x3F) ) );
+		final String $METHOD_NAME = "isChecksumOK"; //$NON-NLS-1$
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, (Checksum.ADD(buffer, 1, 57)) + "; " + ( (((buffer[58]&0xFF) - 94) << 6) | (((buffer[59]&0xFF) - 94) & 0x3F) ) ); //$NON-NLS-1$
 		return Checksum.ADD(buffer, 1, 57) == ((((buffer[58]&0xFF) - 94) << 6) | (((buffer[59]&0xFF) - 94) & 0x3F));
 	}
 

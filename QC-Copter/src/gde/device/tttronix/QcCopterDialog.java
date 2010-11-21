@@ -114,9 +114,8 @@ public class QcCopterDialog extends DeviceDialog {
 				FormLayout dialogShellLayout = new FormLayout();
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
-				//dialogShell.pack();
+				this.dialogShell.pack();
 				this.dialogShell.setSize(600, 10 + 90 + this.measurementsCount * 30 / 2 + 55);
-				//dialogShell.setSize(600, 10 + 40 + 90 + measurementsCount * 30 / 2 + 55);
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -141,25 +140,6 @@ public class QcCopterDialog extends DeviceDialog {
 						QcCopterDialog.this.application.openHelpDialog("WStechVario", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
-				// enable fade in/out alpha blending (do not fade-in on top)
-				//				dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
-				//					@Override
-				//					public void mouseEnter(MouseEvent evt) {
-				//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
-				//						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, 20, 25);
-				//					}
-				//
-				//					@Override
-				//					public void mouseHover(MouseEvent evt) {
-				//						log.log(java.util.logging.Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
-				//					}
-				//
-				//					@Override
-				//					public void mouseExit(MouseEvent evt) {
-				//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
-				//						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 25);
-				//					}
-				//				});
 				{
 					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
 					{
@@ -182,7 +162,7 @@ public class QcCopterDialog extends DeviceDialog {
 								terminalTextLData.horizontalAlignment = GridData.CENTER;
 								this.terminalText.setLayoutData(terminalTextLData);
 								this.terminalText.setText("01234567890123456789012345678901234567890\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
-								this.terminalText.setFont(SWTResourceManager.getFont("Lucida Console", 11, 1, false, false));
+								this.terminalText.setFont(SWTResourceManager.getFont("Monospace", 10, SWT.NORMAL));
 							}
 						}
 					}
