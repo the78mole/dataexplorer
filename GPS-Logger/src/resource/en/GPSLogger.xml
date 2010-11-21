@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V11.xsd">
     <Device>
-        <name implementation="GPSLogger">GPS-Logger</name>
+        <name implementation="GPSLogger">GPSLogger</name>
         <manufacturer>SM-Modellbau</manufacturer>
         <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
         <image></image>
-        <usage>true</usage>
+        <usage>false</usage>
     </Device>
     <TimeBase>
         <name>Time</name>
@@ -21,36 +21,36 @@
         <separator>comma</separator>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredDataLocation>F:\Documents\DataExplorer\GPS-Logger</preferredDataLocation>
+        <preferredDataLocation>/Volumes</preferredDataLocation>
         <preferredFileExtention>*.nmea</preferredFileExtention>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="Flugaufzeichnung"/>
+        <property description="" type="Integer" value="01" name="flight record"/>
     </State>
-    <Channel type="TYPE_CONFIG" name="Thermik">
+    <Channel type="TYPE_CONFIG" name="Konfiguration">
         <Measurement>
-            <name>Breitengrad</name>
+            <name>Latitude</name>
             <symbol>B</symbol>
             <unit>°</unit>
             <active>false</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Längengrad</name>
+            <name>Longitude</name>
             <symbol>L</symbol>
             <unit>°</unit>
             <active>false</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Höhe</name>
+            <name>Height</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>#Satellit</name>
+            <name>#Satellite</name>
             <symbol>#</symbol>
             <unit>-</unit>
             <active>false</active>
@@ -78,7 +78,7 @@
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Geschwindigkeit</name>
+            <name>Velocity</name>
             <symbol>v</symbol>
             <unit>km/h</unit>
             <active>true</active>
@@ -89,119 +89,126 @@
             <property type="String" value="255,0,128" name="google_earth_upper_limit_color"/>
         </Measurement>
         <Measurement>
-            <name>HöheRelativ</name>
+            <name>Hight Relative</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Steigen</name>
+            <name>Climb</name>
             <symbol>Vs</symbol>
             <unit>m/s</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>SpannungRx</name>
+            <name>VoltageRx</name>
             <symbol>u</symbol>
-            <unit>V</unit>
+            <unit>VRx</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Strecke</name>
+            <name>Trip Length</name>
             <symbol>l</symbol>
-            <unit>m</unit>
+            <unit>km</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>AbstandStart</name>
+            <name>Distance</name>
             <symbol>d</symbol>
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>WinkelStart</name>
+            <name>Direction</name>
             <symbol>w</symbol>
             <unit>°</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Gleitzahl</name>
-            <symbol>1/n</symbol>
-            <unit>m</unit>
+            <name>Glide Ratio</name>
+            <symbol>g</symbol>
+            <unit>m/1</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>SpannungUL</name>
+            <name>Voltage_UL</name>
             <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>StromUL</name>
+            <name>Current_UL</name>
             <symbol>I</symbol>
-            <unit>a</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>LeistungUL</name>
-            <symbol>P</symbol>
             <unit>A</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>DrehzahlUL</name>
+            <name>Power_UL</name>
+            <symbol>P</symbol>
+            <unit>W</unit>
+            <active>true</active>
+            <statistics sigma="false" avg="true" max="true" min="true"/>
+        </Measurement>
+        <Measurement>
+            <name>Revolution_UL</name>
             <symbol>rpm</symbol>
-            <unit>1/min</unit>
+            <unit>rpm</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>SpannungRxUL</name>
+            <name>VoltageRx_UL</name>
             <symbol>Urx</symbol>
-            <unit>V</unit>
+            <unit>VRx</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>HöheRelativ_UL</name>
+            <name>HeightRelative_UL</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>nichts_UL</name>
-            <symbol>A1</symbol>
-            <unit>-</unit>
+            <name>Velocity_UL</name>
+            <symbol>v</symbol>
+            <unit>m</unit>
             <active>false</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
+            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
+            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>ServoImpuls_UL</name>
-            <symbol>A2</symbol>
-            <unit>[us]</unit>
+            <name>Capacity_UL</name>
+            <symbol>c</symbol>
+            <unit>mAh</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
+            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
+            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>Temperatur_UL</name>
-            <symbol>A3</symbol>
-            <unit>[°C]</unit>
+            <name>Temperature_UL</name>
+            <symbol>t</symbol>
+            <unit>°C</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
+            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
+            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>SpannungRx_ML</name>
+            <name>VoltageRx_ML</name>
             <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
@@ -209,21 +216,21 @@
             <property type="Integer" value="10" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>Prozent_ML</name>
-            <symbol>sig</symbol>
+            <name>Reception_ML</name>
+            <symbol>LQI</symbol>
             <unit>%</unit>
             <active>false</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>nichts_ML</name>
+            <name>Empty_ML</name>
             <symbol>x</symbol>
             <unit>-</unit>
             <active>false</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Steigen_ML</name>
+            <name>Climb_ML</name>
             <symbol>Vs</symbol>
             <unit>m/s</unit>
             <active>true</active>
@@ -231,14 +238,14 @@
             <property type="Integer" value="9" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>Temperatur_ML</name>
+            <name>Temperature_ML</name>
             <symbol>T</symbol>
             <unit>°C</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Geschwindigkeit_ML</name>
+            <name>Velocity_ML</name>
             <symbol>v</symbol>
             <unit>km/h</unit>
             <active>true</active>
@@ -246,14 +253,14 @@
             <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>Winkel_ML</name>
+            <name>Direction_ML</name>
             <symbol>w</symbol>
             <unit>°</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>HöheRelativ_ML</name>
+            <name>HeoghtRelative_ML</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
@@ -261,7 +268,7 @@
             <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>AbstandStart_ML</name>
+            <name>Distance_ML</name>
             <symbol>d</symbol>
             <unit>m</unit>
             <active>true</active>
@@ -269,7 +276,7 @@
             <property type="Integer" value="12" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>Strecke_ML</name>
+            <name>TripLength_ML</name>
             <symbol>l</symbol>
             <unit>km</unit>
             <active>true</active>
@@ -277,35 +284,35 @@
             <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>Strom_ML</name>
+            <name>Current_ML</name>
             <symbol>I</symbol>
             <unit>A</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Spannung_ML</name>
+            <name>Voltage_ML</name>
             <symbol>V</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Drehzahl_ML</name>
+            <name>Revolution_ML</name>
             <symbol>r</symbol>
             <unit>rpm</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Kapazität_ML</name>
+            <name>Capacity_ML</name>
             <symbol>C</symbol>
             <unit>mAh</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>HöheRelativ2_ML</name>
+            <name>HeoghtRelative 2_ML</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>

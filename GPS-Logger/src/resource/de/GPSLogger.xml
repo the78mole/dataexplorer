@@ -6,7 +6,7 @@
         <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
         <image></image>
-        <usage>true</usage>
+        <usage>false</usage>
     </Device>
     <TimeBase>
         <name>Time</name>
@@ -21,13 +21,13 @@
         <separator>comma</separator>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredDataLocation>F:\Documents\DataExplorer\GPS-Logger</preferredDataLocation>
+        <preferredDataLocation>/Volumes</preferredDataLocation>
         <preferredFileExtention>*.nmea</preferredFileExtention>
     </DataBlock>
     <State>
         <property description="" type="Integer" value="01" name="Flugaufzeichnung"/>
     </State>
-    <Channel type="TYPE_CONFIG" name="Thermik">
+    <Channel type="TYPE_CONFIG" name="Konfiguration">
         <Measurement>
             <name>Breitengrad</name>
             <symbol>B</symbol>
@@ -105,26 +105,26 @@
         <Measurement>
             <name>SpannungRx</name>
             <symbol>u</symbol>
-            <unit>V</unit>
+            <unit>VRx</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Strecke</name>
             <symbol>l</symbol>
-            <unit>m</unit>
+            <unit>km</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>AbstandStart</name>
+            <name>Abstand</name>
             <symbol>d</symbol>
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>WinkelStart</name>
+            <name>Richtung</name>
             <symbol>w</symbol>
             <unit>°</unit>
             <active>true</active>
@@ -132,8 +132,8 @@
         </Measurement>
         <Measurement>
             <name>Gleitzahl</name>
-            <symbol>1/n</symbol>
-            <unit>m</unit>
+            <symbol>g</symbol>
+            <unit>m/1</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
@@ -147,28 +147,28 @@
         <Measurement>
             <name>Strom_UL</name>
             <symbol>I</symbol>
-            <unit>a</unit>
+            <unit>A</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Leistung_UL</name>
             <symbol>P</symbol>
-            <unit>A</unit>
+            <unit>W</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Drehzahl_UL</name>
             <symbol>rpm</symbol>
-            <unit>1/min</unit>
+            <unit>rpm</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>SpannungRx_UL</name>
             <symbol>Urx</symbol>
-            <unit>V</unit>
+            <unit>VRx</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
@@ -178,28 +178,34 @@
             <unit>m</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+            <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>nichts_UL</name>
-            <symbol>A1</symbol>
-            <unit>-</unit>
+            <name>Geschwindigkeit_UL</name>
+            <symbol>v</symbol>
+            <unit>m</unit>
             <active>false</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
+            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
+            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
         </Measurement>
         <Measurement>
-            <name>ServoImpuls_UL</name>
-            <symbol>A2</symbol>
-            <unit>[us]</unit>
+            <name>Kapazität_UL</name>
+            <symbol>c</symbol>
+            <unit>mAh</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
+            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
+            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
         </Measurement>
         <Measurement>
             <name>Temperatur_UL</name>
-            <symbol>A3</symbol>
-            <unit>[°C]</unit>
+            <symbol>t</symbol>
+            <unit>°C</unit>
             <active>true</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
+            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
+            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
         </Measurement>
         <Measurement>
             <name>SpannungRx_ML</name>
@@ -210,8 +216,8 @@
             <property type="Integer" value="10" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>Prozent_ML</name>
-            <symbol>sig</symbol>
+            <name>Empfang_ML</name>
+            <symbol>LQI</symbol>
             <unit>%</unit>
             <active>false</active>
             <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -247,7 +253,7 @@
             <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
-            <name>Winkel_ML</name>
+            <name>Richtung_ML</name>
             <symbol>w</symbol>
             <unit>°</unit>
             <active>true</active>
@@ -306,7 +312,7 @@
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>HöheRelativ2_ML</name>
+            <name>HöheRelativ 2_ML</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
@@ -320,6 +326,6 @@
         <property value="true" name="analog_tab"/>
         <property value="false" name="voltage_per_cell_tab"/>
         <property description="UTILITY_GRAPHICS_TAB" value="false" name="utility_garphics_tab"/>
-        <property description="UTILITY_DEVICE_TAB" value="true" name="utility_device_tab"/>
+        <property description="UTILITY_DEVICE_TAB" value="false" name="utility_device_tab"/>
     </Desktop>
 </DeviceProperties>
