@@ -59,7 +59,7 @@ import gde.utils.StringHelper;
  * class defining a composite with statistics configuration data
  * @author Winfried Brügmann
 */
-public class StatisticsTypeTabItem extends CTabItem {
+public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 	final static Logger						log														= Logger.getLogger(StatisticsTypeTabItem.class.getName());
 	final static String[]					STRING_ARRAY_TRIGGER_SECONDS	= new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" }; //$NON-NLS-1$
 	final static String[]					STRING_ARRAY_TRIGGER_VALUES		= new String[] { "250", "500", "1000", "1500", "2000", "2500", "3000", "3500", "4000", "5000", "7500" };													//$NON-NLS-1$

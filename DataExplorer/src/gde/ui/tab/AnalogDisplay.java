@@ -227,7 +227,7 @@ public class AnalogDisplay extends Composite {
 			int knobRradius = (int) (this.radius * 0.1);
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
 			this.tachoImageGC.setBackground(DataExplorer.COLOR_BLACK);
-			knobRradius = Double.valueOf(this.radius / 10 * 0.2).intValue();
+			knobRradius = Double.valueOf(this.radius / 10.0 * 0.2).intValue();
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
 
 			evt.gc.drawImage(this.tachoImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);

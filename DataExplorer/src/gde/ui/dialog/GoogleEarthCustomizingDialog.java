@@ -329,7 +329,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 							Integer measurementOrdinal = device.getGPS2KMLMeasurementOrdinal();
 							RecordSet activeRecordSet = application.getActiveRecordSet();
 							if (activeRecordSet != null && measurementOrdinal != null) {
-								int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000);
+								int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000.0);
 								try {
 									double factor = Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT));
 									if (factor >= 1) {
@@ -559,7 +559,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			Integer measurementOrdinal = device.getGPS2KMLMeasurementOrdinal();
 			RecordSet activeRecordSet = application.getActiveRecordSet();
 			if (activeRecordSet != null && measurementOrdinal != null) {
-				int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000);
+				int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000.0);
 				try {
 					lowerLimitText.setText(String.format("%d", (int)(avgValue/Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT))))); //$NON-NLS-1$
 					upperLimitText.setText(String.format("%d", (int)(avgValue*Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT))))); //$NON-NLS-1$

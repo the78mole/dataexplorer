@@ -1565,7 +1565,7 @@ public class DevicePropertiesEditor extends Composite {
 		else {
 			log.log(Level.SEVERE, Messages.getString(MessageIds.GDE_MSGW0001));
 		}
-		log.log(Level.WARNING, "DevicesPath = " + applHomePath + "Devices");
+		log.log(Level.FINE, "DevicesPath = " + applHomePath + "Devices");
 	return applHomePath + "Devices"; //$NON-NLS-1$
 	}
 

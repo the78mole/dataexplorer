@@ -57,7 +57,7 @@ import gde.utils.StringHelper;
  * class defining a CTabItem with ChannelType configuration data
  * @author Winfried Brügmann
  */
-public class ChannelTypeTabItem extends CTabItem {
+public class ChannelTypeTabItem extends CTabItem implements Cloneable {
 	final static Logger						log								= Logger.getLogger(ChannelTypeTabItem.class.getName());
 
 	Composite											channelConfigComposite;

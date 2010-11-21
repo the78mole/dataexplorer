@@ -966,8 +966,6 @@ public class FileUtils {
 		log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
 		if (url.getPath().endsWith("/")) { // running inside Eclipse //$NON-NLS-1$
 			log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$
-			String bitmode = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
-			bitmode = bitmode != null && bitmode.length() == 2 ? bitmode : System.getProperty("com.ibm.vm.bitmode"); //$NON-NLS-1$
 			basePath = url.getFile().substring(GDE.IS_WINDOWS ? 1 : 0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			basePath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
@@ -1054,6 +1052,7 @@ public class FileUtils {
 	public static boolean checkJavaExecutableVersion(String javaFullQualifiedExecutablePath, String expectedVersionString) {
 		final String javaVersion = "java version"; //$NON-NLS-1$
 		int actualVersion = 0;
+		BufferedReader br = null;
 		try {
 			String line;
 			if (javaFullQualifiedExecutablePath.indexOf("%WINDIR%") > -1) { //$NON-NLS-1$
@@ -1067,7 +1066,7 @@ public class FileUtils {
 			Process process = new ProcessBuilder(javaFullQualifiedExecutablePath, "-version").start(); //$NON-NLS-1$
 			InputStream is = process.getErrorStream();
 			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
+			br = new BufferedReader(isr);
 			
 			while ((line = br.readLine()) != null) { // clean std err
 				if (line.startsWith(javaVersion)) actualVersion = parseJavaVersion(line.substring(javaVersion.length()+2));
@@ -1088,6 +1087,14 @@ public class FileUtils {
 		}
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		finally {
+			if (br != null) try {
+				br.close();
+			}
+			catch (IOException e) {
+				// ignore
+			}
 		}
 		
 		log.log(Level.INFO, parseJavaVersion(expectedVersionString) + " <= " + actualVersion); //$NON-NLS-1$
@@ -1253,12 +1260,6 @@ public class FileUtils {
 	 * main method to execute post execution cleanup, called by cleanupPost()
 	 */
 	public static void main(String[] args) {
-		try {
-			Thread.sleep(1000);
-		}
-		catch (InterruptedException e) {
-			// ignore
-		}
 		if (GDE.IS_WINDOWS) 
 			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "WinHelper*.dll", "swtlib-"+GDE.BIT_MODE, }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		else if (GDE.IS_LINUX)

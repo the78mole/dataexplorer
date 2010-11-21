@@ -19,6 +19,8 @@
 package gde.ui.menu;
 
 import gde.log.Level;
+
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -1094,8 +1096,8 @@ public class CurveSelectorContextMenu {
 									compareSet.setMaxValue(newMaxValue); // store new max value into record set
 								}
 							}
-							for (String minRecordKey : compareSet.keySet()) { // loop through all and make equal
-								compareSet.get(minRecordKey).setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
+							for (Entry<String, Record> entry : compareSet.entrySet()) {
+								entry.getValue().setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
 							}
 
 							CurveSelectorContextMenu.this.application.updateCompareWindow();

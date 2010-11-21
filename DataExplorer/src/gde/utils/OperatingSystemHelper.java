@@ -270,6 +270,8 @@ public class OperatingSystemHelper {
 		int rc = -1;
 		String targetDir = GDE.JAVA_IO_TMPDIR;
 		String command = GDE.STRING_BLANK;
+		
+		BufferedReader besr = null;
 
 		try {
 			URL url = FileUtils.class.getProtectionDomain().getCodeSource().getLocation();
@@ -300,7 +302,7 @@ public class OperatingSystemHelper {
 					Process process = new ProcessBuilder("cmd", "/C", targetDir + regExe, targetBasePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 					process.waitFor();
 					BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
-					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 					String line;
 
 					StringBuilder sb = new StringBuilder();
@@ -420,6 +422,14 @@ public class OperatingSystemHelper {
 				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0039));
 			}
 		}
+		finally {
+			if (besr != null) try {
+				besr.close();
+			}
+			catch (IOException e) {
+				// ignore
+			}
+		}
 		log.log(Level.INFO, "DataExplorer MIME registered = " + (rc == 0)); //$NON-NLS-1$
 		return rc == 0;
 	}
@@ -436,6 +446,8 @@ public class OperatingSystemHelper {
 
 		String jarBasePath = FileUtils.getJarBasePath();
 		String jarFilePath = jarBasePath + "/DataExplorer.jar"; //$NON-NLS-1$
+		
+		BufferedReader besr = null;
 
 		try {
 			JarFile jarFile = new JarFile(jarFilePath);
@@ -452,7 +464,7 @@ public class OperatingSystemHelper {
 				Process process = new ProcessBuilder("cmd", "/C", targetDir + regExe).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
 				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+				besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 				String line;
 
 				StringBuilder sb = new StringBuilder();
@@ -557,6 +569,14 @@ public class OperatingSystemHelper {
 			}
 			else {
 				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0039));
+			}
+		}
+		finally {
+			if (besr != null) try {
+				besr.close();
+			}
+			catch (IOException e) {
+				// ignore
 			}
 		}
 		return rc == 0;

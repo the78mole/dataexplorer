@@ -39,7 +39,7 @@ import gde.GDE;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "PropertyType") //$NON-NLS-1$
-public class PropertyType {
+public class PropertyType implements Cloneable {
 
     @XmlAttribute(required = true)
     protected String name;

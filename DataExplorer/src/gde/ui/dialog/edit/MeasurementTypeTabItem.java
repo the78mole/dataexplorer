@@ -57,7 +57,7 @@ import gde.ui.SWTResourceManager;
  * class defining a CTabItem with MeasurementType configuration data
  * @author Winfried Brügmann
  */
-public class MeasurementTypeTabItem extends CTabItem {
+public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 	final static Logger						log	= Logger.getLogger(MeasurementTypeTabItem.class.getName());
 
 	final CTabFolder							measurementsTabFolder;

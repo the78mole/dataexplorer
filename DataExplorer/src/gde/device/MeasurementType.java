@@ -48,7 +48,7 @@ import javax.xml.bind.annotation.XmlType;
 		"statistics", //$NON-NLS-1$
 		"property" //$NON-NLS-1$
 })
-public class MeasurementType {
+public class MeasurementType implements Cloneable {
 
 	@XmlElement(required = true)
 	protected String							name;

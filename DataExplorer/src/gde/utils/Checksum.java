@@ -39,13 +39,13 @@ public class Checksum {
 				(byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C,
 				(byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x07 };
 
-		System.out.println("CRC16    = " + Integer.toHexString(Checksum.crc16(b))); //$NON-NLS-1$
-		System.out.println("CRC32 = " + Integer.toHexString(Checksum.CRC32(b))); //$NON-NLS-1$
-		System.out.println("Adler32  = " + Long.toHexString(Checksum.adler32(b))); //$NON-NLS-1$
-		System.out.println("ADD      = " + Integer.toHexString(Checksum.AND(b))); //$NON-NLS-1$
-		// Picolario seams to use XOR checksum
-		System.out.println("XOR      = " + Integer.toHexString(Checksum.XOR(b))); //$NON-NLS-1$
-		System.out.println("XOR      = " + Integer.toHexString(Checksum.XOR(b1))); //$NON-NLS-1$
+		System.out.println("CRC16    	= " + Integer.toHexString(Checksum.CRC16(b, 0))); //$NON-NLS-1$
+		System.out.println("CRC16CCITT= " + Integer.toHexString(Checksum.CRC16CCITT(b, 0))); //$NON-NLS-1$
+		System.out.println("CRC32 		= " + Integer.toHexString(Checksum.CRC32(b))); //$NON-NLS-1$
+		System.out.println("Adler32  	= " + Long.toHexString(Checksum.adler32(b))); //$NON-NLS-1$
+		System.out.println("ADD      	= " + Integer.toHexString(Checksum.AND(b))); //$NON-NLS-1$
+		System.out.println("XOR     	= " + Integer.toHexString(Checksum.XOR(b))); //$NON-NLS-1$
+		System.out.println("XOR      	= " + Integer.toHexString(Checksum.XOR(b1))); //$NON-NLS-1$
 
 	}
 
@@ -54,11 +54,27 @@ public class Checksum {
 	 */
 	private static final int	poly			= 0x1021;			/* x16 + x12 + x5 + 1 generator polynomial */
 	/* 0x8408 used in European X.25 */
-
+	
 	/**
-	* scrambler lookup table for fast computation.
-	*/
-	private static int[]			crcTable	= new int[256];
+	 * calculate CRC16
+	 * @param bytes byte array to compute CRC16
+	 * @return 16-bit CRC, unsigned
+	 */
+	public static short CRC16(byte[] bytes, int initValue) {
+		int crc = initValue; // initial value
+		int polynomial = 0x1021; // 0001 0000 0010 0001  (0, 5, 12) 
+		for (byte b : bytes) {
+			for (int i = 0; i < 8; i++) {
+				boolean bit = ((b >> (7 - i) & 1) == 1);
+				boolean c15 = ((crc >> 15 & 1) == 1);
+				crc <<= 1;
+				if (c15 ^ bit) crc ^= polynomial;
+			}
+		}
+		return (short) (crc &= 0xffff);
+	}
+
+	private static int[] crcTable	= new int[256];
 	static {
 		// initialize lookup table
 		for (int i = 0; i < 256; i++) {
@@ -79,22 +95,18 @@ public class Checksum {
 	}
 
 	/**
-	 * calculate CRC with CCITT method.
+	 * calculate CRC16 with CCITT method.
 	 * @param b byte array to compute CRC on
 	 * @return 16-bit CRC, unsigned
 	 */
-	public static short crc16(byte[] b) {
-		int work = 0xffff;
+	public static short CRC16CCITT(byte[] b, int initValue) {
+		int crc = initValue;
 		for (int i = 0; i < b.length; i++) {
-			// xor the next data byte with the high byte of what we have so far to
-			// look up the scrambler.
-			// xor that with the low byte of what we have so far.
-			// Mask back to 16 bits.
-			work = (crcTable[(b[i] ^ (work >>> 8)) & 0xff] ^ (work << 8)) & 0xffff;
+			crc = (crcTable[(b[i] ^ (crc >>> 8)) & 0xff] ^ (crc << 8)) & 0xffff;
 		}
-		return (short) work;
+		return (short) crc;
 	}
-
+	
 	/**
 	 * calculate CRC-32 with Java method
 	 * @param b byte array to compute CRC on
@@ -128,7 +140,7 @@ public class Checksum {
 	 */
 	public static byte OR(byte[] b) {
 		int value = b[0];
-		for (int i = 1; i < b.length - 1; i++) {
+		for (int i = 1; i < b.length; i++) {
 			value = value | b[i];
 		}
 		return (byte) value;
@@ -141,8 +153,21 @@ public class Checksum {
 	 */
 	public static int OR(int[] a, int offset, int length) {
 		int value = a[offset];
-		for (int i = 1; i < length - 1; i++) {
+		for (int i = 1; i < length; i++) {
 			value = value | a[i];
+		}
+		return value;
+	}
+
+	/**
+	 * calculate XOR bit operation
+	 * @param c character array to compute
+	 * @return 8-bit result
+	 */
+	public static int XOR(char[] c) {
+		int value = 0;
+		for (int i = 0; i < c.length; i++) {
+			value ^= c[i];
 		}
 		return value;
 	}
@@ -152,12 +177,12 @@ public class Checksum {
 	 * @param b byte array to compute
 	 * @return 8-bit result
 	 */
-	public static byte XOR(byte[] b) {
-		int value = b[0];
-		for (int i = 1; i < b.length - 1; i++) {
-			value = value ^ b[i];
+	public static int XOR(byte[] b) {
+		int value = 0;
+		for (int i = 0; i < b.length; i++) {
+			value ^= b[i];
 		}
-		return (byte) value;
+		return value;
 	}
 
 	/**
@@ -167,8 +192,8 @@ public class Checksum {
 	 */
 	public static int XOR(int[] a, int offset, int length) {
 		int value = a[offset];
-		for (int i = offset+1; i < length - 1; i++) {
-			value = value ^ a[i];
+		for (int i = offset+1; i < length; i++) {
+			value ^= a[i];
 		}
 		return value;
 	}
@@ -180,7 +205,7 @@ public class Checksum {
 	 */
 	public static byte AND(byte[] b) {
 		int value = b[0];
-		for (int i = 1; i < b.length - 1; i++) {
+		for (int i = 1; i < b.length; i++) {
 			value = value & b[i];
 		}
 		return (byte) value;
