@@ -1424,7 +1424,7 @@ public class DevicePropertiesEditor extends Composite {
 			{
 				this.preferredFileExtensionText = new Text(this.dataBlockOptionalGroup, SWT.BORDER);
 				this.preferredFileExtensionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.preferredFileExtensionText.setBounds(140, GDE.IS_MAC_COCOA ? 115 : 130, 40, 20);
+				this.preferredFileExtensionText.setBounds(140, GDE.IS_MAC_COCOA ? 115 : 130, 50, 20);
 				this.preferredFileExtensionText.setEnabled(false);
 				this.preferredFileExtensionText.addKeyListener(new KeyAdapter() {
 					@Override
