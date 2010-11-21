@@ -1533,6 +1533,21 @@ public class DataExplorer extends Composite {
 	}
 	
 	/**
+	 * update all visualization windows
+	 */
+	public void updateAll() {
+		this.updateGraphicsWindow();
+		this.updateStatisticsData();
+		this.updateDigitalWindow();
+		this.updateAnalogWindow();
+		this.updateCellVoltageWindow();
+		this.updateFileCommentWindow();
+		if (this.getActiveRecordSet() != null) {
+			this.updateDataTable(this.getActiveRecordSet().getName(), true);
+		}
+	}
+	
+	/**
 	 * update the graphicsWindow
 	 */
 	public void updateGraphicsWindow() {
