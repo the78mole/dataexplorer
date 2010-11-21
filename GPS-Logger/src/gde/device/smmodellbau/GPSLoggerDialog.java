@@ -293,9 +293,9 @@ public class GPSLoggerDialog extends DeviceDialog {
 				{
 					this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData helpButtonLData = new FormData();
-					helpButtonLData.width = 30;
+					helpButtonLData.width = 40;
 					helpButtonLData.height = 30;
-					helpButtonLData.left = new FormAttachment(0, 1000, 307);
+					helpButtonLData.left = new FormAttachment(0, 1000, 302);
 					helpButtonLData.bottom = new FormAttachment(1000, 1000, -10);
 					this.helpButton.setLayoutData(helpButtonLData);
 					this.helpButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
