@@ -108,7 +108,7 @@ public class MeasurementControlConfigurable extends Composite {
 		{
 			this.measurement = new Button(this, SWT.CHECK | SWT.RIGHT);
 			RowData measurementLData = new RowData();
-			measurementLData.width = 35;
+			measurementLData.width = 50;
 			measurementLData.height = 20;
 			this.measurement.setLayoutData(measurementLData);
 			this.measurement.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -140,8 +140,8 @@ public class MeasurementControlConfigurable extends Composite {
 		{
 			this.measurementName = new Text(this, SWT.CENTER | SWT.BORDER);
 			RowData measurementNameLData = new RowData();
-			measurementNameLData.width = 125;
-			measurementNameLData.height = 16;
+			measurementNameLData.width = 120;
+			measurementNameLData.height = 12;
 			this.measurementName.setLayoutData(measurementNameLData);
 			this.measurementName.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.measurementName.setText(this.measurementType.getName().endsWith(this.filterExtend) ? this.measurementType.getName().substring(0, this.measurementType.getName().length() - 3)
@@ -157,8 +157,8 @@ public class MeasurementControlConfigurable extends Composite {
 		{
 			this.measurementSymbol = new Text(this, SWT.CENTER | SWT.BORDER);
 			RowData measurementSymbolLabelLData = new RowData();
-			measurementSymbolLabelLData.width = 50;
-			measurementSymbolLabelLData.height = 16;
+			measurementSymbolLabelLData.width = 35;
+			measurementSymbolLabelLData.height = 12;
 			this.measurementSymbol.setLayoutData(measurementSymbolLabelLData);
 			this.measurementSymbol.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE - 1, SWT.NORMAL));
 			this.measurementSymbol.setText(this.measurementType.getSymbol());
@@ -173,7 +173,7 @@ public class MeasurementControlConfigurable extends Composite {
 		{
 			this.measurementUnit = new CLabel(this, SWT.CENTER);
 			RowData measurementUnitLabelLData = new RowData();
-			measurementUnitLabelLData.width = 50;
+			measurementUnitLabelLData.width = 35;
 			measurementUnitLabelLData.height = 20;
 			this.measurementUnit.setLayoutData(measurementUnitLabelLData);
 			this.measurementUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE - 1, SWT.NORMAL));
@@ -189,7 +189,7 @@ public class MeasurementControlConfigurable extends Composite {
 		{
 			this.measurementSynch = new Button(this, SWT.CHECK);
 			RowData measurementLData = new RowData();
-			measurementLData.width = 35;
+			measurementLData.width = 50;
 			measurementLData.height = 20;
 			this.measurementSynch.setLayoutData(measurementLData);
 			this.measurementSynch.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
