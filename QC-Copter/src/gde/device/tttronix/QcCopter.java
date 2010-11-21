@@ -165,7 +165,7 @@ public class QcCopter  extends DeviceConfiguration implements IDevice {
 				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}	
 			if(includeReasonableDataCheck) {
-				record.setDisplayable(record.hasReasonableData());
+				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
 				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ //$NON-NLS-2$				
 			}
 
