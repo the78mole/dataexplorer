@@ -88,7 +88,7 @@ public class MeasurementControl extends Composite {
 		thisLData.horizontalSpan = horizontalSpan;
 		thisLData.horizontalAlignment = GridData.BEGINNING;
 		thisLData.verticalAlignment = GridData.BEGINNING;
-		thisLData.heightHint = 25;
+		thisLData.heightHint = 23;
 		this.setLayoutData(thisLData);
 		this.setLayout(thisLayout);
 		{

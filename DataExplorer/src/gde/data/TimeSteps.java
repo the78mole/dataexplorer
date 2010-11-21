@@ -77,6 +77,7 @@ public class TimeSteps extends Vector<Integer> {
 	 * overwritten clone method
 	 */
 	public synchronized TimeSteps clone() {
+		super.clone();
   	return new TimeSteps(this);
   }
 	
@@ -132,7 +133,7 @@ public class TimeSteps extends Vector<Integer> {
 	 */
 	public double getAverageTimeStep_ms() {
 		try {
-			return this.isConstant ? this.getTime_ms(1) : this.elementCount > 2 ? this.lastElement()/(elementCount-1)/10.0 : this.get(1)/10.0;
+			return this.isConstant ? this.getTime_ms(1) : (this.elementCount > 2 ? this.lastElement()/(elementCount-1)/10.0 : this.get(1)/10.0);
 		}
 		catch (Exception e) {
 			// a redraw event where the record set has no records 
@@ -212,7 +213,7 @@ public class TimeSteps extends Vector<Integer> {
 				index = (int) (position + 0.5);
 			}
 			else {
-				index = (int) (time_ms / (this.lastElement() / (this.elementCount - 1) / 10) / 2);
+				index = (int) (time_ms / (this.lastElement() / (this.elementCount - 1) / 10.0) / 2.0);
 				int value = Double.valueOf(time_ms * 10.0).intValue();
 				for (; index < elementCount; index++) {
 					if (value <= this.get(index)) break;

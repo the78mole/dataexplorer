@@ -41,6 +41,7 @@ import gde.utils.TimeLine;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -1185,8 +1186,8 @@ public class RecordSet extends HashMap<String, Record> {
 			}
 		}
 		else {
-			for (String recordName : this.keySet()) {
-				Record record = this.get(recordName);
+			for (java.util.Map.Entry<String, Record> element : this.entrySet()) {
+				Record record = element.getValue();
 				record.minZoomScaleValue = record.minScaleValue;
 				record.maxZoomScaleValue = record.maxScaleValue;
 			}
@@ -1225,8 +1226,8 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setDisplayZoomBounds(Rectangle newDisplayZoomBounds) {
 		// iterate children 
-		for (String recordKey : this.keySet()) {
-			this.get(recordKey).setZoomBounds(newDisplayZoomBounds);
+		for (Map.Entry<String, Record> element : this.entrySet()) {
+			element.getValue().setZoomBounds(newDisplayZoomBounds);
 		}
 	}
 

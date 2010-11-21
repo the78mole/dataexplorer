@@ -18,22 +18,6 @@
 ****************************************************************************************/
 package gde.data;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.Vector;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-
 import gde.GDE;
 import gde.device.DataTypes;
 import gde.device.IDevice;
@@ -41,10 +25,26 @@ import gde.device.MeasurementPropertyTypes;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.StatisticsType;
+import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * @author Winfried Brügmann
@@ -1608,7 +1608,7 @@ public class Record extends Vector<Integer> {
 	}
 	
 	/**
-	 * reset all variables to enable recalcualation of statistics
+	 * reset all variables to enable re-calcualation of statistics
 	 */
 	public void resetStatiticCalculationBase() {
 		this.maxValueTriggered = Integer.MIN_VALUE;
@@ -1716,20 +1716,16 @@ public class Record extends Vector<Integer> {
 		// each record loaded from a file gets new properties instead of using the default initialized in constructor
 		this.properties = new ArrayList<PropertyType>(); // offset, factor, reduction, ...
 		
-		Iterator<String> iterator = recordDeviceProps.keySet().iterator();
-		if (iterator.hasNext()) {
-			while (iterator.hasNext()) {
-				String propName = iterator.next();
-				String prop = recordDeviceProps.get(propName);
-				PropertyType tmpProperty = new ObjectFactory().createPropertyType();
-				tmpProperty.setName(propName);
-				String type = prop.split(GDE.STRING_EQUAL)[0].substring(1);
-				if (type != null && type.length() > 3) tmpProperty.setType(DataTypes.fromValue(type));
-				String value = prop.split(GDE.STRING_EQUAL)[1];
-				if (value != null && value.length() > 0) tmpProperty.setValue(value.trim());
-				this.properties.add(tmpProperty);
-				if (log.isLoggable(Level.FINE)) sb.append(propName).append(" = ").append(value); //$NON-NLS-1$
-			}
+		for (Entry<String, String> entry : recordDeviceProps.entrySet()) {
+			String prop = entry.getValue();
+			PropertyType tmpProperty = new ObjectFactory().createPropertyType();
+			tmpProperty.setName(entry.getKey());
+			String type = prop.split(GDE.STRING_EQUAL)[0].substring(1);
+			if (type != null && type.length() > 3) tmpProperty.setType(DataTypes.fromValue(type));
+			String value = prop.split(GDE.STRING_EQUAL)[1];
+			if (value != null && value.length() > 0) tmpProperty.setValue(value.trim());
+			this.properties.add(tmpProperty);
+			if (log.isLoggable(Level.FINE)) sb.append(entry.getKey()).append(" = ").append(value); //$NON-NLS-1$
 		}
 		log.log(Level.FINE, sb.toString());
 	}
@@ -1768,7 +1764,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * @return the avgValue
 	 */
-	public int getAvgValue() {
+	public synchronized int getAvgValue() {
 		this.setAvgValue();
 		return this.avgValue;
 	}
@@ -1790,7 +1786,7 @@ public class Record extends Vector<Integer> {
 	 * @param referencedMeasurementOrdinal
 	 * @return average value according trigger specification of referenced measurement
 	 */
-	public int getAvgValueTriggered(int referencedMeasurementOrdinal) {
+	public synchronized int getAvgValueTriggered(int referencedMeasurementOrdinal) {
 		if (this.triggerRanges == null)  {
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}
@@ -1841,7 +1837,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * @return the sigmaValue
 	 */
-	public int getSigmaValue() {
+	public synchronized int getSigmaValue() {
 		this.setSigmaValue();
 		return this.sigmaValue;
 	}
@@ -1859,11 +1855,11 @@ public class Record extends Vector<Integer> {
 	}
 	
 	/**
-	 * get/calcualte avg value by referenced triggered other measurement
+	 * get/calculate avg value by referenced triggered other measurement
 	 * @param referencedMeasurementOrdinal
 	 * @return sigma value according trigger specification of referenced measurement
 	 */
-	public int getSigmaValueTriggered(int referencedMeasurementOrdinal) {
+	public synchronized int getSigmaValueTriggered(int referencedMeasurementOrdinal) {
 		if (this.triggerRanges == null)  {
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}

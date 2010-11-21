@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010 Winfried Bruegmann
+    Copyright (c) 2010 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
 
@@ -22,9 +22,9 @@ import gde.GDE;
 import gde.device.CheckSumTypes;
 import gde.device.IDevice;
 import gde.exception.DevicePropertiesInconsistenceException;
-import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
+import gde.utils.Checksum;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,38 +39,30 @@ import java.util.logging.Logger;
  * @author Winfried Brügmann
  */
 public class NMEAParser {
-	static Logger					log			= Logger.getLogger(NMEAParser.class.getName());
+	private static final Logger	log												= Logger.getLogger(NMEAParser.class.getName());
+	private static final String	STRING_SENTENCE_SPLITTER	= " |:";																				//$NON-NLS-1$
 
-	int									time_ms;
-	long								lastTimeStamp = 0;
-	int[]								values;
-	Date								date;
-	int									checkSum;
-	String 							comment;
-	int									year, month, day;
-	
-	final int						size;
-	final int						timeFactor = 1000;
-	final String				separator;
-	final String				leader;
-	final CheckSumTypes	checkSumType;
-	final IDevice				device;
-	final int						channelConfigNumber;
-	
-	
+	int													time_ms;
+	long												lastTimeStamp							= 0;
+	int[]												values;
+	Date												date;
+	short												timeOffsetUTC							= 0;
+	int													checkSum;
+	String											comment;
+	int													year, month, day;
+
+	final int										size;
+	final String								separator;
+	final String								leader;
+	final CheckSumTypes					checkSumType;
+	final IDevice								device;
+	final int										channelConfigNumber;
+
 	public enum NMEA {
-		
-		
-		GPRMC,
-		GPGSA,
-		GPGGA,
-		GPVTG,
+
+		GPRMC, GPGSA, GPGGA, GPVTG,
 		//SM-Modellbau GPS-Logger
-		SMGPS,
-		MLINK,
-		UNILOG,
-		KOMMENTAR,
-		COMMENT
+		GPSETUP, SETUP, SMGPS, MLINK, UNILOG, KOMMENTAR, COMMENT
 	}
 
 	/**
@@ -94,60 +86,108 @@ public class NMEAParser {
 	public void parse(String[] inputLines) throws Exception {
 		try {
 			for (String inputLine : inputLines) {
-				log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
+				NMEAParser.log.log(java.util.logging.Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
 				if (!inputLine.startsWith(this.leader)) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0046, new String[] { this.leader }));
-				if (!inputLine.contains(separator)) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0047, new String[] { inputLine, separator }));
+				if (!inputLine.contains(this.separator)) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0047, new String[] { inputLine, this.separator }));
 
-				String[] strValues = inputLine.split(this.separator); // {$GPRMC,162614,A,5230.5900,N,01322.3900,E,10.0,90.0,131006,1.2,E,A*13}
+				if (isChecksumOK(inputLine)) {
 
-				NMEA sentence = NMEA.valueOf(strValues[0].substring(1));
-				switch (sentence) {
-				case GPRMC: //Recommended Minimum Sentence C (RMC)
-					parseRMC(strValues);
-					break;
-				case GPGGA: //Global Positioning System Fix Data (GGA)				
-					parseGGA(strValues);
-					break;
-				case GPGSA: //Satellite status (GSA)
-					parseGSA(strValues);
-					break;
-				case GPVTG: // Velocity made good (VTG)
-					parseVTG(strValues);
-					break;
-				case SMGPS:
-					parseSMGPS(strValues);
-					break;
-				case MLINK:
-					parseMLINK(strValues);
-					break;
-				case UNILOG:
-					parseUNILOG(strValues);
-					break;
-				case COMMENT:
-				case KOMMENTAR:
-					//$KOMMENTAR,Extra 300. Kuban Acht. Mit UniLog Daten.*
-					//$KOMMENTAR,Trojan. Ein paar liegende Figuren. Volle M-Link Bestückung.*
-					this.comment = strValues[1].trim();
-					this.comment = this.comment.endsWith(GDE.STRING_STAR) ? this.comment.substring(0,this.comment.length()-1) : this.comment;
+					String[] strValues = inputLine.split(this.separator); // {$GPRMC,162614,A,5230.5900,N,01322.3900,E,10.0,90.0,131006,1.2,E,A*13}
 
-					break;
-				default:
-					log.log(Level.WARNING, "NMEA sentence = " + strValues[0].substring(1) + " actually not implementes!"); //$NON-NLS-1$
-					break;
+					try {
+						NMEA sentence = NMEA.valueOf(strValues[0].substring(1));
+						switch (sentence) {
+						case GPRMC: //Recommended Minimum Sentence C (RMC)
+							parseRMC(strValues);
+							break;
+						case GPGGA: //Global Positioning System Fix Data (GGA)				
+							parseGGA(strValues);
+							break;
+						case GPGSA: //Satellite status (GSA)
+							parseGSA(strValues);
+							break;
+						case GPVTG: // Velocity made good (VTG)
+							parseVTG(strValues);
+							break;
+						case SMGPS:
+							parseSMGPS(strValues);
+							break;
+						case MLINK:
+							parseMLINK(strValues);
+							break;
+						case UNILOG:
+							parseUNILOG(strValues);
+							break;
+						case COMMENT:
+						case KOMMENTAR:
+							//$KOMMENTAR,Extra 300. Kuban Acht. Mit UniLog Daten.*
+							//$KOMMENTAR,Trojan. Ein paar liegende Figuren. Volle M-Link Bestückung.*
+							this.comment = strValues[1].trim();
+							this.comment = this.comment.endsWith(GDE.STRING_STAR) ? this.comment.substring(0, this.comment.length() - 1) : this.comment;
+
+							break;
+						case GPSETUP:
+							//no implementation here
+							break;
+						case SETUP: // setup SM GPS-Logger firmware 1.00
+							try {
+								byte[] buffer = strValues[1].getBytes();
+								this.timeOffsetUTC = (short) ((buffer[7] << 8) + (buffer[6] & 0x00FF));
+							}
+							catch (Exception e) {
+								NMEAParser.log.log(java.util.logging.Level.WARNING, e.getMessage());
+							}
+							break;
+						default:
+							NMEAParser.log.log(java.util.logging.Level.WARNING, "NMEA sentence = " + strValues[0].substring(1) + " actually not implementes!"); //$NON-NLS-1$ //$NON-NLS-2$
+							break;
+						}
+						//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+						//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+						//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
+						//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+					}
+					catch (Exception e) {
+						if (e instanceof IllegalArgumentException && e.getMessage().contains("No enum")) { //$NON-NLS-1$
+							//ignore;
+						}
+						else {
+							throw e;
+						}
+					}
 				}
-				//0=latitude 1=longitude 2=altitude 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocityKnots 8=velocityKmh 9=height 10=climb 11=voltageRx 12=distanceTotal 13=distanceStart 14=directionStart 15=glideRatio
-				//16=voltage 17=current 18=power 19=revolution 20=voltageRx 21=height 22=A1 23=A2 24=A3 25=? 26=? 28=? 29=? 30=?
-
 			}
 		}
 		catch (NumberFormatException e) {
-			log.log(Level.WARNING, e.getMessage(), e);
+			NMEAParser.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 			//do not re-throw and skip sentence set
 		}
 		catch (Exception e) {
-			log.log(Level.WARNING, e.getMessage(), e);
+			NMEAParser.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 			throw e;
 		}
+	}
+
+	/**
+	 * check sentence checkSum against last two bytes hex value
+	 * checksum is build of exclusive or between $ and *
+	 * @param strValues
+	 */
+	boolean isChecksumOK(String sentence) {
+		boolean isOK = true;
+		try {
+			String hexCheckSum = sentence.trim().substring(sentence.indexOf(GDE.STRING_STAR) + 1);
+			if (hexCheckSum.length() == 2) {
+				int checkSum = Integer.parseInt(hexCheckSum, 16);
+				String subSentence = sentence.substring(1, sentence.indexOf(GDE.STRING_STAR));
+				isOK = checkSum == Checksum.XOR(subSentence.toCharArray());
+				if (!isOK) NMEAParser.log.log(java.util.logging.Level.WARNING, checkSum + " missmatch " + Checksum.XOR(subSentence.getBytes()) + " in " + subSentence); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+		catch (Exception e) {
+			NMEAParser.log.log(java.util.logging.Level.WARNING, e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage() + " in " + sentence); //$NON-NLS-1$
+		}
+		return isOK;
 	}
 
 	/**
@@ -156,7 +196,7 @@ public class NMEAParser {
 	 * <ul>
 	 * $GPRMC,HHMMSS.ss,A,BBBB.BBBB,b,LLLLL.LLLL,l,GG.G,RR.R,DDMMYY,M.M,m,F*PP
 	 * $GPRMC,132045.100,A,4752.4904,N,01106.7063,E,1.29,267.55,170910,,,A*60
- 	 * <li> RMC          Recommended Minimum sentence C						</li>
+	 * <li> RMC          Recommended Minimum sentence C						</li>
 	 * <li> 123519       Fix taken at 12:35:19 UTC								</li>
 	 * <li> A            Status A=active or V=Void.								</li> 		
 	 * <li> 4807.038,N   Latitude 48 deg 07.038' N								</li>
@@ -170,56 +210,56 @@ public class NMEAParser {
 	 * @param strValues
 	 */
 	void parseRMC(String[] strValues) {
-		if (strValues[2].equals("A")) { // &&  Integer.parseInt(strValues[strValues.length-1].substring(2).trim()) == Checksum.XOR(this.values, 0, this.size)) {
-			if (this.date == null) { 
-					String strValueDate = strValues[9].trim();
-					this.year = Integer.parseInt(strValueDate.substring(4));
-					year = year > 50 ? year + 1900 : year + 2000;
-					this.month = Integer.parseInt(strValueDate.substring(2, 4));
-					this.day = Integer.parseInt(strValueDate.substring(0, 2));
+		if (strValues[2].equals("A")) { //$NON-NLS-1$
+			if (this.date == null) {
+				String strValueDate = strValues[9].trim();
+				this.year = Integer.parseInt(strValueDate.substring(4));
+				this.year = this.year > 50 ? this.year + 1900 : this.year + 2000;
+				this.month = Integer.parseInt(strValueDate.substring(2, 4));
+				this.day = Integer.parseInt(strValueDate.substring(0, 2));
 			}
 			String strValueTime = strValues[1].trim();
-			int hour = Integer.parseInt(strValueTime.substring(0,2));
-			int minute = Integer.parseInt(strValueTime.substring(2,4));
-			int second = Integer.parseInt(strValueTime.substring(4,6));
-			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month-1, this.day, hour, minute, second);
-			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT)+1)) : 0);
+			int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
+			int minute = Integer.parseInt(strValueTime.substring(2, 4));
+			int second = Integer.parseInt(strValueTime.substring(4, 6));
+			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
 
-			if (lastTimeStamp < timeStamp) {
-				this.time_ms = (int)(this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
+			if (this.lastTimeStamp < timeStamp) {
+				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
 				this.lastTimeStamp = timeStamp;
 				this.date = calendar.getTime();
-				log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
-				
+				NMEAParser.log.log(java.util.logging.Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
+
 				int latitude, longitude, velocity;
 				try {
 					latitude = Integer.parseInt(strValues[3].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
 				}
-				catch (NumberFormatException e) {
+				catch (Exception e) {
 					latitude = this.values[0];
 				}
 				try {
 					longitude = Integer.parseInt(strValues[5].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
 				}
-				catch (NumberFormatException e) {
+				catch (Exception e) {
 					longitude = this.values[1];
 				}
 				try {
-					velocity = (int)(Double.parseDouble(strValues[7].trim())*1852.0);
+					velocity = (int) (Double.parseDouble(strValues[7].trim()) * 1852.0);
 				}
-				catch (NumberFormatException e) {
+				catch (Exception e) {
 					velocity = this.values[7];
 				}
-				 
+
 				//GPS 
-				this.values[0]  = latitude;
-				this.values[1]  = longitude;
+				this.values[0] = latitude;
+				this.values[1] = longitude;
 				//this.values[2]  = altitudeAbs;
 				//this.values[3]  = numSatelites;
-			  //this.values[4]  = PDOP (dilution of precision) 
+				//this.values[4]  = PDOP (dilution of precision) 
 				//this.values[5]  = HDOP (horizontal dilution of precision) 
 				//this.values[6]  = VDOP (vertical dilution of precision)
-				this.values[7]  = velocity;
+				this.values[7] = velocity;
 				//SMGPS
 				//this.values[8]  = altitudeRel;
 				//this.values[9]  = climb;
@@ -290,47 +330,47 @@ public class NMEAParser {
 	 * @param strValues
 	 */
 	void parseGGA(String[] strValues) {
-		if (Integer.parseInt(strValues[6].trim()) > 0 ) { //&&  Integer.parseInt(strValues[strValues.length-1].substring(1).trim()) == Checksum.XOR(this.values, 0, this.size)) {
+		if (Integer.parseInt(strValues[6].trim()) > 0) {
 			String strValueTime = strValues[1].trim();
-			int hour = Integer.parseInt(strValueTime.substring(0,2));
-			int minute = Integer.parseInt(strValueTime.substring(2,4));
-			int second = Integer.parseInt(strValueTime.substring(4,6));
-			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month-1, this.day, hour, minute, second);
-			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT)+1)) : 0);
+			int hour = Integer.parseInt(strValueTime.substring(0, 2));
+			int minute = Integer.parseInt(strValueTime.substring(2, 4));
+			int second = Integer.parseInt(strValueTime.substring(4, 6));
+			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
 
-			if (lastTimeStamp == timeStamp) { // validate sentence  depends to same sentence set
+			if (this.lastTimeStamp == timeStamp) { // validate sentence  depends to same sentence set
 				int latitude, longitude, numSatelites, altitudeAbs;
 				try {
 					latitude = this.values[0] == 0 ? Integer.parseInt(strValues[2].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY)) : this.values[0];
 				}
-				catch (NumberFormatException e) {
+				catch (Exception e) {
 					latitude = this.values[0];
 				}
 				try {
 					longitude = this.values[1] == 0 ? Integer.parseInt(strValues[4].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY)) : this.values[1];
 				}
-				catch (NumberFormatException e) {
+				catch (Exception e) {
 					longitude = this.values[1];
 				}
 				try {
-					numSatelites = Integer.parseInt(strValues[7].trim())*1000;
+					numSatelites = Integer.parseInt(strValues[7].trim()) * 1000;
 				}
-				catch (NumberFormatException e) {
+				catch (Exception e) {
 					numSatelites = this.values[3];
 				}
 				try {
-					altitudeAbs = (int)(Double.parseDouble(strValues[9].trim())*1000.0);
+					altitudeAbs = (int) (Double.parseDouble(strValues[9].trim()) * 1000.0);
 				}
-				catch (NumberFormatException e) {
+				catch (Exception e) {
 					altitudeAbs = this.values[2];
 				}
-				 
+
 				//GPS 
-				this.values[0]  = latitude;
-				this.values[1]  = longitude;
-				this.values[2]  = altitudeAbs;
-				this.values[3]  = numSatelites;
-			  //this.values[4]  = PDOP (dilution of precision) 
+				this.values[0] = latitude;
+				this.values[1] = longitude;
+				this.values[2] = altitudeAbs;
+				this.values[3] = numSatelites;
+				//this.values[4]  = PDOP (dilution of precision) 
 				//this.values[5]  = HDOP (horizontal dilution of precision) 
 				//this.values[6]  = VDOP (vertical dilution of precision)
 				//this.values[7]  = velocity;
@@ -390,37 +430,37 @@ public class NMEAParser {
 	 * @param strValues
 	 */
 	void parseGSA(String[] strValues) {
-		if (strValues[1].equals("A")) { // &&  Integer.parseInt(strValues[2].trim()) > 1 &&  Integer.parseInt(strValues[strValues.length-1].substring(1).trim()) == Checksum.XOR(this.values, 0, this.size)) {
-			int PDOP=this.values[4], HDOP=this.values[5], VDOP=this.values[6];
+		if (strValues[1].equals("A") || strValues[1].equals("M")) { //$NON-NLS-1$ //$NON-NLS-2$
+			int PDOP = this.values[4], HDOP = this.values[5], VDOP = this.values[6];
 			try {
-				PDOP = (int)(Double.parseDouble(strValues[strValues.length-3].trim())*1000.0);
+				PDOP = (int) (Double.parseDouble(strValues[strValues.length - 3].trim()) * 1000.0);
 			}
-			catch (NumberFormatException e) {
+			catch (Exception e) {
 				//ignore and leave value unchanged
 			}
 			try {
-				HDOP = (int)(Double.parseDouble(strValues[strValues.length-2].trim())*1000.0);
+				HDOP = (int) (Double.parseDouble(strValues[strValues.length - 2].trim()) * 1000.0);
 			}
-			catch (NumberFormatException e) {
+			catch (Exception e) {
 				//ignore and leave value unchanged
 			}
 			try {
-				String value = strValues[strValues.length-1].trim();
+				String value = strValues[strValues.length - 1].trim();
 				value = value.contains(GDE.STRING_STAR) ? value.substring(0, value.indexOf(GDE.STRING_STAR)) : value;
-				VDOP = (int)(Double.parseDouble(value)*1000.0);
+				VDOP = (int) (Double.parseDouble(value) * 1000.0);
 			}
-			catch (NumberFormatException e) {
+			catch (Exception e) {
 				//ignore and leave value unchanged
 			}
-			 
+
 			//GPS 
 			//this.values[0]  = latitude;
 			//this.values[1]  = longitude;
 			//this.values[2]  = altitudeAbs;
 			//this.values[3]  = numSatelites;
-		  this.values[4]  = PDOP; // (dilution of precision) 
-			this.values[5]  = HDOP; // (horizontal dilution of precision) 
-			this.values[6]  = VDOP; // (vertical dilution of precision)
+			this.values[4] = PDOP; // (dilution of precision) 
+			this.values[5] = HDOP; // (horizontal dilution of precision) 
+			this.values[6] = VDOP; // (vertical dilution of precision)
 			//this.values[7]  = velocity;
 			//SMGPS
 			//this.values[8]  = altitudeRel;
@@ -458,9 +498,9 @@ public class NMEAParser {
 			//this.values[38] = add14;
 		}
 	}
-	
+
 	/**
-	 * parse the Velocity made good sentence VTG
+	 * parse the velocity made good sentence VTG
 	 * <ul>
 	 * $GPVTG,054.7,T,034.4,M,005.5,N,010.2,K*48
 	 * $GPVTG,267.55,T,,M,1.29,N,2.38,K,A*3D
@@ -474,29 +514,29 @@ public class NMEAParser {
 	 * @param strValues
 	 */
 	void parseVTG(String[] strValues) {
-		if (true) { // Integer.parseInt(strValues[strValues.length-1].substring(1).trim()) == Checksum.XOR(this.values, 0, this.size)) {			
+		if (true) {
 			int velocity;
 			try {
-				velocity = (int)(Double.parseDouble(strValues[7].trim())*1000.0);
+				velocity = (int) (Double.parseDouble(strValues[7].trim()) * 1000.0);
 			}
-			catch (NumberFormatException e) {
+			catch (Exception e) {
 				try {
-					velocity = (int)(Double.parseDouble(strValues[5].trim())*1852.0);
+					velocity = (int) (Double.parseDouble(strValues[5].trim()) * 1852.0);
 				}
-				catch (NumberFormatException e1) {
+				catch (Exception e1) {
 					velocity = this.values[7];
 				}
 			}
-			 
+
 			//GPS 
 			//this.values[0]  = latitude;
 			//this.values[1]  = longitude;
 			//this.values[2]  = altitudeAbs;
 			//this.values[3]  = numSatelites;
-		  //this.values[4]  = PDOP (dilution of precision) 
+			//this.values[4]  = PDOP (dilution of precision) 
 			//this.values[5]  = HDOP (horizontal dilution of precision) 
 			//this.values[6]  = VDOP (vertical dilution of precision)
-			this.values[7]  = velocity;
+			this.values[7] = velocity;
 			//SMGPS
 			//this.values[8]  = altitudeRel;
 			//this.values[9]  = climb;
@@ -547,9 +587,10 @@ public class NMEAParser {
 	 * @param strValues
 	 */
 	void parseSMGPS(String[] strValues) {
+		final String STRING_GLIDE_RATIO_UNIT = "m/1"; //$NON-NLS-1$
 		for (int i = 0; i < strValues.length && i < 7; i++) {
 			try {
-				String[] values = strValues[i+1].trim().split(" |:");
+				String[] values = strValues[i + 1].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
 				if (i != 6) {
 					this.values[8 + i] = (int) (Double.parseDouble(values[0]) * 1000.0);
 					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals(values[1])) {
@@ -558,22 +599,22 @@ public class NMEAParser {
 				}
 				else {
 					this.values[8 + i] = (int) (Double.parseDouble(values[1]) * 1000.0);
-					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals("m/1")) {
-						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit("m/1");
+					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals(STRING_GLIDE_RATIO_UNIT)) {
+						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(STRING_GLIDE_RATIO_UNIT);
 					}
 				}
 			}
-			catch (NumberFormatException e) {
+			catch (Exception e) {
 				// ignore and leave value unchanged
 			}
 		}
-		
+
 		//GPS 
 		//this.values[0]  = latitude;
 		//this.values[1]  = longitude;
 		//this.values[2]  = altitudeAbs;
 		//this.values[3]  = numSatelites;
-	  //this.values[4]  = PDOP (dilution of precision) 
+		//this.values[4]  = PDOP (dilution of precision) 
 		//this.values[5]  = HDOP (horizontal dilution of precision) 
 		//this.values[6]  = VDOP (vertical dilution of precision)		
 		//this.values[7]  = velocity;
@@ -630,13 +671,13 @@ public class NMEAParser {
 	void parseUNILOG(String[] strValues) {
 		for (int i = 0; i < strValues.length && i < 9; i++) {
 			try {
-				String[] values = strValues[i+1].trim().split(GDE.STRING_BLANK);
-				this.values[15+i] = (int)(Double.parseDouble(values[0])*1000.0);
-				if (!this.device.getMeasurement(this.channelConfigNumber, 15+i).getUnit().equals(values[1])) {
-					this.device.getMeasurement(this.channelConfigNumber, 15+i).setUnit(values[1].contains(GDE.STRING_STAR) ? values[1].substring(0, values[1].indexOf(GDE.STRING_STAR)) : values[1]);
+				String[] values = strValues[i + 1].trim().split(GDE.STRING_BLANK);
+				this.values[15 + i] = (int) (Double.parseDouble(values[0]) * 1000.0);
+				if (!this.device.getMeasurement(this.channelConfigNumber, 15 + i).getUnit().equals(values[1])) {
+					this.device.getMeasurement(this.channelConfigNumber, 15 + i).setUnit(values[1].contains(GDE.STRING_STAR) ? values[1].substring(0, values[1].indexOf(GDE.STRING_STAR)) : values[1]);
 				}
 			}
-			catch (NumberFormatException e) {
+			catch (Exception e) {
 				// ignore and leave value unchanged
 			}
 		}
@@ -646,7 +687,7 @@ public class NMEAParser {
 		//this.values[1]  = longitude;
 		//this.values[2]  = altitudeAbs;
 		//this.values[3]  = numSatelites;
-	  //this.values[4]  = PDOP (dilution of precision) 
+		//this.values[4]  = PDOP (dilution of precision) 
 		//this.values[5]  = HDOP (horizontal dilution of precision) 
 		//this.values[6]  = VDOP (vertical dilution of precision)
 		//this.values[7]  = velocity;
@@ -695,14 +736,14 @@ public class NMEAParser {
 	void parseMLINK(String[] strValues) {
 		for (int i = 1; i < strValues.length && i < 15; i++) {
 			try {
-				String[] values = strValues[i].trim().split(" |:");
+				String[] values = strValues[i].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
 				int address = Integer.parseInt(values[0]);
-				this.values[24+address] = (int)(Double.parseDouble(values[2])*1000.0);
-				if (!this.device.getMeasurement(this.channelConfigNumber, 24+address).getUnit().equals(values[3])) {
-					this.device.getMeasurement(this.channelConfigNumber, 24+address).setUnit(values[3].contains(GDE.STRING_STAR) ? values[3].substring(0, values[3].indexOf(GDE.STRING_STAR)) : values[3]);
+				this.values[24 + address] = (int) (Double.parseDouble(values[2]) * 1000.0);
+				if (!this.device.getMeasurement(this.channelConfigNumber, 24 + address).getUnit().equals(values[3])) {
+					this.device.getMeasurement(this.channelConfigNumber, 24 + address).setUnit(values[3].contains(GDE.STRING_STAR) ? values[3].substring(0, values[3].indexOf(GDE.STRING_STAR)) : values[3]);
 				}
 			}
-			catch (NumberFormatException e) {
+			catch (Exception e) {
 				// ignore and leave value unchanged
 			}
 		}
@@ -712,7 +753,7 @@ public class NMEAParser {
 		//this.values[1]  = longitude;
 		//this.values[2]  = altitudeAbs;
 		//this.values[3]  = numSatelites;
-	  //this.values[4]  = PDOP (dilution of precision) 
+		//this.values[4]  = PDOP (dilution of precision) 
 		//this.values[5]  = HDOP (horizontal dilution of precision) 
 		//this.values[6]  = VDOP (vertical dilution of precision)
 		//this.values[7]  = velocity;
@@ -751,32 +792,32 @@ public class NMEAParser {
 		//this.values[37] = add13;
 		//this.values[38] = add14;
 	}
-	
+
 	/**
 	 * @return the time
 	 */
 	public long getTime_ms() {
-		return time_ms;
+		return this.time_ms;
 	}
 
 	/**
 	 * @return the values
 	 */
 	public int[] getValues() {
-		return values;
+		return this.values;
 	}
 
 	/**
 	 * @return the date
 	 */
 	public Date getDate() {
-		return date;
+		return this.date;
 	}
 
 	/**
 	 * @return the comment
 	 */
 	public String getComment() {
-		return comment != null ? this.comment : GDE.STRING_EMPTY;
+		return this.comment != null ? this.comment : GDE.STRING_EMPTY;
 	}
 }

@@ -51,26 +51,26 @@ import org.eclipse.swt.widgets.Text;
  * @author Winfried Brügmann
  */
 public class MeasurementControlConfigurable extends Composite {
-	final static Logger						log	= Logger.getLogger(MeasurementControlConfigurable.class.getName());
+	final static Logger		log	= Logger.getLogger(MeasurementControlConfigurable.class.getName());
 
-	Composite											measurementComposite;
-	Button												measurement;
-	Text													measurementName;
-	CLabel												measurementUnit;
-	Text													measurementSymbol;
-	Button												measurementSynch;
-	Button												inputFileButton;
-	Composite											buttonComposite;
+	Composite							measurementComposite;
+	Button								measurement;
+	Text									measurementName;
+	CLabel								measurementUnit;
+	Text									measurementSymbol;
+	Button								measurementSynch;
+	Button								inputFileButton;
+	Composite							buttonComposite;
 
-	final IDevice									device;																										// get device specific things, get serial port, ...
-	final DataExplorer						application;																							// interaction with application instance
-	final Channels								channels;																									// interaction with channels, source of all records
-	final DeviceDialog						dialog;
-	final MeasurementType					measurementType;
-	final int											ordinal;
-	final int 										channelConfigNumber;
-	final String									address;
-	final String									filterExtend;
+	final IDevice					device;																																// get device specific things, get serial port, ...
+	final DataExplorer		application;																														// interaction with application instance
+	final Channels				channels;																															// interaction with channels, source of all records
+	final DeviceDialog		dialog;
+	final MeasurementType	measurementType;
+	final int							ordinal;
+	final int							channelConfigNumber;
+	final String					address;
+	final String					filterExtend;
 
 	/**
 	 * create a check button to activate measurement while displaying name, symbol and unit
@@ -81,8 +81,11 @@ public class MeasurementControlConfigurable extends Composite {
 	 * @param useMeasurementType
 	 * @param useDevice
 	 * @param horizontalSpan
+	 * @param useAddress
+	 * @param useFilterExtend
 	 */
-	public MeasurementControlConfigurable(Composite parentComposite, DeviceDialog parentDialog, int useChannelConfigNumber, int useOrdinal, MeasurementType useMeasurementType, IDevice useDevice, int horizontalSpan, String useAddress, String useFilterExtend) {
+	public MeasurementControlConfigurable(Composite parentComposite, DeviceDialog parentDialog, int useChannelConfigNumber, int useOrdinal, MeasurementType useMeasurementType, IDevice useDevice,
+			int horizontalSpan, String useAddress, String useFilterExtend) {
 		super(parentComposite, SWT.NONE);
 		this.dialog = parentDialog;
 		this.channelConfigNumber = useChannelConfigNumber;
@@ -99,7 +102,7 @@ public class MeasurementControlConfigurable extends Composite {
 		thisLData.horizontalSpan = horizontalSpan;
 		thisLData.horizontalAlignment = GridData.BEGINNING;
 		thisLData.verticalAlignment = GridData.BEGINNING;
-		thisLData.heightHint = 25;
+		thisLData.heightHint = 23;
 		this.setLayoutData(thisLData);
 		this.setLayout(thisLayout);
 		{
@@ -109,13 +112,13 @@ public class MeasurementControlConfigurable extends Composite {
 			measurementLData.height = 20;
 			this.measurement.setLayoutData(measurementLData);
 			this.measurement.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-			this.measurement.setText(String.format(" %2s", this.address));
+			this.measurement.setText(String.format(" %2s", this.address)); //$NON-NLS-1$
 			this.measurement.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0299));
 			this.measurement.setSelection(this.measurementType.isActive());
 			this.measurement.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(Level.FINEST, "measurement.widgetSelected, event=" + evt);
+					log.log(Level.FINEST, "measurement.widgetSelected, event=" + evt); //$NON-NLS-1$
 					boolean isVisible = MeasurementControlConfigurable.this.measurement.getSelection();
 					MeasurementControlConfigurable.this.device.setMeasurementActive(MeasurementControlConfigurable.this.channelConfigNumber, MeasurementControlConfigurable.this.ordinal, isVisible);
 					Channel activeChannel = MeasurementControlConfigurable.this.channels.getActiveChannel();
@@ -141,10 +144,12 @@ public class MeasurementControlConfigurable extends Composite {
 			measurementNameLData.height = 16;
 			this.measurementName.setLayoutData(measurementNameLData);
 			this.measurementName.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-			this.measurementName.setText(this.measurementType.getName().endsWith(filterExtend) ? this.measurementType.getName().substring(0, this.measurementType.getName().length()-3) : this.measurementType.getName());
+			this.measurementName.setText(this.measurementType.getName().endsWith(this.filterExtend) ? this.measurementType.getName().substring(0, this.measurementType.getName().length() - 3)
+					: this.measurementType.getName());
 			this.measurementName.addKeyListener(new KeyAdapter() {
+				@Override
 				public void keyReleased(KeyEvent evt) {
-					updateName(measurementName.getText());
+					updateName(MeasurementControlConfigurable.this.measurementName.getText());
 					MeasurementControlConfigurable.this.dialog.enableSaveButton(true);
 				}
 			});
@@ -155,11 +160,12 @@ public class MeasurementControlConfigurable extends Composite {
 			measurementSymbolLabelLData.width = 50;
 			measurementSymbolLabelLData.height = 16;
 			this.measurementSymbol.setLayoutData(measurementSymbolLabelLData);
-			this.measurementSymbol.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.measurementSymbol.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE - 1, SWT.NORMAL));
 			this.measurementSymbol.setText(this.measurementType.getSymbol());
 			this.measurementSymbol.addKeyListener(new KeyAdapter() {
+				@Override
 				public void keyReleased(KeyEvent evt) {
-					measurementType.setSymbol(measurementSymbol.getText());
+					MeasurementControlConfigurable.this.measurementType.setSymbol(MeasurementControlConfigurable.this.measurementSymbol.getText());
 					MeasurementControlConfigurable.this.dialog.enableSaveButton(true);
 				}
 			});
@@ -170,14 +176,8 @@ public class MeasurementControlConfigurable extends Composite {
 			measurementUnitLabelLData.width = 50;
 			measurementUnitLabelLData.height = 20;
 			this.measurementUnit.setLayoutData(measurementUnitLabelLData);
-			this.measurementUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.measurementUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE - 1, SWT.NORMAL));
 			this.measurementUnit.setText(GDE.STRING_LEFT_BRACKET + this.measurementType.getUnit() + GDE.STRING_RIGHT_BRACKET);
-			this.measurementUnit.addKeyListener(new KeyAdapter() {
-				public void keyReleased(KeyEvent evt) {
-					measurementType.setUnit(measurementUnit.getText());
-					MeasurementControlConfigurable.this.dialog.enableSaveButton(true);
-				}
-			});
 		}
 		{
 			Composite spacer = new Composite(this, SWT.NONE);
@@ -193,13 +193,13 @@ public class MeasurementControlConfigurable extends Composite {
 			measurementLData.height = 20;
 			this.measurementSynch.setLayoutData(measurementLData);
 			this.measurementSynch.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-			this.measurementSynch.setText(String.format(" %2s", this.measurementType.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) != null ? this.measurementType.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()).getValue() : GDE.STRING_EMPTY));
+			this.measurementSynch.setText(String.format(" %2s", this.measurementType.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) != null ? this.measurementType.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()).getValue() : GDE.STRING_EMPTY)); //$NON-NLS-1$
 			this.measurementSynch.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0298));
 			this.measurementSynch.setSelection(this.measurementType.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) != null ? true : false);
 			this.measurementSynch.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(Level.FINEST, "measurementSynch.widgetSelected, event=" + evt);
+					log.log(Level.FINEST, "measurementSynch.widgetSelected, event=" + evt); //$NON-NLS-1$
 					MeasurementControlConfigurable.this.measurementSynch.setSelection(synchronizeRecord(MeasurementControlConfigurable.this.measurementSynch.getSelection()));
 					MeasurementControlConfigurable.this.dialog.enableSaveButton(true);
 				}
@@ -213,12 +213,12 @@ public class MeasurementControlConfigurable extends Composite {
 	 */
 	void updateName(String newName) {
 		for (int i = this.filterExtend.length(); i > 0; i--) {
-			if(newName.endsWith(this.filterExtend.substring(0,i))) {
-				newName = newName.substring(0, newName.length()-this.filterExtend.length());
+			if (newName.endsWith(this.filterExtend.substring(0, i))) {
+				newName = newName.substring(0, newName.length() - this.filterExtend.length());
 				break;
 			}
 		}
-		measurementType.setName(newName + this.filterExtend);
+		this.measurementType.setName(newName + this.filterExtend);
 		RecordSet activeRecordSet = this.application.getActiveRecordSet();
 		if (activeRecordSet != null) {
 			activeRecordSet.get(this.ordinal).setName(newName + this.filterExtend);
@@ -230,22 +230,21 @@ public class MeasurementControlConfigurable extends Composite {
 	 */
 	boolean synchronizeRecord(boolean enable) {
 		boolean isEnabled = !enable;
-		if(enable) {
+		if (enable) {
 			RecordSet activeRecordSet = this.application.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				String syncMeasurementName = measurementType.getName().endsWith(this.filterExtend) ? measurementType.getName().substring(0, measurementType.getName().length()-this.filterExtend.length()) : measurementType.getName();
+				String syncMeasurementName = this.measurementType.getName().endsWith(this.filterExtend) ? this.measurementType.getName().substring(0,	this.measurementType.getName().length() - this.filterExtend.length()) : this.measurementType.getName();
 				if (activeRecordSet.get(syncMeasurementName) != null) {
-					device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,
-							activeRecordSet.get(syncMeasurementName).getOrdinal());
+					this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,	activeRecordSet.get(syncMeasurementName).getOrdinal());
 					isEnabled = true;
 				}
 			}
 		}
 		else {
-			device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER, null);
+			this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER, null);
 			isEnabled = false;
 		}
-		this.measurementSynch.setText(String.format(" %2s", this.measurementType.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) != null ? this.measurementType.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()).getValue() : GDE.STRING_EMPTY));
+		this.measurementSynch.setText(String.format(" %2s", this.measurementType.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) != null ? this.measurementType.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()).getValue() : GDE.STRING_EMPTY)); //$NON-NLS-1$
 		return isEnabled;
 	}
 }

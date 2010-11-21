@@ -133,6 +133,8 @@ public class GDE {
 	public static final String		FILE_ENDING_STAR_XML			= "*.xml";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_KML			= "*.kml";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_GPX			= "*.gpx";//$NON-NLS-1$
+	public static final String		FILE_ENDING_STAR_HEX			= "*.hex";//$NON-NLS-1$
+	public static final String		FILE_ENDING_STAR_INI			= "*.ini";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_STAR			= "*.*";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_JAR				= ".jar";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_LOV				= ".lov";	//$NON-NLS-1$

@@ -221,6 +221,7 @@ public class DataExplorer extends Composite {
 		this.extensionFilterMap.put(GDE.FILE_ENDING_KML, Messages.getString(MessageIds.GDE_MSGT0222));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_GPX, Messages.getString(MessageIds.GDE_MSGT0223));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_STAR, Messages.getString(MessageIds.GDE_MSGT0216));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_INI, Messages.getString(MessageIds.GDE_MSGT0368));
 	}
 
 	/**
@@ -1450,9 +1451,42 @@ public class DataExplorer extends Composite {
 		return fileOpenDialog;
 	}
 
+	public FileDialog openFileOpenDialog(Shell parent, String name, String[] extensions, String path, String fileName, int addStyle) {
+		final String $METHOD_NAME = "openFileOpenDialog"; //$NON-NLS-1$
+		FileDialog fileOpenDialog = new FileDialog(parent, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);
+		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
+		fileOpenDialog.setText(name);
+		fileOpenDialog.setFileName(fileName == null ? GDE.STRING_EMPTY : fileName);
+		if (extensions != null) {
+			fileOpenDialog.setFilterExtensions(extensions);
+			fileOpenDialog.setFilterNames(getExtensionDescription(extensions));
+		}
+		if (path != null) fileOpenDialog.setFilterPath(path);
+		fileOpenDialog.open();
+		return fileOpenDialog;
+	}
+
 	public FileDialog prepareFileSaveDialog(String name, String[] extensions, String path, String fileName) {
 		final String $METHOD_NAME = "openFileSaveDialog"; //$NON-NLS-1$
 		FileDialog fileSaveDialog = new FileDialog(DataExplorer.shell, SWT.PRIMARY_MODAL | SWT.SAVE);
+		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
+		fileSaveDialog.setText(name);
+		if (extensions != null) {
+			fileSaveDialog.setFilterExtensions(extensions);
+			fileSaveDialog.setFilterNames(getExtensionDescription(extensions));
+		}
+		if (path != null) fileSaveDialog.setFilterPath(path);
+		fileSaveDialog.setFileName(fileName != null && fileName.length() > 5 ? fileName : GDE.STRING_EMPTY);
+		return fileSaveDialog;
+	}
+
+	public FileDialog prepareFileSaveDialog(Shell parent, String name, String[] extensions, String path, String fileName) {
+		final String $METHOD_NAME = "openFileSaveDialog"; //$NON-NLS-1$
+		FileDialog fileSaveDialog = new FileDialog(parent, SWT.PRIMARY_MODAL | SWT.SAVE | SWT.ON_TOP);
 		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
