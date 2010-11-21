@@ -371,6 +371,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 	@Override
 	public void enableSaveButton(boolean enable) {
 		this.saveVisualizationButton.setEnabled(enable);
+		this.application.updateAll();
 	}
 
 	/**
