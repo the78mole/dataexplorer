@@ -102,7 +102,7 @@ public class VarioDialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				//dialogShell.pack();
-				this.dialogShell.setSize(310, 10 + 30 + 90 + this.measurementsCount * 30 + 55);
+				this.dialogShell.setSize(310, 30 + 25 + 25 + this.measurementsCount * 28 + 40 + 50); //header + tab + label + this.measurementsCount * 23 + loadButton + save/close buttons
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$

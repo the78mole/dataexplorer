@@ -64,7 +64,7 @@ public class VarioTabItem extends CTabItem {
 
 	final CTabFolder								parent;
 	final IDevice										device;																																								// get device specific things, get serial port, ...
-	final DataExplorer		application;																																						// interaction with application instance
+	final DataExplorer							application;																																						// interaction with application instance
 	final Channels									channels;																																							// interaction with channels, source of all records
 	final VarioDialog		dialog;
 	final int												channelConfigNumber;
@@ -94,7 +94,7 @@ public class VarioTabItem extends CTabItem {
 			GridData tabItemLabelLData = new GridData();
 			tabItemLabelLData.horizontalAlignment = GridData.BEGINNING;
 			tabItemLabelLData.verticalAlignment = GridData.BEGINNING;
-			tabItemLabelLData.heightHint = 30;
+			tabItemLabelLData.heightHint = 20;
 			tabItemLabelLData.widthHint = 292;
 			this.tabItemLabel.setLayoutData(tabItemLabelLData);
 			this.tabItemLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+2, SWT.BOLD));
