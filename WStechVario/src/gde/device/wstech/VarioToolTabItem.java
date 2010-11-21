@@ -2159,8 +2159,7 @@ public class VarioToolTabItem extends CTabItem {
 	}
 
 	void loadSetup() {
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] { GDE.FILE_ENDING_STAR }, this.device
-				.getDataBlockPreferredDataLocation(), this.getDefaultFileName(), SWT.SINGLE);
+		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] { GDE.FILE_ENDING_STAR_HEX, GDE.FILE_ENDING_STAR }, this.device.getDataBlockPreferredDataLocation(), this.getDefaultFileName(), SWT.SINGLE);
 		String selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		VarioToolTabItem.log.log(Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
 
@@ -2299,7 +2298,7 @@ public class VarioToolTabItem extends CTabItem {
 	}
 
 	void saveSetup() {
-		FileDialog fileDialog = this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] { GDE.FILE_ENDING_HEX, GDE.FILE_ENDING_STAR }, this.device
+		FileDialog fileDialog = this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] { GDE.FILE_ENDING_STAR_HEX, GDE.FILE_ENDING_STAR }, this.device
 				.getDataBlockPreferredDataLocation(), this.getDefaultFileName());
 		VarioToolTabItem.log.log(Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
 		String setupFilePath = fileDialog.open();
