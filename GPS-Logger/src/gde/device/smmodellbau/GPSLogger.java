@@ -508,14 +508,21 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 			if (fd.getFileName().length() > 4) {
-				try {
-					Integer channelConfigNumber = this.dialog != null && !this.dialog.isDisposed() ? 1 : null;
-					String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-					NMEAReaderWriter.read(selectedImportFile, this, recordNameExtend, channelConfigNumber);
-				}
-				catch (Throwable e) {
-					log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-				}
+				final Integer channelConfigNumber = this.dialog != null && !this.dialog.isDisposed() ? 1 : null;
+				final String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+				final String importFileName = selectedImportFile;
+				Thread reader = new Thread() {
+					@Override
+					public void run() {
+						try {
+							NMEAReaderWriter.read(importFileName, GPSLogger.this, recordNameExtend, channelConfigNumber);
+						}
+						catch (Throwable e) {
+							log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+						}
+					}
+				};
+				reader.start();
 			}
 		}
 	}
