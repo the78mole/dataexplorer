@@ -89,6 +89,7 @@ public class NMEAReaderWriter {
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
 		String recordSetNameExtend = device.getRecordSetStemName();
 		long timeStamp = -1;
+		NMEAReaderWriter.application.setProgress(0, sThreadId);
 
 		try {
 			if (channelConfigNumber == null)
@@ -106,16 +107,15 @@ public class NMEAReaderWriter {
 					activeChannel = NMEAReaderWriter.channels.getActiveChannel();
 				}
 				String recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
-
-				//now get all data   $1;1;0; 14780;  598;  1000;  8838;  0002
-				//$recordSetNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
 				int dataBlockSize = device.getDataBlockSize(); // measurements size must not match data block size, there are some measurements which are result of calculation			
-				NMEAReaderWriter.log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize != dataBlockSize) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new Object[] { filePath, measurementSize, dataBlockSize }));
 				NMEAParser data = new NMEAParser(device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize, device, activeChannel.getNumber());
 
-				DataInputStream binReader = new DataInputStream(new FileInputStream(new File(filePath)));
+				File inputFile = new File(filePath);
+				long approximateLines = inputFile.length()/65; //average approximately 70 bytes per line
+				DataInputStream binReader = new DataInputStream(new FileInputStream(inputFile));
 				byte[] buffer = new byte[1024];
 				byte[] lineEnding = device.getDataBlockEnding();
 				boolean lineEndingOcurred = false;
@@ -130,44 +130,59 @@ public class NMEAReaderWriter {
 
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$		
 				Vector<String> lines = new Vector<String>();
-				while ((line = reader.readLine()).startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSETUP.name())
+				while ((line = reader.readLine()) == null || line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSETUP.name())
 						|| !line.startsWith(device.getDataBlockLeader())) {
-					if (line.startsWith(device.getDataBlockLeader() + NMEA.GPSETUP.name())) {
-						data.parse(new String[] { line });
+					if (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSETUP.name())) {
+						data.parse(new String[] { line }, lineNumber);
+					}
+					else {
+						log.log(Level.WARNING, filePath + " line number " + lineNumber + " does not starts with " + device.getDataBlockLeader() + " !"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 					++lineNumber;
 				}
 
 				String signature = line.substring(0, 6);
 
+				--lineNumber; // correct do to do-while
 				do {
 					line.trim();
 					++lineNumber;
-					if (line.length() > 0 && line.startsWith(device.getDataBlockLeader())) {
-						NMEAReaderWriter.log.log(java.util.logging.Level.FINER, line);
+					if (line.length() > 7 && line.startsWith(device.getDataBlockLeader())) {
+						log.log(java.util.logging.Level.FINER, line);
 						lines.add(line);
 					}
+					else {
+						log.log(Level.WARNING, "line number " + lineNumber + " line length to short or missing " + device.getDataBlockLeader() + " !"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					}
 
-					NMEAReaderWriter.log.log(Level.TIME, "signature = " + signature); //$NON-NLS-1$
+					log.log(Level.TIME, "signature = " + signature); //$NON-NLS-1$
 					while ((line = reader.readLine()) != null) {
 						line = line.trim();
 						++lineNumber;
 						if (line.startsWith(signature)) break;
 
 						if (line.length() > 7 && line.startsWith(device.getDataBlockLeader())) {
-							NMEAReaderWriter.log.log(java.util.logging.Level.FINER, line);
+							log.log(java.util.logging.Level.FINER, line);
 							lines.add(line);
 						}
+						else {
+							log.log(Level.WARNING, filePath + " line number " + lineNumber + " line length to short or missing " + device.getDataBlockLeader() + " !"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						}
 					}
-					data.parse(lines.toArray(new String[1]));
+					data.parse(lines.toArray(new String[1]), lineNumber);
+					int progress = (int) (lineNumber*100/approximateLines);
+					if (progress % 5 == 0) 	NMEAReaderWriter.application.setProgress(progress, sThreadId);
+					//start over with new line and signature
 					lines.clear();
-					if (line != null && line.length() > 0) {
+					if (line != null && line.length() > 7) {
 						lines.add(line);
 						signature = line.substring(0, 6);
 					}
-					if (device.getStateType() == null) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] { device.getPropertiesFileName() }));
-					try {
+					
+					if (device.getStateType() == null) 
+						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] { device.getPropertiesFileName() }));
 
+					try {
 						recordSetNameExtend = device.getStateType().getProperty().get(0).getName(); // state name
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
@@ -222,11 +237,11 @@ public class NMEAReaderWriter {
 			}
 		}
 		catch (FileNotFoundException e) {
-			NMEAReaderWriter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 			NMEAReaderWriter.application.openMessageDialog(e.getMessage());
 		}
 		catch (IOException e) {
-			NMEAReaderWriter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 			NMEAReaderWriter.application.openMessageDialog(e.getMessage());
 		}
 		catch (Exception e) {
@@ -240,7 +255,7 @@ public class NMEAReaderWriter {
 			}
 			// now display the error message
 			String msg = filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGE0045, new Object[] { e.getMessage(), lineNumber });
-			NMEAReaderWriter.log.log(java.util.logging.Level.WARNING, msg, e);
+			log.log(java.util.logging.Level.WARNING, msg, e);
 			NMEAReaderWriter.application.openMessageDialog(msg);
 		}
 		finally {

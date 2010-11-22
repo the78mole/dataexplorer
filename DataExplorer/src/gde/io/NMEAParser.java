@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.device.CheckSumTypes;
 import gde.device.IDevice;
 import gde.exception.DevicePropertiesInconsistenceException;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.Checksum;
@@ -40,6 +41,7 @@ import java.util.logging.Logger;
  */
 public class NMEAParser {
 	private static final Logger	log												= Logger.getLogger(NMEAParser.class.getName());
+	private 			 final String $CLASS_NAME								= "NMEAParser.";
 	private static final String	STRING_SENTENCE_SPLITTER	= " |:";																				//$NON-NLS-1$
 
 	int													time_ms;
@@ -57,6 +59,8 @@ public class NMEAParser {
 	final CheckSumTypes					checkSumType;
 	final IDevice								device;
 	final int										channelConfigNumber;
+	
+	int lineNumber = 0;
 
 	public enum NMEA {
 
@@ -83,12 +87,17 @@ public class NMEAParser {
 		this.channelConfigNumber = useChannelConfigNumber;
 	}
 
-	public void parse(String[] inputLines) throws Exception {
+	public void parse(String[] inputLines, int lastLineNumber) throws Exception {
+		final String $METHOD_NAME = "parse()";
 		try {
-			for (String inputLine : inputLines) {
-				NMEAParser.log.log(java.util.logging.Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
-				if (!inputLine.startsWith(this.leader)) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0046, new String[] { this.leader }));
-				if (!inputLine.contains(this.separator)) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0047, new String[] { inputLine, this.separator }));
+			for (int i=0; i<inputLines.length; ++i) {
+				String inputLine = inputLines[i];
+				this.lineNumber = lastLineNumber - inputLines.length + i;
+				log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
+				if (!inputLine.startsWith(this.leader)) 
+					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0046, new Object[] { this.leader, this.lineNumber }));
+				if (!inputLine.contains(this.separator)) 
+					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0047, new Object[] { inputLine, this.separator, this.lineNumber }));
 
 				if (isChecksumOK(inputLine)) {
 
@@ -127,7 +136,7 @@ public class NMEAParser {
 
 							break;
 						case GPSETUP:
-							//no implementation here
+							//not yet implemented, future
 							break;
 						case SETUP: // setup SM GPS-Logger firmware 1.00
 							try {
@@ -135,11 +144,8 @@ public class NMEAParser {
 								this.timeOffsetUTC = (short) ((buffer[7] << 8) + (buffer[6] & 0x00FF));
 							}
 							catch (Exception e) {
-								NMEAParser.log.log(java.util.logging.Level.WARNING, e.getMessage());
+								log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 							}
-							break;
-						default:
-							NMEAParser.log.log(java.util.logging.Level.WARNING, "NMEA sentence = " + strValues[0].substring(1) + " actually not implementes!"); //$NON-NLS-1$ //$NON-NLS-2$
 							break;
 						}
 						//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
@@ -149,7 +155,7 @@ public class NMEAParser {
 					}
 					catch (Exception e) {
 						if (e instanceof IllegalArgumentException && e.getMessage().contains("No enum")) { //$NON-NLS-1$
-							//ignore;
+							log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + " - NMEA sentence = " + strValues[0].substring(1) + " actually not implementes!"); //$NON-NLS-1$ //$NON-NLS-2$
 						}
 						else {
 							throw e;
@@ -159,11 +165,11 @@ public class NMEAParser {
 			}
 		}
 		catch (NumberFormatException e) {
-			NMEAParser.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage(), e);
 			//do not re-throw and skip sentence set
 		}
 		catch (Exception e) {
-			NMEAParser.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage(), e);
 			throw e;
 		}
 	}
@@ -181,11 +187,11 @@ public class NMEAParser {
 				int checkSum = Integer.parseInt(hexCheckSum, 16);
 				String subSentence = sentence.substring(1, sentence.indexOf(GDE.STRING_STAR));
 				isOK = checkSum == Checksum.XOR(subSentence.toCharArray());
-				if (!isOK) NMEAParser.log.log(java.util.logging.Level.WARNING, checkSum + " missmatch " + Checksum.XOR(subSentence.getBytes()) + " in " + subSentence); //$NON-NLS-1$ //$NON-NLS-2$
+				if (!isOK) log.logp(Level.WARNING, $CLASS_NAME, "parse()", "line number " + this.lineNumber + " checkSum " + checkSum + " missmatch " + Checksum.XOR(subSentence.getBytes()) + " in " + subSentence); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		catch (Exception e) {
-			NMEAParser.log.log(java.util.logging.Level.WARNING, e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage() + " in " + sentence); //$NON-NLS-1$
+			log.logp(Level.WARNING, $CLASS_NAME, "isChecksumOK()", "line number " + this.lineNumber + GDE.STRING_BLANK + e.getClass().getSimpleName() + GDE.STRING_BLANK + e.getMessage() + " in " + sentence); //$NON-NLS-1$
 		}
 		return isOK;
 	}
@@ -229,7 +235,7 @@ public class NMEAParser {
 				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
 				this.lastTimeStamp = timeStamp;
 				this.date = calendar.getTime();
-				NMEAParser.log.log(java.util.logging.Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
+				log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
 
 				int latitude, longitude, velocity;
 				try {
