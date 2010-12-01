@@ -1,19 +1,19 @@
 package gde.device.conrad;
 
-import java.io.IOException;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import gde.device.DeviceConfiguration;
+import gde.comm.DeviceCommPort;
+import gde.device.IDevice;
 import gde.exception.TimeOutException;
-import gde.serial.DeviceSerialPort;
+import gde.log.Level;
 import gde.ui.DataExplorer;
+
+import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Sample serial port implementation, used as template for new device implementations
  * @author Winfried Brügmann
  */
-public class VC800SerialPort extends DeviceSerialPort {
+public class VC800SerialPort extends DeviceCommPort {
 	final static String $CLASS_NAME = VC800SerialPort.class.getName();
 	final static Logger	log	= Logger.getLogger($CLASS_NAME);
 
@@ -24,8 +24,8 @@ public class VC800SerialPort extends DeviceSerialPort {
 	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
 	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 */
-	public VC800SerialPort(DeviceConfiguration currentDeviceConfig, DataExplorer currentApplication) {
-		super(currentDeviceConfig, currentApplication);
+	public VC800SerialPort(IDevice currentDevice, DataExplorer currentApplication) {
+		super(currentDevice, currentApplication);
 	}
 
 	/**

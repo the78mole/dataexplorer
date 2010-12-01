@@ -19,6 +19,7 @@
 package gde.device.conrad;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -31,7 +32,6 @@ import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 
 import java.io.FileNotFoundException;
@@ -69,7 +69,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new VC800SerialPort(this, this.application);
 		this.dialog = new VC800Dialog(this.application.getShell(), this);
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 	}
 
 	/**
@@ -84,15 +84,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new VC800SerialPort(this, this.application);
 		this.dialog = new VC800Dialog(this.application.getShell(), this);
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
-	}
-	
-	/**
-	 * query the default stem used as record set name
-	 * @return recordSetStemName
-	 */
-	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.GDE_MSGT1537);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 	}
 
 	/**

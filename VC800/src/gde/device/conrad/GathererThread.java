@@ -77,6 +77,7 @@ public class GathererThread extends Thread {
 		this.channels = Channels.getInstance();
 		this.channelNumber = channelConfigNumber;
 		this.channel = this.channels.get(this.channelNumber);
+		this.recordSetKey = this.device.getRecordSetStemName();
 
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();
@@ -146,18 +147,8 @@ public class GathererThread extends Thread {
 					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
 
 					if (recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
-						DataExplorer.display.asyncExec(new Runnable() {
-							public void run() {
-								GathererThread.this.application.updateGraphicsWindow();
-								GathererThread.this.application.updateStatisticsData();
-								GathererThread.this.application.updateDataTable(recordSetKey, false);
-								GathererThread.this.application.updateDigitalWindowChilds();
-								GathererThread.this.application.updateAnalogWindowChilds();
-								//GathererThread.this.application.updateCellVoltageChilds();
-							}
-						});
+						GathererThread.this.application.updateAllTabs(false);
 					}
-					//OsdReaderWriter.write("E:\\Temp\\not.osd", this.channel, 1);
 				}
 			}
 			catch (DataInconsitsentException e) {
