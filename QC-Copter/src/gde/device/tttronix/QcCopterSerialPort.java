@@ -19,12 +19,14 @@
 package gde.device.tttronix;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
+import gde.comm.IDeviceCommPort;
 import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
 
@@ -35,7 +37,7 @@ import java.util.logging.Logger;
  * QC-Copter or QuadroConrtol serial port implementation
  * @author Winfried Brügmann
  */
-public class QcCopterSerialPort extends DeviceSerialPort {
+public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPort {
 	final static String $CLASS_NAME = QcCopterSerialPort.class.getName();
 	final static Logger	log	= Logger.getLogger($CLASS_NAME);
 	
@@ -54,12 +56,12 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
 	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 */
-	public QcCopterSerialPort(DeviceConfiguration currentDeviceConfig, DataExplorer currentApplication) {
-		super(currentDeviceConfig, currentApplication);
-		this.deviceConfig = currentDeviceConfig;
+	public QcCopterSerialPort(IDevice currentDevice, DataExplorer currentApplication) {
+		super(currentDevice, currentApplication);
+		this.deviceConfig = currentDevice.getDeviceConfiguration();
 		this.dataSize = this.deviceConfig.getDataBlockSize();
 	}
-
+	
 	/**
 	 * method to gather data from device, implementation is individual for device
 	 * @return byte array containing gathered data - this can individual specified per device
@@ -69,13 +71,8 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
 		byte[] data = new byte[this.dataSize];
 
-		boolean isPortOpenedByMe = false;
 		try {
-			if (!this.isConnected()) {
-				this.open();
-				isPortOpenedByMe = true;
-			}
-			data = this.read(data, 1500);
+			data = this.read(data, 1000);
 			
 			//check data for valid content
 			if (containsSTX(data)) {
@@ -106,9 +103,9 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				}
 				
 				if (!isChecksumOK(data)) {
-					this.xferErrors++;
+					this.addXferError();
 					this.retrys++;
-					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.xferErrors); //$NON-NLS-1$
+					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 					if (this.retrys > 3) { //retry or skip in case of xfer errors
 						throw new SerialPortException(Messages.getString(MessageIds.GDE_MSGT1904));
 					}
@@ -129,10 +126,6 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 			throw e;
-		}
-		finally {
-			if (isPortOpenedByMe) 
-				this.close();
 		}
 		return data;
 	}
@@ -160,16 +153,10 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 	public synchronized String getTerminalData() throws Exception {
 		final String $METHOD_NAME = "getTerminalData"; //$NON-NLS-1$
 		String returnString = GDE.STRING_EMPTY;
-		int timeout_ms = 2000;
+		int timeout_ms = 1000;
 
-		boolean isPortOpenedByMe = false;
-		try {
-			if (!this.isConnected()) {
-				this.open();
-				isPortOpenedByMe = true;
-			}
-			
-			int size = waitForStableReceiveBuffer(345, timeout_ms, 100);// stable counter max 3000/4 = 750
+		try {			
+			int size = this.waitForStableReceiveBuffer(345, timeout_ms, 100);// stable counter max 3000/4 = 750
 			log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "receive buffer data size = " + size); //$NON-NLS-1$
 			byte[] data = new byte[size];
 			if (size >= 400) {// terminal character limit
@@ -204,10 +191,6 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 				throw e;
 			}
 		}
-		finally {
-			if (isPortOpenedByMe) 
-				this.close();
-		}
 		return returnString;
 	}
 
@@ -221,5 +204,4 @@ public class QcCopterSerialPort extends DeviceSerialPort {
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, (Checksum.ADD(buffer, 1, 57)) + "; " + ( (((buffer[58]&0xFF) - 94) << 6) | (((buffer[59]&0xFF) - 94) & 0x3F) ) ); //$NON-NLS-1$
 		return Checksum.ADD(buffer, 1, 57) == ((((buffer[58]&0xFF) - 94) << 6) | (((buffer[59]&0xFF) - 94) & 0x3F));
 	}
-
 }

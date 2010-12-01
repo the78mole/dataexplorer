@@ -72,7 +72,7 @@ public class QcCopterTabItem extends CTabItem {
 		this.parent = parentTabFolder;
 		this.dialog = parentDialog;
 		this.device = useDevice;
-		this.serialPort = useDevice.getSerialPort();
+		this.serialPort = useDevice.getCommunicationPort();
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.channelConfigNumber = useChannelConfigNumber;
