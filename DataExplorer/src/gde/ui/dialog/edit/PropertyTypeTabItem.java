@@ -434,8 +434,7 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.nameText.setText(this.propertyType.getName());
 			
 			if (this.nameCombo.isVisible()) {
-				this.nameCombo.select(this.propertyType == null ? 0 : MeasurementPropertyTypes.fromValue(this.propertyType.getName())
-						.ordinal());
+				this.nameCombo.select(MeasurementPropertyTypes.fromValue(this.propertyType.getName()).ordinal());
 			}
 
 			if (this.propertyType.getType() != null) {

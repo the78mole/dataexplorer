@@ -18,6 +18,21 @@
 ****************************************************************************************/
 package gde.ui.dialog.edit;
 
+import gde.GDE;
+import gde.comm.DeviceSerialPortImpl;
+import gde.device.DataBitsTypes;
+import gde.device.DataTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.FlowControlTypes;
+import gde.device.ParityTypes;
+import gde.device.StopBitsTypes;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -39,21 +54,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
-
-import gde.GDE;
-import gde.device.DataBitsTypes;
-import gde.device.DataTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.FlowControlTypes;
-import gde.device.ParityTypes;
-import gde.device.StopBitsTypes;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
 
 /**
  * class defining a CTabItem with SerialPortType configuration data
@@ -155,7 +155,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				{
 					this.baudeRateCombo = new CCombo(this.serialPortComposite, SWT.BORDER);
 					this.baudeRateCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.baudeRateCombo.setItems(DeviceSerialPort.STRING_ARRAY_BAUDE_RATES);
+					this.baudeRateCombo.setItems(DeviceSerialPortImpl.STRING_ARRAY_BAUDE_RATES);
 					this.baudeRateCombo.setBounds(142, 101, 180, 20);
 					this.baudeRateCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
