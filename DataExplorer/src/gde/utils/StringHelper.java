@@ -18,20 +18,20 @@
 ****************************************************************************************/
 package gde.utils;
 
+import gde.GDE;
+import gde.comm.DeviceSerialPortImpl;
+import gde.device.DataTypes;
+import gde.log.Level;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Point;
-
-import gde.GDE;
-import gde.device.DataTypes;
-import gde.serial.DeviceSerialPort;
 
 /**
  * @author Winfried Brügmann
@@ -281,7 +281,7 @@ public class StringHelper {
 			if (GDE.IS_WINDOWS) {
 				try {
 					int portNumber = Integer.parseInt(tmpSerialPortList[i].substring(3));
-					String portDescription = DeviceSerialPort.getWindowsPorts().get(portNumber)==null ? "" : DeviceSerialPort.getWindowsPorts().get(portNumber);
+					String portDescription = DeviceSerialPortImpl.getWindowsPorts().get(portNumber)==null ? "" : DeviceSerialPortImpl.getWindowsPorts().get(portNumber);
 					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + " - " + portDescription;
 				}
 				catch (Exception e) {

@@ -76,7 +76,7 @@ public class ApplicationLauncher {
 						log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
 						sb.append(line);
 					}
-					while ( besr.readLine() != null) {
+					while ((line = besr.readLine()) != null) {
 						log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
 					}
 					if (process.exitValue() != 0) {

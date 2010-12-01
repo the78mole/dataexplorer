@@ -18,17 +18,16 @@
 ****************************************************************************************/
 package gde.utils;
 
-import java.util.Date;
-import java.util.TreeMap;
-
 import gde.GDE;
+import gde.comm.DeviceSerialPortImpl;
 import gde.log.Level;
-import java.util.logging.Logger;
-
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
+
+import java.util.Date;
+import java.util.TreeMap;
+import java.util.logging.Logger;
 
 
 
@@ -94,7 +93,7 @@ public class WindowsHelper {
 			return;
 		}
 		
-		TreeMap<Integer, String> winPorts = DeviceSerialPort.getWindowsPorts();
+		TreeMap<Integer, String> winPorts = DeviceSerialPortImpl.getWindowsPorts();
 		winPorts.clear();
 		for (String portString : enumPorts) {
 			if (portString != null && portString.length() > 1 && !portString.toLowerCase().contains("bluetooth")) { //$NON-NLS-1$
