@@ -30,8 +30,8 @@
     </DataBlock>
     <Channel type="TYPE_CONFIG" name="Height">
         <Measurement>
-            <name>VoltageRec</name>
-            <symbol>Ur</symbol>
+            <name>VoltageRx</name>
+            <symbol>Urx</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -122,7 +122,7 @@
         <Measurement>
             <name>ServoImpuls</name>
             <symbol>A2</symbol>
-            <unit>µs</unit>
+            <unit>�s</unit>
             <active>true</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
             <property type="Double" value="0.0" name="offset"/>
@@ -131,7 +131,7 @@
         <Measurement>
             <name>TempIntern</name>
             <symbol>A3</symbol>
-            <unit>°C</unit>
+            <unit>�C</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
             <property type="Double" value="0.0" name="offset"/>
@@ -140,8 +140,8 @@
     </Channel>
     <Channel type="TYPE_CONFIG" name="Receiver">
         <Measurement>
-            <name>VoltageRec</name>
-            <symbol>Ur</symbol>
+            <name>VoltageRx/name>
+            <symbol>Urx</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -232,7 +232,7 @@
         <Measurement>
             <name>ServoImpuls</name>
             <symbol>A2</symbol>
-            <unit>µs</unit>
+            <unit>�s</unit>
             <active>false</active>
             <statistics sigma="false" avg="false" max="true" min="true"/>
             <property type="Double" value="0.0" name="offset"/>
@@ -241,7 +241,7 @@
         <Measurement>
             <name>TempIntern</name>
             <symbol>A3</symbol>
-            <unit>°C</unit>
+            <unit>�C</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
             <property type="Double" value="0.0" name="offset"/>
@@ -250,8 +250,8 @@
     </Channel>
     <Channel type="TYPE_CONFIG" name="Motor">
         <Measurement>
-            <name>VoltageRec</name>
-            <symbol>Ur</symbol>
+            <name>VoltageRx</name>
+            <symbol>Urx</symbol>
             <unit>V</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -268,7 +268,7 @@
             <symbol>I</symbol>
             <unit>A</unit>
             <active>true</active>
-            <statistics sumTriggerTimeText="Motor run time" countTriggerText="Number of climb flights" countByTrigger="true" sigma="false" avg="true" max="true" min="false">
+            <statistics sumTriggerTimeText="Motor run time" countTriggerText="Number of climb flights" countByTrigger="true" sigma="true" avg="true" max="true" min="false">
                 <trigger comment="Trigger: current &gt; 2 A + &gt; 5 sec." minTimeSec="5" isGreater="true" level="2000"/>
             </statistics>
             <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
@@ -304,7 +304,7 @@
             <symbol>n</symbol>
             <unit>1/min</unit>
             <active>true</active>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="false"/>
+            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
             <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
             <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
             <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
@@ -346,24 +346,24 @@
             <symbol>A2</symbol>
             <unit>µs</unit>
             <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <statistics sigma="false" avg="false" max="true" min="true"/>
             <property type="Double" value="0.0" name="offset"/>
             <property type="Double" value="1.0" name="factor"/>
         </Measurement>
         <Measurement>
             <name>TempIntern</name>
             <symbol>A3</symbol>
-            <unit>°C</unit>
+            <unit>�C</unit>
             <active>false</active>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
             <property type="Double" value="0.0" name="offset"/>
             <property type="Double" value="1.0" name="factor"/>
         </Measurement>
     </Channel>
     <Channel type="TYPE_CONFIG" name="Velocity">
         <Measurement>
-            <name>VoltageRec</name>
-            <symbol>Ur</symbol>
+            <name>VoltageRx</name>
+            <symbol>Urx</symbol>
             <unit>V</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -456,7 +456,7 @@
         <Measurement>
             <name>Temperature A2</name>
             <symbol>A2</symbol>
-            <unit>°C</unit>
+            <unit>�C</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
             <property type="Double" value="0.0" name="offset"/>
@@ -465,18 +465,15 @@
         <Measurement>
             <name>Temperature A3</name>
             <symbol>A3</symbol>
-            <unit>°C</unit>
+            <unit>�C</unit>
             <active>false</active>
             <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
             <property type="Double" value="0.0" name="offset"/>
             <property type="Double" value="1.0" name="factor"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-            <property type="Double" value="0.0" name="reduction"/>
         </Measurement>
     </Channel>
     <Desktop>
-        <property value="false" name="table_tab"/>
+        <property value="true" name="table_tab"/>
         <property value="true" name="digital_tab"/>
         <property value="true" name="analog_tab"/>
         <property value="false" name="voltage_per_cell_tab"/>

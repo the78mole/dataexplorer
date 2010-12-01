@@ -42,8 +42,7 @@ import java.util.logging.Logger;
 public class UniLogLiveGatherer extends Thread {
 	final static Logger			log													= Logger.getLogger(UniLogLiveGatherer.class.getName());
 
-	DataExplorer	application;
-	final String						RECORD_SET_NAME							= Messages.getString(MessageIds.GDE_MSGT1378);
+	final DataExplorer			application;
 	final UniLogSerialPort	serialPort;
 	final UniLog						device;
 	final UniLogDialog			dialog;
@@ -114,7 +113,7 @@ public class UniLogLiveGatherer extends Thread {
 		int delay = 0;
 		int period = this.timeStep_ms;
 		log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
-		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
+		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
 
 		this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, this.channelNumber, true, false));
 		log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
@@ -162,16 +161,7 @@ public class UniLogLiveGatherer extends Thread {
 							}
 
 							if (recordSet.isChildOfActiveChannel() && recordSet.equals(UniLogLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
-								DataExplorer.display.asyncExec(new Runnable() {
-									public void run() {
-										UniLogLiveGatherer.this.application.updateGraphicsWindow();
-										UniLogLiveGatherer.this.application.updateStatisticsData();
-										UniLogLiveGatherer.this.application.updateDataTable(recordSetKey, false);
-										UniLogLiveGatherer.this.application.updateDigitalWindowChilds();
-										UniLogLiveGatherer.this.application.updateAnalogWindowChilds();
-										//LiveGathererThread.this.application.updateCellVoltageChilds();
-									}
-								});
+								UniLogLiveGatherer.this.application.updateAllTabs(false);
 							}
 						}
 					}

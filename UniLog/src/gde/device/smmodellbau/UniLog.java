@@ -19,6 +19,7 @@
 package gde.device.smmodellbau;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -27,11 +28,9 @@ import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
-import gde.device.smmodellbau.unilog.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
 import gde.utils.LinearRegression;
@@ -143,7 +142,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**
@@ -159,15 +158,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
-	}
-	
-	/**
-	 * query the default stem used as record set name
-	 * @return recordSetStemName
-	 */
-	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.GDE_MSGT1378);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**

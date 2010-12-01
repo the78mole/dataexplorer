@@ -18,12 +18,12 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
-import gde.device.DeviceConfiguration;
+import gde.comm.DeviceCommPort;
+import gde.device.IDevice;
 import gde.exception.CheckSumMissmatchException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.Checksum;
@@ -40,7 +40,7 @@ import org.eclipse.swt.SWT;
  * UniLog serial port implementation class, just copied from Sample projectS
  * @author Winfried Brügmann
  */
-public class UniLogSerialPort extends DeviceSerialPort {
+public class UniLogSerialPort extends DeviceCommPort {
 	final static Logger					log											= Logger.getLogger(UniLogSerialPort.class.getName());
 
 	public final static String 		NUMBER_RECORD						= "number_record"; 	//$NON-NLS-1$
@@ -77,8 +77,8 @@ public class UniLogSerialPort extends DeviceSerialPort {
 	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 * @throws NoSuchPortException
 	 */
-	public UniLogSerialPort(DeviceConfiguration actualDeviceConfig, DataExplorer currentApplication) {
-		super(actualDeviceConfig, currentApplication);
+	public UniLogSerialPort(IDevice currentDevice, DataExplorer currentApplication) {
+		super(currentDevice, currentApplication);
 	}
 
 	/**
@@ -237,7 +237,7 @@ public class UniLogSerialPort extends DeviceSerialPort {
 		boolean isLiveDataAvailable = false;
 		if (this.isConnected()) {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-			while (this.getInputStream().available() < 10 && retrys-- > 0 && !isInterruptedByUser) {
+			while (this.getAvailableBytes() < 10 && retrys-- > 0 && !isInterruptedByUser) {
 				this.write(COMMAND_LIVE_VALUES);
 				try {
 					Thread.sleep(250);

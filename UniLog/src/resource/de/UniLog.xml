@@ -30,8 +30,8 @@
 	</DataBlock>
     <Channel type="TYPE_CONFIG" name="Höhe">
         <Measurement>
-            <name>SpannungEmpf</name>
-            <symbol>Ue</symbol>
+            <name>SpannungRx</name>
+            <symbol>Urx</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -140,8 +140,8 @@
     </Channel>
     <Channel type="TYPE_CONFIG" name="Empfänger">
         <Measurement>
-            <name>SpannungEmpf</name>
-            <symbol>Ue</symbol>
+            <name>SpannungRx</name>
+            <symbol>Urx</symbol>
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -250,8 +250,8 @@
     </Channel>
     <Channel type="TYPE_CONFIG" name="Motormessung">
         <Measurement>
-            <name>SpannungEmpf</name>
-            <symbol>Ue</symbol>
+            <name>SpannungRx</name>
+            <symbol>Urx</symbol>
             <unit>V</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -362,8 +362,8 @@
     </Channel>
     <Channel type="TYPE_CONFIG" name="Geschwindigkeit">
         <Measurement>
-            <name>SpannungEmpf</name>
-            <symbol>Ue</symbol>
+            <name>SpannungRx</name>
+            <symbol>Urx</symbol>
             <unit>V</unit>
             <active>false</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -473,7 +473,7 @@
         </Measurement>
     </Channel>
     <Desktop>
-        <property value="false" name="table_tab"/>
+        <property value="true" name="table_tab"/>
         <property value="true" name="digital_tab"/>
         <property value="true" name="analog_tab"/>
         <property value="false" name="voltage_per_cell_tab"/>

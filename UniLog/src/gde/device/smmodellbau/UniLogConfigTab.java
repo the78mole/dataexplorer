@@ -304,11 +304,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									String[] recordKeys = activeRecordSet.getRecordNames();
 									Record currentRecord = activeRecordSet.get(recordKeys[2]);
 									UniLogConfigTab.this.device.invertRecordData(currentRecord);
-									UniLogConfigTab.this.application.updateGraphicsWindow();
-									UniLogConfigTab.this.application.updateStatisticsData();
-									UniLogConfigTab.this.application.updateDataTable(activeRecordSet.getName(), true);
-									UniLogConfigTab.this.application.updateDigitalWindow();
-									UniLogConfigTab.this.application.updateAnalogWindow();
+									UniLogConfigTab.this.application.updateAllTabs(true);
 								}
 							}
 						});

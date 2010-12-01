@@ -43,8 +43,7 @@ import gde.utils.CalculationThread;
 public class UniLogDataGatherer extends Thread {
 	final static Logger			log							= Logger.getLogger(UniLogDataGatherer.class.getName());
 
-	DataExplorer	application;
-	final String						RECORD_SET_NAME	= Messages.getString(MessageIds.GDE_MSGT1378);
+	final DataExplorer			application;
 	final UniLogSerialPort	serialPort;
 	final UniLogDialog			dialog;
 	final UniLog						device;
@@ -106,7 +105,7 @@ public class UniLogDataGatherer extends Thread {
 				// iterate over telegram entries to build the record set
 				log.log(Level.FINER, "number record set = " + keys[i]); //$NON-NLS-1$
 
-				recordSetKey = channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
+				recordSetKey = channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
 				
 				// check analog modus and update channel/configuration
 				this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.channelNumber);
