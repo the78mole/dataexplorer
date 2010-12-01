@@ -19,6 +19,7 @@
 package gde.device;
 
 import gde.GDE;
+import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -858,7 +859,7 @@ public class DeviceConfiguration {
 	}
 
 	public int getDataBlockTimeUnitFactor() {
-		return this.dataBlock != null && this.dataBlock.getTimeUnit() == null ? 1000 : this.dataBlock.getTimeUnit().equals(TimeUnitTypes.MSEC) ? 1 : 1000;
+		return this.dataBlock != null && this.dataBlock.getTimeUnit() == null ? 1000 : this.dataBlock != null && this.dataBlock.getTimeUnit().equals(TimeUnitTypes.MSEC) ? 1 : 1000;
 	}
 
 	public CommaSeparatorTypes getDataBlockSeparator() {
@@ -882,7 +883,7 @@ public class DeviceConfiguration {
 		if(this.dataBlock == null) {
 			this.deviceProps.dataBlock = this.dataBlock = new ObjectFactory().createDataBlockType();
 		}
-		this.dataBlock.setPreferredDataLocation(value != null ? value.trim() : value);
+		this.dataBlock.setPreferredDataLocation(value != null ? value.trim() : GDE.STRING_EMPTY);
 	}
 	
 	public boolean isDataBlockPreferredFileExtentionDefined() {
@@ -1993,6 +1994,21 @@ public class DeviceConfiguration {
 	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
 	 */
 	public Integer getGPS2KMLMeasurementOrdinal() {
+		return null;
+	}
+	
+	/**
+	 * query the default stem used as record set name
+	 * @return recordSetStemName
+	 */
+	public String getRecordSetStemName() {
+		return this.getStateType()!= null ? this.getStateType().getProperty() != null ? ") "+ this.getStateType().getProperty().get(0).getName() : Messages.getString(MessageIds.GDE_MSGT0272) : Messages.getString(MessageIds.GDE_MSGT0272);
+	}
+	
+	/**
+	 * @return the device communication port
+	 */
+	public IDeviceCommPort getCommunicationPort() {
 		return null;
 	}
 }

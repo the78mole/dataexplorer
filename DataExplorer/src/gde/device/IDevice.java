@@ -18,16 +18,16 @@
 ****************************************************************************************/
 package gde.device;
 
+import gde.comm.IDeviceCommPort;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.exception.DataInconsitsentException;
+import gde.utils.CalculationThread;
+
 import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.swt.custom.CTabItem;
-
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.exception.DataInconsitsentException;
-import gde.serial.DeviceSerialPort;
-import gde.utils.CalculationThread;
 
 /**
  * Defines the interface for all device implementations, it also covers some interface methods from 
@@ -61,9 +61,9 @@ public interface IDevice {
 	public DeviceDialog getDialog();
 	
 	/**
-	 * @return the device serial port (optional)
+	 * @return the device communication port
 	 */
-	public DeviceSerialPort getSerialPort();
+	public IDeviceCommPort getCommunicationPort();
 		
 	/**
 	 * @return the device name

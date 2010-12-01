@@ -428,7 +428,7 @@ public class LogViewReader {
 	 * @throws NotSupportedException 
 	 * @throws NotSupportedFileFormat
 	 */
-	private static HashMap<String, String> readHeader(DataInputStream data_in) throws IOException, NotSupportedFileFormatException, NotSupportedException {
+	public static HashMap<String, String> readHeader(DataInputStream data_in) throws IOException, NotSupportedFileFormatException, NotSupportedException {
 		HashMap<String, String> header = new HashMap<String, String>();
 		
 		getBaseHeaderData(header, data_in);
