@@ -209,10 +209,10 @@ public class SetupReaderWriter {
 				buffer[79] = (byte) ((this.mLinkAddressDirection & 0xFF00) >> 8);
 				buffer[80] = (byte) (this.mLinkAddressHeight & 0x00FF);
 				buffer[81] = (byte) ((this.mLinkAddressHeight & 0xFF00) >> 8);
-				buffer[82] = (byte) (this.mLinkAddressTripLength & 0x00FF);
-				buffer[83] = (byte) ((this.mLinkAddressTripLength & 0xFF00) >> 8);
-				buffer[84] = (byte) (this.mLinkAddressDistance & 0x00FF);
-				buffer[85] = (byte) ((this.mLinkAddressDistance & 0xFF00) >> 8);
+				buffer[82] = (byte) (this.mLinkAddressDistance & 0x00FF);
+				buffer[83] = (byte) ((this.mLinkAddressDistance & 0xFF00) >> 8);
+				buffer[84] = (byte) (this.mLinkAddressTripLength & 0x00FF);
+				buffer[85] = (byte) ((this.mLinkAddressTripLength & 0xFF00) >> 8);
 				//C 10
 				buffer[106] = (byte) (this.firmwareVersion & 0x00FF);
 				buffer[107] = (byte) ((this.firmwareVersion & 0xFF00) >> 8);
@@ -223,7 +223,7 @@ public class SetupReaderWriter {
 				buffer[190] = (byte) (checkSum & 0x00FF);
 				buffer[191] = (byte) ((checkSum & 0xFF00) >> 8);
 
-				log.log(java.util.logging.Level.WARNING, StringHelper.convertHexInput(buffer));
+				log.log(java.util.logging.Level.FINER, "$SETUP," + StringHelper.convertHexInput(buffer));
 				FileOutputStream file_out = new FileOutputStream(setupFile);
 				DataOutputStream data_out = new DataOutputStream(file_out);
 				data_out.write(buffer);

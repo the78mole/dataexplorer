@@ -19,6 +19,7 @@
 package gde.device.smmodellbau;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -36,7 +37,6 @@ import gde.io.NMEAParser;
 import gde.io.NMEAReaderWriter;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 
@@ -80,7 +80,10 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.dialog = new GPSLoggerDialog(this.application.getShell(), this);
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
+		if (this.application.getMenuToolBar() != null) {
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+			updateFileMenu(this.application.getMenuBar().getExportMenu());
+		}
 	}
 
 	/**
@@ -95,16 +98,10 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.dialog = new GPSLoggerDialog(this.application.getShell(), this);
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
-	}
-
-	/**
-	 * query the default stem used as record set name
-	 * @return recordSetStemName
-	 */
-	@Override
-	public String getRecordSetStemName() {
-		return Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
+		if (this.application.getMenuToolBar() != null) {
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+			updateFileMenu(this.application.getMenuBar().getExportMenu());
+		}
 	}
 
 	/**
@@ -467,14 +464,6 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * @return the serialPort
-	 */
-	@Override
-	public DeviceSerialPort getSerialPort() {
-		return null;
-	}
-
-	/**
 	 * query for all the property keys this device has in use
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
@@ -495,36 +484,35 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2000), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
+		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2000), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
 				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
-		for (String tmpFileName : fd.getFileNames()) {
-			String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-			if (!selectedImportFile.endsWith(GDE.FILE_ENDING_DOT_NMEA)) {
-				if (selectedImportFile.contains(GDE.STRING_DOT)) {
-					selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
-				}
-				selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_NMEA;
-			}
-			log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-
-			if (fd.getFileName().length() > 4) {
-				final Integer channelConfigNumber = this.dialog != null && !this.dialog.isDisposed() ? 1 : null;
-				final String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-				final String importFileName = selectedImportFile;
-				Thread reader = new Thread() {
-					@Override
-					public void run() {
-						try {
-							NMEAReaderWriter.read(importFileName, GPSLogger.this, recordNameExtend, channelConfigNumber);
+		Thread reader = new Thread(){
+			public void run() {
+				for (String tmpFileName : fd.getFileNames()) {
+					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+					if (!selectedImportFile.endsWith(GDE.FILE_ENDING_DOT_NMEA)) {
+						if (selectedImportFile.contains(GDE.STRING_DOT)) {
+							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
 						}
-						catch (Throwable e) {
-							log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_NMEA;
+					}
+					log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+
+					if (fd.getFileName().length() > 4) {
+						Integer channelConfigNumber = GPSLogger.this.application.getActiveChannelNumber();
+						channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
+						String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+						try {
+							NMEAReaderWriter.read(selectedImportFile, GPSLogger.this, recordNameExtend, channelConfigNumber);
+						}
+						catch (Exception e) {
+							log.log(Level.WARNING, e.getMessage(), e);
 						}
 					}
-				};
-				reader.start();
+				}
 			}
-		}
+		};
+		reader.start();
 	}
 
 	/**
