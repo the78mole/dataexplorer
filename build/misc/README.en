@@ -15,7 +15,9 @@ Actual the following devices are available as plug-in:
 											 - Pichler P6 , P60 (Pichler) charger/discharger 
 											 - VC820, VC840 (Conrad/VoltCraft) multimeter
 											 - CSV2SerialAdapter, enables to import CVS files as log data
-											 - DataVario, DataVarioDuo (WStech) variometer, GPS, multi measurement device
+											 - DataVario, DataVarioDuo, LinkVario (WStech) variometer, GPS, multi measurement device
+											 - GPS-Logger (SM-Modellbau) GPS, multi measurement device
+											 - QC-Copter (tt-tronix) control unit
 											 - Simulator test plug-in
 
 More device are under construction. Help doing this is very welcome.		

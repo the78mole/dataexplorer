@@ -15,7 +15,9 @@ Zur Zeit sind folgende Geräte eingebunden:
 											 - Pichler P6 , P60 (Pichler) Lade-/Entlade-gerät
 											 - VC820, VC840 (Conrad/VoltCraft) Multimeter
 											 - CSV2SerialAdapter, ermöglicht CVS als Log-Daten zu importieren
-											 - DataVario, DataVarioDuo (WStech) Variometer, GPS, Mulitmessgerät
+											 - DataVario, DataVarioDuo, LinkVario (WStech) Variometer, GPS, Mulitmessgerät
+											 - GPS-Logger (SM-Modellbau) GPS, Multimessgerät
+											 - QC-Copter (tt-tronix) Kontrolleinheit
 											 - Simulator Test Plug-in
 											 
 Weitere Geräte sind in Arbeit. Hilfe bei der Einbindung von zusätzlichen Geräten ist herzlich willkommen.
@@ -36,12 +38,10 @@ DataExplorer.exe (Windows)
 DevicePropertiesEditor.exe (Windows)
 DataExplorer (GNU/Linux)
 DevicePropertiesEditor (GNU/Linux)
-DataExplorer.xpm (GNU/Linux)
 DataExplorer.desktop (GNU/Linux)
-DataExplorer.desktop (GNU/Linux)
-DataExplorerMac32 (Mac OS)
-DevicePropertiesEditorMac32 (Mac OS)
-DataExplorer.icns (Mac OS)
+DevicePropertiesEditor.desktop (GNU/Linux)
+DataExplorerMac32/64 (Mac OS)
+DevicePropertiesEditorMac32/64 (Mac OS)
 RXTX_Post-Install_MacOS.txt (Mac OS)
 
 Andere Programmresourcen sind:
