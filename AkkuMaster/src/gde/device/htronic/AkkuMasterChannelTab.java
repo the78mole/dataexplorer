@@ -581,17 +581,7 @@ public class AkkuMasterChannelTab {
 														AkkuMasterChannelTab.this.recordSet.addPoints(points); 
 														
 														if (AkkuMasterChannelTab.this.recordSet.isChildOfActiveChannel() && AkkuMasterChannelTab.this.recordSet.equals(AkkuMasterChannelTab.this.channels.getActiveChannel().getActiveRecordSet())) {
-															DataExplorer.display.asyncExec(new Runnable() {
-																public void run() {
-																	AkkuMasterChannelTab.this.application.updateGraphicsWindow();
-																	AkkuMasterChannelTab.this.application.updateStatisticsData();
-																	AkkuMasterChannelTab.this.application.updateDataTable(AkkuMasterChannelTab.this.recordSetKey, false);
-																	AkkuMasterChannelTab.this.application.updateDigitalWindowChilds();
-																	AkkuMasterChannelTab.this.application.updateAnalogWindowChilds();
-																	//AkkuMasterChannelTab.this.application.updateCellVoltageChilds();
-																}
-															});
-														}
+															AkkuMasterChannelTab.this.application.updateAllTabs(false);														}
 													}
 													else {
 														// enable switching records sets

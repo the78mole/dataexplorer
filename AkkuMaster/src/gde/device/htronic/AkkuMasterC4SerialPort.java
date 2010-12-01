@@ -18,22 +18,22 @@
 ****************************************************************************************/
 package gde.device.htronic;
 
+import gde.comm.DeviceCommPort;
+import gde.device.IDevice;
+import gde.exception.TimeOutException;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+
 import java.io.IOException;
 import java.util.HashMap;
-import gde.log.Level;
 import java.util.logging.Logger;
-
-import gde.device.DeviceConfiguration;
-import gde.exception.TimeOutException;
-import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
-import gde.ui.DataExplorer;
 
 /**
  * SSerial port implementation for AkkuMaster C4 device
  * @author Winfried Brügmann
  */
-public class AkkuMasterC4SerialPort extends DeviceSerialPort {
+public class AkkuMasterC4SerialPort extends DeviceCommPort {
 	final static Logger					log															= Logger.getLogger(AkkuMasterC4SerialPort.class.getName());
 
 	public static final String	PROCESS_NAME										= Messages.getString(MessageIds.GDE_MSGT1114);	// "4 ) Laden" = AkkuMaster aktiv Laden
@@ -130,8 +130,8 @@ public class AkkuMasterC4SerialPort extends DeviceSerialPort {
 	//	// Verbleibende Wartezeit bis Formieren wiederholt wird
 	//	private byte							formUpLatencyTime[]							= new byte[2];								//1 bit = 1 Minute
 
-	public AkkuMasterC4SerialPort(DeviceConfiguration actualDeviceConfig, DataExplorer currentApplication) {
-		super(actualDeviceConfig, currentApplication);
+	public AkkuMasterC4SerialPort(IDevice currentDevice, DataExplorer currentApplication) {
+		super(currentDevice, currentApplication);
 	}
 
 	/**

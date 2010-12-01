@@ -19,6 +19,7 @@
 package gde.device.htronic;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.Record;
@@ -28,7 +29,6 @@ import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gnu.io.NoSuchPortException;
 
@@ -66,7 +66,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**
@@ -83,15 +83,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
-	}
-	
-	/**
-	 * query the default stem used as record set name
-	 * @return recordSetStemName
-	 */
-	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.GDE_MSGT1186);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**

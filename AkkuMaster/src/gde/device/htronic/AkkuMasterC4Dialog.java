@@ -34,6 +34,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -293,7 +295,14 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.statusComposite.setBounds(0, 430, 430, 45);
 				this.statusComposite.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						AkkuMasterC4Dialog.log.log(Level.FINEST, "statusComposite.widgetSelected, event=" + evt); //$NON-NLS-1$
+						AkkuMasterC4Dialog.log.log(Level.FINEST, "statusComposite.paintCOntrol, event=" + evt); //$NON-NLS-1$
+						AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
+						AkkuMasterC4Dialog.this.totalChargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalChargeCurrent));
+					}
+				});
+				this.statusComposite.addFocusListener(new FocusAdapter() {
+					public void focusGained(FocusEvent evt) {
+						AkkuMasterC4Dialog.log.log(Level.FINEST, "statusComposite.focusGained, event=" + evt); //$NON-NLS-1$
 						AkkuMasterC4Dialog.this.totalDischargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
 						AkkuMasterC4Dialog.this.totalChargeCurrentLabel.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalChargeCurrent));
 					}
