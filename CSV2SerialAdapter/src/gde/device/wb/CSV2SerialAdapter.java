@@ -20,6 +20,7 @@ package gde.device.wb;
 
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -33,7 +34,6 @@ import gde.io.CSVSerialDataReaderWriter;
 import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 
@@ -69,7 +69,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
 	}
 
 	/**
@@ -83,15 +83,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
-	}
-	
-	/**
-	 * query the default stem used as record set name
-	 * @return recordSetStemName
-	 */
-	public String getRecordSetStemName() {
-		return Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
 	}
 
 	/**
@@ -417,7 +409,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the serialPort
 	 */
-	public DeviceSerialPort getSerialPort() {
+	public DeviceCommPort getSerialPort() {
 		return null;
 	}
 
