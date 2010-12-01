@@ -18,28 +18,28 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Vector;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-
-import gde.device.DeviceConfiguration;
+import gde.comm.DeviceCommPort;
+import gde.device.IDevice;
 import gde.exception.CheckSumMissmatchException;
 import gde.exception.TimeOutException;
+import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.Checksum;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
 
 /**
  * LiPoWatch serial port implementation
  * @author Winfried Brügmann
  */
-public class LiPoWatchSerialPort extends DeviceSerialPort {
+public class LiPoWatchSerialPort extends DeviceCommPort {
 	final static Logger	log	= Logger.getLogger(LiPoWatchSerialPort.class.getName());
 
 	public final static String 		NUMBER_RECORD						= "number_record"; 	//$NON-NLS-1$
@@ -76,8 +76,8 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
 	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 */
-	public LiPoWatchSerialPort(DeviceConfiguration currentDeviceConfig, DataExplorer currentApplication) {
-		super(currentDeviceConfig, currentApplication);
+	public LiPoWatchSerialPort(IDevice currentDevice, DataExplorer currentApplication) {
+		super(currentDevice, currentApplication);
 	}
 
 	/**
@@ -256,7 +256,7 @@ public class LiPoWatchSerialPort extends DeviceSerialPort {
 		boolean isLiveDataAvailable = false;
 		if (this.isConnected()) {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-			while (this.getInputStream().available() < 10 && retrys-- > 0) {
+			while (this.getAvailableBytes() < 10 && retrys-- > 0) {
 				this.write(COMMAND_LIVE_VALUES);
 				Thread.sleep(250);
 				log.log(Level.FINE, "retryLimit = " + retrys); //$NON-NLS-1$

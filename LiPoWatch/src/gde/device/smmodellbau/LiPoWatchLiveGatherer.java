@@ -42,24 +42,22 @@ import gde.ui.DataExplorer;
 public class LiPoWatchLiveGatherer extends Thread {
 	final static Logger			log													= Logger.getLogger(LiPoWatchLiveGatherer.class.getName());
 
-	DataExplorer	application;
-	final String						RECORD_SET_NAME							= Messages.getString(MessageIds.GDE_MSGT1601);
-	final LiPoWatchSerialPort	serialPort;
-	final LiPoWatch						device;
-	final LiPoWatchDialog			dialog;
-	final Channels					channels;
-	final Channel						channel;
-	final Integer						channelNumber;
-	final String						configKey;
-	final int								timeStep_ms;
-	Timer										timer;
-	TimerTask								timerTask;
-	boolean									isTimerRunning							= false;
-	boolean									isPortOpenedByLiveGatherer	= false;
-	final int[]							time_ms											= { 1000/4, 1000/2, 1000, 2000, 5000, 10000 };
-	boolean 								isSwitchedRecordSet 				= false;
-	boolean									isGatheredRecordSetVisible	= true;
-
+	final DataExplorer						application;
+	final LiPoWatchSerialPort			serialPort;
+	final LiPoWatch								device;
+	final LiPoWatchDialog					dialog;
+	final Channels								channels;
+	final Channel									channel;
+	final Integer									channelNumber;
+	final String									configKey;
+	final int											timeStep_ms;
+	Timer													timer;
+	TimerTask											timerTask;
+	boolean												isTimerRunning							= false;
+	boolean												isPortOpenedByLiveGatherer	= false;
+	final int[]										time_ms											= { 1000 / 4, 1000 / 2, 1000, 2000, 5000, 10000 };
+	boolean												isSwitchedRecordSet					= false;
+	boolean												isGatheredRecordSetVisible	= true;
 
 	// offsets and factors are constant over thread live time
 	final HashMap<String, Double> calcValues = new HashMap<String, Double>();
@@ -105,7 +103,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		int delay = 0;
 		int period = this.timeStep_ms;
 		log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
-		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
+		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
 
 		this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, this.channelNumber, true, false));
 		log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
@@ -154,16 +152,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 						}
 						
 						if (recordSet.isChildOfActiveChannel() && recordSet.equals(LiPoWatchLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
-							DataExplorer.display.asyncExec(new Runnable() {
-								public void run() {
-									LiPoWatchLiveGatherer.this.application.updateGraphicsWindow();
-									LiPoWatchLiveGatherer.this.application.updateStatisticsData();
-									LiPoWatchLiveGatherer.this.application.updateDataTable(recordSetKey, false);
-									LiPoWatchLiveGatherer.this.application.updateDigitalWindowChilds();
-									LiPoWatchLiveGatherer.this.application.updateAnalogWindowChilds();
-									LiPoWatchLiveGatherer.this.application.updateCellVoltageChilds();
-								}
-							});
+							LiPoWatchLiveGatherer.this.application.updateAllTabs(false);
 						}
 					}
 				}

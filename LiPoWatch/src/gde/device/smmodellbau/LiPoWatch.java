@@ -19,6 +19,7 @@
 package gde.device.smmodellbau;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -29,7 +30,6 @@ import gde.device.smmodellbau.lipowatch.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
 import gde.utils.StringHelper;
@@ -79,7 +79,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
 		this.dialog = new LiPoWatchDialog(this.application.getShell(), this);
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**
@@ -94,13 +94,14 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
 		this.dialog = new LiPoWatchDialog(this.application.getShell(), this);
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**
 	 * query the default stem used as record set name
 	 * @return recordSetStemName
 	 */
+	@Override
 	public String getRecordSetStemName() {
 		return Messages.getString(MessageIds.GDE_MSGT1601);
 	}
