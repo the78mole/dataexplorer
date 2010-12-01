@@ -1,0 +1,271 @@
+/**************************************************************************************
+  	This file is part of GNU DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright (c) 2010 Winfried Bruegmann
+****************************************************************************************/
+package gde.comm;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.device.IDevice;
+import gde.exception.ApplicationConfigurationException;
+import gde.exception.SerialPortException;
+import gde.exception.TimeOutException;
+import gde.io.LogViewReader;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.FileUtils;
+import gde.utils.WaitTimer;
+import gnu.io.SerialPort;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Random;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.FileDialog;
+
+/**
+ * class to simulate serial port where bytes read form input file
+ */
+public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
+	final static String	$CLASS_NAME					= DeviceSerialPortSimulatorImpl.class.getName();
+	final static Logger	log									= Logger.getLogger($CLASS_NAME);
+
+	DataInputStream			data_in;
+	int									xferErrors					= 0;
+	boolean							isConnected					= false;
+
+	final Settings			settings;
+	final IDevice				device;
+	final DataExplorer	application;
+	final int						sleepTime_ms;
+	final boolean				isTimeStepConstant;
+
+	/**
+	 * constructor to create a communications port simulation instance
+	 * @param currentDevice
+	 * @param currentApplication
+	 * @param timeStep_ms
+	 */
+	public DeviceSerialPortSimulatorImpl(IDevice currentDevice, DataExplorer currentApplication, boolean isTimeStepConstant, int timeStep_ms) {
+		this.device = currentDevice;
+		this.application = currentApplication;
+		this.settings = Settings.getInstance();
+		this.sleepTime_ms = timeStep_ms;
+		this.isTimeStepConstant = isTimeStepConstant;
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceSerialPort#open()
+	 */
+	@Override
+	public SerialPort open() throws ApplicationConfigurationException, SerialPortException {
+		try {
+			String path;
+			if (this.application.isObjectoriented()) {
+				path = this.application.getObjectFilePath();
+			}
+			else {
+				String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+				path = this.application.getActiveDevice() != null ? this.settings.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX : this.settings.getDataFilePath();
+				if (!FileUtils.checkDirectoryAndCreate(path)) {
+					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
+				}
+			}
+			FileDialog openFileDialog = this.application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV }, path, null, SWT.SINGLE);
+			if (openFileDialog.getFileName().length() > 4) {
+				String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+
+				if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
+					//TODO add implementation to use *.osd files as simulation data input
+				}
+				else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
+					data_in = new DataInputStream(new FileInputStream(new File(openFilePath)));
+					LogViewReader.readHeader(data_in);
+				}
+				else
+					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0008) + openFilePath);
+			}
+			this.isConnected = true;
+			if (this.application != null) this.application.setPortConnected(true);
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceSerialPort#close()
+	 */
+	@Override
+	public void close() {
+		try {
+			data_in.close();
+			this.isConnected = false;
+			if (this.application != null) this.application.setPortConnected(false);
+		}
+		catch (IOException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceSerialPort#read(byte[], int)
+	 */
+	@Override
+	public byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
+		try {
+			wait4Bytes(timeout_msec);
+		}
+		catch (InterruptedException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
+		data_in.read(readBuffer);
+		data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		return readBuffer;
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceSerialPort#read(byte[], int, int)
+	 */
+	@Override
+	public byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
+		try {
+			waitForStableReceiveBuffer(readBuffer.length, timeout_msec, 100);
+		}
+		catch (InterruptedException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
+		data_in.read(readBuffer);
+		data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		return readBuffer;
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceSerialPort#read(byte[], int, java.util.Vector)
+	 */
+	@Override
+	public byte[] read(byte[] readBuffer, int timeout_msec, Vector<Long> waitTimes) throws IOException, TimeOutException {
+		try {
+			wait4Bytes(readBuffer.length, timeout_msec);
+		}
+		catch (IOException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
+		data_in.read(readBuffer);
+		data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		return readBuffer;
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceSerialPort#write(byte[])
+	 */
+	@Override
+	public void write(byte[] writeBuffer) throws IOException {
+		log.log(Level.WARNING, "write() not supported in simulation");
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceSerialPort#wait4Bytes(int)
+	 */
+	@Override
+	public long wait4Bytes(int timeout_msec) throws InterruptedException, TimeOutException, IOException {
+		new WaitTimer(getRandomWaitTime()).run();
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceSerialPort#wait4Bytes(int, int)
+	 */
+	@Override
+	public int wait4Bytes(int numBytes, int timeout_msec) throws IOException {
+		new WaitTimer(getRandomWaitTime()).run();
+		return numBytes;
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceSerialPort#waitForStableReceiveBuffer(int, int, int)
+	 */
+	@Override
+	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex) throws InterruptedException, TimeOutException, IOException {
+		new WaitTimer(getRandomWaitTime()).run();
+		return expectedBytes;
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceSerialPort#waitForStableReceiveBuffer(int, int, int)
+	 */
+	public int getAvailableBytes() throws IOException {
+		return 20;
+	}
+
+	/**
+	 * query if the port is already open
+	 * @return
+	 */
+	public boolean isConnected() {
+		return this.isConnected;
+	}
+
+	/**
+	 * @return number of transfer errors occur (checksum)
+	 */
+	public int getXferErrors() {
+		return this.xferErrors;
+	}
+
+	/**
+	 * add up transfer errors
+	 */
+	public void addXferError() {
+		this.xferErrors++;
+	}
+
+	/**
+	 * check if a configured serial port string matches actual available ports
+	 * @param newSerialPortStr
+	 * @return true if given port string matches one of the available once
+	 */
+	public boolean isMatchAvailablePorts(String newSerialPortStr) {
+		return true;
+	}
+
+	/**
+	 * @return calculated sleep time in milli seconds
+	 */
+	int getRandomWaitTime() {
+		int sleepTime = 0;
+		Random randomGenerator = new Random();
+    if (this.isTimeStepConstant) {
+    	sleepTime = this.sleepTime_ms;
+    }
+    else {
+			while (sleepTime < this.sleepTime_ms/3 || sleepTime > this.sleepTime_ms) {
+				sleepTime = randomGenerator.nextInt(this.sleepTime_ms);
+			}
+		}
+		log.log(Level.TIME, "sleepTime : " + sleepTime + " ms");
+		return sleepTime;
+	}
+}
