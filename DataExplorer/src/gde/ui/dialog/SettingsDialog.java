@@ -18,6 +18,21 @@
 ****************************************************************************************/
 package gde.ui.dialog;
 
+import gde.GDE;
+import gde.comm.DeviceSerialPortImpl;
+import gde.config.Settings;
+import gde.device.CommaSeparatorTypes;
+import gde.device.DecimalSeparatorTypes;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.LogLevelSelectionContextMenu;
+import gde.utils.ObjectKeyScanner;
+import gde.utils.OperatingSystemHelper;
+import gde.utils.StringHelper;
+
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -57,21 +72,6 @@ import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.device.CommaSeparatorTypes;
-import gde.device.DecimalSeparatorTypes;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.LogLevelSelectionContextMenu;
-import gde.utils.ObjectKeyScanner;
-import gde.utils.OperatingSystemHelper;
-import gde.utils.StringHelper;
 
 /**
  * Dialog class to adjust application wide properties
@@ -1164,7 +1164,7 @@ public class SettingsDialog extends Dialog {
 			public void run() {
 				try {
 					while (!SettingsDialog.this.dialogShell.isDisposed()) {
-						SettingsDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts(SettingsDialog.this.settings.doPortAvailabilityCheck(), 
+						SettingsDialog.this.availablePorts = DeviceSerialPortImpl.listConfiguredSerialPorts(SettingsDialog.this.settings.doPortAvailabilityCheck(), 
 								SettingsDialog.this.settings.isSerialPortBlackListEnabled() ? SettingsDialog.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
 								SettingsDialog.this.settings.isSerialPortWhiteListEnabled() ? SettingsDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
 						DataExplorer.display.syncExec(new Runnable() {

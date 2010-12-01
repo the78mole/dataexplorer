@@ -19,6 +19,8 @@
 package gde.ui.dialog;
 
 import gde.GDE;
+import gde.comm.DeviceSerialPortImpl;
+import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -28,10 +30,10 @@ import gde.exception.NotSupportedException;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -173,14 +175,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.activeDevices = new Vector<String>(2, 1);
 
 		//wait until schema is setup
+		WaitTimer waitTimer = new WaitTimer(5);
 		while (this.settings.isXsdThreadAlive()) {
-			try {
 				log.log(Level.INFO, "waiting for XSD thread");
-				Thread.sleep(5);
-			}
-			catch (InterruptedException e) {
-				//ignore
-			}
+				waitTimer.run(); //run synchronous do not use start() here
 		}
 		
 		//long startTime = new Date().getTime();
@@ -276,7 +274,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								Thread.sleep(500);
 							}
 							if (DeviceSelectionDialog.this.application.getActiveDevice() != null) {
-								DeviceSerialPort serialPort = DeviceSelectionDialog.this.application.getActiveDevice().getSerialPort();
+								IDeviceCommPort serialPort = DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort();
 								if (serialPort != null && !serialPort.isConnected()) DeviceSelectionDialog.this.application.getActiveDevice().openCloseSerialPort();
 							}
 						}
@@ -332,8 +330,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											DeviceSelectionDialog.log.log(Level.FINEST, "deviceSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											// allow device switch only if port not connected
 											if (DeviceSelectionDialog.this.application.getActiveDevice() == null 
-													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getSerialPort() == null)
-													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getSerialPort() != null && !DeviceSelectionDialog.this.application.getActiveDevice().getSerialPort().isConnected())) {
+													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() == null)
+													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() != null && !DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort().isConnected())) {
 												DeviceSelectionDialog.this.activeDeviceName = DeviceSelectionDialog.this.deviceSelectCombo.getText();
 												DeviceSelectionDialog.log.log(Level.FINE, "activeName = " + DeviceSelectionDialog.this.activeDeviceName); //$NON-NLS-1$
 												DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.activeDeviceName);
@@ -361,8 +359,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											DeviceSelectionDialog.log.log(Level.FINEST, "deviceSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
 											// allow device switch only if port not connected
 											if (DeviceSelectionDialog.this.application.getActiveDevice() == null 
-													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getSerialPort() == null)
-													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getSerialPort() != null && !DeviceSelectionDialog.this.application.getActiveDevice().getSerialPort().isConnected())) {
+													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() == null)
+													|| (DeviceSelectionDialog.this.application.getActiveDevice() != null && DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort() != null && !DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort().isConnected())) {
 												int position = DeviceSelectionDialog.this.deviceSlider.getSelection();
 												DeviceSelectionDialog.log.log(Level.FINE, " Position: " + position); //$NON-NLS-1$
 												if (DeviceSelectionDialog.this.activeDevices.size() > 0 && !DeviceSelectionDialog.this.activeDevices.get(position).equals(DeviceSelectionDialog.this.activeDeviceName)) {
@@ -895,7 +893,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 			else { // no active device
 				this.selectedActiveDeviceConfig = null;
-				this.activeDeviceName = (this.selectedActiveDeviceConfig == null) ? GDE.STRING_EMPTY : this.selectedActiveDeviceConfig.getName();
+				this.activeDeviceName = GDE.STRING_EMPTY;
 				this.deviceSelectCombo.setItems(new String[] { Messages.getString(MessageIds.GDE_MSGT0190) });
 				this.deviceSelectCombo.setVisibleItemCount(1);
 				this.deviceSelectCombo.select(0);
@@ -1013,7 +1011,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	public boolean checkPortSelection() {
 		boolean matches = true;
 		if (this.availablePorts == null) {
-			this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts(false, DeviceSelectionDialog.this.settings.getSerialPortBlackList(), DeviceSelectionDialog.this.settings.getSerialPortWhiteList());
+			this.availablePorts = DeviceSerialPortImpl.listConfiguredSerialPorts(false, DeviceSelectionDialog.this.settings.getSerialPortBlackList(), DeviceSelectionDialog.this.settings.getSerialPortWhiteList());
 		}
 
 		if (this.settings.isGlobalSerialPort() && this.availablePorts.indexOf(this.settings.getSerialPort()) < 0) {
@@ -1228,9 +1226,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			@Override
 			public void run() {
 				try {
-					while (!DeviceSelectionDialog.this.dialogShell.isDisposed()) {
+					while (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
 						if (DeviceSelectionDialog.this.isUpdateSerialPorts) {
-							DeviceSelectionDialog.this.availablePorts = DeviceSerialPort.listConfiguredSerialPorts(DeviceSelectionDialog.this.settings.doPortAvailabilityCheck(), DeviceSelectionDialog.this.settings
+							DeviceSelectionDialog.this.availablePorts = DeviceSerialPortImpl.listConfiguredSerialPorts(DeviceSelectionDialog.this.settings.doPortAvailabilityCheck(), DeviceSelectionDialog.this.settings
 									.isSerialPortBlackListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY, DeviceSelectionDialog.this.settings
 									.isSerialPortWhiteListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
 							if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
