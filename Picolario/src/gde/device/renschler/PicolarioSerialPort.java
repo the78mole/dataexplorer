@@ -18,25 +18,24 @@
 ****************************************************************************************/
 package gde.device.renschler;
 
+import gde.comm.DeviceCommPort;
+import gde.device.IDevice;
+import gde.exception.ReadWriteOutOfSyncException;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.Checksum;
 import gnu.io.NoSuchPortException;
 
 import java.io.IOException;
 import java.util.Vector;
-import gde.log.Level;
 import java.util.logging.Logger;
-
-import gde.device.DeviceConfiguration;
-import gde.exception.ReadWriteOutOfSyncException;
-import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
-import gde.ui.DataExplorer;
-import gde.utils.Checksum;
 
 /**
  * Serial communication implementation class for the Renschler Picolariolog device
  * @author Winfried Brügmann
  */
-public class PicolarioSerialPort extends DeviceSerialPort {
+public class PicolarioSerialPort extends DeviceCommPort {
 	final static Logger	log											= Logger.getLogger(PicolarioSerialPort.class.getName());
 
 	boolean							isTransmitFinished			= false;
@@ -51,8 +50,8 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 	 * @param currentApplication
 	 * @throws NoSuchPortException
 	 */
-	public PicolarioSerialPort(DeviceConfiguration currentDeviceConfig, DataExplorer currentApplication) {
-		super(currentDeviceConfig, currentApplication);
+	public PicolarioSerialPort(IDevice currentDevice, DataExplorer currentApplication) {
+		super(currentDevice, currentApplication);
 	}
 
 	/**
@@ -163,7 +162,7 @@ public class PicolarioSerialPort extends DeviceSerialPort {
 		int availableBytes = 0;
 
 		Thread.sleep(8);
-		while (0 == (availableBytes = this.getInputStream().available()) && timeCounter-- > 0) {
+		while (0 == (availableBytes = this.getAvailableBytes()) && timeCounter-- > 0) {
 			Thread.sleep(sleepTime);	
 		}
 		return availableBytes == 0 || this.isTransmitFinished;

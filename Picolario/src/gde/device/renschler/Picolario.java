@@ -19,6 +19,7 @@
 package gde.device.renschler;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.Record;
@@ -29,7 +30,6 @@ import gde.device.PropertyType;
 import gde.exception.DataInconsitsentException;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
 import gde.utils.LinearRegression;
@@ -73,7 +73,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_OPEN_CLOSE);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
 	}
 	
 	/**
