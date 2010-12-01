@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.GraphicsTemplate;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -48,7 +49,6 @@ import gde.device.IDevice;
 import gde.io.FileHandler;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.dialog.DeviceSelectionDialog;
@@ -103,7 +103,7 @@ public class MenuBar {
 	MenuItem											saveFileMenuItem;
 	MenuItem											newFileMenuItem;
 	
-	int														iconSet = DeviceSerialPort.ICON_SET_OPEN_CLOSE; 
+	int														iconSet = DeviceCommPort.ICON_SET_OPEN_CLOSE; 
 	
 	final Menu										parent;
 	final DataExplorer						application;
@@ -481,7 +481,7 @@ public class MenuBar {
 					this.prevDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "prevDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuBar.this.application.getActiveDevice().getSerialPort() == null || !MenuBar.this.application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port noct connected
+							if (MenuBar.this.application.getActiveDevice().getCommunicationPort() == null || !MenuBar.this.application.getActiveDevice().getCommunicationPort().isConnected()) { // allow device switch only if port noct connected
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {
@@ -515,7 +515,7 @@ public class MenuBar {
 					this.nextDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "nextDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuBar.this.application.getActiveDevice().getSerialPort() == null || !MenuBar.this.application.getActiveDevice().getSerialPort().isConnected()) { // allow device switch only if port noct connected
+							if (MenuBar.this.application.getActiveDevice().getCommunicationPort() == null || !MenuBar.this.application.getActiveDevice().getCommunicationPort().isConnected()) { // allow device switch only if port noct connected
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {
