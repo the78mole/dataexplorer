@@ -96,6 +96,12 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 
 	@Override
 	public synchronized MeasurementTypeTabItem clone() {
+		try {
+			super.clone();
+		}
+		catch (CloneNotSupportedException e) {
+			// ignore
+		}
 		return new MeasurementTypeTabItem(this);
 	}
 

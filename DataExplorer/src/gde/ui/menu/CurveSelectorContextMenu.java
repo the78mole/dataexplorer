@@ -1052,9 +1052,9 @@ public class CurveSelectorContextMenu {
 								log.log(Level.FINE, "adapt compareSet maxRecordTime_sec = " + TimeLine.getFomatedTimeWithUnit(maxRecordTime_ms)); //$NON-NLS-1$
 
 								// new added record exceed size of existing, existing needs draw limit to be updated and to be padded
-								for (String tmpRecordKey : compareSet.keySet()) {
-									if (!newRecordkey.equals(tmpRecordKey)) {
-										Record tmpRecord = compareSet.get(tmpRecordKey);
+								for (Entry<String, Record> tmpRecordEntry : compareSet.entrySet()) {
+									if (!newRecordkey.equals(tmpRecordEntry.getKey())) {
+										Record tmpRecord = tmpRecordEntry.getValue();
 										if (tmpRecord.getCompareSetDrawLimit_ms() == Integer.MAX_VALUE // draw linit untouched
 												|| tmpRecord.getCompareSetDrawLimit_ms() < newRecordMaxTime_ms) {
 											double avgTimeStep_ms = tmpRecord.getAverageTimeStep_ms();

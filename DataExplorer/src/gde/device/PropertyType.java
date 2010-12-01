@@ -70,6 +70,12 @@ public class PropertyType implements Cloneable {
      * clone methods to deep copy PropertyType
      */
     public PropertyType clone() {
+  		try {
+  			super.clone();
+  		}
+  		catch (CloneNotSupportedException e) {
+  			// ignore
+  		}
     	return new PropertyType(this);
     }
     

@@ -144,6 +144,12 @@ public class ChannelTypeTabItem extends CTabItem implements Cloneable {
 
 	@Override
 	public synchronized ChannelTypeTabItem clone() {
+		try {
+			super.clone();
+		}
+		catch (CloneNotSupportedException e) {
+			// ignore
+		}
 		return new ChannelTypeTabItem(this);
 	}
 

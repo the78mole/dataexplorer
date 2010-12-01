@@ -166,7 +166,9 @@ public class ObjectDataReaderWriter {
 				if (t instanceof ZipException) {
 					if (DataExplorer.getInstance().isVisible()) {
 						int answer = DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0025, new Object[] {file.getAbsolutePath()}));
-						if (answer == SWT.YES) file.delete();
+						if (answer == SWT.YES) 
+							if(!file.delete())
+								log.log(Level.WARNING, "failed to delete " + file.getAbsolutePath());
 					}
 					else {
 						String msg = Messages.getString(MessageIds.GDE_MSGW0026, new Object[] {file.getAbsolutePath()}); 
@@ -177,7 +179,9 @@ public class ObjectDataReaderWriter {
 					if (DataExplorer.getInstance().isVisible()) {
 						String msg = Messages.getString(MessageIds.GDE_MSGW0027, new Object[] {file.getAbsolutePath(), redObjectkey});
 						int answer = DataExplorer.getInstance().openYesNoMessageDialog(msg);
-						if (answer == SWT.YES) file.delete();
+						if (answer == SWT.YES) 
+							if (!file.delete())
+								log.log(Level.WARNING, "failed to delete " + file.getAbsolutePath());
 					}	
 					else {
 						String msg = Messages.getString(MessageIds.GDE_MSGW0028, new Object[] {file.getAbsolutePath(), redObjectkey});
@@ -263,15 +267,18 @@ public class ObjectDataReaderWriter {
 			File targetFileDir = new File(this.filePath.substring(0, this.filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
 			if (targetFileDir.exists()) {
 				if (targetFile.exists()) {
-					targetFile.delete();
+					if (!targetFile.delete())
+						log.log(Level.WARNING, "failed to delete " + this.filePath);
 				}
 				else {
-					targetFile.createNewFile();
+					if (!targetFile.createNewFile())
+						log.log(Level.WARNING, "failed to create " + this.filePath);
 				}
 			}
 			else {
-				targetFileDir.mkdir();
-				targetFile.createNewFile();
+				if (targetFileDir.mkdir())
+					if(!targetFile.createNewFile())
+						log.log(Level.WARNING, "failed to create " + this.filePath);
 			}
 			ZipOutputStream outZip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(targetFile)));
 			if (this.objectData.getImage() != null) { // image not set in object window

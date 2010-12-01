@@ -18,26 +18,26 @@
 ****************************************************************************************/
 package gde.data;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Vector;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-
 import gde.GDE;
 import gde.config.GraphicsTemplate;
 import gde.config.Settings;
 import gde.device.ChannelTypes;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.RecordSetNameComparator;
 import gde.utils.StringHelper;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 
 /**
  * Channel class represents on channel (Ausgang 1, Ausgang 2, ...) where data record sets are accessible (1) laden, 2)Entladen, 1) Flugaufzeichnung, ..)
@@ -174,7 +174,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * TPPE_CONFIG measn one objects has different views, so this method returns all record set names for all channels
 	 * @return String[] containing the records names
 	 */
-	public String[] getRecordSetNames() {
+	public synchronized String[] getRecordSetNames() {
 		String[] keys;
 		if(this.type == ChannelTypes.TYPE_OUTLET) {
 			keys = this.keySet().toArray( new String[1]);
@@ -182,13 +182,15 @@ public class Channel extends HashMap<String, RecordSet> {
 		else { // ChannelTypes.TYPE_CONFIG
 			Channels channels = Channels.getInstance();
 			Vector<String> namesVector = new Vector<String>();
- 			for (int i=1; i <= channels.size(); ++i) {
- 				String[] recordSetNames = channels.get(i).getUnsortedRecordSetNames();
- 				for (int j = 0; j < recordSetNames.length; j++) {
- 	 				if (recordSetNames[j] != null) namesVector.add(recordSetNames[j]);
+			synchronized (channels) {
+				for (int i = 1; i <= channels.size(); ++i) {
+					String[] recordSetNames = channels.get(i).getUnsortedRecordSetNames();
+					for (int j = 0; j < recordSetNames.length; j++) {
+						if (recordSetNames[j] != null) namesVector.add(recordSetNames[j]);
+					}
 				}
 			}
-			keys = namesVector.toArray( new String[1]);
+			keys = namesVector.toArray(new String[1]);
 		}
 		Arrays.sort(keys, this.comparator);
 		return keys;
@@ -198,7 +200,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * method to get unsorted recordNames within channels instance to avoid stack overflow due to never ending recursion 
 	 * @return String[] containing the records names
 	 */
-	public String[] getUnsortedRecordSetNames() {
+	public synchronized String[] getUnsortedRecordSetNames() {
 		return this.keySet().toArray( new String[1]);
 	}
 
@@ -232,7 +234,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * method to get all the record sets of this channel
 	 * @return HashMap<Integer, Records>
 	 */
-	public HashMap<String, RecordSet> getRecordSets() {
+	public synchronized HashMap<String, RecordSet> getRecordSets() {
 		HashMap<String, RecordSet> content = new HashMap<String, RecordSet>(this.size());
 		if(this.type == ChannelTypes.TYPE_OUTLET) {
 			for (String key : this.getRecordSetNames()) {
@@ -241,10 +243,12 @@ public class Channel extends HashMap<String, RecordSet> {
 		}
 		else { // ChannelTypes.TYPE_CONFIG
 			Channels channels = Channels.getInstance();
- 			for (int i=1; i <= channels.size(); ++i) {
- 				for (String key : channels.get(i).getUnsortedRecordSetNames()) {
- 					if (key !=null && key.length() > 1) content.put(key, channels.get(i).get(key));
- 				}
+			synchronized (channels) {
+				for (int i = 1; i <= channels.size(); ++i) {
+					for (String key : channels.get(i).getUnsortedRecordSetNames()) {
+						if (key != null && key.length() > 1) content.put(key, channels.get(i).get(key));
+					}
+				}
 			}
 		}
 		return content;
@@ -492,13 +496,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
 			this.application.getMenuToolBar().updateGoogleEarthToolItem();
 			this.application.cleanHeaderAndCommentInGraphicsWindow();
-			this.application.updateGraphicsWindow();
-			this.application.updateStatisticsData();
-			this.application.updateDataTable(recordSetKey, true);
-			this.application.updateDigitalWindow();
-			this.application.updateAnalogWindow();
-			this.application.updateCellVoltageWindow();
-			this.application.updateFileCommentWindow();
+			this.application.updateAllTabs(true);
 		}
 	}
 

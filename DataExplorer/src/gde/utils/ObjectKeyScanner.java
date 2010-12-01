@@ -242,7 +242,9 @@ public class ObjectKeyScanner extends Thread {
 					String actualFilePath = file.getAbsolutePath();
 					if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD) && !actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
 						log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
-						file.delete();
+						if (!file.delete()) {
+							log.log(Level.FINE, "could not delete " + file.getName()); //$NON-NLS-1$
+						}
 					}
 				}
 				catch (IOException e) {

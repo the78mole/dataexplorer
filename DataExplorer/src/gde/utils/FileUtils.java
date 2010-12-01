@@ -132,7 +132,8 @@ public class FileUtils {
 		File dir = new File(directory);
 		if (!dir.exists() && !dir.isDirectory()) {
 			exist = false;
-			dir.mkdirs();
+			if(dir.mkdirs())
+				log.log(Level.WARNING, "failed to create " + directory);
 		}
 		return exist;
 	}
@@ -148,7 +149,8 @@ public class FileUtils {
 		File dir = new File(directory);
 		if (!dir.exists() && !dir.isDirectory()) {
 			exist = false;
-			dir.mkdir();
+			if(!dir.mkdir())
+				log.log(Level.WARNING, "failed to create " + directory);
 		}
 		else {
 			File file = new File(directory + GDE.FILE_SEPARATOR_UNIX + versionFileName);
@@ -156,10 +158,12 @@ public class FileUtils {
 					exist = false;
 					String oldVersion = String.format("%02d", new Integer(versionFileName.substring(versionFileName.length()-6, versionFileName.length()-4)) - 1); //$NON-NLS-1$
 					String oldVersionStr = versionFileName.substring(versionFileName.length()-8, versionFileName.length()-6) + oldVersion;
-					dir.renameTo(new File(directory + oldVersionStr));
+					if(dir.renameTo(new File(directory + oldVersionStr)))
+						log.log(Level.WARNING, "failed to rename " + directory);
 					log.log(Level.FINE, "found old version " + oldVersionStr + " and created a backup directory"); //$NON-NLS-1$ //$NON-NLS-2$
 					File newDir = new File(directory);
-					newDir.mkdir();
+					if (newDir.mkdir())
+						log.log(Level.WARNING, "failed to create " + directory);
 			}
 		}
 		return exist;
@@ -238,9 +242,11 @@ public class FileUtils {
 			if (file.canWrite()) {
 				File newFile = new File(filePath.substring(0, filePath.lastIndexOf(GDE.STRING_DOT)+1) + extension);
 				if (newFile.exists()) {
-					newFile.delete();
+					if(!newFile.delete())
+						log.log(Level.WARNING, "failed to delete " + filePath);
 				}
-				file.renameTo(newFile);				
+				if(!file.renameTo(newFile))
+					log.log(Level.WARNING, "failed to rename " + filePath.substring(0, filePath.lastIndexOf(GDE.STRING_DOT)+1) + extension);
 				resultFilePath = filePath.substring(0, filePath.lastIndexOf(GDE.STRING_DOT)+1) + extension;
 			}
 			else {
@@ -258,7 +264,8 @@ public class FileUtils {
 		if (FileUtils.checkFileExist(fullQualifiedFilePath) || FileUtils.checkDirectoryExist(fullQualifiedFilePath)) {
 		    File fileToBeDeleted = new File(fullQualifiedFilePath);
 			if (!fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite()) 
-				fileToBeDeleted.delete();
+				if(fileToBeDeleted.delete())
+					log.log(Level.WARNING, "failed to delete " + fullQualifiedFilePath);
 			else if(fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite())
 				FileUtils.deleteDirectory(fileToBeDeleted.getAbsolutePath());
 			else
@@ -805,7 +812,7 @@ public class FileUtils {
 	 */
 	public static String getJarFileNameOfDevice(DeviceConfiguration deviceConfig) throws ClassNotFoundException, NoSuchMethodException,
 			InstantiationException, IllegalAccessException, InvocationTargetException, NoClassDefFoundError {
-		String deviceJarPath = null;
+		String deviceJarFileName = null;
 		String deviceImplName = deviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		IDevice newInst = null;
 		String className = deviceImplName.contains(GDE.STRING_DOT) ? deviceImplName  // full qualified
@@ -817,14 +824,20 @@ public class FileUtils {
 		log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (constructor != null) {
 			newInst = (IDevice) constructor.newInstance(new Object[] { deviceConfig });
-			deviceJarPath = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
+			deviceJarFileName = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 		}
 		else
 			throw new NoClassDefFoundError(Messages.getString(MessageIds.GDE_MSGE0016));
 		
-		deviceJarPath = deviceJarPath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath); //$NON-NLS-1$
-		return deviceJarPath;
+		deviceJarFileName = deviceJarFileName.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		log.log(Level.WARNING, "deviceJarPath = " + deviceJarFileName); //$NON-NLS-1$
+		
+		if(deviceJarFileName.endsWith(GDE.STRING_WITHIN_ECLIPSE)) { //stated within eclipse
+			deviceJarFileName = deviceJarFileName.substring(0, deviceJarFileName.indexOf(GDE.STRING_WITHIN_ECLIPSE));
+			deviceJarFileName = deviceJarFileName.substring(deviceJarFileName.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
+		}
+		
+		return deviceJarFileName;
 	}
 
 	/**
@@ -1064,19 +1077,14 @@ public class FileUtils {
 					+ "java" + javaFullQualifiedExecutablePath.substring(javaFullQualifiedExecutablePath.indexOf("javaw")+ "javaw".length()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			Process process = new ProcessBuilder(javaFullQualifiedExecutablePath, "-version").start(); //$NON-NLS-1$
-			InputStream is = process.getErrorStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			br = new BufferedReader(isr);
+			br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			
 			while ((line = br.readLine()) != null) { // clean std err
 				if (line.startsWith(javaVersion)) actualVersion = parseJavaVersion(line.substring(javaVersion.length()+2));
 			}
 			
-			is = process.getInputStream();
-			isr = new InputStreamReader(is);
-			br = new BufferedReader(isr);
+			br = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			while ((line = br.readLine()) != null) {} // clean std out
-			br.close();
 			process.waitFor(); // waits until termination
 			
 			//if (process.exitValue() == 0) {
@@ -1089,8 +1097,8 @@ public class FileUtils {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		finally {
-			if (br != null) try {
-				br.close();
+			try {
+				if (br != null) br.close();
 			}
 			catch (IOException e) {
 				// ignore

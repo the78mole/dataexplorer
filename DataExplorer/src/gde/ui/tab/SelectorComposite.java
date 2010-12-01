@@ -180,28 +180,7 @@ public class SelectorComposite extends Composite {
 								}
 								activeRecord.getParent().syncScaleOfSyncableRecords(true);
 							}
-//							else {
-//								log.log(Level.FINER, "GraphicsWindow.type = " + SelectorComposite.this.windowType + " recordName = \"" + recordName + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//								RecordSet activeRecordSet = SelectorComposite.this.channels.getActiveChannel() != null ? SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet() : null;
-//								RecordSet recordSet = SelectorComposite.this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet : SelectorComposite.this.application.getCompareSet();
-//								if (recordSet != null && recordSet.size() > 0) {
-//									if (item.getChecked()) {
-//										item.setData(DataExplorer.OLD_STATE, true);
-//										recordSet.setSyncRequested(true, true);
-//										recordSet.setSyncRecordSelected(true);
-//									}
-//									else {
-//										item.setData(DataExplorer.OLD_STATE, false);
-//										recordSet.setSyncRequested(false, true);
-//										recordSet.setSyncRecordSelected(false);
-//									}
-//								}
-//							}
-							SelectorComposite.this.application.updateGraphicsWindow();
-							SelectorComposite.this.application.updateDigitalWindow();
-							SelectorComposite.this.application.updateAnalogWindow();
-							SelectorComposite.this.application.updateCellVoltageWindow();
-							SelectorComposite.this.application.updateFileCommentWindow();
+							SelectorComposite.this.application.updateAllTabs(false);
 						}
 					}
 				}
@@ -283,7 +262,7 @@ public class SelectorComposite extends Composite {
 	/**
 	 * @return the selectorColumnWidth
 	 */
-	public int getSelectorColumnWidth() {
+	public synchronized int getSelectorColumnWidth() {
 		return this.selectorColumnWidth;
 	}
 }

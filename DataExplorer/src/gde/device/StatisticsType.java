@@ -109,6 +109,12 @@ public class StatisticsType implements Cloneable {
 	 */
 	@Override
 	public StatisticsType clone() {
+		try {
+			super.clone();
+		}
+		catch (CloneNotSupportedException e) {
+			// ignore
+		}
 		return new StatisticsType(this);
 	}
 

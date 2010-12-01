@@ -123,6 +123,12 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 
 	@Override
 	public synchronized StatisticsTypeTabItem clone() {
+		try {
+			super.clone();
+		}
+		catch (CloneNotSupportedException e) {
+			// ignore
+		}
 		return new StatisticsTypeTabItem(this);
 	}
 
@@ -175,11 +181,12 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.triggerType = this.statisticsType == null ? null : this.statisticsType.getTrigger();
 
-		this.statisticsMinButton.setSelection(this.statisticsMin = this.statisticsType.isMin());
-		this.statisticsMaxButton.setSelection(this.statisticsMax = this.statisticsType.isMax());
-		this.statisticsAvgButton.setSelection(this.statisticsAvg = this.statisticsType.isAvg());
-		this.statisticsSigmaButton.setSelection(this.statisticsSigma = this.statisticsType.isSigma());
-
+		if (this.statisticsType != null) {
+			this.statisticsMinButton.setSelection(this.statisticsMin = this.statisticsType.isMin());
+			this.statisticsMaxButton.setSelection(this.statisticsMax = this.statisticsType.isMax());
+			this.statisticsAvgButton.setSelection(this.statisticsAvg = this.statisticsType.isAvg());
+			this.statisticsSigmaButton.setSelection(this.statisticsSigma = this.statisticsType.isSigma());
+		}
 		this.measurementReferenceItems = this.deviceConfig.getMeasurementNames(this.channelConfigNumber);
 		this.triggerRefOrdinalCombo.setItems(this.measurementReferenceItems);
 		this.sumByTriggerRefOrdinalCombo.setItems(this.measurementReferenceItems);
@@ -187,7 +194,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 
 		updateTriggerDependent(this.isSomeTriggerDefined = isSomeTriggerDefined());
 
-		if (this.triggerRefOrdinal != this.sumByTriggerRefOrdinal) {
+		if (this.triggerRefOrdinal != null && this.sumByTriggerRefOrdinal != null && this.triggerRefOrdinal.intValue() != this.sumByTriggerRefOrdinal.intValue()) {
 			MessageBox mb = new MessageBox(this.channelConfigMeasurementPropertiesTabFolder.getShell(), SWT.OK);
 			mb.setText(Messages.getString(MessageIds.GDE_MSGW0540));
 			mb.setMessage(Messages.getString(MessageIds.GDE_MSGW0542));
@@ -233,129 +240,131 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 		this.ratioRefOrdinalCombo.setEnabled(isTriggerDefined && this.triggerType == null);
 		this.ratioText.setEnabled(isTriggerDefined && this.triggerType == null);
 
-		if (isTriggerDefined) {
-			if (this.isSumTriggerTime = (this.statisticsType.getSumTriggerTimeText() != null)) {
-				this.countByTriggerButton.setSelection(this.isSumTriggerTime);
-				if (this.isSumTriggerTime) {
-					this.sumTriggerTimeText.setEnabled(true);
-					this.sumTriggerTimeText.setText(this.sumTriggerTimeComment = this.statisticsType.getSumTriggerTimeText() == null ? GDE.STRING_EMPTY : this.statisticsType.getSumTriggerTimeText());
-				}
-				else {
-					this.sumTriggerTimeText.setEnabled(false);
-				}
-			}
-			else {
-				this.countByTriggerText.setEnabled(false);
-			}
-			if ((this.isCountByTrigger = this.statisticsType.isCountByTrigger()) != null) {
-				this.countByTriggerButton.setSelection(this.isCountByTrigger);
-				if (this.isCountByTrigger) {
-					this.countByTriggerText.setEnabled(true);
-					this.countByTriggerText.setText(this.countByTriggerComment = this.statisticsType.getCountTriggerText() == null ? GDE.STRING_EMPTY : this.statisticsType.getCountTriggerText());
+		if (this.statisticsType != null) {
+			if (isTriggerDefined) {
+				if (this.isSumTriggerTime = (this.statisticsType.getSumTriggerTimeText() != null)) {
+					this.countByTriggerButton.setSelection(this.isSumTriggerTime);
+					if (this.isSumTriggerTime) {
+						this.sumTriggerTimeText.setEnabled(true);
+						this.sumTriggerTimeText.setText(this.sumTriggerTimeComment = this.statisticsType.getSumTriggerTimeText() == null ? GDE.STRING_EMPTY : this.statisticsType.getSumTriggerTimeText());
+					}
+					else {
+						this.sumTriggerTimeText.setEnabled(false);
+					}
 				}
 				else {
 					this.countByTriggerText.setEnabled(false);
 				}
+				if ((this.isCountByTrigger = this.statisticsType.isCountByTrigger()) != null) {
+					this.countByTriggerButton.setSelection(this.isCountByTrigger);
+					if (this.isCountByTrigger) {
+						this.countByTriggerText.setEnabled(true);
+						this.countByTriggerText.setText(this.countByTriggerComment = this.statisticsType.getCountTriggerText() == null ? GDE.STRING_EMPTY : this.statisticsType.getCountTriggerText());
+					}
+					else {
+						this.countByTriggerText.setEnabled(false);
+					}
+				}
+				else {
+					this.countByTriggerText.setEnabled(false);
+				}
+				if ((this.triggerRefOrdinal = this.statisticsType.getTriggerRefOrdinal()) != null) {
+					this.triggerRefOrdinalButton.setSelection(true);
+					this.triggerRefOrdinalText.setText(this.triggerRefOrdinalComment = this.statisticsType.getComment() == null ? GDE.STRING_EMPTY : this.statisticsType.getComment());
+					this.triggerRefOrdinalCombo.select(this.triggerRefOrdinal);
+				}
+				else {
+					//this.triggerRefOrdinalCombo.setEnabled(false);
+				}
+				if ((this.sumByTriggerRefOrdinal = this.statisticsType.getSumByTriggerRefOrdinal()) != null) {
+					this.isSumByTriggerRefOrdinalButton.setEnabled(true);
+					this.isSumByTriggerRefOrdinalButton.setSelection(true);
+					//this.sumByTriggerRefOrdinalCombo.setEnabled(true);
+					this.sumTriggerText.setEnabled(true);
+					this.sumByTriggerRefOrdinalCombo.select(this.sumByTriggerRefOrdinal);
+					this.sumTriggerText.setText((this.sumTriggerComment = this.statisticsType.getSumTriggerText()) != null ? this.sumTriggerComment : GDE.STRING_EMPTY);
+				}
+				else {
+					this.isSumByTriggerRefOrdinalButton.setSelection(false);
+					//this.sumByTriggerRefOrdinalCombo.setEnabled(false);
+					this.sumTriggerText.setEnabled(false);
+				}
+				if ((this.ratioRefOrdinal = this.statisticsType.getRatioRefOrdinal()) != null) {
+					this.isRatioRefOrdinalButton.setEnabled(true);
+					this.isRatioRefOrdinalButton.setSelection(this.isRatioRefOrdinal = true);
+					this.ratioRefOrdinalCombo.setEnabled(true);
+					this.ratioRefOrdinalCombo.select(this.ratioRefOrdinal);
+					this.ratioText.setEnabled(true);
+					this.ratioText.setText((this.ratioComment = this.statisticsType.getRatioText()) != null ? this.ratioComment : GDE.STRING_EMPTY);
+				}
+				else {
+					this.isRatioRefOrdinalButton.setSelection(this.isRatioRefOrdinal = false);
+					this.ratioRefOrdinalCombo.setEnabled(false);
+					this.ratioText.setEnabled(false);
+				}
 			}
-			else {
+			else { // no measurement defines a trigger, as reult no measurement can reference to it
+				this.isCountByTrigger = null;
+				if (this.statisticsType.isCountByTrigger() != null) {
+					this.statisticsType.setCountByTrigger(null);
+					this.deviceConfig.setChangePropery(true);
+					this.propsEditor.enableSaveButton(true);
+				}
+				this.countByTriggerButton.setSelection(false);
 				this.countByTriggerText.setEnabled(false);
-			}
-			if ((this.triggerRefOrdinal = this.statisticsType.getTriggerRefOrdinal()) != null) {
-				this.triggerRefOrdinalButton.setSelection(true);
-				this.triggerRefOrdinalText.setText(this.triggerRefOrdinalComment = this.statisticsType.getComment() == null ? GDE.STRING_EMPTY : this.statisticsType.getComment());
-				this.triggerRefOrdinalCombo.select(this.triggerRefOrdinal);
-			}
-			else {
-				//this.triggerRefOrdinalCombo.setEnabled(false);
-			}
-			if ((this.sumByTriggerRefOrdinal = this.statisticsType.getSumByTriggerRefOrdinal()) != null) {
-				this.isSumByTriggerRefOrdinalButton.setEnabled(true);
-				this.isSumByTriggerRefOrdinalButton.setSelection(true);
-				//this.sumByTriggerRefOrdinalCombo.setEnabled(true);
-				this.sumTriggerText.setEnabled(true);
-				this.sumByTriggerRefOrdinalCombo.select(this.sumByTriggerRefOrdinal);
-				this.sumTriggerText.setText((this.sumTriggerComment = this.statisticsType.getSumTriggerText()) != null ? this.sumTriggerComment : GDE.STRING_EMPTY);
-			}
-			else {
+				this.countByTriggerText.setText(GDE.STRING_EMPTY);
+				this.countByTriggerComment = null;
+				if (this.statisticsType.getCountTriggerText() != null) {
+					this.statisticsType.setCountTriggerText(null);
+					this.deviceConfig.setChangePropery(true);
+					this.propsEditor.enableSaveButton(true);
+				}
+
+				this.triggerRefOrdinal = null;
+				if (this.statisticsType.getTriggerRefOrdinal() != null) {
+					this.statisticsType.setTriggerRefOrdinal(null);
+					this.deviceConfig.setChangePropery(true);
+					this.propsEditor.enableSaveButton(true);
+				}
+				this.triggerRefOrdinalButton.setSelection(false);
+				this.triggerRefOrdinalCombo.select(0);
+
+				this.sumByTriggerRefOrdinal = null;
+				if (this.statisticsType.getSumByTriggerRefOrdinal() != null) {
+					this.statisticsType.setSumByTriggerRefOrdinal(null);
+					this.deviceConfig.setChangePropery(true);
+					this.propsEditor.enableSaveButton(true);
+				}
 				this.isSumByTriggerRefOrdinalButton.setSelection(false);
-				//this.sumByTriggerRefOrdinalCombo.setEnabled(false);
+				this.sumByTriggerRefOrdinalCombo.select(0);
+				this.sumTriggerComment = null;
+				if (this.statisticsType.getSumTriggerText() != null) {
+					this.statisticsType.setSumTriggerText(null);
+					this.deviceConfig.setChangePropery(true);
+					this.propsEditor.enableSaveButton(true);
+				}
 				this.sumTriggerText.setEnabled(false);
-			}
-			if ((this.ratioRefOrdinal = this.statisticsType.getRatioRefOrdinal()) != null) {
-				this.isRatioRefOrdinalButton.setEnabled(true);
-				this.isRatioRefOrdinalButton.setSelection(this.isRatioRefOrdinal = true);
-				this.ratioRefOrdinalCombo.setEnabled(true);
-				this.ratioRefOrdinalCombo.select(this.ratioRefOrdinal);
-				this.ratioText.setEnabled(true);
-				this.ratioText.setText((this.ratioComment = this.statisticsType.getRatioText()) != null ? this.ratioComment : GDE.STRING_EMPTY);
-			}
-			else {
-				this.isRatioRefOrdinalButton.setSelection(this.isRatioRefOrdinal = false);
+				this.sumTriggerText.setText(GDE.STRING_EMPTY);
+
+				this.ratioRefOrdinal = null;
+				if (this.statisticsType.getRatioRefOrdinal() != null) {
+					this.statisticsType.setRatioRefOrdinal(null);
+					this.deviceConfig.setChangePropery(true);
+					this.propsEditor.enableSaveButton(true);
+				}
+				this.isRatioRefOrdinalButton.setEnabled(false);
+				this.isRatioRefOrdinalButton.setSelection(false);
 				this.ratioRefOrdinalCombo.setEnabled(false);
+				this.ratioRefOrdinalCombo.select(0);
+				this.ratioComment = null;
+				if (this.statisticsType.getRatioText() != null) {
+					this.statisticsType.setRatioText(null);
+					this.deviceConfig.setChangePropery(true);
+					this.propsEditor.enableSaveButton(true);
+				}
 				this.ratioText.setEnabled(false);
+				this.ratioText.setText(GDE.STRING_EMPTY);
 			}
-		}
-		else { // no measurement defines a trigger, as reult no measurement can reference to it
-			this.isCountByTrigger = null;
-			if (this.statisticsType.isCountByTrigger() != null) {
-				this.statisticsType.setCountByTrigger(null);
-				this.deviceConfig.setChangePropery(true);
-				this.propsEditor.enableSaveButton(true);
-			}
-			this.countByTriggerButton.setSelection(false);
-			this.countByTriggerText.setEnabled(false);
-			this.countByTriggerText.setText(GDE.STRING_EMPTY);
-			this.countByTriggerComment = null;
-			if (this.statisticsType.getCountTriggerText() != null) {
-				this.statisticsType.setCountTriggerText(null);
-				this.deviceConfig.setChangePropery(true);
-				this.propsEditor.enableSaveButton(true);
-			}
-
-			this.triggerRefOrdinal = null;
-			if (this.statisticsType.getTriggerRefOrdinal() != null) {
-				this.statisticsType.setTriggerRefOrdinal(null);
-				this.deviceConfig.setChangePropery(true);
-				this.propsEditor.enableSaveButton(true);
-			}
-			this.triggerRefOrdinalButton.setSelection(false);
-			this.triggerRefOrdinalCombo.select(0);
-
-			this.sumByTriggerRefOrdinal = null;
-			if (this.statisticsType.getSumByTriggerRefOrdinal() != null) {
-				this.statisticsType.setSumByTriggerRefOrdinal(null);
-				this.deviceConfig.setChangePropery(true);
-				this.propsEditor.enableSaveButton(true);
-			}
-			this.isSumByTriggerRefOrdinalButton.setSelection(false);
-			this.sumByTriggerRefOrdinalCombo.select(0);
-			this.sumTriggerComment = null;
-			if (this.statisticsType.getSumTriggerText() != null) {
-				this.statisticsType.setSumTriggerText(null);
-				this.deviceConfig.setChangePropery(true);
-				this.propsEditor.enableSaveButton(true);
-			}
-			this.sumTriggerText.setEnabled(false);
-			this.sumTriggerText.setText(GDE.STRING_EMPTY);
-
-			this.ratioRefOrdinal = null;
-			if (this.statisticsType.getRatioRefOrdinal() != null) {
-				this.statisticsType.setRatioRefOrdinal(null);
-				this.deviceConfig.setChangePropery(true);
-				this.propsEditor.enableSaveButton(true);
-			}
-			this.isRatioRefOrdinalButton.setEnabled(false);
-			this.isRatioRefOrdinalButton.setSelection(false);
-			this.ratioRefOrdinalCombo.setEnabled(false);
-			this.ratioRefOrdinalCombo.select(0);
-			this.ratioComment = null;
-			if (this.statisticsType.getRatioText() != null) {
-				this.statisticsType.setRatioText(null);
-				this.deviceConfig.setChangePropery(true);
-				this.propsEditor.enableSaveButton(true);
-			}
-			this.ratioText.setEnabled(false);
-			this.ratioText.setText(GDE.STRING_EMPTY);
 		}
 	}
 
@@ -892,7 +901,9 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
 						else {
-							StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(null);
+							if (StatisticsTypeTabItem.this.statisticsType != null) {
+								StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(null);
+							}
 							StatisticsTypeTabItem.this.ratioText.setText(GDE.STRING_EMPTY);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
 							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
@@ -1018,8 +1029,8 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 			StatisticsTypeTabItem.this.updateTriggerDependent(StatisticsTypeTabItem.this.isSomeTriggerDefined = StatisticsTypeTabItem.this.isSomeTriggerDefined());
 		}
 		if (StatisticsTypeTabItem.this.triggerLevel != null) {
-			StatisticsTypeTabItem.this.triggerLevelButton.setSelection(StatisticsTypeTabItem.this.triggerLevel != null);
-			StatisticsTypeTabItem.this.triggerLevelCombo.select(StatisticsTypeTabItem.this.triggerLevel == null ? 0 : StatisticsTypeTabItem.this.triggerLevel);
+			StatisticsTypeTabItem.this.triggerLevelButton.setSelection(true);
+			StatisticsTypeTabItem.this.triggerLevelCombo.select(StatisticsTypeTabItem.this.triggerLevel);
 			StatisticsTypeTabItem.this.triggerCommentText.setText(StatisticsTypeTabItem.this.triggerComment == null ? GDE.STRING_EMPTY : StatisticsTypeTabItem.this.triggerComment);
 			StatisticsTypeTabItem.this.isGreaterButton
 					.setSelection(StatisticsTypeTabItem.this.isGreater == null ? StatisticsTypeTabItem.this.isGreater = true : StatisticsTypeTabItem.this.isGreater);

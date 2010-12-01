@@ -143,6 +143,7 @@ public class GPXWriter {
 					if (!isHeight0Calculated) {
 						gpsHeight0 = isRelative ? (int)device.translateValue(recordGPSHeight, recordGPSHeight.realGet(i)/1000.0) : 0;
 						isHeight0Calculated = true;
+						break;
 					}
 				}
 			}

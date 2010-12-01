@@ -41,7 +41,7 @@ import gde.utils.TimeLine;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -594,12 +594,13 @@ public class RecordSet extends HashMap<String, Record> {
 	 * method to get the sorted record active names which are visible as string array
 	 * @return String[] containing record names 
 	 */
-	public String[] getActiveAndVisibleRecordNames() {
-		Vector<String> activeVisibleRecords = new Vector<String>();
+	public String[] getDisplayableAndVisibleRecordNames() {
+		Vector<String> displayableAndVisibleRecords = new Vector<String>();
 		for (String recordKey : this.recordNames) {
-			if (this.get(recordKey).isActive() && this.get(recordKey).isVisible()) activeVisibleRecords.add(recordKey);
+			if (this.get(recordKey).isDisplayable && this.get(recordKey).isVisible) 
+				displayableAndVisibleRecords.add(recordKey);
 		}
-		return activeVisibleRecords.toArray(new String[0]);
+		return displayableAndVisibleRecords.toArray(new String[0]);
 	}
 
 	/**
@@ -1173,8 +1174,8 @@ public class RecordSet extends HashMap<String, Record> {
 			this.resetMeasurement();
 			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
 				// iterate children and reset min/max values
-				for (String recordName : this.keySet()) {
-					Record record = this.get(recordName);
+				for (Entry<String, Record> recordEntry : this.entrySet()) {
+					Record record = recordEntry.getValue();
 					record.zoomOffset = 0;
 					record.zoomTimeOffset = 0.0;
 					record.drawTimeWidth = record.getMaxTime_ms();
@@ -1226,7 +1227,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setDisplayZoomBounds(Rectangle newDisplayZoomBounds) {
 		// iterate children 
-		for (Map.Entry<String, Record> element : this.entrySet()) {
+		for (Entry<String, Record> element : this.entrySet()) {
 			element.getValue().setZoomBounds(newDisplayZoomBounds);
 		}
 	}
@@ -1720,12 +1721,13 @@ public class RecordSet extends HashMap<String, Record> {
 	boolean isRecordContained(int syncMasterRecordOrdinal, Record tmpRecord) {
 		final String $METHOD_NAME = "isRecordContained";
 		boolean isContained = false;
-		this.scaleSyncedRecords.get(syncMasterRecordOrdinal).contains(tmpRecord);
-		for (Record tempRecord : this.scaleSyncedRecords.get(syncMasterRecordOrdinal)) {
-			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + tmpRecord.name);
-			if (tempRecord.name.equals(tmpRecord.name)) {
-				isContained = true;
-				break;
+		synchronized (this.scaleSyncedRecords) {
+			for (Record tempRecord : this.scaleSyncedRecords.get(syncMasterRecordOrdinal)) {
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + tmpRecord.name);
+				if (tempRecord.name.equals(tmpRecord.name)) {
+					isContained = true;
+					break;
+				}
 			}
 		}
 		return isContained;

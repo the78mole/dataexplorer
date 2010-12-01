@@ -681,12 +681,12 @@ public class Record extends Vector<Integer> {
 		return this.minValue;
 	}
 
-	public int getMaxValueTriggered() {
+	public synchronized int getMaxValueTriggered() {
 		if (this.tmpTriggerRange == null) this.evaluateMinMax();
 			return this.maxValueTriggered;
 	}
 
-	public int getMinValueTriggered() {
+	public synchronized int getMinValueTriggered() {
 		if (this.tmpTriggerRange == null) this.evaluateMinMax();
 			return this.minValueTriggered;
 	}
@@ -789,7 +789,7 @@ public class Record extends Vector<Integer> {
 	 * @param referencedMeasurementOrdinal
 	 * @return maximum value according trigger specification of referenced measurement
 	 */
-	public int getMaxValueTriggered(int referencedMeasurementOrdinal) {
+	public synchronized int getMaxValueTriggered(int referencedMeasurementOrdinal) {
 		if (this.tmpTriggerRange == null || this.triggerRanges == null)  {
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}
@@ -802,7 +802,7 @@ public class Record extends Vector<Integer> {
 	 * @param referencedMeasurementOrdinal
 	 * @return minimum value according trigger specification of referenced measurement
 	 */
-	public int getMinValueTriggered(int referencedMeasurementOrdinal) {
+	public synchronized int getMinValueTriggered(int referencedMeasurementOrdinal) {
 		if (this.tmpTriggerRange == null || this.triggerRanges == null)  {
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}
@@ -1610,7 +1610,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * reset all variables to enable re-calcualation of statistics
 	 */
-	public void resetStatiticCalculationBase() {
+	public synchronized void resetStatiticCalculationBase() {
 		this.maxValueTriggered = Integer.MIN_VALUE;
 		this.minValueTriggered = Integer.MAX_VALUE;
 		this.avgValue = Integer.MIN_VALUE;
@@ -1773,7 +1773,7 @@ public class Record extends Vector<Integer> {
 	 * get/calcualte avg value by configuraed trigger
 	 * @return average value according trigger specification
 	 */
-	public int getAvgValueTriggered() {
+	public synchronized int getAvgValueTriggered() {
 		if (this.triggerRanges == null)  {
 			this.evaluateMinMax();
 		}
@@ -1846,7 +1846,7 @@ public class Record extends Vector<Integer> {
 	 * get/calcualte avg value by trigger configuration
 	 * @return sigma value according trigger specification
 	 */
-	public int getSigmaValueTriggered() {
+	public synchronized int getSigmaValueTriggered() {
 		if (this.triggerRanges == null)  {
 			this.evaluateMinMax();
 		}
@@ -1903,7 +1903,7 @@ public class Record extends Vector<Integer> {
 	 * get/calcualte sum of values by configured trigger
 	 * @return sum value according trigger range specification of referenced measurement
 	 */
-	public int getSumTriggeredRange() {
+	public synchronized int getSumTriggeredRange() {
 		if (this.triggerRanges == null)  {
 			this.evaluateMinMax();
 		}
@@ -1915,7 +1915,7 @@ public class Record extends Vector<Integer> {
 	 * @param referencedMeasurementOrdinal
 	 * @return sum value according trigger range specification of referenced measurement
 	 */
-	public int getSumTriggeredRange(int referencedMeasurementOrdinal) {
+	public synchronized int getSumTriggeredRange(int referencedMeasurementOrdinal) {
 		if (this.triggerRanges == null)  {
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}
@@ -1925,7 +1925,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * calculate sum of min/max delta of each trigger range
 	 */
-	int calculateSum() {
+	synchronized int calculateSum() {
 		int sum = 0;
 		int min=0, max=0;
 		if (this.triggerRanges != null) {
@@ -1949,7 +1949,7 @@ public class Record extends Vector<Integer> {
 	 * get/calcualte sum of time by configured trigger
 	 * @return sum value according trigger range specification of referenced measurement
 	 */
-	public String getTimeSumTriggeredRange() {
+	public synchronized String getTimeSumTriggeredRange() {
 		if (this.triggerRanges == null)  {
 			this.evaluateMinMax();
 		}
@@ -1961,7 +1961,7 @@ public class Record extends Vector<Integer> {
 	 * @param referencedMeasurementOrdinal
 	 * @return sum value according trigger range specification of referenced measurement
 	 */
-	public String getTimeSumTriggeredRange(int referencedMeasurementOrdinal) {
+	public synchronized String getTimeSumTriggeredRange(int referencedMeasurementOrdinal) {
 		if (this.triggerRanges == null)  {
 			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
 		}
@@ -1971,7 +1971,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * calculate sum of min/max delta of each trigger range
 	 */
-	String calculateTimeSum() {
+	synchronized String calculateTimeSum() {
 		double sum = 0;
 		if (this.triggerRanges != null) {
 			for (TriggerRange range : this.triggerRanges) {
@@ -1984,7 +1984,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * @return the triggerRanges
 	 */
-	public Vector<TriggerRange> getTriggerRanges() {
+	public synchronized Vector<TriggerRange> getTriggerRanges() {
 		this.evaluateMinMax();
 		return this.triggerRanges;
 	}

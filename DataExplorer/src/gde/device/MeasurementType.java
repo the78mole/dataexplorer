@@ -92,6 +92,12 @@ public class MeasurementType implements Cloneable {
 	 */
 	@Override
 	public MeasurementType clone() {
+		try {
+			super.clone();
+		}
+		catch (CloneNotSupportedException e) {
+			// ignore
+		}
 		return new MeasurementType(this);
 	}
 

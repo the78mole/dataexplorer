@@ -60,19 +60,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-
-/**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
 /**
  * this dialog enable to modify speed limits and associated colors of the KML track
  */
@@ -133,18 +120,12 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 		try {
 			Shell parent = getParent();
 			dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-
-			{
-				//Register as a resource user - SWTResourceManager will
-				//handle the obtaining and disposing of resources
-				SWTResourceManager.registerResourceUser(dialogShell);
-			}
-			
+			SWTResourceManager.registerResourceUser(dialogShell);
 			dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0283));
 			dialogShell.setLayout( new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();			
-			dialogShell.setSize(312, 199);
+			dialogShell.setSize(350, 200);
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/EarthConfigHot.gif")); //$NON-NLS-1$
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
@@ -158,18 +139,16 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				RowLayout compositeLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
 				colorComposite.setLayout(compositeLayout);
 				FormData colorCompositeLData = new FormData();
-				colorCompositeLData.width = 150;
-				colorCompositeLData.height = 120;
-				colorCompositeLData.right =  new FormAttachment(501, 1000, 0);
-				colorCompositeLData.bottom =  new FormAttachment(711, 1000, 0);
+				colorCompositeLData.right =  new FormAttachment(450, 1000, 0);
+				colorCompositeLData.bottom =  new FormAttachment(750, 1000, 0);
 				colorCompositeLData.left =  new FormAttachment(0, 1000, 0);
 				colorCompositeLData.top =  new FormAttachment(0, 1000, 0);
 				colorComposite.setLayoutData(colorCompositeLData);
 				{
+					compositeLower = new Composite(colorComposite, SWT.BORDER);
 					RowData composite1LData = new RowData();
 					composite1LData.width = 145;
-					composite1LData.height = 32;
-					compositeLower = new Composite(colorComposite, SWT.NONE);
+					composite1LData.height = 30;
 					GridLayout composite1Layout = new GridLayout();
 					composite1Layout.makeColumnsEqualWidth = true;
 					compositeLower.setLayout(composite1Layout);
@@ -200,10 +179,10 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					fillerComposite.setLayoutData(fillerComposite_RALData);
 				}
 				{
+					compositeWithin = new Composite(colorComposite, SWT.BORDER);
 					RowData composite2LData = new RowData();
 					composite2LData.width = 145;
-					composite2LData.height = 32;
-					compositeWithin = new Composite(colorComposite, SWT.NONE);
+					composite2LData.height = 30;
 					GridLayout composite2Layout = new GridLayout();
 					composite2Layout.makeColumnsEqualWidth = true;
 					compositeWithin.setLayout(composite2Layout);
@@ -234,10 +213,10 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					fillerComposite.setLayoutData(fillerComposite_RA1LData);
 				}
 				{
+					compositeUpper = new Composite(colorComposite, SWT.BORDER);
 					RowData composite3LData = new RowData();
 					composite3LData.width = 145;
-					composite3LData.height = 32;
-					compositeUpper = new Composite(colorComposite, SWT.NONE);
+					composite3LData.height = 30;
 					GridLayout composite3Layout = new GridLayout();
 					composite3Layout.makeColumnsEqualWidth = true;
 					compositeUpper.setLayout(composite3Layout);
@@ -267,10 +246,8 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				RowLayout limitCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				limitComposite.setLayout(limitCompositeLayout);
 				FormData limitCompositeLData = new FormData();
-				limitCompositeLData.width = 150;
-				limitCompositeLData.height = 120;
-				limitCompositeLData.left =  new FormAttachment(501, 1000, 0);
-				limitCompositeLData.bottom =  new FormAttachment(711, 1000, 0);
+				limitCompositeLData.left =  new FormAttachment(460, 1000, 0);
+				limitCompositeLData.bottom =  new FormAttachment(750, 1000, 0);
 				limitCompositeLData.right =  new FormAttachment(1000, 1000, 0);
 				limitCompositeLData.top =  new FormAttachment(0, 1000, 0);
 				limitComposite.setLayoutData(limitCompositeLData);
@@ -278,13 +255,13 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					fillerComposite = new Composite(limitComposite, SWT.NONE);
 					RowData composite_IL2LData = new RowData();
 					composite_IL2LData.width = 145;
-					composite_IL2LData.height = 15;
+					composite_IL2LData.height = 20;
 					fillerComposite.setLayoutData(composite_IL2LData);
 				}
 				{
-					lowerLimitLabel = new CLabel(limitComposite, SWT.NONE);
+					lowerLimitLabel = new CLabel(limitComposite, SWT.RIGHT);
 					RowData lowerLimitLabelLData = new RowData();
-					lowerLimitLabelLData.width = 95;
+					lowerLimitLabelLData.width = 115;
 					lowerLimitLabelLData.height = 22;
 					lowerLimitLabel.setLayoutData(lowerLimitLabelLData);
 					lowerLimitLabel.setText(Messages.getString(MessageIds.GDE_MSGT0284));
@@ -293,7 +270,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				{
 					lowerLimitText = new Text(limitComposite, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
 					RowData lowerLimitTextLData = new RowData();
-					lowerLimitTextLData.width = 30;
+					lowerLimitTextLData.width = 35;
 					lowerLimitTextLData.height = 16;
 					lowerLimitText.setLayoutData(lowerLimitTextLData);
 					lowerLimitText.addVerifyListener(new VerifyListener() {
@@ -304,9 +281,9 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					});
 				}
 				{
-					averageFactorLabel = new CLabel(limitComposite, SWT.NONE);
+					averageFactorLabel = new CLabel(limitComposite, SWT.RIGHT);
 					RowData averageFactorLabelLData = new RowData();
-					averageFactorLabelLData.width = 95;
+					averageFactorLabelLData.width = 115;
 					averageFactorLabelLData.height = 22;
 					averageFactorLabel.setLayoutData(averageFactorLabelLData);
 					averageFactorLabel.setText(Messages.getString(MessageIds.GDE_MSGT0286));
@@ -315,7 +292,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				{
 					avgFactorText = new Text(limitComposite, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
 					RowData avgFactorTextLData = new RowData();
-					avgFactorTextLData.width = 30;
+					avgFactorTextLData.width = 35;
 					avgFactorTextLData.height = 16;
 					avgFactorText.setLayoutData(avgFactorTextLData);
 					avgFactorText.addVerifyListener(new VerifyListener() {
@@ -355,9 +332,9 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					});
 				}
 				{
-					upperLimitLabel = new CLabel(limitComposite, SWT.NONE);
+					upperLimitLabel = new CLabel(limitComposite, SWT.RIGHT);
 					RowData upperLimitLabelLData = new RowData();
-					upperLimitLabelLData.width = 95;
+					upperLimitLabelLData.width = 115;
 					upperLimitLabelLData.height = 22;
 					upperLimitLabel.setLayoutData(upperLimitLabelLData);
 					upperLimitLabel.setText(Messages.getString(MessageIds.GDE_MSGT0288));
@@ -366,7 +343,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				{
 					upperLimitText = new Text(limitComposite, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
 					RowData upperLimitTextLData = new RowData();
-					upperLimitTextLData.width = 30;
+					upperLimitTextLData.width = 35;
 					upperLimitTextLData.height = 16;
 					upperLimitText.setLayoutData(upperLimitTextLData);
 					upperLimitText.addVerifyListener(new VerifyListener() {
@@ -376,7 +353,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 						}
 					});
 				}
-				limitComposite.pack();
+//				limitComposite.pack();
 				limitComposite.layout();
 			}
 			{
@@ -384,11 +361,9 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				closeButton.setText(Messages.getString(MessageIds.GDE_MSGT0291));
 				closeButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0292));
 				FormData closeButtonLData = new FormData();
-				closeButtonLData.width = 160;
 				closeButtonLData.height = 25;
-				closeButtonLData.top =  new FormAttachment(782, 1000, 0);
-				closeButtonLData.left =  new FormAttachment(0, 1000, 65);
-				closeButtonLData.right =  new FormAttachment(1000, 1000, -79);
+				closeButtonLData.left =  new FormAttachment(0, 1000, 70);
+				closeButtonLData.right =  new FormAttachment(1000, 1000, -70);
 				closeButtonLData.bottom =  new FormAttachment(1000, 1000, -12);
 				closeButton.setLayoutData(closeButtonLData);
 				closeButton.addSelectionListener(new SelectionAdapter() {
@@ -605,8 +580,9 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_WITHIN_LIMITS_COLOR.value(), withinLimitsColor.red + GDE.STRING_COMMA + withinLimitsColor.green + GDE.STRING_COMMA	+ withinLimitsColor.blue);
 				properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_LOWER_LIMIT_COLOR.value(), lowerLimitColor.red + GDE.STRING_COMMA + lowerLimitColor.green + GDE.STRING_COMMA	+ lowerLimitColor.blue);
 				properties.setProperty(MeasurementPropertyTypes.GOOGLE_EARTH_UPPER_LIMIT_COLOR.value(), upperLimitColor.red + GDE.STRING_COMMA + upperLimitColor.green + GDE.STRING_COMMA	+ upperLimitColor.blue);
+
+				object.save();
 			}
-			object.save();
 		}
 		else { //device oriented
 			Integer activeChannelNumber = application.getActiveChannelNumber();

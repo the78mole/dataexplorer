@@ -18,8 +18,19 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import java.util.HashMap;
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
 import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
+
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -45,17 +56,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.TabAreaContextMenu;
 
 /**
  * Class to enable a file comment
@@ -196,7 +196,7 @@ public class FileCommentWindow extends CTabItem {
 		}
 	}
 
-	public void update() {
+	public synchronized void update() {
 		if (this.channels.getActiveChannel() != null) {
 			this.fileCommentText.setText(this.channels.getActiveChannel().getFileDescription());
 		}
@@ -206,7 +206,7 @@ public class FileCommentWindow extends CTabItem {
 	/**
 	 * update the record set entry table
 	 */
-	void updateRecordSetTable() {
+	synchronized void updateRecordSetTable() {
 		Point mainSize = FileCommentWindow.this.commentMainComposite.getSize();
 		//log.log(Level.FINE, "mainSize = " + mainSize.toString());
 		Rectangle bounds = new Rectangle(mainSize.x * 5 / 100, mainSize.y * 10 / 100, mainSize.x * 90 / 100, mainSize.y * 40 / 100);
@@ -224,11 +224,14 @@ public class FileCommentWindow extends CTabItem {
 		Channel channel = Channels.getInstance().getActiveChannel();
 		TableItem item;
 		if (channel != null) {
-			HashMap<String, RecordSet> recordSets = channel.getRecordSets();
-			for (String recordSetKey : channel.getRecordSetNames()) {
-				if (recordSetKey != null) {
-					item = new TableItem(FileCommentWindow.this.recordCommentTable, SWT.LEFT);
-					item.setText(new String[] { recordSetKey, recordSets.get(recordSetKey).getRecordSetDescription() });
+			synchronized (channel) {
+				HashMap<String, RecordSet> recordSets = channel.getRecordSets();
+				for (String recordSetKey : channel.getRecordSetNames()) {
+					if (recordSetKey != null) {
+						item = new TableItem(FileCommentWindow.this.recordCommentTable, SWT.LEFT);
+						RecordSet tmpRecordSet = recordSets.get(recordSetKey);
+						if (tmpRecordSet != null) item.setText(new String[] { recordSetKey, tmpRecordSet.getRecordSetDescription() });
+					}
 				}
 			}
 		}

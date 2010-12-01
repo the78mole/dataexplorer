@@ -19,8 +19,7 @@
 package gde.log;
 
 /**
- * @author brueg
- *
+ * class shadows the simple name of the superclass java.util.logging.Level and add TIME level
  */
 public class Level extends java.util.logging.Level {
 

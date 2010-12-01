@@ -36,13 +36,13 @@ public class GraphicsTemplate extends Properties {
 	static final long			serialVersionUID	= 260357;
 	static final Logger		log								= Logger.getLogger(GraphicsTemplate.class.getName());
 
-	private boolean				isAvailable				= false;
-	private boolean				isSaved						= false;																				// indicates if template is saved to file
-	private String				defaultFileName;
-	private String				selectedFileName;
-	private String				currentFileFilePath;
-	private String				templatePath;
-	private String				templateFilePath;
+	boolean				isAvailable				= false;
+	boolean				isSaved						= false;																				// indicates if template is saved to file
+	String				defaultFileName;
+	String				selectedFileName;
+	String				currentFileFilePath;
+	String				templatePath;
+	String				templateFilePath;
 
 	/**
 	 * constructor using the application home path and the device signature as initialization parameter
@@ -94,9 +94,11 @@ public class GraphicsTemplate extends Properties {
 	public void store() {
 		try {
 			// check if templatePath exist, else create directory
-			if (!(new File(this.templatePath).exists())) {
-				File tmpPath = new File(this.templatePath);
-				tmpPath.mkdir();
+			File tmpPath = new File(this.templatePath);
+			if (!tmpPath.exists()) {
+				if (!tmpPath.mkdir()) {
+					log.log(Level.WARNING, "failed to create " + tmpPath);
+				}
 			}
 
 			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
@@ -146,5 +148,4 @@ public class GraphicsTemplate extends Properties {
 	public String getDefaultFileName() {
 		return this.defaultFileName;
 	}
-
 }

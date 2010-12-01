@@ -153,7 +153,8 @@ public class FileHandler {
 	String getFileNameProposal() {
 		String fileName = GDE.STRING_EMPTY;
 		if (Settings.getInstance().getUsageDateAsFileNameLeader()) {
-			fileName = StringHelper.getDate() + GDE.STRING_UNDER_BAR;
+			String fileDescriptionDate = application.getActiveChannel() != null ? application.getActiveChannel().getFileDescription().substring(0,10) : GDE.STRING_EMPTY;
+			fileName = (fileDescriptionDate.length() > 0 ? fileDescriptionDate : StringHelper.getDate()) + GDE.STRING_UNDER_BAR;
 		}
 		if (Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null && Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {
 			fileName = fileName + Channels.getInstance().getActiveChannel().getObjectKey();
@@ -422,7 +423,7 @@ public class FileHandler {
 				// ignore
 			}
 		}
-		FileDialog kmlFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_KML }, path, fileName.length() > 4 ? fileName : getFileNameProposal());
+		FileDialog kmlFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_KML }, path, fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal());
 		String kmlFilePath = kmlFileDialog.open();
 		if (kmlFilePath != null && kmlFileDialog.getFileName().length() > 4) {
 			if (FileUtils.checkFileExist(kmlFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { kmlFilePath }))) {
@@ -539,7 +540,7 @@ public class FileHandler {
 				// ignore
 			}
 		}
-		FileDialog gpxFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName.length() > 4 ? fileName : getFileNameProposal());
+		FileDialog gpxFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal());
 		String gpxFilePath = gpxFileDialog.open();
 		if (gpxFilePath != null && gpxFilePath.length() > 4) {
 			if (FileUtils.checkFileExist(gpxFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { gpxFilePath }))) {

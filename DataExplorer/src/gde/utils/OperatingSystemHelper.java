@@ -272,6 +272,7 @@ public class OperatingSystemHelper {
 		String command = GDE.STRING_BLANK;
 		
 		BufferedReader besr = null;
+		BufferedReader bisr = null;
 
 		try {
 			URL url = FileUtils.class.getProtectionDomain().getCodeSource().getLocation();
@@ -301,7 +302,7 @@ public class OperatingSystemHelper {
 					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 					Process process = new ProcessBuilder("cmd", "/C", targetDir + regExe, targetBasePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 					process.waitFor();
-					BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+					bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 					besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 					String line;
 
@@ -347,8 +348,6 @@ public class OperatingSystemHelper {
 						log.log(Level.WARNING, "failed to register DataExplorer MIME type rc = " + process.exitValue()); //$NON-NLS-1$
 						throw new IOException("error=740"); //$NON-NLS-1$
 					}
-					besr.close();
-					bisr.close();
 					rc = 0;
 				}
 				else if (GDE.IS_LINUX) {
@@ -423,8 +422,9 @@ public class OperatingSystemHelper {
 			}
 		}
 		finally {
-			if (besr != null) try {
-				besr.close();
+			try {
+				if (bisr != null) bisr.close();
+				if (besr != null) besr.close();
 			}
 			catch (IOException e) {
 				// ignore
@@ -448,6 +448,7 @@ public class OperatingSystemHelper {
 		String jarFilePath = jarBasePath + "/DataExplorer.jar"; //$NON-NLS-1$
 		
 		BufferedReader besr = null;
+		BufferedReader bisr = null;
 
 		try {
 			JarFile jarFile = new JarFile(jarFilePath);
@@ -463,7 +464,7 @@ public class OperatingSystemHelper {
 				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 				Process process = new ProcessBuilder("cmd", "/C", targetDir + regExe).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
-				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 				String line;
 
@@ -572,8 +573,9 @@ public class OperatingSystemHelper {
 			}
 		}
 		finally {
-			if (besr != null) try {
-				besr.close();
+			try {
+				if (bisr != null) bisr.close();
+				if (besr != null) besr.close();
 			}
 			catch (IOException e) {
 				// ignore
@@ -676,7 +678,8 @@ public class OperatingSystemHelper {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					new FileInputStream(filePath), "UTF-8")); //$NON-NLS-1$
 			char[] tmpChars = new char[25];
-			reader.read(tmpChars);
+			if(reader.read(tmpChars) != 25)
+				log.log(Level.WARNING, "failed reading " + filePath);
 			String line = new String(tmpChars);
 			log.log(Level.FINE, "line = " + line); //$NON-NLS-1$
 			reader.close();
@@ -724,7 +727,8 @@ public class OperatingSystemHelper {
 		else if (GDE.IS_MAC) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8")); //$NON-NLS-1$
 			char[] tmpChars = new char[25]; // max path length
-			reader.read(tmpChars);
+			if( 25 != reader.read(tmpChars))
+				log.log(Level.WARNING, "failed to read from " + filePath);
 			String line = new String(tmpChars);
 			log.log(Level.FINE, "line = " + line); //$NON-NLS-1$
 			if (!line.contains(GDE.DATA_EXPLORER_FILE) && !line.contains(GDE.LEGACY_OSDE_FILE)) {

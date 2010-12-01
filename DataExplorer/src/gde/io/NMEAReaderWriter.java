@@ -145,7 +145,7 @@ public class NMEAReaderWriter {
 
 				--lineNumber; // correct do to do-while
 				do {
-					line.trim();
+					line = line.trim();
 					++lineNumber;
 					if (line.length() > 7 && line.startsWith(device.getDataBlockLeader())) {
 						log.log(java.util.logging.Level.FINER, line);
@@ -209,10 +209,10 @@ public class NMEAReaderWriter {
 						}
 						if (!isOutdated) {
 							recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+							activeChannel.setFileDescription(dateTime.substring(0, 10) + activeChannel.getFileDescription().substring(10));
 						}
 						else {
-							recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129)
-									+ new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
+							recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
 						}
 
 						activeChannel.put(recordSetName, recordSet);

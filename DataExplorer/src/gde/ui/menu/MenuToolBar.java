@@ -19,6 +19,7 @@
 package gde.ui.menu;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -31,7 +32,6 @@ import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.dialog.DeviceSelectionDialog;
@@ -106,7 +106,7 @@ public class MenuToolBar {
 	CoolItem											portCoolItem;
 	ToolBar												portToolBar;
 	ToolItem											portOpenCloseItem;
-	int														iconSet = DeviceSerialPort.ICON_SET_OPEN_CLOSE; 
+	int														iconSet = DeviceCommPort.ICON_SET_OPEN_CLOSE; 
 	
 	CoolItem											dataCoolItem;
 	ToolBar												dataToolBar;
@@ -294,8 +294,8 @@ public class MenuToolBar {
 							log.log(Level.FINEST, "prevDeviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// allow device switch only if port not connected
 							if (MenuToolBar.this.application.getActiveDevice() == null 
-									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getSerialPort() == null)
-									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getSerialPort() != null && !MenuToolBar.this.application.getActiveDevice().getSerialPort().isConnected())) {
+									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getCommunicationPort() == null)
+									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getCommunicationPort() != null && !MenuToolBar.this.application.getActiveDevice().getCommunicationPort().isConnected())) {
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuToolBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {
@@ -332,8 +332,8 @@ public class MenuToolBar {
 							log.log(Level.FINEST, "nextDeviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// allow device switch only if port not connected
 							if (MenuToolBar.this.application.getActiveDevice() == null 
-									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getSerialPort() == null)
-									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getSerialPort() != null && !MenuToolBar.this.application.getActiveDevice().getSerialPort().isConnected())) {
+									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getCommunicationPort() == null)
+									|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getCommunicationPort() != null && !MenuToolBar.this.application.getActiveDevice().getCommunicationPort().isConnected())) {
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuToolBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {
@@ -705,8 +705,8 @@ public class MenuToolBar {
 							IDevice activeDevice = MenuToolBar.this.application.getActiveDevice();
 							if(activeDevice != null) {
 								activeDevice.openCloseSerialPort();
-								if (activeDevice.getSerialPort() != null) {
-									if (activeDevice.getSerialPort().isConnected()) {
+								if (activeDevice.getCommunicationPort() != null) {
+									if (activeDevice.getCommunicationPort().isConnected()) {
 										MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0067));
 									}
 									else {
@@ -928,13 +928,7 @@ public class MenuToolBar {
 									else {
 										// only update viewable
 										MenuToolBar.this.application.cleanHeaderAndCommentInGraphicsWindow();
-										MenuToolBar.this.application.updateGraphicsWindow();
-										MenuToolBar.this.application.updateStatisticsData();
-										MenuToolBar.this.application.updateDataTable(GDE.STRING_EMPTY, true);
-										MenuToolBar.this.application.updateDigitalWindow();
-										MenuToolBar.this.application.updateAnalogWindow();
-										MenuToolBar.this.application.updateCellVoltageWindow();
-										MenuToolBar.this.application.updateFileCommentWindow();
+										MenuToolBar.this.application.updateAllTabs(true);
 									}
 								}
 							}
@@ -1033,7 +1027,7 @@ public class MenuToolBar {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "helpToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (MenuToolBar.this.application.getActiveDevice().getDialog() != null && !MenuToolBar.this.application.getActiveDevice().getDialog().isDisposed()) {
-									MenuToolBar.this.application.getActiveDevice().getDialog().getDialogShell().getShell().notifyListeners(SWT.Help, new Event());
+									MenuToolBar.this.application.getActiveDevice().getDialog().getDialogShell().notifyListeners(SWT.Help, new Event());
 								}
 								else {
 									for (CTabItem tabItem : MenuToolBar.this.application.getTabFolder().getItems()) {
@@ -1047,7 +1041,12 @@ public class MenuToolBar {
 											}
 											else if (tabItem.getText().endsWith("Tool")) { //DataVarioTool, LinkVarioTool //$NON-NLS-1$
 												if (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().isUtilityDeviceTabRequested()) {
-													MenuToolBar.this.application.openHelpDialog("WStechVario", "HelpInfo.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+													try {
+														MenuToolBar.this.application.openHelpDialog(FileUtils.getJarFileNameOfDevice(MenuToolBar.this.application.getActiveDevice().getDeviceConfiguration()), "HelpInfo.html");//$NON-NLS-1$
+													}
+													catch (Exception e) {
+														//ignore
+													} 	
 												}
 											}
 										}

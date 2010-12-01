@@ -421,8 +421,10 @@ public class Settings extends Properties {
 	public void store() {
 		final String $METHOS_NAME = "store()"; //$NON-NLS-1$
 		try {
-			if (!new File(this.settingsFilePath).exists()) {
-				new File(this.settingsFilePath).createNewFile();
+			File tmpFilePath = new File(this.settingsFilePath);
+			if (!tmpFilePath.exists()) {
+				if (!tmpFilePath.createNewFile())
+					log.logp(Level.WARNING, $CLASS_NAME, $METHOS_NAME, "failed creating " + this.settingsFilePath);
 			}
 			this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.settingsFilePath), "UTF-8")); //$NON-NLS-1$
 

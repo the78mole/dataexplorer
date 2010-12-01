@@ -53,13 +53,14 @@ import gde.ui.DataExplorer;
  *  - class defines also generic constants used for DataExplorer (GDE)
  */
 public class GDE {
+	public static final String	STRING_WITHIN_ECLIPSE	= "/bin/";
 	final static String $CLASS_NAME = GDE.class.getName();
 	public final static long 	StartTime 	= new Date().getTime();
 	public static Handler logHandler = null;
 
 	
 	// ****** begin global constants section *******
-	public static final String		VERSION														= "Version 2.51";						//$NON-NLS-1$
+	public static final String		VERSION														= "Version 2.60";						//$NON-NLS-1$
 	public static final String		NAME_SHORT												= "GDE";										//$NON-NLS-1$
 	public static final String		NAME_LONG													= "DataExplorer";						//$NON-NLS-1$
 	public final static String		DEVICE_PROPERTIES_XSD_VERSION			= "_V11"; 									//$NON-NLS-1$
@@ -329,7 +330,7 @@ public class GDE {
 				throw new ApplicationConfigurationException(Messages.getString(MessageIds.GDE_MSGE0001, new Object[]{ basePath }));
 			}
 			for (String path : files) {
-				if (!path.startsWith(".")) urls.add(new URL("file:" + basePath + path + "/bin/")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (!path.startsWith(GDE.STRING_DOT)) urls.add(new URL("file:" + basePath + path + STRING_WITHIN_ECLIPSE)); //$NON-NLS-1$
 			}
 		}
 		else { // started outside java -jar *.jar

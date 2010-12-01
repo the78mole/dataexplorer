@@ -72,11 +72,11 @@ public enum LineEndingTypes {
     	byte[] bytes = new byte[] {0x0D, 0x0A};
     	switch (LineEndingTypes.fromValue(v)) {
 			case CRLF:
-				return bytes = new byte[] {0x0D, 0x0A};
+				return new byte[] {0x0D, 0x0A};
 			case CR:
-				return bytes = new byte[] {0x0D};
+				return new byte[] {0x0D};
 			case LF:
-				return bytes = new byte[] {0x0A};
+				return new byte[] {0x0A};
 			}
     	return bytes;
   }

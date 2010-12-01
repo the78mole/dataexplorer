@@ -139,13 +139,14 @@ public class NMEAParser {
 							//not yet implemented, future
 							break;
 						case SETUP: // setup SM GPS-Logger firmware 1.00
-							try {
-								byte[] buffer = strValues[1].getBytes();
-								this.timeOffsetUTC = (short) ((buffer[7] << 8) + (buffer[6] & 0x00FF));
-							}
-							catch (Exception e) {
-								log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
-							}
+//							try {
+//								byte[] buffer = StringHelper.convert2ByteArray(strValues[1]);
+//								this.timeOffsetUTC = (short) ((buffer[7] << 8) + (buffer[6] & 0x00FF));
+//								this.timeOffsetUTC = this.timeOffsetUTC > 12 ? 12 : this.timeOffsetUTC < -12 ? -12 : this.timeOffsetUTC;
+//							}
+//							catch (Exception e) {
+//								log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+//							}
 							break;
 						}
 						//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;

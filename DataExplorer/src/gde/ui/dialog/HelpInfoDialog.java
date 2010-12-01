@@ -106,15 +106,15 @@ public class HelpInfoDialog extends Dialog {
 	 * @param fileName
 	 */
 	private void openURL(String deviceName, String fileName) {
-		String jarBasePath = FileUtils.getJarBasePath() + "/";
+		String jarBasePath = FileUtils.getJarBasePath() + GDE.FILE_SEPARATOR_UNIX;
 		String jarName = GDE.NAME_LONG + GDE.FILE_ENDING_DOT_JAR;
 		String helpDir = "help" + GDE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + GDE.FILE_SEPARATOR;
-		String targetDir = GDE.JAVA_IO_TMPDIR + (GDE.IS_WINDOWS ? "" : GDE.FILE_SEPARATOR) + "GDE" + GDE.FILE_SEPARATOR;
+		String targetDir = GDE.JAVA_IO_TMPDIR + (GDE.IS_WINDOWS ? "" : GDE.FILE_SEPARATOR_UNIX) + "GDE" + GDE.FILE_SEPARATOR_UNIX;
 		
 		if (deviceName.length() >= 1) { // devices/<deviceName>.jar
-			jarBasePath = jarBasePath + "devices" + GDE.FILE_SEPARATOR;
+			jarBasePath = jarBasePath + "devices" + GDE.FILE_SEPARATOR_UNIX;
 			jarName = deviceName + GDE.FILE_ENDING_DOT_JAR;
-			targetDir = targetDir + deviceName + GDE.FILE_SEPARATOR;
+			targetDir = targetDir + deviceName + GDE.FILE_SEPARATOR_UNIX;
 		}
 		
 		log.log(Level.FINE, "jarBasePath = " + jarBasePath + " jarName = " + jarName + " helpDir = " + helpDir); //$NON-NLS-1$
