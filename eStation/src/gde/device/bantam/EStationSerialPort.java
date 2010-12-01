@@ -18,21 +18,21 @@
 ****************************************************************************************/
 package gde.device.bantam;
 
-import java.io.IOException;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import gde.device.DeviceConfiguration;
+import gde.comm.DeviceCommPort;
+import gde.device.IDevice;
 import gde.exception.TimeOutException;
-import gde.serial.DeviceSerialPort;
+import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
+
+import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * eStation serial port implementation
  * @author Winfried Brügmann
  */
-public class EStationSerialPort extends DeviceSerialPort {
+public class EStationSerialPort extends DeviceCommPort {
 	final static String $CLASS_NAME = EStationSerialPort.class.getName();
 	final static Logger	log	= Logger.getLogger($CLASS_NAME);
 	
@@ -43,8 +43,8 @@ public class EStationSerialPort extends DeviceSerialPort {
 	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
 	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 */
-	public EStationSerialPort(DeviceConfiguration currentDeviceConfig, DataExplorer currentApplication) {
-		super(currentDeviceConfig, currentApplication);
+	public EStationSerialPort(IDevice currentDevice, DataExplorer currentApplication) {
+		super(currentDevice, currentApplication);
 	}
 
 	/**
@@ -115,8 +115,8 @@ public class EStationSerialPort extends DeviceSerialPort {
 			}
 			
 			if (!isChecksumOK(data)) {
-				this.xferErrors++;
-				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.xferErrors); //$NON-NLS-1$
+				this.addXferError();
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				data = getData();
 			}
 		}

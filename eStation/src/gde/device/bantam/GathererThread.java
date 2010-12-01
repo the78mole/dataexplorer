@@ -173,12 +173,7 @@ public class GathererThread extends Thread {
 					}
 
 					if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
-						GathererThread.this.application.updateGraphicsWindow();
-						GathererThread.this.application.updateStatisticsData();
-						GathererThread.this.application.updateDataTable(this.recordSetKey, false);
-						GathererThread.this.application.updateDigitalWindowChilds();
-						GathererThread.this.application.updateAnalogWindowChilds();
-						GathererThread.this.application.updateCellVoltageChilds();
+						GathererThread.this.application.updateAllTabs(false);
 					}
 					
 					//switch off single cell voltage lines if no cell voltages is available

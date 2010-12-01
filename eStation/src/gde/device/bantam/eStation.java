@@ -19,6 +19,7 @@
 package gde.device.bantam;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -32,7 +33,6 @@ import gde.exception.SerialPortException;
 import gde.io.LogViewReader;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 
 import java.io.FileNotFoundException;
@@ -83,7 +83,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 	}
 
 	/**
@@ -100,15 +100,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new EStationSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
-		this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
-	}
-	
-	/**
-	 * query the default stem used as record set name
-	 * @return recordSetStemName
-	 */
-	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.GDE_MSGT1411);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 	}
 
 	/**
