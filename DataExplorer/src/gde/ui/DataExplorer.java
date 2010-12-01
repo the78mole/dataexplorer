@@ -468,8 +468,8 @@ public class DataExplorer extends Composite {
 						DataExplorer.application.getDeviceDialog().forceDispose();
 					}
 					// if serial port still open, close it
-					if (DataExplorer.application.getActiveDevice() != null && DataExplorer.application.getActiveDevice().getSerialPort() != null) {
-						DataExplorer.application.getActiveDevice().getSerialPort().close();
+					if (DataExplorer.application.getActiveDevice() != null && DataExplorer.application.getActiveDevice().getCommunicationPort() != null) {
+						DataExplorer.application.getActiveDevice().getCommunicationPort().close();
 						DataExplorer.application.getActiveDevice().storeDeviceProperties();
 					}
 
@@ -1134,7 +1134,7 @@ public class DataExplorer extends Composite {
 			this.utilGraphicsTabItem = null;
 		}
 		//cleanup device specific custom tab item
-		if (this.customTabItem != null || (this.customTabItem != null && !this.customTabItem.isDisposed())) {
+		if (this.customTabItem != null && !this.customTabItem.isDisposed()) {
 			this.customTabItem.dispose();
 			this.customTabItem = null;		
 		}
@@ -1535,15 +1535,47 @@ public class DataExplorer extends Composite {
 	/**
 	 * update all visualization windows
 	 */
-	public void updateAll() {
+	public void updateAllTabs(final boolean force) {
+		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 		this.updateGraphicsWindow();
-		this.updateStatisticsData();
-		this.updateDigitalWindow();
-		this.updateAnalogWindow();
+		this.updateStatisticsData(force);
+		if (force) {
+			this.updateDigitalWindow();
+			this.updateAnalogWindow();
+		}
+		else {
+			this.updateDigitalWindowChilds();
+			this.updateAnalogWindowChilds();
+		}
 		this.updateCellVoltageWindow();
 		this.updateFileCommentWindow();
 		if (this.getActiveRecordSet() != null) {
-			this.updateDataTable(this.getActiveRecordSet().getName(), true);
+			this.updateDataTable(this.getActiveRecordSet().getName(), force);
+		}
+		}
+		else {
+			DataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					DataExplorer.this.updateGraphicsWindow();
+					DataExplorer.this.updateStatisticsData(force);
+					if (force) {
+						DataExplorer.this.updateDigitalWindow();
+						DataExplorer.this.updateAnalogWindow();
+					}
+					else {
+						DataExplorer.this.updateDigitalWindowChilds();
+						DataExplorer.this.updateAnalogWindowChilds();
+					}
+					DataExplorer.this.updateCellVoltageWindow();
+					DataExplorer.this.updateFileCommentWindow();
+					if (DataExplorer.this.getActiveRecordSet() != null) {
+						DataExplorer.this.updateDataTable(DataExplorer.this.getActiveRecordSet().getName(), force);
+					}
+					else {
+						DataExplorer.this.updateDataTable(GDE.STRING_EMPTY, force);
+					}
+				}
+			});
 		}
 	}
 	
@@ -2445,19 +2477,13 @@ public class DataExplorer extends Composite {
 	 */
 	public CTabItem registerCustomTabItem(CTabItem customDeviceTabItem) {
 		if (customDeviceTabItem == null) {
-			if (this.customTabItem != null || (this.customTabItem != null && !this.customTabItem.isDisposed())) {
+			if (this.customTabItem != null && !this.customTabItem.isDisposed()) {
 				this.customTabItem.dispose();
 				this.customTabItem = null;		
 			}
 		}
 		else {
 			this.customTabItem = customDeviceTabItem;
-//			Vector<Control> tabListVector = new Vector<Control>();
-//			for ( Control oldTabControl : this.displayTab.getTabList() ) {
-//				tabListVector.add(oldTabControl);
-//			}
-//			tabListVector.add(customDeviceTabItem.getControl());
-//			this.displayTab.setTabList(tabListVector.toArray(new Control[1]));
 		}
 		return customTabItem;
 	}
