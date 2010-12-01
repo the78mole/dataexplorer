@@ -43,7 +43,7 @@
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Height</name>
+            <name>Height (GPS)</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
@@ -89,7 +89,7 @@
             <property type="String" value="255,0,128" name="google_earth_upper_limit_color"/>
         </Measurement>
         <Measurement>
-            <name>Hight Relative</name>
+            <name>Hight (relative)</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
@@ -110,7 +110,7 @@
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>Trip Length</name>
+            <name>TripLength</name>
             <symbol>l</symbol>
             <unit>km</unit>
             <active>true</active>
@@ -142,28 +142,36 @@
             <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
-            <statistics sigma="false" avg="true" max="true" min="true"/>
+            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Current_UL</name>
             <symbol>I</symbol>
             <unit>A</unit>
             <active>true</active>
-            <statistics sigma="false" avg="true" max="true" min="true"/>
+            <statistics sumTriggerTimeText="Motor run time" countTriggerText="Number of climb flights" countByTrigger="true" sigma="false" avg="true" max="true" min="false">
+                <trigger comment="Trigger: current &gt; 3 A + &gt; 5 sec." minTimeSec="5" isGreater="true" level="3000"/>
+            </statistics>
+            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
+            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
         </Measurement>
         <Measurement>
             <name>Power_UL</name>
             <symbol>P</symbol>
             <unit>W</unit>
             <active>true</active>
-            <statistics sigma="false" avg="true" max="true" min="true"/>
+            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="17" sigma="true" avg="true" max="true" min="false"/>
         </Measurement>
         <Measurement>
             <name>Revolution_UL</name>
             <symbol>rpm</symbol>
             <unit>rpm</unit>
             <active>true</active>
-            <statistics sigma="false" avg="true" max="true" min="true"/>
+            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="17" sigma="true" avg="true" max="true" min="false"/>
+            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
+            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
+            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
+            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
         </Measurement>
         <Measurement>
             <name>VoltageRx_UL</name>
@@ -173,11 +181,11 @@
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>HeightRelative_UL</name>
+            <name>Height (relativ)_UL</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <statistics sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="17" sigma="false" avg="false" max="true" min="true"/>
             <property description="Scalesynchronisatios reference as ordinal value" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
@@ -185,7 +193,7 @@
             <symbol>v</symbol>
             <unit>m</unit>
             <active>false</active>
-            <statistics sigma="false" avg="true" max="true" min="true"/>
+            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="17" sigma="true" avg="true" max="true" min="true"/>
             <property description="Offset to a measurement value" type="Double" value="0.0" name="offset"/>
             <property description="Factor to a measurement value" type="Double" value="1.0" name="factor"/>
         </Measurement>
@@ -257,7 +265,7 @@
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>HeightRelative_ML</name>
+            <name>Height(relative)_ML</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
@@ -306,7 +314,7 @@
             <statistics sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
-            <name>HeightRelative 2_ML</name>
+            <name>Height (relative) 2_ML</name>
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
