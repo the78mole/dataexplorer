@@ -27,8 +27,6 @@ public class TestMathUtils  extends TestSuperClass {
 	static Logger	log = Logger.getLogger(TestMathUtils.class.getName());
 	
 	double cat[] = {0,0, 1.0, 2.0, 4.0, 5.0, 8.0, 10.0, 25, 49, 50, 51, 75, 99, 100, 101, 134, 175, 300, 500, 740, 1000, 1345, 2000, 2569, 5000} ;
-	//double cat[] = {5.0} ;
-
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -39,93 +37,6 @@ public class TestMathUtils  extends TestSuperClass {
     log.setLevel(Level.INFO);
     log.setUseParentHandlers(true);
 	}
-
-	public void testRoundUpAlgorithm() {
-
-		for (double d : this.cat) {
-			checkRoundUp(d);
-		}
-		for (double d : this.cat) {
-			checkRoundUp(d * -1);
-		}
-	}
-
-	/**
-	 * @param category
-	 */
-	private void checkRoundUp(double category) {
-		double value;
-		if (category > 0) {
-			log.log(Level.INFO, category + " ---> " + MathUtils.roundUp(category));
-			value = category + 0.17;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
-			value = category + 0.27;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
-			value = category + 0.42;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
-			value = category + 0.57;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
-			value = category + 0.77;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
-		}
-		else {
-			log.log(Level.INFO, category + " ---> " + MathUtils.roundUp(category));
-			value = category - 0.17;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
-			value = category - 0.27;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
-			value = category - 0.42;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
-			value = category - 0.57;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
-			value = category - 0.77;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundUp(value));
-		}
-	}
-
-	public void testRoundDownAlgorithm() {
-
-		for (double d : this.cat) {
-			checkRoundDown(d);
-		}
-		for (double d : this.cat) {
-			checkRoundDown(d * -1);
-		}
-	}
-
-	/**
-	 * @param category
-	 */
-	private void checkRoundDown(double category) {
-		double value;
-		if (category > 0) {
-			log.log(Level.INFO, category + " ---> " + MathUtils.roundDown(category));
-			value = category + 0.17;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
-			value = category + 0.27;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
-			value = category + 0.42;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
-			value = category + 0.57;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
-			value = category + 0.77;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
-		}
-		else {
-			log.log(Level.INFO, category + " ---> " + MathUtils.roundDown(category));
-			value = category - 0.17;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
-			value = category - 0.27;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
-			value = category - 0.42;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
-			value = category - 0.57;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
-			value = category - 0.77;
-			log.log(Level.INFO, value + " ---> " + MathUtils.roundDown(value));
-		}
-	}
-	
 
 	public void testRoundUpAlgorithmWithDeltaval() {
 
