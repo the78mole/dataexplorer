@@ -373,7 +373,6 @@ public class SimulatorDialog extends DeviceDialog {
 							log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 							SimulatorDialog.this.timer = new Timer();
 							SimulatorDialog.this.timerTask = new TimerTask() {
-								String									recordSetKeyStem	= Messages.getString(MessageIds.GDE_MSGT1058); 
 								HashMap<String, Object>	data;															// Spannung, Strom
 								String									recordSetKey;
 
@@ -388,7 +387,7 @@ public class SimulatorDialog extends DeviceDialog {
 											SimulatorDialog.this.isCollectDataStopped = false;
 											SimulatorDialog.this.recordNumber++;
 
-											this.recordSetKey = (SimulatorDialog.this.channel.size() + 1) + this.recordSetKeyStem;
+											this.recordSetKey = (SimulatorDialog.this.channel.size() + 1) + SimulatorDialog.this.device.getRecordSetStemName();
 											SimulatorDialog.this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, 
 													SimulatorDialog.this.application.getActiveDevice(), 1, true, false));
 											log.log(Level.FINE, this.recordSetKey + " created for channel " + SimulatorDialog.this.channel.getName()); //$NON-NLS-1$
@@ -428,11 +427,7 @@ public class SimulatorDialog extends DeviceDialog {
 											recordSet.addPoints(points);
 										}
 
-										SimulatorDialog.this.application.updateGraphicsWindow();
-										SimulatorDialog.this.application.updateDataTable(this.recordSetKey, false);
-										SimulatorDialog.this.application.updateDigitalWindowChilds();
-										SimulatorDialog.this.application.updateAnalogWindowChilds();
-										SimulatorDialog.this.application.updateCellVoltageChilds();
+										SimulatorDialog.this.application.updateAllTabs(false);
 									}
 									catch (DataInconsitsentException e) {
 										if (SimulatorDialog.this.timerTask != null) SimulatorDialog.this.timerTask.cancel();

@@ -18,20 +18,20 @@
 ****************************************************************************************/
 package gde.device.wb;
 
+import gde.comm.DeviceCommPort;
+import gde.device.IDevice;
+import gde.ui.DataExplorer;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import gde.device.DeviceConfiguration;
-import gde.serial.DeviceSerialPort;
-import gde.ui.DataExplorer;
-
 /**
  * Dummy serial port implementation for the simulator device
  * @author Winfried Brügmann
  */
-public class SimulatorSerialPort extends DeviceSerialPort {
+public class SimulatorSerialPort extends DeviceCommPort {
 	final static Logger						log		= Logger.getLogger(SimulatorSerialPort.class.getName());
 
 	int	lastRecord	= -1;
@@ -44,8 +44,8 @@ public class SimulatorSerialPort extends DeviceSerialPort {
 	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
 	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 */
-	public SimulatorSerialPort(DeviceConfiguration currentDeviceConfig, DataExplorer currentApplication) {
-		super(currentDeviceConfig, currentApplication);
+	public SimulatorSerialPort(IDevice currentDevice, DataExplorer currentApplication) {
+		super(currentDevice, currentApplication);
 	}
 
 	/**
