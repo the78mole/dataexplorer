@@ -18,10 +18,10 @@
 ****************************************************************************************/
 package gde.device.wstech;
 
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 
 import java.io.FileNotFoundException;
@@ -53,7 +53,7 @@ public class LinkVario extends DataVario {
 		this.application = DataExplorer.getInstance();
 		this.dialog = new VarioDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}
@@ -70,7 +70,7 @@ public class LinkVario extends DataVario {
 		this.application = DataExplorer.getInstance();
 		this.dialog = new VarioDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}
