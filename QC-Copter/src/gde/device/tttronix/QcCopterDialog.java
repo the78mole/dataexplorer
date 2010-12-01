@@ -24,8 +24,6 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
-import gde.exception.ApplicationConfigurationException;
-import gde.exception.SerialPortException;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
@@ -67,8 +65,7 @@ public class QcCopterDialog extends DeviceDialog {
 	Composite									terminalComposite;
 	CTabItem									terminalTabItem;
 
-	Button										closeButton;
-	Button										saveButton;
+	Button										saveButton, startConfiguration, closeButton;
 	GathererThread						dataGatherThread;
 
 	final QcCopter						device;																															// get device specific things, get serial port, ...
@@ -85,7 +82,7 @@ public class QcCopterDialog extends DeviceDialog {
 	public QcCopterDialog(Shell parent, QcCopter useDevice) {
 		super(parent);
 		this.device = useDevice;
-		this.serialPort = useDevice.getSerialPort();
+		this.serialPort = useDevice.getCommunicationPort();
 		this.settings = Settings.getInstance();
 		for (int i = 1; i <= this.device.getChannelCount(); i++) {
 			int actualMeasurementCount = this.device.getMeasurementNames(i).length;
@@ -137,7 +134,7 @@ public class QcCopterDialog extends DeviceDialog {
 					@Override
 					public void helpRequested(HelpEvent evt) {
 						QcCopterDialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						QcCopterDialog.this.application.openHelpDialog("WStechVario", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						QcCopterDialog.this.application.openHelpDialog("QC-Copter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				{
@@ -161,7 +158,7 @@ public class QcCopterDialog extends DeviceDialog {
 								terminalTextLData.verticalAlignment = GridData.CENTER;
 								terminalTextLData.horizontalAlignment = GridData.CENTER;
 								this.terminalText.setLayoutData(terminalTextLData);
-								this.terminalText.setText("01234567890123456789012345678901234567890\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
+								this.terminalText.setText("012345678901234567890123456789012345678901234567890\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
 								this.terminalText.setFont(SWTResourceManager.getFont("Monospace", 10, SWT.NORMAL));
 							}
 						}
@@ -188,6 +185,25 @@ public class QcCopterDialog extends DeviceDialog {
 								QcCopterDialog.log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								QcCopterDialog.this.device.storeDeviceProperties();
 								QcCopterDialog.this.saveButton.setEnabled(false);
+							}
+						});
+					}
+					{
+						this.startConfiguration = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+						FormData startConfigurationLData = new FormData();
+						startConfigurationLData.height = 30;
+						startConfigurationLData.left = new FormAttachment(0, 1000, 200);
+						startConfigurationLData.right = new FormAttachment(1000, 1000, -200);
+						startConfigurationLData.bottom = new FormAttachment(1000, 1000, -10);
+						this.startConfiguration.setLayoutData(startConfigurationLData);
+						this.startConfiguration.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.startConfiguration.setText(this.device.serialPort.isConnected() ? "stop configurartion" : "start configurartion");//QcCopterDialog.java
+						this.startConfiguration.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								QcCopterDialog.log.log(java.util.logging.Level.FINEST, "startConfiguration.widgetSelected, event=" + evt); //$NON-NLS-1$
+								QcCopterDialog.this.device.openCloseSerialPort();
+								checkPortStatus();
 							}
 						});
 					}
@@ -257,38 +273,21 @@ public class QcCopterDialog extends DeviceDialog {
 					});
 				}
 
-				try {
-					Channel activChannel = Channels.getInstance().getActiveChannel();
-					if (activChannel != null) {
-						RecordSet activeRecordSet = activChannel.getActiveRecordSet();
-						if (activeRecordSet != null) {
-							this.tabFolder.setSelection(activeRecordSet.getChannelConfigNumber());
-						}
-						else {
-							this.dataGatherThread = new GathererThread(this.application, this.device, this.serialPort, activChannel.getNumber(), this);
-							this.dataGatherThread.start();
-						}
+				Channel activChannel = Channels.getInstance().getActiveChannel();
+				if (activChannel != null) {
+					RecordSet activeRecordSet = activChannel.getActiveRecordSet();
+					if (activeRecordSet != null) {
+						this.tabFolder.setSelection(activeRecordSet.getChannelConfigNumber());
 					}
-				}
-				catch (SerialPortException e) {
-					QcCopterDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK
-							+ e.getMessage() }));
-				}
-				catch (ApplicationConfigurationException e) {
-					QcCopterDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
-					this.application.getDeviceSelectionDialog().open();
-				}
-				catch (RuntimeException e) {
-					QcCopterDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-				}
-				catch (Throwable e) {
-					QcCopterDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+					else {
+						if (this.device.serialPort.isMatchAvailablePorts(this.device.getPort()) && !this.device.serialPort.isConnected())
+							this.device.openCloseSerialPort();
+					}
 				}
 
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
 				this.dialogShell.open();
+				this.checkPortStatus();
 			}
 			else {
 				this.dialogShell.setVisible(true);
@@ -329,5 +328,17 @@ public class QcCopterDialog extends DeviceDialog {
 				}
 			}
 		});
+	}
+
+	/**
+	 * 
+	 */
+	void checkPortStatus() {
+		if (this.device.serialPort.isConnected()) {
+			this.startConfiguration.setText("stop configurartion");
+		}
+		else {
+			this.startConfiguration.setText("start configurartion");
+		}
 	}
 }

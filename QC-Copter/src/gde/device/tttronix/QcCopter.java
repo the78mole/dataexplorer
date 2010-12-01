@@ -19,6 +19,7 @@
 package gde.device.tttronix;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -32,7 +33,6 @@ import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
 
@@ -68,7 +68,7 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 		this.serialPort = new QcCopterSerialPort(this, this.application);
 		this.dialog = new QcCopterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 		}
 	}
 
@@ -85,17 +85,8 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 		this.serialPort = new QcCopterSerialPort(this, this.application);
 		this.dialog = new QcCopterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_START_STOP);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 		}
-	}
-
-	/**
-	 * query the default stem used as record set name
-	 * @return recordSetStemName
-	 */
-	@Override
-	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.GDE_MSGT1900);
 	}
 
 	/**
@@ -203,12 +194,11 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 		//	}
 		//}
 	}
-
+	
 	/**
-	 * @return the serialPort
+	 * @return the device communication port
 	 */
-	@Override
-	public QcCopterSerialPort getSerialPort() {
+	public QcCopterSerialPort getCommunicationPort() {
 		return this.serialPort;
 	}
 
