@@ -1,9 +1,12 @@
 Development history / change log, please read from bottom up
 
+Version 2.60 - 01 Dec 2010
 
 add a configuration dialog for GPS/KML velocity limits and colors
 add SM GPS-Logger
-fix scale synchronization problem while same data
+fix scale synchronization problem while nearly identical data
+move package gde.serial to gde.comm
+implement starting point of data input simulation capability
 
 Version 2.50 - 01 Nov 2010
 

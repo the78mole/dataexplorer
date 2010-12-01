@@ -2,6 +2,11 @@ GNU DataExplorer - News - comes with version 2.60
 
 1)add a configuration dialog for GPS/KML velocity limits and colors
 2)add SM GPS-Logger
+3)fix scale synchronization problem while nearly identical data
+4)move package gde.serial to gde.comm
+5)implement starting point of data input simulation capability
+
+
 
 
 
