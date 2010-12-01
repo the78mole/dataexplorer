@@ -121,7 +121,7 @@ public class AnalogWindow extends CTabItem {
 	public void updateChilds() {
 		RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) { // channel does not have a record set yet
-			String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
+			String[] activeRecordKeys = recordSet.getDisplayableAndVisibleRecordNames();
 			if (activeRecordKeys.length != this.displays.size())
 				this.update(true);
 			else
@@ -144,7 +144,7 @@ public class AnalogWindow extends CTabItem {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isAnalogTabRequested()) {
-				String[] recordsToDisplay = recordSet.getActiveAndVisibleRecordNames();
+				String[] recordsToDisplay = recordSet.getDisplayableAndVisibleRecordNames();
 				log.log(Level.FINE, activeChannel.getName());
 				// if recordSet name signature changed new displays need to be created
 				boolean isUpdateRequired = forceUpdate || this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
@@ -163,7 +163,7 @@ public class AnalogWindow extends CTabItem {
 						}
 					}
 					// add new displays
-					for (String recordKey : recordSet.getActiveAndVisibleRecordNames()) {
+					for (String recordKey : recordSet.getDisplayableAndVisibleRecordNames()) {
 						AnalogDisplay display = new AnalogDisplay(this.analogMainComposite, recordKey, DataExplorer.getInstance().getActiveDevice());
 						display.create();
 						log.log(Level.FINE, "created analog display for " + recordKey); //$NON-NLS-1$

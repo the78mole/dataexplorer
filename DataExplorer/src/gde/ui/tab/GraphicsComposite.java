@@ -393,7 +393,7 @@ public class GraphicsComposite extends Composite {
 				}
 				break;
 		}
-		if (recordSet != null) {
+		if (recordSet != null && recordSet.realSize() > 0) {
 			drawCurves(recordSet, this.canvasBounds, this.canvasImageGC);
 			this.canvasGC.drawImage(this.canvasImage, 0,0);
 			

@@ -118,7 +118,7 @@ public class DigitalWindow extends CTabItem {
 	public void updateChilds() {
 		RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) { // channel does not have a record set yet
-			String[] activeRecordKeys = recordSet.getActiveAndVisibleRecordNames();
+			String[] activeRecordKeys = recordSet.getDisplayableAndVisibleRecordNames();
 			if (activeRecordKeys.length != this.displays.size())
 				this.update(true);
 			else
@@ -139,7 +139,7 @@ public class DigitalWindow extends CTabItem {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isDigitalTabRequested()) {
-				String[] recordsToDisplay = recordSet.getActiveAndVisibleRecordNames();
+				String[] recordsToDisplay = recordSet.getDisplayableAndVisibleRecordNames();
 		
 				// if recordSet name signature changed new displays need to be created
 				boolean isUpdateRequired = forceUpdate || this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
@@ -158,7 +158,7 @@ public class DigitalWindow extends CTabItem {
 						}
 					}
 					// add new
-					for (String recordKey : recordSet.getActiveAndVisibleRecordNames()) {
+					for (String recordKey : recordSet.getDisplayableAndVisibleRecordNames()) {
 						DigitalDisplay display = new DigitalDisplay(this.application, this.digitalMainComposite, recordKey, DataExplorer.getInstance().getActiveDevice());
 						display.create();
 						log.log(Level.FINE, "created digital display for " + recordKey); //$NON-NLS-1$
