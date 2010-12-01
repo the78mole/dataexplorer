@@ -20,6 +20,7 @@ package gde.device.wstech;
 
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -36,7 +37,6 @@ import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.serial.DeviceSerialPort;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 
@@ -80,7 +80,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.dialog = new VarioDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}
@@ -98,17 +98,9 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.dialog = new VarioDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceSerialPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
-	}
-
-	/**
-	 * query the default stem used as record set name
-	 * @return recordSetStemName
-	 */
-	public String getRecordSetStemName() {
-		return Messages.getString(MessageIds.GDE_MSGT1858);
 	}
 
 	/**
@@ -220,7 +212,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the serialPort
 	 */
-	public DeviceSerialPort getSerialPort() {
+	public DeviceCommPort getSerialPort() {
 		return null;
 	}
 
@@ -243,28 +235,33 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
-		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, searchDirectory, null, SWT.MULTI);
-		for (String tmpFileName : fd.getFileNames()) {
-			String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-			if (!selectedImportFile.endsWith(GDE.FILE_ENDING_DOT_CSV)) {
-				if (selectedImportFile.contains(GDE.STRING_DOT)) {
-					selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, searchDirectory, null, SWT.MULTI);
+		Thread reader = new Thread() {
+			public void run() {
+				for (String tmpFileName : fd.getFileNames()) {
+					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+					if (!selectedImportFile.endsWith(GDE.FILE_ENDING_DOT_CSV)) {
+						if (selectedImportFile.contains(GDE.STRING_DOT)) {
+							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+						}
+						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
+					}
+					log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+					
+					if (fd.getFileName().length() > 4) {
+						try {
+							Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
+							String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+							CSVSerialDataReaderWriter.read(selectedImportFile, DataVario.this, recordNameExtend, channelConfigNumber, true);
+						}
+						catch (Throwable e) {
+							log.log(Level.WARNING, e.getMessage(), e);
+						}
+					}
 				}
-				selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
 			}
-			log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-			
-			if (fd.getFileName().length() > 4) {
-				try {
-					Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-					String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-					CSVSerialDataReaderWriter.read(selectedImportFile, this, recordNameExtend, channelConfigNumber, true);
-				}
-				catch (Throwable e) {
-					log.log(Level.WARNING, e.getMessage(), e);
-				}
-			}
-		}
+		};
+		reader.start();
 	}
 	
 	/**
