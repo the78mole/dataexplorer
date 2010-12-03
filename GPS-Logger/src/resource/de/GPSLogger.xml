@@ -142,7 +142,7 @@
             <symbol>U</symbol>
             <unit>V</unit>
             <active>true</active>
-            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="17" sigma="false" avg="true" max="true" min="true"/>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="16" sigma="false" avg="true" max="true" min="true"/>
         </Measurement>
         <Measurement>
             <name>Strom_UL</name>
@@ -160,7 +160,7 @@
             <symbol>P</symbol>
             <unit>W</unit>
             <active>true</active>
-            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="17" sigma="true" avg="true" max="true" min="false"/>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
         </Measurement>
         <Measurement>
             <name>Drehzahl_UL</name>
@@ -185,7 +185,7 @@
             <symbol>h</symbol>
             <unit>m</unit>
             <active>true</active>
-            <statistics sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+            <statistics sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="16" triggerRefOrdinal="16" sigma="false" avg="false" max="true" min="true"/>
             <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
@@ -193,7 +193,7 @@
             <symbol>v</symbol>
             <unit>m</unit>
             <active>false</active>
-            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="17" sigma="true" avg="true" max="true" min="true"/>
+            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="true"/>
             <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
             <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
         </Measurement>
@@ -202,7 +202,7 @@
             <symbol>c</symbol>
             <unit>mAh</unit>
             <active>true</active>
-            <statistics sigma="false" avg="true" max="true" min="true"/>
+            <statistics triggerRefOrdinal="16" sigma="false" avg="true" max="true" min="true"/>
             <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
             <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
         </Measurement>
