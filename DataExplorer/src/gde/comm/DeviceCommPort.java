@@ -168,7 +168,7 @@ public class DeviceCommPort implements IDeviceCommPort {
 	 */
 	@Override
 	public boolean isMatchAvailablePorts(String newSerialPortStr) {
-		return isMatchAvailablePorts(newSerialPortStr);
+		return this.port.isMatchAvailablePorts(newSerialPortStr);
 	}
 
 	/* (non-Javadoc)
