@@ -422,7 +422,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
-	public void openCloseSerialPort() {
+	public void open_closeCommPort() {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
 				try {
@@ -430,7 +430,9 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 					if (activChannel != null) {
 						this.getDialog().dataGatherThread = new GathererThread(this.application, this, this.serialPort, activChannel.getNumber(), this.getDialog());
 						try {
-							this.getDialog().dataGatherThread.start();
+							if (this.serialPort.isConnected()) {
+								this.getDialog().dataGatherThread.start();
+							}
 						}
 						catch (RuntimeException e) {
 							log.log(Level.WARNING, e.getMessage(), e);
