@@ -84,15 +84,15 @@ public class UniLogDataGatherer extends Thread {
 			if(!this.serialPort.isConnected()) {
 				this.serialPort.open();
 				isPortOpenedByMe = true;
+				WaitTimer.getInstance().delay(3000);
 			}
 			
-			//update the config display of the dialog to enable comment enichments
-			final byte[] configBuffer = this.serialPort.readConfiguration();
-			DataExplorer.display.asyncExec(new Runnable() {
-				public void run() {
-					UniLogDataGatherer.this.dialog.updateConfigurationValues(configBuffer);
-				}
-			});
+			// get UniLog configuration for timeStep info
+			byte[] readBuffer = this.serialPort.readConfiguration();
+			if (this.dialog != null) {
+				this.dialog.updateConfigurationValues(readBuffer);
+				this.dialog.updateActualConfigTabItemAnalogModi(this.channelNumber);
+			}
 
 			this.dialog.resetDataSetsLabel();
 			this.serialPort.setTransmitFinished(false);

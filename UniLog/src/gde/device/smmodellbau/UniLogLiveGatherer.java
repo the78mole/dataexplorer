@@ -98,7 +98,7 @@ public class UniLogLiveGatherer extends Thread {
 			if (!this.serialPort.isConnected()) {
 				this.serialPort.open();
 				this.isPortOpenedByLiveGatherer = true;
-				WaitTimer.getInstance().delay(2000);
+				WaitTimer.getInstance().delay(3000);
 			}
 			
 			// get UniLog configuration for timeStep info

@@ -642,6 +642,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		Record record;
 		MeasurementType measurement;
+		boolean configChanged = this.isChangePropery();
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
 		String[] recordNames = recordSet.getRecordNames();
@@ -668,7 +669,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 		}
 		
-		if (!includeReasonableDataCheck) {
+		if (includeReasonableDataCheck) {
+			this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
+		}
+		else {
 			// updateStateCurrentDependent
 			boolean enabled = recordSet.get(recordSet.getRecordNames()[2]).isActive();
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
