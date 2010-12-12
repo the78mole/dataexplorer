@@ -424,7 +424,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
-	public void openCloseSerialPort() {
+	public void open_closeCommPort() {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
 				try {
