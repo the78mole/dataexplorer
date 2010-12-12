@@ -198,6 +198,8 @@ public class UniLogDialog extends DeviceDialog {
 	int 													limiterValue							= 0;
 	boolean												isLimiterActive						= false;
 	double												gearRatio									= 1.0;
+	
+	boolean 											isLiveGathererEnabled			= true;
 
 	int														sliderPosition						= 50;
 	String[]											configurationNames				= new String[] { " Konfig 1" };																																										//$NON-NLS-1$
@@ -978,7 +980,7 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.log.log(Level.FINEST, "useConfigCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.readDataButton.setEnabled(true);
 											UniLogDialog.this.startLoggingButton.setEnabled(true);
-											UniLogDialog.this.startLiveGatherButton.setEnabled(true);
+											UniLogDialog.this.startLiveGatherButton.setEnabled(UniLogDialog.this.isLiveGathererEnabled = true);
 											UniLogDialog.this.channelSelectionIndex = UniLogDialog.this.useConfigCombo.getSelectionIndex();
 											UniLogDialog.this.useConfigCombo.select(UniLogDialog.this.channelSelectionIndex);
 											UniLogDialog.this.editConfigButton.setEnabled(true);
@@ -1047,7 +1049,7 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.this.startLoggingButton.setEnabled(false);
 											UniLogDialog.this.stopLoggingButton.setEnabled(false);
 											UniLogDialog.this.useConfigCombo.setEnabled(false);
-											UniLogDialog.this.startLiveGatherButton.setEnabled(false);
+											UniLogDialog.this.startLiveGatherButton.setEnabled(UniLogDialog.this.isLiveGathererEnabled = false);
 											UniLogDialog.this.clearMemoryButton.setEnabled(false);
 											UniLogDialog.this.closeButton.setEnabled(false);
 										}
@@ -1139,7 +1141,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.startLiveGatherButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1384));
 									this.startLiveGatherButton.setBounds(16, GDE.IS_MAC_COCOA ? 11 : 26, 246, 30);
 									this.startLiveGatherButton.setSize(260, 30);
-									this.startLiveGatherButton.setEnabled(true);
+									this.startLiveGatherButton.setEnabled(UniLogDialog.this.isLiveGathererEnabled);
 									this.startLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -1148,10 +1150,10 @@ public class UniLogDialog extends DeviceDialog {
 												int channelNumber = UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1;
 												UniLogDialog.this.readAdjustmentButton.setEnabled(false);
 												UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
-												UniLogDialog.this.startLiveGatherButton.setEnabled(false);
+												UniLogDialog.this.startLiveGatherButton.setEnabled(UniLogDialog.this.isLiveGathererEnabled = false);
 												UniLogDialog.this.readDataButton.setEnabled(false);
 												UniLogDialog.this.stopDataButton.setEnabled(false);
-												UniLogDialog.this.stopLiveGatherButton.setEnabled(true);
+												UniLogDialog.this.stopLiveGatherButton.setEnabled(!UniLogDialog.this.isLiveGathererEnabled);
 												UniLogDialog.this.useConfigCombo.setEnabled(false);
 												UniLogDialog.this.editConfigButton.setEnabled(false);
 												UniLogDialog.this.clearMemoryButton.setEnabled(false);
@@ -1240,7 +1242,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.stopLiveGatherButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.stopLiveGatherButton.setBounds(17, GDE.IS_MAC_COCOA ? 141 : 156, 246, 30);
 									this.stopLiveGatherButton.setText(Messages.getString(MessageIds.GDE_MSGT1333));
-									this.stopLiveGatherButton.setEnabled(false);
+									this.stopLiveGatherButton.setEnabled(!UniLogDialog.this.isLiveGathererEnabled);
 									this.stopLiveGatherButton.setSize(260, 30);
 									this.stopLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -1270,8 +1272,8 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.this.useConfigCombo.setEnabled(true);
 											UniLogDialog.this.readDataButton.setEnabled(true);
 											UniLogDialog.this.stopDataButton.setEnabled(false);
-											UniLogDialog.this.startLiveGatherButton.setEnabled(true);
-											UniLogDialog.this.stopLiveGatherButton.setEnabled(false);
+											UniLogDialog.this.startLiveGatherButton.setEnabled(UniLogDialog.this.isLiveGathererEnabled = true);
+											UniLogDialog.this.stopLiveGatherButton.setEnabled(!UniLogDialog.this.isLiveGathererEnabled);
 											UniLogDialog.this.clearMemoryButton.setEnabled(true);
 											UniLogDialog.this.closeButton.setEnabled(true);
 											setClosePossible(true);
@@ -1418,7 +1420,6 @@ public class UniLogDialog extends DeviceDialog {
 
 		this.unilogVersion = String.format(Locale.ENGLISH, "v%.2f", Double.valueOf(readBuffer[8] & 0xFF) / 100); //$NON-NLS-1$
 		UniLogDialog.log.log(Level.FINER, "unilogVersion = " + this.unilogVersion); //$NON-NLS-1$
-		this.firmwareVersionLabel.setText(this.unilogVersion);
 
 		int memoryDeleted = readBuffer[9] & 0xFF;
 		int tmpMemoryUsed = 0;
@@ -1428,12 +1429,10 @@ public class UniLogDialog extends DeviceDialog {
 			tmpMemoryUsed = this.memoryUsed;
 		this.memoryUsedPercent = String.format("%.2f", tmpMemoryUsed * 100.0 / UniLogDialog.WERTESAETZE_MAX); //$NON-NLS-1$
 		UniLogDialog.log.log(Level.FINER, "memoryUsedPercent = " + this.memoryUsedPercent + " (" + tmpMemoryUsed + "/" + UniLogDialog.WERTESAETZE_MAX + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		this.memUsagePercent.setText(this.memoryUsedPercent);
 
 		// timer interval
 		this.timeIntervalPosition = readBuffer[10] & 0xFF;
 		UniLogDialog.log.log(Level.FINER, "timeIntervalPosition = " + this.timeIntervalPosition); //$NON-NLS-1$
-		this.timeIntervalCombo.select(this.timeIntervalPosition);
 		updateTimeStep_ms(this.timeIntervalPosition);
 
 		// motor/prop
@@ -1451,20 +1450,6 @@ public class UniLogDialog extends DeviceDialog {
 		this.countMotorPole = (readBuffer[11] & 0x7F) * 2;
 		UniLogDialog.log.log(Level.FINER, "isPropBlade = " + this.isPropBlade + " countPropBlade = " + this.countPropBlade); //$NON-NLS-1$ //$NON-NLS-2$
 		UniLogDialog.log.log(Level.FINER, "isMotorPole = " + this.isMotorPole + " countMotorPole = " + this.countMotorPole); //$NON-NLS-1$ //$NON-NLS-2$
-		this.numberPolsButton.setSelection(this.isMotorPole);
-		this.numberPropButton.setSelection(this.isPropBlade);
-		//motorPoleCombo.setItems(new String[] {"2", "4", "6", "8", "10", "12", "14", "16"});
-		this.motorPoleCombo.select(this.countMotorPole / 2 - 1);
-		//numbeProbCombo.setItems(new String[] {"1", "2", "3", "4"});
-		this.numbeProbCombo.select(this.countPropBlade - 1);
-		if (this.isMotorPole) {
-			this.numbeProbCombo.setEnabled(false);
-			this.motorPoleCombo.setEnabled(true);
-		}
-		else {
-			this.numbeProbCombo.setEnabled(true);
-			this.motorPoleCombo.setEnabled(false);
-		}
 
 		this.isAutoStartCurrent = false;
 		this.currentAutoStart = 0;
@@ -1473,8 +1458,6 @@ public class UniLogDialog extends DeviceDialog {
 		}
 		this.currentAutoStart = readBuffer[12] & 0x7F;
 		UniLogDialog.log.log(Level.FINER, "isAutoStartCurrent = " + this.isAutoStartCurrent + " currentAutoStart = " + this.currentAutoStart); //$NON-NLS-1$ //$NON-NLS-2$
-		this.currentTriggerButton.setSelection(this.isAutoStartCurrent);
-		this.currentTriggerCombo.select(this.currentAutoStart - 1);
 
 		this.isAutStartRx = false;
 		this.isRxOn = false;
@@ -1483,8 +1466,6 @@ public class UniLogDialog extends DeviceDialog {
 			this.isAutStartRx = true;
 		}
 		this.rxAutoStartValue = (readBuffer[13] & 0x7F); // 16 = 1.6 ms (value - 11 = position in RX_AUTO_START_MS)
-		this.impulseTriggerCombo.select(this.rxAutoStartValue - 11);
-		this.impulseTriggerButton.setSelection(this.isAutStartRx);
 		UniLogDialog.log.log(Level.FINER, "isAutStartRx = " + this.isAutStartRx + " isRxOn = " + this.isRxOn + " rxAutoStartValue = " + this.rxAutoStartValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		this.isImpulseAutoStartTime = false;
@@ -1494,54 +1475,81 @@ public class UniLogDialog extends DeviceDialog {
 		}
 		this.impulseAutoStartTime_sec = readBuffer[14] & 0x7F;
 		UniLogDialog.log.log(Level.FINER, "isAutoStartTime = " + this.isImpulseAutoStartTime + " timeAutoStart_sec = " + this.impulseAutoStartTime_sec); //$NON-NLS-1$ //$NON-NLS-2$
-		this.timeTriggerButton.setSelection(this.isImpulseAutoStartTime);
-		this.timeTriggerCombo.select(this.impulseAutoStartTime_sec + 1);
-		this.timeTriggerCombo.setText(String.format("%4s", this.impulseAutoStartTime_sec)); //$NON-NLS-1$
 
 		this.currentSensorPosition = readBuffer[15] & 0xFF;
 		UniLogDialog.log.log(Level.FINER, "currentSensor = " + this.currentSensorPosition); //$NON-NLS-1$
-		this.sensorCurrentCombo.select(this.currentSensorPosition);
 
 		this.serialNumber = "" + (((readBuffer[16] & 0xFF) << 8) + (readBuffer[17] & 0xFF)); //$NON-NLS-1$
 		UniLogDialog.log.log(Level.FINER, "serialNumber = " + this.serialNumber); //$NON-NLS-1$
-		this.snLabel.setText(this.serialNumber);
 
 		this.modusA1Position = (readBuffer[18] & 0xFF) <= 3 ? (readBuffer[18] & 0xFF) : 0;
 		UniLogDialog.log.log(Level.FINER, "modusA1 = " + this.modusA1Position); //$NON-NLS-1$
-		this.a1ModusCombo.select(this.modusA1Position);
 		
 		this.modusA2Position = (readBuffer[4] & 0xFF);
 		UniLogDialog.log.log(Level.FINER, "modusA2 = " + this.modusA2Position); //$NON-NLS-1$
-		this.a2ModusCombo.select(this.modusA2Position >= 1 ? this.modusA2Position - 1 : this.modusA2Position);
 		UniLogDialog.log.log(Level.FINER, "select A2 combo = " + (this.modusA2Position >= 1 ? this.modusA2Position - 1 : this.modusA2Position)); //$NON-NLS-1$
 
 		this.modusA3Position = (readBuffer[5] & 0xFF);
 		UniLogDialog.log.log(Level.FINER, "modusA3 = " + this.modusA3Position); //$NON-NLS-1$
-		this.a3ModusCombo.select(this.modusA3Position >= 1 ? this.modusA3Position - 1 : this.modusA3Position);
 		UniLogDialog.log.log(Level.FINER, "select A3 combo = " + (this.modusA3Position >= 1 ? this.modusA3Position - 1 : this.modusA3Position)); //$NON-NLS-1$
 
 		this.isLimiterActive = (readBuffer[19] & 0x80) > 1;
 		UniLogDialog.log.log(Level.FINER, "limiter active = " + this.isLimiterActive); //$NON-NLS-1$
-		this.limiterButton.setSelection(this.isLimiterActive);
 		
 		this.limiterValue = ((readBuffer[19] & 0x7F) << 8) | (readBuffer[20] & 0xFF);
 		UniLogDialog.log.log(Level.FINER, "limiterValue = " + this.limiterValue); //$NON-NLS-1$
-		if (this.limiterValue < 1000) {
-			this.limiterEnergyCombo.select(this.limiterValue / 250);
-		}
-		else {
-			this.limiterEnergyCombo.select(this.limiterValue / 500 + 1);
-		}
-		this.limiterEnergyCombo.setText(""+this.limiterValue);
 
 		this.gearRatio = (readBuffer[21] & 0xFF) / 10.0;
 		UniLogDialog.log.log(Level.FINER, String.format("gearRatio = %.1f", this.gearRatio)); //$NON-NLS-1$
-		this.gearFactorCombo.setText(String.format(" %.1f  :  1", this.gearRatio)); //$NON-NLS-1$
-
-		if (this.configTab1 != null) this.configTab1.setA1ModusAvailable(true);
-		if (this.configTab2 != null) this.configTab2.setA1ModusAvailable(true);
-		if (this.configTab3 != null) this.configTab3.setA1ModusAvailable(true);
-		if (this.configTab4 != null) this.configTab4.setA1ModusAvailable(true);
+		
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) { //update UI if opened
+			DataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					UniLogDialog.this.firmwareVersionLabel.setText(UniLogDialog.this.unilogVersion);
+					UniLogDialog.this.memUsagePercent.setText(UniLogDialog.this.memoryUsedPercent);
+					UniLogDialog.this.timeIntervalCombo.select(UniLogDialog.this.timeIntervalPosition);
+					UniLogDialog.this.numberPolsButton.setSelection(UniLogDialog.this.isMotorPole);
+					UniLogDialog.this.numberPropButton.setSelection(UniLogDialog.this.isPropBlade);
+					//motorPoleCombo.setItems(new String[] {"2", "4", "6", "8", "10", "12", "14", "16"});
+					UniLogDialog.this.motorPoleCombo.select(UniLogDialog.this.countMotorPole / 2 - 1);
+					//numbeProbCombo.setItems(new String[] {"1", "2", "3", "4"});
+					UniLogDialog.this.numbeProbCombo.select(UniLogDialog.this.countPropBlade - 1);
+					if (UniLogDialog.this.isMotorPole) {
+						UniLogDialog.this.numbeProbCombo.setEnabled(false);
+						UniLogDialog.this.motorPoleCombo.setEnabled(true);
+					}
+					else {
+						UniLogDialog.this.numbeProbCombo.setEnabled(true);
+						UniLogDialog.this.motorPoleCombo.setEnabled(false);
+					}
+					UniLogDialog.this.currentTriggerButton.setSelection(UniLogDialog.this.isAutoStartCurrent);
+					UniLogDialog.this.currentTriggerCombo.select(UniLogDialog.this.currentAutoStart - 1);
+					UniLogDialog.this.impulseTriggerCombo.select(UniLogDialog.this.rxAutoStartValue - 11);
+					UniLogDialog.this.impulseTriggerButton.setSelection(UniLogDialog.this.isAutStartRx);
+					UniLogDialog.this.timeTriggerButton.setSelection(UniLogDialog.this.isImpulseAutoStartTime);
+					UniLogDialog.this.timeTriggerCombo.select(UniLogDialog.this.impulseAutoStartTime_sec + 1);
+					UniLogDialog.this.timeTriggerCombo.setText(String.format("%4s", UniLogDialog.this.impulseAutoStartTime_sec)); //$NON-NLS-1$
+					UniLogDialog.this.sensorCurrentCombo.select(UniLogDialog.this.currentSensorPosition);
+					UniLogDialog.this.snLabel.setText(UniLogDialog.this.serialNumber);
+					UniLogDialog.this.a1ModusCombo.select(UniLogDialog.this.modusA1Position);
+					UniLogDialog.this.a2ModusCombo.select(UniLogDialog.this.modusA2Position >= 1 ? UniLogDialog.this.modusA2Position - 1 : UniLogDialog.this.modusA2Position);
+					UniLogDialog.this.a3ModusCombo.select(UniLogDialog.this.modusA3Position >= 1 ? UniLogDialog.this.modusA3Position - 1 : UniLogDialog.this.modusA3Position);
+					UniLogDialog.this.limiterButton.setSelection(UniLogDialog.this.isLimiterActive);
+					if (UniLogDialog.this.limiterValue < 1000) {
+						UniLogDialog.this.limiterEnergyCombo.select(UniLogDialog.this.limiterValue / 250);
+					}
+					else {
+						UniLogDialog.this.limiterEnergyCombo.select(UniLogDialog.this.limiterValue / 500 + 1);
+					}
+					UniLogDialog.this.limiterEnergyCombo.setText("" + UniLogDialog.this.limiterValue);
+					UniLogDialog.this.gearFactorCombo.setText(String.format(" %.1f  :  1", UniLogDialog.this.gearRatio)); //$NON-NLS-1$
+					if (UniLogDialog.this.configTab1 != null) UniLogDialog.this.configTab1.setA1ModusAvailable(true);
+					if (UniLogDialog.this.configTab2 != null) UniLogDialog.this.configTab2.setA1ModusAvailable(true);
+					if (UniLogDialog.this.configTab3 != null) UniLogDialog.this.configTab3.setA1ModusAvailable(true);
+					if (UniLogDialog.this.configTab4 != null) UniLogDialog.this.configTab4.setA1ModusAvailable(true);
+				}
+			});
+		}
 	}
 
 	public byte[] buildUpdateBuffer() {
@@ -1727,49 +1735,60 @@ public class UniLogDialog extends DeviceDialog {
 	 * function to reset all the buttons, normally called after data gathering finished
 	 */
 	public void resetButtons() {
-		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			this.readAdjustmentButton.setEnabled(true);
-			this.storeAdjustmentsButton.setEnabled(false);
+		if (this.dialogShell != null) {
+			if (Thread.currentThread().getId() == this.application.getThreadId()) {
+				this.readAdjustmentButton.setEnabled(true);
+				this.storeAdjustmentsButton.setEnabled(false);
 
-			this.editConfigButton.setEnabled(false);
-			this.useConfigCombo.setEnabled(true);
+				this.editConfigButton.setEnabled(false);
+				this.useConfigCombo.setEnabled(true);
 
-			this.readDataButton.setEnabled(true);
-			this.stopDataButton.setEnabled(false);
+				this.readDataButton.setEnabled(true);
+				this.stopDataButton.setEnabled(false);
 
-			this.startLoggingButton.setEnabled(true);
-			this.stopLoggingButton.setEnabled(false);
+				this.startLoggingButton.setEnabled(true);
+				this.stopLoggingButton.setEnabled(false);
 
-			this.startLiveGatherButton.setEnabled(true);
-			this.stopLiveGatherButton.setEnabled(false);
+				this.setLiveGathererButtons(true);
 
-			this.clearMemoryButton.setEnabled(true);
-			this.closeButton.setEnabled(true);
-			setClosePossible(true);
+				this.clearMemoryButton.setEnabled(true);
+				this.closeButton.setEnabled(true);
+				setClosePossible(true);
+			}
+			else {
+				DataExplorer.display.asyncExec(new Runnable() {
+					public void run() {
+						UniLogDialog.this.readAdjustmentButton.setEnabled(true);
+						UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
+
+						UniLogDialog.this.editConfigButton.setEnabled(false);
+						UniLogDialog.this.useConfigCombo.setEnabled(true);
+
+						UniLogDialog.this.readDataButton.setEnabled(true);
+						UniLogDialog.this.stopDataButton.setEnabled(false);
+
+						UniLogDialog.this.startLoggingButton.setEnabled(true);
+						UniLogDialog.this.stopLoggingButton.setEnabled(false);
+
+						UniLogDialog.this.setLiveGathererButtons(true);
+
+						UniLogDialog.this.clearMemoryButton.setEnabled(true);
+						UniLogDialog.this.closeButton.setEnabled(true);
+						setClosePossible(true);
+					}
+				});
+			}
 		}
-		else {
-			DataExplorer.display.asyncExec(new Runnable() {
-				public void run() {
-					UniLogDialog.this.readAdjustmentButton.setEnabled(true);
-					UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
+	}
 
-					UniLogDialog.this.editConfigButton.setEnabled(false);
-					UniLogDialog.this.useConfigCombo.setEnabled(true);
-
-					UniLogDialog.this.readDataButton.setEnabled(true);
-					UniLogDialog.this.stopDataButton.setEnabled(false);
-
-					UniLogDialog.this.startLoggingButton.setEnabled(true);
-					UniLogDialog.this.stopLoggingButton.setEnabled(false);
-
-					UniLogDialog.this.startLiveGatherButton.setEnabled(true);
-					UniLogDialog.this.stopLiveGatherButton.setEnabled(false);
-
-					UniLogDialog.this.clearMemoryButton.setEnabled(true);
-					UniLogDialog.this.closeButton.setEnabled(true);
-					setClosePossible(true);
-				}
-			});
+	/**
+	 * set the live gatherer buttons state
+	 */
+	void setLiveGathererButtons(boolean isStartButtonEnabled) {
+		this.isLiveGathererEnabled = isStartButtonEnabled;
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
+			this.startLiveGatherButton.setEnabled(isStartButtonEnabled);
+			this.stopLiveGatherButton.setEnabled(!isStartButtonEnabled);
 		}
 	}
 
@@ -1842,19 +1861,21 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public void updateActualConfigTabItemAnalogModi(int configTabIndex) {
 		log.log(Level.FINE, "updating configTab" + configTabIndex);
-		switch (configTabIndex) {
-		case 1:
-			this.configTab1.checkUpdateAnalog();
-			break;
-		case 2:
-			this.configTab2.checkUpdateAnalog();
-			break;
-		case 3:
-			this.configTab3.checkUpdateAnalog();
-			break;
-		case 4:
-			this.configTab4.checkUpdateAnalog();
-			break;
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) { // dialog opened
+			switch (configTabIndex) {
+			case 1:
+				this.configTab1.checkUpdateAnalog();
+				break;
+			case 2:
+				this.configTab2.checkUpdateAnalog();
+				break;
+			case 3:
+				this.configTab3.checkUpdateAnalog();
+				break;
+			case 4:
+				this.configTab4.checkUpdateAnalog();
+				break;
+			}
 		}
 	}
 }
