@@ -21,6 +21,8 @@ package gde.device.smmodellbau;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
@@ -28,7 +30,9 @@ import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
+import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
+import gde.exception.SerialPortException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -142,7 +146,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 	}
 
 	/**
@@ -158,7 +162,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
-		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 	}
 
 	/**
@@ -649,34 +653,40 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			log.log(Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
 			
 			// update active state and displayable state if configuration switched with other names
-			if (record.isActive() != measurement.isActive()) {
+			if (includeReasonableDataCheck) {
+				boolean state = record.hasReasonableData();
+				log.log(Level.TIME, record.getName() + " hasReasonableData " + state); //$NON-NLS-1$ 
+				record.setActive(state);
+				//record.setVisible(state);
+				record.setDisplayable(state);
+			}
+			else if (record.isActive() != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
 				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
-			}	
+			}
 		}
 		
-		// updateStateCurrentDependent
-		boolean enabled = recordSet.get(recordSet.getRecordNames()[2]).isActive();
-		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-		recordSet.get(recordSet.getRecordNames()[3]).setDisplayable(enabled);
-		
-		// updateStateVoltageAndCurrentDependent
-		enabled = recordSet.get(recordSet.getRecordNames()[1]).isActive() && recordSet.get(recordSet.getRecordNames()[2]).isActive();
-		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-		recordSet.get(recordSet.getRecordNames()[4]).setDisplayable(enabled);
-		recordSet.get(recordSet.getRecordNames()[5]).setDisplayable(enabled);
-		recordSet.get(recordSet.getRecordNames()[6]).setDisplayable(enabled);
-
-		// updateStateVoltageCurrentRevolutionDependent
-		enabled = recordSet.get(recordSet.getRecordNames()[1]).isActive() && recordSet.get(recordSet.getRecordNames()[2]).isActive() && recordSet.get(recordSet.getRecordNames()[7]).isActive();
-		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-		recordSet.get(recordSet.getRecordNames()[8]).setDisplayable(enabled);
-		
-		// updateHeightDependent
-		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-		recordSet.get(recordSet.getRecordNames()[10]).setDisplayable(recordSet.get(recordSet.getRecordNames()[9]).isActive());
+		if (!includeReasonableDataCheck) {
+			// updateStateCurrentDependent
+			boolean enabled = recordSet.get(recordSet.getRecordNames()[2]).isActive();
+			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+			recordSet.get(recordSet.getRecordNames()[3]).setDisplayable(enabled);
+			// updateStateVoltageAndCurrentDependent
+			enabled = recordSet.get(recordSet.getRecordNames()[1]).isActive() && recordSet.get(recordSet.getRecordNames()[2]).isActive();
+			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+			recordSet.get(recordSet.getRecordNames()[4]).setDisplayable(enabled);
+			recordSet.get(recordSet.getRecordNames()[5]).setDisplayable(enabled);
+			recordSet.get(recordSet.getRecordNames()[6]).setDisplayable(enabled);
+			// updateStateVoltageCurrentRevolutionDependent
+			enabled = recordSet.get(recordSet.getRecordNames()[1]).isActive() && recordSet.get(recordSet.getRecordNames()[2]).isActive() && recordSet.get(recordSet.getRecordNames()[7]).isActive();
+			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+			recordSet.get(recordSet.getRecordNames()[8]).setDisplayable(enabled);
+			// updateHeightDependent
+			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
+			recordSet.get(recordSet.getRecordNames()[10]).setDisplayable(recordSet.get(recordSet.getRecordNames()[9]).isActive());
+		}
 	}
 	
 	/**
@@ -891,19 +901,36 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
-	public void openCloseSerialPort() {
+	public void open_closeCommPort() {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
 				try {
-					this.serialPort.open();
+					Channel activChannel = Channels.getInstance().getActiveChannel();
+					if (activChannel != null) {
+						this.getDialog().liveThread = new UniLogLiveGatherer(this.application, this, this.serialPort, activChannel.getNumber(), this.getDialog());
+						this.getDialog().setLiveGathererButtons(false);
+						this.getDialog().liveThread.start();
+					}
 				}
-				catch (Exception e) {
+				catch (SerialPortException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() } ));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+				}
+				catch (ApplicationConfigurationException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+					this.application.getDeviceSelectionDialog().open();
+				}
+				catch (Throwable t) {
+					log.log(Level.SEVERE, t.getMessage(), t);
 				}
 			}
 			else {
+				if (this.getDialog().liveThread != null) {
+					this.getDialog().liveThread.stopTimerThread();
+				}
 				this.serialPort.close();
+				this.getDialog().setLiveGathererButtons(true);
 			}
 		}
 	}
