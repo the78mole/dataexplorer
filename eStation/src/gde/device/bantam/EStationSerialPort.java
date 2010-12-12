@@ -57,12 +57,7 @@ public class EStationSerialPort extends DeviceCommPort {
 		byte[] data = new byte[76];
 		byte[] answer = new byte[] {0x00};
 
-		boolean isPortOpenedByMe = false;
 		try {
-			if (!this.isConnected()) {
-				this.open();
-				isPortOpenedByMe = true;
-			}
 			
 			answer = new byte[13];
 			answer = this.read(answer, 3000);
@@ -125,10 +120,6 @@ public class EStationSerialPort extends DeviceCommPort {
 				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 			throw e;
-		}
-		finally {
-			if (isPortOpenedByMe) 
-				this.close();
 		}
 		return data;
 	}

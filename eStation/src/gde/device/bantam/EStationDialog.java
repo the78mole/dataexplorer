@@ -159,7 +159,7 @@ public class EStationDialog extends DeviceDialog {
 						EStationDialog.log.log(Level.FINER, "dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
 						// if port is already connected, do not read the data update will be done by gathere thread
 						if (!EStationDialog.this.isConnectionWarned && !EStationDialog.this.serialPort.isConnected()) {
-							EStationDialog.this.updateConfigTread = new Thread() {
+							EStationDialog.this.updateConfigTread = new Thread("updateConfig") {
 								public void run() {
 									try {
 										EStationDialog.this.configData = new HashMap<String, String>();
