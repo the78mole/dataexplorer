@@ -230,13 +230,13 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
-	public void openCloseSerialPort() {
+	public void open_closeCommPort() {
 		String searchDirectory = Settings.getInstance().getDataFilePath();
 		if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
 		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, searchDirectory, null, SWT.MULTI);
-		Thread reader = new Thread() {
+		Thread reader = new Thread("reader") {
 			public void run() {
 				for (String tmpFileName : fd.getFileNames()) {
 					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
