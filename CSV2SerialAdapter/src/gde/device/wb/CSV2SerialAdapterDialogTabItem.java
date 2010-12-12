@@ -141,7 +141,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 								CSV2SerialAdapterDialogTabItem.this.device.storeDeviceProperties();
 							}
 						}
-						CSV2SerialAdapterDialogTabItem.this.device.openCloseSerialPort();
+						CSV2SerialAdapterDialogTabItem.this.device.open_closeCommPort();
 					}
 				});
 			}

@@ -427,7 +427,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
-	public void openCloseSerialPort() {
+	public void open_closeCommPort() {
 		String searchDirectory = Settings.getInstance().getDataFilePath();
 		if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
