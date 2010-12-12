@@ -62,6 +62,7 @@ public class GathererThread extends Thread {
 	 */
 	public GathererThread(DataExplorer currentApplication, QcCopter useDevice, QcCopterSerialPort useSerialPort, int channelConfigNumber, QcCopterDialog useDialog)
 			throws ApplicationConfigurationException, SerialPortException {
+		super("dataGatherer");
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.dialog = useDialog;
@@ -148,7 +149,7 @@ public class GathererThread extends Thread {
 					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
 					log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
 
-					if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
+					if (recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 						GathererThread.this.application.updateAllTabs(false);
 					}
 				}
