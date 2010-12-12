@@ -1627,6 +1627,7 @@ Documentation is at http://java.sun.com/products/jdk/1.2/docs/api/java/io/InputS
 
 		MonitorThread() 
 		{
+			super("RXTXmonitor");
 			if (debug)
 				z.reportln( "RXTXPort:MontitorThread:MonitorThread()"); 
 		}
