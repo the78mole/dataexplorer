@@ -815,7 +815,7 @@ public interface IDevice {
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
-	public void openCloseSerialPort(); 
+	public void open_closeCommPort(); 
 	
 	/**
 	 * method to modify open/close serial port menu toolbar button and device menu entry

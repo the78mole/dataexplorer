@@ -28,6 +28,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
 import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -152,13 +153,9 @@ public class DeviceConfiguration {
 
 		this.settings = Settings.getInstance();
 
+		WaitTimer timer = WaitTimer.getInstance();
 		while (this.settings.isXsdThreadAlive() || this.settings.getUnmarshaller() == null) {
-			try {
-				Thread.sleep(250);
-			}
-			catch (InterruptedException e) {
-				// ignore
-			}
+			timer.delay(5);
 		}
 		this.unmarshaller = this.settings.getUnmarshaller();
 		this.marshaller = this.settings.getMarshaller();
