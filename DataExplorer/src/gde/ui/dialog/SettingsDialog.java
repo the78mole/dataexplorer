@@ -32,6 +32,7 @@ import gde.ui.menu.LogLevelSelectionContextMenu;
 import gde.utils.ObjectKeyScanner;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -467,28 +468,9 @@ public class SettingsDialog extends Dialog {
 							this.serialPortGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.serialPortGroup.setText(Messages.getString(MessageIds.GDE_MSGT0330));
 							{
-								this.useGlobalSerialPort = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
-								this.useGlobalSerialPort.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.useGlobalSerialPort.setText(Messages.getString(MessageIds.GDE_MSGT0333));
-								this.useGlobalSerialPort.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0334));
-								this.useGlobalSerialPort.setBounds(15, GDE.IS_MAC_COCOA ? 3 : 13, 243, 22);;
-								this.useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "useGlobalSerialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
-										if (SettingsDialog.this.useGlobalSerialPort.getSelection()) {
-											SettingsDialog.this.settings.setIsGlobalSerialPort("true"); //$NON-NLS-1$
-										}
-										else {
-											SettingsDialog.this.settings.setIsGlobalSerialPort("false"); //$NON-NLS-1$
-										}
-									}
-								});
-							}
-							{
 								this.enableBlackListButton = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 								this.enableBlackListButton.setText(Messages.getString(MessageIds.GDE_MSGT0336));
-								this.enableBlackListButton.setBounds(15, GDE.IS_MAC_COCOA ? 25 : 35, 243, 22);
+								this.enableBlackListButton.setBounds(15, GDE.IS_MAC_COCOA ? 3 : 13, 243, 22);
 								this.enableBlackListButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.enableBlackListButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0337));
 								this.enableBlackListButton.addSelectionListener(new SelectionAdapter() {
@@ -517,7 +499,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortBlackList.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.serialPortBlackList.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0337));
-								this.serialPortBlackList.setBounds(260, GDE.IS_MAC_COCOA ? 24 : 34, 181, GDE.IS_LINUX ? 22 : 20);
+								this.serialPortBlackList.setBounds(260, GDE.IS_MAC_COCOA ? 3 : 13, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
@@ -536,7 +518,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.enableWhiteListButton = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 								this.enableWhiteListButton.setText(Messages.getString(MessageIds.GDE_MSGT0338));
-								this.enableWhiteListButton.setBounds(15, GDE.IS_MAC_COCOA ? 47 : 57, 243, 22);
+								this.enableWhiteListButton.setBounds(15, GDE.IS_MAC_COCOA ? 24 : 34, 243, 22);
 								this.enableWhiteListButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.enableWhiteListButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0339));
 								this.enableWhiteListButton.addSelectionListener(new SelectionAdapter() {
@@ -566,7 +548,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortWhiteList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortWhiteList.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.serialPortWhiteList.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0339));
-								this.serialPortWhiteList.setBounds(260, GDE.IS_MAC_COCOA ? 47 : 57, 181, GDE.IS_LINUX ? 22 : 20);
+								this.serialPortWhiteList.setBounds(260, GDE.IS_MAC_COCOA ? 24 : 34, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortWhiteList.addVerifyListener(new VerifyListener() {
 									@Override
 									public void verifyText(VerifyEvent e) {
@@ -584,7 +566,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.doPortAvailabilityCheck = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
-								this.doPortAvailabilityCheck.setBounds(15, GDE.IS_MAC_COCOA ? 69 : 79, 243, 22);
+								this.doPortAvailabilityCheck.setBounds(15, GDE.IS_MAC_COCOA ? 47 : 57, 243, 22);
 								this.doPortAvailabilityCheck.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.doPortAvailabilityCheck.setText(Messages.getString(MessageIds.GDE_MSGT0331));
 								this.doPortAvailabilityCheck.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0332));
@@ -595,6 +577,32 @@ public class SettingsDialog extends Dialog {
 										SettingsDialog.this.settings.setPortAvailabilityCheck(SettingsDialog.this.doPortAvailabilityCheck.getSelection());
 										if (SettingsDialog.this.doPortAvailabilityCheck.getSelection()) {
 											SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGI0036));
+										}
+									}
+								});
+							}
+							{
+								this.useGlobalSerialPort = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
+								this.useGlobalSerialPort.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.useGlobalSerialPort.setText(Messages.getString(MessageIds.GDE_MSGT0333));
+								this.useGlobalSerialPort.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0334));
+								this.useGlobalSerialPort.setBounds(15, GDE.IS_MAC_COCOA ? 69 : 79, 243, 22);;
+								this.useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
+									@SuppressWarnings("deprecation")
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "useGlobalSerialPort.widgetSelected, event=" + evt); //$NON-NLS-1$
+										if (SettingsDialog.this.useGlobalSerialPort.getSelection()) {
+											SettingsDialog.this.settings.setIsGlobalSerialPort("true"); //$NON-NLS-1$
+											SettingsDialog.this.updateAvailablePorts();
+											SettingsDialog.this.portLabel.setForeground(DataExplorer.COLOR_BLACK);
+											SettingsDialog.this.serialPort.setEnabled(true);
+										}
+										else {
+											SettingsDialog.this.settings.setIsGlobalSerialPort("false"); //$NON-NLS-1$
+											SettingsDialog.this.listPortsThread.stop();
+											SettingsDialog.this.portLabel.setForeground(DataExplorer.COLOR_GREY);
+											SettingsDialog.this.serialPort.setEnabled(false);
 										}
 									}
 								});
@@ -1130,8 +1138,6 @@ public class SettingsDialog extends Dialog {
 			this.dialogShell.setLocation(getParent().toDisplay(100, 10));
 			this.dialogShell.open();
 
-			updateAvailablePorts();
-
 			Display display = this.dialogShell.getDisplay();
 			while (!this.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
@@ -1159,11 +1165,13 @@ public class SettingsDialog extends Dialog {
 	 */
 	void updateAvailablePorts() {
 		// execute independent from dialog UI
-		this.listPortsThread = new Thread() {
+		this.listPortsThread = new Thread("updateAvailablePorts") {
+			public boolean stop = false;
 			@Override
 			public void run() {
+				WaitTimer timer = WaitTimer.getInstance();
 				try {
-					while (!SettingsDialog.this.dialogShell.isDisposed()) {
+					while (!SettingsDialog.this.dialogShell.isDisposed() && !this.stop) {
 						SettingsDialog.this.availablePorts = DeviceSerialPortImpl.listConfiguredSerialPorts(SettingsDialog.this.settings.doPortAvailabilityCheck(), 
 								SettingsDialog.this.settings.isSerialPortBlackListEnabled() ? SettingsDialog.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
 								SettingsDialog.this.settings.isSerialPortWhiteListEnabled() ? SettingsDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
@@ -1187,16 +1195,11 @@ public class SettingsDialog extends Dialog {
 								}
 							}
 							});
-						try {
-							Thread.sleep(2500);
-						}
-						catch (InterruptedException e) {
-							// ignore
-						}
+						timer.delay(2500);
 					}
 				}
 				catch (Throwable t) {
-					SettingsDialog.log.log(Level.WARNING, t.getMessage());
+					SettingsDialog.log.log(Level.WARNING, t.getClass().getName());
 				}
 			}
 		};
@@ -1289,7 +1292,17 @@ public class SettingsDialog extends Dialog {
 		SettingsDialog.this.listSeparator.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getListSeparator());
 
 		SettingsDialog.this.doPortAvailabilityCheck.setSelection(SettingsDialog.this.settings.doPortAvailabilityCheck());
-		SettingsDialog.this.useGlobalSerialPort.setSelection(SettingsDialog.this.settings.isGlobalSerialPort());
+		if (SettingsDialog.this.settings.isGlobalSerialPort()) {
+			updateAvailablePorts();
+			SettingsDialog.this.useGlobalSerialPort.setSelection(true);
+			SettingsDialog.this.portLabel.setForeground(DataExplorer.COLOR_BLACK);
+			SettingsDialog.this.serialPort.setEnabled(true);
+		}
+		else {
+			SettingsDialog.this.useGlobalSerialPort.setSelection(false);
+			SettingsDialog.this.portLabel.setForeground(DataExplorer.COLOR_GREY);
+			SettingsDialog.this.serialPort.setEnabled(false);
+		}
 
 		SettingsDialog.this.serialPortBlackList.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getSerialPortBlackList());
 		boolean isBlacklistEnabled = SettingsDialog.this.settings.isSerialPortBlackListEnabled();
