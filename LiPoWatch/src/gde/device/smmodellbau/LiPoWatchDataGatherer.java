@@ -35,6 +35,7 @@ import gde.exception.TimeOutException;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
+import gde.utils.WaitTimer;
 
 /**
  * Thread implementation to gather data from LiPoWatch device
@@ -49,18 +50,21 @@ public class LiPoWatchDataGatherer extends Thread {
 	final LiPoWatch						device;
 	final Integer							channelNumber;
 	final String							configKey;
+	final WaitTimer						timer;
 	CalculationThread					calculationThread;
 
 	/**
 	 * 
 	 */
 	public LiPoWatchDataGatherer(DataExplorer currrentApplication, LiPoWatch useDevice, LiPoWatchSerialPort useSerialPort) {
+		super("dataGatherer");
 		this.application = currrentApplication;
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
 		this.dialog = useDevice.getDialog();
 		this.channelNumber = 1; //$NON-NLS-1$
 		this.configKey = this.device.getChannelName(this.channelNumber);
+		this.timer = WaitTimer.getInstance();
 }
 
 	/**
@@ -191,7 +195,7 @@ public class LiPoWatchDataGatherer extends Thread {
 
 	public void setThreadStop() {
 		try {
-			Thread.sleep(2);
+			this.timer.delay(5);
 			this.serialPort.setTransmitFinished(true);
 		}
 		catch (Exception e) {

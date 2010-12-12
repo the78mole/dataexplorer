@@ -18,13 +18,6 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
-import gde.log.Level;
-import java.util.logging.Logger;
-
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
@@ -32,8 +25,16 @@ import gde.data.RecordSet;
 import gde.device.smmodellbau.lipowatch.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.exception.TimeOutException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.WaitTimer;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Logger;
 
 /**
  * Thread implementation to gather data from LiPoWatch device
@@ -51,6 +52,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 	final Integer									channelNumber;
 	final String									configKey;
 	final int											timeStep_ms;
+	final WaitTimer								waiter;
 	Timer													timer;
 	TimerTask											timerTask;
 	boolean												isTimerRunning							= false;
@@ -66,6 +68,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 	 * @throws Exception 
 	 */
 	public LiPoWatchLiveGatherer(DataExplorer currentApplication, LiPoWatch useDevice, LiPoWatchSerialPort useSerialPort, LiPoWatchDialog useDialog) throws Exception {
+		super("liveDataGatherer");
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
@@ -74,6 +77,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		this.channelNumber = 1; 
 		this.channel = this.channels.get(this.channelNumber);
 		this.configKey = this.device.getChannelName(this.channelNumber);
+		this.waiter = WaitTimer.getInstance();
 
 		this.calcValues.put(LiPoWatch.A1_FACTOR, useDevice.getMeasurementFactor(this.channelNumber, 11)); // 11 = A1
 		this.calcValues.put(LiPoWatch.A1_OFFSET, useDevice.getMeasurementOffset(this.channelNumber, 11));
@@ -81,7 +85,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();
 			this.isPortOpenedByLiveGatherer = true;
-			Thread.sleep(2000);
+			this.waiter.delay(2000);
 		}
 
 		// get LiPoWatch configuration for timeStep info
