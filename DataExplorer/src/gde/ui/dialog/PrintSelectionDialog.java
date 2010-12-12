@@ -18,6 +18,19 @@
 ****************************************************************************************/
 package gde.ui.dialog;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -33,7 +46,6 @@ import java.awt.print.Book;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterJob;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -56,39 +68,28 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
-
 /**
  * simple print configuration dialog
  * @author Winfried Brügmann
  */
 public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
-	final static Logger						log	= Logger.getLogger(PrintSelectionDialog.class.getName());
+	final static Logger	log	= Logger.getLogger(PrintSelectionDialog.class.getName());
 
-	Shell													dialogShell;
-	Button												printButton;
-	Group													configurationGroup;
-	Button												portraitButton;
-	Button												landscapeReverseButton;
-	Button												cancelButton;
-	Button												objectButton;
-	Button												statisticsButton;
-	Button												graphicsButton;
-	Button												curveCompareButton;
-	Group													orientationGroup;
-	Button												landscapeButton;
+	Shell								dialogShell;
+	Button							printButton;
+	Group								configurationGroup;
+	Button							portraitButton;
+	Button							landscapeReverseButton;
+	Button							cancelButton;
+	Button							objectButton;
+	Button							statisticsButton;
+	Button							graphicsButton;
+	Button							curveCompareButton;
+	Group								orientationGroup;
+	Button							landscapeButton;
 
 	final DataExplorer	application;
-	private Button								headerButton;
+	private Button			headerButton;
 
 	/**
 	* Auto-generated main method to display this 
@@ -123,10 +124,10 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.pack();
 			this.dialogShell.setSize(400, 320);
 			this.dialogShell.addDisposeListener(new DisposeListener() {
-				
+
 				@Override
 				public void widgetDisposed(DisposeEvent arg0) {
-					PrintSelectionDialog.this.application.resetShellIcon();				
+					PrintSelectionDialog.this.application.resetShellIcon();
 				}
 			});
 			{
@@ -142,6 +143,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				this.configurationGroup.setText(Messages.getString(MessageIds.GDE_MSGT0448));
 				this.configurationGroup.setBounds(7, 36, 168, 206);
 				this.configurationGroup.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINEST, "configurationGroup.paintControl, event=" + evt); //$NON-NLS-1$
 						Channel activeChannel = Channels.getInstance().getActiveChannel();
@@ -300,16 +302,12 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		org.eclipse.swt.graphics.Image graphicsImageSWT, compareImageSWT, statisticsImageSWT, objectImageSWT;
 		final java.awt.Image graphicsImageAWT, compareImageAWT, statisticsImageAWT, objectImageAWT;
+		final WaitTimer waiter = WaitTimer.getInstance();
 
 		//get all required images
 		if (isGraphics) {
 			this.application.selectTab(0);
-			try {
-				Thread.sleep(250);
-			}
-			catch (InterruptedException e) {
-				//ignore
-			}
+			waiter.delay(250);
 			graphicsImageAWT = convertToAWT((graphicsImageSWT = this.application.getGraphicsPrintImage()).getImageData());
 			graphicsImageSWT.dispose();
 		}
@@ -318,12 +316,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		if (isStatistics) {
 			this.application.selectTab(1);
-			try {
-				Thread.sleep(250);
-			}
-			catch (InterruptedException e) {
-				//ignore
-			}
+			waiter.delay(250);
 			statisticsImageAWT = convertToAWT((statisticsImageSWT = this.application.getStatisticsTabContentAsImage()).getImageData());
 			statisticsImageSWT.dispose();
 		}
@@ -332,12 +325,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		if (this.application.isObjectoriented() && isObject) {
 			this.application.selectTab(8);
-			try {
-				Thread.sleep(250);
-			}
-			catch (InterruptedException e) {
-				//ignore
-			}
+			waiter.delay(250);
 			objectImageAWT = convertToAWT((objectImageSWT = this.application.getObjectTabContentAsImage()).getImageData());
 			objectImageSWT.dispose();
 		}
@@ -346,12 +334,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		if (isCompare) {
 			this.application.selectTab(6);
-			try {
-				Thread.sleep(250);
-			}
-			catch (InterruptedException e) {
-				//ignore
-			}
+			waiter.delay(250);
 			compareImageAWT = convertToAWT((compareImageSWT = this.application.getGraphicsPrintImage()).getImageData());
 			compareImageSWT.dispose();
 		}
@@ -391,7 +374,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					log.log(Level.FINE, "documentPageFormat orientation = " + documentPageFormat.getOrientation());
 					log.log(Level.FINE, "pageFormat.getImageableWidth() = " + documentPageFormat.getImageableWidth());
 					log.log(Level.FINE, "pageFormat.getImageableHeight() = " + documentPageFormat.getImageableHeight());
-					
+
 					String fileName;
 					Channel activeChannel = Channels.getInstance().getActiveChannel();
 					if (activeChannel != null) {
@@ -401,7 +384,6 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					else {
 						fileName = GDE.NAME_LONG + GDE.STRING_MESSAGE_CONCAT;
 					}
-
 
 					if (documentPageFormat.getOrientation() == PageFormat.REVERSE_LANDSCAPE) {
 						if (isGraphics) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
@@ -422,18 +404,18 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						boolean isCompareToBePrinted = isCompare;
 
 						if (isGraphicsToBePrinted && isStatisticsToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, isPrintRequestHeader ? fileName
+											+ Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
 							isGraphicsToBePrinted = isStatisticsToBePrinted = false;
 						}
 						else if (isGraphicsToBePrinted && isObjectToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403)	: "", objectImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, isPrintRequestHeader ? fileName
+											+ Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
 							isGraphicsToBePrinted = isObjectToBePrinted = false;
 						}
 						else if (isGraphicsToBePrinted && isObjectToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144)	: "", compareImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT, isPrintRequestHeader ? fileName
+											+ Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
 							isGraphicsToBePrinted = isObjectToBePrinted = false;
 						}
 						else if (isGraphicsToBePrinted) {
@@ -442,13 +424,13 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						}
 
 						if (isStatisticsToBePrinted && isObjectToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT, isPrintRequestHeader ? fileName
+											+ Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
 							isStatisticsToBePrinted = isObjectToBePrinted = false;
 						}
 						else if (isStatisticsToBePrinted && isCompareToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT, isPrintRequestHeader ? fileName
+											+ Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
 							isStatisticsToBePrinted = isCompareToBePrinted = false;
 						}
 						else if (isStatisticsToBePrinted) {
@@ -457,8 +439,8 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						}
 
 						if (isObjectToBePrinted && isCompareToBePrinted) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT, 
-									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144)	: "", compareImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT, isPrintRequestHeader ? fileName
+											+ Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
 							isObjectToBePrinted = isCompareToBePrinted = false;
 						}
 						else if (isObjectToBePrinted) {
@@ -519,6 +501,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		 * @param page
 		 * @return 
 		 */
+		@Override
 		public int print(Graphics g, PageFormat pageFormat, int page) {
 
 			Graphics2D g2d = (Graphics2D) g;
@@ -537,8 +520,8 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 
 			int offsetY = (this.isPrintRequestHeader ? 20 : 0);
-			double usableImageHeight = (this.awtBufferedImage2 == null ? pageFormat.getImageableHeight() : pageFormat.getImageableHeight()/2) - offsetY;
-				
+			double usableImageHeight = (this.awtBufferedImage2 == null ? pageFormat.getImageableHeight() : pageFormat.getImageableHeight() / 2) - offsetY;
+
 			double scaleFactor1 = pageFormat.getImageableWidth() / this.awtBufferedImage1.getWidth(this);
 			if (scaleFactor1 * this.awtBufferedImage1.getHeight(this) < (usableImageHeight - offsetY)) {
 				g2d.drawImage(this.awtBufferedImage1, 0, offsetY, (int) pageFormat.getImageableWidth(), (int) (scaleFactor1 * this.awtBufferedImage1.getHeight(this)), this);
@@ -546,31 +529,29 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			else {
 				scaleFactor1 = usableImageHeight / this.awtBufferedImage1.getHeight(this);
 				int printWidth = (int) (scaleFactor1 * this.awtBufferedImage1.getWidth(this));
-				int printHeight = (int)usableImageHeight;
+				int printHeight = (int) usableImageHeight;
 				int offsetX = (int) ((pageFormat.getImageableWidth() - printWidth) / 2);
 				g2d.drawImage(this.awtBufferedImage1, offsetX, offsetY, printWidth, printHeight, this);
 			}
 
 			if (this.awtBufferedImage2 != null) {
-				
-				
+
 				if (this.isPrintRequestHeader) {
-					g2d.drawString(this.docType2, 2, (int)(pageFormat.getImageableHeight()/2 + 10));
-					g2d.drawString(date, (int) (pageFormat.getImageableWidth() - rectDate.getWidth()), (int)(pageFormat.getImageableHeight()/2 + 10));
+					g2d.drawString(this.docType2, 2, (int) (pageFormat.getImageableHeight() / 2 + 10));
+					g2d.drawString(date, (int) (pageFormat.getImageableWidth() - rectDate.getWidth()), (int) (pageFormat.getImageableHeight() / 2 + 10));
 				}
 
-				offsetY = (int)(pageFormat.getImageableHeight()/2 + (this.isPrintRequestHeader ? 20 : 0));
-				usableImageHeight = pageFormat.getImageableHeight()/2 - (this.isPrintRequestHeader ? 20 : 0);
-				
+				offsetY = (int) (pageFormat.getImageableHeight() / 2 + (this.isPrintRequestHeader ? 20 : 0));
+				usableImageHeight = pageFormat.getImageableHeight() / 2 - (this.isPrintRequestHeader ? 20 : 0);
+
 				double scaleFactor2 = pageFormat.getImageableWidth() / this.awtBufferedImage2.getWidth(this);
 				if (scaleFactor2 * this.awtBufferedImage2.getHeight(this) < usableImageHeight) {
-					g2d.drawImage(this.awtBufferedImage2, 0, offsetY, 
-							(int) pageFormat.getImageableWidth(),	(int)(scaleFactor2 * this.awtBufferedImage2.getHeight(this)), this);
+					g2d.drawImage(this.awtBufferedImage2, 0, offsetY, (int) pageFormat.getImageableWidth(), (int) (scaleFactor2 * this.awtBufferedImage2.getHeight(this)), this);
 				}
 				else {
 					scaleFactor2 = usableImageHeight / this.awtBufferedImage2.getHeight(this);
 					int printWidth = (int) (scaleFactor2 * this.awtBufferedImage2.getWidth(this));
-					int printHeight = (int)usableImageHeight;
+					int printHeight = (int) usableImageHeight;
 					int offsetX = (int) ((pageFormat.getImageableWidth() - printWidth) / 2);
 					g2d.drawImage(this.awtBufferedImage2, offsetX, offsetY, printWidth, printHeight, this);
 				}

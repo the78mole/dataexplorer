@@ -49,6 +49,7 @@ import gde.ui.tab.UtilGraphicsWindow;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 import gde.utils.WebBrowser;
 
 import java.net.MalformedURLException;
@@ -1286,12 +1287,9 @@ public class DataExplorer extends Composite {
 			}
 		});
 		int counter = 5000;
+		WaitTimer timer = WaitTimer.getInstance();
 		while (this.openYesNoMessageDialogAsyncValue == -1 && counter-- > 0) {
-			try {
-				Thread.sleep(100);
-			}
-			catch (InterruptedException e) {
-			}
+			timer.delay(100);
 		}
 		return this.openYesNoMessageDialogAsyncValue;
 	}
@@ -1538,7 +1536,7 @@ public class DataExplorer extends Composite {
 	public void updateAllTabs(final boolean force) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 		this.updateGraphicsWindow();
-		this.updateStatisticsData(force);
+		this.updateStatisticsData(true);
 		if (force) {
 			this.updateDigitalWindow();
 			this.updateAnalogWindow();
@@ -1557,7 +1555,7 @@ public class DataExplorer extends Composite {
 			DataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
 					DataExplorer.this.updateGraphicsWindow();
-					DataExplorer.this.updateStatisticsData(force);
+					DataExplorer.this.updateStatisticsData(true);
 					if (force) {
 						DataExplorer.this.updateDigitalWindow();
 						DataExplorer.this.updateAnalogWindow();

@@ -18,8 +18,6 @@
 ****************************************************************************************/
 package gde.utils;
 
-import gde.log.Level;
-
 import java.util.logging.Logger;
 
 /**
@@ -29,34 +27,46 @@ import java.util.logging.Logger;
 public class WaitTimer extends Thread {
 	final static String 				$CLASS_NAME 			= WaitTimer.class.getName();
 	final static Logger					log								= Logger.getLogger($CLASS_NAME);
+	
+	long delayTimeMilliSecinds = 1000;
+	
+	static WaitTimer instance = null;
+	
+	public static WaitTimer getInstance() {
+		if (instance == null) {
+			instance = new WaitTimer();
+		}
+		return instance;
+	}
+	
+	/**
+	 * needs to specify sleep time while calling sleep
+	 * initially set wait time to 1000 ms
+	 */
+	private WaitTimer() {
+		super("waitTimer");
+	}
 
-	final int waitTimeMilliSeconds;
-	final int waitTimeNanoSeconds;
-	
-	/**
-	 * @param waitTimeMillis
-	 */
-	public WaitTimer(int waitTimeMillis) {
-		super($CLASS_NAME);
-		this.waitTimeMilliSeconds = waitTimeMillis;
-		this.waitTimeNanoSeconds = 0;
-	}
-	
-	/**
-	 * @param waitTimeMillis
-	 */
-	public WaitTimer(int waitTimeMillis, int waitTimeNanos) {
-		super($CLASS_NAME);
-		this.waitTimeMilliSeconds = waitTimeMillis;
-		this.waitTimeNanoSeconds = waitTimeNanos;
-	}
-	
 	public void run() {
 		try {
-			Thread.sleep(this.waitTimeMilliSeconds, this.waitTimeNanoSeconds);
+			WaitTimer.sleep(this.delayTimeMilliSecinds);
 		}
 		catch (InterruptedException e) {
-			log.logp(Level.WARNING, $CLASS_NAME, "sleep()", e.getMessage());
+		}
+	}
+	
+	/**
+	 * synchronous wait for the given time
+	 * @param milliSeconds
+	 */
+	public void delay(long milliSeconds) {
+		this.delayTimeMilliSecinds = milliSeconds;
+		//this.start();
+		try {
+			WaitTimer.sleep(this.delayTimeMilliSecinds);
+			//this.join();
+		}
+		catch (InterruptedException e) {
 		}
 	}
 }
