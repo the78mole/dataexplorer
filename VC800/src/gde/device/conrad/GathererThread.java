@@ -70,6 +70,7 @@ public class GathererThread extends Thread {
 	 */
 	public GathererThread(DataExplorer currentApplication, VC800 useDevice, VC800SerialPort useSerialPort, int channelConfigNumber, VC800Dialog useDialog)
 			throws ApplicationConfigurationException, SerialPortException {
+		super("liveDataGatherer");
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.dialog = useDialog;
