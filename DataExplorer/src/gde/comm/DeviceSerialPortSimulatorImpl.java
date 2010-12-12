@@ -55,9 +55,10 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	int									xferErrors					= 0;
 	boolean							isConnected					= false;
 
-	final Settings			settings;
 	final IDevice				device;
 	final DataExplorer	application;
+	final Settings			settings;
+	final WaitTimer			timer;
 	final int						sleepTime_ms;
 	final boolean				isTimeStepConstant;
 
@@ -71,6 +72,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		this.device = currentDevice;
 		this.application = currentApplication;
 		this.settings = Settings.getInstance();
+		this.timer = WaitTimer.getInstance();
 		this.sleepTime_ms = timeStep_ms;
 		this.isTimeStepConstant = isTimeStepConstant;
 	}
@@ -106,8 +108,8 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				else
 					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0008) + openFilePath);
 			}
-			this.isConnected = true;
-			if (this.application != null) this.application.setPortConnected(true);
+			this.isConnected = data_in != null;
+			if (this.application != null) this.application.setPortConnected(this.isConnected);
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -121,7 +123,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	@Override
 	public void close() {
 		try {
-			data_in.close();
+			if (data_in != null) data_in.close();
 			this.isConnected = false;
 			if (this.application != null) this.application.setPortConnected(false);
 		}
@@ -141,8 +143,10 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		catch (InterruptedException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
-		data_in.read(readBuffer);
-		data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		if (data_in != null) {
+			data_in.read(readBuffer);
+			data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		}
 		return readBuffer;
 	}
 
@@ -157,8 +161,10 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		catch (InterruptedException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
-		data_in.read(readBuffer);
-		data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		if (data_in != null) {
+			data_in.read(readBuffer);
+			data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		}
 		return readBuffer;
 	}
 
@@ -173,8 +179,10 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		catch (IOException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
-		data_in.read(readBuffer);
-		data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		if (data_in != null) {
+			data_in.read(readBuffer);
+			data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		}
 		return readBuffer;
 	}
 
@@ -191,7 +199,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 */
 	@Override
 	public long wait4Bytes(int timeout_msec) throws InterruptedException, TimeOutException, IOException {
-		new WaitTimer(getRandomWaitTime()).run();
+		this.timer.delay(getWaitTime());
 		return 0;
 	}
 
@@ -200,7 +208,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 */
 	@Override
 	public int wait4Bytes(int numBytes, int timeout_msec) throws IOException {
-		new WaitTimer(getRandomWaitTime()).run();
+		this.timer.delay(getWaitTime());
 		return numBytes;
 	}
 
@@ -209,7 +217,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 */
 	@Override
 	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex) throws InterruptedException, TimeOutException, IOException {
-		new WaitTimer(getRandomWaitTime()).run();
+		this.timer.delay(getWaitTime());
 		return expectedBytes;
 	}
 
@@ -254,7 +262,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	/**
 	 * @return calculated sleep time in milli seconds
 	 */
-	int getRandomWaitTime() {
+	int getWaitTime() {
 		int sleepTime = 0;
 		Random randomGenerator = new Random();
     if (this.isTimeStepConstant) {
