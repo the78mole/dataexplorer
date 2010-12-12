@@ -42,19 +42,7 @@ public class CalculationThread extends Thread {
 	 * @param useRecordSet as RecordSet
 	 */
 	public CalculationThread(String useRecordKey, RecordSet useRecordSet) {
-		this.recordKey = useRecordKey;
-		this.recordSet = useRecordSet;
-		this.application = DataExplorer.getInstance();
-	}
-
-	/**
-	 * constructor using the recordKey and recordSet for initialization, a thread name can be given
-	 * @param name
-	 * @param useRecordKey as String
-	 * @param useRecordSet as RecordSet
-	 */
-	public CalculationThread(String name, String useRecordKey, RecordSet useRecordSet) {
-		super(name);
+		super("calculation");
 		this.recordKey = useRecordKey;
 		this.recordSet = useRecordSet;
 		this.application = DataExplorer.getInstance();

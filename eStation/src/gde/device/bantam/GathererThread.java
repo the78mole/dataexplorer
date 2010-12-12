@@ -33,6 +33,7 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.TimeLine;
+import gde.utils.WaitTimer;
 
 /**
  * Thread implementation to gather data from eStation device
@@ -53,6 +54,7 @@ public class GathererThread extends Thread {
 	final Channels						channels;
 	final Channel							channel;
 	final int									channelNumber;
+	final WaitTimer						timer;
 	
 	String										recordSetKey								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
@@ -69,6 +71,7 @@ public class GathererThread extends Thread {
 	 */
 	public GathererThread(DataExplorer currentApplication, eStation useDevice, EStationSerialPort useSerialPort, int channelConfigNumber, EStationDialog useDialog)
 			throws ApplicationConfigurationException, SerialPortException {
+		super("dataGatherer");
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.dialog = useDialog;
@@ -76,6 +79,7 @@ public class GathererThread extends Thread {
 		this.channels = Channels.getInstance();
 		this.channelNumber = channelConfigNumber;
 		this.channel = this.channels.get(this.channelNumber);
+		this.timer = WaitTimer.getInstance();
 
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();
@@ -212,17 +216,12 @@ public class GathererThread extends Thread {
 			catch (Throwable e) {
 				// this case will be reached while NiXx Akku discharge/charge/discharge cycle
 				if (e instanceof TimeOutException && isCycleMode && dryTimeCycleCount > 0) {
-					try {
-						finalizeRecordSet(false);
-						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "(dry time) waiting..."); //$NON-NLS-1$
-						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1401));
-						recordSet = null;
-						--dryTimeCycleCount;
-						Thread.sleep(waitTime_ms);
-					}
-					catch (InterruptedException e1) {
-						// ignore
-					}
+					finalizeRecordSet(false);
+					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "(dry time) waiting..."); //$NON-NLS-1$
+					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1401));
+					recordSet = null;
+					--dryTimeCycleCount;
+					this.timer.delay(waitTime_ms);
 				}
 				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
 				else if (e instanceof TimeOutException && !isProgrammExecuting) {
