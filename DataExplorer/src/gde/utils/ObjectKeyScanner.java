@@ -56,7 +56,7 @@ public class ObjectKeyScanner extends Thread {
 	 * and a file link will be created in a directory named with the object key
 	 */
 	public ObjectKeyScanner() {
-		super();
+		super("objectKeyScanner");
 		this.settings = Settings.getInstance();
 		this.deviceOriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
 		this.objectKeys = new Vector<String>();
@@ -75,7 +75,7 @@ public class ObjectKeyScanner extends Thread {
 	 * @param newObjectKey the object key to be used for scanning existing files
 	 */
 	public ObjectKeyScanner(String newObjectKey) {
-		super();
+		super("objectKeyScanner");
 		this.objectKey = newObjectKey;
 		this.settings = Settings.getInstance();
 		this.deviceOriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];

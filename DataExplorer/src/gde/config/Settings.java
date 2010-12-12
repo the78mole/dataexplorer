@@ -167,7 +167,6 @@ public class Settings extends Properties {
 	public final static String		SERIAL_IO_LOG_LEVEL						= "serial_IO_log_level"; //$NON-NLS-1$
 	public final static	Properties classbasedLogger							=	new Properties();
 
-	public final static String		AUTO_OPEN_SERIAL_PORT					= "auto_open_port"; //$NON-NLS-1$
 	public final static String		AUTO_OPEN_TOOL_BOX						= "auto_open_tool_box"; //$NON-NLS-1$
 	public static final String		LOCALE_IN_USE									= "locale_in_use"; //$NON-NLS-1$
 	public static final String		LOCALE_CHANGED								= "locale_changed"; //$NON-NLS-1$
@@ -251,7 +250,7 @@ public class Settings extends Properties {
 		}
 
 		this.xmlBasePath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + GDE.FILE_SEPARATOR_UNIX;
-		xsdThread = new Thread() {
+		xsdThread = new Thread("xsdValidation") {
 			public void run() {
 				final String $METHOD_NAME = "xsdThread.run()";
 				// device properties context
@@ -286,7 +285,7 @@ public class Settings extends Properties {
 			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true);
 		}
 
-		xsdThread.start(); // wait to start the thread until the device XMLs are getting updated, locale switch comes with hte same XSD
+		xsdThread.start(); // wait to start the thread until the device XMLs are getting updated, local switch comes with the same XSD
 
 		// locale settings has been changed, replacement of device property files required
 		if (this.getLocaleChanged() && !this.isDevicePropertiesUpdated) {
@@ -494,7 +493,6 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", PORT_WHITELIST, getSerialPortWhiteListString())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", DEVICE_DIALOG_USE_MODAL, isDeviceDialogsModal())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", DEVICE_DIALOG_ON_TOP, isDeviceDialogsOnTop())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", AUTO_OPEN_SERIAL_PORT, isAutoOpenSerialPort())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", AUTO_OPEN_TOOL_BOX, isAutoOpenToolBox())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", LOCALE_IN_USE, getLocale().getLanguage())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", LOCALE_CHANGED, getLocaleChanged())); //$NON-NLS-1$
@@ -931,13 +929,6 @@ public class Settings extends Properties {
 		}
 
 		return ok;
-	}
-
-	/**
-	 * query if serial port opened right after closing device selection dialog
-	 */
-	public boolean isAutoOpenSerialPort() {
-		return Boolean.valueOf(this.getProperty(AUTO_OPEN_SERIAL_PORT, "false").trim()); //$NON-NLS-1$
 	}
 
 	/**

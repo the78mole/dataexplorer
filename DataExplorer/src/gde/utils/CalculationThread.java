@@ -51,7 +51,7 @@ public abstract class CalculationThread extends Thread {
 	 * @param calcIntervalSec
 	 */
 	public CalculationThread(RecordSet currentRecordSet, String inRecordKey, String outRecordKey, int calcIntervalSec) {
-		super();
+		super("calculation");
 		this.recordSet = currentRecordSet;
 		this.sourceRecordKey = inRecordKey;
 		this.targetRecordKey = outRecordKey;
