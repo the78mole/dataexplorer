@@ -53,6 +53,7 @@ public class DataGathererThread extends Thread {
 	 * 
 	 */
 	public DataGathererThread(DataExplorer currentApplication, Picolario currentDevice, PicolarioSerialPort currentSerialPort, String[] useDatagramNumbers) {
+		super("dataGatherer");
 		this.application = currentApplication;
 		this.device = currentDevice;
 		this.serialPort = currentSerialPort;
