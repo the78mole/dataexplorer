@@ -144,7 +144,7 @@ public class VC800Dialog extends DeviceDialog {
 						VC800Dialog.log.log(Level.FINER, "dialogShell.focusGained, event=" + evt); //$NON-NLS-1$
 						if (!VC800Dialog.this.isConnectionWarned) {
 							try {
-								VC800Dialog.this.updateConfigTread = new Thread() {
+								VC800Dialog.this.updateConfigTread = new Thread("updateConfig") {
 									public void run() {
 										try {
 											updateConfig();
