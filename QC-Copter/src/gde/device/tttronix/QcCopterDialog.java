@@ -202,7 +202,7 @@ public class QcCopterDialog extends DeviceDialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								QcCopterDialog.log.log(java.util.logging.Level.FINEST, "startConfiguration.widgetSelected, event=" + evt); //$NON-NLS-1$
-								QcCopterDialog.this.device.openCloseSerialPort();
+								QcCopterDialog.this.device.open_closeCommPort();
 								checkPortStatus();
 							}
 						});
@@ -281,7 +281,7 @@ public class QcCopterDialog extends DeviceDialog {
 					}
 					else {
 						if (this.device.serialPort.isMatchAvailablePorts(this.device.getPort()) && !this.device.serialPort.isConnected())
-							this.device.openCloseSerialPort();
+							this.device.open_closeCommPort();
 					}
 				}
 

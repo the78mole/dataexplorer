@@ -50,7 +50,7 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 	int retrys = 0; // re-try temporary error counter
 	
 	final DeviceConfiguration deviceConfig;
-	
+
 	/**
 	 * constructor of default implementation
 	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
@@ -171,7 +171,7 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 				}
 			}
 			else if (size == 0) {
-				Thread.sleep(timeout_ms);
+				this.timer.delay(timeout_ms);
 			}
 			else {
 				returnString = new String(data = this.read(data, timeout_ms)); 
