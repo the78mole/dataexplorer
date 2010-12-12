@@ -1706,7 +1706,7 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 				log.log(Level.FINE, sb.toString());
 			}
-			if (this.scaleSyncedRecords.size() > 0) {
+			if (this.scaleSyncedRecords.size() > 1) {
 				updateSyncRecordScale();
 			}
 		}
@@ -1774,7 +1774,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void syncMasterSlaveRecords(Record syncInputRecord, int type) {
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			if (this.scaleSyncedRecords.get(syncRecordOrdinal).contains(syncInputRecord)) {
+			if (this.isRecordContained(syncRecordOrdinal, syncInputRecord)) {
 				switch (type) {
 				case Record.TYPE_AXIS_END_VALUES:
 					boolean tmpIsRoundout = syncInputRecord.isRoundOut;
@@ -1860,7 +1860,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param queryRecord the record key to be used for the query
 	 * @return true if syncable records contains queryRecordKey
 	 */
-	public boolean isOneOfSyncableRecord(Record queryRecord) {
+	public synchronized boolean isOneOfSyncableRecord(Record queryRecord) {
 		boolean isContained = false;
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
 			if (this.isRecordContained(syncRecordOrdinal, queryRecord)) {

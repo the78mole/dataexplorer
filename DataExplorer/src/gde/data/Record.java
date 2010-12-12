@@ -1250,7 +1250,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public DecimalFormat getDecimalFormat() {
 		if(this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
-		return this.df;
+		return this.isScaleSynced() ? this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).df : this.df;
 	}
 
 	/**
@@ -1993,7 +1993,7 @@ public class Record extends Vector<Integer> {
 	 * query if the record display scale is synced with an other record
 	 * @return the isScaleSynced
 	 */
-	public boolean isScaleSynced() {
+	public synchronized boolean isScaleSynced() {
 		return this.parent.isOneOfSyncableRecord(this);
 	}
 
