@@ -704,7 +704,7 @@ public class MenuToolBar {
 							log.log(Level.FINEST, "portOpenCloseItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							IDevice activeDevice = MenuToolBar.this.application.getActiveDevice();
 							if(activeDevice != null) {
-								activeDevice.openCloseSerialPort();
+								activeDevice.open_closeCommPort();
 								if (activeDevice.getCommunicationPort() != null) {
 									if (activeDevice.getCommunicationPort().isConnected()) {
 										MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0067));

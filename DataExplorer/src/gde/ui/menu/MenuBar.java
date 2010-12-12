@@ -453,7 +453,7 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "selectDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							IDevice activeDevice = MenuBar.this.application.getActiveDevice();
-							if(activeDevice != null) activeDevice.openCloseSerialPort();
+							if(activeDevice != null) activeDevice.open_closeCommPort();
 						}
 					});
 				}
