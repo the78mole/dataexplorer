@@ -35,6 +35,7 @@ import gde.exception.TimeOutException;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
+import gde.utils.WaitTimer;
 
 /**
  * Thread implementation to gather data from UniLog device
@@ -55,6 +56,7 @@ public class UniLogDataGatherer extends Thread {
 	 * 
 	 */
 	public UniLogDataGatherer(DataExplorer currrentApplication, UniLog useDevice, UniLogSerialPort useSerialPort, String useConfigKey) {
+		super("dataGatherer");
 		this.application = currrentApplication;
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
@@ -179,7 +181,7 @@ public class UniLogDataGatherer extends Thread {
 
 	public void setThreadStop() {
 		try {
-			Thread.sleep(2);
+			WaitTimer.getInstance().delay(5);
 			this.serialPort.setTransmitFinished(true);
 		}
 		catch (Exception e) {

@@ -18,16 +18,20 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.PropertyType;
 import gde.device.smmodellbau.unilog.MessageIds;
+import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
+import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.WaitTimer;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -49,7 +53,7 @@ public class UniLogLiveGatherer extends Thread {
 	final Channels					channels;
 	final Channel						channel;
 	final Integer						channelNumber;
-	final int								timeStep_ms;
+	int								timeStep_ms;
 	Timer										timer;
 	TimerTask								timerTask;
 	boolean									isTimerRunning							= false;
@@ -66,6 +70,7 @@ public class UniLogLiveGatherer extends Thread {
 	 * @throws Exception 
 	 */
 	public UniLogLiveGatherer(DataExplorer currentApplication, UniLog useDevice, UniLogSerialPort useSerialPort, int channelConfigNumber, UniLogDialog useDialog) throws Exception {
+		super("liveDataGatherer");
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
@@ -86,26 +91,40 @@ public class UniLogLiveGatherer extends Thread {
 		property = useDevice.getMeasruementProperty(this.channelNumber, 8, UniLog.PROP_N_100_W); // 8 = efficience
 		int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 		this.calcValues.put(UniLog.PROP_N_100_W, (double)prop_n100W);
-
-		if (!this.serialPort.isConnected()) {
-			UniLogLiveGatherer.this.serialPort.open();
-			this.isPortOpenedByLiveGatherer = true;
-			Thread.sleep(2000);
-		}
-		
-		// get UniLog configuration for timeStep info
-		byte[] readBuffer = useSerialPort.readConfiguration();
-		useDialog.updateConfigurationValues(readBuffer);
-		useDialog.updateActualConfigTabItemAnalogModi(this.channel.getNumber());
-
-		// timer interval
-		int timeIntervalPosition = readBuffer[10] & 0xFF;
-		this.timeStep_ms = this.time_ms[timeIntervalPosition];
-		log.log(Level.FINE, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
-
 	}
 
 	public void run() {
+		try {
+			if (!this.serialPort.isConnected()) {
+				this.serialPort.open();
+				this.isPortOpenedByLiveGatherer = true;
+				WaitTimer.getInstance().delay(2000);
+			}
+			
+			// get UniLog configuration for timeStep info
+			byte[] readBuffer = this.serialPort.readConfiguration();
+			if (this.dialog != null) {
+				this.dialog.updateConfigurationValues(readBuffer);
+				this.dialog.updateActualConfigTabItemAnalogModi(this.channel.getNumber());
+			}
+			// timer interval
+			int timeIntervalPosition = readBuffer[10] & 0xFF;
+			this.timeStep_ms = this.time_ms[timeIntervalPosition];
+			log.log(Level.FINE, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		catch (SerialPortException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+		}
+		catch (ApplicationConfigurationException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+			this.application.getDeviceSelectionDialog().open();
+		}
+		catch (Throwable t) {
+			log.log(Level.SEVERE, t.getMessage(), t);
+		}
+
 		this.channels.switchChannel(this.channel.getName());
 
 		// prepare timed data gatherer thread
@@ -138,6 +157,7 @@ public class UniLogLiveGatherer extends Thread {
 		if (!this.serialPort.isInterruptedByUser) {
 			this.timer = new Timer();
 			this.timerTask = new TimerTask() {
+			long measurementCount = 0;
 
 				public void run() {
 					log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
@@ -160,6 +180,9 @@ public class UniLogLiveGatherer extends Thread {
 								UniLogLiveGatherer.this.isSwitchedRecordSet = true;
 							}
 
+							if (++measurementCount % 5 == 0) {
+								UniLogLiveGatherer.this.device.updateVisibilityStatus(recordSet, true);
+							}
 							if (recordSet.isChildOfActiveChannel() && recordSet.equals(UniLogLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
 								UniLogLiveGatherer.this.application.updateAllTabs(false);
 							}
