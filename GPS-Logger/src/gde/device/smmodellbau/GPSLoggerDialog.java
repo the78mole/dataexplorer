@@ -286,7 +286,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 									GPSLoggerDialog.this.device.storeDeviceProperties();
 								}
 							}
-							GPSLoggerDialog.this.device.openCloseSerialPort();
+							GPSLoggerDialog.this.device.open_closeCommPort();
 						}
 					});
 				}
