@@ -365,7 +365,7 @@ public class GraphicsComposite extends Composite {
 	 * this method is called in case of an paint event (redraw) and draw the containing records 
 	 * @param evt
 	 */
-	synchronized void drawAreaPaintControl(PaintEvent evt) {
+	void drawAreaPaintControl(PaintEvent evt) {
 		log.log(Level.FINEST, "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
 		// Get the canvas and its dimensions
 		this.canvasBounds = this.graphicCanvas.getClientArea();
