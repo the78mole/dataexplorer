@@ -141,7 +141,7 @@ public class VarioTabItem extends CTabItem {
 								VarioTabItem.this.device.storeDeviceProperties();
 							}
 						}
-						VarioTabItem.this.device.openCloseSerialPort();
+						VarioTabItem.this.device.open_closeCommPort();
 					}
 				});
 			}
