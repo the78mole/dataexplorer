@@ -240,7 +240,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
-	public void openCloseSerialPort() {
+	public void open_closeCommPort() {
 		// no serial port is used
 	}
 
