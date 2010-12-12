@@ -69,7 +69,7 @@ public class PicolarioSerialPort extends DeviceCommPort {
 			}
 
 			this.write(this.readNumberRecordSets);
-			Thread.sleep(30);
+			this.timer.delay(30);
 			this.write(this.readNumberRecordSets);
 
 			byte[] answer = new byte[4];
@@ -108,7 +108,7 @@ public class PicolarioSerialPort extends DeviceCommPort {
 			this.write(readRecordSetsWithNumber);
 			this.isTransmitFinished = false;
 
-			Thread.sleep(256); // give picolario time to prepare data
+			this.timer.delay(256); // give picolario time to prepare data
 
 			while (!this.isTransmitFinished) {
 
@@ -161,9 +161,9 @@ public class PicolarioSerialPort extends DeviceCommPort {
 		int timeCounter = timeout_msec / sleepTime;
 		int availableBytes = 0;
 
-		Thread.sleep(8);
+		this.timer.delay(sleepTime);
 		while (0 == (availableBytes = this.getAvailableBytes()) && timeCounter-- > 0) {
-			Thread.sleep(sleepTime);	
+			this.timer.delay(sleepTime);
 		}
 		return availableBytes == 0 || this.isTransmitFinished;
 	}
