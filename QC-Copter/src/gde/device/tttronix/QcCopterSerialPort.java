@@ -167,7 +167,8 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 					returnString = new String(Messages.getString(MessageIds.GDE_MSGT1906));
 				}
 				else {
-					returnString = new String(data);
+					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "receive potential scrambeled data, try to sync ?");					
+					returnString = new String(synchronizeTerminalData(data));
 				}
 			}
 			else if (size == 0) {
@@ -194,6 +195,24 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 		return returnString;
 	}
 
+	/**
+	 * try to synchronize
+	 * @param inData
+	 * @return
+	 */
+	byte[] synchronizeTerminalData(byte[] inData) {
+		int inSize = inData.length;
+		int index = 1;
+		while (inData[index] != '\f' && index < inSize) ++index;
+		if (inSize > index) { //additional '/f' found in data array
+			byte[] outData = new byte[inSize - index]; 
+			System.arraycopy(inData, index, outData, 0, outData.length);
+			return synchronizeTerminalData(outData);
+		}
+		else 
+			return inData;
+	}
+	
 	/**
 	 * check check sum of data buffer
 	 * @param buffer
