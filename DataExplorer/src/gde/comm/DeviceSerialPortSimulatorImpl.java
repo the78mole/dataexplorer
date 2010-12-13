@@ -143,7 +143,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		catch (InterruptedException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
-		if (data_in != null) {
+		if (data_in != null && this.isConnected) {
 			data_in.read(readBuffer);
 			data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
 		}
@@ -161,7 +161,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		catch (InterruptedException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
-		if (data_in != null) {
+		if (data_in != null && this.isConnected) {
 			data_in.read(readBuffer);
 			data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
 		}
@@ -179,7 +179,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		catch (IOException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
-		if (data_in != null) {
+		if (data_in != null && this.isConnected) {
 			data_in.read(readBuffer);
 			data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
 		}

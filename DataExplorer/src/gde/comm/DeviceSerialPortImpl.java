@@ -25,6 +25,7 @@ import gde.exception.ApplicationConfigurationException;
 import gde.exception.ReadWriteOutOfSyncException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -122,14 +123,14 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	@SuppressWarnings("unchecked")
 	public static Vector<String> listConfiguredSerialPorts(final boolean doAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
 		final String $METHOD_NAME = "listConfiguredSerialPorts"; //$NON-NLS-1$
-		log.logp(java.util.logging.Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
+		log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 
 		if (GDE.IS_WINDOWS) {
 			try {
 				WindowsHelper.registerSerialPorts();
 			}
 			catch (Throwable e) {
-				log.log(java.util.logging.Level.WARNING, Messages.getString(MessageIds.GDE_MSGW0035));
+				log.log(Level.WARNING, Messages.getString(MessageIds.GDE_MSGW0035));
 			}
 		}
 
@@ -146,15 +147,15 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 									((SerialPort) commPortIdentifier.open(GDE.NAME_LONG, 10000)).close();
 								}
 								DeviceSerialPortImpl.availablePorts.add(serialPortStr);
-								log.logp(java.util.logging.Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
+								log.logp(Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
 							}
 							catch (Exception e) {
-								log.logp(java.util.logging.Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Found port, but in use: " + serialPortStr); //$NON-NLS-1$
+								log.logp(Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Found port, but in use: " + serialPortStr); //$NON-NLS-1$
 							}
 						}
 					}
 					catch (NoSuchPortException e) {
-						log.logp(java.util.logging.Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getClass().getName() + " - " + serialPortStr); //$NON-NLS-1$
+						log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getClass().getName() + " - " + serialPortStr); //$NON-NLS-1$
 					}
 				}
 			}
@@ -171,31 +172,31 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 									((SerialPort) commPortIdentifier.open("DataExplorer", 10000)).close(); //$NON-NLS-1$
 								}
 								DeviceSerialPortImpl.availablePorts.add(serialPortStr);
-								log.logp(java.util.logging.Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
+								log.logp(Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
 							}
 							catch (Exception e) {
-								log.logp(java.util.logging.Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Found port, but in use: " + serialPortStr); //$NON-NLS-1$
+								log.logp(Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Found port, but in use: " + serialPortStr); //$NON-NLS-1$
 							}
 						}
 					}
 				}
 			}
-			if (log.isLoggable(java.util.logging.Level.FINE)) {
+			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder().append("Available serial Ports : "); //$NON-NLS-1$
 				for (String comPort : DeviceSerialPortImpl.availablePorts) {
 					sb.append(comPort).append(" "); //$NON-NLS-1$
 				}
-				log.logp(java.util.logging.Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
+				log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 			// Windows COM1, COM2 -> COM20
 			// GNU/Linux /dev/ttyS0, /dev/ttyS1, /dev/ttyUSB0, /dev/ttyUSB1
 			DeviceSerialPortImpl.availablePorts.trimToSize();
 		}
 		catch (Throwable t) {
-			log.log(java.util.logging.Level.WARNING, t.getMessage(), t);
+			log.log(Level.WARNING, t.getMessage(), t);
 		}
 
-		log.logp(java.util.logging.Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "exit"); //$NON-NLS-1$
+		log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "exit"); //$NON-NLS-1$
 		return DeviceSerialPortImpl.availablePorts;
 	}
 
@@ -257,7 +258,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			}
 			log
 					.logp(
-							java.util.logging.Level.FINE,
+							Level.FINE,
 							DeviceSerialPortImpl.$CLASS_NAME,
 							$METHOD_NAME,
 							String
@@ -290,25 +291,25 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			if (this.application != null) this.application.setPortConnected(true);
 		}
 		catch (ApplicationConfigurationException e) {
-			log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			if (this.serialPort != null) this.serialPort.close();
 			throw e;
 		}
 		catch (IOException e) {
 			SerialPortException en = new SerialPortException(e.getMessage());
-			log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, en.getMessage(), en);
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, en.getMessage(), en);
 			if (this.serialPort != null) this.serialPort.close();
 			throw en;
 		}
 		catch (NoSuchPortException e) {
 			SerialPortException en = new SerialPortException(e.getMessage());
-			log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, en.getMessage(), en);
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, en.getMessage(), en);
 			if (this.serialPort != null) this.serialPort.close();
 			throw en;
 		}
 		catch (UnsupportedCommOperationException e) {
 			SerialPortException en = new SerialPortException(e.getMessage());
-			log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, en.getMessage(), en);
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, en.getMessage(), en);
 			if (this.serialPort != null) this.serialPort.close();
 			throw en;
 		}
@@ -321,7 +322,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		//}
 		catch (PortInUseException e) {
 			SerialPortException en = new SerialPortException(e.getMessage());
-			log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, en.getMessage(), en);
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, en.getMessage(), en);
 			if (this.serialPort != null) this.serialPort.close();
 			throw en;
 		}
@@ -339,7 +340,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		final String $METHOD_NAME = "write"; //$NON-NLS-1$
 		int num = 0;
 		if ((num = this.inputStream.available()) != 0) {
-			log.logp(java.util.logging.Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "clean inputStreaam left bytes -> " + this.inputStream.read(new byte[num])); //$NON-NLS-1$
+			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "clean inputStreaam left bytes -> " + this.inputStream.read(new byte[num])); //$NON-NLS-1$
 		}
 
 		try {
@@ -350,14 +351,14 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				this.outputStream.flush();
 			}
 
-			if (log.isLoggable(java.util.logging.Level.FINE)) {
+			if (log.isLoggable(Level.FINE)) {
 				StringBuffer sb = new StringBuffer();
 				sb.append("Write data: "); //$NON-NLS-1$
 				for (byte element : writeBuffer) {
 					sb.append(String.format("%02X ", element)); //$NON-NLS-1$
 				}
 				sb.append(" to port ").append(this.serialPort.getName()).append(System.getProperty("line.separator")); //$NON-NLS-1$ //$NON-NLS-2$
-				log.logp(java.util.logging.Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
+				log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 
 			if (this.application != null) this.application.setSerialTxOff();
@@ -387,11 +388,11 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		case SerialPortEvent.RI:
 		case SerialPortEvent.OUTPUT_BUFFER_EMPTY:
 			//this.dataAvailable = false;
-			log.logp(java.util.logging.Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "OUTPUT_BUFFER_EMPTY"); //$NON-NLS-1$
+			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "OUTPUT_BUFFER_EMPTY"); //$NON-NLS-1$
 			break;
 		case SerialPortEvent.DATA_AVAILABLE:
 			//this.dataAvailable = true;
-			log.logp(java.util.logging.Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "DATA_AVAILABLE"); //$NON-NLS-1$
+			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "DATA_AVAILABLE"); //$NON-NLS-1$
 			break;
 		}
 	}
@@ -428,24 +429,24 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				//this.dataAvailable = false;
 				if (timeOutCounter <= 0) {
 					TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { bytes, timeout_msec }));
-					log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 					throw e;
 				}
 			}
 
-			if (log.isLoggable(java.util.logging.Level.FINE)) {
+			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Read  data: "); //$NON-NLS-1$
 				for (byte element : readBuffer) {
 					sb.append(String.format("%02X ", element)); //$NON-NLS-1$
 				}
-				log.logp(java.util.logging.Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
+				log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 
 			if (this.application != null) this.application.setSerialRxOff();
 		}
 		catch (IOException e) {
-			log.logp(java.util.logging.Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			throw e;
 		}
 		return readBuffer;
@@ -483,31 +484,31 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			//this.dataAvailable = false;
 			if (timeOutCounter <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { bytes, timeout_msec }));
-				log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}
 
 			long ms = (new Date().getTime()) - startTime_ms;
-			log.logp(java.util.logging.Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "waitTime = " + ms); //$NON-NLS-1$
+			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "waitTime = " + ms); //$NON-NLS-1$
 			waitTimes.add(ms);
 
-			if (log.isLoggable(java.util.logging.Level.FINE)) {
+			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Read  data: "); //$NON-NLS-1$
 				for (byte element : readBuffer) {
 					sb.append(String.format("%02X ", element)); //$NON-NLS-1$
 				}
-				log.logp(java.util.logging.Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
+				log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 
 			if (this.application != null) this.application.setSerialRxOff();
 		}
 		catch (IOException e) {
-			log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			throw e;
 		}
 		catch (InterruptedException e) {
-			log.logp(java.util.logging.Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 		}
 		return readBuffer;
 	}
@@ -530,7 +531,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 
 			if (timeOutCounter-- <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
-				log.logp(java.util.logging.Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}
 		}
@@ -560,7 +561,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			//log.logp(Level.FINER, "time out counter = " + counter);
 			if (timeOutCounter <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { numBytes, timeout_msec }));
-				log.logp(java.util.logging.Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				break;
 			}
 		}
@@ -586,7 +587,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		int readBytes = 0;
 		int timeOutCounter = timeout_msec / sleepTime;
 		if (stableIndex >= timeOutCounter) {
-			log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGE0013));
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGE0013));
 		}
 
 		try {
@@ -604,7 +605,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			//this.dataAvailable = false;
 			if (timeOutCounter <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { expectedBytes, timeout_msec }));
-				log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}
 
@@ -615,23 +616,23 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				readBuffer = tmpBuffer;
 			}
 
-			if (log.isLoggable(java.util.logging.Level.FINE)) {
+			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Read  data: "); //$NON-NLS-1$
 				for (byte element : readBuffer) {
 					sb.append(String.format("%02X ", element)); //$NON-NLS-1$
 				}
-				log.logp(java.util.logging.Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
+				log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 
 			if (this.application != null) this.application.setSerialRxOff();
 		}
 		catch (IOException e) {
-			log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			throw e;
 		}
 		catch (InterruptedException e) {
-			log.logp(java.util.logging.Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 		}
 		return readBuffer;
 	}
@@ -660,10 +661,12 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		while (byteCounter < expectedBytes && !isStable && !isTimedOut) {
 			this.timer.delay(sleepTime);
 
-			if (byteCounter == (numBytesAvailable = this.inputStream.available()))
+			if (byteCounter == (numBytesAvailable = this.inputStream.available())) 
 				--stableCounter;
-			else
+			else {
+				log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "stableCounter = " + stableCounter + " byteCounter = " + byteCounter); //$NON-NLS-1$ //$NON-NLS-2$
 				stableCounter = stableIndex;
+			}
 
 			if (stableCounter == 0) isStable = true;
 
@@ -671,11 +674,11 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 
 			--timeOutCounter;
 
-			log.logp(java.util.logging.Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "stableCounter = " + stableCounter + " timeOutCounter = " + timeOutCounter); //$NON-NLS-1$ //$NON-NLS-2$
+			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "stableCounter = " + stableCounter + " timeOutCounter = " + timeOutCounter); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (timeOutCounter == 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { expectedBytes, timeout_msec }));
-				log.logp(java.util.logging.Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}
 
@@ -692,7 +695,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	public void checkForLeftBytes() throws ReadWriteOutOfSyncException, IOException {
 		final String $METHOD_NAME = "checkForLeftBytes"; //$NON-NLS-1$
 		//check available bytes in receive buffer == 0
-		log.logp(java.util.logging.Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "inputStream available bytes = " + this.inputStream.available()); //$NON-NLS-1$
+		log.logp(Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "inputStream available bytes = " + this.inputStream.available()); //$NON-NLS-1$
 		if (this.inputStream.available() != 0) throw new ReadWriteOutOfSyncException(Messages.getString(MessageIds.GDE_MSGE0014));
 	}
 
@@ -708,7 +711,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			this.closeThread = new Thread("closePort") {
 				@Override
 				public void run() {
-					log.logp(java.util.logging.Level.CONFIG, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
+					log.logp(Level.CONFIG, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 					try {
 						Thread.sleep(5);
 						byte[] buf = new byte[getInputStream().available()];
@@ -717,21 +720,21 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 						Thread.sleep(5);
 					}
 					catch (Exception e) {
-						log.logp(java.util.logging.Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+						log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 					}
-					log.logp(java.util.logging.Level.CONFIG, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "before close"); //$NON-NLS-1$
+					log.logp(Level.CONFIG, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "before close"); //$NON-NLS-1$
 					DeviceSerialPortImpl.this.serialPort.close();
-					log.logp(java.util.logging.Level.CONFIG, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "after close"); //$NON-NLS-1$
+					log.logp(Level.CONFIG, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "after close"); //$NON-NLS-1$
 					DeviceSerialPortImpl.this.isConnected = false;
 					if (DeviceSerialPortImpl.this.application != null) DeviceSerialPortImpl.this.application.setPortConnected(false);
-					log.logp(java.util.logging.Level.CONFIG, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "exit"); //$NON-NLS-1$
+					log.logp(Level.CONFIG, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "exit"); //$NON-NLS-1$
 				}
 			};
 			try {
 				this.closeThread.start();
 			}
 			catch (RuntimeException e) {
-				log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+				log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
 	}

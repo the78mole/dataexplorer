@@ -25,20 +25,20 @@ import java.util.logging.Logger;
  * use synchronous -> new WaitTimer(500).run(); 
  */
 public class WaitTimer extends Thread {
-	final static String 				$CLASS_NAME 			= WaitTimer.class.getName();
-	final static Logger					log								= Logger.getLogger($CLASS_NAME);
-	
-	long delayTimeMilliSecinds = 1000;
-	
-	static WaitTimer instance = null;
-	
+	final static String	$CLASS_NAME						= WaitTimer.class.getName();
+	final static Logger	log										= Logger.getLogger(WaitTimer.$CLASS_NAME);
+
+	Long								delayTimeMilliSeconds	= 1000l;
+
+	static WaitTimer		instance							= null;
+
 	public static WaitTimer getInstance() {
-		if (instance == null) {
-			instance = new WaitTimer();
+		if (WaitTimer.instance == null) {
+			WaitTimer.instance = new WaitTimer();
 		}
-		return instance;
+		return WaitTimer.instance;
 	}
-	
+
 	/**
 	 * needs to specify sleep time while calling sleep
 	 * initially set wait time to 1000 ms
@@ -47,26 +47,18 @@ public class WaitTimer extends Thread {
 		super("waitTimer");
 	}
 
-	public void run() {
-		try {
-			WaitTimer.sleep(this.delayTimeMilliSecinds);
-		}
-		catch (InterruptedException e) {
-		}
-	}
-	
 	/**
 	 * synchronous wait for the given time
 	 * @param milliSeconds
 	 */
 	public void delay(long milliSeconds) {
-		this.delayTimeMilliSecinds = milliSeconds;
-		//this.start();
-		try {
-			WaitTimer.sleep(this.delayTimeMilliSecinds);
-			//this.join();
-		}
-		catch (InterruptedException e) {
+		synchronized (this.delayTimeMilliSeconds) {
+			this.delayTimeMilliSeconds = milliSeconds;
+			try {
+				Thread.sleep(this.delayTimeMilliSeconds);
+			}
+			catch (InterruptedException e) {
+			}
 		}
 	}
 }
