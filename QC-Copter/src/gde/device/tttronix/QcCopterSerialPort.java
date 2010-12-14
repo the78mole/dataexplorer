@@ -200,17 +200,21 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 	 * @param inData
 	 * @return
 	 */
-	byte[] synchronizeTerminalData(byte[] inData) {
+	static byte[] synchronizeTerminalData(byte[] inData) {
 		int inSize = inData.length;
+		log.logp(Level.WARNING, $CLASS_NAME, "synchronizeTerminalData", "inSize = " + inSize);
 		int index = 1;
-		while (inData[index] != '\f' && index < inSize) ++index;
-		if (inSize > index) { //additional '/f' found in data array
+		while (inData[index] != '\f' && index < inSize-1)
+			++index;
+		
+		if (inSize-1 > index) { //additional '\f' found in data array
 			byte[] outData = new byte[inSize - index]; 
 			System.arraycopy(inData, index, outData, 0, outData.length);
+			log.logp(Level.WARNING, $CLASS_NAME, "synchronizeTerminalData", "outSize = " + outData.length);
 			return synchronizeTerminalData(outData);
 		}
-		else 
-			return inData;
+		log.logp(Level.WARNING, $CLASS_NAME, "synchronizeTerminalData", "outSize = " + inSize);
+		return inData;
 	}
 	
 	/**
