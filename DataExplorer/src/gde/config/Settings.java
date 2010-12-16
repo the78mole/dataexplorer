@@ -1140,7 +1140,7 @@ public class Settings extends Properties {
 	private void setLevelSerialIO(java.util.logging.Level logLevel) {
 		final String $METHOD_NAME = "setLevelSerialIO"; //$NON-NLS-1$
 		try {
-			Logger logger = Logger.getLogger("gde.serial.DeviceSerialPort"); //$NON-NLS-1$
+			Logger logger = Logger.getLogger("gde.comm.DeviceSerialPortImpl"); //$NON-NLS-1$
 			for(Handler handler : logger.getHandlers()) {
 				logger.removeHandler(handler);
 			}
