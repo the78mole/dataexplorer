@@ -669,10 +669,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			}
 		}
 		
-		if (includeReasonableDataCheck) {
-			this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
-		}
-		else {
+		if (!includeReasonableDataCheck) {
 			// updateStateCurrentDependent
 			boolean enabled = recordSet.get(recordSet.getRecordNames()[2]).isActive();
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
@@ -691,6 +688,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 			recordSet.get(recordSet.getRecordNames()[10]).setDisplayable(recordSet.get(recordSet.getRecordNames()[9]).isActive());
 		}
+		this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
 	}
 	
 	/**
@@ -912,7 +910,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					Channel activChannel = Channels.getInstance().getActiveChannel();
 					if (activChannel != null) {
 						this.getDialog().liveThread = new UniLogLiveGatherer(this.application, this, this.serialPort, activChannel.getNumber(), this.getDialog());
-						this.getDialog().setLiveGathererButtons(false);
+						this.getDialog().setButtonStateLiveGatherer(false);
 						this.getDialog().liveThread.start();
 					}
 				}
@@ -933,8 +931,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				if (this.getDialog().liveThread != null) {
 					this.getDialog().liveThread.stopTimerThread();
 				}
+				if (this.getDialog().gatherThread != null) {
+					this.getDialog().gatherThread.setThreadStop();
+				}
 				this.serialPort.close();
-				this.getDialog().setLiveGathererButtons(true);
+				this.getDialog().setButtonStateLiveGatherer(true);
 			}
 		}
 	}

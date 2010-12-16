@@ -1148,16 +1148,7 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.log.log(Level.FINE, "liveViewButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											try {
 												int channelNumber = UniLogDialog.this.useConfigCombo.getSelectionIndex() + 1;
-												UniLogDialog.this.readAdjustmentButton.setEnabled(false);
-												UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
-												UniLogDialog.this.startLiveGatherButton.setEnabled(UniLogDialog.this.isLiveGathererEnabled = false);
-												UniLogDialog.this.readDataButton.setEnabled(false);
-												UniLogDialog.this.stopDataButton.setEnabled(false);
-												UniLogDialog.this.stopLiveGatherButton.setEnabled(!UniLogDialog.this.isLiveGathererEnabled);
-												UniLogDialog.this.useConfigCombo.setEnabled(false);
-												UniLogDialog.this.editConfigButton.setEnabled(false);
-												UniLogDialog.this.clearMemoryButton.setEnabled(false);
-												UniLogDialog.this.closeButton.setEnabled(false);
+												setButtonStateLiveGatherer(UniLogDialog.this.isLiveGathererEnabled = false);
 												setClosePossible(false);
 												UniLogDialog.this.liveThread = new UniLogLiveGatherer(UniLogDialog.this.application, UniLogDialog.this.device, UniLogDialog.this.serialPort, channelNumber, UniLogDialog.this);
 												try {
@@ -1266,16 +1257,7 @@ public class UniLogDialog extends DeviceDialog {
 													}
 												}
 											}
-											UniLogDialog.this.readAdjustmentButton.setEnabled(true);
-											UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
-											UniLogDialog.this.editConfigButton.setEnabled(false);
-											UniLogDialog.this.useConfigCombo.setEnabled(true);
-											UniLogDialog.this.readDataButton.setEnabled(true);
-											UniLogDialog.this.stopDataButton.setEnabled(false);
-											UniLogDialog.this.startLiveGatherButton.setEnabled(UniLogDialog.this.isLiveGathererEnabled = true);
-											UniLogDialog.this.stopLiveGatherButton.setEnabled(!UniLogDialog.this.isLiveGathererEnabled);
-											UniLogDialog.this.clearMemoryButton.setEnabled(true);
-											UniLogDialog.this.closeButton.setEnabled(true);
+											setButtonStateLiveGatherer(UniLogDialog.this.isLiveGathererEnabled = true);
 											setClosePossible(true);
 											if (!UniLogDialog.this.stopLoggingButton.getEnabled()) {
 												UniLogDialog.this.readDataButton.setEnabled(true);
@@ -1736,59 +1718,25 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public void resetButtons() {
 		if (this.dialogShell != null) {
-			if (Thread.currentThread().getId() == this.application.getThreadId()) {
-				this.readAdjustmentButton.setEnabled(true);
-				this.storeAdjustmentsButton.setEnabled(false);
-
-				this.editConfigButton.setEnabled(false);
-				this.useConfigCombo.setEnabled(true);
-
-				this.readDataButton.setEnabled(true);
-				this.stopDataButton.setEnabled(false);
-
+			if (Thread.currentThread().getId() == this.application.getThreadId()) {		
+				this.setButtonStateLiveGatherer(true);
 				this.startLoggingButton.setEnabled(true);
 				this.stopLoggingButton.setEnabled(false);
-
-				this.setLiveGathererButtons(true);
-
-				this.clearMemoryButton.setEnabled(true);
 				this.closeButton.setEnabled(true);
 				setClosePossible(true);
 			}
 			else {
 				DataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
+						UniLogDialog.this.setButtonStateLiveGatherer(true);
 						UniLogDialog.this.readAdjustmentButton.setEnabled(true);
-						UniLogDialog.this.storeAdjustmentsButton.setEnabled(false);
-
-						UniLogDialog.this.editConfigButton.setEnabled(false);
-						UniLogDialog.this.useConfigCombo.setEnabled(true);
-
-						UniLogDialog.this.readDataButton.setEnabled(true);
-						UniLogDialog.this.stopDataButton.setEnabled(false);
-
 						UniLogDialog.this.startLoggingButton.setEnabled(true);
 						UniLogDialog.this.stopLoggingButton.setEnabled(false);
-
-						UniLogDialog.this.setLiveGathererButtons(true);
-
-						UniLogDialog.this.clearMemoryButton.setEnabled(true);
 						UniLogDialog.this.closeButton.setEnabled(true);
 						setClosePossible(true);
 					}
 				});
 			}
-		}
-	}
-
-	/**
-	 * set the live gatherer buttons state
-	 */
-	void setLiveGathererButtons(boolean isStartButtonEnabled) {
-		this.isLiveGathererEnabled = isStartButtonEnabled;
-		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
-			this.startLiveGatherButton.setEnabled(isStartButtonEnabled);
-			this.stopLiveGatherButton.setEnabled(!isStartButtonEnabled);
 		}
 	}
 
@@ -1876,6 +1824,25 @@ public class UniLogDialog extends DeviceDialog {
 				this.configTab4.checkUpdateAnalog();
 				break;
 			}
+		}
+	}
+
+	/**
+	 * update buttons live gatherer dependent
+	 */
+	void setButtonStateLiveGatherer(boolean liveGathererEnabled) {
+		this.isLiveGathererEnabled = liveGathererEnabled;
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
+			this.readAdjustmentButton.setEnabled(liveGathererEnabled);
+			this.storeAdjustmentsButton.setEnabled(false);
+			this.editConfigButton.setEnabled(false);
+			this.readDataButton.setEnabled(liveGathererEnabled);
+			this.stopDataButton.setEnabled(false);
+			this.startLiveGatherButton.setEnabled(liveGathererEnabled);
+			this.stopLiveGatherButton.setEnabled(!liveGathererEnabled);
+			this.useConfigCombo.setEnabled(liveGathererEnabled);
+			this.clearMemoryButton.setEnabled(liveGathererEnabled);
+			this.closeButton.setEnabled(liveGathererEnabled);
 		}
 	}
 }

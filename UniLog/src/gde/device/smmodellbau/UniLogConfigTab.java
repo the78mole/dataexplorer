@@ -1370,7 +1370,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 					}
 				}
-				UniLogConfigTab.this.setConfigButton.setEnabled(true);
 				UniLogConfigTab.this.powerGroup.redraw();
 				UniLogConfigTab.this.axModusGroup.redraw();
 			}
