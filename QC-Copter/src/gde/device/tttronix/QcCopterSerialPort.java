@@ -43,8 +43,9 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 	
 	boolean isInSync = false;
 	
-	final byte STX = 0x02;
-	final byte ETX = 0x03;
+	final public static byte STX = 0x02;
+	final public static byte ETX = 0x03;
+	final public static byte FF = '\f';
 	final int  dataSize;
 	final int  terminalDataSize = 345; // configuration menu string
 	int retrys = 0; // re-try temporary error counter
@@ -131,13 +132,28 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 	}
 	
 	/**
-	 * check if received data contains STX which
+	 * check if received data contains STX
 	 * @return true if one byte of data represent STX else false
 	 */
 	boolean containsSTX(byte[] data) {
 		boolean isContained = false;
 		for (int i = 0; i < data.length; i++) {
 			if (data[i] == STX) {
+				isContained = true;
+				break;
+			}
+		}
+		return isContained;
+	}
+	
+	/**
+	 * check if received data contains form feed 
+	 * @return true if one byte of data represent FF else false
+	 */
+	boolean containsFF(byte[] data) {
+		boolean isContained = false;
+		for (int i = 0; i < data.length; i++) {
+			if (data[i] == FF) {
 				isContained = true;
 				break;
 			}
@@ -152,32 +168,12 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 	 */
 	public synchronized String getTerminalData() throws Exception {
 		final String $METHOD_NAME = "getTerminalData"; //$NON-NLS-1$
-		String returnString = GDE.STRING_EMPTY;
 		int timeout_ms = 1000;
+		byte[] data = null;
 
-		try {			
-			int size = this.waitForStableReceiveBuffer(345, timeout_ms, 100);// stable counter max 3000/4 = 750
-			log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "receive buffer data size = " + size); //$NON-NLS-1$
-			byte[] data = new byte[size];
-			if (size >= 400) {// terminal character limit
-				data = this.read(data, timeout_ms);
-				byte[] checkSTX = new byte[62];
-				System.arraycopy(data, size-63, checkSTX, 0, 62);
-				if(containsSTX(checkSTX)) {
-					returnString = new String(Messages.getString(MessageIds.GDE_MSGT1906));
-				}
-				else {
-					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "receive potential scrambeled data, try to sync ?");					
-					returnString = new String(synchronizeTerminalData(data));
-				}
-			}
-			else if (size == 0) {
-				this.timer.delay(timeout_ms);
-			}
-			else {
-				returnString = new String(data = this.read(data, timeout_ms)); 
-			}
-			
+		try {
+			data = this.read(new byte[this.getAvailableBytes()], timeout_ms);
+
 			if (log.isLoggable(Level.FINER)) {
 				StringBuilder sb = new StringBuilder();
 				for (byte b : data) {
@@ -192,7 +188,7 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 				throw e;
 			}
 		}
-		return returnString;
+		return (data != null && data.length > 0) ? new String(data) : GDE.STRING_EMPTY;
 	}
 
 	/**

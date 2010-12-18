@@ -331,14 +331,18 @@ public class QcCopterDialog extends DeviceDialog {
 	}
 
 	/**
-	 * 
+	 * toggle the text of start configuration button according comm port state
 	 */
 	void checkPortStatus() {
-		if (this.device.serialPort.isConnected()) {
-			this.startConfiguration.setText("stop configurartion");
-		}
-		else {
-			this.startConfiguration.setText("start configurartion");
-		}
+		DataExplorer.display.asyncExec(new Runnable() {
+			public void run() {
+				if (QcCopterDialog.this.device.serialPort.isConnected()) {
+					QcCopterDialog.this.startConfiguration.setText("stop configurartion");
+				}
+				else {
+					QcCopterDialog.this.startConfiguration.setText("start configurartion");
+				}
+			}
+		});
 	}
 }

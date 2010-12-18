@@ -87,27 +87,38 @@ public class GathererThread extends Thread {
 		long tmpCycleTime = 0;
 		long measurementCount = 0;
 		byte[] dataBuffer = null;
-		boolean isTerminalDataRecived = false;
-
+		
 		this.isCollectDataStopped = false;
 		log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
+		StringBuffer terminalText = new StringBuffer();
 		while (!this.isCollectDataStopped) {
 			try {
-
 				// check if device is ready for data capturing or terminal open
-				// else wait for 180 seconds max. for actions
-				if (this.dialog != null && !this.dialog.isDisposed()) {
-					//dialog terminal is open
-					String returnString = GDE.STRING_EMPTY;
-					returnString = this.serialPort.getTerminalData();
-
-					if (returnString.length() > 5) {
-						isTerminalDataRecived = true;
-						this.dialog.setTerminalText(returnString);
+				// in case of time outs wait for 180 seconds max. for actions
+				if (this.dialog != null && !this.dialog.isDisposed()) {					
+					String text = this.serialPort.getTerminalData();
+					if (text.length() > 0 && !text.equals(GDE.STRING_EMPTY)) {
+						if (this.serialPort.containsSTX(text.getBytes())) {
+							DataExplorer.display.syncExec(new Runnable() {
+								@Override
+								public void run() {
+									if (!GathererThread.this.dialog.isDisposed()) {
+										GathererThread.this.dialog.dispose();
+									}
+								}
+							});
+						}
+						else if (this.serialPort.containsFF(text.getBytes())) {
+							terminalText = new StringBuffer().append(text.substring(text.indexOf(QcCopterSerialPort.FF) + 1));
+						}
+						else {
+							terminalText.append(text);
+						}
+						this.dialog.setTerminalText(terminalText.toString());
 					}
-					else if (!isTerminalDataRecived) {
-						this.dialog.setTerminalText(Messages.getString(MessageIds.GDE_MSGI1900));
+					else {
+						stopDataGatheringThread(true, null);
 					}
 				}
 				else if (this.dialog != null && this.dialog.isDisposed()) {
@@ -198,6 +209,9 @@ public class GathererThread extends Thread {
 		}
 		if (this.serialPort != null && this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
 			this.serialPort.close();
+		}
+		if (this.dialog != null && !this.dialog.isDisposed()) {
+			this.dialog.checkPortStatus();
 		}
 
 		RecordSet recordSet = this.channel.get(this.recordSetKey);
