@@ -33,10 +33,12 @@ import gde.utils.FileUtils;
 import gde.utils.WaitTimer;
 import gnu.io.SerialPort;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -52,8 +54,10 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	final static Logger	log									= Logger.getLogger($CLASS_NAME);
 
 	DataInputStream			data_in;
+	BufferedReader			txt_in;
 	int									xferErrors					= 0;
 	boolean							isConnected					= false;
+	String 							fileType 						= GDE.FILE_ENDING_STAR_LOV;
 
 	final IDevice				device;
 	final DataExplorer	application;
@@ -94,21 +98,27 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
 				}
 			}
-			FileDialog openFileDialog = this.application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV }, path, null, SWT.SINGLE);
+			FileDialog openFileDialog = this.application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV, GDE.FILE_ENDING_STAR_TXT }, path, null, SWT.SINGLE);
 			if (openFileDialog.getFileName().length() > 4) {
 				String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 
 				if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
+					fileType = GDE.FILE_ENDING_STAR_OSD;
 					//TODO add implementation to use *.osd files as simulation data input
 				}
 				else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
+					fileType = GDE.FILE_ENDING_STAR_LOV;
 					data_in = new DataInputStream(new FileInputStream(new File(openFilePath)));
 					LogViewReader.readHeader(data_in);
+				}
+				else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
+					fileType = GDE.FILE_ENDING_STAR_TXT;
+					txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
 				}
 				else
 					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0008) + openFilePath);
 			}
-			this.isConnected = data_in != null;
+			this.isConnected = data_in != null || txt_in != null;
 			if (this.application != null) this.application.setPortConnected(this.isConnected);
 		}
 		catch (Exception e) {
@@ -123,9 +133,18 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	@Override
 	public void close() {
 		try {
-			if (data_in != null) data_in.close();
-			this.isConnected = false;
-			if (this.application != null) this.application.setPortConnected(false);
+			if (data_in != null) {
+				data_in.close(); 
+				data_in = null;
+			}
+			if (txt_in != null) {
+				txt_in.close(); 
+				txt_in = null;
+			}
+			if (this.isConnected) {
+				this.isConnected = false;
+				if (this.application != null) this.application.setPortConnected(false);
+			}
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -143,9 +162,32 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		catch (InterruptedException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
-		if (data_in != null && this.isConnected) {
-			data_in.read(readBuffer);
-			data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		if (this.isConnected) {
+			if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
+				if(data_in.read(readBuffer) > 0) {
+					data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+				}
+				else {
+					readBuffer = new byte[0];
+					this.close();
+				}
+			}
+			else if (txt_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_TXT)) {
+				char[] cbuf = new char[readBuffer.length];
+				if (txt_in.read(cbuf) > 0) {
+					for (int i = 0, j = 0; j < cbuf.length; i++, j++) {
+						if (cbuf[j] == '\\' && cbuf[j + 1] == 'f') {
+							readBuffer = new byte[readBuffer.length - 1];
+							readBuffer[j] = 12;
+							j++;
+						}
+						else
+							readBuffer[i] = (byte) cbuf[j];
+					}
+				}
+				else
+					this.close();
+			}
 		}
 		return readBuffer;
 	}
@@ -161,9 +203,25 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		catch (InterruptedException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
-		if (data_in != null && this.isConnected) {
-			data_in.read(readBuffer);
-			data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		if (this.isConnected) {
+			if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
+				data_in.read(readBuffer);
+				data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+			}
+			else if (txt_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_TXT)) {
+				char[] cbuf = new char[readBuffer.length];
+				if (txt_in.read(cbuf) > 0) {
+					for (int i = 0, j = 0; j < cbuf.length; i++, j++) {
+						if (cbuf[j] == '\\' && cbuf[j + 1] == 'f') {
+							readBuffer = new byte[readBuffer.length - 1];
+							readBuffer[j] = 12;
+							j++;
+						}
+						else
+							readBuffer[i] = (byte) cbuf[j];
+					}
+				}
+			}
 		}
 		return readBuffer;
 	}
@@ -179,9 +237,25 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		catch (IOException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
-		if (data_in != null && this.isConnected) {
-			data_in.read(readBuffer);
-			data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+		if (this.isConnected) {
+			if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
+				data_in.read(readBuffer);
+				data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
+			}
+			else if (txt_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_TXT)) {
+				char[] cbuf = new char[readBuffer.length];
+				if (txt_in.read(cbuf) > 0) {
+					for (int i = 0, j = 0; j < cbuf.length; i++, j++) {
+						if (cbuf[j] == '\\' && cbuf[j + 1] == 'f') {
+							readBuffer = new byte[readBuffer.length - 1];
+							readBuffer[j] = 12;
+							j++;
+						}
+						else
+							readBuffer[i] = (byte) cbuf[j];
+					}
+				}
+			}
 		}
 		return readBuffer;
 	}
@@ -225,7 +299,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @see gde.serial.IDeviceSerialPort#waitForStableReceiveBuffer(int, int, int)
 	 */
 	public int getAvailableBytes() throws IOException {
-		return 20;
+		return this.isConnected ? 20 : 0;
 	}
 
 	/**

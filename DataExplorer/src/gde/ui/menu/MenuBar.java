@@ -812,7 +812,7 @@ public class MenuBar {
 	 * @param isOpenStatus
 	 */
 	public void setPortConnected(final boolean isOpenStatus) {
-		if (!this.application.isDisposed()) {
+		if (!this.application.isDisposed() && !this.portMenuItem.isDisposed()) {
 			switch (this.iconSet) {
 			case 0: // DeviceSerialPort.ICON_SET_OPEN_CLOSE
 			default:
