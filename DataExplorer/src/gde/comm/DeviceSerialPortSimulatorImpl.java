@@ -30,6 +30,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
+import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 import gnu.io.SerialPort;
 
@@ -40,6 +41,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -98,7 +100,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
 				}
 			}
-			FileDialog openFileDialog = this.application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV, GDE.FILE_ENDING_STAR_TXT }, path, null, SWT.SINGLE);
+			FileDialog openFileDialog = this.application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV, GDE.FILE_ENDING_STAR_TXT, GDE.FILE_ENDING_STAR_LOG }, path, null, SWT.SINGLE);
 			if (openFileDialog.getFileName().length() > 4) {
 				String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 
@@ -113,6 +115,10 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				}
 				else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
 					fileType = GDE.FILE_ENDING_STAR_TXT;
+					txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
+				}
+				else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+					fileType = GDE.FILE_ENDING_STAR_LOG;
 					txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
 				}
 				else
@@ -172,24 +178,57 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 					this.close();
 				}
 			}
-			else if (txt_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_TXT)) {
-				char[] cbuf = new char[readBuffer.length];
-				if (txt_in.read(cbuf) > 0) {
-					for (int i = 0, j = 0; j < cbuf.length; i++, j++) {
-						if (cbuf[j] == '\\' && cbuf[j + 1] == 'f') {
-							readBuffer = new byte[readBuffer.length - 1];
-							readBuffer[j] = 12;
-							j++;
+			else if (txt_in != null) {
+				if (this.fileType.equals(GDE.FILE_ENDING_STAR_TXT)) {
+					char[] cbuf = new char[readBuffer.length];
+					if (txt_in.read(cbuf) > 0) {
+						for (int i = 0, j = 0; j < cbuf.length; i++, j++) {
+							if (cbuf[j] == '\\' && cbuf[j + 1] == 'f') {
+								readBuffer = new byte[readBuffer.length - 1];
+								readBuffer[j] = 12;
+								j++;
+							}
+							else
+								readBuffer[i] = (byte) cbuf[j];
 						}
-						else
-							readBuffer[i] = (byte) cbuf[j];
 					}
+					else
+						this.close();
 				}
-				else
-					this.close();
+				else if (this.fileType.equals(GDE.FILE_ENDING_STAR_LOG)) {
+					String line;
+					if ((line = txt_in.readLine()) != null) {
+						line = getHexDataLine(line);
+						if (line != null) {
+							//System.out.println(line);
+							StringTokenizer token = new StringTokenizer(line);
+							StringBuffer sb = new StringBuffer();
+							while (token.hasMoreElements()) {
+								sb.append(token.nextElement());
+							}
+							//System.out.println(sb.toString());
+							readBuffer = StringHelper.convert2ByteArray(sb.toString());
+						}
+					}
+					else
+						this.close();
+				}
 			}
 		}
 		return readBuffer;
+	}
+
+	/**
+	 * @param line
+	 * @return
+	 * @throws IOException
+	 */
+	String getHexDataLine(String line) throws IOException {
+		while(!line.contains("Read  data:") && (line = txt_in.readLine()) != null) ;
+		if(line != null) {
+			line = line.substring(line.indexOf("Read  data:") + 12);
+		}
+		return line == null || line.length() > 1 ? line : getHexDataLine(line);
 	}
 
 	/* (non-Javadoc)

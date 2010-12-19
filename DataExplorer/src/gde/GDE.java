@@ -137,6 +137,7 @@ public class GDE {
 	public static final String		FILE_ENDING_STAR_HEX			= "*.hex";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_INI			= "*.ini";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_TXT			= "*.txt";//$NON-NLS-1$
+	public static final String		FILE_ENDING_STAR_LOG			= "*.log";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_STAR			= "*.*";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_JAR				= ".jar";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_LOV				= ".lov";	//$NON-NLS-1$
@@ -147,6 +148,7 @@ public class GDE {
 	public static final String		FILE_ENDING_DOT_PNG				= ".png";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_GIF				= ".gif";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_TXT				= ".txt";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_DOT_LOG				= ".log";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_STF				= ".stf";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_ZIP				= ".zip";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_BAK				= ".bak";	//$NON-NLS-1$
