@@ -141,6 +141,7 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
+		boolean configChanged = this.isChangePropery();
 		Record record;
 		MeasurementType measurement;
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
@@ -172,6 +173,7 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 		}
 		log.log(Level.TIME, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
+		this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
 	}
 
 	/**

@@ -103,7 +103,7 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 					log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, sb.toString());
 				}
 				
-				if (!isChecksumOK(data)) {
+				if (data.length != this.dataSize || !isChecksumOK(data)) {
 					this.addXferError();
 					this.retrys++;
 					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
@@ -115,11 +115,7 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 				this.retrys = 0;
 			}
 			else { // only flight simulation data contains STX, so this must be configuration menu string
-				this.retrys++;
-				if (this.retrys >= 4) { //345/dataSize = 5,5
-					this.retrys = 0;
-					throw new SerialPortException(Messages.getString(MessageIds.GDE_MSGT1905));
-				}
+				throw new TimeOutException("received no flight simulation data!");
 			}
 		}
 		catch (Exception e) {
@@ -172,6 +168,7 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 		byte[] data = null;
 
 		try {
+			wait4Bytes(timeout_ms);
 			data = this.read(new byte[this.getAvailableBytes()], timeout_ms);
 
 			if (log.isLoggable(Level.FINER)) {
@@ -183,36 +180,12 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 			}
 		}
 		catch (Exception e) {
-			if (!(e instanceof TimeOutException)) {
-				log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
-				throw e;
-			}
+			log.logp(Level.SEVERE, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			throw e;
 		}
 		return (data != null && data.length > 0) ? new String(data) : GDE.STRING_EMPTY;
 	}
 
-	/**
-	 * try to synchronize
-	 * @param inData
-	 * @return
-	 */
-	static byte[] synchronizeTerminalData(byte[] inData) {
-		int inSize = inData.length;
-		log.logp(Level.WARNING, $CLASS_NAME, "synchronizeTerminalData", "inSize = " + inSize);
-		int index = 1;
-		while (inData[index] != '\f' && index < inSize-1)
-			++index;
-		
-		if (inSize-1 > index) { //additional '\f' found in data array
-			byte[] outData = new byte[inSize - index]; 
-			System.arraycopy(inData, index, outData, 0, outData.length);
-			log.logp(Level.WARNING, $CLASS_NAME, "synchronizeTerminalData", "outSize = " + outData.length);
-			return synchronizeTerminalData(outData);
-		}
-		log.logp(Level.WARNING, $CLASS_NAME, "synchronizeTerminalData", "outSize = " + inSize);
-		return inData;
-	}
-	
 	/**
 	 * check check sum of data buffer
 	 * @param buffer

@@ -110,12 +110,15 @@ public class GathererThread extends Thread {
 							});
 						}
 						else if (this.serialPort.containsFF(text.getBytes())) {
-							terminalText = new StringBuffer().append(text.substring(text.indexOf(QcCopterSerialPort.FF) + 1));
+							log.logp(java.util.logging.Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "received text length = " + (terminalText.length()+1));
+							this.dialog.setTerminalText(terminalText.toString());
+							terminalText = new StringBuffer();
+							if(text.length() > 1)
+								terminalText.append(text.substring(text.indexOf(QcCopterSerialPort.FF) + 1));
 						}
 						else {
 							terminalText.append(text);
 						}
-						this.dialog.setTerminalText(terminalText.toString());
 					}
 					else {
 						stopDataGatheringThread(true, null);
