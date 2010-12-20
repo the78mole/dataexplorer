@@ -159,7 +159,7 @@ public class QcCopterDialog extends DeviceDialog {
 								terminalTextLData.horizontalAlignment = GridData.CENTER;
 								this.terminalText.setLayoutData(terminalTextLData);
 								this.terminalText.setText("012345678901234567890123456789012345678901234567890\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9");
-								this.terminalText.setFont(SWTResourceManager.getFont(GDE.IS_WINDOWS?"Courier":"Monospace", 10, SWT.NORMAL));
+								this.terminalText.setFont(SWTResourceManager.getFont(GDE.IS_WINDOWS?"Courier":"Monospace", GDE.IS_MAC?12:10, SWT.NORMAL));
 							}
 						}
 					}
