@@ -340,7 +340,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		final String $METHOD_NAME = "write"; //$NON-NLS-1$
 		int num = 0;
 		if ((num = this.inputStream.available()) != 0) {
-			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "clean inputStreaam left bytes -> " + this.inputStream.read(new byte[num])); //$NON-NLS-1$
+			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "clean inputStream left bytes -> " + this.inputStream.read(new byte[num])); //$NON-NLS-1$
 		}
 
 		try {

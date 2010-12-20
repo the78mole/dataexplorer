@@ -186,31 +186,31 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 
 					sb.append('\f');
 					while ((value = txt_in.read()) != -1 && value != '\f')
-						sb.append((char)value);
+						sb.append((char) value);
 
 					if (sb.length() > 1)
 						readBuffer = sb.toString().getBytes();
 					else
 						this.close();
 				}
-			}
-			else if (this.fileType.equals(GDE.FILE_ENDING_STAR_LOG)) {
-				String line;
-				if ((line = txt_in.readLine()) != null) {
-					line = getHexDataLine(line);
-					if (line != null) {
-						//System.out.println(line);
-						StringTokenizer token = new StringTokenizer(line);
-						StringBuffer sb = new StringBuffer();
-						while (token.hasMoreElements()) {
-							sb.append(token.nextElement());
+				else if (this.fileType.equals(GDE.FILE_ENDING_STAR_LOG)) {
+					String line;
+					if ((line = txt_in.readLine()) != null) {
+						line = getHexDataLine(line);
+						if (line != null) {
+							//System.out.println(line);
+							StringTokenizer token = new StringTokenizer(line);
+							StringBuffer sb = new StringBuffer();
+							while (token.hasMoreElements()) {
+								sb.append(token.nextElement());
+							}
+							//System.out.println(sb.toString());
+							readBuffer = StringHelper.convert2ByteArray(sb.toString());
 						}
-						//System.out.println(sb.toString());
-						readBuffer = StringHelper.convert2ByteArray(sb.toString());
 					}
+					else
+						this.close();
 				}
-				else
-					this.close();
 			}
 		}
 		return readBuffer;
