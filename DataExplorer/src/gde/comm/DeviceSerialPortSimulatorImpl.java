@@ -116,6 +116,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
 					fileType = GDE.FILE_ENDING_STAR_TXT;
 					txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
+					txt_in.read();
 				}
 				else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
 					fileType = GDE.FILE_ENDING_STAR_LOG;
@@ -170,7 +171,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		}
 		if (this.isConnected) {
 			if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
-				if(data_in.read(readBuffer) > 0) {
+				if (data_in.read(readBuffer) > 0) {
 					data_in.read(new byte[this.device.getLovDataByteSize() - this.device.getDataBlockSize()]);
 				}
 				else {
@@ -180,39 +181,36 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 			}
 			else if (txt_in != null) {
 				if (this.fileType.equals(GDE.FILE_ENDING_STAR_TXT)) {
-					char[] cbuf = new char[readBuffer.length];
-					if (txt_in.read(cbuf) > 0) {
-						for (int i = 0, j = 0; j < cbuf.length; i++, j++) {
-							if (cbuf[j] == '\\' && cbuf[j + 1] == 'f') {
-								readBuffer = new byte[readBuffer.length - 1];
-								readBuffer[j] = 12;
-								j++;
-							}
-							else
-								readBuffer[i] = (byte) cbuf[j];
-						}
-					}
+					StringBuffer sb = new StringBuffer();
+					int value;
+
+					sb.append('\f');
+					while ((value = txt_in.read()) != -1 && value != '\f')
+						sb.append((char)value);
+
+					if (sb.length() > 1)
+						readBuffer = sb.toString().getBytes();
 					else
 						this.close();
 				}
-				else if (this.fileType.equals(GDE.FILE_ENDING_STAR_LOG)) {
-					String line;
-					if ((line = txt_in.readLine()) != null) {
-						line = getHexDataLine(line);
-						if (line != null) {
-							//System.out.println(line);
-							StringTokenizer token = new StringTokenizer(line);
-							StringBuffer sb = new StringBuffer();
-							while (token.hasMoreElements()) {
-								sb.append(token.nextElement());
-							}
-							//System.out.println(sb.toString());
-							readBuffer = StringHelper.convert2ByteArray(sb.toString());
+			}
+			else if (this.fileType.equals(GDE.FILE_ENDING_STAR_LOG)) {
+				String line;
+				if ((line = txt_in.readLine()) != null) {
+					line = getHexDataLine(line);
+					if (line != null) {
+						//System.out.println(line);
+						StringTokenizer token = new StringTokenizer(line);
+						StringBuffer sb = new StringBuffer();
+						while (token.hasMoreElements()) {
+							sb.append(token.nextElement());
 						}
+						//System.out.println(sb.toString());
+						readBuffer = StringHelper.convert2ByteArray(sb.toString());
 					}
-					else
-						this.close();
 				}
+				else
+					this.close();
 			}
 		}
 		return readBuffer;
