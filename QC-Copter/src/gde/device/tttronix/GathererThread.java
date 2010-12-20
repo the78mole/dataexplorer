@@ -110,7 +110,6 @@ public class GathererThread extends Thread {
 							});
 						}
 						else if (this.serialPort.containsFF(text.getBytes())) {
-							log.logp(java.util.logging.Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, "received text length = " + (terminalText.length()+1));
 							this.dialog.setTerminalText(terminalText.toString());
 							terminalText = new StringBuffer();
 							if(text.length() > 1)
