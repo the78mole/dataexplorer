@@ -192,7 +192,6 @@ public class OsdReaderWriter {
 		}
 
 		try { // build the data structure
-
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
 				recordSetName = recordSetInfo.get(GDE.RECORD_SET_NAME);
@@ -202,6 +201,7 @@ public class OsdReaderWriter {
 				recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
 				recordDataSize = new Long(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
+				
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				if (channel == null) { // 1.st try channelConfiguration not found
 					try { // get channel last digit and use as channel config ordinal
@@ -258,16 +258,20 @@ public class OsdReaderWriter {
 					}
 					log.log(Level.FINE, sb.toString());
 				}
-				String [] recordKeys = recordSet.getRecordNames();
+
+				String [] recordKeys = checkBalanceMeasurement(recordsProperties, device, recordSet.getRecordNames());
 				// check if the file content fits measurements form device properties XML which was used to create the record set
 				if (recordsProperties.length != recordKeys.length) {
 					for (int j = recordsProperties.length; j < recordKeys.length; j++) {
 						recordSet.remove(recordKeys[j]);
+						log.log(Level.FINER, "removed record " + recordKeys[j]);
 					}
-					recordKeys = recordSet.getRecordNames();
+					//update recordKeys to reflect change
+					recordKeys = checkBalanceMeasurement(recordsProperties, device, recordSet.getRecordNames());
 				}
 				for (int i = 0; i < recordKeys.length; ++i) {
 					Record record = recordSet.get(recordKeys[i]);
+					log.log(Level.FINER, "setSerializedProperties " + recordKeys[i]);
 					record.setSerializedProperties(recordsProperties[i]);
 					record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
 				}
@@ -323,6 +327,43 @@ public class OsdReaderWriter {
 			data_in = null;
 			file_input = null;
 		}
+	}
+
+	/**
+	 * check if a device is used which has added Balance curve
+	 * @param recordsProperties
+	 * @param device
+	 * @param recordKeys
+	 * @return
+	 */
+	static String[] checkBalanceMeasurement(String[] recordsProperties, IDevice device, String[] recordKeys) {
+		//check for LipoWatch with added balance curve, LipoWatch has different recordSetSize according to connected cells
+		if(device.getName().startsWith("LiPoWatch") || device.getName().startsWith("eStation")) {
+			if (!containsBalance(recordsProperties)) {
+				Vector<String> cleanedReordNames = new Vector<String>();
+				for (String tmpRecordName : recordKeys) {
+					if (!tmpRecordName.toLowerCase().contains("balance")) {
+						cleanedReordNames.add(tmpRecordName);
+					}
+				}
+				recordKeys = cleanedReordNames.toArray(new String[1]);
+			}
+		}
+		return recordKeys;
+	}
+
+	/**
+	 * check if a record named Balance is contained
+	 * @param recordsProperties
+	 * @return
+	 */
+	static boolean containsBalance(String[] recordsProperties) {
+		boolean isContained = false;
+		for (String recordProperties : recordsProperties) {
+			isContained = recordProperties.toLowerCase().contains("balance");
+			if (isContained) break;
+		}
+		return isContained;
 	}
 
 	/**
@@ -688,5 +729,4 @@ public class OsdReaderWriter {
 			DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0038, new Object[] {e.getMessage()}));
 		}
 	}
-
 }
