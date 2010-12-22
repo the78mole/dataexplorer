@@ -1,5 +1,14 @@
 Development history / change log, please read from bottom up
 
+
+fix value format sync problem digital, analog versus graphics
+enable one click live data gathering (UniLog/LiPoWatch)
+fix value format sync problem digital, analog vs graphics
+fix QC-Copter terminal configuration menu display
+update QC-Copter English help
+fix pan menu item state in menu bar
+add balance curve to LiPoWatch, all eStations and clones
+
 Version 2.60 - 01 Dec 2010
 
 add a configuration dialog for GPS/KML velocity limits and colors
