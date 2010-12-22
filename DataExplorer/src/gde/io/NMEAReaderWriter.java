@@ -89,7 +89,7 @@ public class NMEAReaderWriter {
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
 		String recordSetNameExtend = device.getRecordSetStemName();
 		long timeStamp = -1;
-		NMEAReaderWriter.application.setProgress(0, sThreadId);
+		if (NMEAReaderWriter.application.getStatusBar() != null) NMEAReaderWriter.application.setProgress(0, sThreadId);
 
 		try {
 			if (channelConfigNumber == null)
@@ -171,7 +171,7 @@ public class NMEAReaderWriter {
 					}
 					data.parse(lines.toArray(new String[1]), lineNumber);
 					int progress = (int) (lineNumber*100/approximateLines);
-					if (progress % 5 == 0) 	NMEAReaderWriter.application.setProgress(progress, sThreadId);
+					if (NMEAReaderWriter.application.getStatusBar() != null && progress % 5 == 0) 	NMEAReaderWriter.application.setProgress(progress, sThreadId);
 					//start over with new line and signature
 					lines.clear();
 					if (line != null && line.length() > 7) {
