@@ -25,6 +25,7 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
+import gde.utils.WaitTimer;
 import gnu.io.NoSuchPortException;
 
 import java.io.IOException;
@@ -69,7 +70,7 @@ public class PicolarioSerialPort extends DeviceCommPort {
 			}
 
 			this.write(this.readNumberRecordSets);
-			this.timer.delay(30);
+			WaitTimer.delay(30);
 			this.write(this.readNumberRecordSets);
 
 			byte[] answer = new byte[4];
@@ -108,7 +109,7 @@ public class PicolarioSerialPort extends DeviceCommPort {
 			this.write(readRecordSetsWithNumber);
 			this.isTransmitFinished = false;
 
-			this.timer.delay(256); // give picolario time to prepare data
+			WaitTimer.delay(256); // give picolario time to prepare data
 
 			while (!this.isTransmitFinished) {
 
@@ -161,9 +162,9 @@ public class PicolarioSerialPort extends DeviceCommPort {
 		int timeCounter = timeout_msec / sleepTime;
 		int availableBytes = 0;
 
-		this.timer.delay(sleepTime);
+		WaitTimer.delay(sleepTime);
 		while (0 == (availableBytes = this.getAvailableBytes()) && timeCounter-- > 0) {
-			this.timer.delay(sleepTime);
+			WaitTimer.delay(sleepTime);
 		}
 		return availableBytes == 0 || this.isTransmitFinished;
 	}
