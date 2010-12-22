@@ -209,20 +209,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
-		
-		//StringBuilder sb = new StringBuilder();
-		//for (byte b : dataBuffer) {
-		//	sb.append(String.format("%02x", b)).append(" ");
-		//}
-		//log.log(Level.FINE, sb.toString());
-		
-		//int modeIndex = getProcessingMode(dataBuffer);
-		//String mode = USAGE_MODE[modeIndex];
-		//int accuIndex = getAccuCellType(dataBuffer);
-		//String accuType = ACCU_TYPES[accuIndex - 1]; 
-		//getNumberOfLithiumXCells(dataBuffer);
-		
-		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
+		int maxVotage = Integer.MIN_VALUE;
+		int minVotage = Integer.MAX_VALUE;
+				
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
 		points[0] = Integer.valueOf((((dataBuffer[35] & 0xFF)-0x80)*100 + ((dataBuffer[36] & 0xFF)-0x80))*10);  //35,36   feed-back voltage
 		points[1] = Integer.valueOf((((dataBuffer[33] & 0xFF)-0x80)*100 + ((dataBuffer[34] & 0xFF)-0x80))*10);  //33,34   feed-back current : 0=0.0A,900=9.00A
 		points[2] = Integer.valueOf((((dataBuffer[43] & 0xFF)-0x80)*100 + ((dataBuffer[44] & 0xFF)-0x80))*1000);//43,44  cq_capa_dis;  : charged capacity
@@ -231,11 +221,18 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		points[5] = Integer.valueOf((((dataBuffer[37] & 0xFF)-0x80)*100 + ((dataBuffer[38] & 0xFF)-0x80))*10);  //37,38  fd_ex_th;     : external temperature
 		points[6] = Integer.valueOf((((dataBuffer[39] & 0xFF)-0x80)*100 + ((dataBuffer[40] & 0xFF)-0x80))*10);  //39,40  fd_in_th      : internal temperature
 		points[7] = Integer.valueOf((((dataBuffer[41] & 0xFF)-0x80)*100 + ((dataBuffer[42] & 0xFF)-0x80))*10);  //41,42  fd_in_12v;    : input voltage(00.00V 30.00V)
-		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
-		for (int i=0, j=0; i<points.length - 8; ++i, j+=2) {
-			//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
-			points[i+8]  = Integer.valueOf((((dataBuffer[j+45] & 0xFF)-0x80)*100 + ((dataBuffer[j+46] & 0xFF)-0x80))*10);  //45,46 CELL_420v[1];
+		points[8] = 0;
+
+		// 9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 ..
+		for (int i=0, j=0; i<points.length - 9; ++i, j+=2) {
+			points[i + 9]  = Integer.valueOf((((dataBuffer[j+45] & 0xFF)-0x80)*100 + ((dataBuffer[j+46] & 0xFF)-0x80))*10);  //45,46 CELL_420v[1];
+			if (points[i + 9] > 0) {
+				maxVotage = points[i + 9] > maxVotage ? points[i + 9] : maxVotage;
+				minVotage = points[i + 9] < minVotage ? points[i + 9] : minVotage;
+			}
 		}
+		//calculate balance on the fly
+		points[8] = maxVotage - minVotage;
 
 		return points;
 	}
@@ -379,7 +376,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize);
 			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 			
-			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
+			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
 			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
@@ -388,11 +385,21 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			points[5] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
 			points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
 			points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
+			points[8] = 0;
+			int maxVotage = Integer.MIN_VALUE;
+			int minVotage = Integer.MAX_VALUE;
+
 			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
-			for (int j=0, k=0; j<points.length - 8; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+			for (int j=0, k=0; j<points.length - 9; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
 				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
-				points[j+8] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff) << 0));
+				points[j + 9] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff) << 0));
+				if (points[j + 9] > 0) {
+					maxVotage = points[j + 9] > maxVotage ? points[j + 9] : maxVotage;
+					minVotage = points[j + 9] < minVotage ? points[j + 9] : minVotage;
+				}
 			}
+			//calculate balance on the fly
+			points[8] = maxVotage - minVotage;
 			
 			if(recordSet.isTimeStepConstant()) 
 				recordSet.addPoints(points);
@@ -402,6 +409,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		updateVisibilityStatus(recordSet, true);
 	}
 
 	/**

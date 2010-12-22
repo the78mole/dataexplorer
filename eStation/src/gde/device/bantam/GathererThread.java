@@ -18,9 +18,6 @@
 ****************************************************************************************/
 package gde.device.bantam;
 
-import java.util.HashMap;
-import java.util.logging.Logger;
-
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
@@ -34,6 +31,9 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.TimeLine;
 import gde.utils.WaitTimer;
+
+import java.util.HashMap;
+import java.util.logging.Logger;
 
 /**
  * Thread implementation to gather data from eStation device
@@ -54,7 +54,6 @@ public class GathererThread extends Thread {
 	final Channels						channels;
 	final Channel							channel;
 	final int									channelNumber;
-	final WaitTimer						timer;
 	
 	String										recordSetKey								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
@@ -79,7 +78,6 @@ public class GathererThread extends Thread {
 		this.channels = Channels.getInstance();
 		this.channelNumber = channelConfigNumber;
 		this.channel = this.channels.get(this.channelNumber);
-		this.timer = WaitTimer.getInstance();
 
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();
@@ -111,7 +109,7 @@ public class GathererThread extends Thread {
 		this.isCollectDataStopped = false;
 		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
-		int posCells = this.device.getName().endsWith("BC6") || this.device.getName().endsWith("P6") || this.device.getName().endsWith("P60") ? 6 : 8; //$NON-NLS-1$
+		int posCells = this.device.getName().endsWith("BC6") || this.device.getName().endsWith("P6") || this.device.getName().endsWith("P60") ? 7 : 9; //$NON-NLS-1$
 
 		while (!this.isCollectDataStopped) {
 			try {
@@ -221,7 +219,7 @@ public class GathererThread extends Thread {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1401));
 					recordSet = null;
 					--dryTimeCycleCount;
-					this.timer.delay(waitTime_ms);
+					WaitTimer.delay(waitTime_ms);
 				}
 				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
 				else if (e instanceof TimeOutException && !isProgrammExecuting) {
