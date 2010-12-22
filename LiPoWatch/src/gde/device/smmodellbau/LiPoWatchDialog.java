@@ -151,6 +151,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 	int														timeAutoStart_sec						= 0;
 	double												offsetA1										= 0.0;
 	double												factorA1										= 1.0;
+	boolean 											isLiveGathererEnabled				= true;
 
 	String												numberRedDataSetsText				= "0";																																											//$NON-NLS-1$
 	String												numberActualDataSetsText		= "0";																																											//$NON-NLS-1$
@@ -479,6 +480,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								this.readConfigButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.readConfigButton.setText(Messages.getString(MessageIds.GDE_MSGT1627));
 								this.readConfigButton.setBounds(135, 56, 232, 30);
+								this.readConfigButton.setEnabled(this.isLiveGathererEnabled);
 								this.readConfigButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1628));
 								this.readConfigButton.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								this.readConfigButton.addSelectionListener(new SelectionAdapter() {
@@ -501,7 +503,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								this.storeConfigButton.setText(Messages.getString(MessageIds.GDE_MSGT1629));
 								this.storeConfigButton.setBounds(135, 249, 229, 30);
 								this.storeConfigButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1630));
-								this.storeConfigButton.setEnabled(false);
+								this.storeConfigButton.setEnabled(this.isLiveGathererEnabled);
 								this.storeConfigButton.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								this.storeConfigButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -644,7 +646,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.readDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.readDataButton.setText(Messages.getString(MessageIds.GDE_MSGT1651));
 										this.readDataButton.setBounds(11, 24, 218, 30);
-										this.readDataButton.setEnabled(true);
+										this.readDataButton.setEnabled(this.isLiveGathererEnabled);
 										this.readDataButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1651));
 										this.readDataButton.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -754,21 +756,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.startLiveGatherButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.startLiveGatherButton.setText(Messages.getString(MessageIds.GDE_MSGT1658));
 										this.startLiveGatherButton.setBounds(12, GDE.IS_MAC_COCOA ? 9 : 24, 202, 30);
-										this.startLiveGatherButton.setEnabled(true);
+										this.startLiveGatherButton.setEnabled(this.isLiveGathererEnabled);
 										this.startLiveGatherButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1658));
 										this.startLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 											@Override
 											public void widgetSelected(SelectionEvent evt) {
 												LiPoWatchDialog.log.log(Level.FINE, "liveViewButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 												try {
-													LiPoWatchDialog.this.readConfigButton.setEnabled(false);
-													LiPoWatchDialog.this.storeConfigButton.setEnabled(false);
-													LiPoWatchDialog.this.startLiveGatherButton.setEnabled(false);
-													LiPoWatchDialog.this.readDataButton.setEnabled(false);
-													LiPoWatchDialog.this.stopReadDataButton.setEnabled(false);
-													LiPoWatchDialog.this.stopLiveGatherButton.setEnabled(true);
-													LiPoWatchDialog.this.clearMemoryButton.setEnabled(false);
-													LiPoWatchDialog.this.closeButton.setEnabled(false);
+													setButtonStateLiveGatherer(false);
 													setClosePossible(false);
 													LiPoWatchDialog.this.liveThread = new LiPoWatchLiveGatherer(LiPoWatchDialog.this.application, LiPoWatchDialog.this.device, LiPoWatchDialog.this.serialPort,
 															LiPoWatchDialog.this);
@@ -856,7 +851,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.stopLiveGatherButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.stopLiveGatherButton.setBounds(12, GDE.IS_MAC_COCOA ? 111 : 126, 202, 30);
 										this.stopLiveGatherButton.setText(Messages.getString(MessageIds.GDE_MSGT1665));
-										this.stopLiveGatherButton.setEnabled(false);
+										this.stopLiveGatherButton.setEnabled(!this.isLiveGathererEnabled);
 										this.stopLiveGatherButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1666));
 										this.stopLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -872,14 +867,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 														LiPoWatchDialog.this.liveThread.finalizeRecordSet(activeRecordSet.getName());
 													}
 												}
-												LiPoWatchDialog.this.readConfigButton.setEnabled(true);
-												LiPoWatchDialog.this.storeConfigButton.setEnabled(false);
-												LiPoWatchDialog.this.readDataButton.setEnabled(true);
-												LiPoWatchDialog.this.stopReadDataButton.setEnabled(false);
-												LiPoWatchDialog.this.startLiveGatherButton.setEnabled(true);
-												LiPoWatchDialog.this.stopLiveGatherButton.setEnabled(false);
-												LiPoWatchDialog.this.clearMemoryButton.setEnabled(true);
-												LiPoWatchDialog.this.closeButton.setEnabled(true);
+												setButtonStateLiveGatherer(true);
 												setClosePossible(true);
 												if (!LiPoWatchDialog.this.stopLoggingButton.getEnabled()) {
 													LiPoWatchDialog.this.readDataButton.setEnabled(true);
@@ -900,6 +888,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.clearMemoryButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.clearMemoryButton.setText(Messages.getString(MessageIds.GDE_MSGT1668));
 										this.clearMemoryButton.setBounds(12, GDE.IS_MAC_COCOA ? 41 : 56, 202, 31);
+										this.clearMemoryButton.setEnabled(this.isLiveGathererEnabled);
 										this.clearMemoryButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1603));
 										this.clearMemoryButton.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -994,8 +983,6 @@ public class LiPoWatchDialog extends DeviceDialog {
 	 * @param readBuffer
 	 */
 	public void updateConfigurationValues(byte[] readBuffer) {
-
-
 		//status field
 		this.memoryUsed = ((readBuffer[8] & 0xFF) << 24) + ((readBuffer[7] & 0xFF) << 16) + ((readBuffer[6] & 0xFF) << 8) + (readBuffer[5] & 0xFF);
 		LiPoWatchDialog.log.log(Level.FINE, "memoryUsed = " + this.memoryUsed); //$NON-NLS-1$
@@ -1003,12 +990,10 @@ public class LiPoWatchDialog extends DeviceDialog {
 		//serial number
 		this.serialNumber = "" + (((readBuffer[10] & 0xFF) << 8) + (readBuffer[9] & 0xFF)); //$NON-NLS-1$
 		LiPoWatchDialog.log.log(Level.FINE, "serialNumber = " + this.serialNumber); //$NON-NLS-1$
-		this.snLabel.setText(this.serialNumber);
 
 		//firmware version
 		this.lipoWatchVersion = String.format(Locale.ENGLISH, "v%.2f", (readBuffer[11] & 0xFF) / 100.0); //$NON-NLS-1$
 		LiPoWatchDialog.log.log(Level.FINE, "unilogVersion = " + this.lipoWatchVersion); //$NON-NLS-1$
-		this.firmwareVersionLabel.setText(this.lipoWatchVersion);
 
 		//memory delete flag
 		int memoryDeleted = readBuffer[12] & 0xFF;
@@ -1019,18 +1004,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 			tmpMemoryUsed = this.memoryUsed;
 		this.memoryUsedPercent = String.format("%.2f", tmpMemoryUsed * 100.0 / LiPoWatchDialog.MAX_DATA_VALUES); //$NON-NLS-1$
 		LiPoWatchDialog.log.log(Level.FINE, "memoryUsedPercent = " + this.memoryUsedPercent + " (" + tmpMemoryUsed + "/" + LiPoWatchDialog.MAX_DATA_RECORDS + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		this.memUsagePercent.setText(this.memoryUsedPercent);
 
 		// timer interval
 		this.timeIntervalPosition = readBuffer[13] & 0xFF;
 		LiPoWatchDialog.log.log(Level.FINE, "timeIntervalPosition = " + this.timeIntervalPosition); //$NON-NLS-1$
-		this.timeIntervalCombo.select(this.timeIntervalPosition);
-		updateTimeStep_ms(this.timeIntervalPosition);
 
 		// voltage modus absolute/relative
 		this.measurementModus = readBuffer[14] & 0xFF;
 		LiPoWatchDialog.log.log(Level.FINE, "measurementModus(relative, absolute) = " + this.measurementModus); //$NON-NLS-1$
-		this.measurementModusCombo.select(this.measurementModus);
 
 		// auto start time
 		this.isAutoStartTime = false;
@@ -1040,22 +1021,13 @@ public class LiPoWatchDialog extends DeviceDialog {
 		}
 		this.timeAutoStart_sec = readBuffer[15] & 0x7F;
 		LiPoWatchDialog.log.log(Level.FINE, "isAutoStartTime = " + this.isAutoStartTime + " timeAutoStart_sec = " + this.timeAutoStart_sec); //$NON-NLS-1$ //$NON-NLS-2$
-		this.timeTriggerButton.setSelection(this.isAutoStartTime);
-		int timeSelect = 0;
-		for (; timeSelect < this.timeTriggerCombo.getItemCount(); ++timeSelect) {
-			if (this.timeAutoStart_sec >= Integer.parseInt(this.timeTriggerCombo.getItems()[timeSelect].trim())) break;
-		}
-		this.timeTriggerCombo.select(timeSelect);
-		this.timeTriggerCombo.setText(String.format("%4s", this.timeAutoStart_sec)); //$NON-NLS-1$
 
 		// auto start voltage limit
 		this.voltageLevelRegulationLimit = (readBuffer[16] & 0xFF) - 20;
 		LiPoWatchDialog.log.log(Level.FINE, "voltageLevelRegulationLimit = " + this.voltageLevelRegulationLimit); //$NON-NLS-1$
-		this.voltageLevelRegulationCombo.select(this.voltageLevelRegulationLimit);
 
 		// auto start rx signal
 		this.isAutStartRx = (readBuffer[17] & 0x80) != 0;
-		this.impulseTriggerButton.setSelection(this.isAutStartRx);
 
 		
 		this.isRxOn = (readBuffer[17] & 0x7F) == 0;
@@ -1065,25 +1037,46 @@ public class LiPoWatchDialog extends DeviceDialog {
 		else {// auto start rx impulse length	
 			this.rxAutoStartValue = (readBuffer[17] & 0x7F) - 11; // 16 = 1.6 ms 
 		}
-		this.impulseTriggerCombo.select(this.rxAutoStartValue);
 		LiPoWatchDialog.log.log(Level.FINE, "isAutStartRx = " + this.isAutStartRx + " isRxOn = " + this.isRxOn + " rxAutoStartValue = " + this.rxAutoStartValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// auto start voltage drop
 		this.impulsReductionType = (readBuffer[18] & 0x7F);
 		LiPoWatchDialog.log.log(Level.FINE, "impulsReductionType = " + this.impulsReductionType); //$NON-NLS-1$
-		this.regulationTypeCombo.select(this.impulsReductionType);
 		this.isAutoStartVoltageDrop = false;
 		if ((readBuffer[19] & 0xFF) != 0) {
 			this.isAutoStartVoltageDrop = true;
 		}
 		LiPoWatchDialog.log.log(Level.FINE, "isAutoStartVoltageDrop = " + this.isAutoStartVoltageDrop); //$NON-NLS-1$ 
-		this.voltageDropTriggerButton.setSelection(this.isAutoStartVoltageDrop);
 
 		// cell type
 		this.cellType = readBuffer[20] & 0xFF;
 		LiPoWatchDialog.log.log(Level.FINE, "cellType = " + this.cellType); //$NON-NLS-1$
-		this.cellTypeCombo.select(this.cellType);
 
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) { //update UI if opened
+			DataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					LiPoWatchDialog.this.snLabel.setText(LiPoWatchDialog.this.serialNumber);
+					LiPoWatchDialog.this.firmwareVersionLabel.setText(LiPoWatchDialog.this.lipoWatchVersion);
+					LiPoWatchDialog.this.memUsagePercent.setText(LiPoWatchDialog.this.memoryUsedPercent);
+					LiPoWatchDialog.this.timeIntervalCombo.select(LiPoWatchDialog.this.timeIntervalPosition);
+					updateTimeStep_ms(LiPoWatchDialog.this.timeIntervalPosition);
+					LiPoWatchDialog.this.measurementModusCombo.select(LiPoWatchDialog.this.measurementModus);
+					LiPoWatchDialog.this.timeTriggerButton.setSelection(LiPoWatchDialog.this.isAutoStartTime);
+					int timeSelect = 0;
+					for (; timeSelect < LiPoWatchDialog.this.timeTriggerCombo.getItemCount(); ++timeSelect) {
+						if (LiPoWatchDialog.this.timeAutoStart_sec >= Integer.parseInt(LiPoWatchDialog.this.timeTriggerCombo.getItems()[timeSelect].trim())) break;
+					}
+					LiPoWatchDialog.this.timeTriggerCombo.select(timeSelect);
+					LiPoWatchDialog.this.timeTriggerCombo.setText(String.format("%4s", LiPoWatchDialog.this.timeAutoStart_sec)); //$NON-NLS-1$
+					LiPoWatchDialog.this.voltageLevelRegulationCombo.select(LiPoWatchDialog.this.voltageLevelRegulationLimit);
+					LiPoWatchDialog.this.impulseTriggerButton.setSelection(LiPoWatchDialog.this.isAutStartRx);
+					LiPoWatchDialog.this.impulseTriggerCombo.select(LiPoWatchDialog.this.rxAutoStartValue);
+					LiPoWatchDialog.this.regulationTypeCombo.select(LiPoWatchDialog.this.impulsReductionType);
+					LiPoWatchDialog.this.voltageDropTriggerButton.setSelection(LiPoWatchDialog.this.isAutoStartVoltageDrop);
+					LiPoWatchDialog.this.cellTypeCombo.select(LiPoWatchDialog.this.cellType);
+				}
+			});
+		}
 	}
 
 	public byte[] buildUpdateBuffer() {
@@ -1235,6 +1228,23 @@ public class LiPoWatchDialog extends DeviceDialog {
 					setClosePossible(true);
 				}
 			});
+		}
+	}
+
+	/**
+	 * update buttons live gatherer dependent
+	 */
+	void setButtonStateLiveGatherer(boolean liveGathererEnabled) {
+		this.isLiveGathererEnabled = liveGathererEnabled;
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
+			this.readConfigButton.setEnabled(this.isLiveGathererEnabled);
+			this.storeConfigButton.setEnabled(false);
+			this.startLiveGatherButton.setEnabled(this.isLiveGathererEnabled);
+			this.readDataButton.setEnabled(this.isLiveGathererEnabled);
+			this.stopReadDataButton.setEnabled(false);
+			this.stopLiveGatherButton.setEnabled(!this.isLiveGathererEnabled);
+			this.clearMemoryButton.setEnabled(this.isLiveGathererEnabled);
+			this.closeButton.setEnabled(this.isLiveGathererEnabled);
 		}
 	}
 

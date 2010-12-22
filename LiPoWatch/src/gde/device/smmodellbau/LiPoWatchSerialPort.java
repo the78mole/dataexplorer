@@ -27,6 +27,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.Checksum;
+import gde.utils.WaitTimer;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -258,7 +259,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 			while (this.getAvailableBytes() < 10 && retrys-- > 0) {
 				this.write(COMMAND_LIVE_VALUES);
-				this.timer.delay(250);
+				WaitTimer.delay(250);
 				log.log(Level.FINE, "retryLimit = " + retrys); //$NON-NLS-1$
 			}
 			// read data bytes to clear buffer
@@ -505,7 +506,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 		while (!isConnect && counter-- > 0) {
 			this.write(COMMAND_QUERY_STATE);
 			byte[] buffer = new byte[1];
-			this.timer.delay(100);
+			WaitTimer.delay(100);
 			buffer = this.read(buffer, 2000);
 			if (buffer[0] == DATA_STATE_WAITING || buffer[0] == DATA_STATE_READY) {
 				isConnect = true;
@@ -525,7 +526,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 
 		while (!isReady && counter-- > 0) {
 			this.write(COMMAND_QUERY_STATE);
-			this.timer.delay(100);
+			WaitTimer.delay(100);
 			byte[] buffer = new byte[1];
 			buffer = this.read(buffer, 2000);
 			if (buffer[0] == DATA_STATE_READY) {

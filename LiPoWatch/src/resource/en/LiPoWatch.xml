@@ -60,6 +60,13 @@
             <property type="Double" value="1.0" name="factor"/>
         </Measurement>
         <Measurement>
+            <name>Balance</name>
+            <symbol>Bal</symbol>
+            <unit>mV</unit>
+            <statistics sigma="true" avg="true" max="true" min="true"/>
+            <property description="Factor applied to a measured value" type="Double" value="1000.0" name="factor"/>
+        </Measurement>
+        <Measurement>
             <name>CellVoltage 1</name>
             <symbol>U</symbol>
             <unit>V</unit>
@@ -72,7 +79,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 3</name>
@@ -80,7 +87,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 4</name>
@@ -88,7 +95,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 5</name>
@@ -96,7 +103,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 6</name>
@@ -104,7 +111,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 7</name>
@@ -112,7 +119,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 8</name>
@@ -120,7 +127,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 9</name>
@@ -128,7 +135,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 10</name>
@@ -136,7 +143,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 11</name>
@@ -144,7 +151,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 12</name>
@@ -152,7 +159,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 13</name>
@@ -160,7 +167,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 14</name>
@@ -168,7 +175,7 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
         <Measurement>
             <name>CellVoltage 15</name>
@@ -176,13 +183,13 @@
             <unit>V</unit>
             <active>true</active>
             <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+            <property type="Integer" value="5" name="scale_sync_ref_ordinal"/>
         </Measurement>
     </Channel>
     <Desktop>
         <property value="false" name="table_tab"/>
         <property value="true" name="digital_tab"/>
         <property value="true" name="analog_tab"/>
-        <property target_reference_ordinal="4" value="true" name="voltage_per_cell_tab"/>
+        <property target_reference_ordinal="5" value="true" name="voltage_per_cell_tab"/>
    </Desktop>
 </DeviceProperties>

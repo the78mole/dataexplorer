@@ -18,12 +18,15 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.smmodellbau.lipowatch.MessageIds;
+import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
+import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
@@ -51,8 +54,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 	final Channel									channel;
 	final Integer									channelNumber;
 	final String									configKey;
-	final int											timeStep_ms;
-	final WaitTimer								waiter;
+	int														timeStep_ms;
 	Timer													timer;
 	TimerTask											timerTask;
 	boolean												isTimerRunning							= false;
@@ -77,30 +79,44 @@ public class LiPoWatchLiveGatherer extends Thread {
 		this.channelNumber = 1; 
 		this.channel = this.channels.get(this.channelNumber);
 		this.configKey = this.device.getChannelName(this.channelNumber);
-		this.waiter = WaitTimer.getInstance();
 
 		this.calcValues.put(LiPoWatch.A1_FACTOR, useDevice.getMeasurementFactor(this.channelNumber, 11)); // 11 = A1
 		this.calcValues.put(LiPoWatch.A1_OFFSET, useDevice.getMeasurementOffset(this.channelNumber, 11));
-
-		if (!this.serialPort.isConnected()) {
-			this.serialPort.open();
-			this.isPortOpenedByLiveGatherer = true;
-			this.waiter.delay(2000);
-		}
-
-		// get LiPoWatch configuration for timeStep info
-		byte[] readBuffer = useSerialPort.readConfiguration();
-		useDialog.updateConfigurationValues(readBuffer);
-
-		// timer interval
-		int timeIntervalPosition = readBuffer[13] & 0xFF;
-		this.timeStep_ms = this.time_ms[timeIntervalPosition];
-		log.log(Level.FINE, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 
 	public void run() {
 		this.isTimerRunning = true;
+
+		try {
+			if (!this.serialPort.isConnected()) {
+				this.serialPort.open();
+				this.isPortOpenedByLiveGatherer = true;
+				WaitTimer.delay(3000);
+			}
+
+			// get LiPoWatch configuration for timeStep info
+			byte[] readBuffer = this.serialPort.readConfiguration();
+			this.dialog.updateConfigurationValues(readBuffer);
+
+			// timer interval
+			int timeIntervalPosition = readBuffer[13] & 0xFF;
+			this.timeStep_ms = this.time_ms[timeIntervalPosition];
+			log.log(Level.FINE, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		catch (SerialPortException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+		}
+		catch (ApplicationConfigurationException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+			this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+			this.application.getDeviceSelectionDialog().open();
+		}
+		catch (Throwable t) {
+			log.log(Level.SEVERE, t.getMessage(), t);
+		}
+
 		this.channels.switchChannel(this.channel.getName());
 
 		// prepare timed data gatherer thread
@@ -143,14 +159,13 @@ public class LiPoWatchLiveGatherer extends Thread {
 
 						// switch the active record set if the current record set is child of active channel
 						if (!LiPoWatchLiveGatherer.this.isSwitchedRecordSet && LiPoWatchLiveGatherer.this.channel.getName().equals(LiPoWatchLiveGatherer.this.channels.getActiveChannel().getName())) {
-							//LiPoWatchLiveGatherer.this.device.updateMeasurementByAnalogModi(dataBuffer, recordSet.getChannelConfigName());
 							LiPoWatchLiveGatherer.this.channel.applyTemplateBasics(recordSetKey);
 							LiPoWatchLiveGatherer.this.application.getMenuToolBar().addRecordSetName(recordSetKey);
 							LiPoWatchLiveGatherer.this.channels.getActiveChannel().switchRecordSet(recordSetKey);
 							LiPoWatchLiveGatherer.this.isSwitchedRecordSet = true;
 						}
 						
-						if (updateViewCounter++ % 10 == 0) {
+						if (updateViewCounter++ % 5 == 0) {
 							log.log(Level.FINE, "updateVisibilityStatus " + updateViewCounter); //$NON-NLS-1$
 							usedDevice.updateVisibilityStatus(recordSet, true);
 						}

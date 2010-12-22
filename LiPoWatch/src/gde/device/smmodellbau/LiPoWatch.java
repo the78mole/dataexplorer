@@ -21,13 +21,17 @@ package gde.device.smmodellbau;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.PropertyType;
 import gde.device.smmodellbau.lipowatch.MessageIds;
+import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
+import gde.exception.SerialPortException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -79,7 +83,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
 		this.dialog = new LiPoWatchDialog(this.application.getShell(), this);
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 	}
 
 	/**
@@ -94,7 +98,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
 		this.dialog = new LiPoWatchDialog(this.application.getShell(), this);
-		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 	}
 
 	/**
@@ -172,7 +176,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 		for (int i = 0; i < recordDataSize; i++) { 
-//			length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
+//			length = (tmp1ReadBuffer[0] & 0x7F);   
 //			tmp2ReadBuffer = new byte[length-1];
 //			this.read(tmp2ReadBuffer, 4000);		
 //			readBuffer = new byte[length];
@@ -199,8 +203,10 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		StringBuilder sb = new StringBuilder();
 		int tmpValue = 0;
-		int totalVotage = 0;
-		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
+		int totalVotage = 0;		
+		int maxVotage = Integer.MIN_VALUE;
+		int minVotage = Integer.MAX_VALUE;
+		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature , 4=Balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, ....
 
 		//Servoimpuls_in
 		points[1] = (((dataBuffer[6] & 0xFF) << 8) + (dataBuffer[5] & 0xFF) & 0xFFF0) / 16 * 1000;
@@ -221,18 +227,19 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		int i;
 		for (i = 0; i < numberCells; i++) {
 			tmpValue = ((dataBuffer[2 * i + 16] & 0xFF) << 8) + (dataBuffer[2 * i + 15] & 0xFF);
-			points[i + 4] = (tmpValue <= 32786 ? tmpValue * 2 : (tmpValue - 65536) * 2); //cell voltage
+			points[i + 5] = (tmpValue <= 32786 ? tmpValue * 2 : (tmpValue - 65536) * 2); //cell voltage
 			if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(" + (i + 4) + ")" + points[1]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			totalVotage += points[i + 4];
+			maxVotage = points[i + 5] > maxVotage ? points[i + 5] : maxVotage;
+			minVotage = points[i + 5] < minVotage ? points[i + 5] : minVotage;
 		}
 		//measurement modus absolute/relative
 		boolean isRelative = ((dataBuffer[9] & 0xF0) >> 4) == 1;
-		if (isRelative)
-			points[0] = totalVotage;
-		else
-			points[0] = points[i + 3];
-		//points[0] = isRelative ? totalVotage : points[i-3]; // total battery voltage
+		points[0] = isRelative ? totalVotage : points[i + 3]; // total battery voltage
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.insert(0, "(0)" + points[0] + "; "); //$NON-NLS-1$ //$NON-NLS-2$	
+		
+		points[4] = maxVotage - minVotage;
+		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(" + (i + 4) + ")" + points[1]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		LiPoWatch.log.log(Level.FINE, sb.toString());
 		return points;
@@ -260,20 +267,30 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordDataSize; i++) {
 			System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
 
-			// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
+			// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=Balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, .... 
 			points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
 			points[1] = (((convertBuffer[4] & 0xff) << 24) + ((convertBuffer[5] & 0xff) << 16) + ((convertBuffer[6] & 0xff) << 8) + ((convertBuffer[7] & 0xff) << 0));
 			points[2] = (((convertBuffer[8] & 0xff) << 24) + ((convertBuffer[9] & 0xff) << 16) + ((convertBuffer[10] & 0xff) << 8) + ((convertBuffer[11] & 0xff) << 0));
 			points[3] = (((convertBuffer[12] & 0xff) << 24) + ((convertBuffer[13] & 0xff) << 16) + ((convertBuffer[14] & 0xff) << 8) + ((convertBuffer[15] & 0xff) << 0));
+			points[4] = 0;
 
-			for (int j = 0; j < points.length - 4; j++) {
-				points[j + 4] = (((convertBuffer[16 + (j * 4)] & 0xff) << 24) + ((convertBuffer[17 + (j * 4)] & 0xff) << 16) + ((convertBuffer[18 + (j * 4)] & 0xff) << 8) + ((convertBuffer[19 + (j * 4)] & 0xff) << 0));
+			int maxVotage = Integer.MIN_VALUE;
+			int minVotage = Integer.MAX_VALUE;
+			for (int j = 0; j < points.length - 5; j++) {
+				points[j + 5] = (((convertBuffer[16 + (j * 4)] & 0xff) << 24) + ((convertBuffer[17 + (j * 4)] & 0xff) << 16) + ((convertBuffer[18 + (j * 4)] & 0xff) << 8) + ((convertBuffer[19 + (j * 4)] & 0xff) << 0));
+				if (points[j + 5] > 0) {
+					maxVotage = points[j + 5] > maxVotage ? points[j + 5] : maxVotage;
+					minVotage = points[j + 5] < minVotage ? points[j + 5] : minVotage;
+				}
 			}
+			//calculate balance on the fly
+			points[4] = maxVotage - minVotage;
 			recordSet.addPoints(points);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		updateVisibilityStatus(recordSet, true);
 	}
 
 	/**
@@ -283,20 +300,27 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
 		String[] dataTableRow = new String[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
-			String[] recordNames = recordSet.getRecordNames();	// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
+			String[] recordNames = recordSet.getRecordNames();	// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, .... 
 			int numberRecords = recordNames.length;			
+			double offset = 0.0;
+			double factor = 1.0;
 
 			dataTableRow[0] = String.format("%.2f", (recordSet.getTime_ms(rowIndex) / 1000.0));
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				switch (j) {
 				case 3: //3=temperature analog outlet
-					double offset = record.getOffset(); // != 0 if curve has an defined offset
-					double factor = record.getFactor(); // != 1 if a unit translation is required
+					offset = record.getOffset(); // != 0 if curve has an defined offset
+					factor = record.getFactor(); // != 1 if a unit translation is required
+					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + record.get(rowIndex) / 1000.0) * factor);
+					break;
+				case 4: //4=Balance [mV]
+					offset = record.getOffset();
+					factor = record.getFactor();
 					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + record.get(rowIndex) / 1000.0) * factor);
 					break;
 				default:
-					if(j > 3 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
+					if(j > 4 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
 						dataTableRow[j + 1] = String.format("%.3f", (record.get(rowIndex) / 1000.0));
 					else
 						dataTableRow[j + 1] = record.getDecimalFormat().format(record.get(rowIndex) / 1000.0);
@@ -316,19 +340,24 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
-		double newValues = value;
+		double newValue = value;
 
-		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
+		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=Balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, .... 
 		PropertyType property = null;
 		if (record.getOrdinal() == 3) {//3=temperature [°C]
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
 			double factor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
 			double offset = property != null ? new Double(property.getValue()).doubleValue() : 0.0;
-			newValues = value * factor + offset;
+			newValue = value * factor + offset;
+		}
+		else if (record.getOrdinal() == 4) {//4=Balance [mV]
+			double factor =  record.getFactor();
+			double offset = record.getOffset();
+			newValue = value * factor + offset;
 		}
 
-		return newValues;
+		return newValue;
 	}
 
 	/**
@@ -337,19 +366,24 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		double newValues = value;
+		double newValue = value;
 
-		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
+		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=Balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, .... 
 		PropertyType property = null;
 		if (record.getOrdinal() == 3) {//3=temperature [°C]
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
 			double factor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
 			double offset = property != null ? new Double(property.getValue()).doubleValue() : 0.0;
-			newValues = (value - offset) / factor;
+			newValue = (value - offset) / factor;
+		}
+		else if (record.getOrdinal() == 4) {//4=Balance [mV]
+			double factor =  record.getFactor();
+			double offset = record.getOffset();
+			newValue = (value - offset) / factor;
 		}
 
-		return newValues;
+		return newValue;
 	}
 
 	/**
@@ -443,15 +477,35 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
 				try {
-					this.serialPort.open();
+					Channel activChannel = Channels.getInstance().getActiveChannel();
+					if (activChannel != null) {
+						this.getDialog().liveThread = new LiPoWatchLiveGatherer(this.application, this, this.serialPort, this.getDialog());
+						this.getDialog().setButtonStateLiveGatherer(false);
+						this.getDialog().liveThread.start();
+					}
 				}
-				catch (Exception e) {
-					LiPoWatch.log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+				catch (SerialPortException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+				}
+				catch (ApplicationConfigurationException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+					this.application.getDeviceSelectionDialog().open();
+				}
+				catch (Throwable t) {
+					log.log(Level.SEVERE, t.getMessage(), t);
 				}
 			}
 			else {
+				if (this.getDialog().liveThread != null) {
+					this.getDialog().liveThread.stopTimerThread();
+				}
+				if (this.getDialog().gatherThread != null) {
+					this.getDialog().gatherThread.setThreadStop();
+				}
 				this.serialPort.close();
+				this.getDialog().setButtonStateLiveGatherer(true);
 			}
 		}
 	}

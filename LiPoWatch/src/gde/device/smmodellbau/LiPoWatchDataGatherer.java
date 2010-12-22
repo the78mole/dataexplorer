@@ -50,7 +50,6 @@ public class LiPoWatchDataGatherer extends Thread {
 	final LiPoWatch						device;
 	final Integer							channelNumber;
 	final String							configKey;
-	final WaitTimer						timer;
 	CalculationThread					calculationThread;
 
 	/**
@@ -64,7 +63,6 @@ public class LiPoWatchDataGatherer extends Thread {
 		this.dialog = useDevice.getDialog();
 		this.channelNumber = 1; //$NON-NLS-1$
 		this.configKey = this.device.getChannelName(this.channelNumber);
-		this.timer = WaitTimer.getInstance();
 }
 
 	/**
@@ -86,6 +84,7 @@ public class LiPoWatchDataGatherer extends Thread {
 			if(!this.serialPort.isConnected()) {
 				this.serialPort.open();
 				isPortOpenedByMe = true;
+				WaitTimer.delay(3000);
 			}
 			
 			//update the config display of the dialog to enable comment enichments
@@ -134,7 +133,7 @@ public class LiPoWatchDataGatherer extends Thread {
 					dataBuffer = telegrams.get(j);
 					numCells += (dataBuffer[5] & 0x0F);
 				}
-				int numberRecords = numCells/10 + 4; // number cells + total battery voltage + servo impuls in + servio impuls out + temperature
+				int numberRecords = numCells/10 + 5; // number cells + total battery voltage + servo impuls in + servio impuls out + temperature + balance
 				String[] recordKeys = recordSet.getRecordNames();
 				for (int j = numberRecords; j < this.device.getNumberOfMeasurements(1); j++) {
 					recordSet.remove(recordKeys[j]);
@@ -186,7 +185,6 @@ public class LiPoWatchDataGatherer extends Thread {
 	 * @param recordSet
 	 */
 	private void finalizeRecordSet(Channel channel, String recordSetKey, RecordSet recordSet) {
-		this.device.updateVisibilityStatus(recordSet, true);
 		this.device.makeInActiveDisplayable(recordSet);
 		channel.applyTemplate(recordSetKey, true);
 		this.application.updateStatisticsData();
@@ -195,7 +193,7 @@ public class LiPoWatchDataGatherer extends Thread {
 
 	public void setThreadStop() {
 		try {
-			this.timer.delay(5);
+			WaitTimer.delay(5);
 			this.serialPort.setTransmitFinished(true);
 		}
 		catch (Exception e) {
