@@ -373,6 +373,7 @@ public class MenuBar {
 					this.panGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
 					this.panGraphicMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0025));
 					this.panGraphicMenuItem.setImage(SWTResourceManager.getImage("gde/resource/PanHot.gif")); //$NON-NLS-1$
+					this.panGraphicMenuItem.setEnabled(false);
 					this.panGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "panGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -595,10 +596,11 @@ public class MenuBar {
 								GraphicsTemplate template = activeChannel.getTemplate();
 								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
 										.getGraphicsTemplatePath(), template.getDefaultFileName());
-								String templateFilePath = fileDialog.open();
-								if (templateFilePath != null && templateFilePath.length() > 4) {
-									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFilePath); //$NON-NLS-1$
-									template.setNewFileName(templateFilePath);
+								fileDialog.open();
+								String templateFileName = fileDialog.getFileName();
+								if (templateFileName != null && templateFileName.length() > 4) {
+									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
+									template.setNewFileName(templateFileName);
 									activeChannel.saveTemplate();
 								}
 							}
@@ -898,5 +900,13 @@ public class MenuBar {
 		for (int i = this.exportMenu.getItemCount()-1; !this.exportMenu.getItem(i).getText().equals(Messages.getString(MessageIds.GDE_MSGT0018)); i--) {
 			this.exportMenu.getItem(i).dispose();
 		}
+	}
+
+	/**
+	 * enable pan button in zoomed mode
+	 * @param enable 
+	 */
+	public void enablePanButton(boolean enable) {
+		this.panGraphicMenuItem.setEnabled(enable);
 	}
 }
