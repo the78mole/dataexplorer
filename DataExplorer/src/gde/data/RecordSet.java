@@ -146,7 +146,7 @@ public class RecordSet extends HashMap<String, Record> {
 	Vector<String>								unsaveReasons									= new Vector<String>();
 	int														changeCounter									= 0;																						// indicates change in general
 
-	final DataExplorer	application;																																	// pointer to main application
+	final DataExplorer						application;																																	// pointer to main application
 	final Channels								channels;																																			// start point of data hierarchy
 	final IDevice									device;
 
@@ -546,11 +546,6 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return String[] containing record names 
 	 */
 	public String[] getRecordNames() {
-//		Vector<String> recordNamesVector = new Vector<String>();
-//		String syncPlaceholdername = this.getSyncableName();
-//		for (String recordName : this.recordNames) {
-//			if (!recordName.equals(syncPlaceholdername)) recordNamesVector.add(recordName);
-//		}
 		return this.recordNames.clone();
 	}
 
@@ -670,18 +665,16 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return String[] containing record names 
 	 */
 	public String[] getNoneCalculationRecordNames() {
-		if (this.noneCalculationRecords.length == 0) {
-			Vector<String> tmpCalculationRecords = new Vector<String>();
-			String[] deviceMeasurements = this.device.getMeasurementNames(this.parent.number);
-			// record names may not match device measurements, but device measurements might be more then existing records
-			for (int i = 0; i < deviceMeasurements.length && i < this.size(); ++i) { 
-				MeasurementType measurement = this.device.getMeasurement(this.parent.number, i);
-				if (!measurement.isCalculation()) { // active or inactive 
-					tmpCalculationRecords.add(this.recordNames[i]);
-				}
+		Vector<String> tmpCalculationRecords = new Vector<String>();
+		String[] deviceMeasurements = this.device.getMeasurementNames(this.parent.number);
+		// record names may not match device measurements, but device measurements might be more then existing records
+		for (int i = 0; i < deviceMeasurements.length && i < this.size(); ++i) {
+			MeasurementType measurement = this.device.getMeasurement(this.parent.number, i);
+			if (!measurement.isCalculation()) { // active or inactive 
+				tmpCalculationRecords.add(this.recordNames[i]);
 			}
-			this.noneCalculationRecords = tmpCalculationRecords.toArray(new String[0]);
 		}
+		this.noneCalculationRecords = tmpCalculationRecords.toArray(new String[0]);
 		return this.noneCalculationRecords;
 	}
 
@@ -2010,5 +2003,13 @@ public class RecordSet extends HashMap<String, Record> {
 				this.syncScaleOfSyncableRecords(true);
 			}
 		}
+	}
+	
+	/**
+	 * apply the graphics template to make records visible according its device default measurement view
+	 * @param updateVisibilityStatus
+	 */
+	public void applyTemplate(boolean updateVisibilityStatus) {
+		this.parent.applyTemplate(this.name, true);
 	}
 }

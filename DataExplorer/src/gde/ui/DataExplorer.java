@@ -1287,9 +1287,8 @@ public class DataExplorer extends Composite {
 			}
 		});
 		int counter = 5000;
-		WaitTimer timer = WaitTimer.getInstance();
 		while (this.openYesNoMessageDialogAsyncValue == -1 && counter-- > 0) {
-			timer.delay(100);
+			WaitTimer.delay(100);
 		}
 		return this.openYesNoMessageDialogAsyncValue;
 	}

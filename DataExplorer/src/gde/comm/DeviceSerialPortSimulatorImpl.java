@@ -64,7 +64,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	final IDevice				device;
 	final DataExplorer	application;
 	final Settings			settings;
-	final WaitTimer			timer;
 	final int						sleepTime_ms;
 	final boolean				isTimeStepConstant;
 
@@ -78,7 +77,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		this.device = currentDevice;
 		this.application = currentApplication;
 		this.settings = Settings.getInstance();
-		this.timer = WaitTimer.getInstance();
 		this.sleepTime_ms = timeStep_ms;
 		this.isTimeStepConstant = isTimeStepConstant;
 	}
@@ -310,7 +308,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 */
 	@Override
 	public long wait4Bytes(int timeout_msec) throws InterruptedException, TimeOutException, IOException {
-		this.timer.delay(getWaitTime());
+		WaitTimer.delay(getWaitTime());
 		return 0;
 	}
 
@@ -319,7 +317,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 */
 	@Override
 	public int wait4Bytes(int numBytes, int timeout_msec) throws IOException {
-		this.timer.delay(getWaitTime());
+		WaitTimer.delay(getWaitTime());
 		return numBytes;
 	}
 
@@ -328,7 +326,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 */
 	@Override
 	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex) throws InterruptedException, TimeOutException, IOException {
-		this.timer.delay(getWaitTime());
+		WaitTimer.delay(getWaitTime());
 		return expectedBytes;
 	}
 

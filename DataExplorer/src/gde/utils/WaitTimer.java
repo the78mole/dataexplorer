@@ -18,46 +18,25 @@
 ****************************************************************************************/
 package gde.utils;
 
-import java.util.logging.Logger;
-
 /**
  * simple thread implementation to wait during a main thread without using existing locks
- * use synchronous -> new WaitTimer(500).run(); 
+ * use -> WaitTimer.delay.delay(500); 
  */
 public class WaitTimer extends Thread {
-	final static String	$CLASS_NAME						= WaitTimer.class.getName();
-	final static Logger	log										= Logger.getLogger(WaitTimer.$CLASS_NAME);
 
-	Long								delayTimeMilliSeconds	= 1000l;
-
-	static WaitTimer		instance							= null;
-
-	public static WaitTimer getInstance() {
-		if (WaitTimer.instance == null) {
-			WaitTimer.instance = new WaitTimer();
-		}
-		return WaitTimer.instance;
-	}
-
-	/**
-	 * needs to specify sleep time while calling sleep
-	 * initially set wait time to 1000 ms
-	 */
-	private WaitTimer() {
-		super("waitTimer");
-	}
+	static WaitTimer		instance							= new WaitTimer();
 
 	/**
 	 * synchronous wait for the given time
 	 * @param milliSeconds
 	 */
-	public void delay(long milliSeconds) {
-		synchronized (this.delayTimeMilliSeconds) {
-			this.delayTimeMilliSeconds = milliSeconds;
+	public static void delay(long milliSeconds) {
+		synchronized (instance) {
 			try {
-				Thread.sleep(this.delayTimeMilliSeconds);
+				Thread.sleep(milliSeconds);
 			}
 			catch (InterruptedException e) {
+				//ignore
 			}
 		}
 	}

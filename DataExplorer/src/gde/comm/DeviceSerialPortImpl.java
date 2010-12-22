@@ -64,7 +64,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	final protected DeviceConfiguration		deviceConfig;
 	final protected DataExplorer					application;
 	final Settings												settings;
-	final protected WaitTimer							timer;
 	protected SerialPort									serialPort								= null;
 	protected int													xferErrors								= 0;
 
@@ -111,7 +110,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		this.deviceConfig = currentDeviceConfig;
 		this.application = currentApplication;
 		this.settings = Settings.getInstance();
-		this.timer = WaitTimer.getInstance();
 	}
 
 	/**
@@ -423,7 +421,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 					readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
 				}
 				if (bytes != readBytes) {
-					this.timer.delay(sleepTime);
+					WaitTimer.delay(sleepTime);
 				}
 
 				//this.dataAvailable = false;
@@ -478,7 +476,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			while (bytes != readBytes && timeOutCounter-- > 0) {
 				readBytes += this.inputStream.read(readBuffer, readBytes, bytes - readBytes);
 				if (bytes != readBytes) {
-					this.timer.delay(sleepTime); //run synchronous do not use start() here
+					WaitTimer.delay(sleepTime); //run synchronous do not use start() here
 				}
 			}
 			//this.dataAvailable = false;
@@ -527,7 +525,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		int timeOutCounter = timeout_msec / sleepTime;
 
 		while (0 == this.inputStream.available()) {
-			this.timer.delay(sleepTime);
+			WaitTimer.delay(sleepTime);
 
 			if (timeOutCounter-- <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
@@ -555,7 +553,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		int resBytes = 0;
 
 		while ((resBytes = this.inputStream.available()) < numBytes) {
-			this.timer.delay(sleepTime);
+			WaitTimer.delay(sleepTime);
 
 			timeOutCounter--;
 			//log.logp(Level.FINER, "time out counter = " + counter);
@@ -599,7 +597,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, expectedBytes - readBytes);
 
 				if (expectedBytes != readBytes) {
-					this.timer.delay(sleepTime);
+					WaitTimer.delay(sleepTime);
 				}
 			}
 			//this.dataAvailable = false;
@@ -659,7 +657,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		// availableBytes are updated by event handler
 		int byteCounter = 0, numBytesAvailable = 0;
 		while (byteCounter < expectedBytes && !isStable && !isTimedOut) {
-			this.timer.delay(sleepTime);
+			WaitTimer.delay(sleepTime);
 
 			if (byteCounter == (numBytesAvailable = this.inputStream.available())) {
 				log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "stableCounter = " + stableCounter + " byteCounter = " + byteCounter); //$NON-NLS-1$ //$NON-NLS-2$

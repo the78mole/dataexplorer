@@ -153,9 +153,8 @@ public class DeviceConfiguration {
 
 		this.settings = Settings.getInstance();
 
-		WaitTimer timer = WaitTimer.getInstance();
 		while (this.settings.isXsdThreadAlive() || this.settings.getUnmarshaller() == null) {
-			timer.delay(5);
+			WaitTimer.delay(5);
 		}
 		this.unmarshaller = this.settings.getUnmarshaller();
 		this.marshaller = this.settings.getMarshaller();

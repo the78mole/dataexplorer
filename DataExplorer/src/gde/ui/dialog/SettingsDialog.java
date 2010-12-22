@@ -1169,7 +1169,6 @@ public class SettingsDialog extends Dialog {
 			public boolean stop = false;
 			@Override
 			public void run() {
-				WaitTimer timer = WaitTimer.getInstance();
 				try {
 					while (!SettingsDialog.this.dialogShell.isDisposed() && !this.stop) {
 						SettingsDialog.this.availablePorts = DeviceSerialPortImpl.listConfiguredSerialPorts(SettingsDialog.this.settings.doPortAvailabilityCheck(), 
@@ -1195,7 +1194,7 @@ public class SettingsDialog extends Dialog {
 								}
 							}
 							});
-						timer.delay(2500);
+						WaitTimer.delay(2500);
 					}
 				}
 				catch (Throwable t) {

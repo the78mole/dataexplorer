@@ -137,7 +137,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Vector<String>												activeDevices;
 	final DataExplorer										application;
 	final Settings												settings;
-	final WaitTimer												timer;
 	String																activeDeviceName;
 	DeviceConfiguration										selectedActiveDeviceConfig;
 	Thread																listPortsThread;
@@ -149,7 +148,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.application = currentApplication;
 		this.settings = Settings.getInstance();
 		this.activeDeviceName = this.settings.getActiveDevice();
-		this.timer = WaitTimer.getInstance();
 
 		try {
 			initialize();
@@ -176,7 +174,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		//wait until schema is setup
 		while (this.settings.isXsdThreadAlive()) {
 			log.log(java.util.logging.Level.INFO, "waiting for XSD thread");
-			this.timer.delay(5);
+			WaitTimer.delay(5);
 		}
 
 		//long startTime = new Date().getTime();
@@ -272,7 +270,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					try {
 						//wait until listPortThread is stopped
 						while (DeviceSelectionDialog.this.listPortsThread.isAlive()) {
-							DeviceSelectionDialog.this.timer.delay(500);
+							WaitTimer.delay(500);
 						}
 
 						if (DeviceSelectionDialog.this.settings.isAutoOpenToolBox()) {
@@ -1236,7 +1234,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								});
 							}
 						}
-						DeviceSelectionDialog.this.timer.delay(2500);
+						WaitTimer.delay(2500);
 					}
 				}
 				catch (Throwable t) {

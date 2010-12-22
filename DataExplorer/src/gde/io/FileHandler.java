@@ -18,15 +18,6 @@
 ****************************************************************************************/
 package gde.io;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import gde.log.Level;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.FileDialog;
-
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -36,6 +27,7 @@ import gde.device.ChannelTypes;
 import gde.device.IDevice;
 import gde.exception.DeclinedException;
 import gde.exception.NotSupportedFileFormatException;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -43,6 +35,14 @@ import gde.ui.SWTResourceManager;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.FileDialog;
 
 /**
  * Class to provide all file IO relevant functionality
@@ -153,7 +153,20 @@ public class FileHandler {
 	String getFileNameProposal() {
 		String fileName = GDE.STRING_EMPTY;
 		if (Settings.getInstance().getUsageDateAsFileNameLeader()) {
-			String fileDescriptionDate = application.getActiveChannel() != null ? application.getActiveChannel().getFileDescription().substring(0,10) : GDE.STRING_EMPTY;
+			String fileDescriptionDate = GDE.STRING_EMPTY;
+			if(application.getActiveChannel() != null && application.getActiveChannel().getFileDescription().split(GDE.STRING_DASH).length >= 3) {
+				String[] chunks = application.getActiveChannel().getFileDescription().split(GDE.STRING_DASH);
+				int chunkSize = chunks.length;
+				if (chunks[chunkSize==4?1:0].length() >= 4 && chunks[chunkSize==4?2:1].length() == 2 && chunks[chunkSize==4?3:2].length() >= 2) {
+					try {
+						int year = Integer.parseInt(chunks[0].substring(chunks[0].length()-4));
+						int month = Integer.parseInt(chunks[1]);
+						int day = Integer.parseInt(chunks[2].substring(0, 2));
+						fileDescriptionDate = String.format("%04d-%02d-%02d", year, month, day);
+					}
+					catch (NumberFormatException e) {	}
+				}
+			}
 			fileName = (fileDescriptionDate.length() > 0 ? fileDescriptionDate : StringHelper.getDate()) + GDE.STRING_UNDER_BAR;
 		}
 		if (Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null && Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {

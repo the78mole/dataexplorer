@@ -302,49 +302,49 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public void applyTemplateBasics(String recordSetKey) {
 		RecordSet recordSet = this.get(recordSetKey);
-
-		if (this.template != null) this.template.load();
-
-		if (this.template != null && this.template.isAvailable() && recordSet != null) {
-			for (int i=0; i<recordSet.getRecordNames().length; ++i) {
-				Record record = recordSet.get(recordSet.getRecordNames()[i]);
-				//record.setVisible(new Boolean(this.template.getProperty(recordName + Record.IS_VISIBLE, "true")).booleanValue());
-				//record.setPositionLeft(new Boolean(this.template.getProperty(recordName + Record.IS_POSITION_LEFT, "true")).booleanValue());
-				int r, g, b;
-				String color = this.template.getProperty(i + Record.COLOR, "128,128,255"); //$NON-NLS-1$
-				r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-				g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-				b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-				record.setColor(SWTResourceManager.getColor(r, g, b));
-				record.setLineWidth(Integer.valueOf(this.template.getProperty(i + Record.LINE_WITH, "1")).intValue()); //$NON-NLS-1$
-				record.setLineStyle(Integer.valueOf(this.template.getProperty(i + Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID)).intValue());
-				//record.setRoundOut(new Boolean(this.template.getProperty(recordName + Record.IS_ROUND_OUT, "false")).booleanValue());
-				//record.setStartpointZero(new Boolean(this.template.getProperty(recordName + Record.IS_START_POINT_ZERO, "false")).booleanValue());
-				//record.setStartEndDefined(new Boolean(this.template.getProperty(recordName + Record.IS_START_END_DEFINED, "false")).booleanValue(), new Double(this.template.getProperty(recordName + Record.DEFINED_MIN_VALUE, "0"))
-				//		.doubleValue(), new Double(this.template.getProperty(recordName + Record.DEFINED_MAX_VALUE, "0")).doubleValue());
-				record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
-				// time grid
-				color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-				r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-				g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-				b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-				recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
-				recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-				recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				// curve grid
-				color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-				r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-				g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-				b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-				recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
-				recordSet.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-				recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
+		if (recordSet != null) {
+			if (this.template != null) this.template.load();
+			if (this.template != null && this.template.isAvailable() && recordSet != null) {
+				for (int i = 0; i < recordSet.getRecordNames().length; ++i) {
+					Record record = recordSet.get(recordSet.getRecordNames()[i]);
+					//record.setVisible(new Boolean(this.template.getProperty(recordName + Record.IS_VISIBLE, "true")).booleanValue());
+					//record.setPositionLeft(new Boolean(this.template.getProperty(recordName + Record.IS_POSITION_LEFT, "true")).booleanValue());
+					int r, g, b;
+					String color = this.template.getProperty(i + Record.COLOR, "128,128,255"); //$NON-NLS-1$
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					record.setColor(SWTResourceManager.getColor(r, g, b));
+					record.setLineWidth(Integer.valueOf(this.template.getProperty(i + Record.LINE_WITH, "1")).intValue()); //$NON-NLS-1$
+					record.setLineStyle(Integer.valueOf(this.template.getProperty(i + Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID)).intValue());
+					//record.setRoundOut(new Boolean(this.template.getProperty(recordName + Record.IS_ROUND_OUT, "false")).booleanValue());
+					//record.setStartpointZero(new Boolean(this.template.getProperty(recordName + Record.IS_START_POINT_ZERO, "false")).booleanValue());
+					//record.setStartEndDefined(new Boolean(this.template.getProperty(recordName + Record.IS_START_END_DEFINED, "false")).booleanValue(), new Double(this.template.getProperty(recordName + Record.DEFINED_MIN_VALUE, "0"))
+					//		.doubleValue(), new Double(this.template.getProperty(recordName + Record.DEFINED_MAX_VALUE, "0")).doubleValue());
+					record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
+					// time grid
+					color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
+					recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+					recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+					// curve grid
+					color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
+					recordSet.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+					recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+					recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
+				}
+				log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
+				if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
+					this.application.updateGraphicsWindow();
+				}
 			}
-			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
-			if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
-				this.application.updateGraphicsWindow();
-			}	
 		}
 	}	
 
@@ -355,53 +355,53 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public void applyTemplate(String recordSetKey, boolean doUpdateVisibilityStatus) {
 		RecordSet recordSet = this.get(recordSetKey);
-
-		if (this.template != null) this.template.load();
-
-		if (this.template != null && this.template.isAvailable()&& recordSet != null) {
-			for (int i=0; i<recordSet.getRecordNames().length; ++i) {
-				Record record = recordSet.get(recordSet.getRecordNames()[i]);
-				record.setVisible(Boolean.valueOf(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
-				record.setPositionLeft(Boolean.valueOf(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"))); //$NON-NLS-1$
-				int r, g, b;
-				String color = this.template.getProperty(i + Record.COLOR, "128,128,255"); //$NON-NLS-1$
-				r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-				g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-				b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-				record.setColor(SWTResourceManager.getColor(r, g, b));
-				record.setLineWidth(Integer.valueOf(this.template.getProperty(i + Record.LINE_WITH, "1")).intValue()); //$NON-NLS-1$
-				record.setLineStyle(Integer.valueOf(this.template.getProperty(i + Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID)).intValue());
-				record.setRoundOut(Boolean.valueOf(this.template.getProperty(i + Record.IS_ROUND_OUT, "false"))); //$NON-NLS-1$
-				record.setStartpointZero(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_POINT_ZERO, "false"))); //$NON-NLS-1$
-				record.setStartEndDefined(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), new Double(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")) //$NON-NLS-1$ //$NON-NLS-2$
-						.doubleValue(), new Double(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "0")).doubleValue()); //$NON-NLS-1$
-				record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
-				// time grid
-				color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-				r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-				g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-				b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-				recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
-				recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-				recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				// curve grid
-				color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-				r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-				g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-				b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-				recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
-				recordSet.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-				recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
+		if (recordSet != null) {
+			if (this.template != null) this.template.load();
+			if (this.template != null && this.template.isAvailable() && recordSet != null) {
+				for (int i = 0; i < recordSet.getRecordNames().length; ++i) {
+					Record record = recordSet.get(recordSet.getRecordNames()[i]);
+					record.setVisible(Boolean.valueOf(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
+					record.setPositionLeft(Boolean.valueOf(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"))); //$NON-NLS-1$
+					int r, g, b;
+					String color = this.template.getProperty(i + Record.COLOR, "128,128,255"); //$NON-NLS-1$
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					record.setColor(SWTResourceManager.getColor(r, g, b));
+					record.setLineWidth(Integer.valueOf(this.template.getProperty(i + Record.LINE_WITH, "1")).intValue()); //$NON-NLS-1$
+					record.setLineStyle(Integer.valueOf(this.template.getProperty(i + Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID)).intValue());
+					record.setRoundOut(Boolean.valueOf(this.template.getProperty(i + Record.IS_ROUND_OUT, "false"))); //$NON-NLS-1$
+					record.setStartpointZero(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_POINT_ZERO, "false"))); //$NON-NLS-1$
+					record.setStartEndDefined(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), new Double(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")) //$NON-NLS-1$ //$NON-NLS-2$
+							.doubleValue(), new Double(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "0")).doubleValue()); //$NON-NLS-1$
+					record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
+					// time grid
+					color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
+					recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+					recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+					// curve grid
+					color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
+					recordSet.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+					recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+					recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
+				}
+				recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+				log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
+				if (recordSet != null && doUpdateVisibilityStatus) {
+					recordSet.device.updateVisibilityStatus(recordSet, false);
+				}
+				if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
+					this.application.updateGraphicsWindow();
+				}
 			}
-			recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-			log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
-			if (this.activeRecordSet != null && doUpdateVisibilityStatus) {
-				this.activeRecordSet.device.updateVisibilityStatus(this.activeRecordSet, false);
-			}
-			if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
-				this.application.updateGraphicsWindow();
-			}		
 		}
 	}
 	

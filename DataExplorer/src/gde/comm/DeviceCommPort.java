@@ -25,7 +25,6 @@ import gde.exception.ApplicationConfigurationException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.ui.DataExplorer;
-import gde.utils.WaitTimer;
 import gnu.io.SerialPort;
 
 import java.io.IOException;
@@ -44,7 +43,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	final protected IDevice								device;
 	final protected DeviceConfiguration		deviceConfig;
 	final protected DataExplorer					application;
-	final protected WaitTimer							timer;
 	final protected IDeviceCommPort				port;
 
 	public static final int ICON_SET_OPEN_CLOSE = 0;
@@ -61,7 +59,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 		this.deviceConfig = currentDevice.getDeviceConfiguration();
 		this.application = currentApplication;
 		this.settings = Settings.getInstance();
-		this.timer = WaitTimer.getInstance();
 		if (Boolean.parseBoolean(System.getProperty("GDE_IS_SIMULATION"))) {
 			this.port = new DeviceSerialPortSimulatorImpl(this.device, this.application, this.device.getTimeStep_ms() < 0, (this.device.getTimeStep_ms() < 0 ? 100 : (int)this.device.getTimeStep_ms()));
 		}
