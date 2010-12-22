@@ -84,7 +84,7 @@ public class UniLogDataGatherer extends Thread {
 			if(!this.serialPort.isConnected()) {
 				this.serialPort.open();
 				isPortOpenedByMe = true;
-				WaitTimer.getInstance().delay(3000);
+				WaitTimer.delay(3000);
 			}
 			
 			// get UniLog configuration for timeStep info
@@ -181,7 +181,7 @@ public class UniLogDataGatherer extends Thread {
 
 	public void setThreadStop() {
 		try {
-			WaitTimer.getInstance().delay(5);
+			WaitTimer.delay(5);
 			this.serialPort.setTransmitFinished(true);
 		}
 		catch (Exception e) {

@@ -27,6 +27,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.Checksum;
+import gde.utils.WaitTimer;
 import gnu.io.NoSuchPortException;
 
 import java.io.IOException;
@@ -239,7 +240,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 			while (this.getAvailableBytes() < 10 && retrys-- > 0 && !isInterruptedByUser) {
 				this.write(COMMAND_LIVE_VALUES);
-				this.timer.delay(250);
+				WaitTimer.delay(250);
 				log.log(Level.FINE, "retryLimit = " + retrys); //$NON-NLS-1$
 			}
 			if (!isInterruptedByUser) {
@@ -297,7 +298,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 			if (!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
-				this.timer.delay(2000);
+				WaitTimer.delay(2000);
 			}
 
 			this.write(COMMAND_START_LOGGING);
@@ -512,7 +513,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 		while (!isConnect && counter-- > 0) {
 			this.write(COMMAND_QUERY_STATE);
 			byte[] buffer = new byte[1];
-			this.timer.delay(100);
+			WaitTimer.delay(100);
 			buffer = this.read(buffer, 2000);
 			if (buffer[0] == DATA_STATE_WAITING || buffer[0] == DATA_STATE_READY) {
 				isConnect = true;

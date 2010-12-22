@@ -53,7 +53,7 @@ public class UniLogLiveGatherer extends Thread {
 	final Channels					channels;
 	final Channel						channel;
 	final Integer						channelNumber;
-	int								timeStep_ms;
+	int											timeStep_ms;
 	Timer										timer;
 	TimerTask								timerTask;
 	boolean									isTimerRunning							= false;
@@ -98,7 +98,7 @@ public class UniLogLiveGatherer extends Thread {
 			if (!this.serialPort.isConnected()) {
 				this.serialPort.open();
 				this.isPortOpenedByLiveGatherer = true;
-				WaitTimer.getInstance().delay(3000);
+				WaitTimer.delay(3000);
 			}
 			
 			// get UniLog configuration for timeStep info
