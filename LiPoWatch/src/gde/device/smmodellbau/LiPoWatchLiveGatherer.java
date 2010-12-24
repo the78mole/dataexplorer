@@ -105,16 +105,22 @@ public class LiPoWatchLiveGatherer extends Thread {
 			log.log(Level.FINE, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (SerialPortException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+			return;
 		}
 		catch (ApplicationConfigurationException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
-			this.application.getDeviceSelectionDialog().open();
+			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+			DataExplorer.display.asyncExec(new Runnable() {
+				public void run() {
+					LiPoWatchLiveGatherer.this.application.getDeviceSelectionDialog().open();
+				}
+			});
+			return;
 		}
 		catch (Throwable t) {
 			log.log(Level.SEVERE, t.getMessage(), t);
+			this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { t.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + t.getMessage()}));
+			return;
 		}
 
 		this.channels.switchChannel(this.channel.getName());

@@ -238,7 +238,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		points[0] = isRelative ? totalVotage : points[i + 3]; // total battery voltage
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.insert(0, "(0)" + points[0] + "; "); //$NON-NLS-1$ //$NON-NLS-2$	
 		
-		points[4] = maxVotage - minVotage;
+		points[4] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(" + (i + 4) + ")" + points[1]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		LiPoWatch.log.log(Level.FINE, sb.toString());
@@ -284,7 +284,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 				}
 			}
 			//calculate balance on the fly
-			points[4] = maxVotage - minVotage;
+			points[4] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 			recordSet.addPoints(points);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
