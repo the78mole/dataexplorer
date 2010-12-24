@@ -89,7 +89,7 @@ public class eStationBC6 extends eStation {
 			}
 		}
 		//calculate balance on the fly
-		points[6] = maxVotage - minVotage;
+		points[6] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 
 		return points;
 	}
@@ -152,7 +152,7 @@ public class eStationBC6 extends eStation {
 				}
 			}
 			//calculate balance on the fly
-			points[6] = maxVotage - minVotage;
+			points[6] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 			
 			if(recordSet.isTimeStepConstant()) 
 				recordSet.addPoints(points);

@@ -232,7 +232,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			}
 		}
 		//calculate balance on the fly
-		points[8] = maxVotage - minVotage;
+		points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 
 		return points;
 	}
@@ -399,7 +399,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				}
 			}
 			//calculate balance on the fly
-			points[8] = maxVotage - minVotage;
+			points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 			
 			if(recordSet.isTimeStepConstant()) 
 				recordSet.addPoints(points);
