@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V11.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
     <Device>
         <name>Simulator</name>
         <manufacturer>WB</manufacturer>
@@ -17,36 +17,38 @@
     <DataBlock>
         <format size="100" type="BINARY"/>
     </DataBlock>
-    <Channel type="TYPE_CONFIG" name="Sinus">
-        <Measurement>
-            <name>Voltage</name>
-            <symbol>U</symbol>
-            <unit>V</unit>
-            <active>true</active>
-			<statistics min="true" max="true" avg="true" sigma="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Height</name>
-            <symbol>H</symbol>
-            <unit>m</unit>
-            <active>true</active>
-			<statistics min="true" max="true" avg="true" sigma="true"/>
-        </Measurement>
-    </Channel>
-    <Channel type="TYPE_OUTLET" name="Ramp">
-        <Measurement>
-            <name>Voltage</name>
-            <symbol>U</symbol>
-            <unit>V</unit>
-            <active>true</active>
-        </Measurement>
-        <Measurement>
-            <name>Current</name>
-            <symbol>I</symbol>
-            <unit>A</unit>
-            <active>true</active>
-        </Measurement>
-    </Channel>
+    <Channels>
+	    <Channel type="TYPE_CONFIG" name="Sinus">
+	        <Measurement>
+	            <name>Voltage</name>
+	            <symbol>U</symbol>
+	            <unit>V</unit>
+	            <active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Height</name>
+	            <symbol>H</symbol>
+	            <unit>m</unit>
+	            <active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="true"/>
+	        </Measurement>
+	    </Channel>
+	    <Channel type="TYPE_OUTLET" name="Ramp">
+	        <Measurement>
+	            <name>Voltage</name>
+	            <symbol>U</symbol>
+	            <unit>V</unit>
+	            <active>true</active>
+	        </Measurement>
+	        <Measurement>
+	            <name>Current</name>
+	            <symbol>I</symbol>
+	            <unit>A</unit>
+	            <active>true</active>
+	        </Measurement>
+	    </Channel>
+	</Channels>
     <Desktop>
 		<property value="false" name="table_tab"/>
 		<property value="false" name="voltage_per_cell_tab"/>
