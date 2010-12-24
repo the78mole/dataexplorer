@@ -117,6 +117,7 @@ public class GathererThread extends Thread {
 						}
 						else {
 							terminalText.append(text);
+							this.dialog.setTerminalText(terminalText.toString());
 						}
 					}
 					else {
@@ -175,11 +176,7 @@ public class GathererThread extends Thread {
 				// this case will be reached while data gathering enabled, but no data will be received
 				if (e instanceof TimeOutException) {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1900));
-					if (this.dialog != null && !this.dialog.isDisposed()) {
-						//dialog terminal is open
-						this.dialog.setTerminalText(Messages.getString(MessageIds.GDE_MSGI1900));
-					}
-					log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for activation ..."); //$NON-NLS-1$
+					log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI1900));
 				}
 				// program end or unexpected exception occurred, stop data gathering to enable save data by user
 				else {
