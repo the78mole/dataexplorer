@@ -1045,14 +1045,14 @@ public class DeviceConfiguration {
 	 * @return the channel count
 	 */
 	public int getChannelCount() {
-		return this.deviceProps.getChannel().size();
+		return this.deviceProps.getChannels().channel.size();
 	}
 
 	/**
 	 * @return the channel name
 	 */
 	public String getChannelName(int channelNumber) {
-		return this.deviceProps.getChannel().get(channelNumber - 1).getName();
+		return this.deviceProps.getChannels().channel.get(channelNumber - 1).getName();
 	}
 
 	/**
@@ -1061,21 +1061,21 @@ public class DeviceConfiguration {
 	 */
 	public void setChannelName(String channelConfigName, int channelNumber) {
 		this.isChangePropery = true;
-		this.deviceProps.getChannel().get(channelNumber - 1).setName(channelConfigName);
+		this.deviceProps.getChannels().channel.get(channelNumber - 1).setName(channelConfigName);
 	}
 
 	/**
 	 * @return the channel type by given channel number 
 	 */
 	public ChannelType getChannelType(int channelConfigNumber) {
-		return this.deviceProps.getChannel().get(channelConfigNumber - 1);
+		return this.deviceProps.getChannels().channel.get(channelConfigNumber - 1);
 	}
 
 	/**
 	 * @return the channel types by given channel number 
 	 */
 	public ChannelTypes getChannelTypes(int channelConfigNumber) {
-		return this.deviceProps.getChannel().get(channelConfigNumber - 1).getType();
+		return this.deviceProps.getChannels().channel.get(channelConfigNumber - 1).getType();
 	}
 	
 	/**
@@ -1093,7 +1093,7 @@ public class DeviceConfiguration {
 	 */
 	public void setChannelTypes(ChannelTypes newChannleType, int channelNumber) {
 		this.isChangePropery = true;
-		this.deviceProps.getChannel().get(channelNumber - 1).setType(newChannleType);
+		this.deviceProps.getChannels().channel.get(channelNumber - 1).setType(newChannleType);
 	}
 	
 	/**
@@ -1102,7 +1102,7 @@ public class DeviceConfiguration {
 	 */
 	public void addChannelType(ChannelType newChannelType) {
 		this.isChangePropery = true;
-		this.deviceProps.getChannel().add(newChannelType);
+		this.deviceProps.getChannels().channel.add(newChannelType);
 	}
 	
 	/**
@@ -1111,7 +1111,7 @@ public class DeviceConfiguration {
 	 */
 	public void removeChannelType(int channelNumber) {
 		this.isChangePropery = true;
-		this.deviceProps.getChannel().remove(channelNumber - 1);
+		this.deviceProps.getChannels().channel.remove(channelNumber - 1);
 	}
 	
 	/**
@@ -1191,7 +1191,7 @@ public class DeviceConfiguration {
 	 * @return the channel type
 	 */
 	public ChannelType getChannel(int channelConfigNumber) {
-		return this.deviceProps.getChannel().size() >= channelConfigNumber ? this.deviceProps.getChannel().get(channelConfigNumber - 1) : null;
+		return this.deviceProps.getChannels().channel.size() >= channelConfigNumber ? this.deviceProps.getChannels().channel.get(channelConfigNumber - 1) : null;
 	}
 
 	/**
@@ -1202,7 +1202,7 @@ public class DeviceConfiguration {
 	@Deprecated
 	public ChannelType getChannel(String channelConfigKey) {
 		ChannelType channel = null;
-		for (ChannelType c : this.deviceProps.getChannel()) {
+		for (ChannelType c : this.deviceProps.getChannels().channel) {
 			if(c.getName().trim().startsWith(channelConfigKey)) {
 				channel = c;
 				break;
@@ -1243,7 +1243,7 @@ public class DeviceConfiguration {
 	 * @return MeasurementType
 	 */
 	public MeasurementType getMeasurement(int channelConfigNumber, int measurementOrdinal) {
-		return this.deviceProps.channel.size() >= channelConfigNumber ? this.getChannel(channelConfigNumber).getMeasurement().get(measurementOrdinal) : this.getChannel(1).getMeasurement().get(measurementOrdinal);
+		return this.deviceProps.getChannels().channel.size() >= channelConfigNumber ? this.getChannel(channelConfigNumber).getMeasurement().get(measurementOrdinal) : this.getChannel(1).getMeasurement().get(measurementOrdinal);
 	}
 
 	/**
@@ -2006,5 +2006,22 @@ public class DeviceConfiguration {
 	 */
 	public IDeviceCommPort getCommunicationPort() {
 		return null;
+	}
+
+	/**
+	 * get the last used channel number (ordinal + 1 = channel number)
+	 * @return the last used channel number
+	 */
+	public int getLastChannelNumber() {
+		return this.deviceProps.getChannels().getLastUseOrdinal() + 1;
+	}
+
+	/**
+	 * set the last used channel number (ordinal + 1 = channel number)
+	 * @return the last used channel number
+	 */
+	public void setLastChannelNumber(int channelNumber) {
+		if (this.isChangePropery = this.deviceProps.getChannels().getLastUseOrdinal() != (channelNumber - 1)) 
+			this.deviceProps.getChannels().setLastUseOrdinal(channelNumber - 1);
 	}
 }

@@ -700,6 +700,18 @@ public interface IDevice {
 	 */
 	@Deprecated
 	public void setMeasurementPropertyValue(String channelConfigKey, int measurementOrdinal, String propertyKey, DataTypes type, Object value);
+
+	/**
+	 * get the last used channel number (ordinal + 1 = channel number)
+	 * @return the last used channel number
+	 */
+	public int getLastChannelNumber();
+
+	/**
+	 * set the last used channel number (ordinal + 1 = channel number)
+	 * @return the last used channel number
+	 */
+	public void setLastChannelNumber(int channelNumber);
 	
 	/**
 	 * query the default stem used as record set name

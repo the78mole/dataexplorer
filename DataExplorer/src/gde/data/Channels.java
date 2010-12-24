@@ -199,6 +199,8 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 				this.application.getMenuToolBar().updateGoogleEarthToolItem();
 				this.application.updateAllTabs(true);
+				
+				this.application.getActiveDevice().setLastChannelNumber(channelNumber);
 			}
 		}
 		else

@@ -239,11 +239,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					// update device configurations if required
 					for (String deviceKey : DeviceSelectionDialog.this.deviceConfigurations.keySet().toArray(new String[0])) {
-						DeviceConfiguration configuration = DeviceSelectionDialog.this.deviceConfigurations.get(deviceKey);
-						if (configuration.isChangePropery()) {
-							log.log(java.util.logging.Level.FINE, configuration.isChangePropery() + " update device properties for " + configuration.getName()); //$NON-NLS-1$
-							configuration.storeDeviceProperties(); // stores only if is changed
-						}
+						checkAndStoreDeviceConfiguration(deviceKey);
 					}
 					// initialize selected device
 					if (isDeviceChanged()) {
@@ -843,6 +839,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * update entries according configuration, this is called whenever a new device is selected
 	 */
 	void updateDialogEntries() {
+		if (this.activeDeviceName != null) checkAndStoreDeviceConfiguration(this.activeDeviceName);
 		if (!this.isDisposed()) {
 			// device selection
 			log.log(java.util.logging.Level.FINE, "active devices " + this.activeDevices.toString()); //$NON-NLS-1$
@@ -1039,6 +1036,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		IDevice activeDevice = this.application.getActiveDevice();
 		// check if any thing to clean up
 		if (activeDevice != null) { // there is an previous active device
+			checkAndStoreDeviceConfiguration(activeDevice);
 			if (activeDevice.getDialog() != null && !activeDevice.getDialog().isDisposed()) {
 				activeDevice.getDialog().dispose();
 			}
@@ -1086,7 +1084,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				channels.put(Integer.valueOf(i), newChannel);
 				// do not call channel.applyTemplate here, there are no record sets
 			}
-			channels.switchChannel(1, GDE.STRING_EMPTY); // set " 1 : Ausgang" as default after device switch and update
+			channels.switchChannel(activeDevice.getLastChannelNumber(), GDE.STRING_EMPTY); // set " 1 : Ausgang" as default after device switch and update
 		}
 		this.application.setProgress(0, null);
 		this.application.updateGraphicsWindow();
@@ -1275,6 +1273,30 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		else {
 			DeviceSelectionDialog.this.portDescription.setEnabled(true);
 			DeviceSelectionDialog.this.portSelectCombo.setEnabled(true);
+		}
+	}
+
+	/**
+	 * check if device configuration has changed values and store it if required
+	 * @param deviceName
+	 */
+	public void checkAndStoreDeviceConfiguration(String deviceName) {
+		DeviceConfiguration configuration = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
+		if (configuration.isChangePropery()) {
+			log.log(java.util.logging.Level.FINE, configuration.isChangePropery() + " update device properties for " + configuration.getName()); //$NON-NLS-1$
+			configuration.storeDeviceProperties(); // stores only if is changed
+		}
+	}
+
+	/**
+	 * check if device configuration has changed values and store it if required
+	 * @param device
+	 */
+	public void checkAndStoreDeviceConfiguration(IDevice device) {
+		DeviceConfiguration configuration = device.getDeviceConfiguration();
+		if (configuration.isChangePropery()) {
+			log.log(java.util.logging.Level.FINE, configuration.isChangePropery() + " update device properties for " + configuration.getName()); //$NON-NLS-1$
+			configuration.storeDeviceProperties(); // stores only if is changed
 		}
 	}
 }
