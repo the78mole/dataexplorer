@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V11.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
     <Device>
         <name implementation="CSV2SerialAdapter">CSV2Serial1</name>
         <manufacturer>WB</manufacturer>
@@ -25,102 +25,104 @@
     <State>
         <property description="" type="Integer" value="01" name="data record"/>
     </State>
-    <Channel type="TYPE_CONFIG" name="Thermal">
-        <Measurement>
-            <name>RecVoltage</name>
-            <symbol>Ur</symbol>
-            <unit>V</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>Height</name>
-            <symbol>h</symbol>
-            <unit>m</unit>
-            <active>true</active>
-            <statistics ratioText="Used capacity/height" ratioRefOrdinal="4" countTriggerText="Number climbs" countByTrigger="true" sumTriggerText="Reached motor height" sumByTriggerRefOrdinal="2" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>MotorCurrent</name>
-            <symbol>I</symbol>
-            <unit>A</unit>
-            <active>true</active>
-            <statistics sumTriggerTimeText="Motor runtime" sigma="false" avg="false" max="true" min="true">
-                <trigger comment="Trigger: Motor current &gt; 3 A; &gt; 5 sek." minTimeSec="5" isGreater="true" level="3000"/>
-            </statistics>
-        </Measurement>
-        <Measurement>
-            <name>MotorVoltage</name>
-            <symbol>U</symbol>
-            <unit>mV</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>MotorBatteryCapacity</name>
-            <symbol>C</symbol>
-            <unit>mAh</unit>
-            <active>true</active>
-            <statistics ratioRefOrdinal="1" sumTriggerText="Used battery capacity" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
-        </Measurement>
-        <Measurement>
-            <name>Velocity</name>
-            <symbol>V</symbol>
-            <unit>km/h</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Temperature</name>
-            <symbol>T</symbol>
-            <unit>°C</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Longitude</name>
-            <symbol>L</symbol>
-            <unit>°</unit>
-            <active>true</active>
-        </Measurement>
-        <Measurement>
-            <name>Latitude</name>
-            <symbol>B</symbol>
-            <unit>°</unit>
-            <active>true</active>
-        </Measurement>
-        <Measurement>
-            <name>GPS-Height</name>
-            <symbol>h</symbol>
-            <unit>m</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>GPS-Velocity</name>
-            <symbol>V</symbol>
-            <unit>km/h</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Climb</name>
-            <symbol>Vc</symbol>
-            <unit>m/sec</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property type="Double" value="0.02" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>ServoImpuls</name>
-            <symbol>si</symbol>
-            <unit>µs</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-    </Channel>
+    <Channels>
+	    <Channel type="TYPE_CONFIG" name="Thermal">
+	        <Measurement>
+	            <name>RecVoltage</name>
+	            <symbol>Ur</symbol>
+	            <unit>V</unit>
+	            <active>true</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Height</name>
+	            <symbol>h</symbol>
+	            <unit>m</unit>
+	            <active>true</active>
+	            <statistics ratioText="Used capacity/height" ratioRefOrdinal="4" countTriggerText="Number climbs" countByTrigger="true" sumTriggerText="Reached motor height" sumByTriggerRefOrdinal="2" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>MotorCurrent</name>
+	            <symbol>I</symbol>
+	            <unit>A</unit>
+	            <active>true</active>
+	            <statistics sumTriggerTimeText="Motor runtime" sigma="false" avg="false" max="true" min="true">
+	                <trigger comment="Trigger: Motor current &gt; 3 A; &gt; 5 sek." minTimeSec="5" isGreater="true" level="3000"/>
+	            </statistics>
+	        </Measurement>
+	        <Measurement>
+	            <name>MotorVoltage</name>
+	            <symbol>U</symbol>
+	            <unit>mV</unit>
+	            <active>true</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>MotorBatteryCapacity</name>
+	            <symbol>C</symbol>
+	            <unit>mAh</unit>
+	            <active>true</active>
+	            <statistics ratioRefOrdinal="1" sumTriggerText="Used battery capacity" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Velocity</name>
+	            <symbol>V</symbol>
+	            <unit>km/h</unit>
+	            <active>true</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Temperature</name>
+	            <symbol>T</symbol>
+	            <unit>°C</unit>
+	            <active>true</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Longitude</name>
+	            <symbol>L</symbol>
+	            <unit>°</unit>
+	            <active>true</active>
+	        </Measurement>
+	        <Measurement>
+	            <name>Latitude</name>
+	            <symbol>B</symbol>
+	            <unit>°</unit>
+	            <active>true</active>
+	        </Measurement>
+	        <Measurement>
+	            <name>GPS-Height</name>
+	            <symbol>h</symbol>
+	            <unit>m</unit>
+	            <active>true</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>GPS-Velocity</name>
+	            <symbol>V</symbol>
+	            <unit>km/h</unit>
+	            <active>true</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Climb</name>
+	            <symbol>Vc</symbol>
+	            <unit>m/sec</unit>
+	            <active>true</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <property type="Double" value="0.02" name="factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>ServoImpuls</name>
+	            <symbol>si</symbol>
+	            <unit>µs</unit>
+	            <active>true</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	    </Channel>
+	</Channels>
     <Desktop>
         <property value="true" name="table_tab"/>
         <property value="true" name="digital_tab"/>
