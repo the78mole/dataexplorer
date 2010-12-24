@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V11.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
 	<Device>
 		<name implementation="gde.device.wstech.DataVario">DataVarioDuo</name>
 		<manufacturer>WSTech</manufacturer>
@@ -26,304 +26,306 @@
 	<State>
 		<property description="" type="Integer" value="1" name="Flugaufzeichnung"/>
 	</State>
-	<Channel type="TYPE_CONFIG" name="Vario">
-		<Measurement>
-			<name>EmpfSpannung</name>
-			<symbol>Ue</symbol>
-			<unit>V</unit>
-			<active>true</active>
-			<statistics sigma="true" avg="true" max="true" min="true"/>
-			<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
-		</Measurement>
-		<Measurement>
-			<name>Höhe</name>
-			<symbol>h</symbol>
-			<unit>m</unit>
-			<active>true</active>
-			<statistics sigma="false" avg="true" max="true" min="true"/>
-			<property description="dm -&gt; m" type="Double" value="0.10" name="factor"/>
-			<property description="Reduktion aller gemessenem Werte durch den ersten Messwert" type="Boolean" value="true" name="do_subtract_first"/>
-		</Measurement>
-		<Measurement>
-			<name>Strom</name>
-			<symbol>I</symbol>
-			<unit>A</unit>
-			<active>false</active>
-			<statistics sumTriggerTimeText="Motorlaufzeit" sigma="false" avg="true" max="true" min="true"/>
-		</Measurement>
-		<Measurement>
-			<name>Spannung</name>
-			<symbol>U</symbol>
-			<unit>V</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="true" max="true" min="true"/>
-			<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
-		</Measurement>
-		<Measurement>
-			<name>Kapazität</name>
-			<symbol>C</symbol>
-			<unit>mAh</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="false" max="true" min="false"/>
-		</Measurement>
-		<Measurement>
-			<name>Geschwindigkeit</name>
-			<symbol>V</symbol>
-			<unit>km/h</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="true" max="true" min="true"/>
-		</Measurement>
-		<Measurement>
-			<name>Temperatur</name>
-			<symbol>T</symbol>
-			<unit>°C</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="false" max="true" min="true"/>
-		</Measurement>
-		<Measurement>
-			<name>Längengrad</name>
-			<symbol>L</symbol>
-			<unit>°</unit>
-			<active>false</active>
-		</Measurement>
-		<Measurement>
-			<name>Breitengrad</name>
-			<symbol>B</symbol>
-			<unit>°</unit>
-			<active>false</active>
-		</Measurement>
-		<Measurement>
-			<name>GPS-Höhe</name>
-			<symbol>h</symbol>
-			<unit>m</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="false" max="true" min="true"/>
-		</Measurement>
-		<Measurement>
-			<name>GPS-Geschwindigkeit</name>
-			<symbol>V</symbol>
-			<unit>km/h</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="false" max="true" min="true"/>
-            <property description="Google Earth untere Geschwindigkeitsgrenze" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
-            <property description="Google Earth obere Geschwindigkeitsgrenze" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
-		</Measurement>
-		<Measurement>
-			<name>Steigen</name>
-			<symbol>Vs</symbol>
-			<unit>m/s</unit>
-			<active>true</active>
-			<statistics sigma="false" avg="true" max="true" min="true"/>
-			<property type="Double" value="0.02" name="factor"/>
-		</Measurement>
-		<Measurement>
-			<name>ServoImpuls</name>
-			<symbol>si</symbol>
-			<unit>µs</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="false" max="true" min="true"/>
-		</Measurement>
-	</Channel>
-	<Channel type="TYPE_CONFIG" name="Vario+GPS">
-		<Measurement>
-			<name>EmpfSpannung</name>
-			<symbol>Ue</symbol>
-			<unit>V</unit>
-			<active>true</active>
-			<statistics sigma="true" avg="true" max="true" min="true"/>
-			<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
-		</Measurement>
-		<Measurement>
-			<name>Höhe</name>
-			<symbol>h</symbol>
-			<unit>m</unit>
-			<active>true</active>
-			<statistics sumTriggerText="Motorhöhe" sumByTriggerRefOrdinal="11" sigma="false" avg="false" max="true" min="true"/>
-			<property description="dm -&gt; m" type="Double" value="0.10" name="factor"/>
-			<property description="Reduktion aller gemessenem Werte durch den ersten Messwert" type="Boolean" value="true" name="do_subtract_first"/>
-		</Measurement>
-		<Measurement>
-			<name>MotorStrom</name>
-			<symbol>I</symbol>
-			<unit>A</unit>
-			<active>false</active>
-			<statistics sumTriggerTimeText="Motorlaufzeit" sigma="false" avg="false" max="true" min="true"/>
-		</Measurement>
-		<Measurement>
-			<name>MotorSpannung</name>
-			<symbol>U</symbol>
-			<unit>V</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="false" max="true" min="true"/>
-			<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
-		</Measurement>
-		<Measurement>
-			<name>MotorAkkuKapazität</name>
-			<symbol>C</symbol>
-			<unit>mAh</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="false" max="true" min="false"/>
-		</Measurement>
-		<Measurement>
-			<name>Geschwindigkeit</name>
-			<symbol>V</symbol>
-			<unit>km/h</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="false" max="true" min="true"/>
-		</Measurement>
-		<Measurement>
-			<name>Temperatur</name>
-			<symbol>T</symbol>
-			<unit>°C</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="false" max="true" min="true"/>
-		</Measurement>
-		<Measurement>
-			<name>Längengrad</name>
-			<symbol>L</symbol>
-			<unit>°</unit>
-			<active>false</active>
-		</Measurement>
-		<Measurement>
-			<name>Breitengrad</name>
-			<symbol>B</symbol>
-			<unit>°</unit>
-			<active>false</active>
-		</Measurement>
-		<Measurement>
-			<name>GPS-Höhe</name>
-			<symbol>h</symbol>
-			<unit>m</unit>
-			<active>true</active>
-			<statistics sigma="false" avg="true" max="true" min="true"/>
-		</Measurement>
-		<Measurement>
-			<name>GPS-Geschwindigkeit</name>
-			<symbol>V</symbol>
-			<unit>km/h</unit>
-			<active>true</active>
-			<statistics sigma="false" avg="true" max="true" min="true"/>
-            <property description="Google Earth untere Geschwindigkeitsgrenze" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
-            <property description="Google Earth obere Geschwindigkeitsgrenze" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
-		</Measurement>
-		<Measurement>
-			<name>Steigen</name>
-			<symbol>Vs</symbol>
-			<unit>m/s</unit>
-			<active>true</active>
-			<statistics sumTriggerTimeText="~Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="false" avg="false" max="true" min="true">
-				<trigger comment="Trigger: Steigen &gt; 1 m/s über 15 sec" minTimeSec="15" isGreater="true" level="1000"/>
-			</statistics>
-			<property type="Double" value="0.02" name="factor"/>
-		</Measurement>
-		<Measurement>
-			<name>ServoImpuls</name>
-			<symbol>si</symbol>
-			<unit>µs</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="false" max="true" min="true"/>
-		</Measurement>
-	</Channel>
-	<Channel type="TYPE_CONFIG" name="Motormessung">
-		<Measurement>
-			<name>EmpfSpannung</name>
-			<symbol>Ue</symbol>
-			<unit>V</unit>
-			<active>true</active>
-			<statistics sigma="true" avg="true" max="true" min="true"/>
-			<property description="mv -&gt; V" type="Double" value="0.001" name="factor"/>
-		</Measurement>
-		<Measurement>
-			<name>Höhe</name>
-			<symbol>h</symbol>
-			<unit>m</unit>
-			<active>true</active>
-			<statistics ratioText="Verbrauchte Kapazität/Höhenmeter" ratioRefOrdinal="4" sumTriggerText="Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
-			<property description="dm -&gt; m" type="Double" value="0.10" name="factor"/>
-			<property description="Reduktion aller gemessenem Werte durch den ersten Messwert" type="Boolean" value="true" name="do_subtract_first"/>
-		</Measurement>
-		<Measurement>
-			<name>MotorStrom</name>
-			<symbol>I</symbol>
-			<unit>A</unit>
-			<active>true</active>
-			<statistics sumTriggerTimeText="Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="false" avg="false" max="true" min="true">
-				<trigger comment="Trigger:Strom &gt; 3 A über Zeit &gt; 5 sec" minTimeSec="5" isGreater="true" level="3000"/>
-			</statistics>
-		</Measurement>
-		<Measurement>
-			<name>MotorSpannung</name>
-			<symbol>U</symbol>
-			<unit>V</unit>
-			<active>true</active>
-			<statistics comment="Werte bezogen auf Trigger" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
-			<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
-		</Measurement>
-		<Measurement>
-			<name>MotorAkkuKapazität</name>
-			<symbol>C</symbol>
-			<unit>mAh</unit>
-			<active>true</active>
-			<statistics sumTriggerText="Motorlaufzeitkapazität" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
-		</Measurement>
-		<Measurement>
-			<name>Geschwindigkeit</name>
-			<symbol>V</symbol>
-			<unit>km/h</unit>
-			<active>true</active>
-			<statistics comment="Werte bezogen auf Steigflug (Trigger)" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
-		</Measurement>
-		<Measurement>
-			<name>Temperatur</name>
-			<symbol>T</symbol>
-			<unit>°C</unit>
-			<active>true</active>
-			<statistics sigma="false" avg="false" max="true" min="true"/>
-		</Measurement>
-		<Measurement>
-			<name>Längengrad</name>
-			<symbol>L</symbol>
-			<unit>°</unit>
-			<active>false</active>
-		</Measurement>
-		<Measurement>
-			<name>Breitengrad</name>
-			<symbol>B</symbol>
-			<unit>°</unit>
-			<active>false</active>
-		</Measurement>
-		<Measurement>
-			<name>GPS-Höhe</name>
-			<symbol>h</symbol>
-			<unit>m</unit>
-			<active>false</active>
-			<statistics sumTriggerText="Gesammthöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
-		</Measurement>
-		<Measurement>
-			<name>GPS-Geschwindigkeit</name>
-			<symbol>V</symbol>
-			<unit>km/h</unit>
-			<active>false</active>
-			<statistics comment="Werte bezogen auf Triggerbereiche" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
-            <property description="Google Earth untere Geschwindigkeitsgrenze" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
-            <property description="Google Earth obere Geschwindigkeitsgrenze" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
-		</Measurement>
-		<Measurement>
-			<name>Steigen</name>
-			<symbol>Vs</symbol>
-			<unit>m/s</unit>
-			<active>true</active>
-			<statistics comment="bezogen auf Trigger" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
-			<property type="Double" value="0.02" name="factor"/>
-		</Measurement>
-		<Measurement>
-			<name>ServoImpuls</name>
-			<symbol>si</symbol>
-			<unit>µs</unit>
-			<active>false</active>
-			<statistics sigma="false" avg="false" max="true" min="true"/>
-		</Measurement>
-	</Channel>
+	<Channels>
+		<Channel type="TYPE_CONFIG" name="Vario">
+			<Measurement>
+				<name>EmpfSpannung</name>
+				<symbol>Ue</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics sigma="true" avg="true" max="true" min="true"/>
+				<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
+			</Measurement>
+			<Measurement>
+				<name>Höhe</name>
+				<symbol>h</symbol>
+				<unit>m</unit>
+				<active>true</active>
+				<statistics sigma="false" avg="true" max="true" min="true"/>
+				<property description="dm -&gt; m" type="Double" value="0.10" name="factor"/>
+				<property description="Reduktion aller gemessenem Werte durch den ersten Messwert" type="Boolean" value="true" name="do_subtract_first"/>
+			</Measurement>
+			<Measurement>
+				<name>Strom</name>
+				<symbol>I</symbol>
+				<unit>A</unit>
+				<active>false</active>
+				<statistics sumTriggerTimeText="Motorlaufzeit" sigma="false" avg="true" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>Spannung</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="true" max="true" min="true"/>
+				<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
+			</Measurement>
+			<Measurement>
+				<name>Kapazität</name>
+				<symbol>C</symbol>
+				<unit>mAh</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="false" max="true" min="false"/>
+			</Measurement>
+			<Measurement>
+				<name>Geschwindigkeit</name>
+				<symbol>V</symbol>
+				<unit>km/h</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="true" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>Temperatur</name>
+				<symbol>T</symbol>
+				<unit>°C</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="false" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>Längengrad</name>
+				<symbol>L</symbol>
+				<unit>°</unit>
+				<active>false</active>
+			</Measurement>
+			<Measurement>
+				<name>Breitengrad</name>
+				<symbol>B</symbol>
+				<unit>°</unit>
+				<active>false</active>
+			</Measurement>
+			<Measurement>
+				<name>GPS-Höhe</name>
+				<symbol>h</symbol>
+				<unit>m</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="false" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>GPS-Geschwindigkeit</name>
+				<symbol>V</symbol>
+				<unit>km/h</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="false" max="true" min="true"/>
+	            <property description="Google Earth untere Geschwindigkeitsgrenze" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
+	            <property description="Google Earth obere Geschwindigkeitsgrenze" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
+			</Measurement>
+			<Measurement>
+				<name>Steigen</name>
+				<symbol>Vs</symbol>
+				<unit>m/s</unit>
+				<active>true</active>
+				<statistics sigma="false" avg="true" max="true" min="true"/>
+				<property type="Double" value="0.02" name="factor"/>
+			</Measurement>
+			<Measurement>
+				<name>ServoImpuls</name>
+				<symbol>si</symbol>
+				<unit>µs</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="false" max="true" min="true"/>
+			</Measurement>
+		</Channel>
+		<Channel type="TYPE_CONFIG" name="Vario+GPS">
+			<Measurement>
+				<name>EmpfSpannung</name>
+				<symbol>Ue</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics sigma="true" avg="true" max="true" min="true"/>
+				<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
+			</Measurement>
+			<Measurement>
+				<name>Höhe</name>
+				<symbol>h</symbol>
+				<unit>m</unit>
+				<active>true</active>
+				<statistics sumTriggerText="Motorhöhe" sumByTriggerRefOrdinal="11" sigma="false" avg="false" max="true" min="true"/>
+				<property description="dm -&gt; m" type="Double" value="0.10" name="factor"/>
+				<property description="Reduktion aller gemessenem Werte durch den ersten Messwert" type="Boolean" value="true" name="do_subtract_first"/>
+			</Measurement>
+			<Measurement>
+				<name>MotorStrom</name>
+				<symbol>I</symbol>
+				<unit>A</unit>
+				<active>false</active>
+				<statistics sumTriggerTimeText="Motorlaufzeit" sigma="false" avg="false" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>MotorSpannung</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="false" max="true" min="true"/>
+				<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
+			</Measurement>
+			<Measurement>
+				<name>MotorAkkuKapazität</name>
+				<symbol>C</symbol>
+				<unit>mAh</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="false" max="true" min="false"/>
+			</Measurement>
+			<Measurement>
+				<name>Geschwindigkeit</name>
+				<symbol>V</symbol>
+				<unit>km/h</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="false" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>Temperatur</name>
+				<symbol>T</symbol>
+				<unit>°C</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="false" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>Längengrad</name>
+				<symbol>L</symbol>
+				<unit>°</unit>
+				<active>false</active>
+			</Measurement>
+			<Measurement>
+				<name>Breitengrad</name>
+				<symbol>B</symbol>
+				<unit>°</unit>
+				<active>false</active>
+			</Measurement>
+			<Measurement>
+				<name>GPS-Höhe</name>
+				<symbol>h</symbol>
+				<unit>m</unit>
+				<active>true</active>
+				<statistics sigma="false" avg="true" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>GPS-Geschwindigkeit</name>
+				<symbol>V</symbol>
+				<unit>km/h</unit>
+				<active>true</active>
+				<statistics sigma="false" avg="true" max="true" min="true"/>
+	            <property description="Google Earth untere Geschwindigkeitsgrenze" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
+	            <property description="Google Earth obere Geschwindigkeitsgrenze" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
+			</Measurement>
+			<Measurement>
+				<name>Steigen</name>
+				<symbol>Vs</symbol>
+				<unit>m/s</unit>
+				<active>true</active>
+				<statistics sumTriggerTimeText="~Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="false" avg="false" max="true" min="true">
+					<trigger comment="Trigger: Steigen &gt; 1 m/s über 15 sec" minTimeSec="15" isGreater="true" level="1000"/>
+				</statistics>
+				<property type="Double" value="0.02" name="factor"/>
+			</Measurement>
+			<Measurement>
+				<name>ServoImpuls</name>
+				<symbol>si</symbol>
+				<unit>µs</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="false" max="true" min="true"/>
+			</Measurement>
+		</Channel>
+		<Channel type="TYPE_CONFIG" name="Motormessung">
+			<Measurement>
+				<name>EmpfSpannung</name>
+				<symbol>Ue</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics sigma="true" avg="true" max="true" min="true"/>
+				<property description="mv -&gt; V" type="Double" value="0.001" name="factor"/>
+			</Measurement>
+			<Measurement>
+				<name>Höhe</name>
+				<symbol>h</symbol>
+				<unit>m</unit>
+				<active>true</active>
+				<statistics ratioText="Verbrauchte Kapazität/Höhenmeter" ratioRefOrdinal="4" sumTriggerText="Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+				<property description="dm -&gt; m" type="Double" value="0.10" name="factor"/>
+				<property description="Reduktion aller gemessenem Werte durch den ersten Messwert" type="Boolean" value="true" name="do_subtract_first"/>
+			</Measurement>
+			<Measurement>
+				<name>MotorStrom</name>
+				<symbol>I</symbol>
+				<unit>A</unit>
+				<active>true</active>
+				<statistics sumTriggerTimeText="Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="false" avg="false" max="true" min="true">
+					<trigger comment="Trigger:Strom &gt; 3 A über Zeit &gt; 5 sec" minTimeSec="5" isGreater="true" level="3000"/>
+				</statistics>
+			</Measurement>
+			<Measurement>
+				<name>MotorSpannung</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
+				<active>true</active>
+				<statistics comment="Werte bezogen auf Trigger" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+				<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
+			</Measurement>
+			<Measurement>
+				<name>MotorAkkuKapazität</name>
+				<symbol>C</symbol>
+				<unit>mAh</unit>
+				<active>true</active>
+				<statistics sumTriggerText="Motorlaufzeitkapazität" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
+			</Measurement>
+			<Measurement>
+				<name>Geschwindigkeit</name>
+				<symbol>V</symbol>
+				<unit>km/h</unit>
+				<active>true</active>
+				<statistics comment="Werte bezogen auf Steigflug (Trigger)" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>Temperatur</name>
+				<symbol>T</symbol>
+				<unit>°C</unit>
+				<active>true</active>
+				<statistics sigma="false" avg="false" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>Längengrad</name>
+				<symbol>L</symbol>
+				<unit>°</unit>
+				<active>false</active>
+			</Measurement>
+			<Measurement>
+				<name>Breitengrad</name>
+				<symbol>B</symbol>
+				<unit>°</unit>
+				<active>false</active>
+			</Measurement>
+			<Measurement>
+				<name>GPS-Höhe</name>
+				<symbol>h</symbol>
+				<unit>m</unit>
+				<active>false</active>
+				<statistics sumTriggerText="Gesammthöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+			</Measurement>
+			<Measurement>
+				<name>GPS-Geschwindigkeit</name>
+				<symbol>V</symbol>
+				<unit>km/h</unit>
+				<active>false</active>
+				<statistics comment="Werte bezogen auf Triggerbereiche" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+	            <property description="Google Earth untere Geschwindigkeitsgrenze" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
+	            <property description="Google Earth obere Geschwindigkeitsgrenze" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
+			</Measurement>
+			<Measurement>
+				<name>Steigen</name>
+				<symbol>Vs</symbol>
+				<unit>m/s</unit>
+				<active>true</active>
+				<statistics comment="bezogen auf Trigger" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+				<property type="Double" value="0.02" name="factor"/>
+			</Measurement>
+			<Measurement>
+				<name>ServoImpuls</name>
+				<symbol>si</symbol>
+				<unit>µs</unit>
+				<active>false</active>
+				<statistics sigma="false" avg="false" max="true" min="true"/>
+			</Measurement>
+		</Channel>
+	</Channels>
 	<Desktop>
 		<property value="true" name="table_tab"/>
 		<property value="true" name="digital_tab"/>
