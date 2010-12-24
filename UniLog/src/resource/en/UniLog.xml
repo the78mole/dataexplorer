@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V11.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
     <Device>
         <name>UniLog</name>
         <manufacturer>SM-Modellbau</manufacturer>
@@ -28,450 +28,452 @@
         <format type="BINARY" size="24"/>
 		<checkSum type="XOR" format="BINARY"/>
     </DataBlock>
-    <Channel type="TYPE_CONFIG" name="Height">
-        <Measurement>
-            <name>VoltageRx</name>
-            <symbol>Urx</symbol>
-            <unit>V</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Voltage</name>
-            <symbol>U</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Current</name>
-            <symbol>I</symbol>
-            <unit>A</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
-            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
-        </Measurement>
-        <Measurement>
-            <name>Capacity</name>
-            <symbol>C</symbol>
-            <unit>mAh</unit>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Power</name>
-            <symbol>P</symbol>
-            <unit>W</unit>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Energy</name>
-            <symbol>E</symbol>
-            <unit>Wh</unit>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Voltage/Cell</name>
-            <symbol>U*</symbol>
-            <unit>V</unit>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="4" name="number_cells"/>
-        </Measurement>
-        <Measurement>
-            <name>Revolution</name>
-            <symbol>n</symbol>
-            <unit>1/min</unit>
-            <active>false</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
-            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
-            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
-            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
-        </Measurement>
-        <Measurement>
-            <name>Efficience</name>
-            <symbol>eta</symbol>
-            <unit>%</unit>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property type="Integer" value="3400" name="prop_n100W"/>
-        </Measurement>
-        <Measurement>
-            <name>Height</name>
-            <symbol>h</symbol>
-            <unit>m</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Climb</name>
-            <symbol>Vc</symbol>
-            <unit>m/sec</unit>
-            <statistics sigma="true" avg="false" max="true" min="true"/>
-            <property type="Integer" value="10" name="regression_interval_sec"/>
-            <property type="String" value="regression_type_curve" name="regression_type"/>
-        </Measurement>
-        <Measurement>
-            <name>Velocity</name>
-            <symbol>A1</symbol>
-            <unit>km/h</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>ServoImpuls</name>
-            <symbol>A2</symbol>
-            <unit>�s</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>TempIntern</name>
-            <symbol>A3</symbol>
-            <unit>�C</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-    </Channel>
-    <Channel type="TYPE_CONFIG" name="Receiver">
-        <Measurement>
-            <name>VoltageRx/name>
-            <symbol>Urx</symbol>
-            <unit>V</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Voltage</name>
-            <symbol>U</symbol>
-            <unit>V</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Current</name>
-            <symbol>I</symbol>
-            <unit>A</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
-            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
-        </Measurement>
-        <Measurement>
-            <name>Capacity</name>
-            <symbol>C</symbol>
-            <unit>mAh</unit>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Power</name>
-            <symbol>P</symbol>
-            <unit>W</unit>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Energy</name>
-            <symbol>E</symbol>
-            <unit>Wh</unit>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Voltage/Cell</name>
-            <symbol>U*</symbol>
-            <unit>V</unit>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="2" name="number_cells"/>
-        </Measurement>
-        <Measurement>
-            <name>Revolution</name>
-            <symbol>n</symbol>
-            <unit>1/min</unit>
-            <active>false</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
-            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
-            <property description="Number motos ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
-            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
-        </Measurement>
-        <Measurement>
-            <name>Efficience</name>
-            <symbol>eta</symbol>
-            <unit>%</unit>
-            <statistics sigma="false" avg="true" max="false" min="false"/>
-            <property type="Integer" value="3400" name="prop_n100W"/>
-        </Measurement>
-        <Measurement>
-            <name>Height</name>
-            <symbol>h</symbol>
-            <unit>m</unit>
-            <active>true</active>
-            <statistics sigma="false" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Climb</name>
-            <symbol>Vc</symbol>
-            <unit>m/sec</unit>
-            <statistics sigma="true" avg="false" max="true" min="true"/>
-            <property type="Integer" value="10" name="regression_interval_sec"/>
-            <property type="String" value="regression_type_curve" name="regression_type"/>
-        </Measurement>
-        <Measurement>
-            <name>Velocity</name>
-            <symbol>A1</symbol>
-            <unit>km/h</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>ServoImpuls</name>
-            <symbol>A2</symbol>
-            <unit>�s</unit>
-            <active>false</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>TempIntern</name>
-            <symbol>A3</symbol>
-            <unit>�C</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-    </Channel>
-    <Channel type="TYPE_CONFIG" name="Motor">
-        <Measurement>
-            <name>VoltageRx</name>
-            <symbol>Urx</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Voltage</name>
-            <symbol>U</symbol>
-            <unit>V</unit>
-            <active>true</active>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Current</name>
-            <symbol>I</symbol>
-            <unit>A</unit>
-            <active>true</active>
-            <statistics sumTriggerTimeText="Motor run time" countTriggerText="Number of climb flights" countByTrigger="true" sigma="true" avg="true" max="true" min="false">
-                <trigger comment="Trigger: current &gt; 2 A + &gt; 5 sec." minTimeSec="5" isGreater="true" level="2000"/>
-            </statistics>
-            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
-            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
-        </Measurement>
-        <Measurement>
-            <name>Capacity</name>
-            <symbol>C</symbol>
-            <unit>mAh</unit>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Power</name>
-            <symbol>P</symbol>
-            <unit>W</unit>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
-        </Measurement>
-        <Measurement>
-            <name>Energy</name>
-            <symbol>E</symbol>
-            <unit>Wh</unit>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Voltage/Cell</name>
-            <symbol>U*</symbol>
-            <unit>V</unit>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
-            <property description="Anzahl der Zellen vom Akku" type="Integer" value="12" name="number_cells"/>
-        </Measurement>
-        <Measurement>
-            <name>Revolution</name>
-            <symbol>n</symbol>
-            <unit>1/min</unit>
-            <active>true</active>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
-            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
-            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
-            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
-            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
-        </Measurement>
-        <Measurement>
-            <name>Efficience</name>
-            <symbol>eta</symbol>
-            <unit>%</unit>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="false" min="false"/>
-            <property description="PropellerRevolution bei 100 W" type="Integer" value="3400" name="prop_n100W"/>
-        </Measurement>
-        <Measurement>
-            <name>Height</name>
-            <symbol>h</symbol>
-            <unit>m</unit>
-            <active>true</active>
-            <statistics ratioText="capacity/height" ratioRefOrdinal="4" sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Climb</name>
-            <symbol>Vc</symbol>
-            <unit>m/sec</unit>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="10" name="regression_interval_sec"/>
-            <property type="String" value="regression_type_curve" name="regression_type"/>
-        </Measurement>
-        <Measurement>
-            <name>Velocity</name>
-            <symbol>A1</symbol>
-            <unit>km/h</unit>
-            <active>false</active>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>ServoImpuls</name>
-            <symbol>A2</symbol>
-            <unit>µs</unit>
-            <active>false</active>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>TempIntern</name>
-            <symbol>A3</symbol>
-            <unit>�C</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-    </Channel>
-    <Channel type="TYPE_CONFIG" name="Velocity">
-        <Measurement>
-            <name>VoltageRx</name>
-            <symbol>Urx</symbol>
-            <unit>V</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Voltage</name>
-            <symbol>U</symbol>
-            <unit>V</unit>
-            <active>true</active>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Current</name>
-            <symbol>I</symbol>
-            <unit>A</unit>
-            <active>true</active>
-            <statistics sumTriggerTimeText="Motor run time" countTriggerText="Number of climb flights" countByTrigger="true" sigma="false" avg="true" max="true" min="false">
-                <trigger comment="Trigger: current &gt; 2 A + &gt; 5 sec." minTimeSec="5" isGreater="true" level="2000"/>
-            </statistics>
-            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
-            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
-        </Measurement>
-        <Measurement>
-            <name>Capacity</name>
-            <symbol>C</symbol>
-            <unit>mAh</unit>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Power</name>
-            <symbol>P</symbol>
-            <unit>W</unit>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
-        </Measurement>
-        <Measurement>
-            <name>Energy</name>
-            <symbol>E</symbol>
-            <unit>Wh</unit>
-            <statistics sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Voltage/Cell</name>
-            <symbol>U*</symbol>
-            <unit>V</unit>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
-            <property description="Anzahl der Zellen vom Akku" type="Integer" value="12" name="number_cells"/>
-        </Measurement>
-        <Measurement>
-            <name>Revolution</name>
-            <symbol>n</symbol>
-            <unit>1/min</unit>
-            <active>true</active>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="false"/>
-            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
-            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
-            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
-            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
-        </Measurement>
-        <Measurement>
-            <name>Efficience</name>
-            <symbol>eta</symbol>
-            <unit>%</unit>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="false" min="false"/>
-            <property description="Propeller revolution at 100 W power" type="Integer" value="3400" name="prop_n100W"/>
-        </Measurement>
-        <Measurement>
-            <name>Height</name>
-            <symbol>h</symbol>
-            <unit>m</unit>
-            <active>true</active>
-            <statistics ratioText="capacity/height" ratioRefOrdinal="4" sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
-        </Measurement>
-        <Measurement>
-            <name>Climb</name>
-            <symbol>Vc</symbol>
-            <unit>m/sec</unit>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
-            <property type="Integer" value="10" name="regression_interval_sec"/>
-            <property type="String" value="regression_type_curve" name="regression_type"/>
-        </Measurement>
-        <Measurement>
-            <name>Velocity</name>
-            <symbol>A1</symbol>
-            <unit>km/h</unit>
-            <active>true</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>Temperature A2</name>
-            <symbol>A2</symbol>
-            <unit>�C</unit>
-            <active>false</active>
-            <statistics sigma="true" avg="true" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-        <Measurement>
-            <name>Temperature A3</name>
-            <symbol>A3</symbol>
-            <unit>�C</unit>
-            <active>false</active>
-            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
-            <property type="Double" value="0.0" name="offset"/>
-            <property type="Double" value="1.0" name="factor"/>
-        </Measurement>
-    </Channel>
+    <Channels>
+	    <Channel type="TYPE_CONFIG" name="Height">
+	        <Measurement>
+	            <name>VoltageRx</name>
+	            <symbol>Urx</symbol>
+	            <unit>V</unit>
+	            <active>true</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Voltage</name>
+	            <symbol>U</symbol>
+	            <unit>V</unit>
+	            <active>false</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Current</name>
+	            <symbol>I</symbol>
+	            <unit>A</unit>
+	            <active>false</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
+	            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Capacity</name>
+	            <symbol>C</symbol>
+	            <unit>mAh</unit>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Power</name>
+	            <symbol>P</symbol>
+	            <unit>W</unit>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Energy</name>
+	            <symbol>E</symbol>
+	            <unit>Wh</unit>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Voltage/Cell</name>
+	            <symbol>U*</symbol>
+	            <unit>V</unit>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Integer" value="4" name="number_cells"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Revolution</name>
+	            <symbol>n</symbol>
+	            <unit>1/min</unit>
+	            <active>false</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
+	            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
+	            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
+	            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Efficience</name>
+	            <symbol>eta</symbol>
+	            <unit>%</unit>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <property type="Integer" value="3400" name="prop_n100W"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Height</name>
+	            <symbol>h</symbol>
+	            <unit>m</unit>
+	            <active>true</active>
+	            <statistics sigma="false" avg="true" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Climb</name>
+	            <symbol>Vc</symbol>
+	            <unit>m/sec</unit>
+	            <statistics sigma="true" avg="false" max="true" min="true"/>
+	            <property type="Integer" value="10" name="regression_interval_sec"/>
+	            <property type="String" value="regression_type_curve" name="regression_type"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Velocity</name>
+	            <symbol>A1</symbol>
+	            <unit>km/h</unit>
+	            <active>false</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>ServoImpuls</name>
+	            <symbol>A2</symbol>
+	            <unit>�s</unit>
+	            <active>true</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>TempIntern</name>
+	            <symbol>A3</symbol>
+	            <unit>�C</unit>
+	            <active>true</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	    </Channel>
+	    <Channel type="TYPE_CONFIG" name="Receiver">
+	        <Measurement>
+	            <name>VoltageRx</name>
+	            <symbol>Urx</symbol>
+	            <unit>V</unit>
+	            <active>true</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Voltage</name>
+	            <symbol>U</symbol>
+	            <unit>V</unit>
+	            <active>true</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Current</name>
+	            <symbol>I</symbol>
+	            <unit>A</unit>
+	            <active>true</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
+	            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Capacity</name>
+	            <symbol>C</symbol>
+	            <unit>mAh</unit>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Power</name>
+	            <symbol>P</symbol>
+	            <unit>W</unit>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Energy</name>
+	            <symbol>E</symbol>
+	            <unit>Wh</unit>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Voltage/Cell</name>
+	            <symbol>U*</symbol>
+	            <unit>V</unit>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Integer" value="2" name="number_cells"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Revolution</name>
+	            <symbol>n</symbol>
+	            <unit>1/min</unit>
+	            <active>false</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
+	            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
+	            <property description="Number motos ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
+	            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Efficience</name>
+	            <symbol>eta</symbol>
+	            <unit>%</unit>
+	            <statistics sigma="false" avg="true" max="false" min="false"/>
+	            <property type="Integer" value="3400" name="prop_n100W"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Height</name>
+	            <symbol>h</symbol>
+	            <unit>m</unit>
+	            <active>true</active>
+	            <statistics sigma="false" avg="true" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Climb</name>
+	            <symbol>Vc</symbol>
+	            <unit>m/sec</unit>
+	            <statistics sigma="true" avg="false" max="true" min="true"/>
+	            <property type="Integer" value="10" name="regression_interval_sec"/>
+	            <property type="String" value="regression_type_curve" name="regression_type"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Velocity</name>
+	            <symbol>A1</symbol>
+	            <unit>km/h</unit>
+	            <active>false</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>ServoImpuls</name>
+	            <symbol>A2</symbol>
+	            <unit>�s</unit>
+	            <active>false</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>TempIntern</name>
+	            <symbol>A3</symbol>
+	            <unit>�C</unit>
+	            <active>true</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	    </Channel>
+	    <Channel type="TYPE_CONFIG" name="Motor">
+	        <Measurement>
+	            <name>VoltageRx</name>
+	            <symbol>Urx</symbol>
+	            <unit>V</unit>
+	            <active>false</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Voltage</name>
+	            <symbol>U</symbol>
+	            <unit>V</unit>
+	            <active>true</active>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Current</name>
+	            <symbol>I</symbol>
+	            <unit>A</unit>
+	            <active>true</active>
+	            <statistics sumTriggerTimeText="Motor run time" countTriggerText="Number of climb flights" countByTrigger="true" sigma="true" avg="true" max="true" min="false">
+	                <trigger comment="Trigger: current &gt; 2 A + &gt; 5 sec." minTimeSec="5" isGreater="true" level="2000"/>
+	            </statistics>
+	            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
+	            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Capacity</name>
+	            <symbol>C</symbol>
+	            <unit>mAh</unit>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Power</name>
+	            <symbol>P</symbol>
+	            <unit>W</unit>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Energy</name>
+	            <symbol>E</symbol>
+	            <unit>Wh</unit>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Voltage/Cell</name>
+	            <symbol>U*</symbol>
+	            <unit>V</unit>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+	            <property description="Anzahl der Zellen vom Akku" type="Integer" value="12" name="number_cells"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Revolution</name>
+	            <symbol>n</symbol>
+	            <unit>1/min</unit>
+	            <active>true</active>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
+	            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
+	            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
+	            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
+	            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Efficience</name>
+	            <symbol>eta</symbol>
+	            <unit>%</unit>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="false" min="false"/>
+	            <property description="PropellerRevolution bei 100 W" type="Integer" value="3400" name="prop_n100W"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Height</name>
+	            <symbol>h</symbol>
+	            <unit>m</unit>
+	            <active>true</active>
+	            <statistics ratioText="capacity/height" ratioRefOrdinal="4" sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Climb</name>
+	            <symbol>Vc</symbol>
+	            <unit>m/sec</unit>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Integer" value="10" name="regression_interval_sec"/>
+	            <property type="String" value="regression_type_curve" name="regression_type"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Velocity</name>
+	            <symbol>A1</symbol>
+	            <unit>km/h</unit>
+	            <active>false</active>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>ServoImpuls</name>
+	            <symbol>A2</symbol>
+	            <unit>µs</unit>
+	            <active>false</active>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>TempIntern</name>
+	            <symbol>A3</symbol>
+	            <unit>�C</unit>
+	            <active>false</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	    </Channel>
+	    <Channel type="TYPE_CONFIG" name="Velocity">
+	        <Measurement>
+	            <name>VoltageRx</name>
+	            <symbol>Urx</symbol>
+	            <unit>V</unit>
+	            <active>false</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Voltage</name>
+	            <symbol>U</symbol>
+	            <unit>V</unit>
+	            <active>true</active>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Current</name>
+	            <symbol>I</symbol>
+	            <unit>A</unit>
+	            <active>true</active>
+	            <statistics sumTriggerTimeText="Motor run time" countTriggerText="Number of climb flights" countByTrigger="true" sigma="false" avg="true" max="true" min="false">
+	                <trigger comment="Trigger: current &gt; 2 A + &gt; 5 sec." minTimeSec="5" isGreater="true" level="2000"/>
+	            </statistics>
+	            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
+	            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Capacity</name>
+	            <symbol>C</symbol>
+	            <unit>mAh</unit>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Power</name>
+	            <symbol>P</symbol>
+	            <unit>W</unit>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Energy</name>
+	            <symbol>E</symbol>
+	            <unit>Wh</unit>
+	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Voltage/Cell</name>
+	            <symbol>U*</symbol>
+	            <unit>V</unit>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+	            <property description="Anzahl der Zellen vom Akku" type="Integer" value="12" name="number_cells"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Revolution</name>
+	            <symbol>n</symbol>
+	            <unit>1/min</unit>
+	            <active>true</active>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="false"/>
+	            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
+	            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
+	            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
+	            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Efficience</name>
+	            <symbol>eta</symbol>
+	            <unit>%</unit>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="false" min="false"/>
+	            <property description="Propeller revolution at 100 W power" type="Integer" value="3400" name="prop_n100W"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Height</name>
+	            <symbol>h</symbol>
+	            <unit>m</unit>
+	            <active>true</active>
+	            <statistics ratioText="capacity/height" ratioRefOrdinal="4" sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Climb</name>
+	            <symbol>Vc</symbol>
+	            <unit>m/sec</unit>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Integer" value="10" name="regression_interval_sec"/>
+	            <property type="String" value="regression_type_curve" name="regression_type"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Velocity</name>
+	            <symbol>A1</symbol>
+	            <unit>km/h</unit>
+	            <active>true</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Temperature A2</name>
+	            <symbol>A2</symbol>
+	            <unit>�C</unit>
+	            <active>false</active>
+	            <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Temperature A3</name>
+	            <symbol>A3</symbol>
+	            <unit>�C</unit>
+	            <active>false</active>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+	            <property type="Double" value="0.0" name="offset"/>
+	            <property type="Double" value="1.0" name="factor"/>
+	        </Measurement>
+	    </Channel>
+	</Channels>
     <Desktop>
         <property value="true" name="table_tab"/>
         <property value="true" name="digital_tab"/>
