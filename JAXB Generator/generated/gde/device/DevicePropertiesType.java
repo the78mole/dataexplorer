@@ -8,7 +8,6 @@
 
 package gde.device;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -279,7 +278,7 @@ public class DevicePropertiesType {
         @XmlElement(name = "Channel", required = true)
         protected List<ChannelType> channel;
         @XmlAttribute
-        protected BigInteger lastUseOrdinal;
+        protected Integer lastUseOrdinal;
 
         /**
          * Gets the value of the channel property.
@@ -315,10 +314,10 @@ public class DevicePropertiesType {
          * 
          * @return
          *     possible object is
-         *     {@link BigInteger }
+         *     {@link Integer }
          *     
          */
-        public BigInteger getLastUseOrdinal() {
+        public Integer getLastUseOrdinal() {
             return lastUseOrdinal;
         }
 
@@ -327,10 +326,10 @@ public class DevicePropertiesType {
          * 
          * @param value
          *     allowed object is
-         *     {@link BigInteger }
+         *     {@link Integer }
          *     
          */
-        public void setLastUseOrdinal(BigInteger value) {
+        public void setLastUseOrdinal(Integer value) {
             this.lastUseOrdinal = value;
         }
 
