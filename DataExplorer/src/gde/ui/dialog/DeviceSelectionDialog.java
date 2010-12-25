@@ -704,12 +704,18 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						this.auswahlTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0186));
 						{
 							this.deviceGroup = new Group(this.settingsTabFolder, SWT.NONE);
-							this.deviceGroup.setLayout(null);
+							this.deviceGroup.setLayout(new FormLayout());
 							this.auswahlTabItem.setControl(this.deviceGroup);
 							this.deviceGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.deviceGroup.setText(Messages.getString(MessageIds.GDE_MSGT0187));
 							{
 								this.deviceTable = new Table(this.deviceGroup, SWT.MULTI | SWT.CHECK | SWT.BORDER);
+								FormData deviceTableLData = new FormData();
+								deviceTableLData.top = new FormAttachment(0, 1000, 20);
+								deviceTableLData.bottom = new FormAttachment(1000, 1000, -20);
+								deviceTableLData.left = new FormAttachment(0, 1000, 20);
+								deviceTableLData.right = new FormAttachment(1000, 1000, -20);
+								this.deviceTable.setLayoutData(deviceTableLData);
 								this.deviceTable.setBounds(17, 40, 497, 401);
 								this.deviceTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.deviceTable.addSelectionListener(new SelectionAdapter() {
@@ -1281,10 +1287,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * @param deviceName
 	 */
 	public void checkAndStoreDeviceConfiguration(String deviceName) {
-		DeviceConfiguration configuration = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
-		if (configuration.isChangePropery()) {
-			log.log(java.util.logging.Level.FINE, configuration.isChangePropery() + " update device properties for " + configuration.getName()); //$NON-NLS-1$
-			configuration.storeDeviceProperties(); // stores only if is changed
+		if (!deviceName.equals(Settings.EMPTY)) {
+			DeviceConfiguration configuration = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
+			if (configuration != null && configuration.isChangePropery()) {
+				log.log(java.util.logging.Level.FINE, configuration.isChangePropery() + " update device properties for " + configuration.getName()); //$NON-NLS-1$
+				configuration.storeDeviceProperties(); // stores only if is changed
+			}
 		}
 	}
 
