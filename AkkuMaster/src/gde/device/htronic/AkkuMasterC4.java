@@ -21,6 +21,7 @@ package gde.device.htronic;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
+import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -66,7 +67,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 	}
 
 	/**
@@ -83,7 +84,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		this.serialPort = new AkkuMasterC4SerialPort(this, this.application);
 		this.dialog = new AkkuMasterC4Dialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
 	}
 
 	/**
@@ -350,17 +351,17 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	public void open_closeCommPort() {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
-				try {
-					this.serialPort.open();
-				}
-				catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.getDialog().getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] {e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage() } ));
+				Channel activChannel = Channels.getInstance().getActiveChannel();
+				if (activChannel != null) {
+					if (this.getDialog().isDisposed())
+						this.getDialog().open();
+					else 
+						this.getDialog().startUpdateVersionThread();
 				}
 			}
 			else {
 				this.serialPort.close();
 			}
 		}
-	}	
+	}
 }
