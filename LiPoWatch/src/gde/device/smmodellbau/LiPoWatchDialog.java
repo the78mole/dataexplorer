@@ -42,6 +42,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TaskBar;
+import org.eclipse.swt.widgets.TaskItem;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -157,6 +159,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 	String												numberActualDataSetsText		= "0";																																											//$NON-NLS-1$
 	String												numberReadErrorText					= "0";																																											//$NON-NLS-1$	
 	String												numberLess4Text							= "0";																																											//$NON-NLS-1$	
+	TaskItem											taskBarItem;
 
 	final LiPoWatch								device;																																																								// get device specific things, get serial port, ...
 	final LiPoWatchSerialPort			serialPort;																																																						// open/close port execute getData()....
@@ -946,6 +949,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 				this.dialogShell.setActive();
 			}
 			Display display = this.dialogShell.getDisplay();
+			TaskBar taskBar = display.getSystemTaskBar();
+			if (taskBar == null)
+				this.taskBarItem = null;
+			else {
+				this.taskBarItem = taskBar.getItem(dialogShell) != null ? taskBar.getItem(dialogShell) : taskBar.getItem(null);
+				this.taskBarItem.setProgressState(SWT.NORMAL);
+			}
+
 			while (!this.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
 			}
@@ -1287,6 +1298,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 				int tmpValue = value < 0 ? 0 : value;
 				tmpValue = value > 100 ? 100 : value;
 				LiPoWatchDialog.this.readDataProgressBar.setSelection(tmpValue);
+				LiPoWatchDialog.this.taskBarItem.setProgress(tmpValue);
 			}
 		});
 	}
