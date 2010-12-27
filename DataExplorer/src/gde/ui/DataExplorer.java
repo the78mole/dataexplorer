@@ -105,6 +105,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TaskBar;
+import org.eclipse.swt.widgets.TaskItem;
 
 /**
  * Main application class of DataExplorer
@@ -189,6 +191,7 @@ public class DataExplorer extends Composite {
 	RecordSet											utilitySet;
 	final long										threadId;
 	String												progressBarUser = null;
+	TaskItem											taskBarItem;
 
 	boolean												isRecordCommentVisible						= false;
 	boolean												isGraphicsHeaderVisible						= false;
@@ -351,6 +354,15 @@ public class DataExplorer extends Composite {
 
 			shell.layout();
 			shell.open();
+			
+			TaskBar taskBar = DataExplorer.display.getSystemTaskBar();
+			if (taskBar == null)
+				this.taskBarItem = null;
+			else {
+				this.taskBarItem = taskBar.getItem(DataExplorer.shell) != null ? taskBar.getItem(DataExplorer.shell) : taskBar.getItem(null);
+				this.taskBarItem.setProgressState(SWT.PAUSED);
+			}
+
 
 			if (this.settings.isDevicePropertiesUpdated() || this.settings.isGraphicsTemplateUpdated() || this.settings.isDevicePropertiesReplaced()) {
 				StringBuilder sb = new StringBuilder();
@@ -1013,11 +1025,19 @@ public class DataExplorer extends Composite {
 			
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.statusBar.setProgress(percentage);
+				if (this.taskBarItem != null) {
+					System.out.println("processState = " + this.taskBarItem.getProgressState());
+					this.taskBarItem.setProgress(percentage);
+				}
 			}
 			else {
 				DataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
 						DataExplorer.this.statusBar.setProgress(percentage);
+						if (DataExplorer.this.taskBarItem != null) {
+							System.out.println("processState = " + DataExplorer.this.taskBarItem.getProgressState());
+							DataExplorer.this.taskBarItem.setProgress(percentage);
+						}
 					}
 				});
 			}
