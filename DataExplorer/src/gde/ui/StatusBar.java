@@ -33,6 +33,7 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.TaskItem;
 
 import gde.GDE;
 
@@ -44,6 +45,7 @@ public class StatusBar {
 	final Logger	log	= Logger.getLogger(this.getClass().getName());
 	
 	final Composite					statusComposite;
+	final TaskItem					taskBarItem;
 	Composite								connectionComposite;
 	Label										txText;
 	Label										rxText;
@@ -68,6 +70,7 @@ public class StatusBar {
 				StatusBar.this.msgLabel.setBounds(offsetX, offsetY, width, 20);
 			}
 		});
+		this.taskBarItem = DataExplorer.display.getSystemTaskBar() != null ? DataExplorer.display.getSystemTaskBar().getItem(DataExplorer.shell) : null;
 	}
 
 	public void create() {
@@ -162,6 +165,8 @@ public class StatusBar {
 	
 	public void setProgress(final int percentage) {
 		this.progressBar.setSelection(percentage);
+		if (this.taskBarItem != null) this.taskBarItem.setProgressState(percentage);
+		
 	}
 	
 	public int getProgressPercentage() {
