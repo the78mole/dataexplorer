@@ -29,7 +29,7 @@
         <checkSum type="ADD" format="BINARY"/>
     </DataBlock>
     <State>
-        <property type="Integer" value="1" name="simulation"/>
+        <property type="Integer" value="1" name="flight record"/>
     </State>
     <Channels>
 	    <Channel type="TYPE_CONFIG" name="config">

@@ -73,6 +73,7 @@ public class QcCopterDialog extends DeviceDialog {
 	final Settings						settings;																														// application configuration settings
 
 	int												measurementsCount	= 0;
+	int												tabFolderSelectionIndex = 0;
 
 	/**
 	 * default constructor initialize all variables required
@@ -269,6 +270,7 @@ public class QcCopterDialog extends DeviceDialog {
 									}
 								}
 							}
+							tabFolderSelectionIndex = tabFolder.getSelectionIndex();
 						}
 					});
 				}
@@ -278,6 +280,7 @@ public class QcCopterDialog extends DeviceDialog {
 					RecordSet activeRecordSet = activChannel.getActiveRecordSet();
 					if (activeRecordSet != null) {
 						this.tabFolder.setSelection(activeRecordSet.getChannelConfigNumber());
+						tabFolderSelectionIndex = tabFolder.getSelectionIndex();
 					}
 					else {
 						if (this.device.serialPort.isMatchAvailablePorts(this.device.getPort()) && !this.device.serialPort.isConnected())
@@ -315,7 +318,7 @@ public class QcCopterDialog extends DeviceDialog {
 	 * @return the tabFolder selection index
 	 */
 	public Integer getTabFolderSelectionIndex() {
-		return this.tabFolder.getSelectionIndex();
+		return this.tabFolderSelectionIndex;
 	}
 
 	public void setTerminalText(final String newText) {
@@ -336,11 +339,13 @@ public class QcCopterDialog extends DeviceDialog {
 	void checkPortStatus() {
 		DataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
-				if (QcCopterDialog.this.device.serialPort.isConnected()) {
-					QcCopterDialog.this.startConfiguration.setText("stop configurartion");
-				}
-				else {
-					QcCopterDialog.this.startConfiguration.setText("start configurartion");
+				if (!QcCopterDialog.this.startConfiguration.isDisposed()) {
+					if (QcCopterDialog.this.device.serialPort.isConnected()) {
+						QcCopterDialog.this.startConfiguration.setText("stop configurartion");
+					}
+					else {
+						QcCopterDialog.this.startConfiguration.setText("start configurartion");
+					}
 				}
 			}
 		});

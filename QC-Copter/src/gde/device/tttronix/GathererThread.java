@@ -92,22 +92,24 @@ public class GathererThread extends Thread {
 		log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
 		StringBuffer terminalText = new StringBuffer();
-		while (!this.isCollectDataStopped) {
+		while (!this.isCollectDataStopped && this.serialPort.isConnected()) {
 			try {
 				// check if device is ready for data capturing or terminal open
 				// in case of time outs wait for 180 seconds max. for actions
-				if (this.dialog != null && !this.dialog.isDisposed()) {					
+				if (this.dialog != null && !this.dialog.isDisposed() && this.dialog.getTabFolderSelectionIndex() == 0) {					
 					String text = this.serialPort.getTerminalData();
 					if (text.length() > 0 && !text.equals(GDE.STRING_EMPTY)) {
 						if (this.serialPort.containsSTX(text.getBytes())) {
-							DataExplorer.display.syncExec(new Runnable() {
-								@Override
-								public void run() {
-									if (!GathererThread.this.dialog.isDisposed()) {
-										GathererThread.this.dialog.dispose();
-									}
-								}
-							});
+							terminalText.append(Messages.getString(MessageIds.GDE_MSGI1903));
+							this.dialog.setTerminalText(terminalText.toString());
+//							DataExplorer.display.syncExec(new Runnable() {
+//								@Override
+//								public void run() {
+//									if (!GathererThread.this.dialog.isDisposed()) {
+//										GathererThread.this.dialog.dispose();
+//									}
+//								}
+//							});
 						}
 						else if (this.serialPort.containsFF(text.getBytes())) {
 							this.dialog.setTerminalText(terminalText.toString());
@@ -124,7 +126,7 @@ public class GathererThread extends Thread {
 						stopDataGatheringThread(true, null);
 					}
 				}
-				else if (this.dialog != null && this.dialog.isDisposed()) {
+				else { //if (this.dialog != null && this.dialog.isDisposed()) {
 					//get flight simulation data from device
 					dataBuffer = this.serialPort.getData();
 
@@ -187,6 +189,10 @@ public class GathererThread extends Thread {
 		}
 		this.application.setStatusMessage(""); //$NON-NLS-1$
 		log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+		
+		if(!this.isCollectDataStopped) {
+			this.stopDataGatheringThread(true, null);
+		}
 	}
 
 	/**

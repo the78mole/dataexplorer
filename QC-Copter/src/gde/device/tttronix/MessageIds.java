@@ -24,16 +24,14 @@ package gde.device.tttronix;
  */ 
 public class MessageIds { 
 
-	public final static String	GDE_MSGW1900 = "GDE_MSGW1900";
 	public final static String	GDE_MSGI1900 = "GDE_MSGI1900";
 	public final static String	GDE_MSGI1901 = "GDE_MSGI1901";
 	public final static String	GDE_MSGI1902 = "GDE_MSGI1902";
+	public final static String	GDE_MSGI1903 = "GDE_MSGI1903";
 	public final static String	GDE_MSGT1900 = "GDE_MSGT1900";
 	public final static String	GDE_MSGT1901 = "GDE_MSGT1901";
 	public final static String	GDE_MSGT1902 = "GDE_MSGT1902";
 	public final static String	GDE_MSGT1903 = "GDE_MSGT1903";
 	public final static String	GDE_MSGT1904 = "GDE_MSGT1904";
-	public final static String	GDE_MSGT1905 = "GDE_MSGT1905";
-	public final static String	GDE_MSGT1906 = "GDE_MSGT1906";
 
  }

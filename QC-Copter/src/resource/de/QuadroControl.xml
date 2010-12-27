@@ -29,7 +29,7 @@
         <checkSum type="ADD" format="BINARY"/>
     </DataBlock>
     <State>
-        <property type="Integer" value="1" name="Simulation"/>
+        <property type="Integer" value="1" name="Flugaufnahme"/>
     </State>
     <Channels>
 	    <Channel type="TYPE_CONFIG" name="Konfig 1">
@@ -118,7 +118,7 @@
 	            <property description="Factor to measurement value 12V == 609" type="Double" value="0.0197" name="factor"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Motor-VR</name>
+	            <name>Motor VR</name>
 	            <symbol>M</symbol>
 	            <unit>1/min</unit>
 	            <active>false</active>
