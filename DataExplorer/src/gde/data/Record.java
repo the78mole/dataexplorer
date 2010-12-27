@@ -493,7 +493,12 @@ public class Record extends Vector<Integer> {
 		if (this.parent.scaleSyncedRecords.get(this.ordinal) != null 
 				&& this.parent.scaleSyncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1) {
 			sb.append(GDE.STRING_BLANK).append(this.parent.scaleSyncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1 ? this.parent.scaleSyncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR).append(GDE.STRING_DOT);
-			sb.append(GDE.STRING_DOT).append(this.parent.scaleSyncedRecords.get(this.ordinal).lastElement().name.split(GDE.STRING_BLANK).length > 1 ? this.parent.scaleSyncedRecords.get(this.ordinal).lastElement().name.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
+			sb.append(GDE.STRING_DOT);
+			String trailer = GDE.STRING_STAR;
+			for (Record tmpRecord : this.parent.scaleSyncedRecords.get(this.ordinal)) {
+				if (tmpRecord.isDisplayable && tmpRecord.realSize() > 1) trailer = tmpRecord.name;
+			}
+			sb.append(trailer.split(GDE.STRING_BLANK).length > 1 ? trailer.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
 		} 
 		else {
 			sb.append(GDE.STRING_BLANK).append(GDE.STRING_STAR);
