@@ -1065,7 +1065,8 @@ public class FileUtils {
 	public static boolean checkJavaExecutableVersion(String javaFullQualifiedExecutablePath, String expectedVersionString) {
 		final String javaVersion = "java version"; //$NON-NLS-1$
 		int actualVersion = 0;
-		BufferedReader br = null;
+		BufferedReader brerr = null;
+		BufferedReader brout = null;
 		try {
 			String line;
 			if (javaFullQualifiedExecutablePath.indexOf("%WINDIR%") > -1) { //$NON-NLS-1$
@@ -1077,14 +1078,14 @@ public class FileUtils {
 					+ "java" + javaFullQualifiedExecutablePath.substring(javaFullQualifiedExecutablePath.indexOf("javaw")+ "javaw".length()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			Process process = new ProcessBuilder(javaFullQualifiedExecutablePath, "-version").start(); //$NON-NLS-1$
-			br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			brerr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			
-			while ((line = br.readLine()) != null) { // clean std err
+			while ((line = brerr.readLine()) != null) { // clean std err
 				if (line.startsWith(javaVersion)) actualVersion = parseJavaVersion(line.substring(javaVersion.length()+2));
 			}
 			
-			br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			while ((line = br.readLine()) != null) {} // clean std out
+			brout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			while ((line = brout.readLine()) != null) {} // clean std out
 			process.waitFor(); // waits until termination
 			
 			//if (process.exitValue() == 0) {
@@ -1098,7 +1099,8 @@ public class FileUtils {
 		}
 		finally {
 			try {
-				if (br != null) br.close();
+				if (brerr != null) brerr.close();
+				if (brout != null) brout.close();
 			}
 			catch (IOException e) {
 				// ignore

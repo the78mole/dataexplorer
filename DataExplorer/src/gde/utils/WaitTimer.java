@@ -24,20 +24,16 @@ package gde.utils;
  */
 public class WaitTimer extends Thread {
 
-	static WaitTimer		instance							= new WaitTimer();
-
 	/**
 	 * synchronous wait for the given time
 	 * @param milliSeconds
 	 */
 	public static void delay(long milliSeconds) {
-		synchronized (instance) {
-			try {
-				Thread.sleep(milliSeconds);
-			}
-			catch (InterruptedException e) {
-				//ignore
-			}
+		try {
+			Thread.sleep(milliSeconds);
+		}
+		catch (InterruptedException e) {
+			//ignore
 		}
 	}
 }

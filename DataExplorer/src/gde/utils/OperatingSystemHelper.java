@@ -324,6 +324,8 @@ public class OperatingSystemHelper {
 
 						throw new UnsatisfiedLinkError(msg);
 					}
+					bisr.close();
+					besr.close();
 
 					//check if registration was successful
 					command = "cmd /C assoc .osd"; //$NON-NLS-1$
@@ -486,6 +488,8 @@ public class OperatingSystemHelper {
 
 					throw new UnsatisfiedLinkError(msg);
 				}
+				bisr.close();
+				besr.close();
 
 				//check if deregistration was successful
 				process = Runtime.getRuntime().exec("cmd /C assoc .osd"); //$NON-NLS-1$

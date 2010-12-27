@@ -123,73 +123,68 @@ public class MeasurementContextmenu {
 				MeasurementContextmenu.this.defaultPropertyMenuItem.setEnabled(true);
 				if (MeasurementContextmenu.this.measurementPropertiesTabFolder != null) {
 					for (CTabItem tabItem : MeasurementContextmenu.this.measurementPropertiesTabFolder.getItems()) {
-						try {
-							switch (MeasurementPropertyTypes.fromValue(tabItem.getText())) {
-							case OFFSET:
-								MeasurementContextmenu.this.offsetPropertyMenuItem.setEnabled(false);
-								break;
-							case FACTOR:
-								MeasurementContextmenu.this.factorPropertyMenuItem.setEnabled(false);
-								break;
-							case REDUCTION:
-								MeasurementContextmenu.this.reductionPropertyMenuItem.setEnabled(false);
-								break;
-							case DO_SUBTRACT_FIRST:
-								MeasurementContextmenu.this.doSubtractFirstPropertyMenuItem.setEnabled(false);
-								break;
-							case DO_SUBTRACT_LAST:
-								MeasurementContextmenu.this.doSubtractLastPropertyMenuItem.setEnabled(false);
-								break;
-							case REGRESSION_INTERVAL_SEC:
-								MeasurementContextmenu.this.regressionIntervalPropertyMenuItem.setEnabled(false);
-								break;
-							case REGRESSION_TYPE_CURVE:
-								MeasurementContextmenu.this.regressionTypeCurvePropertyMenuItem.setEnabled(false);
-								break;
-							case REGRESSION_TYPE_LINEAR:
-								MeasurementContextmenu.this.regressionTypeLinearPropertyMenuItem.setEnabled(false);
-								break;
-							case NUMBER_MOTOR:
-								MeasurementContextmenu.this.numberMotorPropertyMenuItem.setEnabled(false);
-								break;
-							case REVOLUTION_FACTOR:
-								MeasurementContextmenu.this.revolutionFactorPropertyMenuItem.setEnabled(false);
-								break;
-							case NUMBER_CELLS:
-								MeasurementContextmenu.this.numberCellsPropertyMenuItem.setEnabled(false);
-								break;
-							case PROP_N_100_W:
-								MeasurementContextmenu.this.prop100WPropertyMenuItem.setEnabled(false);
-								break;
-							case IS_INVERT_CURRENT:
-								MeasurementContextmenu.this.invertCurrentPropertyMenuItem.setEnabled(false);
-								break;
-							case SCALE_SYNC_REF_ORDINAL:
-								MeasurementContextmenu.this.scaleSyncRefOrdinal.setEnabled(false);
-								break;
-							case GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR:
-								MeasurementContextmenu.this.googleEarthVelocityAvgLimitFactor.setEnabled(false);
-								MeasurementContextmenu.this.googleEarthVelocityLowerLimit.setEnabled(false);
-								MeasurementContextmenu.this.googleEarthVelocityUpperLimit.setEnabled(false);
-								break;
-							case GOOGLE_EARTH_VELOCITY_LOWER_LIMIT:
-								MeasurementContextmenu.this.googleEarthVelocityAvgLimitFactor.setEnabled(false);
-								MeasurementContextmenu.this.googleEarthVelocityLowerLimit.setEnabled(false);
-								break;
-							case GOOGLE_EARTH_VELOCITY_UPPER_LIMIT:
-								MeasurementContextmenu.this.googleEarthVelocityAvgLimitFactor.setEnabled(false);
-								MeasurementContextmenu.this.googleEarthVelocityUpperLimit.setEnabled(false);
-								break;
-							case NONE_SPECIFIED:
-								MessageBox mb = new MessageBox(MeasurementContextmenu.this.menu.getShell(), SWT.OK);
-								mb.setText(Messages.getString(MessageIds.GDE_MSGW0540));
-								mb.setMessage(Messages.getString(MessageIds.GDE_MSGW0541));
-								mb.open();
-								break;
-							}
-						}
-						catch (Exception e1) {
-							//ignore updated none_specified PropertyTypes
+						switch (MeasurementPropertyTypes.fromValue(tabItem.getText())) {
+						case OFFSET:
+							MeasurementContextmenu.this.offsetPropertyMenuItem.setEnabled(false);
+							break;
+						case FACTOR:
+							MeasurementContextmenu.this.factorPropertyMenuItem.setEnabled(false);
+							break;
+						case REDUCTION:
+							MeasurementContextmenu.this.reductionPropertyMenuItem.setEnabled(false);
+							break;
+						case DO_SUBTRACT_FIRST:
+							MeasurementContextmenu.this.doSubtractFirstPropertyMenuItem.setEnabled(false);
+							break;
+						case DO_SUBTRACT_LAST:
+							MeasurementContextmenu.this.doSubtractLastPropertyMenuItem.setEnabled(false);
+							break;
+						case REGRESSION_INTERVAL_SEC:
+							MeasurementContextmenu.this.regressionIntervalPropertyMenuItem.setEnabled(false);
+							break;
+						case REGRESSION_TYPE_CURVE:
+							MeasurementContextmenu.this.regressionTypeCurvePropertyMenuItem.setEnabled(false);
+							break;
+						case REGRESSION_TYPE_LINEAR:
+							MeasurementContextmenu.this.regressionTypeLinearPropertyMenuItem.setEnabled(false);
+							break;
+						case NUMBER_MOTOR:
+							MeasurementContextmenu.this.numberMotorPropertyMenuItem.setEnabled(false);
+							break;
+						case REVOLUTION_FACTOR:
+							MeasurementContextmenu.this.revolutionFactorPropertyMenuItem.setEnabled(false);
+							break;
+						case NUMBER_CELLS:
+							MeasurementContextmenu.this.numberCellsPropertyMenuItem.setEnabled(false);
+							break;
+						case PROP_N_100_W:
+							MeasurementContextmenu.this.prop100WPropertyMenuItem.setEnabled(false);
+							break;
+						case IS_INVERT_CURRENT:
+							MeasurementContextmenu.this.invertCurrentPropertyMenuItem.setEnabled(false);
+							break;
+						case SCALE_SYNC_REF_ORDINAL:
+							MeasurementContextmenu.this.scaleSyncRefOrdinal.setEnabled(false);
+							break;
+						case GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR:
+							MeasurementContextmenu.this.googleEarthVelocityAvgLimitFactor.setEnabled(false);
+							MeasurementContextmenu.this.googleEarthVelocityLowerLimit.setEnabled(false);
+							MeasurementContextmenu.this.googleEarthVelocityUpperLimit.setEnabled(false);
+							break;
+						case GOOGLE_EARTH_VELOCITY_LOWER_LIMIT:
+							MeasurementContextmenu.this.googleEarthVelocityAvgLimitFactor.setEnabled(false);
+							MeasurementContextmenu.this.googleEarthVelocityLowerLimit.setEnabled(false);
+							break;
+						case GOOGLE_EARTH_VELOCITY_UPPER_LIMIT:
+							MeasurementContextmenu.this.googleEarthVelocityAvgLimitFactor.setEnabled(false);
+							MeasurementContextmenu.this.googleEarthVelocityUpperLimit.setEnabled(false);
+							break;
+						case NONE_SPECIFIED:
+							MessageBox mb = new MessageBox(MeasurementContextmenu.this.menu.getShell(), SWT.OK);
+							mb.setText(Messages.getString(MessageIds.GDE_MSGW0540));
+							mb.setMessage(Messages.getString(MessageIds.GDE_MSGW0541));
+							mb.open();
+							break;
 						}
 					}
 				}
