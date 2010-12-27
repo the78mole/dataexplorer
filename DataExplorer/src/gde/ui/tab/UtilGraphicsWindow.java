@@ -190,7 +190,7 @@ public class UtilGraphicsWindow extends CTabItem {
 	public void setCurveSelectorEnabled(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
 		if (enabled)
-			setSashFormWeights(this.curveSelectorComposite.selectorColumnWidth);
+			setSashFormWeights(this.curveSelectorComposite.getSelectorColumnWidth());
 		else 
 			setSashFormWeights(0);
 	}

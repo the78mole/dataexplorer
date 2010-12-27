@@ -290,6 +290,8 @@ public class RecordSet extends HashMap<String, Record> {
 		this.horizontalGridRecordOrdinal = recordSet.horizontalGridRecordOrdinal;
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
+		
+		this.syncScaleOfSyncableRecords();
 	}
 
 	/**
@@ -430,7 +432,7 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
-			this.syncScaleOfSyncableRecords(false);
+			this.updateSyncRecordScale(); //syncScaleOfSyncableRecords(false);
 		}
 		else
 			throw new DataInconsitsentException(Messages.getString(MessageIds.GDE_MSGE0035, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME})); //$NON-NLS-1$
@@ -467,7 +469,7 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
-			this.syncScaleOfSyncableRecords(false);
+			this.updateSyncRecordScale(); //syncScaleOfSyncableRecords(false);
 		}
 		else
 			throw new DataInconsitsentException(Messages.getString(MessageIds.GDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}));
@@ -763,7 +765,7 @@ public class RecordSet extends HashMap<String, Record> {
 				activeChannel.setObjectKey(Settings.getInstance().getActiveObject());
 			}
 		}
-
+		newRecordSet.syncScaleOfSyncableRecords();
 		return newRecordSet;
 	}
 
@@ -1657,51 +1659,44 @@ public class RecordSet extends HashMap<String, Record> {
 		return this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
 	}
 	
-	public void syncScaleOfSyncableRecords(boolean force) {
-		if (this.get(0).realSize() > 1) { //more than one data point
-			synchronized (this.scaleSyncedRecords) {
-				if (force) {
-					this.scaleSyncedRecords = new HashMap<Integer, Vector<Record>>(2);
+	/**
+	 * synchronize scales according device properties 
+	 */
+	public void syncScaleOfSyncableRecords() {
+		for (int i = 0; i < this.size(); i++) {
+			PropertyType syncProperty = this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+			Record tmpRecord = this.get(i);
+			if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+				int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
+				if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
+					this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
+					this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
+					this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
+					this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
 				}
-				for (int i = 0; i < this.size(); i++) {
-					PropertyType syncProperty = this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-					Record tmpRecord = this.get(i);
-					if (tmpRecord.hasReasonableData() && syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
-						int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
-						if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
-							this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
-							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
-							this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
-							this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
-						}
-						if (!isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
-							if ((i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
-								this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
-							else
-								//sort while add
-								this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add((i - syncMasterRecordOrdinal), tmpRecord);
+				if (!isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
+					if ((i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
+						this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
+					else
+						//sort while add
+						this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add((i - syncMasterRecordOrdinal), tmpRecord);
 
-							this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
-							this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);
-							this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_SCALE_POSITION);
-							log.log(Level.FINE, "add " + tmpRecord.name);
-						}
-					}
+					this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
+					this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);
+					this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_SCALE_POSITION);
+					log.log(Level.FINE, "add " + tmpRecord.name);
 				}
 			}
-			if (log.isLoggable(Level.FINE)) {
-				StringBuilder sb = new StringBuilder();
-				for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-					sb.append(syncRecordOrdinal).append(GDE.STRING_COLON);
-					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-						sb.append(tmpRecord.name).append(GDE.STRING_SEMICOLON);
-					}
+		}
+		if (log.isLoggable(Level.FINE)) {
+			StringBuilder sb = new StringBuilder();
+			for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
+				sb.append(syncRecordOrdinal).append(GDE.STRING_COLON);
+				for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+					sb.append(tmpRecord.name).append(GDE.STRING_SEMICOLON);
 				}
-				log.log(Level.FINE, sb.toString());
 			}
-			if (this.scaleSyncedRecords.size() > 1) {
-				updateSyncRecordScale();
-			}
+			log.log(Level.FINE, sb.toString());
 		}
 	}
 
@@ -1736,13 +1731,15 @@ public class RecordSet extends HashMap<String, Record> {
 			int tmpSyncMax = Integer.MIN_VALUE;
 			log.log(Level.FINE, this.get(syncRecordOrdinal).name + " syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-				if (tmpRecord.isVisible) {
-					int tmpMin = tmpRecord.getMinValue();
-					int tmpMax = tmpRecord.getMaxValue();
-					if (tmpMin != 0 || tmpMax != 0) {
-						log.log(Level.FINE, tmpRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
-						if (tmpMin < tmpSyncMin) tmpSyncMin = tmpMin;
-						if (tmpMax > tmpSyncMax) tmpSyncMax = tmpMax;
+				synchronized (tmpRecord) {
+					if (tmpRecord.isVisible) {
+						int tmpMin = tmpRecord.getMinValue();
+						int tmpMax = tmpRecord.getMaxValue();
+						if (tmpMin != 0 || tmpMax != 0) {
+							log.log(Level.FINE, tmpRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+							if (tmpMin < tmpSyncMin) tmpSyncMin = tmpMin;
+							if (tmpMax > tmpSyncMax) tmpSyncMax = tmpMax;
+						}
 					}
 				}
 			}
@@ -1816,16 +1813,14 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return true if one of the syncable records is visible
 	 */
 	public boolean isOneSyncableVisible() {
-		boolean isOneSynceableVisible = false;
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
 			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 				if (tmpRecord != null && tmpRecord.isVisible) {
-					isOneSynceableVisible = true;
-					break;
+					return true;
 				}
 			}
 		}
-		return isOneSynceableVisible;
+		return false;
 	}
 
 	/**
@@ -1834,14 +1829,12 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return true if one of the syncable records is visible
 	 */
 	public boolean isOneSyncableVisible(int syncMasterOrdinal) {
-		boolean isOneSynceableVisible = false;
 		for (Record tmpRecord : this.scaleSyncedRecords.get(syncMasterOrdinal)) {
 			if (tmpRecord != null && tmpRecord.isVisible) {
-				isOneSynceableVisible = true;
-				break;
+				return true;
 			}
 		}
-		return isOneSynceableVisible;
+		return false;
 	}
 
 	public int realSize() {
@@ -1853,15 +1846,13 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param queryRecord the record key to be used for the query
 	 * @return true if syncable records contains queryRecordKey
 	 */
-	public synchronized boolean isOneOfSyncableRecord(Record queryRecord) {
-		boolean isContained = false;
+	public boolean isOneOfSyncableRecord(Record queryRecord) {
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
 			if (this.isRecordContained(syncRecordOrdinal, queryRecord)) {
-				isContained = true;
-				break;
+				return true;
 			}				
 		}
-		return isContained;
+		return false;
 	}
 	
 	/**
@@ -1870,14 +1861,12 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return the synchronization master record name
 	 */
 	public int getSyncMasterRecordOrdinal(Record queryRecord) {
-		int syncMasterRecordOrdinal = -1;
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			if (this.scaleSyncedRecords.get(syncRecordOrdinal).contains(queryRecord)) {
-				syncMasterRecordOrdinal = syncRecordOrdinal;
-				break;
+			if (this.isRecordContained(syncRecordOrdinal, queryRecord)) {
+				return syncRecordOrdinal;
 			}				
 		}
-		return syncMasterRecordOrdinal;
+		return -1;
 	}
 
 	/**
@@ -2000,7 +1989,7 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 			}
 			if (!this.scaleSyncedRecords.isEmpty()) {
-				this.syncScaleOfSyncableRecords(true);
+				this.updateSyncRecordScale(); //syncScaleOfSyncableRecords(true);
 			}
 		}
 	}

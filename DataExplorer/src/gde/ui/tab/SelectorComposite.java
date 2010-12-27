@@ -178,7 +178,8 @@ public class SelectorComposite extends Composite {
 									item.setData(DataExplorer.OLD_STATE, false);
 									item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
 								}
-								activeRecord.getParent().syncScaleOfSyncableRecords(true);
+								activeRecord.getParent().syncScaleOfSyncableRecords();
+								activeRecord.getParent().updateSyncRecordScale(); //syncScaleOfSyncableRecords(true);
 							}
 							SelectorComposite.this.application.updateAllTabs(false);
 						}
@@ -186,8 +187,10 @@ public class SelectorComposite extends Composite {
 				}
 			});
 			{
-				this.tableSelectorColumn = new TableColumn(this.curveSelectorTable, SWT.LEAD);
-				this.tableSelectorColumn.setWidth(this.selectorColumnWidth);
+				synchronized (this) {
+					this.tableSelectorColumn = new TableColumn(this.curveSelectorTable, SWT.LEAD);
+					this.tableSelectorColumn.setWidth(this.selectorColumnWidth);
+				}
 			}
 		}	
 	}
@@ -228,19 +231,7 @@ public class SelectorComposite extends Composite {
 							}
 						}
 					}
-				}
-//				if (recordSet.isSyncableDisplayableRecords(false) && recordSet.isOneSyncableVisible() && this.windowType == GraphicsWindow.TYPE_NORMAL) {
-//					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
-//					item.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-//					item.setText("Sync " + recordSet.getSyncableName());
-//					item.setChecked(recordSet.isSyncRequested());
-//					item.setData(DataExplorer.OLD_STATE, recordSet.isSyncRequested());
-//					item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
-//					item.setData(DataExplorer.RECORD_SYNC_PLACEHOLDER, true);
-//					textSize = item.getText().length() * 7;
-//					if (itemWidth < (textSize+checkBoxWidth)) itemWidth = textSize+checkBoxWidth;
-//				}
-				
+				}				
 				this.selectorColumnWidth = itemWidth;
 				log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 		}
@@ -262,7 +253,9 @@ public class SelectorComposite extends Composite {
 	/**
 	 * @return the selectorColumnWidth
 	 */
-	public synchronized int getSelectorColumnWidth() {
-		return this.selectorColumnWidth;
+	public int getSelectorColumnWidth() {
+		synchronized (this) {
+			return this.selectorColumnWidth;
+		}
 	}
 }

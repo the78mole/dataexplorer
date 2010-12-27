@@ -116,7 +116,9 @@ public class TimeSteps extends Vector<Integer> {
 	 * @return time fit to index
 	 */
 	public double getTime_ms(int index) {
-		return this.isConstant ? (index == 0 ? 0.0 : this.get(0)/10.0*index) : (index < 0 ? this.firstElement() : index > elementCount-1 ? this.lastElement()/10.0 : this.get(index)/10.0);
+		synchronized (this) {
+			return this.isConstant ? (index == 0 ? 0.0 : this.get(0) / 10.0 * index) : (index < 0 ? this.firstElement() : index > elementCount - 1 ? this.lastElement() / 10.0 : this.get(index) / 10.0);
+		}
 	}
 
 	/**
@@ -125,7 +127,9 @@ public class TimeSteps extends Vector<Integer> {
 	 * @return true if add was successful
 	 */
 	public synchronized boolean add(double value) {
-		return this.isConstant ? true : super.add((int) (value * 10));
+		synchronized (this) {
+			return this.isConstant ? true : super.add((int) (value * 10));
+		}
 	}
 	
 	/**

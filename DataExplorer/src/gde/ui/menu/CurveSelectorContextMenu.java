@@ -190,7 +190,8 @@ public class CurveSelectorContextMenu {
 						boolean checked = CurveSelectorContextMenu.this.lineVisible.getSelection();
 						CurveSelectorContextMenu.this.actualRecord.setVisible(checked);
 						CurveSelectorContextMenu.this.selectedItem.setChecked(checked);
-						CurveSelectorContextMenu.this.recordSet.syncScaleOfSyncableRecords(true);
+						CurveSelectorContextMenu.this.recordSet.syncScaleOfSyncableRecords();
+						CurveSelectorContextMenu.this.recordSet.updateSyncRecordScale();
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}

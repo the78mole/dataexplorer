@@ -454,7 +454,7 @@ public class Record extends Vector<Integer> {
 	 * add a data point to the record data, checks for minimum and maximum to define display range
 	 * @param point
 	 */
-	public synchronized boolean add(Integer point, double timeStep_ms) {
+	public boolean add(Integer point, double timeStep_ms) {
 		if (this.timeStep_ms != null) this.timeStep_ms.add(timeStep_ms);
 		return this.add(point);
 	}
@@ -463,18 +463,21 @@ public class Record extends Vector<Integer> {
 	 * add a data point to the record data, checks for minimum and maximum to define display range
 	 * @param point
 	 */
-	public synchronized boolean add(Integer point) {
-		final String $METHOD_NAME = "add"; //$NON-NLS-1$
-		if (super.size() == 0) {
-			this.minValue = this.maxValue = point;
+	public boolean add(Integer point) {
+		synchronized (this) {
+			final String $METHOD_NAME = "add"; //$NON-NLS-1$
+			if (super.size() == 0) {
+				this.minValue = this.maxValue = point;
+			}
+			else {
+				if (point > this.maxValue)
+					this.maxValue = point;
+				else if (point < this.minValue) this.minValue = point;
+			}
+			log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
+			log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+			return super.add(point);
 		}
-		else {
-			if 			(point > this.maxValue) this.maxValue = point;
-			else if (point < this.minValue) this.minValue = point;
-		}	
-		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
-		log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
-		return super.add(point);
 	}
 
 	public int getOrdinal() {
@@ -682,14 +685,18 @@ public class Record extends Vector<Integer> {
 		return this.minValue;
 	}
 
-	public synchronized int getMaxValueTriggered() {
-		if (this.tmpTriggerRange == null) this.evaluateMinMax();
+	public int getMaxValueTriggered() {
+		synchronized (this) {
+			if (this.tmpTriggerRange == null) this.evaluateMinMax();
 			return this.maxValueTriggered;
+		}
 	}
 
-	public synchronized int getMinValueTriggered() {
-		if (this.tmpTriggerRange == null) this.evaluateMinMax();
+	public int getMinValueTriggered() {
+		synchronized (this) {
+			if (this.tmpTriggerRange == null) this.evaluateMinMax();
 			return this.minValueTriggered;
+		}
 	}
 
 	/**
@@ -707,82 +714,88 @@ public class Record extends Vector<Integer> {
 	 * while building vector of trigger range definitions as pre-requisite of avg and sigma calculation
 	 */
 	@SuppressWarnings("unchecked") // clone triggerRanges to be able to modify by time filter
-	 synchronized void evaluateMinMax() {
-		if (this.triggerRanges == null && this.isDisplayable && this.triggerIsGreater != null && this.triggerLevel != null) {
-			int deviceTriggerlevel = Double.valueOf(this.device.reverseTranslateValue(this, this.triggerLevel / 1000.0) * 1000).intValue();
-			for (int i = 0; i < this.realSize(); ++i) {
-				int point = this.realGet(i);
-				if (this.triggerIsGreater) { // point value must above trigger level
-					if (point > deviceTriggerlevel) {
-						if (this.tmpTriggerRange == null) {
-							if (this.triggerRanges == null) {
-								this.triggerRanges = new Vector<TriggerRange>();
-								this.minValueTriggered = this.maxValueTriggered = point;
+	 void evaluateMinMax() {
+		synchronized (this) {
+			if (this.triggerRanges == null && this.isDisplayable && this.triggerIsGreater != null && this.triggerLevel != null) {
+				int deviceTriggerlevel = Double.valueOf(this.device.reverseTranslateValue(this, this.triggerLevel / 1000.0) * 1000).intValue();
+				for (int i = 0; i < this.realSize(); ++i) {
+					int point = this.realGet(i);
+					if (this.triggerIsGreater) { // point value must above trigger level
+						if (point > deviceTriggerlevel) {
+							if (this.tmpTriggerRange == null) {
+								if (this.triggerRanges == null) {
+									this.triggerRanges = new Vector<TriggerRange>();
+									this.minValueTriggered = this.maxValueTriggered = point;
+								}
+								this.tmpTriggerRange = new TriggerRange(i);
 							}
-							this.tmpTriggerRange = new TriggerRange(i);
+							else {
+								if (point > this.maxValueTriggered) this.maxValueTriggered = point;
+								if (point < this.minValueTriggered) this.minValueTriggered = point;
+							}
 						}
 						else {
-							if (point > this.maxValueTriggered) this.maxValueTriggered = point;
-							if (point < this.minValueTriggered) this.minValueTriggered = point;
-						}
-					}
-					else {
-						if (this.triggerRanges != null && this.tmpTriggerRange != null) {
-							this.tmpTriggerRange.setOut(i);
-							this.triggerRanges.add(this.tmpTriggerRange);
-							this.tmpTriggerRange = null;
-						}
-					}
-				}
-				else { // point value must below trigger level
-					if (point < deviceTriggerlevel) {
-						if (this.tmpTriggerRange == null) {
-							if (this.triggerRanges == null) {
-								this.triggerRanges = new Vector<TriggerRange>();
-								this.minValueTriggered = this.maxValueTriggered = point;
+							if (this.triggerRanges != null && this.tmpTriggerRange != null) {
+								this.tmpTriggerRange.setOut(i);
+								this.triggerRanges.add(this.tmpTriggerRange);
+								this.tmpTriggerRange = null;
 							}
-							this.tmpTriggerRange = new TriggerRange(i);
+						}
+					}
+					else { // point value must below trigger level
+						if (point < deviceTriggerlevel) {
+							if (this.tmpTriggerRange == null) {
+								if (this.triggerRanges == null) {
+									this.triggerRanges = new Vector<TriggerRange>();
+									this.minValueTriggered = this.maxValueTriggered = point;
+								}
+								this.tmpTriggerRange = new TriggerRange(i);
+							}
+							else {
+								if (point > this.maxValueTriggered) this.maxValueTriggered = point;
+								if (point < this.minValueTriggered) this.minValueTriggered = point;
+							}
 						}
 						else {
-							if (point > this.maxValueTriggered) this.maxValueTriggered = point;
-							if (point < this.minValueTriggered) this.minValueTriggered = point;
-						}
-					}
-					else {
-						if (this.triggerRanges != null) {
-							this.tmpTriggerRange.setOut(i);
-							this.triggerRanges.add(this.tmpTriggerRange);
-							this.tmpTriggerRange = null;
+							if (this.triggerRanges != null) {
+								this.tmpTriggerRange.setOut(i);
+								this.triggerRanges.add(this.tmpTriggerRange);
+								this.tmpTriggerRange = null;
+							}
 						}
 					}
 				}
 			}
-		}
-		if (log.isLoggable(Level.FINE)) {
+			if (log.isLoggable(Level.FINE)) {
+				if (this.triggerRanges != null) {
+					for (TriggerRange range : this.triggerRanges) {
+						log.log(Level.FINE,
+								this.name
+										+ " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.in)) + "), " + range.out + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.out)) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					}
+				}
+				else
+					log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
+			}
 			if (this.triggerRanges != null) {
-				for (TriggerRange range : this.triggerRanges) {
-					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.in)) + "), " + range.out + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.out)) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				// evaluate trigger ranges to meet minTimeSec requirement 
+				for (TriggerRange range : (Vector<TriggerRange>) this.triggerRanges.clone()) {
+					if ((this.getTime_ms(range.out) - this.getTime_ms(range.in)) < this.getMinTriggerTimeSec() * 1000) this.triggerRanges.remove(range);
 				}
 			}
-			else
-				log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
-		}
-		if (this.triggerRanges != null) {
-			// evaluate trigger ranges to meet minTimeSec requirement 
-			for (TriggerRange range : (Vector<TriggerRange>) this.triggerRanges.clone()) {
-				if ((this.getTime_ms(range.out) - this.getTime_ms(range.in)) < this.getMinTriggerTimeSec()*1000) this.triggerRanges.remove(range);
-			}
-		}
-		if (log.isLoggable(Level.FINE)) {
-			if (this.triggerRanges != null) {
-				for (TriggerRange range : this.triggerRanges) {
-					log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.out)) + "), " + range.out + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.in)) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			if (log.isLoggable(Level.FINE)) {
+				if (this.triggerRanges != null) {
+					for (TriggerRange range : this.triggerRanges) {
+						log.log(Level.FINE,
+								this.name
+										+ " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.out)) + "), " + range.out + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.in)) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					}
 				}
+				else
+					log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
 			}
-			else
-				log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
+			log.log(Level.FINER, this.name + " minTriggered = " + this.minValueTriggered + " maxTriggered = " + this.maxValueTriggered); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		log.log(Level.FINER, this.name + " minTriggered = " + this.minValueTriggered + " maxTriggered = " + this.maxValueTriggered); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -790,12 +803,14 @@ public class Record extends Vector<Integer> {
 	 * @param referencedMeasurementOrdinal
 	 * @return maximum value according trigger specification of referenced measurement
 	 */
-	public synchronized int getMaxValueTriggered(int referencedMeasurementOrdinal) {
-		if (this.tmpTriggerRange == null || this.triggerRanges == null)  {
-			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+	public int getMaxValueTriggered(int referencedMeasurementOrdinal) {
+		synchronized (this) {
+			if (this.tmpTriggerRange == null || this.triggerRanges == null) {
+				this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+			}
+			if (this.maxValueTriggered == Integer.MIN_VALUE) this.setMinMaxValueTriggered();
+			return this.maxValueTriggered;
 		}
-		if (this.maxValueTriggered == Integer.MIN_VALUE )this.setMinMaxValueTriggered();
-		return this.maxValueTriggered;
 	}
 
 	/**
@@ -803,21 +818,25 @@ public class Record extends Vector<Integer> {
 	 * @param referencedMeasurementOrdinal
 	 * @return minimum value according trigger specification of referenced measurement
 	 */
-	public synchronized int getMinValueTriggered(int referencedMeasurementOrdinal) {
-		if (this.tmpTriggerRange == null || this.triggerRanges == null)  {
-			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+	public int getMinValueTriggered(int referencedMeasurementOrdinal) {
+		synchronized (this) {
+			if (this.tmpTriggerRange == null || this.triggerRanges == null) {
+				this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+			}
+			if (this.minValueTriggered == Integer.MAX_VALUE) this.setMinMaxValueTriggered();
+			return this.minValueTriggered;
 		}
-		if (this.minValueTriggered == Integer.MAX_VALUE )this.setMinMaxValueTriggered();
-		return this.minValueTriggered;
 	}
 	
-	synchronized void setMinMaxValueTriggered() {
-		if (this.triggerRanges != null) {
-			for (TriggerRange range : this.triggerRanges) {
-				for (int i = range.in; i < range.out; i++) {
-					int point = this.realGet(i);
-					if (point > this.maxValueTriggered) this.maxValueTriggered = point;
-					if (point < this.minValueTriggered) this.minValueTriggered = point;
+	void setMinMaxValueTriggered() {
+		synchronized (this) {
+			if (this.triggerRanges != null) {
+				for (TriggerRange range : this.triggerRanges) {
+					for (int i = range.in; i < range.out; i++) {
+						int point = this.realGet(i);
+						if (point > this.maxValueTriggered) this.maxValueTriggered = point;
+						if (point < this.minValueTriggered) this.minValueTriggered = point;
+					}
 				}
 			}
 		}
@@ -858,25 +877,26 @@ public class Record extends Vector<Integer> {
 	 * @param index
 	 */
 	@Override
-	public synchronized Integer get(int index) {
-		int size = elementCount;
-		if(this.parent.isZoomMode) {
-			index = index + this.zoomOffset;
-			index = index > (size-1) ? (size-1) : index;
-			index = index < 0 ? 0 : index;
+	public Integer get(int index) {
+		synchronized (this) {
+			int size = elementCount;
+			if (this.parent.isZoomMode) {
+				index = index + this.zoomOffset;
+				index = index > (size - 1) ? (size - 1) : index;
+				index = index < 0 ? 0 : index;
+			}
+			else if (this.parent.isScopeMode) {
+				index = index + this.parent.scopeModeOffset;
+				index = index > (size - 1) ? (size - 1) : index;
+				index = index < 0 ? 0 : index;
+			}
+			else {
+				index = index > (size - 1) ? (size - 1) : index;
+				index = index < 0 ? 0 : index;
+			}
+			//log.log(Level.INFO, "index=" + index);
+			return size != 0 ? super.get(index) : 0;
 		}
-		else 
-			if(this.parent.isScopeMode) {
-			index = index + this.parent.scopeModeOffset;
-			index = index > (size-1) ? (size-1) : index;
-			index = index < 0 ? 0 : index;
-		}
-		else {
-			index = index > (size-1) ? (size-1) : index;
-			index = index < 0 ? 0 : index;
-		}
-		//log.log(Level.INFO, "index=" + index);
-		return size != 0 ? super.get(index) : 0;
 	}
 
 	/**
@@ -887,20 +907,6 @@ public class Record extends Vector<Integer> {
 		return super.size() != 0 ? super.get(index) : 0;
 	}
 
-//	/**
-//	 * overwrites vector elementAt(int index) to enable zoom
-//	 * @param index
-//	 */
-//	public synchronized Integer elementAt(int index) {
-//		Integer value;
-//		if(this.parent.isZoomMode || this.parent.isScopeMode)
-//			value = super.elementAt(index + this.zoomOffset);
-//		else
-//			value = super.elementAt(index);
-//		
-//		return value;
-//	}
-	
 	public boolean isPositionLeft() {
 		return this.isPositionLeft;
 	}
@@ -1251,6 +1257,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public DecimalFormat getDecimalFormat() {
 		if(this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
+		log.log(Level.FINE, this.isScaleSynced() + " - " + this.parent.getSyncMasterRecordOrdinal(this));
 		return this.isScaleSynced() ? this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).df : this.df;
 	}
 
@@ -1611,16 +1618,18 @@ public class Record extends Vector<Integer> {
 	/**
 	 * reset all variables to enable re-calcualation of statistics
 	 */
-	public synchronized void resetStatiticCalculationBase() {
-		this.maxValueTriggered = Integer.MIN_VALUE;
-		this.minValueTriggered = Integer.MAX_VALUE;
-		this.avgValue = Integer.MIN_VALUE;
-		this.sigmaValue = Integer.MIN_VALUE;
-		this.avgValueTriggered = Integer.MIN_VALUE;
-		this.sigmaValueTriggered = Integer.MIN_VALUE;
-		this.triggerRanges = null;
-		this.tmpTriggerRange = null;
-		log.log(Level.FINER, this.name);
+	public void resetStatiticCalculationBase() {
+		synchronized (this) {
+			this.maxValueTriggered = Integer.MIN_VALUE;
+			this.minValueTriggered = Integer.MAX_VALUE;
+			this.avgValue = Integer.MIN_VALUE;
+			this.sigmaValue = Integer.MIN_VALUE;
+			this.avgValueTriggered = Integer.MIN_VALUE;
+			this.sigmaValueTriggered = Integer.MIN_VALUE;
+			this.triggerRanges = null;
+			this.tmpTriggerRange = null;
+			log.log(Level.FINER, this.name);
+		}
 	}
 	
 	/**
@@ -1765,7 +1774,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * @return the avgValue
 	 */
-	public synchronized int getAvgValue() {
+	public int getAvgValue() {
 		this.setAvgValue();
 		return this.avgValue;
 	}
@@ -1774,12 +1783,14 @@ public class Record extends Vector<Integer> {
 	 * get/calcualte avg value by configuraed trigger
 	 * @return average value according trigger specification
 	 */
-	public synchronized int getAvgValueTriggered() {
-		if (this.triggerRanges == null)  {
-			this.evaluateMinMax();
+	public int getAvgValueTriggered() {
+		synchronized (this) {
+			if (this.triggerRanges == null) {
+				this.evaluateMinMax();
+			}
+			this.setAvgValueTriggered();
+			return this.avgValueTriggered;
 		}
-		this.setAvgValueTriggered();
-		return this.avgValueTriggered;
 	}
 	
 	/**
@@ -1787,58 +1798,64 @@ public class Record extends Vector<Integer> {
 	 * @param referencedMeasurementOrdinal
 	 * @return average value according trigger specification of referenced measurement
 	 */
-	public synchronized int getAvgValueTriggered(int referencedMeasurementOrdinal) {
-		if (this.triggerRanges == null)  {
-			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+	public int getAvgValueTriggered(int referencedMeasurementOrdinal) {
+		synchronized (this) {
+			if (this.triggerRanges == null) {
+				this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+			}
+			this.setAvgValueTriggered();
+			return this.avgValueTriggered;
 		}
-		this.setAvgValueTriggered();
-		return this.avgValueTriggered;
 	}
 	
 	/**
 	 * calculates the avgValue
 	 */
-	public synchronized void setAvgValue() {
-		if (this.size() >= 2) {
-			long sum = 0;
-			int zeroCount = 0;
-			for (Integer xi : this) {
-				if (xi != 0) {
-					sum += xi;
+	public void setAvgValue() {
+		synchronized (this) {
+			if (this.size() >= 2) {
+				long sum = 0;
+				int zeroCount = 0;
+				for (Integer xi : this) {
+					if (xi != 0) {
+						sum += xi;
+					}
+					else {
+						zeroCount++;
+					}
 				}
-				else {
-					zeroCount++;
-				}
+				this.avgValue = (this.size() - zeroCount) != 0 ? Long.valueOf(sum / (this.size() - zeroCount)).intValue() : 0;
 			}
-			this.avgValue = (this.size()-zeroCount) != 0 ? Long.valueOf(sum / (this.size()-zeroCount)).intValue() : 0;
 		}
 	}
 	
 	/**
 	 * calculates the avgValue using trigger ranges
 	 */
-	public synchronized void setAvgValueTriggered() {
-		long sum = 0;
-		int numPoints = 0;
-		StringBuilder sb = new StringBuilder();
-		if (this.triggerRanges != null) {
-			for (TriggerRange range : this.triggerRanges) {
-				for (int i = range.in; i < range.out; i++) {
-					sum += this.get(i);
-					if (log.isLoggable(Level.FINER)) sb.append(this.realGet(i) / 1000.0).append(", "); //$NON-NLS-1$
-					numPoints++;
+	public void setAvgValueTriggered() {
+		synchronized (this) {
+			long sum = 0;
+			int numPoints = 0;
+			StringBuilder sb = new StringBuilder();
+			if (this.triggerRanges != null) {
+				for (TriggerRange range : this.triggerRanges) {
+					for (int i = range.in; i < range.out; i++) {
+						sum += this.get(i);
+						if (log.isLoggable(Level.FINER)) sb.append(this.realGet(i) / 1000.0).append(", "); //$NON-NLS-1$
+						numPoints++;
+					}
+					if (log.isLoggable(Level.FINER)) sb.append("\n"); //$NON-NLS-1$
 				}
-				if (log.isLoggable(Level.FINER)) sb.append("\n"); //$NON-NLS-1$
+				log.log(Level.FINER, sb.toString());
+				this.avgValueTriggered = numPoints > 0 ? Long.valueOf(sum / numPoints).intValue() : 0;
 			}
-			log.log(Level.FINER, sb.toString());
-			this.avgValueTriggered = numPoints > 0 ? Long.valueOf(sum / numPoints).intValue() : 0 ;
 		}
 	}
 
 	/**
 	 * @return the sigmaValue
 	 */
-	public synchronized int getSigmaValue() {
+	public int getSigmaValue() {
 		this.setSigmaValue();
 		return this.sigmaValue;
 	}
@@ -1847,12 +1864,14 @@ public class Record extends Vector<Integer> {
 	 * get/calcualte avg value by trigger configuration
 	 * @return sigma value according trigger specification
 	 */
-	public synchronized int getSigmaValueTriggered() {
-		if (this.triggerRanges == null)  {
-			this.evaluateMinMax();
+	public int getSigmaValueTriggered() {
+		synchronized (this) {
+			if (this.triggerRanges == null) {
+				this.evaluateMinMax();
+			}
+			if (this.sigmaValueTriggered == Integer.MIN_VALUE) this.setSigmaValueTriggered();
+			return this.sigmaValueTriggered;
 		}
-		if (this.sigmaValueTriggered == Integer.MIN_VALUE) this.setSigmaValueTriggered();
-		return this.sigmaValueTriggered;
 	}
 	
 	/**
@@ -1860,43 +1879,49 @@ public class Record extends Vector<Integer> {
 	 * @param referencedMeasurementOrdinal
 	 * @return sigma value according trigger specification of referenced measurement
 	 */
-	public synchronized int getSigmaValueTriggered(int referencedMeasurementOrdinal) {
-		if (this.triggerRanges == null)  {
-			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+	public int getSigmaValueTriggered(int referencedMeasurementOrdinal) {
+		synchronized (this) {
+			if (this.triggerRanges == null) {
+				this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+			}
+			if (this.sigmaValueTriggered == Integer.MIN_VALUE) this.setSigmaValueTriggered();
+			return this.sigmaValueTriggered;
 		}
-		if (this.sigmaValueTriggered == Integer.MIN_VALUE) this.setSigmaValueTriggered();
-		return this.sigmaValueTriggered;
 	}
 
 	/**
 	 * calculates the sigmaValue 
 	 */
-	public synchronized void setSigmaValue() {
-		if (super.size() >= 2) {
-			double average = this.getAvgValue() / 1000.0;
-			double sumPoweredValues = 0;
-			for (Integer xi : this) {
-				sumPoweredValues += Math.pow(xi / 1000.0 - average, 2);
+	public void setSigmaValue() {
+		synchronized (this) {
+			if (super.size() >= 2) {
+				double average = this.getAvgValue() / 1000.0;
+				double sumPoweredValues = 0;
+				for (Integer xi : this) {
+					sumPoweredValues += Math.pow(xi / 1000.0 - average, 2);
+				}
+				this.sigmaValue = Double.valueOf(Math.sqrt(sumPoweredValues / (this.realSize() - 1)) * 1000).intValue();
 			}
-			this.sigmaValue = Double.valueOf(Math.sqrt(sumPoweredValues / (this.realSize() - 1)) * 1000).intValue();
 		}
 	}
 
 	/**
 	 * calculates the sigmaValue using trigger ranges
 	 */
-	public synchronized void setSigmaValueTriggered() {
-		double average = this.getAvgValueTriggered()/1000.0;
-		double sumPoweredDeviations = 0;
-		int numPoints = 0;
-		if (this.triggerRanges != null) {
-			for (TriggerRange range : this.triggerRanges) {
-				for (int i = range.in; i < range.out; i++) {
-					sumPoweredDeviations += Math.pow(this.realGet(i)/1000.0 - average, 2);
-					numPoints++;
+	public void setSigmaValueTriggered() {
+		synchronized (this) {
+			double average = this.getAvgValueTriggered() / 1000.0;
+			double sumPoweredDeviations = 0;
+			int numPoints = 0;
+			if (this.triggerRanges != null) {
+				for (TriggerRange range : this.triggerRanges) {
+					for (int i = range.in; i < range.out; i++) {
+						sumPoweredDeviations += Math.pow(this.realGet(i) / 1000.0 - average, 2);
+						numPoints++;
+					}
 				}
+				this.sigmaValueTriggered = Double.valueOf(Math.sqrt(sumPoweredDeviations / (numPoints - 1)) * 1000).intValue();
 			}
-			this.sigmaValueTriggered = Double.valueOf(Math.sqrt(sumPoweredDeviations/(numPoints-1))*1000).intValue();
 		}
 	}
 	
@@ -1926,35 +1951,39 @@ public class Record extends Vector<Integer> {
 	/**
 	 * calculate sum of min/max delta of each trigger range
 	 */
-	synchronized int calculateSum() {
-		int sum = 0;
-		int min=0, max=0;
-		if (this.triggerRanges != null) {
-			for (TriggerRange range : this.triggerRanges) {
-				for (int i = range.in; i < range.out; i++) {
-					if (i == range.in)
-						min = max = this.realGet(i);
-					else {
-						int point = this.realGet(i);
-						if (point > max) max = point;
-						if (point < min) min = point;
+	int calculateSum() {
+		synchronized (this) {
+			int sum = 0;
+			int min = 0, max = 0;
+			if (this.triggerRanges != null) {
+				for (TriggerRange range : this.triggerRanges) {
+					for (int i = range.in; i < range.out; i++) {
+						if (i == range.in)
+							min = max = this.realGet(i);
+						else {
+							int point = this.realGet(i);
+							if (point > max) max = point;
+							if (point < min) min = point;
+						}
 					}
+					sum += this.device.translateValue(this, (max - min));
 				}
-				sum += this.device.translateValue(this, (max - min));
 			}
+			return sum;
 		}
-		return sum;
 	}
 	
 	/**
 	 * get/calcualte sum of time by configured trigger
 	 * @return sum value according trigger range specification of referenced measurement
 	 */
-	public synchronized String getTimeSumTriggeredRange() {
-		if (this.triggerRanges == null)  {
-			this.evaluateMinMax();
+	public String getTimeSumTriggeredRange() {
+		synchronized (this) {
+			if (this.triggerRanges == null) {
+				this.evaluateMinMax();
+			}
+			return this.calculateTimeSum();
 		}
-		return this.calculateTimeSum();
 	}
 	
 	/**
@@ -1962,39 +1991,45 @@ public class Record extends Vector<Integer> {
 	 * @param referencedMeasurementOrdinal
 	 * @return sum value according trigger range specification of referenced measurement
 	 */
-	public synchronized String getTimeSumTriggeredRange(int referencedMeasurementOrdinal) {
-		if (this.triggerRanges == null)  {
-			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+	public String getTimeSumTriggeredRange(int referencedMeasurementOrdinal) {
+		synchronized (this) {
+			if (this.triggerRanges == null) {
+				this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+			}
+			return this.calculateTimeSum();
 		}
-		return this.calculateTimeSum();
 	}
 	
 	/**
 	 * calculate sum of min/max delta of each trigger range
 	 */
-	synchronized String calculateTimeSum() {
-		double sum = 0;
-		if (this.triggerRanges != null) {
-			for (TriggerRange range : this.triggerRanges) {
-				sum += (this.getTime_ms(range.out) - this.getTime_ms(range.in));
+	String calculateTimeSum() {
+		synchronized (this) {
+			double sum = 0;
+			if (this.triggerRanges != null) {
+				for (TriggerRange range : this.triggerRanges) {
+					sum += (this.getTime_ms(range.out) - this.getTime_ms(range.in));
+				}
 			}
+			return TimeLine.getFomatedTimeWithUnit(sum);
 		}
-		return TimeLine.getFomatedTimeWithUnit(sum);
 	}
 	
 	/**
 	 * @return the triggerRanges
 	 */
-	public synchronized Vector<TriggerRange> getTriggerRanges() {
-		this.evaluateMinMax();
-		return this.triggerRanges;
+	public Vector<TriggerRange> getTriggerRanges() {
+		synchronized (this) {
+			this.evaluateMinMax();
+			return this.triggerRanges;
+		}
 	}
 
 	/**
 	 * query if the record display scale is synced with an other record
 	 * @return the isScaleSynced
 	 */
-	public synchronized boolean isScaleSynced() {
+	public boolean isScaleSynced() {
 		return this.parent.isOneOfSyncableRecord(this);
 	}
 
