@@ -365,7 +365,7 @@ public class RecordSet extends HashMap<String, Record> {
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
 		
-		this.device.updateVisibilityStatus(this, true);
+		this.device.updateVisibilityStatus(this, false);
 	}
 
 	/**
@@ -392,7 +392,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * check all records of this record set are displayable
 	 * @return true/false	
 	 */
-	public synchronized boolean checkAllRecordsDisplayable() {
+	public boolean checkAllRecordsDisplayable() {
 		int displayableRecordEntries = 0;
 		for (String recordKey : this.recordNames) {
 			if (this.getRecord(recordKey).isDisplayable()) ++displayableRecordEntries;
@@ -400,7 +400,7 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 
 		int targetDisplayable = this.configuredDisplayable == 0 ? this.getRecordNames().length : this.configuredDisplayable;
-		log.log(Level.TIME, "targetDisplayable = " + targetDisplayable + " - displayableRecordEntries = " + displayableRecordEntries); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.FINE, "targetDisplayable = " + targetDisplayable + " - displayableRecordEntries = " + displayableRecordEntries); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return displayableRecordEntries >= targetDisplayable;
 	}
@@ -432,7 +432,6 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
-			this.updateSyncRecordScale(); //syncScaleOfSyncableRecords(false);
 		}
 		else
 			throw new DataInconsitsentException(Messages.getString(MessageIds.GDE_MSGE0035, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME})); //$NON-NLS-1$
@@ -469,7 +468,6 @@ public class RecordSet extends HashMap<String, Record> {
 				}
 				log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
-			this.updateSyncRecordScale(); //syncScaleOfSyncableRecords(false);
 		}
 		else
 			throw new DataInconsitsentException(Messages.getString(MessageIds.GDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}));
@@ -1164,7 +1162,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * set the mouse tracker in graphics window active for zoom window selection
 	 * @param zoomModeEnabled the isZoomMode to set
 	 */
-	public synchronized void setZoomMode(boolean zoomModeEnabled) {
+	public void setZoomMode(boolean zoomModeEnabled) {
 		if (!zoomModeEnabled) {
 			this.resetMeasurement();
 			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
@@ -1195,7 +1193,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * reset the record set in viewpoint of measurement and zooming
 	 */
-	public synchronized void resetZoomAndMeasurement() {
+	public void resetZoomAndMeasurement() {
 		this.setZoomMode(false);
 		this.setMeasurementMode(this.recordKeyMeasurement, false);
 		this.setDeltaMeasurementMode(this.recordKeyMeasurement, false);
@@ -1732,7 +1730,7 @@ public class RecordSet extends HashMap<String, Record> {
 			log.log(Level.FINE, this.get(syncRecordOrdinal).name + " syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 				synchronized (tmpRecord) {
-					if (tmpRecord.isVisible) {
+					if (tmpRecord.isVisible && tmpRecord.isDisplayable) {
 						int tmpMin = tmpRecord.getMinValue();
 						int tmpMax = tmpRecord.getMaxValue();
 						if (tmpMin != 0 || tmpMax != 0) {
@@ -1830,7 +1828,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public boolean isOneSyncableVisible(int syncMasterOrdinal) {
 		for (Record tmpRecord : this.scaleSyncedRecords.get(syncMasterOrdinal)) {
-			if (tmpRecord != null && tmpRecord.isVisible) {
+			if (tmpRecord != null && tmpRecord.isVisible && tmpRecord.isDisplayable) {
 				return true;
 			}
 		}
@@ -1987,9 +1985,6 @@ public class RecordSet extends HashMap<String, Record> {
 					log.log(Level.FINE, record.getName() + ": scopeMin = " + min / 1000.0 + "; scopeMax = " + max / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 					record.setScopeMinMax(min, max);
 				}
-			}
-			if (!this.scaleSyncedRecords.isEmpty()) {
-				this.updateSyncRecordScale(); //syncScaleOfSyncableRecords(true);
 			}
 		}
 	}

@@ -179,7 +179,6 @@ public class SelectorComposite extends Composite {
 									item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
 								}
 								activeRecord.getParent().syncScaleOfSyncableRecords();
-								activeRecord.getParent().updateSyncRecordScale(); //syncScaleOfSyncableRecords(true);
 							}
 							SelectorComposite.this.application.updateAllTabs(false);
 						}
