@@ -1661,6 +1661,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * synchronize scales according device properties 
 	 */
 	public void syncScaleOfSyncableRecords() {
+		this.scaleSyncedRecords	= new HashMap<Integer,Vector<Record>>(1);
 		for (int i = 0; i < this.size(); i++) {
 			PropertyType syncProperty = this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 			Record tmpRecord = this.get(i);
@@ -1709,7 +1710,7 @@ public class RecordSet extends HashMap<String, Record> {
 		boolean isContained = false;
 		synchronized (this.scaleSyncedRecords) {
 			for (Record tempRecord : this.scaleSyncedRecords.get(syncMasterRecordOrdinal)) {
-				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + tmpRecord.name);
+				log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + tmpRecord.name);
 				if (tempRecord.name.equals(tmpRecord.name)) {
 					isContained = true;
 					break;
