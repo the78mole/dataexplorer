@@ -98,6 +98,7 @@ public class GathererThread extends Thread {
 				// in case of time outs wait for 180 seconds max. for actions
 				if (this.dialog != null && !this.dialog.isDisposed() && this.dialog.getTabFolderSelectionIndex() == 0) {					
 					String text = this.serialPort.getTerminalData();
+					log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, text);
 					if (text.length() > 0 && !text.equals(GDE.STRING_EMPTY)) {
 						if (this.serialPort.containsSTX(text.getBytes())) {
 							terminalText.append(Messages.getString(MessageIds.GDE_MSGI1903));
@@ -112,19 +113,18 @@ public class GathererThread extends Thread {
 //							});
 						}
 						else if (this.serialPort.containsFF(text.getBytes())) {
-							this.dialog.setTerminalText(terminalText.toString());
 							terminalText = new StringBuffer();
 							if(text.length() > 1)
 								terminalText.append(text.substring(text.indexOf(QcCopterSerialPort.FF) + 1));
 						}
 						else {
 							terminalText.append(text);
-							this.dialog.setTerminalText(terminalText.toString());
 						}
 					}
 					else {
 						stopDataGatheringThread(true, null);
 					}
+					this.dialog.setTerminalText(terminalText.toString());
 				}
 				else { //if (this.dialog != null && this.dialog.isDisposed()) {
 					//get flight simulation data from device

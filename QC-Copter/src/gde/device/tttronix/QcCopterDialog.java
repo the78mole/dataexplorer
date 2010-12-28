@@ -30,6 +30,7 @@ import gde.ui.SWTResourceManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -328,6 +329,7 @@ public class QcCopterDialog extends DeviceDialog {
 				if (!QcCopterDialog.this.dialogShell.isDisposed()) {
 					QcCopterDialog.this.terminalText.setText(newText);
 					QcCopterDialog.this.terminalText.update();
+					log.logp(Level.FINER, "QCCopterDialog", "setTerminalText()", newText);
 				}
 			}
 		});
