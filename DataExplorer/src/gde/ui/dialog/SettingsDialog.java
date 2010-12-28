@@ -1194,7 +1194,7 @@ public class SettingsDialog extends Dialog {
 								}
 							}
 							});
-						WaitTimer.delay(2500);
+						WaitTimer.delay(1000);
 					}
 				}
 				catch (Throwable t) {
