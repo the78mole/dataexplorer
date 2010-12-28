@@ -1653,7 +1653,7 @@ public class UniLogDialog extends DeviceDialog {
 				int tmpValue = value < 0 ? 0 : value;
 				tmpValue = value > 100 ? 100 : value;
 				UniLogDialog.this.readDataProgressBar.setSelection(tmpValue);
-				if (UniLogDialog.this.taskBarItem != null) UniLogDialog.this.taskBarItem.setProgress(0);
+				if (UniLogDialog.this.taskBarItem != null) UniLogDialog.this.taskBarItem.setProgress(tmpValue);
 			}
 		});
 	}
@@ -1685,7 +1685,7 @@ public class UniLogDialog extends DeviceDialog {
 				int tmpValue = progress < 0 ? 0 : progress;
 				tmpValue = progress > 100 ? 100 : progress;
 				UniLogDialog.this.readDataProgressBar.setSelection(tmpValue);
-				if (UniLogDialog.this.taskBarItem != null) UniLogDialog.this.taskBarItem.setProgress(0);
+				if (UniLogDialog.this.taskBarItem != null) UniLogDialog.this.taskBarItem.setProgress(tmpValue);
 				UniLogDialog.this.redDataSetLabel.setText(UniLogDialog.this.numberRedDataSetsText);
 				UniLogDialog.this.actualDataSetNumber.setText(UniLogDialog.this.numberActualDataSetsText);
 				UniLogDialog.this.numberReadErrorLabel.setText(UniLogDialog.this.numberReadErrorText);
