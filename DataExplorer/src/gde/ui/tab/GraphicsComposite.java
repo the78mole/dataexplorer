@@ -444,7 +444,7 @@ public class GraphicsComposite extends Composite {
 		for (String recordKey : recordSet.getRecordNames()) {
 			Record tmpRecord = recordSet.getRecord(recordKey);
 			if (tmpRecord != null && tmpRecord.isScaleVisible()) {
-				log.log(Level.FINER, "==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				log.log(Level.FINER, "==>> " + recordKey + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				if (tmpRecord.isPositionLeft())
 					numberCurvesLeft++;
 				else

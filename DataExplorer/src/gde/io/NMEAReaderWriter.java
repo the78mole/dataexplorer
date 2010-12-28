@@ -155,7 +155,7 @@ public class NMEAReaderWriter {
 						log.log(Level.WARNING, "line number " + lineNumber + " line length to short or missing " + device.getDataBlockLeader() + " !"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 
-					log.log(Level.TIME, "signature = " + signature); //$NON-NLS-1$
+					log.log(Level.FINER, "signature = " + signature); //$NON-NLS-1$
 					while ((line = reader.readLine()) != null) {
 						line = line.trim();
 						++lineNumber;
