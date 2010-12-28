@@ -200,6 +200,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 //			log.log(Level.FINE, sumTimeDelta/recordDataSize + " " + sumTimeDelta);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		updateVisibilityStatus(recordSet, true);
+		recordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**
@@ -410,6 +412,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		updateVisibilityStatus(recordSet, true);
+		recordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**
