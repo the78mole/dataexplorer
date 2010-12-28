@@ -291,6 +291,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		updateVisibilityStatus(recordSet, true);
+		recordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**
