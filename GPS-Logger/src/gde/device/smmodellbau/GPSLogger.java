@@ -440,7 +440,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				++displayableCounter;
 			}
 		}
-		log.log(Level.TIME, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		log.log(Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 	}
 
