@@ -138,6 +138,7 @@ public class LiPoWatchDataGatherer extends Thread {
 				for (int j = numberRecords; j < this.device.getNumberOfMeasurements(1); j++) {
 					recordSet.remove(recordKeys[j]);
 				}
+				recordSet.syncScaleOfSyncableRecords();
 
 				if (i == 0 && channel.getActiveRecordSet() == null) {
 					Channels.getInstance().switchChannel(this.channelNumber, recordSetKey);
