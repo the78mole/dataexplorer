@@ -1025,19 +1025,13 @@ public class DataExplorer extends Composite {
 			
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.statusBar.setProgress(percentage);
-				if (this.taskBarItem != null) {
-					System.out.println("processState = " + this.taskBarItem.getProgressState());
-					this.taskBarItem.setProgress(percentage);
-				}
+				if (this.taskBarItem != null) this.taskBarItem.setProgress(percentage > 99 ? 0 : percentage);
 			}
 			else {
 				DataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
 						DataExplorer.this.statusBar.setProgress(percentage);
-						if (DataExplorer.this.taskBarItem != null) {
-							System.out.println("processState = " + DataExplorer.this.taskBarItem.getProgressState());
-							DataExplorer.this.taskBarItem.setProgress(percentage);
-						}
+						if (DataExplorer.this.taskBarItem != null) DataExplorer.this.taskBarItem.setProgress(percentage > 99 ? 0 : percentage);
 					}
 				});
 			}
