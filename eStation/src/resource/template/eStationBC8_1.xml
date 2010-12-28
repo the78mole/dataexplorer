@@ -112,7 +112,7 @@
 <entry key="9_lineStyle">1</entry>
 <entry key="9_lineWidth">1</entry>
 <entry key="9_numberFormat">-1</entry>
-<entry key="10_color">255,0,128</entry>
+<entry key="10_color">0,192,128</entry>
 <entry key="10_defMaxValue">4.25</entry>
 <entry key="10_defMinValue">3.0</entry>
 <entry key="10_isPositionLeft">false</entry>
