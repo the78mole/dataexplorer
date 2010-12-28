@@ -490,7 +490,7 @@ public class CellVoltageWindow extends CTabItem {
 				if (cellVoltageReferenceMasterOrdinal >= 0 && recordSet.getScaleSyncedRecords(cellVoltageReferenceMasterOrdinal) != null) {
 					for (Record record : recordSet.getScaleSyncedRecords(cellVoltageReferenceMasterOrdinal)) {
 						log.log(Level.FINE, "record " + record.getName() + " symbol " + record.getSymbol()); //$NON-NLS-1$ //$NON-NLS-2$
-						if (record.getLast() >= 0) { // last value is current value
+						if (record.isDisplayable()) {
 							this.voltageVector.add(new CellInfo(record.getLast(), record.getName(), record.getUnit()));
 							this.voltageAvg += record.getLast();
 							cellCount++;
