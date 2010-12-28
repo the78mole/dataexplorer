@@ -1297,7 +1297,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 				int tmpValue = value < 0 ? 0 : value;
 				tmpValue = value > 100 ? 100 : value;
 				LiPoWatchDialog.this.readDataProgressBar.setSelection(tmpValue);
-				if (LiPoWatchDialog.this.taskBarItem != null) LiPoWatchDialog.this.taskBarItem.setProgress(0);
+				if (LiPoWatchDialog.this.taskBarItem != null) LiPoWatchDialog.this.taskBarItem.setProgress(tmpValue);
 			}
 		});
 	}
@@ -1321,7 +1321,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 				int tmpValue = progress < 0 ? 0 : progress;
 				tmpValue = progress > 100 ? 100 : progress;
 				LiPoWatchDialog.this.readDataProgressBar.setSelection(tmpValue);
-				if (LiPoWatchDialog.this.taskBarItem != null) LiPoWatchDialog.this.taskBarItem.setProgress(0);
+				if (LiPoWatchDialog.this.taskBarItem != null) LiPoWatchDialog.this.taskBarItem.setProgress(tmpValue);
 				LiPoWatchDialog.this.redDataSetLabel.setText(LiPoWatchDialog.this.numberRedDataSetsText);
 				LiPoWatchDialog.this.actualDataSetNumber.setText(LiPoWatchDialog.this.numberActualDataSetsText);
 				LiPoWatchDialog.this.numberReadErrorLabel.setText(LiPoWatchDialog.this.numberReadErrorText);
