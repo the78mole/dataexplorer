@@ -102,7 +102,6 @@ public class GathererThread extends Thread {
 					if (text.length() > 0 && !text.equals(GDE.STRING_EMPTY)) {
 						if (this.serialPort.containsSTX(text.getBytes())) {
 							terminalText.append(Messages.getString(MessageIds.GDE_MSGI1903));
-							this.dialog.setTerminalText(terminalText.toString());
 //							DataExplorer.display.syncExec(new Runnable() {
 //								@Override
 //								public void run() {
@@ -242,7 +241,7 @@ public class GathererThread extends Thread {
 
 		RecordSet tmpRecordSet = this.channel.get(this.recordSetKey);
 		if (tmpRecordSet != null) {
-			this.device.updateVisibilityStatus(tmpRecordSet, true);
+			this.device.updateVisibilityStatus(tmpRecordSet, false);
 			this.device.makeInActiveDisplayable(tmpRecordSet);
 			this.application.updateStatisticsData();
 			this.application.updateDataTable(this.recordSetKey, false);
