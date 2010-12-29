@@ -949,13 +949,6 @@ public class LiPoWatchDialog extends DeviceDialog {
 				this.dialogShell.setActive();
 			}
 			Display display = this.dialogShell.getDisplay();
-			TaskBar taskBar = display.getSystemTaskBar();
-			if (taskBar == null)
-				this.taskBarItem = null;
-			else {
-				this.taskBarItem = taskBar.getItem(this.dialogShell) != null ? taskBar.getItem(this.dialogShell) : taskBar.getItem(null);
-				this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.ERROR : SWT.NORMAL);
-			}
 			while (!this.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
 			}
@@ -1084,6 +1077,16 @@ public class LiPoWatchDialog extends DeviceDialog {
 					LiPoWatchDialog.this.regulationTypeCombo.select(LiPoWatchDialog.this.impulsReductionType);
 					LiPoWatchDialog.this.voltageDropTriggerButton.setSelection(LiPoWatchDialog.this.isAutoStartVoltageDrop);
 					LiPoWatchDialog.this.cellTypeCombo.select(LiPoWatchDialog.this.cellType);
+					
+					TaskBar taskBar = LiPoWatchDialog.this.dialogShell.getDisplay().getSystemTaskBar();
+					if (taskBar == null)
+						LiPoWatchDialog.this.taskBarItem = null;
+					else {
+						LiPoWatchDialog.this.taskBarItem = taskBar.getItem(LiPoWatchDialog.this.dialogShell) != null ? taskBar.getItem(LiPoWatchDialog.this.dialogShell) : taskBar.getItem(null);
+						
+						if (LiPoWatchDialog.this.readDataButton.getSelection() && LiPoWatchDialog.this.taskBarItem != null) 
+							LiPoWatchDialog.this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.ERROR : SWT.NORMAL);
+					}
 				}
 			});
 		}
@@ -1219,6 +1222,8 @@ public class LiPoWatchDialog extends DeviceDialog {
 			this.clearMemoryButton.setEnabled(true);
 			this.closeButton.setEnabled(true);
 			setClosePossible(true);
+			if (LiPoWatchDialog.this.taskBarItem != null) 
+				LiPoWatchDialog.this.taskBarItem.setProgressState(SWT.DEFAULT);
 		}
 		else {
 			DataExplorer.display.asyncExec(new Runnable() {
@@ -1234,8 +1239,9 @@ public class LiPoWatchDialog extends DeviceDialog {
 						LiPoWatchDialog.this.stopLiveGatherButton.setEnabled(false);
 						LiPoWatchDialog.this.clearMemoryButton.setEnabled(true);
 						LiPoWatchDialog.this.closeButton.setEnabled(true);
+						setClosePossible(true);
+						if (LiPoWatchDialog.this.taskBarItem != null) LiPoWatchDialog.this.taskBarItem.setProgressState(SWT.DEFAULT);
 					}
-					setClosePossible(true);
 				}
 			});
 		}
