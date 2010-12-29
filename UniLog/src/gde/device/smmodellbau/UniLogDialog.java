@@ -1539,7 +1539,7 @@ public class UniLogDialog extends DeviceDialog {
 					else {
 						UniLogDialog.this.taskBarItem = taskBar.getItem(UniLogDialog.this.dialogShell) != null ? taskBar.getItem(UniLogDialog.this.dialogShell) : taskBar.getItem(null);
 						
-						if (UniLogDialog.this.readDataButton.getSelection() && UniLogDialog.this.taskBarItem != null) 
+						if (!UniLogDialog.this.readDataButton.getEnabled() && UniLogDialog.this.taskBarItem != null) 
 							UniLogDialog.this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.ERROR : SWT.NORMAL);
 					}
 				}
