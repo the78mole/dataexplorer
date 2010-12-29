@@ -1084,7 +1084,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 					else {
 						LiPoWatchDialog.this.taskBarItem = taskBar.getItem(LiPoWatchDialog.this.dialogShell) != null ? taskBar.getItem(LiPoWatchDialog.this.dialogShell) : taskBar.getItem(null);
 						
-						if (LiPoWatchDialog.this.readDataButton.getSelection() && LiPoWatchDialog.this.taskBarItem != null) 
+						if (!LiPoWatchDialog.this.readDataButton.getEnabled() && LiPoWatchDialog.this.taskBarItem != null) 
 							LiPoWatchDialog.this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.ERROR : SWT.NORMAL);
 					}
 				}
