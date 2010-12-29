@@ -1019,32 +1019,28 @@ public class DataExplorer extends Composite {
 	 */
 	public void setProgress(final int percentage, final String user) {
 		if (this.progressBarUser == null || user == null || this.progressBarUser.equals(user)) {
-			if (percentage > 99 | percentage == 0) 	{
-				this.progressBarUser = null;
-				DataExplorer.display.asyncExec(new Runnable() {
-					public void run() {
-						if (DataExplorer.this.taskBarItem != null) DataExplorer.this.taskBarItem.setProgressState(SWT.DEFAULT);
-					}
-				});
-			}
-			else {
-				this.progressBarUser = user;
-				DataExplorer.display.asyncExec(new Runnable() {
-					public void run() {
-						if (DataExplorer.this.taskBarItem != null) DataExplorer.this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.PAUSED : SWT.NORMAL);
-					}
-				});
-			}
-			
+			if (percentage > 99 | percentage == 0) 	this.progressBarUser = null;
+			else																		this.progressBarUser = user;
+
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.statusBar.setProgress(percentage);
-				if (this.taskBarItem != null) this.taskBarItem.setProgress(percentage > 99 ? 0 : percentage);
+				if (this.taskBarItem != null) {
+					if (user == null) this.taskBarItem.setProgressState(SWT.DEFAULT);
+					else this.taskBarItem.setProgressState(GDE.IS_MAC?SWT.PAUSED:SWT.NORMAL);
+					
+					this.taskBarItem.setProgress(percentage);						
+				}
 			}
 			else {
 				DataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
 						DataExplorer.this.statusBar.setProgress(percentage);
-						if (DataExplorer.this.taskBarItem != null) DataExplorer.this.taskBarItem.setProgress(percentage > 99 ? 0 : percentage);
+						if (DataExplorer.this.taskBarItem != null) {
+							if (user == null) DataExplorer.this.taskBarItem.setProgressState(SWT.DEFAULT);
+							else DataExplorer.this.taskBarItem.setProgressState(GDE.IS_MAC?SWT.PAUSED:SWT.NORMAL);
+							
+							DataExplorer.this.taskBarItem.setProgress(percentage);						
+						}
 					}
 				});
 			}
@@ -1057,7 +1053,7 @@ public class DataExplorer extends Composite {
 			this.progessPercentage = this.statusBar.getProgressPercentage();
 		}
 		else { // if the percentage is not up to date it will updated later
-			DataExplorer.display.syncExec(new Runnable() {
+			DataExplorer.display.asyncExec(new Runnable() {
 				public void run() {
 					DataExplorer.this.progessPercentage = DataExplorer.this.statusBar.getProgressPercentage();
 				}
