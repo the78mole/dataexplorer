@@ -1121,7 +1121,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.stopDataButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINE, "stopDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											log.log(Level.FINE, "stopDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$											
 											if (UniLogDialog.this.gatherThread != null && UniLogDialog.this.gatherThread.isAlive()) {
 												UniLogDialog.this.gatherThread.setThreadStop(); // end serial communication
 											}
@@ -1385,13 +1385,6 @@ public class UniLogDialog extends DeviceDialog {
 				this.dialogShell.setActive();
 			}
 			Display display = this.dialogShell.getDisplay();
-			TaskBar taskBar = display.getSystemTaskBar();
-			if (taskBar == null)
-				this.taskBarItem = null;
-			else {
-				this.taskBarItem = taskBar.getItem(this.dialogShell) != null ? taskBar.getItem(this.dialogShell) : taskBar.getItem(null);
-				this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.ERROR : SWT.NORMAL);
-			}
 			while (!this.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
 			}
@@ -1539,6 +1532,16 @@ public class UniLogDialog extends DeviceDialog {
 					if (UniLogDialog.this.configTab2 != null) UniLogDialog.this.configTab2.setA1ModusAvailable(true);
 					if (UniLogDialog.this.configTab3 != null) UniLogDialog.this.configTab3.setA1ModusAvailable(true);
 					if (UniLogDialog.this.configTab4 != null) UniLogDialog.this.configTab4.setA1ModusAvailable(true);
+					
+					TaskBar taskBar = UniLogDialog.this.dialogShell.getDisplay().getSystemTaskBar();
+					if (taskBar == null)
+						UniLogDialog.this.taskBarItem = null;
+					else {
+						UniLogDialog.this.taskBarItem = taskBar.getItem(UniLogDialog.this.dialogShell) != null ? taskBar.getItem(UniLogDialog.this.dialogShell) : taskBar.getItem(null);
+						
+						if (UniLogDialog.this.readDataButton.getSelection() && UniLogDialog.this.taskBarItem != null) 
+							UniLogDialog.this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.ERROR : SWT.NORMAL);
+					}
 				}
 			});
 		}
@@ -1738,6 +1741,8 @@ public class UniLogDialog extends DeviceDialog {
 				this.stopLoggingButton.setEnabled(false);
 				this.closeButton.setEnabled(true);
 				setClosePossible(true);
+				if (this.taskBarItem != null) 
+					this.taskBarItem.setProgressState(SWT.DEFAULT);
 			}
 			else {
 				DataExplorer.display.asyncExec(new Runnable() {
@@ -1748,6 +1753,8 @@ public class UniLogDialog extends DeviceDialog {
 						UniLogDialog.this.stopLoggingButton.setEnabled(false);
 						UniLogDialog.this.closeButton.setEnabled(true);
 						setClosePossible(true);
+						if (UniLogDialog.this.taskBarItem != null) 
+							UniLogDialog.this.taskBarItem.setProgressState(SWT.DEFAULT);
 					}
 				});
 			}
