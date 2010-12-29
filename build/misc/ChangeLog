@@ -10,6 +10,8 @@ fix pan menu item state in menu bar
 add balance curve to LiPoWatch, all eStations and clones -> force update by template XSD V05
 add test to validate device XMLs in workspace
 add capability to remember last used configuration -> force update by device properties XSD V12
+enable progress status indicator in task bar for supporting operating systems
+update SWT.jar for MAC to 3.7M3
 
 Version 2.60 - 01 Dec 2010
 
