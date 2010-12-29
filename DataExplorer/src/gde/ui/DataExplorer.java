@@ -360,7 +360,6 @@ public class DataExplorer extends Composite {
 				this.taskBarItem = null;
 			else {
 				this.taskBarItem = taskBar.getItem(DataExplorer.shell) != null ? taskBar.getItem(DataExplorer.shell) : taskBar.getItem(null);
-				this.taskBarItem.setProgressState(SWT.PAUSED);
 			}
 
 
@@ -1020,8 +1019,14 @@ public class DataExplorer extends Composite {
 	 */
 	public void setProgress(final int percentage, final String user) {
 		if (this.progressBarUser == null || user == null || this.progressBarUser.equals(user)) {
-			if (percentage > 99 | percentage == 0) 	this.progressBarUser = null;
-			else 																		this.progressBarUser = user;
+			if (percentage > 99 | percentage == 0) 	{
+				this.progressBarUser = null;
+				if (this.taskBarItem != null) this.taskBarItem.setProgressState(SWT.DEFAULT);
+			}
+			else {
+				this.progressBarUser = user;
+				if (this.taskBarItem != null) this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.PAUSED : SWT.NORMAL);
+			}
 			
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.statusBar.setProgress(percentage);
@@ -1044,7 +1049,7 @@ public class DataExplorer extends Composite {
 			this.progessPercentage = this.statusBar.getProgressPercentage();
 		}
 		else { // if the percentage is not up to date it will updated later
-			DataExplorer.display.asyncExec(new Runnable() {
+			DataExplorer.display.syncExec(new Runnable() {
 				public void run() {
 					DataExplorer.this.progessPercentage = DataExplorer.this.statusBar.getProgressPercentage();
 				}
