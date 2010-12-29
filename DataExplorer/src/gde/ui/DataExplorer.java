@@ -1021,11 +1021,19 @@ public class DataExplorer extends Composite {
 		if (this.progressBarUser == null || user == null || this.progressBarUser.equals(user)) {
 			if (percentage > 99 | percentage == 0) 	{
 				this.progressBarUser = null;
-				if (this.taskBarItem != null) this.taskBarItem.setProgressState(SWT.DEFAULT);
+				DataExplorer.display.asyncExec(new Runnable() {
+					public void run() {
+						if (DataExplorer.this.taskBarItem != null) DataExplorer.this.taskBarItem.setProgressState(SWT.DEFAULT);
+					}
+				});
 			}
 			else {
 				this.progressBarUser = user;
-				if (this.taskBarItem != null) this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.PAUSED : SWT.NORMAL);
+				DataExplorer.display.asyncExec(new Runnable() {
+					public void run() {
+						if (DataExplorer.this.taskBarItem != null) DataExplorer.this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.PAUSED : SWT.NORMAL);
+					}
+				});
 			}
 			
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
