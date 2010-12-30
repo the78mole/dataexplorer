@@ -124,6 +124,7 @@ public class PicolarioDialog extends DeviceDialog {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (PicolarioDialog.this.gatherThread != null && PicolarioDialog.this.gatherThread.isAlive()) PicolarioDialog.this.gatherThread.setThreadStop(true);
+					PicolarioDialog.this.dispose();
 				}
 			});
 			this.dialogShell.addHelpListener(new HelpListener() {
