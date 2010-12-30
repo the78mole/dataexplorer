@@ -171,7 +171,7 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 				++displayableCounter;
 			}
 		}
-		log.log(Level.TIME, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 		this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
 	}
