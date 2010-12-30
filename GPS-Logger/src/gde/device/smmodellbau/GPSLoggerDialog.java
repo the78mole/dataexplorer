@@ -126,6 +126,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 								setClosePossible(true);
 							}
 						}
+						GPSLoggerDialog.this.dispose();
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
