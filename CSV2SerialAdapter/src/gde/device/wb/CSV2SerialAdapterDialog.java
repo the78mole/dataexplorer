@@ -118,6 +118,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 								setClosePossible(true);
 							}
 						}
+						CSV2SerialAdapterDialog.this.dispose();
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
