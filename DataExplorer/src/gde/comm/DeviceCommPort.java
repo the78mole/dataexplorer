@@ -60,7 +60,9 @@ public class DeviceCommPort implements IDeviceCommPort {
 		this.application = currentApplication;
 		this.settings = Settings.getInstance();
 		if (Boolean.parseBoolean(System.getProperty("GDE_IS_SIMULATION"))) {
-			this.port = new DeviceSerialPortSimulatorImpl(this.device, this.application, this.device.getTimeStep_ms() < 0, (this.device.getTimeStep_ms() < 0 ? 100 : (int)this.device.getTimeStep_ms()));
+			this.port = new DeviceSerialPortSimulatorImpl(this.device, this.application, this.device.getTimeStep_ms() > 0, (this.device.getTimeStep_ms() < 0 
+						? (System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC") != null ? Integer.parseInt(System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC")) : 100) 
+						: (System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC") != null ? Integer.parseInt(System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC")) : (int)this.device.getTimeStep_ms())));
 		}
 		else {
 			this.port = new DeviceSerialPortImpl(this.deviceConfig, this.application);

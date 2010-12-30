@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -430,12 +431,12 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 */
 	int getWaitTime() {
 		int sleepTime = 0;
-		Random randomGenerator = new Random();
+		Random randomGenerator = new Random(new Date().getTime());
     if (this.isTimeStepConstant) {
     	sleepTime = this.sleepTime_ms;
     }
     else {
-			while (sleepTime < this.sleepTime_ms/3 || sleepTime > this.sleepTime_ms) {
+			while (sleepTime < this.sleepTime_ms/2 || sleepTime > this.sleepTime_ms*2) {
 				sleepTime = randomGenerator.nextInt(this.sleepTime_ms);
 			}
 		}

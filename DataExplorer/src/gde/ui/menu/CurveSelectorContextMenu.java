@@ -431,6 +431,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.actualRecord.setRoundOut(false);
 						CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
 						CurveSelectorContextMenu.this.actualRecord.setStartEndDefined(false, 0, 0);
+						actualRecord.getParent().syncMasterSlaveRecords(actualRecord, Record.TYPE_AXIS_END_VALUES);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();

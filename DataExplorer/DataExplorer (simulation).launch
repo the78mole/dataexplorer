@@ -15,5 +15,5 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="gde.GDE"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="DataExplorer"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms40M -Xmx256M &#13;&#10;-DECLIPSE=true&#13;&#10;-DGDE_IS_SIMULATION=&quot;true&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms40M -Xmx256M &#13;&#10;-DECLIPSE=true&#13;&#10;-DGDE_IS_SIMULATION=&quot;true&quot;&#13;&#10;-DGDE_SIMULATION_TIME_STEP_MSEC=100"/>
 </launchConfiguration>
