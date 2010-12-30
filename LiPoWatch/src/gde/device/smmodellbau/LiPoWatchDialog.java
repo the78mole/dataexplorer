@@ -239,6 +239,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								LiPoWatchDialog.this.liveThread.stopTimerThread();
 							}
 						}
+						LiPoWatchDialog.this.dispose();
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
