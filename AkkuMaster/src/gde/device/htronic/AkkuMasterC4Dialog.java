@@ -141,6 +141,12 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
 				this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.tabFolder.setBounds(0, 0, 430, 425);
+				this.tabFolder.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent evt) {
+						AkkuMasterC4Dialog.log.log(Level.FINEST, "tabFolder.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						AkkuMasterC4Dialog.this.statusComposite.redraw();
+					}
+				});
 
 				@SuppressWarnings("nls")
 				String[] aCapacity = new String[] { "100", "250", "500", "600", "800", "1000", "1250", "1500", "1750", "2000", "2500", "3000", "4000", "5000" };
