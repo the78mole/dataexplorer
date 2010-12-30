@@ -18,13 +18,27 @@
 ****************************************************************************************/
 package gde.device.conrad;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.device.DeviceDialog;
+import gde.exception.ApplicationConfigurationException;
+import gde.exception.SerialPortException;
+import gde.exception.TimeOutException;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
 import java.io.IOException;
 import java.util.HashMap;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
@@ -47,18 +61,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.device.DeviceDialog;
-import gde.exception.ApplicationConfigurationException;
-import gde.exception.SerialPortException;
-import gde.exception.TimeOutException;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 /**
  * e-Station dialog implementation (902, BC6, BC610, BC8)
@@ -174,6 +176,13 @@ public class VC800Dialog extends DeviceDialog {
 					public void helpRequested(HelpEvent evt) {
 						VC800Dialog.log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						VC800Dialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				});
+				this.dialogShell.addDisposeListener(new DisposeListener() {
+					@Override
+					public void widgetDisposed(DisposeEvent evt) {
+						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						VC800Dialog.this.dispose();
 					}
 				});
 				{
