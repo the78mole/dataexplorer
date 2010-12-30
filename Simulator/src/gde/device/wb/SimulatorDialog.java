@@ -293,7 +293,7 @@ public class SimulatorDialog extends DeviceDialog {
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-						//TODO check if some thing to do before exiting
+						SimulatorDialog.this.dispose();
 					}
 				});
 				this.dialogShell.addKeyListener(new KeyAdapter() {
