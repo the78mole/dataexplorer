@@ -349,7 +349,7 @@ public class DataExplorer extends Composite {
 			//this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.UTILITY_RECORD_SET, 1);
 
 			shell.setLayout(new FillLayout());
-			shell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.png")); //$NON-NLS-1$
+			shell.setImage(SWTResourceManager.getImage(GDE.IS_MAC ? "gde/resource/DataExplorer_MAC.png" : "gde/resource/DataExplorer.png")); //$NON-NLS-1$ //$NON-NLS-2$
 			shell.setText(APPLICATION_NAME);
 
 			shell.layout();
@@ -2522,7 +2522,7 @@ public class DataExplorer extends Composite {
 	public void resetShellIcon() {
 		DataExplorer.display.asyncExec(new Runnable() {
 			public void run() {
-				shell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.png")); //$NON-NLS-1$
+				shell.setImage(SWTResourceManager.getImage(GDE.IS_MAC ? "gde/resource/DataExplorer_MAC.png" : "gde/resource/DataExplorer.png")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 	}
