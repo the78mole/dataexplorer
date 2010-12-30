@@ -213,6 +213,7 @@ public class AkkuMasterChannelTab {
 									}
 									catch (Exception e) {
 										AkkuMasterChannelTab.this.captureOnlyButton.setSelection(false);
+										AkkuMasterChannelTab.this.stopTimer();
 										AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(),
 												Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
@@ -254,6 +255,7 @@ public class AkkuMasterChannelTab {
 									}
 									catch (Exception e) {
 										AkkuMasterChannelTab.this.programmButton.setSelection(false);
+										AkkuMasterChannelTab.this.stopTimer();
 										AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(),
 												Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 									}
