@@ -18,12 +18,23 @@
 ****************************************************************************************/
 package gde.device.bantam;
 
-import java.util.HashMap;
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.device.DeviceDialog;
 import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
@@ -45,15 +56,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.device.DeviceDialog;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 /**
  * e-Station dialog implementation (902, BC6, BC610, BC8)
@@ -192,6 +194,13 @@ public class EStationDialog extends DeviceDialog {
 					public void helpRequested(HelpEvent evt) {
 						EStationDialog.log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						EStationDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+				});
+				this.dialogShell.addDisposeListener(new DisposeListener() {
+					@Override
+					public void widgetDisposed(DisposeEvent evt) {
+						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						EStationDialog.this.dispose();
 					}
 				});
 				{
