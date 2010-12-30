@@ -293,6 +293,7 @@ public class UniLogDialog extends DeviceDialog {
 								UniLogDialog.this.liveThread.interrupt();
 							}
 						}
+						UniLogDialog.this.dispose();
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
