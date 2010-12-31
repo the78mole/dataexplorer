@@ -198,9 +198,11 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				else if (this.fileType.equals(GDE.FILE_ENDING_STAR_LOG)) {
 					String line;
 					if ((line = txt_in.readLine()) != null) {
-						line = getHexDataLine(line);
-						if (line != null) {
-							//System.out.println(line);
+						while(!line.contains("WARNING") && !line.contains("Read  data:") && (line = txt_in.readLine()) != null) ;
+						
+						//System.out.println(line);
+						if(line != null && line.contains("Read  data:")) {
+							line = line.substring(line.indexOf("Read  data:") + 12);
 							StringTokenizer token = new StringTokenizer(line);
 							StringBuffer sb = new StringBuffer();
 							while (token.hasMoreElements()) {
@@ -209,6 +211,11 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 							//System.out.println(sb.toString());
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
 						}
+						else { // WARNING, assume time out
+							log.logp(Level.TIME, $CLASS_NAME, "read()", "delay " + timeout_msec);
+							WaitTimer.delay(timeout_msec);
+							throw new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
+						}
 					}
 					else
 						this.close();
@@ -216,19 +223,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 			}
 		}
 		return readBuffer;
-	}
-
-	/**
-	 * @param line
-	 * @return
-	 * @throws IOException
-	 */
-	String getHexDataLine(String line) throws IOException {
-		while(!line.contains("Read  data:") && (line = txt_in.readLine()) != null) ;
-		if(line != null) {
-			line = line.substring(line.indexOf("Read  data:") + 12);
-		}
-		return line == null || line.length() > 1 ? line : getHexDataLine(line);
 	}
 
 	/* (non-Javadoc)
@@ -272,9 +266,11 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				else if (this.fileType.equals(GDE.FILE_ENDING_STAR_LOG)) {
 					String line;
 					if ((line = txt_in.readLine()) != null) {
-						line = getHexDataLine(line);
-						if (line != null) {
-							//System.out.println(line);
+						while(!line.contains("WARNING") && !line.contains("Read  data:") && (line = txt_in.readLine()) != null) ;
+						
+						//System.out.println(line);
+						if(line != null && line.contains("Read  data:")) {
+							line = line.substring(line.indexOf("Read  data:") + 12);
 							StringTokenizer token = new StringTokenizer(line);
 							StringBuffer sb = new StringBuffer();
 							while (token.hasMoreElements()) {
@@ -282,6 +278,11 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 							}
 							//System.out.println(sb.toString());
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
+						}
+						else { // WARNING, assume time out
+							log.logp(Level.TIME, $CLASS_NAME, "read()", "delay " + timeout_msec);
+							WaitTimer.delay(timeout_msec);
+							throw new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
 						}
 					}
 					else
@@ -333,9 +334,11 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				else if (this.fileType.equals(GDE.FILE_ENDING_STAR_LOG)) {
 					String line;
 					if ((line = txt_in.readLine()) != null) {
-						line = getHexDataLine(line);
-						if (line != null) {
-							//System.out.println(line);
+						while(!line.contains("WARNING") && !line.contains("Read  data:") && (line = txt_in.readLine()) != null) ;
+						
+						//System.out.println(line);
+						if(line != null && line.contains("Read  data:")) {
+							line = line.substring(line.indexOf("Read  data:") + 12);
 							StringTokenizer token = new StringTokenizer(line);
 							StringBuffer sb = new StringBuffer();
 							while (token.hasMoreElements()) {
@@ -343,6 +346,11 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 							}
 							//System.out.println(sb.toString());
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
+						}
+						else { // WARNING, assume time out
+							log.logp(Level.TIME, $CLASS_NAME, "read()", "delay " + timeout_msec);
+							WaitTimer.delay(timeout_msec);
+							throw new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
 						}
 					}
 					else
