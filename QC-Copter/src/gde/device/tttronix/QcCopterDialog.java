@@ -130,6 +130,7 @@ public class QcCopterDialog extends DeviceDialog {
 								setClosePossible(true);
 							}
 						}
+						QcCopterDialog.this.dispose();
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {

@@ -119,11 +119,12 @@ public class GathererThread extends Thread {
 						else {
 							terminalText.append(text);
 						}
+						if (text.length() > 100) this.dialog.setTerminalText(terminalText.toString());
+						else log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, text);
 					}
 					else {
 						stopDataGatheringThread(true, null);
 					}
-					this.dialog.setTerminalText(terminalText.toString());
 				}
 				else { //if (this.dialog != null && this.dialog.isDisposed()) {
 					//get flight simulation data from device
