@@ -108,6 +108,7 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 					this.retrys++;
 					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 					if (this.retrys > 3) { //retry or skip in case of xfer errors
+						this.retrys = 0;
 						throw new SerialPortException(Messages.getString(MessageIds.GDE_MSGT1904));
 					}
 					data = getData();
