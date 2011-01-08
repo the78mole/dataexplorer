@@ -51,30 +51,30 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>#Satellit</name>
-	            <symbol>#</symbol>
-	            <unit>-</unit>
-	            <active>false</active>
+	            <name>Satellit</name>
+	            <symbol></symbol>
+	            <unit>#</unit>
+	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>PDOP</name>
-	            <symbol>p</symbol>
-	            <unit>-</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>false</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>HDOP</name>
-	            <symbol>ph</symbol>
-	            <unit>-</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>false</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>VDOP</name>
-	            <symbol>pv</symbol>
-	            <unit>-</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>false</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -98,15 +98,15 @@
 	        </Measurement>
 	        <Measurement>
 	            <name>Steigen</name>
-	            <symbol>Vs</symbol>
+	            <symbol>vs</symbol>
 	            <unit>m/s</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>SpannungRx</name>
-	            <symbol>u</symbol>
-	            <unit>VRx</unit>
+	            <symbol>Urx</symbol>
+	            <unit>V</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -133,7 +133,7 @@
 	        </Measurement>
 	        <Measurement>
 	            <name>Gleitzahl</name>
-	            <symbol>g</symbol>
+	            <symbol></symbol>
 	            <unit>m/1</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -177,7 +177,7 @@
 	        <Measurement>
 	            <name>SpannungRx_UL</name>
 	            <symbol>Urx</symbol>
-	            <unit>VRx</unit>
+	            <unit>V</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -218,7 +218,7 @@
 	        </Measurement>
 	        <Measurement>
 	            <name>SpannungRx_ML</name>
-	            <symbol>U</symbol>
+	            <symbol>Urx</symbol>
 	            <unit>V</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>

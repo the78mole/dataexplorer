@@ -24,7 +24,7 @@ package gde.device.smmodellbau.gpslogger;
  */ 
 public class MessageIds { 
 
-	public final static String	GDE_MSGI1700 = "GDE_MSGI1700";
+	public final static String	GDE_MSGI2000 = "GDE_MSGI2000";
 	public final static String	GDE_MSGT2000 = "GDE_MSGT2000";
 	public final static String	GDE_MSGT2001 = "GDE_MSGT2001";
 	public final static String	GDE_MSGT2002 = "GDE_MSGT2002";

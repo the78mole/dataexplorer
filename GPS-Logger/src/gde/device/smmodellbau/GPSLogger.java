@@ -151,7 +151,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
 		NMEAParser data = new NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), this.getDataBlockSize(), this,
-				this.channels.getActiveChannelNumber());
+				this.channels.getActiveChannelNumber(), this.getUTCdelta());
 		int[] startLength = new int[] { 0, 0 };
 		byte[] lineBuffer = null;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
