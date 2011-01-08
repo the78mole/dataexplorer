@@ -474,10 +474,27 @@ public class Record extends Vector<Integer> {
 					this.maxValue = point;
 				else if (point < this.minValue) this.minValue = point;
 			}
-			log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
-			log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+			if(log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
+			if(log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 			return super.add(point);
 		}
+	}
+	
+	public Integer set(int index, Integer point) {
+		synchronized (this) {
+			final String $METHOD_NAME = "set"; //$NON-NLS-1$
+			if (super.size() == 0) {
+				this.minValue = this.maxValue = point;
+			}
+			else {
+				if (point > this.maxValue)
+					this.maxValue = point;
+				else if (point < this.minValue) this.minValue = point;
+			}
+			if(log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " setting point = " + point); //$NON-NLS-1$
+			if(log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+			return super.set(index, point);
+		}		
 	}
 
 	public int getOrdinal() {
@@ -1385,7 +1402,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public String getVerticalDisplayPointAsFormattedScaleValue(int yPos, Rectangle drawAreaBounds) {
 		String displayPointValue;
-		PropertyType syncProperty = this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+		PropertyType syncProperty = this.parent.isCompareSet ? null : this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 		if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
 			Record syncRecord = this.parent.get(this.ordinal);
 				displayPointValue = syncRecord.df.format(new Double(syncRecord.minDisplayValue +  ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
