@@ -219,6 +219,16 @@ public interface IDevice {
 	 * set new time step in ms
 	 */
 	public void setAverageTimeStep_ms(double newTimeStep_ms);
+
+	/**
+	 * @return UTC delta time in hours
+	 */
+	public short getUTCdelta();
+
+	/**
+	 * set new UTC delta time in hours
+	 */
+	public void setUTCdelta(int newUTCdelta);
 	
 	/**
 	 * @return the serial port type, optional configure for the device

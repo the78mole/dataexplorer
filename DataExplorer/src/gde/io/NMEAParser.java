@@ -28,8 +28,10 @@ import gde.messages.Messages;
 import gde.utils.Checksum;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 /**
@@ -41,7 +43,7 @@ import java.util.logging.Logger;
  */
 public class NMEAParser {
 	private static final Logger	log												= Logger.getLogger(NMEAParser.class.getName());
-	private 			 final String $CLASS_NAME								= "NMEAParser.";
+	private final String				$CLASS_NAME								= "NMEAParser.";
 	private static final String	STRING_SENTENCE_SPLITTER	= " |:";																				//$NON-NLS-1$
 
 	int													time_ms;
@@ -52,6 +54,9 @@ public class NMEAParser {
 	int													checkSum;
 	String											comment;
 	int													year, month, day;
+	int													numGSVsentence 						= 1; //check if GSV sentences are in sync
+	int													numSattelites							= 0;
+	Vector<String>							missingImpleWarned				= new Vector<String>();
 
 	final int										size;
 	final String								separator;
@@ -63,9 +68,9 @@ public class NMEAParser {
 	int lineNumber = 0;
 
 	public enum NMEA {
-
-		GPRMC, GPGSA, GPGGA, GPVTG,
-		//SM-Modellbau GPS-Logger
+		//NMEA sentences
+		GPRMC, GPGSA, GPGGA, GPVTG, GPGSV, GPRMB, GPGLL, GPZDA, 
+		//additional SM-Modellbau GPS-Logger NMEA sentences
 		GPSETUP, SETUP, SMGPS, MLINK, UNILOG, KOMMENTAR, COMMENT
 	}
 
@@ -77,7 +82,7 @@ public class NMEAParser {
 	 * @param useCheckSum , exclusive OR
 	 * @param useSize , size of the data points to be filled while parsing
 	 */
-	public NMEAParser(String useLeaderChar, String useSeparator, CheckSumTypes useCheckSum, int useSize, IDevice useDevice, int useChannelConfigNumber) {
+	public NMEAParser(String useLeaderChar, String useSeparator, CheckSumTypes useCheckSum, int useSize, IDevice useDevice, int useChannelConfigNumber, short useTimeOffsetUTC) {
 		this.separator = useSeparator;
 		this.leader = useLeaderChar;
 		this.checkSumType = useCheckSum;
@@ -85,84 +90,26 @@ public class NMEAParser {
 		this.values = new int[this.size];
 		this.device = useDevice;
 		this.channelConfigNumber = useChannelConfigNumber;
+		this.timeOffsetUTC = useTimeOffsetUTC;
 	}
 
-	public void parse(String[] inputLines, int lastLineNumber) throws Exception {
+	public void parse(Vector<String> inputLines, int lastLineNumber) throws Exception {
 		final String $METHOD_NAME = "parse()";
 		try {
-			for (int i=0; i<inputLines.length; ++i) {
-				String inputLine = inputLines[i];
-				this.lineNumber = lastLineNumber - inputLines.length + i;
-				log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
-				if (!inputLine.startsWith(this.leader)) 
-					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0046, new Object[] { this.leader, this.lineNumber }));
-				if (!inputLine.contains(this.separator)) 
-					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0047, new Object[] { inputLine, this.separator, this.lineNumber }));
-
-				if (isChecksumOK(inputLine)) {
-
-					String[] strValues = inputLine.split(this.separator); // {$GPRMC,162614,A,5230.5900,N,01322.3900,E,10.0,90.0,131006,1.2,E,A*13}
-
-					try {
-						NMEA sentence = NMEA.valueOf(strValues[0].substring(1));
-						switch (sentence) {
-						case GPRMC: //Recommended Minimum Sentence C (RMC)
-							parseRMC(strValues);
-							break;
-						case GPGGA: //Global Positioning System Fix Data (GGA)				
-							parseGGA(strValues);
-							break;
-						case GPGSA: //Satellite status (GSA)
-							parseGSA(strValues);
-							break;
-						case GPVTG: // Velocity made good (VTG)
-							parseVTG(strValues);
-							break;
-						case SMGPS:
-							parseSMGPS(strValues);
-							break;
-						case MLINK:
-							parseMLINK(strValues);
-							break;
-						case UNILOG:
-							parseUNILOG(strValues);
-							break;
-						case COMMENT:
-						case KOMMENTAR:
-							//$KOMMENTAR,Extra 300. Kuban Acht. Mit UniLog Daten.*
-							//$KOMMENTAR,Trojan. Ein paar liegende Figuren. Volle M-Link Bestückung.*
-							this.comment = strValues[1].trim();
-							this.comment = this.comment.endsWith(GDE.STRING_STAR) ? this.comment.substring(0, this.comment.length() - 1) : this.comment;
-
-							break;
-						case GPSETUP:
-							//not yet implemented, future
-							break;
-						case SETUP: // setup SM GPS-Logger firmware 1.00
-//							try {
-//								byte[] buffer = StringHelper.convert2ByteArray(strValues[1]);
-//								this.timeOffsetUTC = (short) ((buffer[7] << 8) + (buffer[6] & 0x00FF));
-//								this.timeOffsetUTC = this.timeOffsetUTC > 12 ? 12 : this.timeOffsetUTC < -12 ? -12 : this.timeOffsetUTC;
-//							}
-//							catch (Exception e) {
-//								log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
-//							}
-							break;
-						}
-						//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-						//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-						//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-						//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-					}
-					catch (Exception e) {
-						if (e instanceof IllegalArgumentException && e.getMessage().contains("No enum")) { //$NON-NLS-1$
-							log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + " - NMEA sentence = " + strValues[0].substring(1) + " actually not implementes!"); //$NON-NLS-1$ //$NON-NLS-2$
-						}
-						else {
-							throw e;
-						}
-					}
+			int indexRMC = 0;
+			for (; indexRMC < inputLines.size(); ++indexRMC) {
+				if (inputLines.elementAt(indexRMC).indexOf("RMC", 1) > -1) {
+					this.lineNumber = lastLineNumber - inputLines.size() + indexRMC + 1;
+					parse(inputLines.elementAt(indexRMC));
+					inputLines.remove(indexRMC);
+					break;
 				}
+			}
+
+			for (int i = 0; i < inputLines.size(); ++i) {
+				String inputLine = inputLines.elementAt(i);
+				this.lineNumber = lastLineNumber - inputLines.size() + (i<indexRMC ? i : i+1);
+				parse(inputLine);
 			}
 		}
 		catch (NumberFormatException e) {
@@ -172,6 +119,102 @@ public class NMEAParser {
 		catch (Exception e) {
 			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage(), e);
 			throw e;
+		}
+	}
+
+	/**
+	 * parse the input line string
+	 * @param inputLine
+	 * @throws DevicePropertiesInconsistenceException
+	 * @throws Exception
+	 */
+	private void parse(String inputLine) throws DevicePropertiesInconsistenceException, Exception {
+		final String $METHOD_NAME = "parse()";
+		log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
+		if (!inputLine.startsWith(this.leader)) 
+			throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0046, new Object[] { this.leader, this.lineNumber }));
+		if (!inputLine.contains(this.separator)) 
+			throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0047, new Object[] { inputLine, this.separator, this.lineNumber }));
+
+		if (isChecksumOK(inputLine)) {
+
+			String[] strValues = inputLine.split(this.separator); // {$GPRMC,162614,A,5230.5900,N,01322.3900,E,10.0,90.0,131006,1.2,E,A*13}
+
+			try {
+				NMEA sentence = NMEA.valueOf(strValues[0].substring(1));
+				switch (sentence) {
+				case GPRMC: //Recommended Minimum Sentence C (RMC)
+					parseRMC(strValues);
+					break;
+				case GPGGA: //Global Positioning System Fix Data (GGA)				
+					parseGGA(strValues);
+					break;
+				case GPGSA: //Satellite status (GSA)
+					parseGSA(strValues);
+					break;
+				case GPVTG: // Velocity made good (VTG)
+					parseVTG(strValues);
+					break;
+				case GPGSV: // Satellites in view (GSV)
+					parseGSV(strValues);
+					break;
+				case GPRMB: // Recommended minimum navigation information (RMB)
+					parseRMB(strValues);
+					break;
+				case GPGLL: // Geographic Latitude and Longitude (GLL)
+					parseGLL(strValues);
+					break;
+				case GPZDA: // Data and Time (ZDA)
+					parseZDA(strValues);
+					break;
+				case SMGPS:
+					parseSMGPS(strValues);
+					break;
+				case MLINK:
+					parseMLINK(strValues);
+					break;
+				case UNILOG:
+					parseUNILOG(strValues);
+					break;
+				case COMMENT:
+				case KOMMENTAR:
+					//$KOMMENTAR,Extra 300. Kuban Acht. Mit UniLog Daten.*
+					//$KOMMENTAR,Trojan. Ein paar liegende Figuren. Volle M-Link Bestückung.*
+					this.comment = strValues[1].trim();
+					this.comment = this.comment.endsWith(GDE.STRING_STAR) ? this.comment.substring(0, this.comment.length() - 1) : this.comment;
+
+					break;
+				case GPSETUP:
+					//not yet implemented, future
+					break;
+				case SETUP: // setup SM GPS-Logger firmware 1.00
+//							try {
+//								byte[] buffer = StringHelper.convert2ByteArray(strValues[1]);
+//								this.timeOffsetUTC = (short) ((buffer[7] << 8) + (buffer[6] & 0x00FF));
+//								this.timeOffsetUTC = this.timeOffsetUTC > 12 ? 12 : this.timeOffsetUTC < -12 ? -12 : this.timeOffsetUTC;
+//							}
+//							catch (Exception e) {
+//								log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+//							}
+					break;
+				}
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
+				//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+			}
+			catch (Exception e) {
+				if (e instanceof IllegalArgumentException && e.getMessage().contains("No enum")) { //$NON-NLS-1$
+					if (!missingImpleWarned.contains(strValues[0].substring(1))) {
+						log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + " - NMEA sentence = " + strValues[0].substring(1) + " actually not implementes!"); //$NON-NLS-1$ //$NON-NLS-2$
+						missingImpleWarned.add(strValues[0].substring(1));
+					}
+				}
+				else {
+					throw e;
+				}
+			}
 		}
 	}
 
@@ -188,7 +231,8 @@ public class NMEAParser {
 				int checkSum = Integer.parseInt(hexCheckSum, 16);
 				String subSentence = sentence.substring(1, sentence.indexOf(GDE.STRING_STAR));
 				isOK = checkSum == Checksum.XOR(subSentence.toCharArray());
-				if (!isOK) log.logp(Level.WARNING, $CLASS_NAME, "parse()", "line number " + this.lineNumber + " checkSum " + checkSum + " missmatch " + Checksum.XOR(subSentence.getBytes()) + " in " + subSentence); //$NON-NLS-1$ //$NON-NLS-2$
+				if (!isOK) 
+					log.logp(Level.WARNING, $CLASS_NAME, "parse()", String.format("line number %d : checkSum 0x%s missmatch 0x%X in %s!", this.lineNumber, hexCheckSum, Checksum.XOR(subSentence.getBytes()), subSentence)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		catch (Exception e) {
@@ -217,7 +261,7 @@ public class NMEAParser {
 	 * @param strValues
 	 */
 	void parseRMC(String[] strValues) {
-		if (strValues[2].equals("A")) { //$NON-NLS-1$
+		if (strValues[2].equals("A") || strValues[2].equals("V")) { //$NON-NLS-1$
 			if (this.date == null) {
 				String strValueDate = strValues[9].trim();
 				this.year = Integer.parseInt(strValueDate.substring(4));
@@ -238,7 +282,7 @@ public class NMEAParser {
 				this.date = calendar.getTime();
 				log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
 
-				int latitude, longitude, velocity;
+				int latitude, longitude, velocity, magneticVariation;
 				try {
 					latitude = Integer.parseInt(strValues[3].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
 				}
@@ -257,6 +301,12 @@ public class NMEAParser {
 				catch (Exception e) {
 					velocity = this.values[7];
 				}
+				try {
+					magneticVariation = strValues[10].trim().length() > 0 ? (int) (Double.parseDouble(strValues[10].trim()) * 1000.0) : this.values[10];
+				}
+				catch (Exception e) {
+					magneticVariation = this.values[10];
+				}
 
 				//GPS 
 				this.values[0] = latitude;
@@ -267,40 +317,13 @@ public class NMEAParser {
 				//this.values[5]  = HDOP (horizontal dilution of precision) 
 				//this.values[6]  = VDOP (vertical dilution of precision)
 				this.values[7] = velocity;
-				//SMGPS
+				
 				//this.values[8]  = altitudeRel;
 				//this.values[9]  = climb;
-				//this.values[10] = voltageRx;
+				this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
 				//this.values[11] = distanceTotal;
 				//this.values[12] = distanceStart;
 				//this.values[13] = directionStart;
-				//this.values[14] = glideRatio;
-				//Unilog
-				//this.values[15] = voltageUniLog;
-				//this.values[16] = currentUniLog;
-				//this.values[17] = powerUniLog;
-				//this.values[18] = revolutionUniLog;
-				//this.values[19] = voltageRxUniLog;
-				//this.values[20] = heightUniLog;
-				//this.values[21] = a1UniLog;
-				//this.values[22] = a2UniLog;
-				//this.values[23] = a3UniLog;
-				//M-LINK
-				//this.values[24] = add00;
-				//this.values[25] = add01;
-				//this.values[26] = add02;
-				//this.values[27] = add03;
-				//this.values[28] = add04;
-				//this.values[29] = add05;
-				//this.values[30] = add06;
-				//this.values[31] = add07;
-				//this.values[32] = add08;
-				//this.values[33] = add09;
-				//this.values[34] = add10;
-				//this.values[35] = add11;
-				//this.values[36] = add12;
-				//this.values[37] = add13;
-				//this.values[38] = add14;
 			}
 		}
 	}
@@ -381,40 +404,13 @@ public class NMEAParser {
 				//this.values[5]  = HDOP (horizontal dilution of precision) 
 				//this.values[6]  = VDOP (vertical dilution of precision)
 				//this.values[7]  = velocity;
-				//SMGPS
+
 				//this.values[8]  = altitudeRel;
 				//this.values[9]  = climb;
-				//this.values[10] = voltageRx;
+				//this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
 				//this.values[11] = distanceTotal;
 				//this.values[12] = distanceStart;
 				//this.values[13] = directionStart;
-				//this.values[14] = glideRatio;
-				//Unilog
-				//this.values[15] = voltageUniLog;
-				//this.values[16] = currentUniLog;
-				//this.values[17] = powerUniLog;
-				//this.values[18] = revolutionUniLog;
-				//this.values[19] = voltageRxUniLog;
-				//this.values[20] = heightUniLog;
-				//this.values[21] = a1UniLog;
-				//this.values[22] = a2UniLog;
-				//this.values[23] = a3UniLog;
-				//M-LINK
-				//this.values[24] = add00;
-				//this.values[25] = add01;
-				//this.values[26] = add02;
-				//this.values[27] = add03;
-				//this.values[28] = add04;
-				//this.values[29] = add05;
-				//this.values[30] = add06;
-				//this.values[31] = add07;
-				//this.values[32] = add08;
-				//this.values[33] = add09;
-				//this.values[34] = add10;
-				//this.values[35] = add11;
-				//this.values[36] = add12;
-				//this.values[37] = add13;
-				//this.values[38] = add14;
 			}
 		}
 	}
@@ -469,40 +465,92 @@ public class NMEAParser {
 			this.values[5] = HDOP; // (horizontal dilution of precision) 
 			this.values[6] = VDOP; // (vertical dilution of precision)
 			//this.values[7]  = velocity;
-			//SMGPS
+
 			//this.values[8]  = altitudeRel;
 			//this.values[9]  = climb;
-			//this.values[10] = voltageRx;
+			//this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
 			//this.values[11] = distanceTotal;
 			//this.values[12] = distanceStart;
 			//this.values[13] = directionStart;
-			//this.values[14] = glideRatio;
-			//Unilog
-			//this.values[15] = voltageUniLog;
-			//this.values[16] = currentUniLog;
-			//this.values[17] = powerUniLog;
-			//this.values[18] = revolutionUniLog;
-			//this.values[19] = voltageRxUniLog;
-			//this.values[20] = heightUniLog;
-			//this.values[21] = a1UniLog;
-			//this.values[22] = a2UniLog;
-			//this.values[23] = a3UniLog;
-			//M-LINK
-			//this.values[24] = add00;
-			//this.values[25] = add01;
-			//this.values[26] = add02;
-			//this.values[27] = add03;
-			//this.values[28] = add04;
-			//this.values[29] = add05;
-			//this.values[30] = add06;
-			//this.values[31] = add07;
-			//this.values[32] = add08;
-			//this.values[33] = add09;
-			//this.values[34] = add10;
-			//this.values[35] = add11;
-			//this.values[36] = add12;
-			//this.values[37] = add13;
-			//this.values[38] = add14;
+		}
+	}
+
+	/**
+	 * parse the GSV - Satellites in view
+	 * <ul>
+	 * $GPGSV,2,1,08,01,40,083,46,02,17,308,41,12,07,344,39,14,22,228,45*75
+	 * <li> GSV          Satellites in view
+	 * <li> 2            Number of sentences for full data
+	 * <li> 1            sentence 1 of 2
+	 * <li> 08           Number of satellites in view
+	 * <li> 01           Satellite PRN number
+	 * <li> 40           Elevation, degrees
+	 * <li> 083          Azimuth, degrees
+	 * <li> 46           SNR - higher is better   
+	 * <li> 			for up to 4 satellites per sentence
+	 * <li> *75      the checksum data, always begins with *
+	 * </ul>
+	 * @param strValues
+	 */
+	void parseGSV(String[] strValues) {
+		if (!(GDE.STRING_EMPTY+numGSVsentence).equals(strValues[1]) || (GDE.STRING_EMPTY+numGSVsentence).equals(strValues[2])) { 
+			int numSentence = 1;
+			int actualSentence = 0;
+			int actualNumSattelites = 0;
+			try {
+				numSentence = Integer.parseInt(strValues[1]);
+				actualSentence = Integer.parseInt(strValues[2]);
+				actualNumSattelites = Integer.parseInt(strValues[3]) * 1000;
+				if (numSentence >= numGSVsentence && actualSentence <= numGSVsentence && (numSattelites == 0 || numSattelites == actualNumSattelites)){ // in synch
+					numGSVsentence = actualSentence == numSentence ? 1 : numSentence; // reset after reading last sentence of set
+					numSattelites = actualNumSattelites;
+					this.values[3]  = actualNumSattelites;
+				}
+				else {
+					numGSVsentence = 1;
+					log.log(Level.WARNING, "GSV sentences out of sync, skip and reset!");
+					return;
+				}
+			}
+			catch (Exception e) {
+				//ignore and leave value unchanged
+			}
+			//passed sentence sync check
+			try {
+				for (int i = 0; i < 4 && (7 + 4*i) < strValues.length; i++) { //up to 4 satellites per sentence
+					int numSattelite = Integer.parseInt(strValues[4 + 4*i]);
+					int elevationDegrees = Integer.parseInt(strValues[5 + 4*i]);
+					int azimuthDegrees = Integer.parseInt(strValues[6 + 4*i]);
+					int signalNoiseRation;
+					if (strValues[7 + 4*i].contains(GDE.STRING_STAR)) {
+						String tmpValue = strValues[7 + 4*i].substring(0, strValues[7 + 4*i].indexOf(GDE.STRING_STAR));
+						signalNoiseRation = tmpValue.length() > 0 ? Integer.parseInt(tmpValue) : 0;
+					}
+					else 
+						signalNoiseRation = Integer.parseInt(strValues[7 + 4*i]);
+					log.log(Level.WARNING, "numSattelite = " + numSattelite + " elevation = " + elevationDegrees + " azimuth = " + azimuthDegrees + " signalNoiseRation = " + signalNoiseRation);
+				}
+			}
+			catch (Exception e) {
+				//ignore and leave value unchanged
+			}
+
+			//GPS 
+			//this.values[0]  = latitude;
+			//this.values[1]  = longitude;
+			//this.values[2]  = altitudeAbs;
+			//this.values[3]  = numSatelites;
+			//this.values[4] = PDOP; // (dilution of precision) 
+			//this.values[5] = HDOP; // (horizontal dilution of precision) 
+			//this.values[6] = VDOP; // (vertical dilution of precision)
+			//this.values[7]  = velocity;
+
+			//this.values[8]  = altitudeRel;
+			//this.values[9]  = climb;
+			//this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
+			//this.values[11] = distanceTotal;
+			//this.values[12] = distanceStart;
+			//this.values[13] = directionStart;
 		}
 	}
 
@@ -544,40 +592,167 @@ public class NMEAParser {
 			//this.values[5]  = HDOP (horizontal dilution of precision) 
 			//this.values[6]  = VDOP (vertical dilution of precision)
 			this.values[7] = velocity;
-			//SMGPS
+
 			//this.values[8]  = altitudeRel;
 			//this.values[9]  = climb;
-			//this.values[10] = voltageRx;
+			//this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
 			//this.values[11] = distanceTotal;
 			//this.values[12] = distanceStart;
 			//this.values[13] = directionStart;
-			//this.values[14] = glideRatio;
-			//Unilog
-			//this.values[15] = voltageUniLog;
-			//this.values[16] = currentUniLog;
-			//this.values[17] = powerUniLog;
-			//this.values[18] = revolutionUniLog;
-			//this.values[19] = voltageRxUniLog;
-			//this.values[20] = heightUniLog;
-			//this.values[21] = a1UniLog;
-			//this.values[22] = a2UniLog;
-			//this.values[23] = a3UniLog;
-			//M-LINK
-			//this.values[24] = add00;
-			//this.values[25] = add01;
-			//this.values[26] = add02;
-			//this.values[27] = add03;
-			//this.values[28] = add04;
-			//this.values[29] = add05;
-			//this.values[30] = add06;
-			//this.values[31] = add07;
-			//this.values[32] = add08;
-			//this.values[33] = add09;
-			//this.values[34] = add10;
-			//this.values[35] = add11;
-			//this.values[36] = add12;
-			//this.values[37] = add13;
-			//this.values[38] = add14;
+		}
+	}
+
+	/**
+	 	 * parse the GLL - Geographic Latitude and Longitude
+	 	 * <ul>
+	 	 * $GPGLL,4916.45,N,12311.12,W,225444,A,*1D
+	 	 * <li> GLL          Geographic position, Latitude and Longitude
+	 	 * <li> 4916.46,N    Latitude 49 deg. 16.45 min. North
+	 	 * <li> 12311.12,W   Longitude 123 deg. 11.12 min. West
+	 	 * <li> 225444       Fix taken at 22:54:44 UTC
+	 	 * <li> A            Data Active or V (void)
+	 	 * <li> *iD          checksum data
+	 	 * </ul>
+	 	 * @param strValues
+	 	 */
+	void parseGLL(String[] strValues) {
+		if (strValues[6].equals("A")) { //$NON-NLS-1$ //$NON-NLS-2$
+			if (this.date == null) {
+				Calendar calendar = new GregorianCalendar();
+				this.year = calendar.get(Calendar.YEAR);
+				this.month = calendar.get(Calendar.MONTH)+1;
+				this.day = calendar.get(Calendar.DATE);
+			}
+			String strValueTime = strValues[5].trim();
+			int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
+			int minute = Integer.parseInt(strValueTime.substring(2, 4));
+			int second = Integer.parseInt(strValueTime.substring(4, 6));
+			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
+
+			if (this.lastTimeStamp < timeStamp) {
+				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
+				this.lastTimeStamp = timeStamp;
+				this.date = calendar.getTime();
+				log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
+
+				int latitude, longitude;
+				try {
+					latitude = Integer.parseInt(strValues[1].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+				}
+				catch (Exception e) {
+					latitude = this.values[0];
+				}
+				try {
+					longitude = Integer.parseInt(strValues[3].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+				}
+				catch (Exception e) {
+					longitude = this.values[1];
+				}
+
+				//GPS 
+				this.values[0] = latitude;
+				this.values[1] = longitude;
+				//this.values[2]  = altitudeAbs;
+				//this.values[3]  = numSatelites;
+				//this.values[4] = PDOP; // (dilution of precision) 
+				//this.values[5] = HDOP; // (horizontal dilution of precision) 
+				//this.values[6] = VDOP; // (vertical dilution of precision)
+				//this.values[7]  = velocity;
+
+				//this.values[8]  = altitudeRel;
+				//this.values[9]  = climb;
+				//this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
+				//this.values[11] = distanceTotal;
+				//this.values[12] = distanceStart;
+				//this.values[13] = directionStart;
+			}
+		}
+	}
+
+	/**
+	 * parse ZDA - Data and Time
+	 * $GPZDA,hhmmss.ss,dd,mm,yyyy,xx,yy*CC
+	 * $GPZDA,201530.00,04,07,2002,00,00*60
+	 * <ul>
+	 * <li>         ZDA					Data and Time
+	 * <li>         hhmmss    	HrMinSec(UTC)
+	 * <li>         dd,mm,yyy 	Day,Month,Year
+	 * <li>         xx        	local zone hours -13..13
+	 * <li>         yy        	local zone minutes 0..59    	 								
+	 * <li>         *CC       	checksum
+	 * </ul>
+	 * @param strValues
+	 */
+	void parseZDA(String[] strValues) {
+		if (this.date == null) {
+			String strValueDate = strValues[9].trim();
+			this.year = Integer.parseInt(strValueDate.substring(4));
+			this.year = this.year > 50 ? this.year + 1900 : this.year + 2000;
+			this.month = Integer.parseInt(strValueDate.substring(2, 4));
+			this.day = Integer.parseInt(strValueDate.substring(0, 2));
+		}
+		String strValueTime = strValues[1].trim();
+		int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
+		int minute = Integer.parseInt(strValueTime.substring(2, 4));
+		int second = Integer.parseInt(strValueTime.substring(4, 6));
+		GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+		long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
+
+		if (this.lastTimeStamp < timeStamp) {
+			this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
+			this.lastTimeStamp = timeStamp;
+			this.date = calendar.getTime();
+			log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
+		}
+	}
+
+	/**
+	 * parse RMB - Recommended minimum navigation information
+	 * $GPZDA,hhmmss.ss,dd,mm,yyyy,xx,yy*CC
+	 * $GPRMB,A,0.66,L,003,004,4917.24,N,12309.57,W,001.3,052.5,000.5,V*20
+	 * <ul>
+	 * <li>         RMB          Recommended minimum navigation information
+	 * <li>         A            Data status A = OK, V = Void (warning)
+	 * <li>         0.66,L       Cross-track error (nautical miles, 9.99 max), steer Left to correct (or R = right)
+	 * <li>         003          Origin waypoint ID
+	 * <li>         004          Destination waypoint ID  	 	
+	 * <li>         4917.24,N    Destination waypoint latitude 49 deg. 17.24 min. N
+	 * <li>         12309.57,W   Destination waypoint longitude 123 deg. 09.57 min. W		
+	 * <li>         001.3        Range to destination, nautical miles (999.9 max)	    
+	 * <li>         052.5        True bearing to destination		
+	 * <li>         000.5        Velocity towards destination, knots	
+	 * <li>         V            Arrival alarm  A = arrived, V = not arrived	
+	 * <li>         *20          checksum
+	 * </ul>
+	 * @param strValues
+	 */
+	void parseRMB(String[] strValues) {
+		if (strValues[1].equals("A")) { //$NON-NLS-1$
+			int velocity;
+			try {
+				velocity = (int) (Double.parseDouble(strValues[12].trim()) * 1852.0);
+			}
+			catch (Exception e) {
+				velocity = this.values[7];
+			}
+
+			//GPS 
+			//this.values[0]  = latitude;
+			//this.values[1]  = longitude;
+			//this.values[2]  = altitudeAbs;
+			//this.values[3]  = numSatelites;
+			//this.values[4] = PDOP; // (dilution of precision) 
+			//this.values[5] = HDOP; // (horizontal dilution of precision) 
+			//this.values[6] = VDOP; // (vertical dilution of precision)
+			this.values[7]  = velocity;
+
+			//this.values[8]  = altitudeRel;
+			//this.values[9]  = climb;
+			//this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
+			//this.values[11] = distanceTotal;
+			//this.values[12] = distanceStart;
+			//this.values[13] = directionStart;
 		}
 	}
 

@@ -111,7 +111,7 @@ public class NMEAReaderWriter {
 				int dataBlockSize = device.getDataBlockSize(); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize != dataBlockSize) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new Object[] { filePath, measurementSize, dataBlockSize }));
-				NMEAParser data = new NMEAParser(device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize, device, activeChannel.getNumber());
+				NMEAParser data = new NMEAParser(device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize, device, activeChannel.getNumber(), (short) device.getUTCdelta());
 
 				File inputFile = new File(filePath);
 				long approximateLines = inputFile.length()/65; //average approximately 70 bytes per line
@@ -130,10 +130,13 @@ public class NMEAReaderWriter {
 
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$		
 				Vector<String> lines = new Vector<String>();
+				//skip SM GPS-Logger setup sentence
 				while ((line = reader.readLine()) == null || line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSETUP.name())
 						|| !line.startsWith(device.getDataBlockLeader())) {
 					if (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSETUP.name())) {
-						data.parse(new String[] { line }, lineNumber);
+						Vector<String> setupLine = new Vector<String>();
+						setupLine.add(line);
+						data.parse(setupLine, lineNumber);
 					}
 					else {
 						log.log(Level.WARNING, filePath + " line number " + lineNumber + " does not starts with " + device.getDataBlockLeader() + " !"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -142,6 +145,7 @@ public class NMEAReaderWriter {
 				}
 
 				String signature = line.substring(0, 6);
+				log.log(Level.FINE, "sync with signature: " + signature);
 
 				--lineNumber; // correct do to do-while
 				do {
@@ -169,7 +173,7 @@ public class NMEAReaderWriter {
 							log.log(Level.WARNING, filePath + " line number " + lineNumber + " line length to short or missing " + device.getDataBlockLeader() + " !"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						}
 					}
-					data.parse(lines.toArray(new String[1]), lineNumber);
+					data.parse(lines, lineNumber);
 					int progress = (int) (lineNumber*100/approximateLines);
 					if (NMEAReaderWriter.application.getStatusBar() != null && progress % 5 == 0) 	NMEAReaderWriter.application.setProgress(progress, sThreadId);
 					//start over with new line and signature

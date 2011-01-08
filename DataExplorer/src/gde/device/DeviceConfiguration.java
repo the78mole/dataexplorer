@@ -386,6 +386,21 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * @return UTC delta time in hours
+	 */
+	public short getUTCdelta() {
+		return this.timeBase.getUTCdelta();
+	}
+
+	/**
+	 * set new UTC delta time in hours
+	 */
+	public void setUTCdelta(int newUTCdelta) {
+		this.isChangePropery = true;
+		this.timeBase.setUTCdelta(newUTCdelta);
+	}
+
+	/**
 	 * @return the port configured for the device, if SerialPortType is not defined in device specific XML a empty string will returned
 	 */
 	public String getPort() {

@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="unit" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="timeStep" type="{http://www.w3.org/2001/XMLSchema}double"/>
  *         &lt;element name="avarage_timeStep" type="{http://www.w3.org/2001/XMLSchema}double" minOccurs="0"/>
+ *         &lt;element name="UTCdelta" type="{http://www.w3.org/2001/XMLSchema}integer" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -45,7 +46,8 @@ import javax.xml.bind.annotation.XmlType;
     "symbol", //$NON-NLS-1$
     "unit", //$NON-NLS-1$
     "timeStep", //$NON-NLS-1$
-    "avarageTimeStep"   //$NON-NLS-1$
+    "avarageTimeStep",   //$NON-NLS-1$
+    "utCdelta"  //$NON-NLS-1$
 })
 public class TimeBaseType {
 
@@ -58,6 +60,8 @@ public class TimeBaseType {
     protected double timeStep;
     @XmlElement(name = "avarage_timeStep")
     protected Double avarageTimeStep;
+    @XmlElement(name = "UTCdelta")
+    protected Integer utCdelta;
 
     /**
      * Gets the value of the name property.
@@ -171,5 +175,29 @@ public class TimeBaseType {
     public void setAvarageTimeStep(Double value) {
     	if (value % 1 == 0) this.avarageTimeStep = Double.parseDouble(String.format(Locale.ENGLISH, "%.0f", value)); //$NON-NLS-1$
     	else								this.avarageTimeStep = Double.parseDouble(String.format(Locale.ENGLISH, "%.1f", value)); //$NON-NLS-1$  
+    }
+
+    /**
+     * Gets the value of the utCdelta property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
+     */
+    public short getUTCdelta() {
+        return (short) (utCdelta != null ? utCdelta : 0);
+    }
+
+    /**
+     * Sets the value of the utCdelta property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link BigInteger }
+     *     
+     */
+    public void setUTCdelta(Integer value) {
+        this.utCdelta = value;
     }
 }

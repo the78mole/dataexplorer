@@ -445,8 +445,12 @@ public class MathUtils {
 		// check delta scale enable easy readable tick marks
 		double tmpDeltaScale = tmpMaxValue - tmpMinValue;
 		if (isAuto) {
-			if (tmpDeltaScale <= 0) {
+			if (tmpDeltaScale <= 0.000001) {
 				results = evaluateNumTicksAuto(tmpMinValue - 0.05, tmpMaxValue + 0.05, maxNumberTicks, 1000);
+			}
+			else if (tmpDeltaScale <= 0.00025) {
+				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 50000);
+				results[2] = new Integer(1);
 			}
 			else if (tmpDeltaScale <= 0.0025) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 50000);
@@ -498,8 +502,11 @@ public class MathUtils {
 			if (tmpDeltaScale <= 0) {
 				results = evaluateNumTicks(tmpMinValue - 0.05, tmpMaxValue + 0.05, maxNumberTicks, 1000);
 			}
+			else if (tmpDeltaScale <= 0.0025) {
+				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 50000);
+			}
 			else if (tmpDeltaScale <= 0.005) {
-				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 100000);
+				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 20000);
 			}
 			else if (tmpDeltaScale <= 0.010) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 10000);
@@ -541,7 +548,7 @@ public class MathUtils {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.01);
 			}
 		}
-		log.log(Level.FINER, minValue + " --> " + tmpMinValue + " " + maxValue + " --> " + tmpMaxValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$	
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, minValue + " --> " + tmpMinValue + " " + maxValue + " --> " + tmpMaxValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$	
 		return results;
 	}
 
