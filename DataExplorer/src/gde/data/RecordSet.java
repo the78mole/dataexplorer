@@ -1662,7 +1662,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void syncScaleOfSyncableRecords() {
 		this.scaleSyncedRecords	= new HashMap<Integer,Vector<Record>>(1);
-		for (int i = 0; i < this.size(); i++) {
+		for (int i = 0; i < this.size() && !this.isCompareSet; i++) {
 			PropertyType syncProperty = this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 			Record tmpRecord = this.get(i);
 			if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
