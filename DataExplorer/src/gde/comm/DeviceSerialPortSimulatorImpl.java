@@ -202,13 +202,26 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 						
 						//System.out.println(line);
 						if(line != null && line.contains("Read  data:")) {
+							boolean isQCdata = false;
 							line = line.substring(line.indexOf("Read  data:") + 12);
 							StringTokenizer token = new StringTokenizer(line);
 							StringBuffer sb = new StringBuffer();
 							while (token.hasMoreElements()) {
-								sb.append(token.nextElement());
+								String nextByte = token.nextToken();
+								if (nextByte.equals("02")) isQCdata = true;
+								sb.append(nextByte);
 							}
 							//System.out.println(sb.toString());
+							if (isQCdata) {
+								//sync with QC data
+								sb.delete(0, sb.indexOf("02"));
+								if (sb.length() > readBuffer.length*2) {
+									sb.delete(readBuffer.length*2, sb.length()-1);
+								}
+								else if (sb.length() < readBuffer.length*2) {
+									sb.append(StringHelper.convertHexInput(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
+								}
+							}
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
 						}
 						else { // WARNING, assume time out
@@ -270,13 +283,26 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 						
 						//System.out.println(line);
 						if(line != null && line.contains("Read  data:")) {
+							boolean isQCdata = false;
 							line = line.substring(line.indexOf("Read  data:") + 12);
 							StringTokenizer token = new StringTokenizer(line);
 							StringBuffer sb = new StringBuffer();
 							while (token.hasMoreElements()) {
-								sb.append(token.nextElement());
+								String nextByte = token.nextToken();
+								if (nextByte.equals("02")) isQCdata = true;
+								sb.append(nextByte);
 							}
 							//System.out.println(sb.toString());
+							if (isQCdata) {
+								//sync with QC data
+								sb.delete(0, sb.indexOf("02"));
+								if (sb.length() > readBuffer.length*2) {
+									sb.delete(readBuffer.length*2, sb.length()-1);
+								}
+								else if (sb.length() < readBuffer.length*2) {
+									sb.append(StringHelper.convertHexInput(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
+								}
+							}
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
 						}
 						else { // WARNING, assume time out
@@ -338,13 +364,26 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 						
 						//System.out.println(line);
 						if(line != null && line.contains("Read  data:")) {
+							boolean isQCdata = false;
 							line = line.substring(line.indexOf("Read  data:") + 12);
 							StringTokenizer token = new StringTokenizer(line);
 							StringBuffer sb = new StringBuffer();
 							while (token.hasMoreElements()) {
-								sb.append(token.nextElement());
+								String nextByte = token.nextToken();
+								if (nextByte.equals("02")) isQCdata = true;
+								sb.append(nextByte);
 							}
 							//System.out.println(sb.toString());
+							if (isQCdata) {
+								//sync with QC data
+								sb.delete(0, sb.indexOf("02"));
+								if (sb.length() > readBuffer.length*2) {
+									sb.delete(readBuffer.length*2, sb.length()-1);
+								}
+								else if (sb.length() < readBuffer.length*2) {
+									sb.append(StringHelper.convertHexInput(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
+								}
+							}
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
 						}
 						else { // WARNING, assume time out
