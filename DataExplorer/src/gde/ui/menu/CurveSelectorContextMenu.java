@@ -1040,7 +1040,7 @@ public class CurveSelectorContextMenu {
 								compareSet.setHorizontalGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalColor());
 								compareSet.setTimeGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalType());
 								compareSet.setTimeGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalColor());
-								compareSet.setHorizontalGridRecordOrdinal(compareSet.getRecord(newRecordkey).getOrdinal());
+								compareSet.setHorizontalGridRecordOrdinal(0); //compareSet.getRecord(newRecordkey).getOrdinal());
 							}
 							// check if the new added record exceeds the existing one in time or set draw limit and pad with dummy points
 							double maxRecordTime_ms = compareSet.getCompareSetMaxScaleTime_ms();
