@@ -166,6 +166,7 @@
 		<ant antfile="build.xml" target="clean" dir="WStechVario" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="QC-Copter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="GPS-Logger" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="NMEA-Adapter" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -262,6 +263,7 @@
 		<ant antfile="build.xml" target="package" dir="WStechVario" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="QC-Copter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="GPS-Logger" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="NMEA-Adapter" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -278,6 +280,7 @@
 			<include name="WStechVario/build/*.jar" />
 			<include name="QC-Copter/build/*.jar" />
 			<include name="GPS-Logger/build/*.jar" />
+			<include name="NMEA-Adapter/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
