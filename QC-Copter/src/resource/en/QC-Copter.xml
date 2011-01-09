@@ -5,7 +5,7 @@
         <manufacturer>tt-tronix</manufacturer>
         <manufacturerURL>http://www.qc-copter.de</manufacturerURL>
         <group>control-unit</group>
-        <image>QuadroControl.png</image>
+        <image>QC-Copter.png</image>
         <usage>false</usage>
     </Device>
     <SerialPort>
