@@ -18,6 +18,16 @@
 ****************************************************************************************/
 package gde.device.nmea;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceDialog;
+import gde.device.IDevice;
+import gde.messages.Messages;
+import gde.ui.SWTResourceManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -40,16 +50,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.device.DeviceDialog;
-import gde.device.IDevice;
-import gde.messages.Messages;
-import gde.ui.SWTResourceManager;
-
 /**
  * Dialog class to enable visualization control
  * @author Winfried Brügmann
@@ -58,7 +58,7 @@ public class NMEAAdapterDialog extends DeviceDialog {
 	final static Logger		log								= Logger.getLogger(NMEAAdapterDialog.class.getName());
 
 	CTabFolder						tabFolder;
-	Button								saveButton, closeButton;
+	Button								saveButton, closeButton, helpButton;
 	CLabel 								timeZoneOffsetUTCLabel, timeZoneOffsetUTCUnit;
 	CCombo								timeZoneOffsetUTCCombo;
 
@@ -207,10 +207,10 @@ public class NMEAAdapterDialog extends DeviceDialog {
 					{
 						this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData saveButtonLData = new FormData();
-						saveButtonLData.width = 120;
+						saveButtonLData.width = 115;
 						saveButtonLData.height = 30;
 						saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
-						saveButtonLData.left = new FormAttachment(0, 1000, 15);
+						saveButtonLData.left = new FormAttachment(0, 1000, 10);
 						this.saveButton.setLayoutData(saveButtonLData);
 						this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.saveButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0486));
@@ -225,11 +225,29 @@ public class NMEAAdapterDialog extends DeviceDialog {
 						});
 					}
 					{
+						this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+						FormData helpButtonLData = new FormData();
+						helpButtonLData.width = 40;
+						helpButtonLData.height = 30;
+						helpButtonLData.left = new FormAttachment(0, 1000, 132);
+						helpButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+						this.helpButton.setLayoutData(helpButtonLData);
+						this.helpButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.helpButton.setImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
+						this.helpButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								NMEAAdapterDialog.this.application.openHelpDialog("NMEA-Adapter", "HelpInfo.html");  //$NON-NLS-1$
+							}
+						});
+					}
+					{
 						this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData closeButtonLData = new FormData();
-						closeButtonLData.width = 120;
+						closeButtonLData.width = 115;
 						closeButtonLData.height = 30;
-						closeButtonLData.right = new FormAttachment(1000, 1000, -15);
+						closeButtonLData.right = new FormAttachment(1000, 1000, -10);
 						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
 						this.closeButton.setLayoutData(closeButtonLData);
 						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
