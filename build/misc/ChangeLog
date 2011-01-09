@@ -15,6 +15,7 @@ enable progress status indicator in task bar for supporting operating systems
 update SWT.jar for MAC to 3.7M3
 add NMEA Adapter plug-in
 fix errors in compare window
+sync plug-in name to configuration files
 
 Version 2.60 - 01 Dec 2010
 
