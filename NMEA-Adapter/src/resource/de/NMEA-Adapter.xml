@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
     <Device>
-        <name implementation="gde.device.nmea.NMEAAdapter">NMEAAdapter</name>
+        <name implementation="gde.device.nmea.NMEAAdapter">NMEA-Adapter</name>
         <manufacturer>diverse</manufacturer>
         <manufacturerURL>http://www.nmea.org</manufacturerURL>
         <group>logger</group>
-        <image>NMEAAdapter.png</image>
+        <image>NMEA-Adapter.png</image>
         <usage>false</usage>
     </Device>
     <TimeBase>
@@ -26,33 +26,33 @@
         <preferredFileExtention>*.nmea</preferredFileExtention>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="track record"/>
+        <property description="" type="Integer" value="01" name="Wegaufzeichnung"/>
     </State>
     <Channels>
-	    <Channel type="TYPE_CONFIG" name="Configuration">
+	    <Channel type="TYPE_CONFIG" name="Konfiguration">
 	        <Measurement>
-	            <name>Latitude</name>
-                <symbol>Phi</symbol>
+	            <name>Breitengrad</name>
+	            <symbol>Phi</symbol>
 	            <unit>°</unit>
                 <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Longitude</name>
-                <symbol>Lambda</symbol>
+	            <name>Längengrad</name>
+	            <symbol>Lambda</symbol>
 	            <unit>°</unit>
                 <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Altitude</name>
+                <name>Höhe</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Satellite</name>
+	            <name>Satellit</name>
 	            <symbol></symbol>
 	            <unit>#</unit>
                 <active>true</active>
@@ -80,7 +80,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Velocity</name>
+	            <name>Geschwindigkeit</name>
 	            <symbol>v</symbol>
 	            <unit>km/h</unit>
 	            <active>true</active>
@@ -90,50 +90,50 @@
 	            <property type="String" value="0,255,0" name="google_earth_lower_limit_color"/>
 	            <property type="String" value="255,0,128" name="google_earth_upper_limit_color"/>
 	        </Measurement>
-            <Measurement>
-                <name>Magnetic Variation</name>
+	        <Measurement>
+                <name>Magnetische Variation</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
-	        <Measurement>
-	            <name>Altitude (relative)</name>
+            <Measurement>
+	            <name>Höhe (relativ)</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Scale synchronization  measurement reference ordinal" type="Integer" value="2" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="2" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Climb</name>
+	            <name>Steigen</name>
 	            <symbol>vs</symbol>
 	            <unit>m/s</unit>
-	            <statistics sigma="false" avg="true" max="true" min="true"/>
-	        </Measurement>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
             <Measurement>
-                <name>TripLength</name>
+                <name>Strecke</name>
                 <symbol>l</symbol>
                 <unit>km</unit>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Distance</name>
+                <name>Abstand</name>
                 <symbol>d</symbol>
                 <unit>m</unit>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Azimuth</name>
+                <name>Kurswinkel</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-	        </Measurement>
+            </Measurement>
             <Measurement>
-                <name>Direction</name>
+                <name>Richtung</name>
                 <symbol></symbol>
                 <unit>°</unit>
-	            <statistics sigma="false" avg="true" max="true" min="true"/>
-	        </Measurement>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
 	    </Channel>
 	</Channels>
     <Desktop>
