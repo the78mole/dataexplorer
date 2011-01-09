@@ -159,7 +159,7 @@ public class GathererThread extends Thread {
 					if (measurementCount++ == 0) {
 						startCycleTime = tmpCycleTime;
 					}
-					else if (measurementCount == 10) {
+					else if (measurementCount % 10 == 0) {
 						this.device.updateVisibilityStatus(recordSet, true);
 					}
 					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
