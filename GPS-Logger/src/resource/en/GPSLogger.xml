@@ -44,7 +44,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Height (GPS)</name>
+	            <name>Altitude</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
@@ -53,7 +53,7 @@
 	        <Measurement>
 	            <name>Satellite</name>
 	            <symbol></symbol>
-	            <unit>#</unit>
+	            <unit>Count</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -61,21 +61,21 @@
 	            <name>PDOP</name>
 	            <symbol></symbol>
 	            <unit></unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>HDOP</name>
 	            <symbol></symbol>
 	            <unit></unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>VDOP</name>
 	            <symbol></symbol>
 	            <unit></unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
@@ -90,7 +90,7 @@
 	            <property type="String" value="255,0,128" name="google_earth_upper_limit_color"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Hight (relative)</name>
+	            <name>Altitude (relative)</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
@@ -133,7 +133,7 @@
 	        </Measurement>
 	        <Measurement>
 	            <name>Glide Ratio</name>
-	            <symbol>g</symbol>
+	            <symbol></symbol>
 	            <unit>m/1</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -168,7 +168,7 @@
 	            <symbol>rpm</symbol>
 	            <unit>rpm</unit>
 	            <active>true</active>
-	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="17" sigma="true" avg="true" max="true" min="false"/>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
 	            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
 	            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
 	            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
@@ -182,7 +182,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Height (relativ)_UL</name>
+	            <name>Altitude (relative)_UL</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
@@ -193,7 +193,7 @@
 	            <name>Velocity_UL</name>
 	            <symbol>v</symbol>
 	            <unit>m</unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="true"/>
 	            <property description="Offset to a measurement value" type="Double" value="0.0" name="offset"/>
 	            <property description="Factor to a measurement value" type="Double" value="1.0" name="factor"/>
@@ -203,7 +203,7 @@
 	            <symbol>c</symbol>
 	            <unit>mAh</unit>
 	            <active>true</active>
-	            <statistics sigma="false" avg="true" max="true" min="true"/>
+	            <statistics triggerRefOrdinal="16" sigma="false" avg="true" max="true" min="true"/>
 	            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
 	            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
 	        </Measurement>
@@ -227,14 +227,14 @@
 	            <name>Reception_ML</name>
 	            <symbol>LQI</symbol>
 	            <unit>%</unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Empty_ML</name>
 	            <symbol>x</symbol>
 	            <unit>-</unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
@@ -266,7 +266,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Height(relative)_ML</name>
+	            <name>Altitude (relative)_ML</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
@@ -315,7 +315,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Height (relative) 2_ML</name>
+	            <name>Altitude (relative) 2_ML</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>

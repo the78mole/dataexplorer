@@ -44,16 +44,16 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Höhe (GPS)</name>
+                <name>Höhe</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Satellit</name>
+                <name>Satelliten</name>
 	            <symbol></symbol>
-	            <unit>#</unit>
+                <unit>Stck</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -61,21 +61,21 @@
 	            <name>PDOP</name>
 	            <symbol></symbol>
 	            <unit></unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>HDOP</name>
 	            <symbol></symbol>
 	            <unit></unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>VDOP</name>
 	            <symbol></symbol>
 	            <unit></unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
@@ -168,7 +168,7 @@
 	            <symbol>rpm</symbol>
 	            <unit>rpm</unit>
 	            <active>true</active>
-	            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="17" sigma="true" avg="true" max="true" min="false"/>
+	            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
 	            <property description="(LogView Konformität)" type="Double" value="0.0" name="offset"/>
 	            <property description="(LogView Konformität)" type="Double" value="1.0" name="factor"/>
 	            <property description="Anzahl Motore ? (LogView Konformität)" type="Integer" value="1" name="number_motor"/>
@@ -193,7 +193,7 @@
 	            <name>Geschwindigkeit_UL</name>
 	            <symbol>v</symbol>
 	            <unit>m</unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="true"/>
 	            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
 	            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
@@ -227,14 +227,14 @@
 	            <name>Empfang_ML</name>
 	            <symbol>LQI</symbol>
 	            <unit>%</unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>nichts_ML</name>
 	            <symbol>x</symbol>
 	            <unit>-</unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
