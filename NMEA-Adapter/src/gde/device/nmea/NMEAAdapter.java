@@ -27,9 +27,7 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
-import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
-import gde.device.PropertyType;
 import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
 import gde.io.NMEAParser;
@@ -163,8 +161,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 				setDataLineStartAndLength(dataBuffer, startLength);
 				lineBuffer = new byte[startLength[1]];
 				System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-				//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+				//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 
 				recordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms());
 
@@ -254,8 +252,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 			log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 
-			//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-			//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
+			//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+			//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 			for (int j = 0; j < 8; j++) {
 				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8) + ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
 			}
@@ -308,27 +306,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
-		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-		//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
-		if (record.getOrdinal() == 8) { 
-			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
-			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
-			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-
-			try {
-				if (subtractFirst) {
-					reduction = record.getFirst() / 1000.0;
-				}
-				else if (subtractLast) {
-					reduction = record.getLast() / 1000.0;
-				}
-			}
-			catch (Throwable e) {
-				reduction = 0;
-			}
-		}
-
+		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 		double newValue = 0;
 		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
 			int tValue = (int)(value * 1000);
@@ -354,27 +333,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
-		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-		//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
-		if (record.getOrdinal() == 8) { 
-			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
-			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
-			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-
-			try {
-				if (subtractFirst) {
-					reduction = record.getFirst() / 1000.0;
-				}
-				else if (subtractLast) {
-					reduction = record.getLast() / 1000.0;
-				}
-			}
-			catch (Throwable e) {
-				reduction = 0;
-			}
-		}
-
+		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 		double newValue = 0;
 		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
 			int grad = (int) value;
@@ -403,8 +363,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		boolean configChanged = this.isChangePropery();
 		Record record;
 		MeasurementType measurement;
-		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-		//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
+		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
 		String[] recordNames = recordSet.getRecordNames();
 		// check if measurements isActive == false and set to isDisplayable == false
@@ -444,9 +404,9 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-		//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
-		GPSHelper.calculateValues(this, recordSet, 0, 1, 2, 8, 9, 11, 12, 13);
+		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
+		GPSHelper.calculateValues(this, recordSet, 0, 1, 2, 9, 10, 11, 12, 13, 14);
 		
 		this.application.updateStatisticsData(true);	
 		this.updateVisibilityStatus(recordSet, true);
@@ -572,8 +532,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
 	 */
 	public void export2KML3D(int type) {
-		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-		//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
+		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 		new FileHandler().exportFileKML(Messages.getString(MessageIds.GDE_MSGT2103), 1, 0, 2, 7, type == DeviceConfiguration.HEIGHT_RELATIVE);
 	}
 
@@ -582,9 +542,9 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
 	 */
 	public void export2GPX(int type) {
-		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-		//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
-		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT2104), 1, 0, 2, 7, 8, type == DeviceConfiguration.HEIGHT_RELATIVE);
+		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
+		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT2104), 1, 0, 2, 7, 9, type == DeviceConfiguration.HEIGHT_RELATIVE);
 	}
 
 	/**
@@ -598,8 +558,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-				//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+				//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 				containsGPSdata = activeRecordSet.get(0).hasReasonableData() && activeRecordSet.get(1).hasReasonableData();
 			}
 		}
@@ -628,8 +588,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public Integer getGPS2KMLMeasurementOrdinal() {
-		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-		//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
+		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 		return 7;
 	}
 }

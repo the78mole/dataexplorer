@@ -16,7 +16,7 @@
         <UTCdelta>0</UTCdelta>
     </TimeBase>
     <DataBlock>
-        <format size="14" type="TEXT"/>
+        <format size="9" type="TEXT"/>
         <checkSum type="XOR"/>
         <timeUnit>msec</timeUnit>
         <separator>comma</separator>
@@ -62,21 +62,21 @@
 	            <name>PDOP</name>
 	            <symbol></symbol>
 	            <unit></unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>HDOP</name>
 	            <symbol></symbol>
 	            <unit></unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>VDOP</name>
 	            <symbol></symbol>
 	            <unit></unit>
-	            <active>false</active>
+                <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
@@ -91,18 +91,6 @@
 	            <property type="String" value="255,0,128" name="google_earth_upper_limit_color"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Höhe (relativ)</name>
-	            <symbol>h</symbol>
-	            <unit>m</unit>
-	            <statistics sigma="false" avg="true" max="true" min="true"/>
-	        </Measurement>
-	        <Measurement>
-	            <name>Steigen</name>
-	            <symbol>vs</symbol>
-	            <unit>m/s</unit>
-	            <statistics sigma="false" avg="true" max="true" min="true"/>
-	        </Measurement>
-            <Measurement>
                 <name>Magnetische Variation</name>
                 <symbol></symbol>
                 <unit>°</unit>
@@ -110,10 +98,23 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
+	            <name>Höhe (relativ)</name>
+	            <symbol>h</symbol>
+	            <unit>m</unit>
+	            <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="2" name="scale_sync_ref_ordinal"/>
+	        </Measurement>
+	        <Measurement>
+	            <name>Steigen</name>
+	            <symbol>vs</symbol>
+	            <unit>m/s</unit>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
                 <name>Strecke</name>
                 <symbol>l</symbol>
                 <unit>km</unit>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Abstand</name>
@@ -123,7 +124,13 @@
             </Measurement>
             <Measurement>
                 <name>Kurswinkel</name>
-                <symbol>Omega</symbol>
+                <symbol></symbol>
+                <unit>°</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Richtung</name>
+                <symbol></symbol>
                 <unit>°</unit>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
