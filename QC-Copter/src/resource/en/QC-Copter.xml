@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
     <Device>
-        <name implementation="gde.device.tttronix.QcCopter">QuadroControl</name>
+        <name implementation="gde.device.tttronix.QcCopter">QC-Copter</name>
         <manufacturer>tt-tronix</manufacturer>
         <manufacturerURL>http://www.qc-copter.de</manufacturerURL>
         <group>control-unit</group>
@@ -29,10 +29,10 @@
         <checkSum type="ADD" format="BINARY"/>
     </DataBlock>
     <State>
-        <property type="Integer" value="1" name="Flugaufnahme"/>
+        <property type="Integer" value="1" name="flight record"/>
     </State>
     <Channels>
-	    <Channel type="TYPE_CONFIG" name="Konfig 1">
+	    <Channel type="TYPE_CONFIG" name="config">
 	        <Measurement>
 	            <name>Roll Integral</name>
 	            <symbol>R</symbol>
@@ -41,7 +41,7 @@
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Roll Winkel</name>
+	            <name>Roll Angle</name>
 	            <symbol>R</symbol>
 	            <unit>°</unit>
 	            <active>true</active>
@@ -56,7 +56,7 @@
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Nick Winkel</name>
+	            <name>Nick Angle</name>
 	            <symbol>N</symbol>
 	            <unit>°</unit>
 	            <active>true</active>
@@ -79,7 +79,7 @@
 	            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Gyro Gier</name>
+	            <name>Gyro Yaw</name>
 	            <symbol>G</symbol>
 	            <unit>i</unit>
 	            <active>true</active>
@@ -110,7 +110,7 @@
 	            <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Akkuspannung</name>
+	            <name>Battery-Voltage</name>
 	            <symbol>U</symbol>
 	            <unit>V</unit>
 	            <active>true</active>
@@ -149,42 +149,42 @@
 	            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>User-Daten 0</name>
+	            <name>User-Data 0</name>
 	            <symbol>Du</symbol>
 	            <unit>x</unit>
 	            <active>false</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>User-Daten 1</name>
+	            <name>User-Data 1</name>
 	            <symbol>Du</symbol>
 	            <unit>x</unit>
 	            <active>false</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>User-Daten 2</name>
+	            <name>User-Data 2</name>
 	            <symbol>Du</symbol>
 	            <unit>x</unit>
 	            <active>false</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>User-Daten 3</name>
+	            <name>User-Data 3</name>
 	            <symbol>Du</symbol>
 	            <unit>x</unit>
 	            <active>false</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>User-Daten 4</name>
+	            <name>User-Data 4</name>
 	            <symbol>Du</symbol>
 	            <unit>x</unit>
 	            <active>false</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>User-Daten 5</name>
+	            <name>User-Data 5</name>
 	            <symbol>Du</symbol>
 	            <unit>x</unit>
 	            <active>false</active>
