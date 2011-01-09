@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
     <Device>
-        <name implementation="GPSLogger">GPSLogger</name>
+        <name implementation="GPSLogger">GPS-Logger</name>
         <manufacturer>SM-Modellbau</manufacturer>
         <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
@@ -25,35 +25,35 @@
         <preferredFileExtention>*.nmea</preferredFileExtention>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="Flugaufzeichnung"/>
+        <property description="" type="Integer" value="01" name="flight record"/>
     </State>
     <Channels>
-	    <Channel type="TYPE_CONFIG" name="Konfiguration">
+	    <Channel type="TYPE_CONFIG" name="Configuration">
 	        <Measurement>
-	            <name>Breitengrad</name>
+	            <name>Latitude</name>
 	            <symbol>B</symbol>
 	            <unit>°</unit>
 	            <active>false</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Längengrad</name>
+	            <name>Longitude</name>
 	            <symbol>L</symbol>
 	            <unit>°</unit>
 	            <active>false</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-                <name>Höhe</name>
+	            <name>Altitude</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-                <name>Satelliten</name>
+	            <name>Satellite</name>
 	            <symbol></symbol>
-                <unit>Stck</unit>
+	            <unit>Count</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -79,7 +79,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Geschwindigkeit</name>
+	            <name>Velocity</name>
 	            <symbol>v</symbol>
 	            <unit>km/h</unit>
 	            <active>true</active>
@@ -90,116 +90,116 @@
 	            <property type="String" value="255,0,128" name="google_earth_upper_limit_color"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Höhe (relativ)</name>
+	            <name>Altitude (relative)</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Steigen</name>
+	            <name>Climb</name>
 	            <symbol>vs</symbol>
 	            <unit>m/s</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>SpannungRx</name>
+	            <name>VoltageRx</name>
 	            <symbol>Urx</symbol>
 	            <unit>V</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Strecke</name>
+	            <name>TripLength</name>
 	            <symbol>l</symbol>
 	            <unit>km</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Abstand</name>
+	            <name>Distance</name>
 	            <symbol>d</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Richtung</name>
+	            <name>Direction</name>
 	            <symbol>w</symbol>
 	            <unit>°</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Gleitzahl</name>
+	            <name>Glide Ratio</name>
 	            <symbol></symbol>
 	            <unit>m/1</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Spannung_UL</name>
+	            <name>Voltage_UL</name>
 	            <symbol>U</symbol>
 	            <unit>V</unit>
 	            <active>true</active>
-	            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="16" sigma="false" avg="true" max="true" min="true"/>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Strom_UL</name>
+	            <name>Current_UL</name>
 	            <symbol>I</symbol>
 	            <unit>A</unit>
 	            <active>true</active>
-	            <statistics sumTriggerTimeText="Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="false">
-	                <trigger comment="Trigger: Strom &gt; 3 A + &gt; 5 sek." minTimeSec="5" isGreater="true" level="3000"/>
+	            <statistics sumTriggerTimeText="Motor run time" countTriggerText="Number of climb flights" countByTrigger="true" sigma="false" avg="true" max="true" min="false">
+	                <trigger comment="Trigger: current &gt; 3 A + &gt; 5 sec." minTimeSec="5" isGreater="true" level="3000"/>
 	            </statistics>
-	            <property description="Bei falsch gekauften Stromsensoren (Stecker) kann es vorkommen, das ein negativer Strom gemessen wird" type="Boolean" value="false" name="is_invert_current"/>
-	            <property description="Durch BEC Betrieb oder ungenaue Kalibrierung kann ein geringen Stromoffset auftreten" type="Double" value="0.0" name="offset"/>
+	            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
+	            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Leistung_UL</name>
+	            <name>Power_UL</name>
 	            <symbol>P</symbol>
 	            <unit>W</unit>
 	            <active>true</active>
-	            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Drehzahl_UL</name>
+	            <name>Revolution_UL</name>
 	            <symbol>rpm</symbol>
 	            <unit>rpm</unit>
 	            <active>true</active>
-	            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
-	            <property description="(LogView Konformität)" type="Double" value="0.0" name="offset"/>
-	            <property description="(LogView Konformität)" type="Double" value="1.0" name="factor"/>
-	            <property description="Anzahl Motore ? (LogView Konformität)" type="Integer" value="1" name="number_motor"/>
-	            <property description="Drehzahlfaktor ? (LogView Konformität)" type="Double" value="1.0" name="revolution_factor"/>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
+	            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
+	            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
+	            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
+	            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>SpannungRx_UL</name>
+	            <name>VoltageRx_UL</name>
 	            <symbol>Urx</symbol>
 	            <unit>V</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Höhe (relativ)_UL</name>
+	            <name>Altitude (relative)_UL</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
-	            <statistics sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="16" triggerRefOrdinal="16" sigma="false" avg="false" max="true" min="true"/>
-	            <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+	            <statistics sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="16" triggerRefOrdinal="16" sigma="false" avg="false" max="true" min="true"/>
+	            <property description="Scalesynchronisatios reference as ordinal value" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Geschwindigkeit_UL</name>
+	            <name>Velocity_UL</name>
 	            <symbol>v</symbol>
 	            <unit>m</unit>
                 <active>true</active>
-	            <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="true"/>
-	            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
-	            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="true"/>
+	            <property description="Offset to a measurement value" type="Double" value="0.0" name="offset"/>
+	            <property description="Factor to a measurement value" type="Double" value="1.0" name="factor"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Kapazität_UL</name>
+	            <name>Capacity_UL</name>
 	            <symbol>c</symbol>
 	            <unit>mAh</unit>
 	            <active>true</active>
@@ -208,7 +208,7 @@
 	            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Temperatur_UL</name>
+	            <name>Temperature_UL</name>
 	            <symbol>t</symbol>
 	            <unit>°C</unit>
 	            <active>true</active>
@@ -217,105 +217,105 @@
 	            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>SpannungRx_ML</name>
+	            <name>VoltageRx_ML</name>
 	            <symbol>Urx</symbol>
 	            <unit>V</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Empfang_ML</name>
+	            <name>Reception_ML</name>
 	            <symbol>LQI</symbol>
 	            <unit>%</unit>
                 <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>nichts_ML</name>
+	            <name>Empty_ML</name>
 	            <symbol>x</symbol>
 	            <unit>-</unit>
                 <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Steigen_ML</name>
+	            <name>Climb_ML</name>
 	            <symbol>Vs</symbol>
 	            <unit>m/s</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Temperatur_ML</name>
+	            <name>Temperature_ML</name>
 	            <symbol>T</symbol>
 	            <unit>°C</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Geschwindigkeit_ML</name>
+	            <name>Velocity_ML</name>
 	            <symbol>v</symbol>
 	            <unit>km/h</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Richtung_ML</name>
+	            <name>Direction_ML</name>
 	            <symbol>w</symbol>
 	            <unit>°</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Höhe (relativ)_ML</name>
+	            <name>Altitude (relative)_ML</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>AbstandStart_ML</name>
+	            <name>Distance_ML</name>
 	            <symbol>d</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Strecke_ML</name>
+	            <name>TripLength_ML</name>
 	            <symbol>l</symbol>
 	            <unit>km</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Strom_ML</name>
+	            <name>Current_ML</name>
 	            <symbol>I</symbol>
 	            <unit>A</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Spannung_ML</name>
+	            <name>Voltage_ML</name>
 	            <symbol>V</symbol>
 	            <unit>V</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Drehzahl_ML</name>
+	            <name>Revolution_ML</name>
 	            <symbol>r</symbol>
 	            <unit>rpm</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Kapazität_ML</name>
+	            <name>Capacity_ML</name>
 	            <symbol>C</symbol>
 	            <unit>mAh</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Höhe (relativ) 2_ML</name>
+	            <name>Altitude (relative) 2_ML</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
