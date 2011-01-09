@@ -135,7 +135,7 @@ public class ApplicationLauncher {
 			public void run() {
 				try {
 					Process process = new ProcessBuilder(arguments).start(); //$NON-NLS-1$ //$NON-NLS-2$
-					process.waitFor();
+					//process.waitFor();
 					BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 					String line;

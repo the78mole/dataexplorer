@@ -168,13 +168,13 @@ public class NMEAParser {
 					parseZDA(strValues);
 					break;
 				case SMGPS:
-					parseSMGPS(strValues);
-					break;
-				case MLINK:
-					parseMLINK(strValues);
+					if (this.values.length >=15) parseSMGPS(strValues);
 					break;
 				case UNILOG:
-					parseUNILOG(strValues);
+					if (this.values.length >=24) parseUNILOG(strValues);
+					break;
+				case MLINK:
+					if (this.values.length >=39) parseMLINK(strValues);
 					break;
 				case COMMENT:
 				case KOMMENTAR:
@@ -305,7 +305,7 @@ public class NMEAParser {
 					magneticVariation = strValues[10].trim().length() > 0 ? (int) (Double.parseDouble(strValues[10].trim()) * 1000.0) : this.values[10];
 				}
 				catch (Exception e) {
-					magneticVariation = this.values[10];
+					magneticVariation = this.values[8];
 				}
 
 				//GPS 
@@ -317,13 +317,7 @@ public class NMEAParser {
 				//this.values[5]  = HDOP (horizontal dilution of precision) 
 				//this.values[6]  = VDOP (vertical dilution of precision)
 				this.values[7] = velocity;
-				
-				//this.values[8]  = altitudeRel;
-				//this.values[9]  = climb;
-				this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
-				//this.values[11] = distanceTotal;
-				//this.values[12] = distanceStart;
-				//this.values[13] = directionStart;
+				this.values[8] = magneticVariation; // SM GPS-Logger -> altitudeRel;
 			}
 		}
 	}
@@ -404,13 +398,7 @@ public class NMEAParser {
 				//this.values[5]  = HDOP (horizontal dilution of precision) 
 				//this.values[6]  = VDOP (vertical dilution of precision)
 				//this.values[7]  = velocity;
-
-				//this.values[8]  = altitudeRel;
-				//this.values[9]  = climb;
-				//this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
-				//this.values[11] = distanceTotal;
-				//this.values[12] = distanceStart;
-				//this.values[13] = directionStart;
+				//this.values[8]  = magneticVariation; // SM GPS-Logger -> altitudeRel;
 			}
 		}
 	}
@@ -465,13 +453,7 @@ public class NMEAParser {
 			this.values[5] = HDOP; // (horizontal dilution of precision) 
 			this.values[6] = VDOP; // (vertical dilution of precision)
 			//this.values[7]  = velocity;
-
-			//this.values[8]  = altitudeRel;
-			//this.values[9]  = climb;
-			//this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
-			//this.values[11] = distanceTotal;
-			//this.values[12] = distanceStart;
-			//this.values[13] = directionStart;
+			//this.values[8]  = magneticVariation; // SM GPS-Logger -> altitudeRel;
 		}
 	}
 
@@ -592,13 +574,7 @@ public class NMEAParser {
 			//this.values[5]  = HDOP (horizontal dilution of precision) 
 			//this.values[6]  = VDOP (vertical dilution of precision)
 			this.values[7] = velocity;
-
-			//this.values[8]  = altitudeRel;
-			//this.values[9]  = climb;
-			//this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
-			//this.values[11] = distanceTotal;
-			//this.values[12] = distanceStart;
-			//this.values[13] = directionStart;
+			//this.values[8]  = magneticVariation; // SM GPS-Logger -> altitudeRel;
 		}
 	}
 
@@ -659,13 +635,7 @@ public class NMEAParser {
 				//this.values[5] = HDOP; // (horizontal dilution of precision) 
 				//this.values[6] = VDOP; // (vertical dilution of precision)
 				//this.values[7]  = velocity;
-
-				//this.values[8]  = altitudeRel;
-				//this.values[9]  = climb;
-				//this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
-				//this.values[11] = distanceTotal;
-				//this.values[12] = distanceStart;
-				//this.values[13] = directionStart;
+				//this.values[8]  = magneticVariation; // SM GPS-Logger -> altitudeRel;
 			}
 		}
 	}
@@ -746,13 +716,7 @@ public class NMEAParser {
 			//this.values[5] = HDOP; // (horizontal dilution of precision) 
 			//this.values[6] = VDOP; // (vertical dilution of precision)
 			this.values[7]  = velocity;
-
-			//this.values[8]  = altitudeRel;
-			//this.values[9]  = climb;
-			//this.values[10] = magneticVariation; // SM GPS-Logger -> voltageRx;
-			//this.values[11] = distanceTotal;
-			//this.values[12] = distanceStart;
-			//this.values[13] = directionStart;
+			//this.values[8]  = magneticVariation; // SM GPS-Logger -> altitudeRel;
 		}
 	}
 
@@ -808,32 +772,6 @@ public class NMEAParser {
 		//this.values[12] = distanceStart;
 		//this.values[13] = directionStart;
 		//this.values[14] = glideRatio;
-		//Unilog
-		//this.values[15] = voltageUniLog;
-		//this.values[16] = currentUniLog;
-		//this.values[17] = powerUniLog;
-		//this.values[18] = revolutionUniLog;
-		//this.values[19] = voltageRxUniLog;
-		//this.values[20] = heightUniLog;
-		//this.values[21] = a1UniLog;
-		//this.values[22] = a2UniLog;
-		//this.values[23] = a3UniLog;
-		//M-LINK
-		//this.values[24] = add00;
-		//this.values[25] = add01;
-		//this.values[26] = add02;
-		//this.values[27] = add03;
-		//this.values[28] = add04;
-		//this.values[29] = add05;
-		//this.values[30] = add06;
-		//this.values[31] = add07;
-		//this.values[32] = add08;
-		//this.values[33] = add09;
-		//this.values[34] = add10;
-		//this.values[35] = add11;
-		//this.values[36] = add12;
-		//this.values[37] = add13;
-		//this.values[38] = add14;
 	}
 
 	/**
@@ -891,22 +829,6 @@ public class NMEAParser {
 		//this.values[21] = a1UniLog;
 		//this.values[22] = a2UniLog;
 		//this.values[23] = a3UniLog;
-		//M-LINK
-		//this.values[24] = add00;
-		//this.values[25] = add01;
-		//this.values[26] = add02;
-		//this.values[27] = add03;
-		//this.values[28] = add04;
-		//this.values[29] = add05;
-		//this.values[30] = add06;
-		//this.values[31] = add07;
-		//this.values[32] = add08;
-		//this.values[33] = add09;
-		//this.values[34] = add10;
-		//this.values[35] = add11;
-		//this.values[36] = add12;
-		//this.values[37] = add13;
-		//this.values[38] = add14;
 	}
 
 	/**
@@ -929,7 +851,6 @@ public class NMEAParser {
 				// ignore and leave value unchanged
 			}
 		}
-		// needs correlation with M-LINK configuration
 		//GPS 
 		//this.values[0]  = latitude;
 		//this.values[1]  = longitude;

@@ -45,9 +45,10 @@ public class GPSHelper {
 	 * @param recordOrdinalTripLength - output, depends on input latitude, longitude and altitude
 	 * @param recordOrdinalDistance - output, depends on input latitude, longitude and altitude
 	 * @param recordOrdinalAzimuth - output, depends on input latitude, longitude (will be smoothed to make somehow interpretable)
+	 * @param recordOrdinalDirectionStart - output, depends on input latitude, longitude 
 	 */
 	public static void calculateValues(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude, int recordOrdinalAltutude, int recordOrdinalAltitudeRelative,
-			int recordOrdinalClimb, int recordOrdinalTripLength, int recordOrdinalDistance, int recordOrdinalAzimuth) {
+			int recordOrdinalClimb, int recordOrdinalTripLength, int recordOrdinalDistance, int recordOrdinalAzimuth, int recordOrdinalDirectionStart) {
 		final double rad = Math.PI / 180;
 		double lastTripLength = 0;
 		int startAltitude = 0;
@@ -66,37 +67,64 @@ public class GPSHelper {
 				Record recordTripLength = recordSet.get(recordOrdinalTripLength);
 				Record recordDistance = recordSet.get(recordOrdinalDistance);
 				Record recordAzimuth = recordSet.get(recordOrdinalAzimuth);
+				Record recordDirection = recordSet.get(recordOrdinalDirectionStart);
+				recordAlitudeRelative.clear();
+				recordClimb.clear();
+				recordTripLength.clear();
+				recordDistance.clear();
+				recordAzimuth.clear();
+				recordDirection.clear();
 
 				startAltitude = recordAlitude.get(0); //set initial altitude to enable absolute altitude calculation 
 				int lastLongitude = recordLongitude.get(0);
+				int startLongitude = recordLongitude.get(0);
 				double phi_start_rad = device.translateValue(recordLatitude, recordLatitude.get(0) / 1000.0) * rad;
 				double lambda_start = device.translateValue(recordLongitude, lastLongitude / 1000.0);
 
 				double phi_A_rad = phi_start_rad;
 				double lambda_A = lambda_start;
-				double[] azimuths = new double[5];
+				double[] azimuths = new double[3];
+				
+				int indexMovement = 0;
 
+				recordAlitudeRelative.add(0);
+				recordTripLength.add(0);
+				recordDistance.add(0);
+				recordDirection.add(0);
 				for (int i = 1; i < recordSize; ++i) {
-					recordAlitudeRelative.set(i, (recordAlitude.get(i) - startAltitude));
+					recordAlitudeRelative.add((recordAlitude.get(i) - startAltitude));
 
-					double phi_B = device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0);
-					double phi_B_rad = phi_B * rad;
+					double phi_B_rad = device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0) * rad;
 					double lambda_B = device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0);
-					double zeta_start = Math.acos((Math.sin(phi_start_rad) * Math.sin(phi_B_rad)) + (Math.cos(phi_start_rad) * Math.cos(phi_B_rad) * Math.cos((lambda_B - lambda_start) * rad))) / rad;
+
+					double prod_start = (Math.sin(phi_start_rad) * Math.sin(phi_B_rad)) + (Math.cos(phi_start_rad) * Math.cos(phi_B_rad) * Math.cos((lambda_B - lambda_start) * rad));
+					prod_start = prod_start > 1.0 ? 1.0 : prod_start < -1.0 ? -1.0 : prod_start;
+
+					double zeta_start_rad = Math.acos(prod_start);
+					zeta_start_rad = zeta_start_rad <= 0.0 ? 0.0 : zeta_start_rad >= Math.PI ? Math.PI : zeta_start_rad;
+					double zeta_start = zeta_start_rad / rad;
 
 					double prod = (Math.sin(phi_A_rad) * Math.sin(phi_B_rad)) + (Math.cos(phi_A_rad) * Math.cos(phi_B_rad) * Math.cos((lambda_B - lambda_A) * rad));
-					double zeta_rad = Math.acos(prod > 1.0 ? 1.0 : prod < -1.0 ? -1.0 : prod);
+					prod = prod > 1.0 ? 1.0 : prod < -1.0 ? -1.0 : prod;
+
+					double zeta_rad = Math.acos(prod);
 					zeta_rad = zeta_rad <= 0.0 ? 0.0 : zeta_rad >= Math.PI ? Math.PI : zeta_rad;
 					double zeta = zeta_rad / rad;
 
 					double powDeltaHeight = Math.pow((recordAlitude.get(i - 1) - recordAlitude.get(i)) / 1000.0, 2);
 					double powOrthodrome = Math.pow((zeta * (40041000.0 / 360.0)), 2);
 					double deltaTrip = Math.sqrt(powOrthodrome + powDeltaHeight);
-					recordTripLength.set(i, (int) (lastTripLength + deltaTrip));//[km}];
+					recordTripLength.add((int) (lastTripLength + deltaTrip));//[km}];
 
 					powDeltaHeight = Math.pow(recordAlitudeRelative.get(i) / 1000.0, 2);
 					powOrthodrome = Math.pow(((zeta_start * 40041000 / 360)), 2);
-					recordDistance.set(i, (int) (Math.sqrt(powOrthodrome + powDeltaHeight) * 1000.0)); //[km}];
+					recordDistance.add((int) (Math.sqrt(powOrthodrome + powDeltaHeight) * 1000.0)); //[km}];
+
+					double prod_alpha_start = zeta_start <= 0.0 ? -1.0 : zeta_start >= Math.PI ? Math.PI : (Math.sin(phi_B_rad) - (Math.sin(phi_start_rad) * Math.cos(zeta_start_rad)))
+							/ (Math.cos(phi_start_rad) * Math.sin(zeta_start_rad));
+					double alpha_start = Math.acos(prod_alpha_start < -1.0 ? -1.0 : prod_alpha_start > 1.0 ? 1.0 : prod_alpha_start) / rad;
+					alpha_start = startLongitude > recordLongitude.get(i) ? 360.0 - alpha_start : alpha_start;
+					recordDirection.add((int) (alpha_start * 1000.0));
 
 					double prod_alpha = zeta_rad <= 0.0 ? -1.0 : zeta_rad >= Math.PI ? Math.PI : (Math.sin(phi_B_rad) - (Math.sin(phi_A_rad) * Math.cos(zeta_rad))) / (Math.cos(phi_A_rad) * Math.sin(zeta_rad));
 					double alpha = Math.acos(prod_alpha < -1.0 ? -1.0 : prod_alpha > 1.0 ? 1.0 : prod_alpha) / rad;
@@ -106,24 +134,25 @@ public class GPSHelper {
 						//slight smoothing
 						if (i > 3) {
 							azimuths[(i - 1) % 3] = alpha;
-							recordAzimuth.set(i - 1, (int) ((azimuths[0] + azimuths[1] + azimuths[2]) * 333.333));
+							recordAzimuth.add((int) ((azimuths[0] + azimuths[1] + azimuths[2]) * 333.333));
 						}
 						else {
 							azimuths[(i - 1) % 3] = alpha;
+							recordAzimuth.add((int) (alpha * 1000.0));
 						}
 					}
 					else
-						recordAzimuth.set(i - 1, (int) (alpha * 1000.0));
+						recordAzimuth.add((int) (alpha * 1000.0));
 
 					//make more insensitive for azimuth dither around 0/360 
 					int deltaLongitude = Math.abs(lastLongitude - recordLongitude.get(i));
 					int deltaDistance = Math.abs(recordDistance.get(i - 1) - recordDistance.get(i));
 					if (i != 1 && ((deltaLongitude <= 2 && deltaTrip < 0.5) || deltaDistance < 5)) {
 						if (i > 3) {
-							recordAzimuth.set(i - 1, (recordAzimuth.get(i - 2) + recordAzimuth.get(i - 3) + recordAzimuth.get(i - 4)) / 3);
+							recordAzimuth.set(i - 1, ((recordAzimuth.get(i - 1) + recordAzimuth.get(i - 2) + recordAzimuth.get(i - 3)) / 3));
 						}
 						else
-							recordAzimuth.set(i - 1, recordAzimuth.get(i - 2));
+							recordAzimuth.set(i - 1, recordAzimuth.get(i - 1));
 					}
 					else
 						lastLongitude = recordLongitude.get(i);
@@ -135,7 +164,17 @@ public class GPSHelper {
 					lambda_A = lambda_B;
 
 					lastTripLength = lastTripLength + deltaTrip;
-					recordAzimuth.set(recordSize - 1, recordAzimuth.get(recordSize - 2));
+					
+					if (indexMovement == 0 && recordDistance.get(i) > 1500) 
+						indexMovement = i;
+				}
+				recordAzimuth.add(recordAzimuth.getLast());
+				
+				int azimuth = recordAzimuth.get(indexMovement);
+				int direction = recordDirection.get(indexMovement);
+				for (int i = 0; i < indexMovement; i++) {
+					recordAzimuth.set(i, azimuth);
+					recordDirection.set(i, direction);
 				}
 
 				if (recordAlitude.hasReasonableData()) {
