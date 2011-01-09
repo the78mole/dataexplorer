@@ -310,7 +310,7 @@ public class Settings extends Properties {
 					new Integer(this.getProperty(WINDOW_HEIGHT).trim()).intValue());
 		}
 		else
-			this.window = new Rectangle(50, 50, 900, 600);
+			this.window = new Rectangle(50, 50, 950, 600);
 
 		this.setProperty(LOCALE_CHANGED, "false"); //$NON-NLS-1$
 	}
