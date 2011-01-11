@@ -124,43 +124,24 @@ public class ApplicationLauncher {
 	 */
 	public void execute(final List<String> arguments) {
 		if (this.isLaunchable()) {
-		arguments.add(0, this.fqExecPath);
-		if (GDE.IS_LINUX) {
-			arguments.add("&"); //$NON-NLS-1$
-		}
-		for (String string : arguments) {
-			log.log(Level.FINE, GDE.STRING_SINGLE_QUOAT + string + GDE.STRING_SINGLE_QUOAT);
-		}
-		Thread thread = new Thread() {
-			public void run() {
-				try {
-					Process process = new ProcessBuilder(arguments).start(); //$NON-NLS-1$ //$NON-NLS-2$
-					//process.waitFor();
-					BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
-					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					String line;
-					while ((line = bisr.readLine()) != null) {
-						log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
-					}
-					while ((line = besr.readLine()) != null) {
-						log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
-					}
-					if (process.exitValue() != 0) {
-						String msg = "failed to execute \"" + arguments + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-						log.log(Level.SEVERE, msg);
-					}
-					besr.close();
-					bisr.close();
-				}
-				catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					DataExplorer.getInstance().openMessageDialogAsync(e.getMessage());
-				}
+			arguments.add(0, this.fqExecPath);
+			if (GDE.IS_LINUX) {
+				arguments.add("&"); //$NON-NLS-1$
 			}
-		};
-		thread.start();
+			for (String string : arguments) {
+				log.log(Level.FINE, GDE.STRING_SINGLE_QUOAT + string + GDE.STRING_SINGLE_QUOAT);
+			}
+
+			try {
+				new ProcessBuilder(arguments).start(); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			catch (Exception e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+				DataExplorer.getInstance().openMessageDialogAsync(e.getMessage());
+			}
+		}
 	}
-}
+
 	/**
 	 * @return true if full qualified file path length >= 4
 	 */

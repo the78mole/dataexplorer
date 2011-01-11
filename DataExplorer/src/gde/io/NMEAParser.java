@@ -285,12 +285,14 @@ public class NMEAParser {
 				int latitude, longitude, velocity, magneticVariation;
 				try {
 					latitude = Integer.parseInt(strValues[3].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+					latitude = strValues[4].trim().equalsIgnoreCase("N") ? latitude : -1 * latitude; 
 				}
 				catch (Exception e) {
 					latitude = this.values[0];
 				}
 				try {
 					longitude = Integer.parseInt(strValues[5].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+					longitude = strValues[6].trim().equalsIgnoreCase("E") ? longitude : -1 * longitude; 
 				}
 				catch (Exception e) {
 					longitude = this.values[1];
@@ -365,13 +367,23 @@ public class NMEAParser {
 			if (this.lastTimeStamp == timeStamp) { // validate sentence  depends to same sentence set
 				int latitude, longitude, numSatelites, altitudeAbs;
 				try {
-					latitude = this.values[0] == 0 ? Integer.parseInt(strValues[2].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY)) : this.values[0];
+					if (this.values[0] == 0) {
+						latitude = Integer.parseInt(strValues[2].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+						latitude = strValues[3].trim().equalsIgnoreCase("N") ? latitude : -1 * latitude;
+					} 
+					else
+						latitude = this.values[0];
 				}
 				catch (Exception e) {
 					latitude = this.values[0];
 				}
 				try {
-					longitude = this.values[1] == 0 ? Integer.parseInt(strValues[4].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY)) : this.values[1];
+					if (this.values[1] == 0) {
+						longitude = Integer.parseInt(strValues[4].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+						longitude = strValues[5].trim().equalsIgnoreCase("E") ? longitude : -1 * longitude;
+					} 
+					else
+						longitude = this.values[1];
 				}
 				catch (Exception e) {
 					longitude = this.values[1];
@@ -614,13 +626,23 @@ public class NMEAParser {
 
 				int latitude, longitude;
 				try {
-					latitude = Integer.parseInt(strValues[1].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+					if (this.values[0] == 0) {
+						latitude = Integer.parseInt(strValues[2].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+						latitude = strValues[3].trim().equalsIgnoreCase("N") ? latitude : -1 * latitude;
+					} 
+					else
+						latitude = this.values[0];
 				}
 				catch (Exception e) {
 					latitude = this.values[0];
 				}
 				try {
-					longitude = Integer.parseInt(strValues[3].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+					if (this.values[1] == 0) {
+						longitude = Integer.parseInt(strValues[4].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
+						longitude = strValues[5].trim().equalsIgnoreCase("E") ? longitude : -1 * longitude;
+					} 
+					else
+						longitude = this.values[1];
 				}
 				catch (Exception e) {
 					longitude = this.values[1];
@@ -701,7 +723,7 @@ public class NMEAParser {
 		if (strValues[1].equals("A")) { //$NON-NLS-1$
 			int velocity;
 			try {
-				velocity = (int) (Double.parseDouble(strValues[12].trim()) * 1852.0);
+				velocity = this.values[7] == 0 ? (int) (Double.parseDouble(strValues[12].trim()) * 1852.0) : this.values[7];
 			}
 			catch (Exception e) {
 				velocity = this.values[7];

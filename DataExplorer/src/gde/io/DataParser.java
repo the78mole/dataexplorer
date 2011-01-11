@@ -40,7 +40,8 @@ public class DataParser {
 
 	int									recordNumber;
 	int									state;
-	int									time_ms;
+	int									start_time_ms = Integer.MIN_VALUE;
+	int									time_ms = 0;
 	int[]								values;
 	int									checkSum;
 
@@ -77,7 +78,8 @@ public class DataParser {
 			this.state = Integer.parseInt(strValue);
 
 			strValue = strValues[2].trim();
-			time_ms = Integer.parseInt(strValue) * this.timeFactor; // Seconds * 1000 = msec
+			if (start_time_ms == Integer.MIN_VALUE)	start_time_ms = Integer.parseInt(strValue) * this.timeFactor; // Seconds * 1000 = msec
+			else																					time_ms = Integer.parseInt(strValue) * this.timeFactor - start_time_ms; // Seconds * 1000 = msec
 			
 			for (int i = 0; i < this.size; i++) { 
 				strValue = strValues[i+3].trim();
