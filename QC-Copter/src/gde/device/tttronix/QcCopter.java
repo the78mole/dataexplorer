@@ -159,19 +159,19 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
-				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-				log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
-				log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
-		log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 		this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
 	}

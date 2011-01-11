@@ -101,7 +101,7 @@ public class GathererThread extends Thread {
 					log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, text);
 					if (text.length() > 0 && !text.equals(GDE.STRING_EMPTY)) {
 						if (this.serialPort.containsSTX(text.getBytes())) {
-							terminalText.append(Messages.getString(MessageIds.GDE_MSGI1903));
+							this.dialog.setTerminalText(Messages.getString(MessageIds.GDE_MSGI1903));
 //							DataExplorer.display.syncExec(new Runnable() {
 //								@Override
 //								public void run() {
@@ -119,8 +119,8 @@ public class GathererThread extends Thread {
 						else {
 							terminalText.append(text);
 						}
-						if (text.length() > 100) this.dialog.setTerminalText(terminalText.toString());
-						else log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, text);
+						if (text.length() > 60) this.dialog.setTerminalText(terminalText.toString());
+						else log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, text);
 					}
 					else {
 						stopDataGatheringThread(true, null);
