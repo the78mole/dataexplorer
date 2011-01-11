@@ -56,8 +56,7 @@ public class VarioDialog extends DeviceDialog {
 	final static Logger		log								= Logger.getLogger(VarioDialog.class.getName());
 
 	CTabFolder						tabFolder;
-	Button								closeButton;
-	Button								saveButton;
+	Button								saveButton, closeButton, helpButton;
 
 	final IDevice					device;																																				// get device specific things, get serial port, ...
 	final Settings				settings;																																			// application configuration settings
@@ -157,10 +156,10 @@ public class VarioDialog extends DeviceDialog {
 					{
 						this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData saveButtonLData = new FormData();
-						saveButtonLData.width = 120;
-						saveButtonLData.height = 30;
-						saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
-						saveButtonLData.left = new FormAttachment(0, 1000, 15);
+						saveButtonLData.width = 105;
+						saveButtonLData.height = GDE.IS_MAC ? 33 : 30;
+						saveButtonLData.left = new FormAttachment(0, 1000, 10);
+						saveButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 						this.saveButton.setLayoutData(saveButtonLData);
 						this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.saveButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0486));
@@ -175,12 +174,30 @@ public class VarioDialog extends DeviceDialog {
 						});
 					}
 					{
+						this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+						FormData helpButtonLData = new FormData();
+						helpButtonLData.width = GDE.IS_MAC ? 50 : 40;
+						helpButtonLData.height = GDE.IS_MAC ? 33 : 30;
+						helpButtonLData.left = new FormAttachment(0, 1000, GDE.IS_MAC ? 129 : 132);
+						helpButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
+						this.helpButton.setLayoutData(helpButtonLData);
+						this.helpButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.helpButton.setImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
+						this.helpButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								VarioDialog.this.application.openHelpDialog("WStechVario", "HelpInfo.html");  //$NON-NLS-1$
+							}
+						});
+					}
+					{
 						this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData closeButtonLData = new FormData();
-						closeButtonLData.width = 120;
-						closeButtonLData.height = 30;
-						closeButtonLData.right = new FormAttachment(1000, 1000, -15);
-						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+						closeButtonLData.width = 105;
+						closeButtonLData.height = GDE.IS_MAC ? 33 : 30;
+						closeButtonLData.right = new FormAttachment(1000, 1000, -10);
+						closeButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 						this.closeButton.setLayoutData(closeButtonLData);
 						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0485));
