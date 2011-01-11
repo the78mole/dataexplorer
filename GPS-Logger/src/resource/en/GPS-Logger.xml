@@ -5,7 +5,7 @@
         <manufacturer>SM-Modellbau</manufacturer>
         <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
-        <image>GPSLogger.png</image>
+        <image>GPS-Logger.png</image>
         <usage>false</usage>
     </Device>
     <TimeBase>

@@ -248,9 +248,9 @@ public class GPSLoggerDialog extends DeviceDialog {
 					this.saveVisualizationButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData saveButtonLData = new FormData();
 					saveButtonLData.width = 130;
-					saveButtonLData.height = 30;
-					saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+					saveButtonLData.height = GDE.IS_MAC ? 33 : 30;
 					saveButtonLData.left = new FormAttachment(0, 1000, 15);
+					saveButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 					this.saveVisualizationButton.setLayoutData(saveButtonLData);
 					this.saveVisualizationButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.saveVisualizationButton.setText(Messages.getString(MessageIds.GDE_MSGT2016));
@@ -269,9 +269,9 @@ public class GPSLoggerDialog extends DeviceDialog {
 					this.inputFileButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData inputFileButtonLData = new FormData();
 					inputFileButtonLData.width = 130;
-					inputFileButtonLData.height = 30;
-					inputFileButtonLData.bottom = new FormAttachment(1000, 1000, -10);
-					inputFileButtonLData.left = new FormAttachment(0, 1000, 165);
+					inputFileButtonLData.height = GDE.IS_MAC ? 33 : 30;
+					inputFileButtonLData.left = new FormAttachment(0, 1000, 155);
+					inputFileButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 					this.inputFileButton.setLayoutData(inputFileButtonLData);
 					this.inputFileButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.inputFileButton.setText(Messages.getString(MessageIds.GDE_MSGT2017));
@@ -294,10 +294,10 @@ public class GPSLoggerDialog extends DeviceDialog {
 				{
 					this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData helpButtonLData = new FormData();
-					helpButtonLData.width = 40;
-					helpButtonLData.height = 30;
+					helpButtonLData.width = GDE.IS_MAC ? 50 : 40;
+					helpButtonLData.height = GDE.IS_MAC ? 33 : 30;
 					helpButtonLData.left = new FormAttachment(0, 1000, 302);
-					helpButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+					helpButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 					this.helpButton.setLayoutData(helpButtonLData);
 					this.helpButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.helpButton.setImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
@@ -313,9 +313,9 @@ public class GPSLoggerDialog extends DeviceDialog {
 					this.saveSetupButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData saveSetupButtonLData = new FormData();
 					saveSetupButtonLData.width = 130;
-					saveSetupButtonLData.height = 30;
-					saveSetupButtonLData.right = new FormAttachment(1000, 1000, -165);
-					saveSetupButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+					saveSetupButtonLData.height = GDE.IS_MAC ? 33 : 30;
+					saveSetupButtonLData.right = new FormAttachment(1000, 1000, -155);
+					saveSetupButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 					this.saveSetupButton.setLayoutData(saveSetupButtonLData);
 					this.saveSetupButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.saveSetupButton.setText(Messages.getString(MessageIds.GDE_MSGT2018));
@@ -334,9 +334,9 @@ public class GPSLoggerDialog extends DeviceDialog {
 					this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData closeButtonLData = new FormData();
 					closeButtonLData.width = 130;
-					closeButtonLData.height = 30;
-					closeButtonLData.right = new FormAttachment(1000, 1000, -15);
-					closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+					closeButtonLData.height = GDE.IS_MAC ? 33 : 30;
+					closeButtonLData.right = new FormAttachment(1000, 1000, -10);
+					closeButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 					this.closeButton.setLayoutData(closeButtonLData);
 					this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0485));
