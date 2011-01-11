@@ -27,7 +27,9 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
+import gde.device.PropertyType;
 import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
 import gde.io.NMEAParser;
@@ -37,6 +39,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
+import gde.utils.LinearRegression;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -406,8 +409,63 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
-		GPSHelper.calculateValues(this, recordSet, 0, 1, 2, 9, 10, 11, 12, 13, 14);
+		Record recordLatitude = recordSet.get(0);
+		Record recordLongitude = recordSet.get(1);
+		Record recordAlitude = recordSet.get(2);
+		int recordSize = recordLatitude.realSize();
+
+		Record recordAlitudeRelative = recordSet.get(9);
+		try { //calculate 9=altitudeRel
+			recordAlitudeRelative.clear();
+			//check GPS latitude and longitude				
+			int indexGPS = 0;
+			int i = 0;
+			for (; i < recordSize; ++i) {
+				if (recordLatitude.get(i) != 0 && recordLongitude.get(i) != 0) {
+					indexGPS = i;
+					++i;
+					break;
+				}
+				recordAlitudeRelative.add(0);
+			}
+			recordAlitudeRelative.add(0);
+			int startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
+			for (; i < recordSize; ++i) {
+				recordAlitudeRelative.add((recordAlitude.get(i) - startAltitude));
+			}
+		}
+		catch (RuntimeException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+			recordAlitudeRelative.clear();
+			for (int i=0; i < recordSize; ++i) {
+				recordAlitudeRelative.add(0);
+			}
+		}
+
+		//calculate 11=tripLength 12=distance 13=azimuth 14=directionStart
+		GPSHelper.calculateValues(this, recordSet, 0, 1, 2, 11, 12, 13, 14);
+
 		
+		Record recordClimb = recordSet.get(10);
+		try {//calculate 10=climb
+
+			if (recordAlitude.hasReasonableData()) {
+				recordClimb.setDisplayable(false);
+				recordClimb.clear();
+				PropertyType property = recordClimb.getProperty(MeasurementPropertyTypes.REGRESSION_INTERVAL_SEC.value());
+				int regressionInterval = (int) (property != null ? Double.parseDouble(property.getValue().trim()) : 3);
+				//this.calculationThread = new QuasiLinearRegression(recordSet, recordAlitude.getName(), recordClimb.getName(), regressionInterval);
+				new LinearRegression(recordSet, recordAlitude.getName(), recordClimb.getName(), regressionInterval).start();
+			}			
+		}
+		catch (RuntimeException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+			recordClimb.clear();
+			for (int i=0; i < recordSize; ++i) {
+				recordClimb.add(0);
+			}
+		}
+
 		this.application.updateStatisticsData(true);	
 		this.updateVisibilityStatus(recordSet, true);
 	}
