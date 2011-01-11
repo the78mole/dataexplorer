@@ -126,6 +126,30 @@
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
+            <Measurement>
+                <name>Strecke</name>
+                <symbol>l</symbol>
+                <unit>km</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Abstand</name>
+                <symbol>d</symbol>
+                <unit>m</unit>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Kurswinkel</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Richtung</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
 		</Channel>
 		<Channel type="TYPE_CONFIG" name="Vario+GPS">
 			<Measurement>
@@ -228,6 +252,30 @@
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
+            <Measurement>
+                <name>Strecke</name>
+                <symbol>l</symbol>
+                <unit>km</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Abstand</name>
+                <symbol>d</symbol>
+                <unit>m</unit>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Kurswinkel</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Richtung</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
 		</Channel>
 		<Channel type="TYPE_CONFIG" name="Motormessung">
 			<Measurement>
@@ -330,6 +378,30 @@
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
+            <Measurement>
+                <name>Strecke</name>
+                <symbol>l</symbol>
+                <unit>km</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Abstand</name>
+                <symbol>d</symbol>
+                <unit>m</unit>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Kurswinkel</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Richtung</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
 		</Channel>
 	</Channels>
 	<Desktop>

@@ -124,6 +124,30 @@
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
+            <Measurement>
+                <name>TripLength</name>
+                <symbol>l</symbol>
+                <unit>km</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Distance</name>
+                <symbol>d</symbol>
+                <unit>m</unit>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Azimuth</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+            <Measurement>
+                <name>Direction</name>
+                <symbol></symbol>
+                <unit>°</unit>
+	            <statistics sigma="false" avg="true" max="true" min="true"/>
+	        </Measurement>
 		</Channel>
 		<Channel type="TYPE_CONFIG" name="Vario+GPS">
 			<Measurement>
@@ -224,6 +248,30 @@
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
+            <Measurement>
+                <name>TripLength</name>
+                <symbol>l</symbol>
+                <unit>km</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Distance</name>
+                <symbol>d</symbol>
+                <unit>m</unit>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Azimuth</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+            <Measurement>
+                <name>Direction</name>
+                <symbol></symbol>
+                <unit>°</unit>
+	            <statistics sigma="false" avg="true" max="true" min="true"/>
+	        </Measurement>
 		</Channel>
 		<Channel type="TYPE_CONFIG" name="Motor measurement">
 			<Measurement>
@@ -324,6 +372,30 @@
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
+            <Measurement>
+                <name>TripLength</name>
+                <symbol>l</symbol>
+                <unit>km</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Distance</name>
+                <symbol>d</symbol>
+                <unit>m</unit>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Azimuth</name>
+                <symbol></symbol>
+                <unit>°</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+	        </Measurement>
+            <Measurement>
+                <name>Direction</name>
+                <symbol></symbol>
+                <unit>°</unit>
+	            <statistics sigma="false" avg="true" max="true" min="true"/>
+	        </Measurement>
 		</Channel>
 	</Channels>
 	<Desktop>

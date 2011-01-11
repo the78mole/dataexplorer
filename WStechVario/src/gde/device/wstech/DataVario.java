@@ -39,6 +39,7 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
+import gde.utils.GPSHelper;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -190,23 +191,12 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		//add implementation where data point are calculated
-		//do not forget to make record displayable -> record.setDisplayable(true);
-		
-		//for the moment there are no calculations necessary
-//		Record velocity = recordSet.get(5);
-//		Record height = recordSet.get(1);
-//		Record gpsVelocity = recordSet.get(10);
-//		
-//		velocity.clear();
-//		velocity.add(gpsVelocity.get(0));
-//		for (int i=1; i<recordSet.get(1).realSize(); ++i) {
-//			double deltaTimeSec = (recordSet.getTime_ms(i) - recordSet.getTime_ms(i-1)) / 1000.0;
-//			deltaTimeSec = deltaTimeSec > 0 ? deltaTimeSec : 1;
-//			double deltaHeightVelocity = ((height.get(i)/10000.0)-(height.get(i-1)/10000.0)) / deltaTimeSec * 3.6;
-//			velocity.add(Double.valueOf(Math.sqrt(Math.pow((gpsVelocity.get(i)/1000.0), 2) + Math.pow(deltaHeightVelocity, 2)) * 1000).intValue());
-//		}
-		this.application.updateStatisticsData();
+		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+		//13=tripLength 14=distance 15=azimuth 16=directionStart
+		GPSHelper.calculateValues(this, recordSet, 8, 7, 9, 13, 14, 15, 16);
+
+		this.application.updateStatisticsData(true);	
+		this.updateVisibilityStatus(recordSet, true);
 	}
 
 	/**
@@ -299,7 +289,8 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 				setDataLineStartAndLength(dataBuffer, startLength);
 				lineBuffer = new byte[startLength[1]];
 				System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
-				//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
+				//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+				//13=tripLength 14=distance 15=azimuth 16=directionStart
 				data.parse(new String(lineBuffer));
 
 				recordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms());
@@ -388,7 +379,8 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 			
-			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
+			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+			//13=tripLength 14=distance 15=azimuth 16=directionStart
 			for (int j = 0; j < points.length; j++) {
 				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8) + ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
 			}
@@ -413,7 +405,8 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		String[] dataTableRow = new String[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
 			String[] recordNames = recordSet.getRecordNames();
-			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
+			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+			//13=tripLength 14=distance 15=azimuth 16=directionStart
 			int numberRecords = recordNames.length;			
 
 			dataTableRow[0] = String.format("%.1f", (recordSet.getTime_ms(rowIndex) / 1000.0)); //$NON-NLS-1$
@@ -446,7 +439,8 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
-		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
+		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+		//13=tripLength 14=distance 15=azimuth 16=directionStart
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
@@ -489,7 +483,8 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
+		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+		//13=tripLength 14=distance 15=azimuth 16=directionStart
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
