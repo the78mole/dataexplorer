@@ -987,6 +987,7 @@ public class UniLogDialog extends DeviceDialog {
 											UniLogDialog.this.startLiveGatherButton.setEnabled(UniLogDialog.this.isLiveGathererEnabled = true);
 											UniLogDialog.this.channelSelectionIndex = UniLogDialog.this.useConfigCombo.getSelectionIndex();
 											UniLogDialog.this.useConfigCombo.select(UniLogDialog.this.channelSelectionIndex);
+											Channels.getInstance().switchChannel(UniLogDialog.this.channelSelectionIndex+1, GDE.STRING_EMPTY);
 											UniLogDialog.this.editConfigButton.setEnabled(true);
 											resetDataSetsLabel();
 										}
@@ -1017,7 +1018,8 @@ public class UniLogDialog extends DeviceDialog {
 								this.dataReadGroup.addPaintListener(new PaintListener() {
 									public void paintControl(PaintEvent evt) {
 										log.log(Level.FINEST, "dataReadGroup.paintControl, event=" + evt); //$NON-NLS-1$
-										int index = UniLogDialog.this.useConfigCombo.getSelectionIndex();
+										int index = UniLogDialog.this.application.getActiveChannelNumber() - 1;
+										System.out.println(index);
 										UniLogDialog.this.configurationNames = new String[UniLogDialog.this.device.getChannelCount()];
 										for (int i = 0; i < UniLogDialog.this.configurationNames.length; i++) {
 											UniLogDialog.this.configurationNames[i] = " " + UniLogDialog.this.device.getChannelName(i + 1); //$NON-NLS-1$
