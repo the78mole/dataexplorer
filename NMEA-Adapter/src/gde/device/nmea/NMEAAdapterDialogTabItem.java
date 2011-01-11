@@ -18,6 +18,14 @@
 ****************************************************************************************/
 package gde.device.nmea;
 
+import gde.GDE;
+import gde.data.Channels;
+import gde.device.IDevice;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.MeasurementControl;
+import gde.ui.SWTResourceManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -35,14 +43,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-
-import gde.GDE;
-import gde.data.Channels;
-import gde.device.IDevice;
-import gde.messages.Messages;
-import gde.ui.MeasurementControl;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 /**
  * This class represents a tab item of a universal record visualization control
@@ -110,8 +110,9 @@ public class NMEAAdapterDialogTabItem extends CTabItem {
 			this.buttonComposite = new Composite(this.mainTabComposite, SWT.NONE);
 			GridData buttonCompositeLData = new GridData();
 			buttonCompositeLData.verticalAlignment = GridData.BEGINNING;
-			buttonCompositeLData.horizontalAlignment = GridData.BEGINNING;
-			buttonCompositeLData.heightHint = 60;
+			buttonCompositeLData.horizontalAlignment = GridData.CENTER;
+			buttonCompositeLData.heightHint = 35;
+			buttonCompositeLData.widthHint = 180;
 			buttonCompositeLData.grabExcessHorizontalSpace = true;
 			this.buttonComposite.setLayoutData(buttonCompositeLData);
 			FormLayout buttonCompositeLayout = new FormLayout();
@@ -120,9 +121,9 @@ public class NMEAAdapterDialogTabItem extends CTabItem {
 				this.inputFileButton = new Button(this.buttonComposite, SWT.PUSH | SWT.CENTER);
 				FormData inputFileButtonLData = new FormData();
 				inputFileButtonLData.height = GDE.IS_MAC ? 33 : 30;
-				inputFileButtonLData.left = new FormAttachment(0, 1000, 20);
-				inputFileButtonLData.right = new FormAttachment(1000, 1000, -20);
-				inputFileButtonLData.top = new FormAttachment(150, 1000, 0);
+				inputFileButtonLData.left = new FormAttachment(0, 1000, 0);
+				inputFileButtonLData.right = new FormAttachment(1000, 1000, 0);
+				inputFileButtonLData.top = new FormAttachment(0, 1000, 0);
 				this.inputFileButton.setLayoutData(inputFileButtonLData);
 				this.inputFileButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.inputFileButton.setText(Messages.getString(MessageIds.GDE_MSGT2102));
