@@ -1,4 +1,4 @@
-This is AUTHORS Thus Mar 16 2010
+This is AUTHORS  Jan 11 2011
 
 The DataExplorer is written, starting October 2008, to 
 remove frustration by similar available not cross platform 
@@ -14,6 +14,9 @@ PARTICULAR PURPOSE.
 This package is not the result of one persons time. No coding but
 evaluation and testing takes place by several peoples not directly
 named here.
+
+Special thanks to Markus Verkoyen 
+	help implementing and testing QC-Copter plug-in
 
 Maintainer: Winfried Brügmann <winfried@bruegmaenner.de>
 
