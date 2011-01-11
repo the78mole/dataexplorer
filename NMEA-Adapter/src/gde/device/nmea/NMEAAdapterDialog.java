@@ -207,10 +207,10 @@ public class NMEAAdapterDialog extends DeviceDialog {
 					{
 						this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData saveButtonLData = new FormData();
-						saveButtonLData.width = 115;
-						saveButtonLData.height = 30;
-						saveButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+						saveButtonLData.width = 105;
+						saveButtonLData.height = GDE.IS_MAC ? 33 : 30;
 						saveButtonLData.left = new FormAttachment(0, 1000, 10);
+						saveButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 						this.saveButton.setLayoutData(saveButtonLData);
 						this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.saveButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0486));
@@ -227,10 +227,10 @@ public class NMEAAdapterDialog extends DeviceDialog {
 					{
 						this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData helpButtonLData = new FormData();
-						helpButtonLData.width = 40;
-						helpButtonLData.height = 30;
-						helpButtonLData.left = new FormAttachment(0, 1000, 132);
-						helpButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+						helpButtonLData.width = GDE.IS_MAC ? 50 : 40;
+						helpButtonLData.height = GDE.IS_MAC ? 33 : 30;
+						helpButtonLData.left = new FormAttachment(0, 1000, GDE.IS_MAC ? 129 : 132);
+						helpButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 						this.helpButton.setLayoutData(helpButtonLData);
 						this.helpButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.helpButton.setImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
@@ -245,10 +245,10 @@ public class NMEAAdapterDialog extends DeviceDialog {
 					{
 						this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 						FormData closeButtonLData = new FormData();
-						closeButtonLData.width = 115;
-						closeButtonLData.height = 30;
+						closeButtonLData.width = 105;
+						closeButtonLData.height = GDE.IS_MAC ? 33 : 30;
 						closeButtonLData.right = new FormAttachment(1000, 1000, -10);
-						closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+						closeButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 						this.closeButton.setLayoutData(closeButtonLData);
 						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0485));

@@ -119,14 +119,10 @@ public class NMEAAdapterDialogTabItem extends CTabItem {
 			{
 				this.inputFileButton = new Button(this.buttonComposite, SWT.PUSH | SWT.CENTER);
 				FormData inputFileButtonLData = new FormData();
-				inputFileButtonLData.width = 188;
-				inputFileButtonLData.height = 26;
-				inputFileButtonLData.left = new FormAttachment(183, 1000, 0);
-				inputFileButtonLData.right = new FormAttachment(827, 1000, 0);
+				inputFileButtonLData.height = GDE.IS_MAC ? 33 : 30;
+				inputFileButtonLData.left = new FormAttachment(0, 1000, 20);
+				inputFileButtonLData.right = new FormAttachment(1000, 1000, -20);
 				inputFileButtonLData.top = new FormAttachment(150, 1000, 0);
-				inputFileButtonLData.bottom = new FormAttachment(1016, 1000, 0);
-				buttonCompositeLData.heightHint = 30;
-				buttonCompositeLData.widthHint = 292;
 				this.inputFileButton.setLayoutData(inputFileButtonLData);
 				this.inputFileButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.inputFileButton.setText(Messages.getString(MessageIds.GDE_MSGT2102));
