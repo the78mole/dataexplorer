@@ -2066,7 +2066,7 @@ public class Record extends Vector<Integer> {
 	 * @return true if the record is the scale sync master
 	 */
 	public boolean isScaleVisible() {
-		return isScaleSyncMaster() ? this.parent.isOneSyncableVisible(this.ordinal) && this.isDisplayable : !this.parent.isOneOfSyncableRecord(this) && this.isVisible && this.isDisplayable;
+		return isScaleSyncMaster() ? this.parent.isOneSyncableVisible(this.ordinal) : !this.parent.isOneOfSyncableRecord(this) && this.isVisible && this.isDisplayable;
 	}
 	
 	/**

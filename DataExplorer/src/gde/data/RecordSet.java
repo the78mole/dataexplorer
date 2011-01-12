@@ -1771,11 +1771,15 @@ public class RecordSet extends HashMap<String, Record> {
 					boolean tmpIsRoundout = syncInputRecord.isRoundOut;
 					boolean tmpIsStartpointZero = syncInputRecord.isStartpointZero;
 					boolean tmpIsStartEndDefined = syncInputRecord.isStartEndDefined;
+					double minScaleValue = syncInputRecord.minScaleValue;
+					double maxScaleValue = syncInputRecord.maxScaleValue;
 					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						synchronized (tmpRecord) {
 							tmpRecord.isRoundOut = tmpIsRoundout;
 							tmpRecord.isStartpointZero = tmpIsStartpointZero;
 							tmpRecord.isStartEndDefined = tmpIsStartEndDefined;
+							tmpRecord.minScaleValue = minScaleValue;
+							tmpRecord.maxScaleValue = maxScaleValue;
 						}
 					}
 					break;

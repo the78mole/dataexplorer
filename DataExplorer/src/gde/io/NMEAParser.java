@@ -358,7 +358,7 @@ public class NMEAParser {
 	void parseGGA(String[] strValues) {
 		if (Integer.parseInt(strValues[6].trim()) > 0) {
 			String strValueTime = strValues[1].trim();
-			int hour = Integer.parseInt(strValueTime.substring(0, 2));
+			int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
 			int minute = Integer.parseInt(strValueTime.substring(2, 4));
 			int second = Integer.parseInt(strValueTime.substring(4, 6));
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
