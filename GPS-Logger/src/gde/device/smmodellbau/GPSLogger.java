@@ -33,6 +33,7 @@ import gde.device.PropertyType;
 import gde.device.smmodellbau.gpslogger.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
+import gde.io.LogViewReader;
 import gde.io.NMEAParser;
 import gde.io.NMEAReaderWriter;
 import gde.log.Level;
@@ -42,6 +43,7 @@ import gde.utils.FileUtils;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -152,22 +154,34 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		// prepare the serial CSV data parser
 		NMEAParser data = new NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), this.getDataBlockSize(), this,
 				this.channels.getActiveChannelNumber(), this.getUTCdelta());
-		int[] startLength = new int[] { 0, 0 };
-		byte[] lineBuffer = null;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
+		byte[] lineBuffer;
+		byte[] subLengthBytes;
+		int subLenght;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 		try {
+			int lastLength = 0;
 			for (int i = 0; i < recordDataSize; i++) {
-				setDataLineStartAndLength(dataBuffer, startLength);
-				lineBuffer = new byte[startLength[1]];
-				System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
+				subLengthBytes = new byte[4];
+				System.arraycopy(dataBuffer, lastLength, subLengthBytes, 0, 4);
+				subLenght = LogViewReader.parse2Int(subLengthBytes) - 8;
+				//System.out.println((subLenght+8));
+				lineBuffer = new byte[subLenght];
+				System.arraycopy(dataBuffer, 4 + lastLength, lineBuffer, 0, subLenght);
+				String textInput = new String(lineBuffer,"ISO-8859-1");
+				//System.out.println(textInput);
+				StringTokenizer st = new StringTokenizer(textInput);
+				Vector<String> vec = new Vector<String>();
+				while (st.hasMoreTokens())
+					vec.add(st.nextToken("\r\n"));
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
 				//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
 				//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-				//TODO data.parse(new String(lineBuffer));
+				data.parse(vec, vec.size());
+				lastLength += (subLenght+12);
 
 				recordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms());
 
@@ -182,30 +196,6 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			this.application.openMessageDialog(msg);
 			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);
 		}
-	}
-
-	/**
-	 * set data line end points - this method will be called within getConvertedLovDataBytes only and requires to set startPos and crlfPos to zero before first call
-	 * - data line start is defined with '$ ;'
-	 * - end position is defined with '0d0a' (CRLF)
-	 * @param dataBuffer
-	 * @param startPos
-	 * @param crlfPos
-	 */
-	private void setDataLineStartAndLength(byte[] dataBuffer, int[] refStartLength) {
-		int startPos = refStartLength[0] + refStartLength[1];
-
-		for (; startPos < dataBuffer.length; ++startPos) {
-			if (dataBuffer[startPos] == 0x24) {
-				if (dataBuffer[startPos + 2] == 0x31 || dataBuffer[startPos + 3] == 0x31) break; // "$ ;" or "$  ;" (record set number two digits
-			}
-		}
-		int crlfPos = refStartLength[0] = startPos;
-
-		for (; crlfPos < dataBuffer.length; ++crlfPos) {
-			if (dataBuffer[crlfPos] == 0x0D) if (dataBuffer[crlfPos + 1] == 0X0A) break; //0d0a (CRLF)
-		}
-		refStartLength[1] = crlfPos - startPos;
 	}
 
 	/**
