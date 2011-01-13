@@ -198,30 +198,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * set data line end points - this method will be called within getConvertedLovDataBytes only and requires to set startPos and crlfPos to zero before first call
-	 * - data line start is defined with '$ ;'
-	 * - end position is defined with '0d0a' (CRLF)
-	 * @param dataBuffer
-	 * @param startPos
-	 * @param crlfPos
-	 */
-	private void setDataLineStartAndLength(byte[] dataBuffer, int[] refStartLength) {
-		int startPos = refStartLength[0] + refStartLength[1];
-
-		for (; startPos < dataBuffer.length; ++startPos) {
-			if (dataBuffer[startPos] == 0x24) {
-				if (dataBuffer[startPos + 2] == 0x31 || dataBuffer[startPos + 3] == 0x31) break; // "$ ;" or "$  ;" (record set number two digits
-			}
-		}
-		int crlfPos = refStartLength[0] = startPos;
-
-		for (; crlfPos < dataBuffer.length; ++crlfPos) {
-			if (dataBuffer[crlfPos] == 0x0D) if (dataBuffer[crlfPos + 1] == 0X0A) break; //0d0a (CRLF)
-		}
-		refStartLength[1] = crlfPos - startPos;
-	}
-
-	/**
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
 	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
 	 * @param points pointer to integer array to be filled with converted data
