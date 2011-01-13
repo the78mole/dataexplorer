@@ -342,13 +342,19 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 				if (i != 10 && (points[j] & 0x00008000) > 0) // i==10 battery voltage uint16
 					points[j] = (0xFFFF0000 | points[j]);
 
+				points[j] *= 1000;
 			}
 			else { // motor uint8
-				points[j] = ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
-				++j;
-				points[j] = ((DBx_2 & 0x0007) << 13) | ((DBx_3 & 0x001F) << 8);
+				if (DBx_1 + DBx_2 + DBx_3 != 0) { 
+					points[j] = ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
+					points[j] *= 1000;
+					++j;
+					points[j] = ((DBx_2 & 0x0007) << 5) | (DBx_3 & 0x001F);
+					points[j] *= 1000;
+					//System.out.println(points[j-1] + " ; " + points[j]);
+				}
+				else ++j;
 			}
-			points[j] *= 1000;
 		}
 
 		log.log(java.util.logging.Level.FINER, "CheckSum = " + (Checksum.ADD(dataBuffer, 1, 57)) + " = " + ((((dataBuffer[58] & 0xFF) - 94) << 6) | (((dataBuffer[59] & 0xFF) - 94) & 0x3F))); //$NON-NLS-1$ //$NON-NLS-2$

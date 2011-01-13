@@ -118,33 +118,33 @@
 	            <property description="Factor to measurement value 12V == 609" type="Double" value="0.0197" name="factor"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Motor VR</name>
-	            <symbol>M</symbol>
+	            <name>Motor VL</name>
+	            <symbol></symbol>
 	            <unit>1/min</unit>
-	            <active>false</active>
+	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Motor VL</name>
-	            <symbol>M</symbol>
+	            <name>Motor VR</name>
+	            <symbol></symbol>
 	            <unit>1/min</unit>
-	            <active>false</active>
+	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Motor HL</name>
-	            <symbol>M</symbol>
+	            <symbol></symbol>
 	            <unit>1/min</unit>
-	            <active>false</active>
+	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Motor HR</name>
-	            <symbol>M</symbol>
+	            <symbol></symbol>
 	            <unit>1/min</unit>
-	            <active>false</active>
+	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
