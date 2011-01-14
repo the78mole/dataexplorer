@@ -488,14 +488,17 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 				catch (SerialPortException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+					this.getDialog().setButtonStateLiveGatherer(true);
 				}
 				catch (ApplicationConfigurationException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
+					this.getDialog().setButtonStateLiveGatherer(true);
 				}
 				catch (Throwable t) {
 					log.log(Level.SEVERE, t.getMessage(), t);
+					this.getDialog().setButtonStateLiveGatherer(true);
 				}
 			}
 			else {

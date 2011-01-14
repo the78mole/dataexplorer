@@ -487,7 +487,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 			throw e;
 		}
 		finally {
-			this.write(COMMAND_END_XFER);
+			if (this.isConnected()) this.write(COMMAND_END_XFER);
 			if(isPortOpenedByMe) this.close();
 		}
 		return readBuffer;

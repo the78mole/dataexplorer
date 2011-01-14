@@ -51,6 +51,7 @@ import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
 import gde.device.smmodellbau.lipowatch.MessageIds;
+import gde.exception.ApplicationConfigurationException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -494,6 +495,11 @@ public class LiPoWatchDialog extends DeviceDialog {
 										try {
 											updateConfigurationValues(LiPoWatchDialog.this.serialPort.readConfiguration());
 										}
+										catch (ApplicationConfigurationException e) {
+											log.log(Level.SEVERE, e.getMessage(), e);
+											LiPoWatchDialog.this.application.openMessageDialog(LiPoWatchDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+											LiPoWatchDialog.this.application.getDeviceSelectionDialog().open();
+										}
 										catch (Exception e) {
 											LiPoWatchDialog.this.application.openMessageDialog(LiPoWatchDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0029, new Object[] {
 													e.getClass().getSimpleName(), e.getMessage() }));
@@ -868,7 +874,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 													if (Channels.getInstance().getActiveChannel() != null) {
 														RecordSet activeRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 														// active record set name == live gatherer record name
-														LiPoWatchDialog.this.liveThread.finalizeRecordSet(activeRecordSet.getName());
+														if (LiPoWatchDialog.this.liveThread != null) LiPoWatchDialog.this.liveThread.finalizeRecordSet(activeRecordSet.getName());
 													}
 												}
 												setButtonStateLiveGatherer(true);
