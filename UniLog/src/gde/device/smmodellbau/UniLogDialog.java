@@ -25,6 +25,7 @@ import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
 import gde.device.smmodellbau.unilog.MessageIds;
+import gde.exception.ApplicationConfigurationException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -850,6 +851,11 @@ public class UniLogDialog extends DeviceDialog {
 										log.log(Level.FINEST, "readAdjustmentButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										try {
 											updateConfigurationValues(UniLogDialog.this.serialPort.readConfiguration());
+										}
+										catch (ApplicationConfigurationException e) {
+											log.log(Level.SEVERE, e.getMessage(), e);
+											UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+											UniLogDialog.this.application.getDeviceSelectionDialog().open();
 										}
 										catch (Exception e) {
 											UniLogDialog.this.application.openMessageDialog(UniLogDialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0029, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
