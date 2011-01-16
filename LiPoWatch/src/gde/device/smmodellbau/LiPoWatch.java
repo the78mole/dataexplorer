@@ -40,6 +40,7 @@ import gde.utils.StringHelper;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -222,7 +223,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 
 		// number cells (first measurement might be wrong, so use avarage if possible)
 		int numberCells = (dataBuffer[5] & 0x0F); 
-		LiPoWatch.log.log(Level.FINE, "numberCells = " + numberCells); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "numberCells = " + numberCells); //$NON-NLS-1$
 		// read cell voltage values
 		int i;
 		for (i = 0; i < numberCells; i++) {
@@ -241,7 +242,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		points[4] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(" + (i + 4) + ")" + points[1]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		LiPoWatch.log.log(Level.FINE, sb.toString());
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sb.toString());
 		return points;
 	}
 
@@ -402,17 +403,17 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 			Record record = recordSet.get(recordKeys[i]);
 			boolean hasReasonableData = record.hasReasonableData();
 			//record.setVisible(record.isActive() && hasReasonableData);
-			//log.log(Level.FINER, record.getName() + ".setVisible = " + hasReasonableData);
+			//if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + ".setVisible = " + hasReasonableData);
 			record.setDisplayable(hasReasonableData);
 			if (hasReasonableData) ++displayableCounter;
-			LiPoWatch.log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + hasReasonableData); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + hasReasonableData); //$NON-NLS-1$
 		}
 		recordSet.setConfiguredDisplayable(displayableCounter);
 
 		if (LiPoWatch.log.isLoggable(Level.FINE)) {
 			for (String recordKey : recordKeys) {
 				Record record = recordSet.get(recordKey);
-				LiPoWatch.log.log(Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
 	}
@@ -430,11 +431,11 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordKeys.length; ++i) {
 			Record record = recordSet.get(recordKeys[i]);
 			if (record.isActive() && record.isDisplayable()) {
-				LiPoWatch.log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
-		LiPoWatch.log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 	}
 
@@ -521,5 +522,52 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public int[] getCellVoltageOrdinals() {
 		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 		return new int[] { 0, 3 };
+	}
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		//check for LiPoWatch file contained record properties for containing balance curve
+		String[] recordKeys = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		if (!this.containsBalance(fileRecordsProperties)) {
+			for (String tmpRecordName : recordKeys) {
+				if (!tmpRecordName.toLowerCase().contains("balance")) {
+					cleanedRecordNames.add(tmpRecordName);
+				}
+			}
+			recordKeys = cleanedRecordNames.toArray(new String[1]);
+		}
+
+		// check if the file content fits measurements form device properties XML which was used to create the record set and remove not required cell voltage measurements
+		if (fileRecordsProperties.length != recordKeys.length) {
+			for (int j = fileRecordsProperties.length; j < recordKeys.length; j++) {
+				recordSet.remove(recordKeys[j]);
+				log.log(Level.FINER, "removed record " + recordKeys[j]);
+			}
+			//update recordKeys to reflect change
+			recordKeys = this.crossCheckMeasurements(fileRecordsProperties, recordSet);
+		}
+		return recordKeys;
+	}
+
+	/**
+	 * check if a record named Balance is contained
+	 * @param recordsProperties
+	 * @return
+	 */
+	private boolean containsBalance(String[] recordsProperties) {
+		boolean isContained = false;
+		for (String recordProperties : recordsProperties) {
+			isContained = recordProperties.toLowerCase().indexOf("balance", 0) > -1;
+			if (isContained) break;
+		}
+		return isContained;
 	}
 }

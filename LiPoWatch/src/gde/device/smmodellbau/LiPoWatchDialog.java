@@ -207,7 +207,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-			log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -224,11 +224,11 @@ public class LiPoWatchDialog extends DeviceDialog {
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
-						log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (LiPoWatchDialog.this.storeConfigButton.getEnabled()) {
 							String msg = Messages.getString(MessageIds.GDE_MSGI1600);
 							if (LiPoWatchDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
-								log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
+								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								//device.storeDeviceProperties(); // only used for configurable analog input 
 								setClosePossible(true);
 							}
@@ -245,7 +245,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						LiPoWatchDialog.this.application.openHelpDialog("LiPoWatch", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
@@ -253,18 +253,18 @@ public class LiPoWatchDialog extends DeviceDialog {
 				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
 					@Override
 					public void mouseEnter(MouseEvent evt) {
-						log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
 						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, 20, 25);
 					}
 
 					@Override
 					public void mouseHover(MouseEvent evt) {
-						log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 					}
 
 					@Override
 					public void mouseExit(MouseEvent evt) {
-						log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 25);
 					}
 				});
@@ -350,7 +350,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINEST, "currentTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "currentTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											LiPoWatchDialog.this.isAutoStartVoltageDrop = LiPoWatchDialog.this.voltageDropTriggerButton.getSelection();
 											if (LiPoWatchDialog.this.isAutoStartVoltageDrop) {
 												LiPoWatchDialog.this.impulseTriggerButton.setSelection(LiPoWatchDialog.this.isAutStartRx = false);
@@ -370,7 +370,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.timeTriggerButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINEST, "timeTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "timeTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											LiPoWatchDialog.this.isAutoStartTime = LiPoWatchDialog.this.timeTriggerButton.getSelection();
 											if (LiPoWatchDialog.this.isAutoStartTime) {
 												LiPoWatchDialog.this.impulseTriggerButton.setSelection(LiPoWatchDialog.this.isAutStartRx = false);
@@ -391,7 +391,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.timeTriggerCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINEST, "timeTriggerCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "timeTriggerCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											LiPoWatchDialog.this.timeAutoStart_sec = Integer.parseInt(LiPoWatchDialog.this.timeTriggerCombo.getText().trim());
 											LiPoWatchDialog.this.storeConfigButton.setEnabled(true);
 										}
@@ -399,7 +399,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.timeTriggerCombo.addKeyListener(new KeyAdapter() {
 										@Override
 										public void keyReleased(KeyEvent evt) {
-											log.log(Level.FINEST, "timeTriggerCombo.keyReleased, event=" + evt); //$NON-NLS-1$
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "timeTriggerCombo.keyReleased, event=" + evt); //$NON-NLS-1$
 											if (evt.keyCode == SWT.CR) {
 												int value = Integer.parseInt(LiPoWatchDialog.this.timeTriggerCombo.getText().trim());
 												if (value < 15)
@@ -426,7 +426,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.impulseTriggerButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINEST, "impulseTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "impulseTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											LiPoWatchDialog.this.isAutStartRx = LiPoWatchDialog.this.impulseTriggerButton.getSelection();
 											if (LiPoWatchDialog.this.isAutStartRx) {
 												LiPoWatchDialog.this.timeTriggerButton.setSelection(LiPoWatchDialog.this.isAutoStartTime = false);
@@ -447,7 +447,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.impulseTriggerCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINEST, "rcTriggerCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "rcTriggerCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											LiPoWatchDialog.this.rxAutoStartValue = LiPoWatchDialog.this.impulseTriggerCombo.getSelectionIndex() + 11;
 											LiPoWatchDialog.this.storeConfigButton.setEnabled(true);
 										}
@@ -473,7 +473,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.timeIntervalCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINEST, "timeRateCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "timeRateCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											LiPoWatchDialog.this.timeIntervalPosition = LiPoWatchDialog.this.timeIntervalCombo.getSelectionIndex();
 											LiPoWatchDialog.this.storeConfigButton.setEnabled(true);
 										}
@@ -491,7 +491,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								this.readConfigButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "readConfigButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "readConfigButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										try {
 											updateConfigurationValues(LiPoWatchDialog.this.serialPort.readConfiguration());
 										}
@@ -518,7 +518,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 								this.storeConfigButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "storeConfigButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "storeConfigButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										try {
 											if (LiPoWatchDialog.this.serialPort.setConfiguration(buildUpdateBuffer())) {
 												updateTimeStep_ms(LiPoWatchDialog.this.timeIntervalPosition);
@@ -569,7 +569,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.regulationTypeCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINEST, "regulationTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "regulationTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											LiPoWatchDialog.this.impulsReductionType = LiPoWatchDialog.this.regulationTypeCombo.getSelectionIndex();
 											LiPoWatchDialog.this.storeConfigButton.setEnabled(true);
 										}
@@ -583,7 +583,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.voltageLevelRegulationCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINEST, "voltageLimitCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "voltageLimitCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											LiPoWatchDialog.this.voltageLevelRegulationLimit = LiPoWatchDialog.this.voltageLevelRegulationCombo.getSelectionIndex();
 											LiPoWatchDialog.this.storeConfigButton.setEnabled(true);
 										}
@@ -597,7 +597,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.cellTypeCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINEST, "cellTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "cellTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											LiPoWatchDialog.this.cellType = LiPoWatchDialog.this.cellTypeCombo.getSelectionIndex();
 											LiPoWatchDialog.this.storeConfigButton.setEnabled(true);
 										}
@@ -627,7 +627,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.measurementModusCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINEST, "measurementTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "measurementTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											LiPoWatchDialog.this.measurementModus = LiPoWatchDialog.this.measurementModusCombo.getSelectionIndex();
 											LiPoWatchDialog.this.storeConfigButton.setEnabled(true);
 										}
@@ -661,7 +661,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.readDataButton.addSelectionListener(new SelectionAdapter() {
 											@Override
 											public void widgetSelected(SelectionEvent evt) {
-												log.log(Level.FINEST, "readDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+												if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "readDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 												LiPoWatchDialog.this.gatherThread = new LiPoWatchDataGatherer(LiPoWatchDialog.this.application, LiPoWatchDialog.this.device, LiPoWatchDialog.this.serialPort);
 												try {
 													LiPoWatchDialog.this.gatherThread.start();
@@ -746,7 +746,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.stopReadDataButton.addSelectionListener(new SelectionAdapter() {
 											@Override
 											public void widgetSelected(SelectionEvent evt) {
-												log.log(Level.FINE, "stopDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+												if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "stopDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 												if (LiPoWatchDialog.this.gatherThread != null && LiPoWatchDialog.this.gatherThread.isAlive()) {
 													LiPoWatchDialog.this.gatherThread.setThreadStop(); // end serial communication
 												}
@@ -771,7 +771,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.startLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 											@Override
 											public void widgetSelected(SelectionEvent evt) {
-												log.log(Level.FINE, "liveViewButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+												if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "liveViewButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 												try {
 													setButtonStateLiveGatherer(false);
 													setClosePossible(false);
@@ -811,7 +811,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 												this.startLoggingButton.addSelectionListener(new SelectionAdapter() {
 													@Override
 													public void widgetSelected(SelectionEvent evt) {
-														log.log(Level.FINE, "startLoggingButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+														if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "startLoggingButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 														try {
 															setClosePossible(false);
 															LiPoWatchDialog.this.serialPort.startLogging();
@@ -836,7 +836,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 												this.stopLoggingButton.addSelectionListener(new SelectionAdapter() {
 													@Override
 													public void widgetSelected(SelectionEvent evt) {
-														log.log(Level.FINE, "stopLoggingButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+														if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "stopLoggingButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 														try {
 															LiPoWatchDialog.this.serialPort.stopLogging();
 															LiPoWatchDialog.this.startLoggingButton.setEnabled(true);
@@ -866,7 +866,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.stopLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 											@Override
 											public void widgetSelected(SelectionEvent evt) {
-												log.log(Level.FINE, "stopLiveGatherButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+												if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "stopLiveGatherButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 												if (LiPoWatchDialog.this.liveThread != null) {
 													LiPoWatchDialog.this.liveThread.stopTimerThread();
 													LiPoWatchDialog.this.liveThread.interrupt();
@@ -903,7 +903,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.clearMemoryButton.addSelectionListener(new SelectionAdapter() {
 											@Override
 											public void widgetSelected(SelectionEvent evt) {
-												log.log(Level.FINEST, "deleteMemoryButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+												if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deleteMemoryButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 												try {
 													LiPoWatchDialog.this.clearMemoryButton.setEnabled(false);
 													LiPoWatchDialog.this.serialPort.clearMemory();
@@ -939,7 +939,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 					this.closeButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINE, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							dispose();
 						}
 					});
@@ -995,15 +995,15 @@ public class LiPoWatchDialog extends DeviceDialog {
 	public void updateConfigurationValues(byte[] readBuffer) {
 		//status field
 		this.memoryUsed = ((readBuffer[8] & 0xFF) << 24) + ((readBuffer[7] & 0xFF) << 16) + ((readBuffer[6] & 0xFF) << 8) + (readBuffer[5] & 0xFF);
-		log.log(Level.FINE, "memoryUsed = " + this.memoryUsed); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "memoryUsed = " + this.memoryUsed); //$NON-NLS-1$
 
 		//serial number
 		this.serialNumber = "" + (((readBuffer[10] & 0xFF) << 8) + (readBuffer[9] & 0xFF)); //$NON-NLS-1$
-		log.log(Level.FINE, "serialNumber = " + this.serialNumber); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "serialNumber = " + this.serialNumber); //$NON-NLS-1$
 
 		//firmware version
 		this.lipoWatchVersion = String.format(Locale.ENGLISH, "v%.2f", (readBuffer[11] & 0xFF) / 100.0); //$NON-NLS-1$
-		log.log(Level.FINE, "unilogVersion = " + this.lipoWatchVersion); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "unilogVersion = " + this.lipoWatchVersion); //$NON-NLS-1$
 
 		//memory delete flag
 		int memoryDeleted = readBuffer[12] & 0xFF;
@@ -1013,15 +1013,15 @@ public class LiPoWatchDialog extends DeviceDialog {
 		else
 			tmpMemoryUsed = this.memoryUsed;
 		this.memoryUsedPercent = String.format("%.2f", tmpMemoryUsed * 100.0 / LiPoWatchDialog.MAX_DATA_VALUES); //$NON-NLS-1$
-		log.log(Level.FINE, "memoryUsedPercent = " + this.memoryUsedPercent + " (" + tmpMemoryUsed + "/" + LiPoWatchDialog.MAX_DATA_RECORDS + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "memoryUsedPercent = " + this.memoryUsedPercent + " (" + tmpMemoryUsed + "/" + LiPoWatchDialog.MAX_DATA_RECORDS + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		// timer interval
 		this.timeIntervalPosition = readBuffer[13] & 0xFF;
-		log.log(Level.FINE, "timeIntervalPosition = " + this.timeIntervalPosition); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "timeIntervalPosition = " + this.timeIntervalPosition); //$NON-NLS-1$
 
 		// voltage modus absolute/relative
 		this.measurementModus = readBuffer[14] & 0xFF;
-		log.log(Level.FINE, "measurementModus(relative, absolute) = " + this.measurementModus); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measurementModus(relative, absolute) = " + this.measurementModus); //$NON-NLS-1$
 
 		// auto start time
 		this.isAutoStartTime = false;
@@ -1030,11 +1030,11 @@ public class LiPoWatchDialog extends DeviceDialog {
 			this.isAutoStartTime = true;
 		}
 		this.timeAutoStart_sec = readBuffer[15] & 0x7F;
-		log.log(Level.FINE, "isAutoStartTime = " + this.isAutoStartTime + " timeAutoStart_sec = " + this.timeAutoStart_sec); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isAutoStartTime = " + this.isAutoStartTime + " timeAutoStart_sec = " + this.timeAutoStart_sec); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// auto start voltage limit
 		this.voltageLevelRegulationLimit = (readBuffer[16] & 0xFF) - 20;
-		log.log(Level.FINE, "voltageLevelRegulationLimit = " + this.voltageLevelRegulationLimit); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "voltageLevelRegulationLimit = " + this.voltageLevelRegulationLimit); //$NON-NLS-1$
 
 		// auto start rx signal
 		this.isAutStartRx = (readBuffer[17] & 0x80) != 0;
@@ -1047,20 +1047,20 @@ public class LiPoWatchDialog extends DeviceDialog {
 		else {// auto start rx impulse length	
 			this.rxAutoStartValue = (readBuffer[17] & 0x7F) - 11; // 16 = 1.6 ms 
 		}
-		log.log(Level.FINE, "isAutStartRx = " + this.isAutStartRx + " isRxOn = " + this.isRxOn + " rxAutoStartValue = " + this.rxAutoStartValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isAutStartRx = " + this.isAutStartRx + " isRxOn = " + this.isRxOn + " rxAutoStartValue = " + this.rxAutoStartValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// auto start voltage drop
 		this.impulsReductionType = (readBuffer[18] & 0x7F);
-		log.log(Level.FINE, "impulsReductionType = " + this.impulsReductionType); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "impulsReductionType = " + this.impulsReductionType); //$NON-NLS-1$
 		this.isAutoStartVoltageDrop = false;
 		if ((readBuffer[19] & 0xFF) != 0) {
 			this.isAutoStartVoltageDrop = true;
 		}
-		log.log(Level.FINE, "isAutoStartVoltageDrop = " + this.isAutoStartVoltageDrop); //$NON-NLS-1$ 
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isAutoStartVoltageDrop = " + this.isAutoStartVoltageDrop); //$NON-NLS-1$ 
 
 		// cell type
 		this.cellType = readBuffer[20] & 0xFF;
-		log.log(Level.FINE, "cellType = " + this.cellType); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cellType = " + this.cellType); //$NON-NLS-1$
 
 		if (this.dialogShell != null && !this.dialogShell.isDisposed()) { //update UI if opened
 			DataExplorer.display.asyncExec(new Runnable() {
@@ -1170,7 +1170,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 					sb.append(String.format("%02X ", updateBuffer[i])); //$NON-NLS-1$
 			}
 			sb.append("]"); //$NON-NLS-1$
-			log.log(Level.FINE, sb.toString());
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sb.toString());
 		}
 
 		return updateBuffer;

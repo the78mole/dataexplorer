@@ -74,7 +74,7 @@ public class LiPoWatchDataGatherer extends Thread {
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	// cast from Object to Vector<byte[]>
 	public void run() {
-		log.log(Level.FINE, "entry data gatherer : " + this.channelNumber + " : " + this.configKey); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "entry data gatherer : " + this.channelNumber + " : " + this.configKey); //$NON-NLS-1$ //$NON-NLS-2$
 		Channel channel = Channels.getInstance().get(this.channelNumber);
 		String recordSetKey = null;
 		RecordSet recordSet = null;
@@ -98,7 +98,7 @@ public class LiPoWatchDataGatherer extends Thread {
 			this.dialog.resetDataSetsLabel();
 			this.serialPort.setTransmitFinished(false);
 			HashMap<String, Object> data = this.serialPort.getData(this.dialog);
-			log.log(Level.FINE, "back from gathering data"); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "back from gathering data"); //$NON-NLS-1$
 
 			// iterate over number of telegram sets in map
 			String[] keys = data.keySet().toArray(new String[0]);		
@@ -106,7 +106,7 @@ public class LiPoWatchDataGatherer extends Thread {
 			for (int i = 0; i < keys.length; i++) {
 				Vector<byte[]> telegrams = (Vector<byte[]>) data.get(keys[i]); //$NON-NLS-1$
 				// iterate over telegram entries to build the record set
-				log.log(Level.FINER, "number record set = " + keys[i]); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "number record set = " + keys[i]); //$NON-NLS-1$
 
 				recordSetKey = channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
 				
@@ -114,7 +114,7 @@ public class LiPoWatchDataGatherer extends Thread {
 				//this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.configKey);
 				
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
-				log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
 
 				recordSet = channel.get(recordSetKey); // record set where the data is added
 				this.device.updateInitialRecordSetComment(recordSet);
@@ -128,7 +128,7 @@ public class LiPoWatchDataGatherer extends Thread {
 
 				//reduce receodSet to really available number of cells, calculate average over first 10 measurements since I got different number of cells
 				int numCells = 0;
-				log.log(Level.FINE, "number of measurements = " +  telegrams.size());
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "number of measurements = " +  telegrams.size());
 				for (int j = 0; j < 10 && j < telegrams.size(); j++) {
 					dataBuffer = telegrams.get(j);
 					numCells += (dataBuffer[5] & 0x0F);
@@ -148,7 +148,7 @@ public class LiPoWatchDataGatherer extends Thread {
 			}
 			// make all record set names visible in selection combo
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
-			log.log(Level.FINE, "exit data gatherer"); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "exit data gatherer"); //$NON-NLS-1$
 
 		}
 		catch (DataInconsitsentException e) {

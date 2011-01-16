@@ -108,7 +108,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 				readBuffer = this.readConfiguration();
 				int memoryLeft = ((readBuffer[8] & 0xFF) << 24) + ((readBuffer[7] & 0xFF) << 16) + ((readBuffer[6] & 0xFF) << 8) + (readBuffer[5] & 0xFF);
 				int memoryUsed = memoryLeft;
-				log.log(Level.FINE, "memoryUsed = " + memoryLeft); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "memoryUsed = " + memoryLeft); //$NON-NLS-1$
 				
 				// reset data and prepare for read
 				this.write(COMMAND_RESET);
@@ -138,7 +138,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 							//telegrams.size() > 4 min + max + 2 data points
 							if (telegrams.size() > 4) {
 								dataCollection.put(""+numberRecordSet, telegrams); //$NON-NLS-1$
-								log.log(Level.FINER, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
+								if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
 							}
 							else 
 								++numberLess4measurements;
@@ -147,7 +147,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 							telegrams = new Vector<byte[]>();
 							telegrams.add(readBuffer);
 						}
-						log.log(Level.FINE, "numberRecordSet = " + numberRecordSet + " time_ms = " + time_ms + " memoryLeft = " + memoryLeft); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$						
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "numberRecordSet = " + numberRecordSet + " time_ms = " + time_ms + " memoryLeft = " + memoryLeft); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$						
 						
 						
 						memoryRed+=(dataLength-7);
@@ -167,7 +167,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 				}
 				if (telegrams.size() > 4) {
 					dataCollection.put("" + numberRecordSet, telegrams); //$NON-NLS-1$
-					log.log(Level.FINE, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
 				}
 				else 
 					++numberLess4measurements;
@@ -260,13 +260,13 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 			while (this.getAvailableBytes() < 10 && retrys-- > 0) {
 				this.write(COMMAND_LIVE_VALUES);
 				WaitTimer.delay(250);
-				log.log(Level.FINE, "retryLimit = " + retrys); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "retryLimit = " + retrys); //$NON-NLS-1$
 			}
 			// read data bytes to clear buffer
 			byte[] tmp1ReadBuffer = new byte[1];
 			this.read(tmp1ReadBuffer, 1000);
 			int length = (tmp1ReadBuffer[0] & 0x7F);    // höchstes Bit steht für Einstellungen, sonst Daten
-			log.log(Level.FINE, "length = " + length); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "length = " + length); //$NON-NLS-1$
 			this.read(new byte[(tmp1ReadBuffer[0] & 0x7F)-1], 1000);
 			isLiveDataAvailable = true;
 			
@@ -561,9 +561,9 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 		int checkSumData = 0;
 		int length = (readBuffer[0] & 0x7F);
 		checkSum = Checksum.ADD(readBuffer, 2) + 1;
-		log.log(Level.FINER, "checkSum = " + checkSum); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "checkSum = " + checkSum); //$NON-NLS-1$
 		checkSumData = ((readBuffer[length - 2] & 0xFF) << 8) + (readBuffer[length - 1] & 0xFF);
-		log.log(Level.FINER, "checkSumData = " + checkSumData); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "checkSumData = " + checkSumData); //$NON-NLS-1$
 		
 		if (checkSum != checkSumData)
 			throw new CheckSumMissmatchException(Messages.getString(gde.messages.MessageIds.GDE_MSGE0034, new Object[] { checkSum, checkSumData } ));
@@ -580,7 +580,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 		int checkSumLast2Bytes = 0;
 		checkSum = Checksum.ADD(readBuffer, 2) + 1;
 		checkSumLast2Bytes = ((readBuffer[readBuffer.length - 2] & 0xFF) << 8) + (readBuffer[readBuffer.length - 1] & 0xFF);
-		log.log(Level.FINER, "checkSum = " + checkSum + " checkSumLast2Bytes = " + checkSumLast2Bytes); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "checkSum = " + checkSum + " checkSumLast2Bytes = " + checkSumLast2Bytes); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return (checkSum == checkSumLast2Bytes);
 	}

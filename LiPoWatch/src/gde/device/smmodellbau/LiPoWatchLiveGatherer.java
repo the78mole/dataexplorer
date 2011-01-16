@@ -102,7 +102,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 			// timer interval
 			int timeIntervalPosition = readBuffer[13] & 0xFF;
 			this.timeStep_ms = this.time_ms[timeIntervalPosition];
-			log.log(Level.FINE, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (SerialPortException e) {
 			this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
@@ -128,11 +128,11 @@ public class LiPoWatchLiveGatherer extends Thread {
 		// prepare timed data gatherer thread
 		int delay = 0;
 		int period = this.timeStep_ms;
-		log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
 
 		this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, this.channelNumber, true, false));
-		log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 		final RecordSet recordSet = this.channel.get(recordSetKey);
 		this.device.updateInitialRecordSetComment(recordSet);
 		recordSet.setTimeStep_ms(this.timeStep_ms);
@@ -154,11 +154,11 @@ public class LiPoWatchLiveGatherer extends Thread {
 			int updateViewCounter = -5;
 
 			public void run() {
-				log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
 				try {
 					if (LiPoWatchLiveGatherer.this.isTimerRunning) {
 						// prepare the data for adding to record set
-						log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
 
 						// build the point array according curves from record set
 						recordSet.addPoints(usedDevice.convertDataBytes(points, LiPoWatchLiveGatherer.this.serialPort.queryLiveData()));
@@ -172,7 +172,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 						}
 						
 						if (updateViewCounter++ % 5 == 0) {
-							log.log(Level.FINE, "updateVisibilityStatus " + updateViewCounter); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "updateVisibilityStatus " + updateViewCounter); //$NON-NLS-1$
 							usedDevice.updateVisibilityStatus(recordSet, true);
 						}
 						
@@ -202,13 +202,13 @@ public class LiPoWatchLiveGatherer extends Thread {
 					String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$ 
 					cleanup(recordSetKey, message, e);
 				}
-				log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
 			}
 		};
 		
 		// start the prepared timer thread within the live data gatherer thread
 		this.timer.scheduleAtFixedRate(this.timerTask, delay, period);
-		log.log(Level.FINE, "exit"); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "exit"); //$NON-NLS-1$
 	}
 
 	/**
