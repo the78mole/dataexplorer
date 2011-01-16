@@ -38,12 +38,13 @@ public class GPSHelper {
 	 * @param recordOrdinalLatitude - input, will be checked for reasonable data
 	 * @param recordOrdinalLongitude - input, will be checked for reasonable data
 	 * @param recordOrdinalAltutude - input, might contain zero values, which result in zero values for relative altitude and climb/slope values
+	 * @param startAltitude - input, needed to calculate the distance from start point 
 	 * @param recordOrdinalTripLength - output, depends on input latitude, longitude and altitude
 	 * @param recordOrdinalDistance - output, depends on input latitude, longitude and altitude
 	 * @param recordOrdinalAzimuth - output, depends on input latitude, longitude (will be smoothed to make somehow interpretable)
 	 * @param recordOrdinalDirectionStart - output, depends on input latitude, longitude 
 	 */
-	public static void calculateValues(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude, int recordOrdinalAltutude,
+	public static void calculateValues(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude, int recordOrdinalAltutude, int startAltitude,
 			int recordOrdinalTripLength, int recordOrdinalDistance, int recordOrdinalAzimuth, int recordOrdinalDirectionStart) {
 		final double rad = Math.PI / 180;
 		double lastTripLength = 0;
@@ -120,6 +121,7 @@ public class GPSHelper {
 					double deltaTrip = Math.sqrt(powOrthodrome + powDeltaHeight);
 					recordTripLength.add((int) (lastTripLength + deltaTrip));//[km}];
 
+					powDeltaHeight = Math.pow((recordAlitude.get(i) - startAltitude) / 1000.0, 2); // alternatively the relative altitude could be used here
 					powOrthodrome = Math.pow(((zeta_start * 40041000 / 360)), 2);
 					recordDistance.add((int) (Math.sqrt(powOrthodrome + powDeltaHeight) * 1000.0)); //[km}];
 
