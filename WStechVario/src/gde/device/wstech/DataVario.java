@@ -191,12 +191,30 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
-		//13=tripLength 14=distance 15=azimuth 16=directionStart
-		GPSHelper.calculateValues(this, recordSet, 8, 7, 9, 13, 14, 15, 16);
+		Record recordLatitude = recordSet.get(8);
+		Record recordLongitude = recordSet.get(7);
+		Record recordAlitude = recordSet.get(9);
+		if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData() && recordAlitude.hasReasonableData()) {
+			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+			//13=tripLength 14=distance 15=azimuth 16=directionStart
+			int recordSize = recordLatitude.realSize();
+			int startAltitude = recordAlitude.get(0); // using this as start point might be sense less if the GPS data has no 3D-fix
+			//check GPS latitude and longitude				
+			int indexGPS = 0;
+			int i = 0;
+			for (; i < recordSize; ++i) {
+				if (recordLatitude.get(i) != 0 && recordLongitude.get(i) != 0) {
+					indexGPS = i;
+					++i;
+					break;
+				}
+			}
+			startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
 
-		this.application.updateStatisticsData(true);	
-		this.updateVisibilityStatus(recordSet, true);
+			GPSHelper.calculateValues(this, recordSet, 8, 7, 9, startAltitude, 13, 14, 15, 16);
+			this.application.updateStatisticsData(true);
+			this.updateVisibilityStatus(recordSet, true);
+		}
 	}
 
 	/**

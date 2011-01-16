@@ -130,7 +130,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Distance</name>
+                <name>DistanceStart</name>
                 <symbol>d</symbol>
                 <unit>m</unit>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -142,7 +142,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
 	        </Measurement>
             <Measurement>
-                <name>Direction</name>
+                <name>DirectionStart</name>
                 <symbol></symbol>
                 <unit>°</unit>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -253,7 +253,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Distance</name>
+                <name>DistanceStart</name>
                 <symbol>d</symbol>
                 <unit>m</unit>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -265,7 +265,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
 	        </Measurement>
             <Measurement>
-                <name>Direction</name>
+                <name>DirectionStart</name>
                 <symbol></symbol>
                 <unit>°</unit>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -376,7 +376,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Distance</name>
+                <name>DistanceStart</name>
                 <symbol>d</symbol>
                 <unit>m</unit>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -388,7 +388,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
 	        </Measurement>
             <Measurement>
-                <name>Direction</name>
+                <name>DirectionStart</name>
                 <symbol></symbol>
                 <unit>°</unit>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>

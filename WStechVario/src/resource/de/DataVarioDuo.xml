@@ -131,7 +131,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Abstand</name>
+                <name>AbstandStart</name>
                 <symbol>d</symbol>
                 <unit>m</unit>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -143,7 +143,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Richtung</name>
+                <name>RichtungStart</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -255,7 +255,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Abstand</name>
+                <name>AbstandStart</name>
                 <symbol>d</symbol>
                 <unit>m</unit>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -267,7 +267,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Richtung</name>
+                <name>RichtungStart</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -379,7 +379,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Abstand</name>
+                <name>AbstandStart</name>
                 <symbol>d</symbol>
                 <unit>m</unit>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -391,7 +391,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Richtung</name>
+                <name>RichtungStart</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
