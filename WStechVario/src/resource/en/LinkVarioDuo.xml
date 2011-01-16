@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
 	<Device>
-		<name>DataVario</name>
+		<name implementation="gde.device.wstech.LinkVario">LinkVarioDuo</name>
 		<manufacturer>WSTech</manufacturer>
 		<manufacturerURL>http://www.wstech.de</manufacturerURL>
 		<group>flightrecorder</group>
-		<image>DataVario.jpg</image>
+		<image>LinkVarioDuo.png</image>
 		<usage>false</usage>
 	</Device>
 	<TimeBase>
@@ -42,6 +42,7 @@
 				<unit>m</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true"/>
+				<property description="dm -&gt; m" type="Double" value="0.10" name="factor"/>
 				<property description="Reduction of measurement point by the first measured point" type="Boolean" value="true" name="do_subtract_first"/>
 			</Measurement>
 			<Measurement>
@@ -50,6 +51,7 @@
 				<unit>A</unit>
 				<active>true</active>
 				<statistics sumTriggerTimeText="Motor runtime" sigma="false" avg="true" max="true" min="true"/>
+				<property type="Double" value="0.10" name="factor"/>
 			</Measurement>
 			<Measurement>
 				<name>Voltage</name>
@@ -79,6 +81,7 @@
 				<unit>°C</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
+				<property type="Double" value="0.10" name="factor"/>
 			</Measurement>
 			<Measurement>
 				<name>Longitude</name>
@@ -101,7 +104,7 @@
 			</Measurement>
 			<Measurement>
 				<name>GPS-Velocity</name>
-				<symbol>Vgps</symbol>
+				<symbol>V</symbol>
 				<unit>km/h</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
@@ -117,11 +120,11 @@
 				<property type="Double" value="0.02" name="factor"/>
 			</Measurement>
 			<Measurement>
-				<name>ServoImpuls</name>
-				<symbol>si</symbol>
-				<unit>µs</unit>
+				<name>LQI</name>
+				<symbol></symbol>
+				<unit>%</unit>
 				<active>true</active>
-				<statistics sigma="false" avg="false" max="true" min="true"/>
+				<statistics sigma="true" avg="true" max="true" min="true"/>
 			</Measurement>
             <Measurement>
                 <name>TripLength</name>
@@ -167,6 +170,7 @@
 				<unit>m</unit>
 				<active>true</active>
 				<statistics sumTriggerText="Motor height" sumByTriggerRefOrdinal="11" sigma="false" avg="false" max="true" min="true"/>
+				<property description="dm -&gt; m" type="Double" value="0.10" name="factor"/>
 				<property description="Reduction of measurement point by the first measured point" type="Boolean" value="true" name="do_subtract_first"/>
 			</Measurement>
 			<Measurement>
@@ -174,7 +178,8 @@
 				<symbol>I</symbol>
 				<unit>A</unit>
 				<active>true</active>
-				<statistics sumTriggerTimeText="~Motor runtime" sigma="false" avg="false" max="true" min="true"/>
+				<statistics sumTriggerTimeText="Motor runtime" sigma="false" avg="false" max="true" min="true"/>
+				<property type="Double" value="0.10" name="factor"/>
 			</Measurement>
 			<Measurement>
 				<name>MotorVoltage</name>
@@ -204,6 +209,7 @@
 				<unit>°C</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
+				<property type="Double" value="0.10" name="factor"/>
 			</Measurement>
 			<Measurement>
 				<name>Longitude</name>
@@ -238,17 +244,17 @@
 				<symbol>Vs</symbol>
 				<unit>m/sec</unit>
 				<active>true</active>
-				<statistics sumTriggerTimeText="Motor runtime" countTriggerText="Number climbs" countByTrigger="true" sigma="false" avg="false" max="true" min="true">
-					<trigger comment="Trigger: Climbing &gt; 1 m/s über 15 sec" minTimeSec="15" isGreater="true" level="1000"/>
+				<statistics sumTriggerTimeText="~Motor runtime" countTriggerText="Number climbs" countByTrigger="true" sigma="false" avg="false" max="true" min="true">
+					<trigger comment="Trigger: Slope &gt; 1 m/s for &gt; 15 sec" minTimeSec="15" isGreater="true" level="1000"/>
 				</statistics>
 				<property type="Double" value="0.02" name="factor"/>
 			</Measurement>
 			<Measurement>
-				<name>ServoImpuls</name>
-				<symbol>si</symbol>
-				<unit>µs</unit>
+				<name>LQI</name>
+				<symbol></symbol>
+				<unit>%</unit>
 				<active>true</active>
-				<statistics sigma="false" avg="false" max="true" min="true"/>
+				<statistics sigma="true" avg="true" max="true" min="true"/>
 			</Measurement>
             <Measurement>
                 <name>TripLength</name>
@@ -279,7 +285,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 		</Channel>
-		<Channel type="TYPE_CONFIG" name="Motormeasurement">
+		<Channel type="TYPE_CONFIG" name="Motor measurement">
 			<Measurement>
 				<name>RecVoltage</name>
 				<symbol>Ur</symbol>
@@ -294,6 +300,7 @@
 				<unit>m</unit>
 				<active>true</active>
 				<statistics ratioText="Used capacity/height" ratioRefOrdinal="4" sumTriggerText="Motor height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+				<property description="dm -&gt; m" type="Double" value="0.10" name="factor"/>
 				<property description="Reduction of measurement point by the first measured point" type="Boolean" value="true" name="do_subtract_first"/>
 			</Measurement>
 			<Measurement>
@@ -302,8 +309,9 @@
 				<unit>A</unit>
 				<active>true</active>
 				<statistics sumTriggerTimeText="Motor runtime" countTriggerText="Number climbs" countByTrigger="true" sigma="false" avg="false" max="true" min="true">
-					<trigger comment="Trigger:Current &gt; 3 A for &gt; 5 sec" minTimeSec="5" isGreater="true" level="3000"/>
+					<trigger comment="Trigger: current &gt; 3 A for &gt; 5 sec" minTimeSec="5" isGreater="true" level="3000"/>
 				</statistics>
+				<property type="Double" value="0.10" name="factor"/>
 			</Measurement>
 			<Measurement>
 				<name>MotorVoltage</name>
@@ -325,7 +333,7 @@
 				<symbol>V</symbol>
 				<unit>km/h</unit>
 				<active>true</active>
-				<statistics comment="Values referencing trigger/climb" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+				<statistics comment="Values referencing trigger/climbs" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>Temperature</name>
@@ -333,6 +341,7 @@
 				<unit>°C</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
+				<property type="Double" value="0.10" name="factor"/>
 			</Measurement>
 			<Measurement>
 				<name>Longitude</name>
@@ -371,11 +380,11 @@
 				<property type="Double" value="0.02" name="factor"/>
 			</Measurement>
 			<Measurement>
-				<name>ServoImpuls</name>
-				<symbol>si</symbol>
-				<unit>µs</unit>
+				<name>LQI</name>
+				<symbol></symbol>
+				<unit>%</unit>
 				<active>true</active>
-				<statistics sigma="false" avg="false" max="true" min="true"/>
+				<statistics sigma="true" avg="true" max="true" min="true"/>
 			</Measurement>
             <Measurement>
                 <name>TripLength</name>

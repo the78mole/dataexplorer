@@ -83,4 +83,17 @@ public class LinkVario extends DataVario {
 	public CTabItem getUtilityDeviceTabItem() {
 		return new VarioToolTabItem(this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount(), this, false);
 	}	
+	
+//	Zeit in s; Empfänger-Spannung in mV; Höhe in dm; Motor-Strom in 0,1 A; Motor-Spannung in mV;
+//	verbrauchte Motorakku-Kapazität in mAh; Pitot-Geschwindigkeit in km/h; Temperatur in 0,1 Grad
+//	Celsius; GPS-Länge und –Breite in Grad u. Minuten mit vier Nachkommastellen; GPS-Höhe
+//	(Meereshöhe) in m; GPS-Geschwindigkeit in km/h ( Groundspeed ); Steigen in 2 cm/s; Pulslänge des
+//	LinkVario Steuerkanals in μs; 0 [CR LF]
+	
+//	Zeit in s; Empfänger-Spannung in mV; Höhe in dm; Motor-Strom in 0,1 A; Motor-Spannung in mV;
+//	verbrauchte Motorakku-Kapazität in mAh; Pitot-Geschwindigkeit in km/h; Temperatur in 0,1 Grad
+//	Celsius; GPS-Länge und –Breite in Grad u. Minuten mit vier Nachkommastellen; GPS-Höhe
+//	(Meereshöhe) in m; GPS-Geschwindigkeit in km/h ( Groundspeed ); Steigen in 2 cm/s; LQI-Wert in %;
+//	0 [CR LF]
+//	Achtung: Der
 }

@@ -49,14 +49,14 @@
 				<name>Strom</name>
 				<symbol>I</symbol>
 				<unit>A</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sumTriggerTimeText="Motorlaufzeit" sigma="false" avg="true" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>Spannung</name>
 				<symbol>U</symbol>
 				<unit>V</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true"/>
 				<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
 			</Measurement>
@@ -64,47 +64,47 @@
 				<name>Kapazität</name>
 				<symbol>C</symbol>
 				<unit>mAh</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="false"/>
 			</Measurement>
 			<Measurement>
 				<name>Geschwindigkeit</name>
 				<symbol>V</symbol>
 				<unit>km/h</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>Temperatur</name>
 				<symbol>T</symbol>
 				<unit>°C</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>Längengrad</name>
 				<symbol>L</symbol>
 				<unit>°</unit>
-				<active>false</active>
+				<active>true</active>
 			</Measurement>
 			<Measurement>
 				<name>Breitengrad</name>
 				<symbol>B</symbol>
 				<unit>°</unit>
-				<active>false</active>
+				<active>true</active>
 			</Measurement>
 			<Measurement>
 				<name>GPS-Höhe</name>
 				<symbol>h</symbol>
 				<unit>m</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>GPS-Geschwindigkeit</name>
 				<symbol>V</symbol>
 				<unit>km/h</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 	            <property description="Google Earth untere Geschwindigkeitsgrenze" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
 	            <property description="Google Earth obere Geschwindigkeitsgrenze" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
@@ -121,31 +121,35 @@
 				<name>ServoImpuls</name>
 				<symbol>si</symbol>
 				<unit>µs</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
             <Measurement>
                 <name>Strecke</name>
                 <symbol>l</symbol>
                 <unit>km</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>AbstandStart</name>
                 <symbol>d</symbol>
                 <unit>m</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Kurswinkel</name>
                 <symbol></symbol>
                 <unit>°</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RichtungStart</name>
                 <symbol></symbol>
                 <unit>°</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
 		</Channel>
@@ -171,14 +175,14 @@
 				<name>MotorStrom</name>
 				<symbol>I</symbol>
 				<unit>A</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sumTriggerTimeText="Motorlaufzeit" sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>MotorSpannung</name>
 				<symbol>U</symbol>
 				<unit>V</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 				<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
 			</Measurement>
@@ -186,34 +190,34 @@
 				<name>MotorAkkuKapazität</name>
 				<symbol>C</symbol>
 				<unit>mAh</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="false"/>
 			</Measurement>
 			<Measurement>
 				<name>Geschwindigkeit</name>
 				<symbol>V</symbol>
 				<unit>km/h</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>Temperatur</name>
 				<symbol>T</symbol>
 				<unit>°C</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>Längengrad</name>
 				<symbol>L</symbol>
 				<unit>°</unit>
-				<active>false</active>
+				<active>true</active>
 			</Measurement>
 			<Measurement>
 				<name>Breitengrad</name>
 				<symbol>B</symbol>
 				<unit>°</unit>
-				<active>false</active>
+				<active>true</active>
 			</Measurement>
 			<Measurement>
 				<name>GPS-Höhe</name>
@@ -245,31 +249,35 @@
 				<name>ServoImpuls</name>
 				<symbol>si</symbol>
 				<unit>µs</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
             <Measurement>
                 <name>Strecke</name>
                 <symbol>l</symbol>
                 <unit>km</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>AbstandStart</name>
                 <symbol>d</symbol>
                 <unit>m</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Kurswinkel</name>
                 <symbol></symbol>
                 <unit>°</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RichtungStart</name>
                 <symbol></symbol>
                 <unit>°</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
 		</Channel>
@@ -333,26 +341,26 @@
 				<name>Längengrad</name>
 				<symbol>L</symbol>
 				<unit>°</unit>
-				<active>false</active>
+				<active>true</active>
 			</Measurement>
 			<Measurement>
 				<name>Breitengrad</name>
 				<symbol>B</symbol>
 				<unit>°</unit>
-				<active>false</active>
+				<active>true</active>
 			</Measurement>
 			<Measurement>
 				<name>GPS-Höhe</name>
 				<symbol>h</symbol>
 				<unit>m</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sumTriggerText="Gesammthöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>GPS-Geschwindigkeit</name>
 				<symbol>V</symbol>
 				<unit>km/h</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics comment="Werte bezogen auf Triggerbereiche" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
 	            <property description="Google Earth untere Geschwindigkeitsgrenze" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
 	            <property description="Google Earth obere Geschwindigkeitsgrenze" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
@@ -369,31 +377,35 @@
 				<name>ServoImpuls</name>
 				<symbol>si</symbol>
 				<unit>µs</unit>
-				<active>false</active>
+				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true"/>
 			</Measurement>
             <Measurement>
                 <name>Strecke</name>
                 <symbol>l</symbol>
                 <unit>km</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>AbstandStart</name>
                 <symbol>d</symbol>
                 <unit>m</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Kurswinkel</name>
                 <symbol></symbol>
                 <unit>°</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RichtungStart</name>
                 <symbol></symbol>
                 <unit>°</unit>
+				<active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
 		</Channel>
