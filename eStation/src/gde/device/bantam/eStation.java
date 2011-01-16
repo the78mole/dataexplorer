@@ -647,4 +647,41 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
 		return new int[] {0, 2};
 	}
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		//check for eStation file contained record properties for containing balance curve
+		String[] recordKeys = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		if (!this.containsBalance(fileRecordsProperties)) {
+			for (String tmpRecordName : recordKeys) {
+				if (!tmpRecordName.toLowerCase().contains("balance")) {
+					cleanedRecordNames.add(tmpRecordName);
+				}
+			}
+			recordKeys = cleanedRecordNames.toArray(new String[1]);
+		}
+		return recordKeys;
+	}
+
+	/**
+	 * check if a record named Balance is contained
+	 * @param recordsProperties
+	 * @return
+	 */
+	private boolean containsBalance(String[] recordsProperties) {
+		boolean isContained = false;
+		for (String recordProperties : recordsProperties) {
+			isContained = recordProperties.toLowerCase().indexOf("balance", 0) > -1;
+			if (isContained) break;
+		}
+		return isContained;
+	}
 }
