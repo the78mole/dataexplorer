@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 2.70 - 09 Jan 2011
+Version 2.70 - XX Jan 2011
 
 fix value format sync problem digital, analog versus graphics
 enable one click live data gathering (UniLog/LiPoWatch)
@@ -17,6 +17,10 @@ add NMEA Adapter plug-in
 fix errors in compare window
 sync plug-in name to configuration files
 add lov file support for GPS-Logger
+add lov file support for NMEA-Adapter
+adapt the sync record matching algorithm of configurable measurement control to match first part of measurement name string, delimiter is blank
+change log entries to avoid string parameter interpretation in time critical exec path
+WStech devices, add calculation of track length, distance from start, azimuth and direction from start
 
 Version 2.60 - 01 Dec 2010
 

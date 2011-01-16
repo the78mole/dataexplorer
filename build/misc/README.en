@@ -17,6 +17,7 @@ Actual the following devices are available as plug-in:
 											 - CSV2SerialAdapter, enables to import CVS files as log data
 											 - DataVario, DataVarioDuo, LinkVario (WStech) variometer, GPS, multi measurement device
 											 - GPS-Logger (SM-Modellbau) GPS, multi measurement device
+											 - NMEA-Adapter  GPS
 											 - QC-Copter (tt-tronix) control unit
 											 - Simulator test plug-in
 
@@ -27,7 +28,9 @@ Documentation how to proceed doing this is under construction.
 
 Installation of the binary distribution is an unpack of the containing DataExplorer directory with its sub directories to a place 
 where execution right exist.
-For Windows user a proper place is %ProgramFiles% for GNU/Linux user "/opt" or "/usr", Mac OS /Applications.
+For Windows user a proper place is %ProgramFiles% for GNU/Linux user "/opt" or "/usr", Mac OS unarchive/drag to /Applications (Applications).
+
+Attention: Do not use special characters in path, Java using UTF-8 as default, conversion problems could occur!
 
 For the first execution use a command window (Windows), shell (GNU/Linux) and change into the just created DataExplorer
 directory and execute running Windows, DataExplorer.exe, running GNU/Linux, DataExplorer. For Mac OS the start
@@ -55,7 +58,7 @@ Main program files are:
 Extensions for the Java runtime RXTXcomm and SWT:
 ../java/ext/*.jar 
 ../java/ext/*.LICENSE
-SWT downloaded from eclipse.org/swt as swt-3.4.4.8-<platform>-<architecture>.zip and swt.jar extracted, Mac OS the latest 
+SWT downloaded from eclipse.org/swt as swt-3.*-<platform>-<architecture>.zip and swt.jar extracted, Mac OS the latest 
 available since there are application relevant bugs reported which are not fixed.
 RXTXcomm created from rxtx-pre2 source distribution, refer to thirdparty directory in osde source distribution archive.
 
@@ -75,6 +78,10 @@ For Windows user: Depending of the used Windows version and patch level it might
 For GNU/Linux user: RXTXcomm uses serial port locking mechanism, the application user must be part of uucp group.
 For Mac OS user: Same as for GNU/Linux user, but the /var/lock directory must be created, refer to RXTX_Post-Install_MacOS.txt
 
+Hint: It is planned to use the DataExplorer on different operating systems and share the data files, do not use special characters at all.
+(conversion ISO-8859-1 to UTF-8 and vice versa). File links are different on the supported operatings systems. Object related data files don't get duplicated,
+they get referenced using file links. Before you move data files to a different operating system, remove the objcet related file links and re-create afterwards.
+Please use the preferences dialog with the miscellaneous tab with the related buttons.
 
 For questions or suggestions for improvement feel free to contact me using the e-mail address at the download page.
 
