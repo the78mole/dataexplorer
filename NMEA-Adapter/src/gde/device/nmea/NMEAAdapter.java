@@ -404,6 +404,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		Record recordLongitude = recordSet.get(1);
 		Record recordAlitude = recordSet.get(2);
 		int recordSize = recordLatitude.realSize();
+		int startAltitude = recordAlitude.get(0); // using this as start point might be sense less if the GPS data has no 3D-fix
 
 		Record recordAlitudeRelative = recordSet.get(9);
 		try { //calculate 9=altitudeRel
@@ -420,7 +421,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 				recordAlitudeRelative.add(0);
 			}
 			recordAlitudeRelative.add(0);
-			int startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
+			startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
 			for (; i < recordSize; ++i) {
 				recordAlitudeRelative.add((recordAlitude.get(i) - startAltitude));
 			}
@@ -434,7 +435,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		}
 
 		//calculate 11=tripLength 12=distance 13=azimuth 14=directionStart
-		GPSHelper.calculateValues(this, recordSet, 0, 1, 2, 11, 12, 13, 14);
+		GPSHelper.calculateValues(this, recordSet, 0, 1, 2, startAltitude, 11, 12, 13, 14);
 
 		
 		Record recordClimb = recordSet.get(10);
