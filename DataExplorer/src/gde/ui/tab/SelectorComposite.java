@@ -111,7 +111,7 @@ public class SelectorComposite extends Composite {
 		});
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
-				log.log(Level.FINEST, "curveSelector.helpRequested " + evt); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "curveSelector.helpRequested " + evt); //$NON-NLS-1$
 				SelectorComposite.this.application.openHelpDialog("", "HelpInfo_41.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
@@ -145,12 +145,12 @@ public class SelectorComposite extends Composite {
 			this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
-						log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 						TableItem item = (TableItem) evt.item;
 						String recordName = item.getText();
-						log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$
 						SelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, recordName);
 						SelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, evt.item);
 						if (item.getChecked() != (Boolean) item.getData(DataExplorer.OLD_STATE)) {
@@ -202,7 +202,7 @@ public class SelectorComposite extends Composite {
 		RecordSet activeRecordSet = this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getActiveRecordSet() : null;
 		RecordSet recordSet = this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet : this.application.getCompareSet();
 		if (recordSet != null && recordSet.size() > 0) {
-				log.log(Level.FINE, recordSet.getName());
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSet.getName());
 				this.curveSelectorTable.removeAll();
 				String[] recordKeys = recordSet.getRecordNames();
 				int checkBoxWidth = 20;
@@ -210,10 +210,10 @@ public class SelectorComposite extends Composite {
 				for (String recordKey : recordKeys) {
 					Record record = recordSet.getRecord(recordKey);
 					if (record != null) {
-						log.log(Level.FINER, record.getName());
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName());
 						textSize = record.getName().length() * 8;
 						if (itemWidth < (textSize + checkBoxWidth)) itemWidth = textSize + checkBoxWidth;
-						//log.log(Level.FINE, item.getText() + " " + itemWidth);
+						//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, item.getText() + " " + itemWidth);
 						if (record.isDisplayable()) {
 							TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 							item.setForeground(record.getColor());
@@ -232,7 +232,7 @@ public class SelectorComposite extends Composite {
 					}
 				}				
 				this.selectorColumnWidth = itemWidth;
-				log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 		}
 		else {
 			this.curveSelectorTable.removeAll();
@@ -246,7 +246,7 @@ public class SelectorComposite extends Composite {
 			this.application.setGraphicsSashFormWeights(this.selectorColumnWidth, this.windowType);
 		}
 
-		log.log(Level.FINER, "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 	}
 
 	/**

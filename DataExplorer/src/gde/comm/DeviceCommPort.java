@@ -29,7 +29,6 @@ import gnu.io.SerialPort;
 
 import java.io.IOException;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 /**
  * @author brueg
@@ -37,7 +36,6 @@ import java.util.logging.Logger;
  */
 public class DeviceCommPort implements IDeviceCommPort {
 	final static String 				$CLASS_NAME 			= DeviceCommPort.class.getName();
-	final static Logger					log								= Logger.getLogger($CLASS_NAME);
 
 	final protected Settings							settings;
 	final protected IDevice								device;

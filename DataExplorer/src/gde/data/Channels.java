@@ -152,7 +152,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * @param recordSetKey or empty string if switched to first record set
 	 */
 	public void switchChannel(int channelNumber, String recordSetKey) {
-		log.log(Level.FINE, "switching to channel " + channelNumber);		 //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "switching to channel " + channelNumber);		 //$NON-NLS-1$
 		this.application.checkUpdateFileComment();
 		this.application.checkUpdateRecordSetComment();
 			
@@ -171,14 +171,14 @@ public class Channels extends HashMap<Integer, Channel> {
 				DataExplorer.display.asyncExec(new Runnable() {
 					public void run() {
 						if (!Channels.this.application.getObjectKey().equals(Channels.this.getActiveChannel().getObjectKey())) {
-							log.log(Level.FINE, "switch to channels object key \"" + Channels.this.getActiveChannel().getObjectKey() + "\""); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "switch to channels object key \"" + Channels.this.getActiveChannel().getObjectKey() + "\""); //$NON-NLS-1$
 							Channels.this.application.getMenuToolBar().updateObjectSelector();
 						}
 					}
 				});
 			}
 			else {
-				log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$
 			}
 			this.application.cleanHeaderAndCommentInGraphicsWindow();
 			Channel activeChannel = this.getActiveChannel();

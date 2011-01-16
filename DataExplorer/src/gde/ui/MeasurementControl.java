@@ -104,7 +104,7 @@ public class MeasurementControl extends Composite {
 			this.measurement.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(Level.FINEST, "measurement.widgetSelected, event=" + evt);
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "measurement.widgetSelected, event=" + evt);
 					boolean isVisible = MeasurementControl.this.measurement.getSelection();
 					Channel activeChannel = MeasurementControl.this.channels.getActiveChannel();
 					if (activeChannel != null) {

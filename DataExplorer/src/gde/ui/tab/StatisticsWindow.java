@@ -115,28 +115,28 @@ public class StatisticsWindow extends CTabItem {
 //			this.composite.addPaintListener(new PaintListener() {			
 //				@Override
 //				public void paintControl(PaintEvent evt) {
-//					log.log(Level.FINEST, "composite.paintControl " + evt); //$NON-NLS-1$
+//					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.paintControl " + evt); //$NON-NLS-1$
 //					StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu);
 //				}
 //			});
 			this.composite.addHelpListener(new HelpListener() {
 				@Override
 				public void helpRequested(HelpEvent evt) {
-					log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.composite.addControlListener(new ControlListener() {
 				@Override
 				public void controlResized(ControlEvent evt) {
-					log.log(Level.FINEST, "composite.controlResized evt=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.controlResized evt=" + evt); //$NON-NLS-1$
 					StatisticsWindow.this.descriptionGroup.setSize(StatisticsWindow.this.composite.getClientArea().width-20, 110);
 					StatisticsWindow.this.descriptionTextLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width-15, StatisticsWindow.this.descriptionGroup.getClientArea().height-10);
 					adaptTableSize();
 				}
 				@Override
 				public void controlMoved(ControlEvent evt) {
-					log.log(Level.FINEST, "composite.controlMoved evt=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.controlMoved evt=" + evt); //$NON-NLS-1$
 				}
 			});
 			{
@@ -150,14 +150,14 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup.addHelpListener(new HelpListener() {
 					@Override
 					public void helpRequested(HelpEvent evt) {
-						log.log(Level.FINEST, "descriptionGroup.helpRequested " + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionGroup.helpRequested " + evt); //$NON-NLS-1$
 						DataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.descriptionGroup.addPaintListener(new PaintListener() {
 					@Override
 					public void paintControl(PaintEvent evt) {
-						log.log(Level.FINEST, "descriptionGroup.paintControl, event=" + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionGroup.paintControl, event=" + evt); //$NON-NLS-1$
 						StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 						Channel activeChannel = StatisticsWindow.this.channels.getActiveChannel();
 						if (activeChannel != null) {
@@ -199,14 +199,14 @@ public class StatisticsWindow extends CTabItem {
 				this.dataTable.addHelpListener(new HelpListener() {
 					@Override
 					public void helpRequested(HelpEvent evt) {
-						log.log(Level.FINEST, "dataTable.helpRequested " + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dataTable.helpRequested " + evt); //$NON-NLS-1$
 						DataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.dataTable.addPaintListener(new PaintListener() {
 					@Override
 					public void paintControl(PaintEvent evt) {
-						log.log(Level.FINEST, "dataTable.paintControl, event=" + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dataTable.paintControl, event=" + evt); //$NON-NLS-1$
 						updateStatisticsData(false);
 					}
 				});
@@ -259,7 +259,7 @@ public class StatisticsWindow extends CTabItem {
 	 * update statistics window display data
 	 */
 	public synchronized void updateStatisticsData(boolean forceUpdate) {
-		log.log(Level.FINE, "entry data table update"); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "entry data table update"); //$NON-NLS-1$
 
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
@@ -290,7 +290,7 @@ public class StatisticsWindow extends CTabItem {
 					this.tabelItemText.add(sb.toString());
 
 					for (String recordName : displayableRecords) {
-						log.log(Level.FINE, "updating record = " + recordName);
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "updating record = " + recordName);
 						Record record = activeRecordSet.get(recordName);
 						DecimalFormat df = record.getDecimalFormat();
 						IDevice device = activeRecordSet.getDevice();
@@ -398,7 +398,7 @@ public class StatisticsWindow extends CTabItem {
 							int customColumnTextExtent = 15 + SWTResourceManager.getGC(this.dataTable.getDisplay()).textExtent(sb.substring(sb.lastIndexOf(DELIMITER) + 1)).x;
 							this.customTableColumnWidth = customColumnTextExtent > this.customTableColumnWidth ? customColumnTextExtent : this.customTableColumnWidth;
 
-							log.log(Level.FINER, sb.toString());
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, sb.toString());
 							this.tabelItemText.add(sb.toString());
 						}
 					}
@@ -472,7 +472,7 @@ public class StatisticsWindow extends CTabItem {
 	 */
 	void updateDataTable() {
 
-		log.log(Level.FINE, "entry data table update"); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "entry data table update"); //$NON-NLS-1$
 
 		// cleanup old data table
 		this.dataTable.removeAll();
@@ -487,7 +487,7 @@ public class StatisticsWindow extends CTabItem {
 			row.setText(itemsText.split(DELIMITER));
 		}
 
-		log.log(Level.FINE, "exit data table update"); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "exit data table update"); //$NON-NLS-1$
 	}
 
 	/**
@@ -498,19 +498,19 @@ public class StatisticsWindow extends CTabItem {
 		int columsWidth = 0;
 		for (int i = 0; i < this.dataTable.getColumnCount() - 1; i++) {
 			columsWidth += this.dataTable.getColumn(i).getWidth();
-			log.log(Level.FINE, "ColumWidth = " + this.dataTable.getColumn(i).getWidth()); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "ColumWidth = " + this.dataTable.getColumn(i).getWidth()); //$NON-NLS-1$
 		}
 		Point tableSize = this.dataTable.computeSize(StatisticsWindow.this.composite.getClientArea().width-20, SWT.DEFAULT, true);
-		//log.log(Level.FINE, "computed size = " + tableSize);
+		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "computed size = " + tableSize);
 		//tableHeight = tableHeight+150 < this.composite.getClientArea().height ? tableHeight : this.composite.getClientArea().height-150;
 		int tableHeight = tableSize.y+150 < this.composite.getClientArea().height ? tableSize.y : this.composite.getClientArea().height-150;
 		tableHeight = tableHeight > 0 ? tableHeight : 0;
-		//log.log(Level.FINE, "tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
+		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "tableHeight = " + tableHeight + "/" + (this.composite.getClientArea().height-150));
 		this.dataTable.setSize(StatisticsWindow.this.composite.getClientArea().width-20, tableHeight);
 		
 		int customWidthFill = this.dataTable.getClientArea().width - columsWidth;
 		this.customTableColumn.setWidth(this.customTableColumnWidth > customWidthFill ? this.customTableColumnWidth : customWidthFill);
-		//log.log(Level.FINE, "table width = " + (columsWidth + this.customTableColumn.getWidth()));
+		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "table width = " + (columsWidth + this.customTableColumn.getWidth()));
 	}
 	
 	/**

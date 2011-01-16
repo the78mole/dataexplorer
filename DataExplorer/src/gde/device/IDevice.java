@@ -880,4 +880,14 @@ public interface IDevice {
 	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
 	 */
 	public Integer getGPS2KMLMeasurementOrdinal();
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet);
 }

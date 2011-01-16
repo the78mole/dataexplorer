@@ -259,16 +259,8 @@ public class OsdReaderWriter {
 					log.log(Level.FINE, sb.toString());
 				}
 
-				String [] recordKeys = checkBalanceMeasurement(recordsProperties, device, recordSet.getRecordNames());
+				String [] recordKeys = device.crossCheckMeasurements(recordsProperties, recordSet);
 				// check if the file content fits measurements form device properties XML which was used to create the record set
-				if (recordsProperties.length != recordKeys.length) {
-					for (int j = recordsProperties.length; j < recordKeys.length; j++) {
-						recordSet.remove(recordKeys[j]);
-						log.log(Level.FINER, "removed record " + recordKeys[j]);
-					}
-					//update recordKeys to reflect change
-					recordKeys = checkBalanceMeasurement(recordsProperties, device, recordSet.getRecordNames());
-				}
 				for (int i = 0; i < recordKeys.length; ++i) {
 					Record record = recordSet.get(recordKeys[i]);
 					log.log(Level.FINER, "setSerializedProperties " + recordKeys[i]);
@@ -327,43 +319,6 @@ public class OsdReaderWriter {
 			data_in = null;
 			file_input = null;
 		}
-	}
-
-	/**
-	 * check if a device is used which has added Balance curve
-	 * @param recordsProperties
-	 * @param device
-	 * @param recordKeys
-	 * @return
-	 */
-	static String[] checkBalanceMeasurement(String[] recordsProperties, IDevice device, String[] recordKeys) {
-		//check for LipoWatch with added balance curve, LipoWatch has different recordSetSize according to connected cells
-		if(device.getName().startsWith("LiPoWatch") || device.getName().startsWith("eStation")) {
-			if (!containsBalance(recordsProperties)) {
-				Vector<String> cleanedReordNames = new Vector<String>();
-				for (String tmpRecordName : recordKeys) {
-					if (!tmpRecordName.toLowerCase().contains("balance")) {
-						cleanedReordNames.add(tmpRecordName);
-					}
-				}
-				recordKeys = cleanedReordNames.toArray(new String[1]);
-			}
-		}
-		return recordKeys;
-	}
-
-	/**
-	 * check if a record named Balance is contained
-	 * @param recordsProperties
-	 * @return
-	 */
-	static boolean containsBalance(String[] recordsProperties) {
-		boolean isContained = false;
-		for (String recordProperties : recordsProperties) {
-			isContained = recordProperties.toLowerCase().contains("balance");
-			if (isContained) break;
-		}
-		return isContained;
 	}
 
 	/**

@@ -158,7 +158,7 @@ public class UtilGraphicsWindow extends CTabItem {
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			this.graphicSashForm.setWeights(this.sashFormWeights);
-			log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth + " windowType = " + this.windowType);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth + " windowType = " + this.windowType);
 		}
 	}
 	

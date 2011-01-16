@@ -79,7 +79,7 @@ public class DataTableWindow extends CTabItem {
 		this.dataTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.dataTable.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
-				log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
 				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_6.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});

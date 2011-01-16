@@ -59,7 +59,7 @@ public class StatusBar {
 		this.statusComposite = currentStatusComposite;
 		this.statusComposite.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {
-				StatusBar.this.log.log(Level.FINER, "statusComposite.paintControl evt=" + evt); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "statusComposite.paintControl evt=" + evt); //$NON-NLS-1$
 				Point statusCompositeSize = StatusBar.this.statusComposite.getSize();
 				Point comCompositeSize = StatusBar.this.comComposite.getSize();
 				int offsetX = comCompositeSize.x+280;

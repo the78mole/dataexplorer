@@ -53,16 +53,16 @@ public class CurveUtils {
 		final boolean isCompareSet = record.getParent().isCompareSet();
 		int numberTicks = 10, miniticks = 5;
 
-		log.log(Level.FINER, "x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
 		String recordName = isCompareSet ? record.getKeyName() : record.getName();
-		log.log(Level.FINE, "drawing record =" + recordName + " isCompareSet = " + isCompareSet); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "drawing record =" + recordName + " isCompareSet = " + isCompareSet); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//Draw the curve
 		//(yMaxValue - yMinValue) defines the area to be used for the curve
 		double yMaxValue = (record.isScaleSynced() ? record.getSyncMaxValue() : record.getMaxValue()) / 1000.0;
 		double yMinValue = (record.isScaleSynced() ? record.getSyncMinValue() : record.getMinValue()) / 1000.0;
-		log.log(Level.FINE, "unmodified yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "unmodified yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// yMinValueDisplay and yMaxValueDisplay used for scales and adapted values device and measure unit dependent
 		double yMinValueDisplay = yMinValue, yMaxValueDisplay = yMaxValue;
@@ -84,7 +84,7 @@ public class CurveUtils {
 				yMaxValue = yMaxValueDisplay;
 			}
 
-			log.log(Level.FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
 			//exclude imported data where values don't need correction
@@ -111,7 +111,7 @@ public class CurveUtils {
 					yMaxValue = yMaxValueDisplay;
 				}
 
-				log.log(Level.FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
 			}
 			if (record.isStartpointZero()) {
 				// check if the main part of the curve is on positive side
@@ -133,19 +133,19 @@ public class CurveUtils {
 						yMaxValue = yMaxValueDisplay;
 					}
 				}
-				log.log(Level.FINE, "scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		record.setMinScaleValue(yMinValueDisplay);
 		record.setMaxScaleValue(yMaxValueDisplay);
-		log.log(Level.FINE, "scale  -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "scale  -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 		String graphText = (record.isScaleSyncMaster() ? record.getSyncMasterName()	: recordName);
 		if (record.getSymbol() != null && record.getSymbol().length() > 0) graphText = graphText + "   " + record.getSymbol();
 		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// adapt number space calculation to real displayed max number
 		//Point pt = gc.textExtent(df.format(yMaxValueDisplay));
-		//log.log(Level.FINE, df.format(yMaxValueDisplay) + " gc.textExtent = " + pt.toString());
+		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, df.format(yMaxValueDisplay) + " gc.textExtent = " + pt.toString());
 		Point pt = gc.textExtent("000,00"); //$NON-NLS-1$
 		int ticklength = 5;
 		int gap = 10;
@@ -155,22 +155,22 @@ public class CurveUtils {
 		gc.setLineStyle(SWT.LINE_SOLID);
 		boolean isPositionLeft = record.isPositionLeft();
 		int positionNumber = isCompareSet ? 0 : record.getParent().getAxisPosition(recordName, isPositionLeft);
-		log.log(Level.FINE, recordName + " positionNumber = " + positionNumber); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordName + " positionNumber = " + positionNumber); //$NON-NLS-1$
 		gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
 		if (isPositionLeft) {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0+1, xPos, y0-height-1); //xPos = x0
-			log.log(Level.FINE, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			gc.setForeground(DataExplorer.COLOR_BLACK);
 			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks);
-			log.log(Level.FINEST, "drawText x = " + (xPos - pt.y - 15)); //xPosition Text Spannung [] //$NON-NLS-1$
+			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "drawText x = " + (xPos - pt.y - 15)); //xPosition Text Spannung [] //$NON-NLS-1$
 			if (!isCompareSet) GraphicsUtils.drawTextCentered(graphText, (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
 		else {
 			int xPos = x0 + 1 + width + positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0+1, xPos, y0-height-1); //yMax
 			gc.setForeground(DataExplorer.COLOR_BLACK);
-			log.log(Level.FINEST, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks);
 			if (!isCompareSet) GraphicsUtils.drawTextCentered(graphText, (xPos + scaleWidthSpace - pt.y - 5), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
@@ -178,7 +178,7 @@ public class CurveUtils {
 		// set the values corresponding to the display area of this curve
 		record.setMinDisplayValue(yMinValue);
 		record.setMaxDisplayValue(yMaxValue);
-		log.log(Level.FINE, record.getName() + " data limit  -> yMinValue = " + yMinValue + "; yMaxValue = " + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " data limit  -> yMinValue = " + yMinValue + "; yMaxValue = " + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -192,8 +192,8 @@ public class CurveUtils {
 	 * @param isCompareSet
 	 */
 	public static void drawCurve(Record record, GC gc, int x0, int y0, int width, int height, boolean isCompareSet) {
-		log.log(Level.FINE, record.getName()+ String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
-		log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName()+ String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
 
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
@@ -204,12 +204,12 @@ public class CurveUtils {
 		int displayableSize = record.size();
 
 		// calculate time line adaption if record set is compare set, compare set max have different times for each record, (intRecordSize - 1) is number of time deltas for calculation
-		log.log(Level.FINE, "average record time step msec = " + record.getAverageTimeStep_ms()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "average record time step msec = " + record.getAverageTimeStep_ms()); //$NON-NLS-1$
 		double displayableTime_ms = record.getDrawTimeWidth_ms();
-		log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableSize = " + displayableSize + " displayableTime_ms = " + displayableTime_ms); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// calculate xScale for curves with much to many data points, it makes no sense to draw all the small lines on the same part of the screen
-		int xScaleFactor = Double.valueOf(displayableSize / (width * 2.2)).intValue();
+		int xScaleFactor = (int)(displayableSize / (width * 2.2));
 		xScaleFactor = xScaleFactor > 0 ? xScaleFactor : 1; //check for curves with less points than draw area width
 		while (displayableSize % xScaleFactor > 3 && xScaleFactor > 1) {
 			--xScaleFactor;
@@ -217,7 +217,7 @@ public class CurveUtils {
 		//xScaleFactor+=2;
 		// calculate scale factor to fit time into draw bounds display pixel based
 		double xTimeFactor = width / displayableTime_ms; // * (xScaleFactor - 0.44);
-		log.log(Level.FINE, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$		
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "xTimeFactor = " + xTimeFactor + " xScaleFactor = " + xScaleFactor + " : " + (xTimeFactor * xScaleFactor)); //$NON-NLS-1$ //$NON-NLS-2$		
 		record.setDisplayScaleFactorTime(xTimeFactor);
 		record.setDisplayScaleFactorValue(height);
 
@@ -272,6 +272,6 @@ public class CurveUtils {
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage() + " zoomed compare set ?", e); //$NON-NLS-1$
 		}
-		log.log(Level.FINEST, sb.toString());
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, sb.toString());
 	}
 }

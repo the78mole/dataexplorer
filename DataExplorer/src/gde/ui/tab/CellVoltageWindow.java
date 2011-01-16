@@ -397,13 +397,13 @@ public class CellVoltageWindow extends CTabItem {
 	public void updateChilds() {
 		updateCellVoltageVector();
 		updateVoltageAndCapacity();
-		log.log(Level.FINER, "voltageValues.length = " + this.voltageVector.size() + " displays.size() = " + this.displays.size()); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "voltageValues.length = " + this.voltageVector.size() + " displays.size() = " + this.displays.size()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.voltageVector.size() > 0 && this.voltageVector.size() == this.displays.size()) { // channel does not have a record set yet
 			this.voltageDelta = calculateVoltageDelta(this.voltageVector);
 			for (int i = 0; i < this.voltageVector.size(); ++i) {
 				this.displays.get(i).setVoltage(this.voltageVector.get(i).getVoltage());
 				this.displays.get(i).voltagePaintControl();
-				log.log(Level.FINE, "setVoltage cell " + i + " - " + this.voltageVector.get(i)); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "setVoltage cell " + i + " - " + this.voltageVector.get(i)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		else if (this.coverComposite.isVisible()) {
@@ -427,7 +427,7 @@ public class CellVoltageWindow extends CTabItem {
 				boolean isUpdateRequired = forceUpdate || this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName()) || this.oldChannel == null
 						|| !this.oldChannel.getName().equals(activeChannel.getName()) || this.displays.size() != this.voltageVector.size();
 
-				log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
 					// cleanup
 					for (CellVoltageDisplay display : this.displays) {
@@ -443,7 +443,7 @@ public class CellVoltageWindow extends CTabItem {
 					for (int i = 0; this.voltageVector != null && i < this.voltageVector.size(); ++i) {
 						CellVoltageDisplay display = new CellVoltageDisplay(this.application, this.coverComposite, this.voltageVector.get(i).getVoltage(), this.voltageVector.get(i).getName(), this.voltageVector.get(i).getUnit(), this);
 						display.create();
-						log.log(Level.FINER, "created cellVoltage display for " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "created cellVoltage display for " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$
 						this.displays.add(display);
 					}
 					this.oldRecordSet = recordSet;
@@ -489,7 +489,7 @@ public class CellVoltageWindow extends CTabItem {
 				int cellVoltageReferenceMasterOrdinal = recordSet.getDevice().getDesktopTargetReferenceOrdinal(DesktopPropertyTypes.VOLTAGE_PER_CELL_TAB);
 				if (cellVoltageReferenceMasterOrdinal >= 0 && recordSet.getScaleSyncedRecords(cellVoltageReferenceMasterOrdinal) != null) {
 					for (Record record : recordSet.getScaleSyncedRecords(cellVoltageReferenceMasterOrdinal)) {
-						log.log(Level.FINE, "record " + record.getName() + " symbol " + record.getSymbol()); //$NON-NLS-1$ //$NON-NLS-2$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "record " + record.getName() + " symbol " + record.getSymbol()); //$NON-NLS-1$ //$NON-NLS-2$
 						if (record.isDisplayable()) {
 							this.voltageVector.add(new CellInfo(record.getLast(), record.getName(), record.getUnit()));
 							this.voltageAvg += record.getLast();
@@ -502,13 +502,13 @@ public class CellVoltageWindow extends CTabItem {
 					//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "ZellenSpannung");
 					//cellCount = addCellVoltages4Test(new int[] {4120, 4150, 4175, 4200}, "CellVoltage");
 					if (cellCount > 0) this.voltageAvg = this.voltageAvg / cellCount;
-					//log.log(Level.FINE, "cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
+					//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cellCount  = " + cellCount + " cell voltage average = " + this.voltageAvg);
 
 					//check if voltage values are changed
 					for (int i = 0; i < tmpCellVoltageVector.size() && i < this.voltageVector.size(); i++) {
 						if (tmpCellVoltageVector.get(i) != this.voltageVector.get(i).getVoltage()) {
 							isCellVoltageChanged = true;
-							log.log(Level.FINER, "updateCellVoltageVector -> changed"); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "updateCellVoltageVector -> changed"); //$NON-NLS-1$
 							break;
 						}
 					}
@@ -520,7 +520,7 @@ public class CellVoltageWindow extends CTabItem {
 			for (CellInfo cellInfo : this.voltageVector) {
 				sb.append(cellInfo.getVoltage()).append(" "); //$NON-NLS-1$
 			}
-			log.log(Level.FINE, "updateCellVoltageVector -> " + sb.toString()); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "updateCellVoltageVector -> " + sb.toString()); //$NON-NLS-1$
 		}
 		return isCellVoltageChanged;
 	}
@@ -573,13 +573,13 @@ public class CellVoltageWindow extends CTabItem {
 	void updateAndResize() {
 		boolean isSomeVoltagechanged = updateCellVoltageVector();
 		Point mainSize = CellVoltageWindow.this.cellVoltageMainComposite.getSize();
-		log.log(Level.FINE, "mainSize = " + mainSize.toString()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "mainSize = " + mainSize.toString()); //$NON-NLS-1$
 		if (this.voltageVector.size() > 0) {
 			int cellWidth = mainSize.x / 6;
 			int x = (6 - CellVoltageWindow.this.voltageVector.size()) * cellWidth / 2;
 			int width = mainSize.x - (2 * x);
 			Rectangle bounds = new Rectangle(x, 45, width, mainSize.y - 100);
-			log.log(Level.FINE, "cover bounds = " + bounds.toString()); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cover bounds = " + bounds.toString()); //$NON-NLS-1$
 			CellVoltageWindow.this.coverComposite.setBounds(bounds);
 			CellVoltageWindow.this.digitalComposite.setBounds((mainSize.x - 350) / 2, mainSize.y - 50, 350, 50);
 

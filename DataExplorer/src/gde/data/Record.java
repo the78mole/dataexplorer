@@ -205,7 +205,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public Record(IDevice newDevice, int newOrdinal, String newName, String newSymbol, String newUnit, boolean isActiveValue, StatisticsType newStatistic, List<PropertyType> newProperties, int initialCapacity) {
 		super(initialCapacity);
-		log.log(Level.FINE, newName + " Record(IDevice, int, String, String, String, boolean, StatisticsType, List<PropertyType>, int)"); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, newName + " Record(IDevice, int, String, String, String, boolean, StatisticsType, List<PropertyType>, int)"); //$NON-NLS-1$
 		this.device = newDevice;
 		this.ordinal = newOrdinal;
 		this.name = newName;
@@ -230,7 +230,7 @@ public class Record extends Vector<Integer> {
 	 */
 	private Record(Record record) {
 		super(record);
-		log.log(Level.FINE, record.name + " Record(Record)"); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.name + " Record(Record)"); //$NON-NLS-1$
 		this.parent = record.parent;
 		this.ordinal = record.ordinal;
 		this.name = record.name;
@@ -291,7 +291,7 @@ public class Record extends Vector<Integer> {
 	 */
 	private Record(Record record, int dataIndex, boolean isFromBegin) {
 		//super(record); // vector
-		log.log(Level.FINE, record.name + " Record(Record, int, boolean)"); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.name + " Record(Record, int, boolean)"); //$NON-NLS-1$
 		this.parent = record.parent;
 		this.parent.setZoomMode(false);
 		this.ordinal = record.ordinal;
@@ -372,7 +372,7 @@ public class Record extends Vector<Integer> {
 	private void initializeProperties(Record recordRef, List<PropertyType> newProperties) {
 		this.properties = this.properties != null ? this.properties : new ArrayList<PropertyType>();	// offset, factor, reduction, ...
 		for (PropertyType property : newProperties) {
-			log.log(Level.FINER, recordRef.name + " - " + property.getName() + " = " + property.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordRef.name + " - " + property.getName() + " = " + property.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
 			this.properties.add(property.clone());
 		}
 		// initialize factor, offset, reduction if not exist only
@@ -816,7 +816,7 @@ public class Record extends Vector<Integer> {
 				else
 					log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
 			}
-			log.log(Level.FINER, this.name + " minTriggered = " + this.minValueTriggered + " maxTriggered = " + this.maxValueTriggered); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " minTriggered = " + this.minValueTriggered + " maxTriggered = " + this.maxValueTriggered); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -1279,7 +1279,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public DecimalFormat getDecimalFormat() {
 		if(this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
-		log.log(Level.FINE, this.isScaleSynced() + " - " + this.parent.getSyncMasterRecordOrdinal(this));
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.isScaleSynced() + " - " + this.parent.getSyncMasterRecordOrdinal(this));
 		return this.isScaleSynced() ? this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).df : this.df;
 	}
 
@@ -1369,7 +1369,7 @@ public class Record extends Vector<Integer> {
 		try {
 			double tmpTimeValue = this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms();
 			int[] indexs = this.findBoundingIndexes(tmpTimeValue);
-			log.log(Level.FINE, tmpTimeValue + "; " + indexs[0] + "; " + indexs[1]); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, tmpTimeValue + "; " + indexs[0] + "; " + indexs[1]); //$NON-NLS-1$ //$NON-NLS-2$
 			if (indexs[0] == indexs[1]) {
 				pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue)).intValue();
 			}
@@ -1377,10 +1377,10 @@ public class Record extends Vector<Integer> {
 				int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
 				double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[1]) - this.parent.timeStep_ms.getTime_ms(indexs[0]);
 				double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
-				log.log(Level.FINEST, "deltyValueY = " + deltaValueY  + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deltyValueY = " + deltaValueY  + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
 			}
-			log.log(Level.FINE, xPos + " -> timeValue = " + TimeLine.getFomatedTime(tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, xPos + " -> timeValue = " + TimeLine.getFomatedTime(tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			//check yPos out of range, the graph might not visible within this area
 //		if(pointPosY > this.parent.drawAreaBounds.height) 
@@ -1453,7 +1453,7 @@ public class Record extends Vector<Integer> {
 	 * @return formated string of value
 	 */
 	public String getSlopeValue(Point points) {
-		log.log(Level.FINE, GDE.STRING_EMPTY + points.toString());
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.STRING_EMPTY + points.toString());
 		double measureDelta;
 		if(this.parent.isZoomMode)
 			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / this.parent.drawAreaBounds.height;
@@ -1462,7 +1462,7 @@ public class Record extends Vector<Integer> {
 		//double timeDelta = (1.0 * points.x * this.size() - 1) / drawAreaBounds.width * this.getTimeStep_ms() / 1000; //sec
 		//this.drawTimeWidth * xPos / this.parent.drawAreaBounds.width;
 		double timeDelta = this.drawTimeWidth * points.x / this.parent.drawAreaBounds.width / 1000; //sec
-		log.log(Level.FINE, "measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
 		return new DecimalFormat("0.0").format(measureDelta / timeDelta); //$NON-NLS-1$
 	}
 
@@ -1474,11 +1474,11 @@ public class Record extends Vector<Integer> {
 		this.zoomTimeOffset = this.getHorizontalDisplayPointTime_ms(zoomBounds.x) + this.getDrawTimeOffset_ms();
 		this.drawTimeWidth = this.getHorizontalDisplayPointTime_ms(zoomBounds.width-1);
 		this.zoomOffset = this.findBestIndex(this.zoomTimeOffset);
-		log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth)); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		this.minZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.y, this.parent.drawAreaBounds);
 		this.maxZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
-		log.log(Level.FINER, this.name + " - minZoomScaleValue = " + this.minZoomScaleValue + "  maxZoomScaleValue = " + this.maxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " - minZoomScaleValue = " + this.minZoomScaleValue + "  maxZoomScaleValue = " + this.maxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -1493,7 +1493,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorTime(double newDisplayScaleFactorTime) {
 		this.displayScaleFactorTime = newDisplayScaleFactorTime;
-		log.log(Level.FINER, String.format(Locale.ENGLISH, "displayScaleFactorTime = %.3f", newDisplayScaleFactorTime)); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.ENGLISH, "displayScaleFactorTime = %.3f", newDisplayScaleFactorTime)); //$NON-NLS-1$
 	}
 
 	/**
@@ -1508,7 +1508,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", drawAreaHeight, this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue))); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", drawAreaHeight, this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue))); //$NON-NLS-1$
 
 	}
 
@@ -1572,7 +1572,7 @@ public class Record extends Vector<Integer> {
 	public void setMinMaxZoomScaleValues(double newMinZoomScaleValue, double newMaxZoomScaleValue) {
 		this.minZoomScaleValue				= newMinZoomScaleValue;
 		this.maxZoomScaleValue				= newMaxZoomScaleValue;
-		log.log(Level.FINER, this.name + " - minScaleValue/minZoomScaleValue = " + this.minScaleValue + "/"  + newMinZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/"  + newMaxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " - minScaleValue/minZoomScaleValue = " + this.minScaleValue + "/"  + newMinZoomScaleValue + " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/"  + newMaxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 	/**
@@ -1626,7 +1626,7 @@ public class Record extends Vector<Integer> {
 	public void resetMinMax() {
 		this.maxValue = 0;
 		this.minValue = 0;
-		log.log(Level.FINER, this.name);
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name);
 	}
 
 	/**
@@ -1650,7 +1650,7 @@ public class Record extends Vector<Integer> {
 			this.sigmaValueTriggered = Integer.MIN_VALUE;
 			this.triggerRanges = null;
 			this.tmpTriggerRange = null;
-			log.log(Level.FINER, this.name);
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name);
 		}
 	}
 	
@@ -1669,7 +1669,7 @@ public class Record extends Vector<Integer> {
 		sb.append(MAX_VALUE).append(GDE.STRING_EQUAL).append(this.maxValue).append(DELIMITER);
 		sb.append(MIN_VALUE).append(GDE.STRING_EQUAL).append(this.minValue).append(DELIMITER);
 		for (PropertyType property : this.properties) {
-			log.log(Level.FINE, this.name + " - " + property.getName() + " = " + property.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.name + " - " + property.getName() + " = " + property.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append(property.getName()).append(GDE.STRING_UNDER_BAR).append(property.getType()).append(GDE.STRING_EQUAL).append(property.getValue()).append(DELIMITER);
 		}
 		sb.append(DEFINED_MAX_VALUE).append(GDE.STRING_EQUAL).append(this.maxScaleValue).append(DELIMITER);
@@ -1759,7 +1759,7 @@ public class Record extends Vector<Integer> {
 			this.properties.add(tmpProperty);
 			if (log.isLoggable(Level.FINE)) sb.append(entry.getKey()).append(" = ").append(value); //$NON-NLS-1$
 		}
-		log.log(Level.FINE, sb.toString());
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sb.toString());
 	}
 	
 	/**
@@ -1868,7 +1868,7 @@ public class Record extends Vector<Integer> {
 					}
 					if (log.isLoggable(Level.FINER)) sb.append("\n"); //$NON-NLS-1$
 				}
-				log.log(Level.FINER, sb.toString());
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, sb.toString());
 				this.avgValueTriggered = numPoints > 0 ? Long.valueOf(sum / numPoints).intValue() : 0;
 			}
 		}
@@ -2066,6 +2066,7 @@ public class Record extends Vector<Integer> {
 	 * @return true if the record is the scale sync master
 	 */
 	public boolean isScaleVisible() {
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.parent.isOneOfSyncableRecord(this));
 		return isScaleSyncMaster() ? this.parent.isOneSyncableVisible(this.ordinal) : !this.parent.isOneOfSyncableRecord(this) && this.isVisible && this.isDisplayable;
 	}
 	

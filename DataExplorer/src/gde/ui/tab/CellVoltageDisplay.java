@@ -110,7 +110,7 @@ public class CellVoltageDisplay extends Composite {
 		this.setMenu(this.popupmenu);
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
-				log.log(Level.FINER, "CellVoltageDisplay.helpRequested " + evt); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "CellVoltageDisplay.helpRequested " + evt); //$NON-NLS-1$
 				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_9.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
@@ -169,7 +169,7 @@ public class CellVoltageDisplay extends Composite {
 				this.cellCanvas.setDragDetect(false);
 				this.cellCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						log.log(Level.FINE, "cellCanvas.paintControl, evt = " + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cellCanvas.paintControl, evt = " + evt); //$NON-NLS-1$
 						voltagePaintControl();
 					}
 				});
@@ -198,19 +198,19 @@ public class CellVoltageDisplay extends Composite {
 			Point topHeight = calculateBarGraph(rect);
 			if (this.lastVoltageLevel != checkVoltageLevel()) {
 				this.cellCanvas.redraw();
-				log.log(Level.FINER, newVoltage + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, newVoltage + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			else if (this.lastTop < topHeight.x) {
 				int top = this.lastTop-1 < 0 ? 0 : this.lastTop-1;
 				int height = topHeight.x+1 > rect.height-1 ? rect.height-1 : topHeight.x+1;
 				this.cellCanvas.redraw(0, top, rect.width-1, height, true);
-				log.log(Level.FINER, newVoltage + " redraw "+ ", " + top + " -> " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, newVoltage + " redraw "+ ", " + top + " -> " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			else {
 				int top = topHeight.x-1 < 0 ? 0 : topHeight.x-1;
 				int height = this.lastTop+1 > rect.height-1 ? rect.height-1 : this.lastTop+1;
 				this.cellCanvas.redraw(0, top, rect.width-1, height, true); 
-				log.log(Level.FINER, newVoltage + " redraw "+ ", " + top + " -> " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, newVoltage + " redraw "+ ", " + top + " -> " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
 	}
@@ -224,12 +224,12 @@ public class CellVoltageDisplay extends Composite {
 		this.cellVoltageDigitalLabel.setText(valueText);
 
 		Rectangle rect = this.cellCanvas.getClientArea();
-		log.log(Level.FINE, "cellCanvas.getBounds = " + rect); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cellCanvas.getBounds = " + rect); //$NON-NLS-1$
 		// using hashCode and size as qualifier will re-use the GC if only voltage values changed
 		GC gc = SWTResourceManager.getGC(this.cellCanvas, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
-		log.log(Level.FINE, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
 		Point topHeight = calculateBarGraph(rect);
-		log.log(Level.FINE, valueText + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, valueText + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		rect = new Rectangle(0, topHeight.x, rect.width-1, topHeight.y);
 		this.lastTop = topHeight.x;
 
@@ -247,7 +247,7 @@ public class CellVoltageDisplay extends Composite {
 			break;
 		}
 
-		log.log(Level.FINE, "fillRectangle = " + rect); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "fillRectangle = " + rect); //$NON-NLS-1$
 		gc.fillRectangle(1, topHeight.x, rect.width-1, topHeight.y);
 		gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		gc.drawLine(1, topHeight.x, rect.width-1, topHeight.x);
@@ -289,7 +289,7 @@ public class CellVoltageDisplay extends Composite {
 		
 		topHeight.x = (int)(delta+0.5);
 		topHeight.y = cellCanvasBounds.height-topHeight.x;
-		log.log(Level.FINE, topHeight.toString());
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, topHeight.toString());
 		return topHeight;
 	}
 }

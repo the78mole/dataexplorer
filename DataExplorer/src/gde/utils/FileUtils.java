@@ -116,7 +116,7 @@ public class FileUtils {
 			File src = new File(srcDir + GDE.FILE_SEPARATOR_UNIX + srcFile);
 			if (!src.isDirectory()) {
 				File tgt = new File(tgtDir + GDE.FILE_SEPARATOR_UNIX + srcFile);
-				log.log(Level.FINE, "copy " + src.toString() + " to " + tgt.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "copy " + src.toString() + " to " + tgt.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 				FileUtils.copyFile(src, tgt);
 			}
 		}
@@ -160,7 +160,7 @@ public class FileUtils {
 					String oldVersionStr = versionFileName.substring(versionFileName.length()-8, versionFileName.length()-6) + oldVersion;
 					if(dir.renameTo(new File(directory + oldVersionStr)))
 						log.log(Level.WARNING, "failed to rename " + directory);
-					log.log(Level.FINE, "found old version " + oldVersionStr + " and created a backup directory"); //$NON-NLS-1$ //$NON-NLS-2$
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "found old version " + oldVersionStr + " and created a backup directory"); //$NON-NLS-1$ //$NON-NLS-2$
 					File newDir = new File(directory);
 					if (newDir.mkdir())
 						log.log(Level.WARNING, "failed to create " + directory);
@@ -289,18 +289,18 @@ public class FileUtils {
 		}
 		if (fileNamesWildCard.size() > 0) {
 			for (String fileName : fileNamesWildCard) {
-				log.log(Level.FINE, "fileName = '" +fileName + "'");
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "fileName = '" +fileName + "'");
 				try {
 					String startSignature = fileName.substring(0, fileName.indexOf(GDE.STRING_STAR));
 					String endingSignature = fileName.substring(fileName.lastIndexOf(GDE.STRING_STAR) + 1);
 					List<File> fileList = FileUtils.getFileListingNoSort(new File(fileBasePath));
 					for (File file : fileList) {
 						String tmpFileName = file.getName();
-						log.log(Level.FINE, "evaluating " + tmpFileName); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "evaluating " + tmpFileName); //$NON-NLS-1$
 						if ((startSignature.length() == 0 && endingSignature.length() != 0 && tmpFileName.endsWith(endingSignature)) // "*register.sh"
 								|| (startSignature.length() != 0 && tmpFileName.startsWith(startSignature) && endingSignature.length() == 0) // "bootstrap.log*"
 								|| (startSignature.length() != 0 && tmpFileName.startsWith(startSignature) && endingSignature.length() != 0 && tmpFileName.endsWith(endingSignature))) { // "swt*448.dll"
-							log.log(Level.FINE, "deleting " + tmpFileName); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "deleting " + tmpFileName); //$NON-NLS-1$
 							FileUtils.cleanFile(fileBasePath + tmpFileName);
 						}
 					}
@@ -337,15 +337,15 @@ public class FileUtils {
 		BufferedReader reader;
 		BufferedWriter writer;
 		String line;
-		log.log(Level.FINE, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
 		JarFile jarFile = new JarFile(jarFilePath);
 
 		reader = new BufferedReader(new InputStreamReader(FileUtils.getFileInputStream(jarFile, jarInternalFilePath), sourceEncoding)); 
-		log.log(Level.FINE, "targetPath = " + targetFilePath); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "targetPath = " + targetFilePath); //$NON-NLS-1$
 		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFilePath), targetEncoding)); //$NON-NLS-1$
 
 		while ((line = reader.readLine()) != null) {
-			log.log(Level.FINE, line);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, line);
 			if (line.indexOf(placeholderKey) > -1) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(line.substring(0, line.indexOf(placeholderKey)));
@@ -353,7 +353,7 @@ public class FileUtils {
 				sb.append(line.substring(line.indexOf(placeholderKey) + placeholderKey.length()));
 				line = sb.toString();
 			}
-			log.log(Level.FINE, line);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, line);
 			writer.write(line+GDE.LINE_SEPARATOR);
 		}
 		reader.close();
@@ -379,7 +379,7 @@ public class FileUtils {
 		reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFilePath), GDE.STRING_UTF_8)); 
 		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFilePath), GDE.STRING_UTF_8)); 
 		while ((line = reader.readLine()) != null) {
-			log.log(Level.FINE, line);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, line);
 			if (line.indexOf(placeHolderKey) > -1) {
 				StringBuilder sb = new StringBuilder();
 					sb.append(line.substring(0, line.indexOf(placeHolderKey)));
@@ -390,7 +390,7 @@ public class FileUtils {
 			
 			line = line.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK)  + GDE.LINE_SEPARATOR;
 			
-			log.log(Level.FINE, line);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, line);
 			writer.write(line);
 		}
 		reader.close();
@@ -692,7 +692,7 @@ public class FileUtils {
 
 		//copy content to tmpDeviceJarPath
 		while ((inEntry = in.getNextJarEntry()) != null) {
-			log.log(Level.FINE, "inEntry = " + inEntry.getName()); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "inEntry = " + inEntry.getName()); //$NON-NLS-1$
 			if (!inEntry.getName().equalsIgnoreCase(addJarEntryName) && !inEntry.getName().endsWith("MANIFEST.MF")) { //$NON-NLS-1$
 				out.putNextEntry(new JarEntry(inEntry));
 				while ((len = in.read(buf)) > 0) {
@@ -791,7 +791,7 @@ public class FileUtils {
 		String deviceImplName = deviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
 		String className = deviceImplName.contains(GDE.STRING_DOT) ? deviceImplName  // full qualified
 				: "gde.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
-		log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 		Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Class<?> c = loader.loadClass(className);
@@ -817,11 +817,11 @@ public class FileUtils {
 		IDevice newInst = null;
 		String className = deviceImplName.contains(GDE.STRING_DOT) ? deviceImplName  // full qualified
 				: "gde.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$ //$NON-NLS-2$
-		log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Class<?> c = loader.loadClass(className);
 		Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
-		log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (constructor != null) {
 			newInst = (IDevice) constructor.newInstance(new Object[] { deviceConfig });
 			deviceJarFileName = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
@@ -872,7 +872,7 @@ public class FileUtils {
 
 		//copy content to tmpDeviceJarPath
 		while ((inEntry = in.getNextJarEntry()) != null) {
-			log.log(Level.FINE, "inEntry = " + inEntry.getName()); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "inEntry = " + inEntry.getName()); //$NON-NLS-1$
 			if (!inEntry.getName().equalsIgnoreCase(addJarEntryName) && !inEntry.getName().endsWith("MANIFEST.MF")) { //$NON-NLS-1$
 				out.putNextEntry(new JarEntry(inEntry));
 				while ((len = in.read(buf)) > 0) {
@@ -963,7 +963,7 @@ public class FileUtils {
 				catch(NumberFormatException e) {
 					log.log(Level.SEVERE, "Internal Error - permission not usable (" + unixPermissions +")"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				//log.log(Level.FINE, "chmod 755 " + fileName);
+				//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "chmod 755 " + fileName);
 				Runtime.getRuntime ().exec (new String []{"chmod", unixPermissions, fullQualifiedFilePath}).waitFor(); //$NON-NLS-1$ //$NON-NLS-2$
 			} catch (Throwable e) {}
 		}
@@ -976,9 +976,9 @@ public class FileUtils {
 	public static String getJarBasePath() {
 		String basePath;
 		URL url = DataExplorer.class.getProtectionDomain().getCodeSource().getLocation();
-		log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
 		if (url.getPath().endsWith("/")) { // running inside Eclipse //$NON-NLS-1$
-			log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$
 			basePath = url.getFile().substring(GDE.IS_WINDOWS ? 1 : 0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			basePath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
@@ -986,11 +986,11 @@ public class FileUtils {
 				+ GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY); // + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else { // started outside java -jar *.jar
-			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf("/") + 1); //$NON-NLS-1$
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK); 
 		}
-		log.log(Level.FINE, "GDE base path = " + basePath); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "GDE base path = " + basePath); //$NON-NLS-1$
 		return basePath;
 	}
 
@@ -1002,12 +1002,12 @@ public class FileUtils {
 		String basePath;
 		String jarPath = null;
 		URL url = DataExplorer.class.getProtectionDomain().getCodeSource().getLocation();
-		log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
 		if (url.getPath().endsWith("/")) { // running inside Eclipse //$NON-NLS-1$
-			log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
-			log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
 				//jarPath = basePath + "build" + GDE.FILE_SEPARATOR_UNIX + "target" + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME; //$NON-NLS-1$ //$NON-NLS-2$
 				//targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
@@ -1020,10 +1020,10 @@ public class FileUtils {
 			}
 		}
 		else { // started outside java -jar *.jar
-			log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf("/") + 1); //$NON-NLS-1$
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
-			log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
 				//jarPath = basePath + Settings.DEVICE_PROPERTIES_DIR_NAME;
 				//targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
@@ -1033,7 +1033,7 @@ public class FileUtils {
 				e.printStackTrace(System.err);
 			}
 		}
-		log.log(Level.FINE, "device plug-ins path = " + jarPath); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "device plug-ins path = " + jarPath); //$NON-NLS-1$
 		return jarPath;
 	}
 
@@ -1046,11 +1046,11 @@ public class FileUtils {
 		Vector<String> pluginNamesVector = new Vector<String>();
 		Manifest m = jarFile.getManifest();
 		String services = m.getMainAttributes().getValue("Export-Service"); //$NON-NLS-1$
-		log.log(Level.FINE, "Export-Service = " + services); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "Export-Service = " + services); //$NON-NLS-1$
 		String[] seriveNames = services.split(", *"); //$NON-NLS-1$
 		for (String name : seriveNames) {
 			name = name.substring(name.lastIndexOf('.') + 1);
-			log.log(Level.FINE, "service name = " + name); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "service name = " + name); //$NON-NLS-1$
 			pluginNamesVector.add(name);
 		}
 		return pluginNamesVector.toArray(new String[0]);

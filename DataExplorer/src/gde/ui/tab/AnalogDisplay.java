@@ -130,7 +130,7 @@ public class AnalogDisplay extends Composite {
 	public void create() {
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
-				log.log(Level.FINER, "AnalogDisplay.helpRequested " + evt); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "AnalogDisplay.helpRequested " + evt); //$NON-NLS-1$
 				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_8.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
@@ -150,9 +150,9 @@ public class AnalogDisplay extends Composite {
 	}
 
 	void tachoPaintControl(PaintEvent evt) {
-		log.log(Level.FINEST, "tacho.paintControl, event=" + evt); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "tacho.paintControl, event=" + evt); //$NON-NLS-1$
 		if (this.record != null) {
-			log.log(Level.FINER, "record name = " + this.recordKey); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "record name = " + this.recordKey); //$NON-NLS-1$
 
 			// Get the canvas and its dimensions to check if size changed
 			this.tachoImageBounds = ((Canvas) evt.widget).getClientArea();
@@ -172,10 +172,10 @@ public class AnalogDisplay extends Composite {
 			}
 
 			// draw new tacho
-			log.log(Level.FINE, "tacho redaw required for " + this.recordKey); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "tacho redaw required for " + this.recordKey); //$NON-NLS-1$
 			this.width = this.tachoImageBounds.width;
 			this.height = this.tachoImageBounds.height;
-			log.log(Level.FINER, "canvas size = " + this.width + " x " + this.height); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "canvas size = " + this.width + " x " + this.height); //$NON-NLS-1$ //$NON-NLS-2$
 			// get the image and prepare GC
 			this.tachoImage = SWTResourceManager.getImage(this.width, this.height, this.recordKey);
 			this.tachoImageGC = SWTResourceManager.getGC(this.tachoImage);
@@ -190,10 +190,10 @@ public class AnalogDisplay extends Composite {
 			double radiusW = ((double)this.width / 2.0 * 0.80);
 			//int radiusH = (int) (this.height / 2 * 0.90);
 			double radiusH = this.height * 0.75 - this.textHeight - 40;
-			//log.log(Level.FINE, "radiusH = " + radiusH + " radiusLimitH = " + radiusLimitH);
+			//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "radiusH = " + radiusH + " radiusLimitH = " + radiusLimitH);
 			//radiusH = radiusH < radiusLimitH ? radiusH : radiusLimitH;
 			this.radius = (int)(radiusW < radiusH ? radiusW : radiusH);
-			log.log(Level.FINER, "radius = " + this.radius + " height = " + this.height + " width = " + this.width);
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "radius = " + this.radius + " height = " + this.height + " width = " + this.width);
 			this.angleStart = -20;
 			this.angleDelta = 220;
 			this.tachoImageGC.setForeground(this.record.getColor());
@@ -219,7 +219,7 @@ public class AnalogDisplay extends Composite {
 				dxtext = Double.valueOf((this.radius + 30) * Math.cos(angle * Math.PI / 180)).intValue();
 				dytext = Double.valueOf((this.radius + 30) * Math.sin(angle * Math.PI / 180)).intValue();
 				String valueText = df.format(this.minValue + (i * deltaValue));
-				log.log(Level.FINE, "value = " + valueText);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "value = " + valueText);
 				GraphicsUtils.drawTextCentered(valueText, this.centerX - dxtext, this.centerY - dytext, this.tachoImageGC, SWT.HORIZONTAL);
 			}
 			// center knob
@@ -235,7 +235,7 @@ public class AnalogDisplay extends Composite {
 			//draw the new needle if required
 			Rectangle damageBounds = getNeedleBounds();
 			double tmpActualValue = this.device.translateValue(this.record, (this.record.lastElement() / 1000.0));
-			log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
 			if (tmpActualValue != this.actualValue) {
 				this.actualValue = tmpActualValue;
 				damageBounds = getNeedleBounds();
@@ -265,7 +265,7 @@ public class AnalogDisplay extends Composite {
 		int needleRadius = this.radius - 5;
 		int innerRadius = (int) (this.radius * 0.1) + 3;
 		double angle = this.angleStart + (this.actualValue - this.minValue) / (this.maxValue - this.minValue) * this.angleDelta;
-		log.log(Level.FINE, "angle = " + angle + " actualValue = " + this.actualValue); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "angle = " + angle + " actualValue = " + this.actualValue); //$NON-NLS-1$ //$NON-NLS-2$
 
 		int posXo = Double.valueOf(this.centerX - (needleRadius * Math.cos(angle * Math.PI / 180))).intValue();
 		int posYo = Double.valueOf(this.centerY - (needleRadius * Math.sin(angle * Math.PI / 180))).intValue();
@@ -306,7 +306,7 @@ public class AnalogDisplay extends Composite {
 	 */
 	public void checkTachoNeedlePosition() {
 		double tmpActualValue = this.device.translateValue(this.record, (this.record.lastElement() / 1000.0));
-		log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
 		if (tmpActualValue != this.actualValue) {
 			Rectangle damageBounds = getNeedleBounds(); 
 			redraw(damageBounds.x, damageBounds.y, damageBounds.width, damageBounds.height, true);

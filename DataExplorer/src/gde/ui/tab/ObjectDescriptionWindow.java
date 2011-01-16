@@ -246,7 +246,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		this.tabComposite.setMenu(this.popupmenu);
 		this.tabComposite.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
-				log.log(Level.FINER, "tabComposite.helpRequested " + evt); 			//$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tabComposite.helpRequested " + evt); 			//$NON-NLS-1$
 				ObjectDescriptionWindow.this.application.openHelpDialog("", "HelpInfo_93.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
@@ -336,7 +336,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.objectTypeText.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
-							log.log(Level.FINEST, "objectTypeText.keyReleased, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "objectTypeText.keyReleased, event=" + evt); //$NON-NLS-1$
 							ObjectDescriptionWindow.this.isObjectDataSaved = false;
 						}
 					});
@@ -381,7 +381,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.dateText.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
-							log.log(Level.FINEST, "dateText.keyReleased, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dateText.keyReleased, event=" + evt); //$NON-NLS-1$
 							ObjectDescriptionWindow.this.isObjectDataSaved = false;
 						}
 					});
@@ -427,7 +427,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.statusText.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "statusText.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "statusText.widgetSelected, event=" + evt); //$NON-NLS-1$
 							ObjectDescriptionWindow.this.isObjectDataSaved = false;
 						}
 					});
@@ -451,7 +451,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				this.imageCanvas.setMenu(this.imagePopupMenu);
 				this.imageCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
-						log.log(Level.FINEST, "imageCanvas.paintControl, event=" + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "imageCanvas.paintControl, event=" + evt); //$NON-NLS-1$
 						ObjectDescriptionWindow.this.contextMenu.createMenu(ObjectDescriptionWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 						if (ObjectDescriptionWindow.this.imagePopupMenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED) != null
 								&& (Boolean) ObjectDescriptionWindow.this.imagePopupMenu.getData("OBJECT_IMAGE_CHANGED")) {
@@ -518,7 +518,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 							this.fontSelect.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									log.log(Level.FINEST, "fontSelect.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "fontSelect.widgetSelected, event=" + evt); //$NON-NLS-1$
 									setFont();
 								}
 							});
@@ -540,7 +540,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 								this.fontSizeSelectCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
-										log.log(Level.FINEST, "fontSizeSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+										if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "fontSizeSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 										setFontSize(Float.parseFloat(ObjectDescriptionWindow.this.fontSizeSelectCombo.getText()));
 									}
 								});
@@ -567,7 +567,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 							this.boldButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									log.log(Level.FINEST, "boldButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "boldButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 									setStyle(ObjectDescriptionWindow.this.boldButton);
 								}
 							});
@@ -580,7 +580,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 							this.italicButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									log.log(Level.FINEST, "italicButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "italicButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 									setStyle(ObjectDescriptionWindow.this.italicButton);
 								}
 							});
@@ -593,7 +593,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 							this.underlineButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									log.log(Level.FINEST, "underlineButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "underlineButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 									setStyle(ObjectDescriptionWindow.this.underlineButton);
 								}
 							});
@@ -606,7 +606,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 							this.strikeoutButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									log.log(Level.FINEST, "strikeoutButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "strikeoutButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 									setStyle(ObjectDescriptionWindow.this.strikeoutButton);
 								}
 							});
@@ -619,7 +619,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 							this.fColorButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									log.log(Level.FINEST, "colorItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "colorItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 									RGB rgb = new ColorDialog(ObjectDescriptionWindow.this.editToolBar.getShell()).open();
 									ObjectDescriptionWindow.this.fColorButton.setData(rgb);
 									setStyle(ObjectDescriptionWindow.this.fColorButton);
@@ -634,7 +634,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 							this.bColorButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									log.log(Level.FINEST, "colorItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "colorItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 									RGB rgb = new ColorDialog(ObjectDescriptionWindow.this.editToolBar.getShell()).open();
 									ObjectDescriptionWindow.this.bColorButton.setData(rgb);
 									setStyle(ObjectDescriptionWindow.this.bColorButton);
@@ -649,7 +649,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 							this.copyButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									log.log(Level.FINEST, "copyButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "copyButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 									handleCutCopy();
 									ObjectDescriptionWindow.this.styledText.copy();
 								}
@@ -663,7 +663,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 							this.cutButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									log.log(Level.FINEST, "cutButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "cutButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 									handleCutCopy();
 									ObjectDescriptionWindow.this.styledText.cut();
 								}
@@ -677,11 +677,11 @@ public class ObjectDescriptionWindow extends CTabItem {
 							this.pasteButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									log.log(Level.FINEST, "pasteButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "pasteButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 									ObjectDescriptionWindow.this.styledText.paste();
 									//Clipboard clipboard = new Clipboard(tabComposite.getDisplay());
 									//String data = (String) clipboard.getContents(RTFTransfer.getInstance());
-									//log.log(Level.FINEST, data);
+									//if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, data);
 									//FileInputStream stream = new FileInputStream("sample.rtf");
 									//RTFEditorKit kit = new RTFEditorKit();
 									//Document doc = kit.createDefaultDocument();
@@ -730,7 +730,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.styledText.setMenu(this.popupmenu);
 					this.styledText.addExtendedModifyListener(new ExtendedModifyListener() {
 						public void modifyText(ExtendedModifyEvent evt) {
-							log.log(Level.FINEST, "styledText.modifyText, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "styledText.modifyText, event=" + evt); //$NON-NLS-1$
 							if (evt.length == 0) return;
 							StyleRange style;
 							if (evt.length == 1 || ObjectDescriptionWindow.this.styledText.getTextRange(evt.start, evt.length).equals(ObjectDescriptionWindow.this.styledText.getLineDelimiter())) {
@@ -772,24 +772,24 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.styledText.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
-							log.log(Level.FINEST, "styledText.keyReleased, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "styledText.keyReleased, event=" + evt); //$NON-NLS-1$
 							ObjectDescriptionWindow.this.isObjectDataSaved = false;
 						}
 
 						@Override
 						public void keyPressed(KeyEvent evt) {
-							log.log(Level.FINEST, "styledText.keyPressed, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "styledText.keyPressed, event=" + evt); //$NON-NLS-1$
 							if ((evt.stateMask & SWT.CTRL) != 0) {
 								if (evt.keyCode == 'x') { //cut
-									log.log(Level.FINE, "SWT.CTRL + 'x'"); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "SWT.CTRL + 'x'"); //$NON-NLS-1$
 									handleCutCopy();
 								}
 								else if (evt.keyCode == 'c') { //copy
-									log.log(Level.FINE, "SWT.CTRL + 'c'"); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "SWT.CTRL + 'c'"); //$NON-NLS-1$
 									handleCutCopy();
 								}
 								else if (evt.keyCode == 'v') { //paste
-									log.log(Level.FINE, "SWT.CTRL + 'v'"); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "SWT.CTRL + 'v'"); //$NON-NLS-1$
 								}
 							}
 						}

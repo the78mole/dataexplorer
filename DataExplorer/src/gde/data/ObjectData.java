@@ -18,9 +18,16 @@
 ****************************************************************************************/
 package gde.data;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.io.ObjectDataReaderWriter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
 import java.util.Properties;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -32,26 +39,12 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.printing.Printer;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.io.ObjectDataReaderWriter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-
 /**
  * @author Winfried Brügmann
  * Class to handle object relevant data, like object key, object description, object type, object image, ....
  */
 public class ObjectData {
-	/**
-	 * 
-	 */
 	public static final String	STRING_STYLED_TEXT_DEFAULT	= Messages.getString(MessageIds.GDE_MSGT0433);
-
-	final static Logger	log	= Logger.getLogger(ObjectData.class.getName());
-
 
 	String							key;
 	String							type;

@@ -21,6 +21,7 @@ package gde.device;
 import gde.GDE;
 import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
+import gde.data.RecordSet;
 import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
@@ -57,7 +58,7 @@ import org.eclipse.swt.custom.CTabItem;
  * @author Winfried Brügmann
  */
 public class DeviceConfiguration {
-	private final static Logger									log												= Logger.getLogger(DeviceConfiguration.class.getName());
+	private final static Logger								log												= Logger.getLogger(DeviceConfiguration.class.getName());
 
 	private final Settings										settings;
 
@@ -169,7 +170,7 @@ public class DeviceConfiguration {
 		this.desktop = this.deviceProps.getDesktop();
 		this.isChangePropery = false;
 		
-		log.log(Level.FINE, this.toString());
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
 	}
 
 	/**
@@ -190,7 +191,7 @@ public class DeviceConfiguration {
 		this.desktop = deviceProps.desktop;
 		this.isChangePropery = deviceConfig.isChangePropery;
 
-		log.log(Level.FINE, this.toString());
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
 	}
 
 	/**
@@ -1233,7 +1234,7 @@ public class DeviceConfiguration {
 	 * @param isActive
 	 */
 	public void setMeasurementActive(int channelConfigNumber, int measurementOrdinal, boolean isActive) {
-		log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).setActive(isActive); //$NON-NLS-1$
 	}
@@ -1246,7 +1247,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public void setMeasurementActive(String channelConfigKey, int measurementOrdinal, boolean isActive) {
-		log.log(Level.FINER, "channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigKey, measurementOrdinal).setActive(isActive); //$NON-NLS-1$
 	}
@@ -1337,7 +1338,7 @@ public class DeviceConfiguration {
 	 * @param name
 	 */
 	public void setMeasurementName(int channelConfigNumber, int measurementOrdinal, String name) {
-		log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).setName(name);
 	}
@@ -1350,7 +1351,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public void setMeasurementName(String channelConfigKey, int measurementOrdinal, String name) {
-		log.log(Level.FINER, "channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigKey, measurementOrdinal).setName(name);
 	}
@@ -1362,7 +1363,7 @@ public class DeviceConfiguration {
 	 * @return dataUnit as string
 	 */
 	public String getMeasurementUnit(int channelConfigNumber, int measurementOrdinal) {
-		log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return this.getMeasurement(channelConfigNumber, measurementOrdinal).getUnit(); //$NON-NLS-1$
 	}
 	
@@ -1374,7 +1375,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public String getMeasurementUnit(String channelConfigKey, int measurementOrdinal) {
-		log.log(Level.FINER, "channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return this.getMeasurement(channelConfigKey, measurementOrdinal).getUnit(); //$NON-NLS-1$
 	}
 
@@ -1385,7 +1386,7 @@ public class DeviceConfiguration {
 	 * @param unit
 	 */
 	public void setMeasurementUnit(int channelConfigNumber, int measurementOrdinal, String unit) {
-		log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelConfigNumber = \"" + channelConfigNumber + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigNumber)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).setUnit(unit);
 	}
@@ -1398,7 +1399,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public void setMeasurementUnit(String channelConfigKey, int measurementOrdinal, String unit) {
-		log.log(Level.FINER, "channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "channelKey = \"" + channelConfigKey + "\" measurementKey = \"" + this.getMeasurementNames(channelConfigKey)[measurementOrdinal] + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		this.isChangePropery = true;
 		this.getMeasurement(channelConfigKey, measurementOrdinal).setUnit(unit);
 	}
@@ -1454,7 +1455,7 @@ public class DeviceConfiguration {
 	 * @return statistics, if statistics does not exist return null
 	 */
 	public StatisticsType getMeasurementStatistic(int channelConfigNumber, int measurementOrdinal) {
-		log.log(Level.FINER, "get statistics type from measurement = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get statistics type from measurement = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
 		return this.getMeasurement(channelConfigNumber, measurementOrdinal).getStatistics();
 	}
 
@@ -1466,7 +1467,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public StatisticsType getMeasurementStatistic(String channelConfigKey, int measurementOrdinal) {
-		log.log(Level.FINER, "get statistics type from measurement = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get statistics type from measurement = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		return this.getMeasurement(channelConfigKey, measurementOrdinal).getStatistics();
 	}
 
@@ -1476,7 +1477,7 @@ public class DeviceConfiguration {
 	 * @param measurementOrdinal
 	 */
 	public void removeStatisticsTypeFromMeasurement(int channelConfigNumber, int measurementOrdinal) {
-		log.log(Level.FINER, "remove statistics type from measurement = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "remove statistics type from measurement = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).setStatistics(null);
 	}
 	
@@ -1594,7 +1595,7 @@ public class DeviceConfiguration {
 	 * @return the offset, if property does not exist return 0.0 as default value
 	 */
 	public double getMeasurementOffset(int channelConfigNumber, int measurementOrdinal) {
-		log.log(Level.FINER, "get offset from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get offset from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.OFFSET);
 		if (property != null)
@@ -1611,7 +1612,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public double getMeasurementOffset(String channelConfigKey, int measurementOrdinal) {
-		log.log(Level.FINER, "get offset from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get offset from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET);
 		if (property != null)
@@ -1627,7 +1628,7 @@ public class DeviceConfiguration {
 	 * @param offset the offset to set
 	 */
 	public void setMeasurementOffset(int channelConfigNumber, int measurementOrdinal, double offset) {
-		log.log(Level.FINER, "set offset onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set offset onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.OFFSET);
 		if (property == null) {
 			createProperty(channelConfigNumber, measurementOrdinal, IDevice.OFFSET, DataTypes.DOUBLE, offset);
@@ -1645,7 +1646,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public void setMeasurementOffset(String channelConfigKey, int measurementOrdinal, double offset) {
-		log.log(Level.FINER, "set offset onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set offset onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET, DataTypes.DOUBLE, offset);
@@ -1662,7 +1663,7 @@ public class DeviceConfiguration {
 	 * @return the factor, if property does not exist return 1.0 as default value
 	 */
 	public double getMeasurementFactor(int channelConfigNumber, int measurementOrdinal) {
-		log.log(Level.FINER, "get factor from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get factor from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
 		double value = 1.0;
 		PropertyType property = getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.FACTOR);
 		if (property != null)
@@ -1679,7 +1680,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public double getMeasurementFactor(String channelConfigKey, int measurementOrdinal) {
-		log.log(Level.FINER, "get factor from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get factor from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		double value = 1.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR);
 		if (property != null)
@@ -1695,7 +1696,7 @@ public class DeviceConfiguration {
 	 * @param factor the offset to set
 	 */
 	public void setMeasurementFactor(int channelConfigNumber, int measurementOrdinal, double factor) {
-		log.log(Level.FINER, "set factor onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set factor onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.FACTOR);
 		if (property == null) {
 			createProperty(channelConfigNumber, measurementOrdinal, IDevice.FACTOR, DataTypes.DOUBLE, factor);
@@ -1713,7 +1714,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public void setMeasurementFactor(String channelConfigKey, int measurementOrdinal, double factor) {
-		log.log(Level.FINER, "set factor onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set factor onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR, DataTypes.DOUBLE, factor);
@@ -1730,7 +1731,7 @@ public class DeviceConfiguration {
 	 * @return the reduction, if property does not exist return 0.0 as default value
 	 */
 	public double getMeasurementReduction(int channelConfigNumber, int measurementOrdinal) {
-		log.log(Level.FINER, "get reduction from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get reduction from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.REDUCTION);
 		if (property != null)
@@ -1747,7 +1748,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public double getMeasurementReduction(String channelConfigKey, int measurementOrdinal) {
-		log.log(Level.FINER, "get reduction from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "get reduction from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION);
 		if (property != null)
@@ -1763,7 +1764,7 @@ public class DeviceConfiguration {
 	 * @param reduction of the direct measured value
 	 */
 	public void setMeasurementReduction(int channelConfigNumber, int measurementOrdinal, double reduction) {
-		log.log(Level.FINER, "set reduction onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set reduction onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.REDUCTION);
 		if (property == null) {
 			createProperty(channelConfigNumber, measurementOrdinal, IDevice.REDUCTION, DataTypes.DOUBLE, reduction);
@@ -1781,7 +1782,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public void setMeasurementReduction(String channelConfigKey, int measurementOrdinal, double reduction) {
-		log.log(Level.FINER, "set reduction onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set reduction onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION, DataTypes.DOUBLE, reduction);
@@ -2039,4 +2040,17 @@ public class DeviceConfiguration {
 		if (this.isChangePropery = this.deviceProps.getChannels().getLastUseOrdinal() != (channelNumber - 1)) 
 			this.deviceProps.getChannels().setLastUseOrdinal(channelNumber - 1);
 	}
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		return recordSet.getRecordNames(); // return unchanged set of measurements as default
+	}
+
 }

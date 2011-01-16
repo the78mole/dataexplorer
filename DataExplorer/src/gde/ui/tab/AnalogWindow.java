@@ -95,18 +95,18 @@ public class AnalogWindow extends CTabItem {
 			this.analogMainCompositeLayout.numColumns = 2;
 			this.setControl(this.analogMainComposite);
 			this.analogMainComposite.setLayout(this.analogMainCompositeLayout);
-			log.log(Level.FINE, "digitalMainComposite " + this.analogMainComposite.getBounds().toString()); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "digitalMainComposite " + this.analogMainComposite.getBounds().toString()); //$NON-NLS-1$
 			this.analogMainComposite.setBackground(this.surroundingBackground);
 			this.analogMainComposite.setMenu(this.popupmenu);
 			this.analogMainComposite.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.log(Level.FINER, "analogMainComposite.helpRequested " + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "analogMainComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_8.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.analogMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.log(Level.FINE, "analogMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "analogMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 					AnalogWindow.this.contextMenu.createMenu(AnalogWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 					update(false);
 				}
@@ -140,17 +140,17 @@ public class AnalogWindow extends CTabItem {
 	public synchronized void update(boolean forceUpdate) {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null && this.analogMainComposite.isVisible()) {
-			log.log(Level.FINE, GDE.STRING_BLANK);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.STRING_BLANK);
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isAnalogTabRequested()) {
 				String[] recordsToDisplay = recordSet.getDisplayableAndVisibleRecordNames();
-				log.log(Level.FINE, activeChannel.getName());
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, activeChannel.getName());
 				// if recordSet name signature changed new displays need to be created
 				boolean isUpdateRequired = forceUpdate || this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
 				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
 						|| (recordsToDisplay.length != this.oldRecordsToDisplay.length);
-				log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
 					// set the grid layout
 					this.analogMainComposite.setLayout(this.analogMainCompositeLayout);
@@ -166,7 +166,7 @@ public class AnalogWindow extends CTabItem {
 					for (String recordKey : recordSet.getDisplayableAndVisibleRecordNames()) {
 						AnalogDisplay display = new AnalogDisplay(this.analogMainComposite, recordKey, DataExplorer.getInstance().getActiveDevice());
 						display.create();
-						log.log(Level.FINE, "created analog display for " + recordKey); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "created analog display for " + recordKey); //$NON-NLS-1$
 						this.displays.put(recordKey, display);
 					}
 					this.oldRecordSet = recordSet;
@@ -177,7 +177,7 @@ public class AnalogWindow extends CTabItem {
 				for (String recordKey : this.displays.keySet().toArray(new String[0])) {
 					AnalogDisplay display = this.displays.get(recordKey);
 					if (display != null) {
-						log.log(Level.FINE, "clean child " + recordKey); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "clean child " + recordKey); //$NON-NLS-1$
 						if (!display.isDisposed()) display.dispose();
 						this.displays.remove(recordKey);
 					}

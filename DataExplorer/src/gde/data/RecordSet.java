@@ -779,7 +779,7 @@ public class RecordSet extends HashMap<String, Record> {
 			sb.append(recordNames[i]).append(GDE.STRING_MESSAGE_CONCAT);
 		}
 		sb.delete(sb.length() - 3, sb.length());
-		log.logp(Level.FINE, $CLASS_NAME, methodName, sb.toString());
+		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, methodName, sb.toString());
 	}
 
 	/**
@@ -1712,7 +1712,7 @@ public class RecordSet extends HashMap<String, Record> {
 		boolean isContained = false;
 		synchronized (this.scaleSyncedRecords) {
 			for (Record tempRecord : this.scaleSyncedRecords.get(syncMasterRecordOrdinal)) {
-				log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + tmpRecord.name);
+				if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + tmpRecord.name);
 				if (tempRecord.name.equals(tmpRecord.name)) {
 					isContained = true;
 					break;

@@ -70,7 +70,7 @@ public class TimeSteps extends Vector<Integer> {
 				}
 			}
 		}
-  	log.log(Level.FINER, this.toString());
+  	if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
 	}
 	
 	/**

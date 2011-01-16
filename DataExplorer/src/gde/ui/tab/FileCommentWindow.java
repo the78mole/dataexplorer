@@ -111,13 +111,13 @@ public class FileCommentWindow extends CTabItem {
 		this.commentMainComposite.setMenu(this.popupmenu);
 		this.commentMainComposite.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {
-				log.log(Level.FINE, "commentMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "commentMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 				updateRecordSetTable();
 			}
 		});
 		this.commentMainComposite.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
-				log.log(Level.FINER, "commentMainComposite.helpRequested " + evt); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "commentMainComposite.helpRequested " + evt); //$NON-NLS-1$
 				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_92.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
@@ -131,7 +131,7 @@ public class FileCommentWindow extends CTabItem {
 			this.infoLabel.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {
-					log.log(Level.FINER, "infoLabel.paintControl " + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "infoLabel.paintControl " + evt); //$NON-NLS-1$
 					FileCommentWindow.this.contextMenu.createMenu(FileCommentWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 				}
 			});
@@ -146,27 +146,27 @@ public class FileCommentWindow extends CTabItem {
 			this.fileCommentText.setMenu(this.popupmenu);
 			this.fileCommentText.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.log(Level.FINER, "fileCommentText.helpRequested " + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_92.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.fileCommentText.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyPressed(KeyEvent e) {
-					log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
 					FileCommentWindow.this.isFileCommentChanged = true;
 				}
 			});
 			this.fileCommentText.addFocusListener(new FocusListener() {
 				@Override
 				public void focusLost(FocusEvent evt) {
-					log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
 					setFileComment();
 				}
 
 				@Override
 				public void focusGained(FocusEvent evt) {
-					log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
 				}
 			});
 		}
@@ -181,7 +181,7 @@ public class FileCommentWindow extends CTabItem {
 			this.recordCommentTable.setMenu(this.popupmenu);
 			this.recordCommentTable.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.log(Level.FINER, "recordCommentTable.helpRequested " + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordCommentTable.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_92.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
@@ -208,9 +208,9 @@ public class FileCommentWindow extends CTabItem {
 	 */
 	synchronized void updateRecordSetTable() {
 		Point mainSize = FileCommentWindow.this.commentMainComposite.getSize();
-		//log.log(Level.FINE, "mainSize = " + mainSize.toString());
+		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "mainSize = " + mainSize.toString());
 		Rectangle bounds = new Rectangle(mainSize.x * 5 / 100, mainSize.y * 10 / 100, mainSize.x * 90 / 100, mainSize.y * 40 / 100);
-		//log.log(Level.FINE, "cover bounds = " + bounds.toString());
+		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cover bounds = " + bounds.toString());
 		FileCommentWindow.this.infoLabel.setBounds(50, 10, bounds.width, bounds.y - 10);
 		FileCommentWindow.this.fileCommentText.setBounds(bounds);
 		if (this.channels.getActiveChannel() != null) {

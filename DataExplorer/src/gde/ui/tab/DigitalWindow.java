@@ -97,13 +97,13 @@ public class DigitalWindow extends CTabItem {
 			this.digitalMainComposite.setMenu(this.popupmenu);
 			this.digitalMainComposite.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					log.log(Level.FINER, "digitalMainComposite.helpRequested " + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "digitalMainComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_7.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.digitalMainComposite.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					log.log(Level.FINE, "digitalMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "digitalMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 					DigitalWindow.this.contextMenu.createMenu(DigitalWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
 					update(false);
 				}
@@ -135,7 +135,7 @@ public class DigitalWindow extends CTabItem {
 	public void update(boolean forceUpdate) {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null && this.digitalMainComposite.isVisible()) {
-			log.log(Level.FINE, GDE.STRING_BLANK);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.STRING_BLANK);
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isDigitalTabRequested()) {
@@ -145,7 +145,7 @@ public class DigitalWindow extends CTabItem {
 				boolean isUpdateRequired = forceUpdate || this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
 				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
 						|| (recordsToDisplay.length != this.oldRecordsToDisplay.length);
-				log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
 					// set layout 
 					this.digitalMainComposite.setLayout(this.digitalMainCompositeLayout);
@@ -161,7 +161,7 @@ public class DigitalWindow extends CTabItem {
 					for (String recordKey : recordSet.getDisplayableAndVisibleRecordNames()) {
 						DigitalDisplay display = new DigitalDisplay(this.application, this.digitalMainComposite, recordKey, DataExplorer.getInstance().getActiveDevice());
 						display.create();
-						log.log(Level.FINE, "created digital display for " + recordKey); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "created digital display for " + recordKey); //$NON-NLS-1$
 						this.displays.put(recordKey, display);
 					}
 					this.oldRecordSet = recordSet;
@@ -172,7 +172,7 @@ public class DigitalWindow extends CTabItem {
 				for (String recordKey : this.displays.keySet().toArray(new String[0])) {
 					DigitalDisplay display = this.displays.get(recordKey);
 					if (display != null) {
-						log.log(Level.FINE, "clean child " + recordKey); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "clean child " + recordKey); //$NON-NLS-1$
 						if (!display.isDisposed()) display.dispose();
 						this.displays.remove(recordKey);
 					}

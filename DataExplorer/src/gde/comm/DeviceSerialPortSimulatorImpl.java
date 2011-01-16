@@ -225,7 +225,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
 						}
 						else { // WARNING, assume time out
-							log.logp(Level.TIME, $CLASS_NAME, "read()", "delay " + timeout_msec);
+							if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, $CLASS_NAME, "read()", "delay " + timeout_msec);
 							WaitTimer.delay(timeout_msec);
 							throw new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
 						}
@@ -306,7 +306,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
 						}
 						else { // WARNING, assume time out
-							log.logp(Level.TIME, $CLASS_NAME, "read()", "delay " + timeout_msec);
+							if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, $CLASS_NAME, "read()", "delay " + timeout_msec);
 							WaitTimer.delay(timeout_msec);
 							throw new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
 						}
@@ -387,7 +387,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
 						}
 						else { // WARNING, assume time out
-							log.logp(Level.TIME, $CLASS_NAME, "read()", "delay " + timeout_msec);
+							if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, $CLASS_NAME, "read()", "delay " + timeout_msec);
 							WaitTimer.delay(timeout_msec);
 							throw new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
 						}

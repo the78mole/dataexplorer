@@ -293,7 +293,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				}
 			}
 			this.template.store();
-			log.log(Level.FINE, "creating graphics template file " + Settings.getInstance().getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "creating graphics template file " + Settings.getInstance().getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
 		}
 	}
 	
@@ -340,7 +340,7 @@ public class Channel extends HashMap<String, RecordSet> {
 					recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
 					recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
 				}
-				log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 				if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
 					this.application.updateGraphicsWindow();
 				}
@@ -394,7 +394,7 @@ public class Channel extends HashMap<String, RecordSet> {
 					recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
 				}
 				recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-				log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 				if (recordSet != null && doUpdateVisibilityStatus) {
 					recordSet.device.updateVisibilityStatus(recordSet, false);
 				}
@@ -447,7 +447,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @param recordSetName p.e. "1) Laden"
 	 */
 	public void switchRecordSet(String recordSetName) {
-		log.log(Level.FINE, String.format("switching to record set threadId = %06d", Thread.currentThread().getId())); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("switching to record set threadId = %06d", Thread.currentThread().getId())); //$NON-NLS-1$
 		int percentage = this.application.getProgressPercentage();
 		if (percentage > 99 || percentage == 0)
 			this.application.setProgress(0, null);
@@ -599,16 +599,16 @@ public class Channel extends HashMap<String, RecordSet> {
 	public void checkAndLoadData() {
 		String fullQualifiedFileName = this.getFullQualifiedFileName();
 		for (String tmpRecordSetName : this.getRecordSetNames()) {
-			log.log(Level.FINER, "tmpRecordSetName = " + tmpRecordSetName); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpRecordSetName = " + tmpRecordSetName); //$NON-NLS-1$
 			Channel selectedChannel = Channels.getInstance().get(this.findChannelOfRecordSet(tmpRecordSetName));
-			log.log(Level.FINER, "selectedChannel = " + (selectedChannel != null ? selectedChannel.getName() : "null")); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "selectedChannel = " + (selectedChannel != null ? selectedChannel.getName() : "null")); //$NON-NLS-1$ //$NON-NLS-2$
 			if (selectedChannel != null) {
 				RecordSet tmpRecordSet = selectedChannel.get(tmpRecordSetName);
-				log.log(Level.FINER, "tmpRecordSet = " + (tmpRecordSet != null ? tmpRecordSet.getName() : "null")); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpRecordSet = " + (tmpRecordSet != null ? tmpRecordSet.getName() : "null")); //$NON-NLS-1$ //$NON-NLS-2$
 				if (tmpRecordSet != null && !tmpRecordSet.hasDisplayableData()) {
-					log.log(Level.FINER, "tmpRecordSetName needs data to loaded"); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpRecordSetName needs data to loaded"); //$NON-NLS-1$
 					if (tmpRecordSet.fileDataSize != 0 && tmpRecordSet.fileDataPointer != 0) {
-						log.log(Level.FINER, "loading data ..."); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "loading data ..."); //$NON-NLS-1$
 						tmpRecordSet.loadFileData(fullQualifiedFileName, this.application.getStatusBar() != null);
 					}	
 				}
