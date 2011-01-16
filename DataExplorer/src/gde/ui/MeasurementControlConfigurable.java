@@ -118,7 +118,7 @@ public class MeasurementControlConfigurable extends Composite {
 			this.measurement.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(Level.FINEST, "measurement.widgetSelected, event=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "measurement.widgetSelected, event=" + evt); //$NON-NLS-1$
 					boolean isVisible = MeasurementControlConfigurable.this.measurement.getSelection();
 					MeasurementControlConfigurable.this.device.setMeasurementActive(MeasurementControlConfigurable.this.channelConfigNumber, MeasurementControlConfigurable.this.ordinal, isVisible);
 					Channel activeChannel = MeasurementControlConfigurable.this.channels.getActiveChannel();
@@ -199,7 +199,7 @@ public class MeasurementControlConfigurable extends Composite {
 			this.measurementSynch.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(Level.FINEST, "measurementSynch.widgetSelected, event=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "measurementSynch.widgetSelected, event=" + evt); //$NON-NLS-1$
 					MeasurementControlConfigurable.this.measurementSynch.setSelection(synchronizeRecord(MeasurementControlConfigurable.this.measurementSynch.getSelection()));
 					MeasurementControlConfigurable.this.dialog.enableSaveButton(true);
 				}
@@ -233,9 +233,14 @@ public class MeasurementControlConfigurable extends Composite {
 		if (enable) {
 			RecordSet activeRecordSet = this.application.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				String syncMeasurementName = this.measurementType.getName().endsWith(this.filterExtend) ? this.measurementType.getName().substring(0,	this.measurementType.getName().length() - this.filterExtend.length()) : this.measurementType.getName();
-				if (activeRecordSet.get(syncMeasurementName) != null) {
-					this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,	activeRecordSet.get(syncMeasurementName).getOrdinal());
+				String syncMeasurementName_1 = this.measurementType.getName().endsWith(this.filterExtend) ? this.measurementType.getName().substring(0,	this.measurementType.getName().length() - this.filterExtend.length()) : this.measurementType.getName();
+				String syncMeasurementName_0 = syncMeasurementName_1.split(GDE.STRING_BLANK)[0];
+				if (activeRecordSet.get(syncMeasurementName_0) != null) {
+					this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,	activeRecordSet.get(syncMeasurementName_0).getOrdinal());
+					isEnabled = true;
+				}
+				else if (activeRecordSet.get(syncMeasurementName_1) != null) {
+					this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,	activeRecordSet.get(syncMeasurementName_1).getOrdinal());
 					isEnabled = true;
 				}
 			}
