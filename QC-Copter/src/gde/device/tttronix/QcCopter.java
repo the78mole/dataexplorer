@@ -152,7 +152,7 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(recordNames[i]);
 			measurement = this.getMeasurement(channelConfigNumber, i);
-			log.log(Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
 			if (record.isActive() != measurement.isActive()) {

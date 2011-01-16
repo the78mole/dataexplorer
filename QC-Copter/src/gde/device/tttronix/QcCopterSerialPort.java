@@ -29,6 +29,7 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
+import gde.utils.StringHelper;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -97,9 +98,7 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 
 				if (log.isLoggable(Level.FINER)) {
 					StringBuilder sb = new StringBuilder();
-					for (byte b : data) {
-						sb.append(String.format("0x%02x ,", b)); //$NON-NLS-1$
-					}
+					sb.append(StringHelper.convertHexInput(data));
 					log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, sb.toString());
 				}
 				

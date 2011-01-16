@@ -89,7 +89,7 @@ public class GathererThread extends Thread {
 		byte[] dataBuffer = null;
 		
 		this.isCollectDataStopped = false;
-		log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
 		StringBuffer terminalText = new StringBuffer();
 		while (!this.isCollectDataStopped && this.serialPort.isConnected()) {
@@ -98,7 +98,7 @@ public class GathererThread extends Thread {
 				// in case of time outs wait for 180 seconds max. for actions
 				if (this.dialog != null && !this.dialog.isDisposed() && this.dialog.getTabFolderSelectionIndex() == 0) {					
 					String text = this.serialPort.getTerminalData();
-					log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, text);
+					if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, text);
 					if (text.length() > 0 && !text.equals(GDE.STRING_EMPTY)) {
 						if (this.serialPort.containsSTX(text.getBytes())) {
 							this.dialog.setTerminalText(Messages.getString(MessageIds.GDE_MSGI1903));
@@ -163,7 +163,7 @@ public class GathererThread extends Thread {
 						this.device.updateVisibilityStatus(recordSet, true);
 					}
 					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
-					log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
+					if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
 
 					if (recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 						GathererThread.this.application.updateAllTabs(false);
@@ -178,17 +178,17 @@ public class GathererThread extends Thread {
 				// this case will be reached while data gathering enabled, but no data will be received
 				if (e instanceof TimeOutException) {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI1900));
-					log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI1900));
+					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI1900));
 				}
 				// program end or unexpected exception occurred, stop data gathering to enable save data by user
 				else {
-					log.log(java.util.logging.Level.FINE, "data gathering end detected"); //$NON-NLS-1$
+					log.log(Level.FINE, "data gathering end detected"); //$NON-NLS-1$
 					stopDataGatheringThread(true, e);
 				}
 			}
 		}
 		this.application.setStatusMessage(""); //$NON-NLS-1$
-		log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 		
 		if(!this.isCollectDataStopped) {
 			this.stopDataGatheringThread(true, null);
@@ -204,13 +204,13 @@ public class GathererThread extends Thread {
 		final String $METHOD_NAME = "stopDataGatheringThread"; //$NON-NLS-1$
 
 		if (throwable != null) {
-			log.logp(java.util.logging.Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
+			log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
 		}
 
 		this.isCollectDataStopped = true;
 
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
-			log.log(java.util.logging.Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (this.serialPort != null && this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
 			this.serialPort.close();
