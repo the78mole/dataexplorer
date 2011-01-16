@@ -95,6 +95,7 @@
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
+	            <property description="Scale synchronizations measurement reference ordinal" type="Integer" value="2" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Climb</name>
@@ -118,14 +119,14 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Distance</name>
+	            <name>DistanceStart</name>
 	            <symbol>d</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Direction</name>
+	            <name>DirectionStart</name>
 	            <symbol>w</symbol>
 	            <unit>°</unit>
 	            <active>true</active>

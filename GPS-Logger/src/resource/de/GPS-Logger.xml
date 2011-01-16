@@ -95,6 +95,7 @@
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
+	            <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="2" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Steigen</name>
@@ -118,14 +119,14 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Abstand</name>
+	            <name>AbstandStart</name>
 	            <symbol>d</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Richtung</name>
+	            <name>RichtungStart</name>
 	            <symbol>w</symbol>
 	            <unit>°</unit>
 	            <active>true</active>
