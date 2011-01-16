@@ -106,11 +106,9 @@ public class ApplicationLauncher {
 			if (!fqExecPath.contains(executable)) {
 				DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT0603, new String[] { executable, searchLocationInfo, searchExecutableKey }));
 			}
-			else {
-				if (GDE.IS_MAC) {
-					fqExecPath = GDE.STRING_MAC_APP_OPEN;
-				}
-			}
+			
+			if (GDE.IS_WINDOWS)  fqExecPath = "rundll32.exe";
+			else if (GDE.IS_MAC) fqExecPath = GDE.STRING_MAC_APP_OPEN;
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -125,6 +123,9 @@ public class ApplicationLauncher {
 	public void execute(final List<String> arguments) {
 		if (this.isLaunchable()) {
 			arguments.add(0, this.fqExecPath);
+			if (GDE.IS_WINDOWS) {
+				arguments.add(1, "url.dll,FileProtocolHandler");
+			}
 			if (GDE.IS_LINUX) {
 				arguments.add("&"); //$NON-NLS-1$
 			}
@@ -133,7 +134,7 @@ public class ApplicationLauncher {
 			}
 
 			try {
-				new ProcessBuilder(arguments).start(); //$NON-NLS-1$ //$NON-NLS-2$
+				Runtime.getRuntime().exec(arguments.toArray(new String[1]));
 			}
 			catch (Exception e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
