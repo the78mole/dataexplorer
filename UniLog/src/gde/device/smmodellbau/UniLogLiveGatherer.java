@@ -110,7 +110,7 @@ public class UniLogLiveGatherer extends Thread {
 			// timer interval
 			int timeIntervalPosition = readBuffer[10] & 0xFF;
 			this.timeStep_ms = this.time_ms[timeIntervalPosition];
-			log.log(Level.FINE, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "timeIntervalPosition = " + timeIntervalPosition + " timeStep_ms = " + this.timeStep_ms); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (SerialPortException e) {
 			this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
@@ -137,11 +137,11 @@ public class UniLogLiveGatherer extends Thread {
 		this.serialPort.isInterruptedByUser = false;
 		int delay = 0;
 		int period = this.timeStep_ms;
-		log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
 
 		this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, this.channelNumber, true, false));
-		log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 		final RecordSet recordSet = this.channel.get(recordSetKey);
 		this.channel.applyTemplate(recordSetKey, true);
 		this.device.updateInitialRecordSetComment(recordSet);
@@ -166,11 +166,11 @@ public class UniLogLiveGatherer extends Thread {
 			long measurementCount = 0;
 
 				public void run() {
-					log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
 					try {
 						if (UniLogLiveGatherer.this.isTimerRunning) {
 							// prepare the data for adding to record set
-							log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
 
 							// build the point array according curves from record set
 							byte[] dataBuffer = UniLogLiveGatherer.this.serialPort.queryLiveData();
@@ -216,14 +216,14 @@ public class UniLogLiveGatherer extends Thread {
 						String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$ 
 						cleanup(recordSetKey, message);
 					}
-					log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
 				}
 			};
 
 			// start the prepared timer thread within the live data gatherer thread
 			this.timer.scheduleAtFixedRate(this.timerTask, delay, period);
 			this.isTimerRunning = true;
-			log.log(Level.FINE, "exit"); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "exit"); //$NON-NLS-1$
 		}
 		else {
 			cleanup(recordSetKey, null);

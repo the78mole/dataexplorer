@@ -74,7 +74,7 @@ public class UniLogDataGatherer extends Thread {
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	// cast from Object to Vector<Integer>
 	public void run() {
-		log.log(Level.FINE, "entry data gatherer : " + this.channelNumber + " : " + this.configKey); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "entry data gatherer : " + this.channelNumber + " : " + this.configKey); //$NON-NLS-1$ //$NON-NLS-2$
 		Channel channel = Channels.getInstance().get(this.channelNumber);
 		String recordSetKey = null;
 		RecordSet recordSet = null;
@@ -97,7 +97,7 @@ public class UniLogDataGatherer extends Thread {
 			this.dialog.resetDataSetsLabel();
 			this.serialPort.setTransmitFinished(false);
 			HashMap<String, Object> data = this.serialPort.getData(this.dialog);
-			log.log(Level.FINE, "back from gathering data"); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "back from gathering data"); //$NON-NLS-1$
 
 			// iterate over number of telegram sets in map
 			String[] keys = data.keySet().toArray(new String[0]);		
@@ -105,7 +105,7 @@ public class UniLogDataGatherer extends Thread {
 			for (int i = 0; i < keys.length; i++) {
 				Vector<byte[]> telegrams = (Vector<byte[]>) data.get(keys[i]); //$NON-NLS-1$
 				// iterate over telegram entries to build the record set
-				log.log(Level.FINER, "number record set = " + keys[i]); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "number record set = " + keys[i]); //$NON-NLS-1$
 
 				recordSetKey = channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
 				
@@ -113,7 +113,7 @@ public class UniLogDataGatherer extends Thread {
 				this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.channelNumber);
 				
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
-				log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
 
 				recordSet = channel.get(recordSetKey); // record set where the data is added
 				this.device.updateInitialRecordSetComment(recordSet);
@@ -135,7 +135,7 @@ public class UniLogDataGatherer extends Thread {
 			}
 			// make all record set names visible in selection combo
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
-			log.log(Level.FINE, "exit data gatherer"); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "exit data gatherer"); //$NON-NLS-1$
 
 		}
 		catch (DataInconsitsentException e) {

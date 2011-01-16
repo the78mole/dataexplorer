@@ -27,6 +27,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.Checksum;
+import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 import gnu.io.NoSuchPortException;
 
@@ -111,7 +112,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 				verifyChecksum(readBuffer);
 				int memoryLeft = ((readBuffer[6] & 0xFF) << 8) + (readBuffer[7] & 0xFF);
 				int memoryUsed = memoryLeft;
-				log.log(Level.FINER, "memoryUsed = " + memoryUsed); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "memoryUsed = " + memoryUsed); //$NON-NLS-1$
 				
 				// reset data and prepare for read
 				this.write(COMMAND_RESET);
@@ -136,7 +137,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 						telegrams = new Vector<byte[]>();
 						telegrams.add(readBuffer);
 					}
-					log.log(Level.FINER, "numberRecordSet = " + numberRecordSet + " memoryLeft = " + memoryLeft); //$NON-NLS-1$ //$NON-NLS-2$						
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "numberRecordSet = " + numberRecordSet + " memoryLeft = " + memoryLeft); //$NON-NLS-1$ //$NON-NLS-2$						
 
 					++counter;
 					
@@ -204,9 +205,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 		if (log.isLoggable(Level.WARNING)) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Read before data: "); //$NON-NLS-1$
-			for (int i = 0; i < readBuffer.length; i++) {
-				sb.append(String.format("%02X ", readBuffer[i])); //$NON-NLS-1$
-			}
+			sb.append(StringHelper.convertHexInput(readBuffer));
 			log.logp(Level.WARNING, "UniLogSerialPort", "readRetry", sb.toString());
 		}
 		
@@ -219,9 +218,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 		if (log.isLoggable(Level.WARNING)) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Read after data: "); //$NON-NLS-1$
-			for (int i = 0; i < readBuffer.length; i++) {
-				sb.append(String.format("%02X ", readBuffer[i])); //$NON-NLS-1$
-			}
+			sb.append(StringHelper.convertHexInput(readBuffer));
 			log.logp(Level.WARNING, "UniLogSerialPort", "readRetry", sb.toString());
 		}
 		
@@ -241,7 +238,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 			while (this.getAvailableBytes() < 10 && retrys-- > 0 && !isInterruptedByUser) {
 				this.write(COMMAND_LIVE_VALUES);
 				WaitTimer.delay(250);
-				log.log(Level.FINE, "retryLimit = " + retrys); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "retryLimit = " + retrys); //$NON-NLS-1$
 			}
 			if (!isInterruptedByUser) {
 				// read data bytes to clear buffer
@@ -566,9 +563,9 @@ public class UniLogSerialPort extends DeviceCommPort {
 		int checkSum = 0;
 		int checkSumLast2Bytes = 0;
 		checkSum = Checksum.ADD(readBuffer, 2) + 1;
-		log.log(Level.FINER, "checkSum = " + checkSum); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "checkSum = " + checkSum); //$NON-NLS-1$
 		checkSumLast2Bytes = ((readBuffer[DATA_LENGTH_BYTES - 2] & 0xFF) << 8) + (readBuffer[DATA_LENGTH_BYTES - 1] & 0xFF);
-		log.log(Level.FINER, "checkSumLast2Bytes = " + checkSumLast2Bytes); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "checkSumLast2Bytes = " + checkSumLast2Bytes); //$NON-NLS-1$
 		
 		if (checkSum != checkSumLast2Bytes)
 			throw new CheckSumMissmatchException(Messages.getString(gde.messages.MessageIds.GDE_MSGE0034, new Object[] { checkSum, checkSumLast2Bytes } ));
@@ -585,7 +582,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 		int checkSumLast2Bytes = 0;
 		checkSum = Checksum.ADD(readBuffer, 2) + 1;
 		checkSumLast2Bytes = ((readBuffer[DATA_LENGTH_BYTES - 2] & 0xFF) << 8) + (readBuffer[DATA_LENGTH_BYTES - 1] & 0xFF);
-		log.log(Level.FINER, "checkSum = " + checkSum + " checkSumLast2Bytes = " + checkSumLast2Bytes); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "checkSum = " + checkSum + " checkSumLast2Bytes = " + checkSumLast2Bytes); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return (checkSum == checkSumLast2Bytes);
 	}
