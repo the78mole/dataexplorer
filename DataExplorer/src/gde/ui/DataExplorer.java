@@ -334,8 +334,9 @@ public class DataExplorer extends Composite {
 			this.isDeviceDialogModal = this.settings.isDeviceDialogsModal();
 
 			Rectangle displayBounds = DataExplorer.shell.getDisplay().getBounds();
-			int x = this.settings.getWindow().x < displayBounds.x ? 50 : this.settings.getWindow().x;
-			int y = this.settings.getWindow().y < displayBounds.y ? 50 : this.settings.getWindow().y;
+			Rectangle primaryDisplayBounds = DataExplorer.shell.getDisplay().getPrimaryMonitor().getBounds();
+			int x = this.settings.getWindow().x < displayBounds.x || this.settings.getWindow().x > primaryDisplayBounds.width ? 50 : this.settings.getWindow().x;
+			int y = this.settings.getWindow().y < displayBounds.y || this.settings.getWindow().y > primaryDisplayBounds.height ? 50 : this.settings.getWindow().y;
 			shell.setLocation(x, y);
 			int width = this.settings.getWindow().width + x > displayBounds.width ? displayBounds.width-x : this.settings.getWindow().width;
 			int height = this.settings.getWindow().height + y > displayBounds.height ? displayBounds.height-x : this.settings.getWindow().height;

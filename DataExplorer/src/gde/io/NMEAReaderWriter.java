@@ -127,6 +127,16 @@ public class NMEAReaderWriter {
 				}
 				binReader.close();
 				if (!lineEndingOcurred) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0042, new Object[] { chars, filePath }));
+				if (new String(buffer).indexOf(NMEAParser.NMEA.SETUP.toString(), 1) > -1) {
+					try {
+						//byte[] buffer = StringHelper.convert2ByteArray(strValues[1]);
+						data.timeOffsetUTC = (short) ((buffer[7+7] << 8) + (buffer[7+6] & 0x00FF));
+						data.timeOffsetUTC = data.timeOffsetUTC > 12 ? 12 : data.timeOffsetUTC < -12 ? -12 : data.timeOffsetUTC;
+					}
+					catch (Exception e) {
+						log.log(Level.WARNING, "failed interpreting binary data, time offset to UTC not set!");
+					}
+				}
 
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$		
 				Vector<String> lines = new Vector<String>();
