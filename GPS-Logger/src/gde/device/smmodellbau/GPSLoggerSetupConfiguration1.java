@@ -277,6 +277,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "timeZoneCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.timeZone = (short) (GPSLoggerSetupConfiguration1.this.timeZoneCombo.getSelectionIndex() - 12);
+							GPSLoggerSetupConfiguration1.this.dialog.device.setUTCdelta(GPSLoggerSetupConfiguration1.this.configuration.timeZone);
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});

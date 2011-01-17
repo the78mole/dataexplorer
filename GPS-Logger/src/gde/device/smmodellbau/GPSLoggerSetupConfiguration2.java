@@ -119,17 +119,17 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 		this.capacityCombo.setText(String.format(Locale.ENGLISH, "%5d", this.configuration.capacityUlAlarm)); //$NON-NLS-1$
 
 		this.addressSlider1.setSelection(this.configuration.mLinkAddressVario);
-		this.addressText1.setText(GDE.STRING_EMPTY + this.configuration.mLinkAddressVario);
+		this.addressText1.setText(sliderValues[this.configuration.mLinkAddressVario]);
 		this.addressSlider2.setSelection(this.configuration.mLinkAddressSpeed);
-		this.addressText2.setText(GDE.STRING_EMPTY + this.configuration.mLinkAddressSpeed);
+		this.addressText2.setText(sliderValues[this.configuration.mLinkAddressSpeed]);
 		this.addressSlider3.setSelection(this.configuration.mLinkAddressHeight);
-		this.addressText3.setText(GDE.STRING_EMPTY + this.configuration.mLinkAddressHeight);
+		this.addressText3.setText(sliderValues[this.configuration.mLinkAddressHeight]);
 		this.addressSlider4.setSelection(this.configuration.mLinkAddressDistance);
-		this.addressText4.setText(GDE.STRING_EMPTY + this.configuration.mLinkAddressDistance);
+		this.addressText4.setText(sliderValues[this.configuration.mLinkAddressDistance]);
 		this.addressSlider5.setSelection(this.configuration.mLinkAddressDirection);
-		this.addressText5.setText(GDE.STRING_EMPTY + this.configuration.mLinkAddressDirection);
+		this.addressText5.setText(sliderValues[this.configuration.mLinkAddressDirection]);
 		this.addressSlider6.setSelection(this.configuration.mLinkAddressTripLength);
-		this.addressText6.setText(GDE.STRING_EMPTY + this.configuration.mLinkAddressTripLength);
+		this.addressText6.setText(sliderValues[this.configuration.mLinkAddressTripLength]);
 	}
 
 	void initGUI() {

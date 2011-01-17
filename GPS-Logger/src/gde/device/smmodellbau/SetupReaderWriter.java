@@ -20,6 +20,7 @@ package gde.device.smmodellbau;
 
 import gde.GDE;
 import gde.device.smmodellbau.gpslogger.MessageIds;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
@@ -98,7 +99,7 @@ public class SetupReaderWriter {
 		FileDialog fd = this.application.openFileOpenDialog(this.parent, Messages.getString(MessageIds.GDE_MSGT2001), new String[] { GDE.FILE_ENDING_STAR_INI, GDE.FILE_ENDING_STAR },
 				this.device.getDataBlockPreferredDataLocation(), this.device.getDefaultConfigurationFileName(), SWT.SINGLE);
 		String selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
-		log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
+		log.log(Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {
 			try {
@@ -109,7 +110,7 @@ public class SetupReaderWriter {
 				data_in.close();
 
 				if (size != 192) {
-					log.log(java.util.logging.Level.SEVERE, "error reading configuration file, data size != 192 Bytes!"); //$NON-NLS-1$
+					log.log(Level.SEVERE, "error reading configuration file, data size != 192 Bytes!"); //$NON-NLS-1$
 				}
 				this.serialNumber 					= (buffer[1] << 8) + (buffer[0] & 0x00FF);
 				this.datarate 							= (buffer[3] << 8) + (buffer[2] & 0x00FF);
@@ -145,11 +146,11 @@ public class SetupReaderWriter {
 				System.arraycopy(buffer, 0, chkBuffer, 0, chkBuffer.length);
 				short checkCRC = Checksum.CRC16(chkBuffer, 0);
 				if (this.checkSum != checkCRC) {
-					log.log(java.util.logging.Level.WARNING, "Checksum missmatch!"); //$NON-NLS-1$
+					log.log(Level.WARNING, "Checksum missmatch!"); //$NON-NLS-1$
 				}
 			}
 			catch (Throwable e) {
-				log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+				log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
 	}
@@ -157,7 +158,7 @@ public class SetupReaderWriter {
 	void saveSetup() {
 		FileDialog fileDialog = this.application.prepareFileSaveDialog(this.parent, Messages.getString(MessageIds.GDE_MSGT2002), new String[] { GDE.FILE_ENDING_STAR_INI, GDE.FILE_ENDING_STAR },
 				this.device.getDataBlockPreferredDataLocation(), this.device.getDefaultConfigurationFileName());
-		log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
+		log.log(Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
 		String setupFilePath = fileDialog.open();
 		if (setupFilePath != null && setupFilePath.length() > 4) {
 			File setupFile = new File(setupFilePath);
@@ -223,14 +224,14 @@ public class SetupReaderWriter {
 				buffer[190] = (byte) (checkSum & 0x00FF);
 				buffer[191] = (byte) ((checkSum & 0xFF00) >> 8);
 
-				log.log(java.util.logging.Level.FINER, "$SETUP," + StringHelper.convertHexInput(buffer));
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "$SETUP," + StringHelper.convertHexInput(buffer));
 				FileOutputStream file_out = new FileOutputStream(setupFile);
 				DataOutputStream data_out = new DataOutputStream(file_out);
 				data_out.write(buffer);
 				data_out.close();
 			}
 			catch (Exception e) {
-				log.log(java.util.logging.Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
+				log.log(Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
 			}
 		}
 	}
