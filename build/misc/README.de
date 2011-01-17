@@ -11,12 +11,12 @@ Zur Zeit sind folgende Geräte eingebunden:
 											 - Picolario (Renschler) Variometer
 											 - UniLog (SM-Modellbau) Mulitmessgerät
 											 - LiPoWatch (SM-Modellbau) Motorsteller LiPo-Saver
+											 - GPS-Logger (SM-Modellbau) GPS, Multimessgerät
 											 - eStation BC6, BC610, BC8, 902 (Bantam) Lade-/Entlade-gerät
 											 - Pichler P6 , P60 (Pichler) Lade-/Entlade-gerät
 											 - VC820, VC840 (Conrad/VoltCraft) Multimeter
 											 - CSV2SerialAdapter, ermöglicht CVS als Log-Daten zu importieren
-											 - DataVario, DataVarioDuo, LinkVario (WStech) Variometer, GPS, Mulitmessgerät
-											 - GPS-Logger (SM-Modellbau) GPS, Multimessgerät
+											 - DataVario, DataVarioDuo, LinkVario, LinkVarioDuo (WStech) Variometer, GPS, Mulitmessgerät
 											 - NMEA-Adapter  GPS
 											 - QC-Copter (tt-tronix) Kontrolleinheit
 											 - Simulator Test Plug-in
@@ -30,7 +30,7 @@ Eine Installation ist nicht nötig, das im Archiv enthaltene Verzeichnis "DataExp
 einfach an einen Ort entpacken, wo Ausführungsrechte vorliegen. 
 Für Windowsbenutzer wäre das z.B. %ProgramFiles% für GNU/Linux-Benutzer "/opt" oder "/usr". Mac OS entpacken/verschieben unter /Applications (Programme)
 
-Achtung: Bitte keine Umlaute im Installationspfad benutzen, Java arbeitet standardmäßig mit UTF-8, da kann es Probleme mit der Konvertierung geben!
+Achtung: Bitte keine Umlaute im Installationspfad benutzen, Java arbeitet standardmäßig mit UTF-8, da kann es Probleme mit der Konvertierung in der Laufzeitumgebung geben!
 
 Für den ersten Start des Programms über ein Kommando-Fenster(Windows), Shell(GNU/Linux) in das DataExplorer Verzeichnis 
 wechseln und unter Windows, DataExplorer.exe oder Unix, DataExplorer, ausführen. Mac OS Benutzer finden das Startskript 
@@ -78,9 +78,10 @@ Füt GNU/Linux Anwender: RXTXcomm locked den seriellen Port über die Gruppe "uucp
 Für Mac OS Anwender: Hier gilt prinzipiell das Gleiche wie für GNU/Linux, nur dass das Verzeichnis /var/lock erst angelegt werden muss, siehe
 RXTX_Post-Install_MacOS.txt
 
-Hinweis: Soll der DataExplorer gleichzeitig auf mehreren Betriebssystemen verwendet werden, oder werden die Daten auf zentraler Stelle abelegt,
-sind Umlaute in den Dateinamen und Objektnamen zu vermeiden. (Umwandlung ISO-8859-1 nach UTF-8 und umgekehrt). Dateilinks unterscheiden sich von den verschiedenen Betriebssystemen.
-Objektbezogene Dateien werden micht dupliziert, sondern über Dateilinks referenziert. Vor einem Umzug der gesammelten Daten auf ein anderes Betriebssystem sind die objektbezogenen 
-Dateilinks zu entfernen und auf der Zielplatform wieder herzustellen. Dazu bitte den Einstallungsdialog, "Verschiedens" Tabulator benutzen.
+Hinweis: Soll der DataExplorer gleichzeitig auf mehreren Betriebssystemen verwendet werden, oder werden die Daten auf zentraler Stelle abgelegt,
+sind Umlaute in den Dateinamen und Objektnamen zu vermeiden. (Umwandlung ISO-8859-1 nach UTF-8 und umgekehrt). Dateilinks unterscheiden sich von den 
+verschiedenen Betriebssystemen. Objekt bezogene Dateien werden nicht dupliziert, sondern über Dateilinks referenziert. Vor einem Umzug der gesammelten 
+Daten auf ein anderes Betriebssystem sind die Objekt bezogenen Dateilinks zu entfernen und auf der Zielplatform wieder herzustellen. Dazu bitte den 
+Einstellungsdialog, "Verschiedenes" Tabulator benutzen.
 
 Um Fehler oder Anregungen zu melden, bitte eine e-Mail an die Adresse auf der Downloadseite.
