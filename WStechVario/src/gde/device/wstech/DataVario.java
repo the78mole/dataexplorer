@@ -376,7 +376,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.getRecordNames().length];
+		int[] points = new int[this.getDataBlockSize()]; // use data block size to retrieve size of none calculation measurements
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
@@ -406,7 +406,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			if(recordSet.isTimeStepConstant()) 
 				recordSet.addPoints(points);
 			else
-				recordSet.addPoints(points, timeStamps.get(i)/10.0);
+				recordSet.addNoneCalculationRecordsPoints(points, timeStamps.get(i)/10.0);
 
 			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
@@ -644,13 +644,13 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * export a file of the actual channel/record set
 	 * @return full qualified file path depending of the file ending type
 	 */
-	public String exportFile(String fileEndingType) {
+	public String exportFile(String fileEndingType, boolean isExportTmpDir) {
 		String exportFileName = GDE.STRING_EMPTY;
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KML)) {
-				exportFileName = new FileHandler().exportFileKML(7, 8, 9, 10, true);
+				exportFileName = new FileHandler().exportFileKML(7, 8, 9, 10, true, isExportTmpDir);
 			}
 		}
 		return exportFileName;
@@ -661,5 +661,27 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 */
 	public Integer getGPS2KMLMeasurementOrdinal() {
 		return 10; 
+	}
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		//check for WStech devices file contained record properties for containing calculated measurements
+		String[] recordKeys = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		if (recordKeys.length > fileRecordsProperties.length) {
+			for (int i = 0; i < this.getDataBlockSize(); ++i) {
+				cleanedRecordNames.add(recordKeys[i]);
+			}
+			recordKeys = cleanedRecordNames.toArray(new String[1]);
+		}
+		//record set don't need to adapted, since missing measurements will be calculated
+		return recordKeys;
 	}
 }
