@@ -172,6 +172,9 @@ public class FileHandler {
 		if (Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null && Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {
 			fileName = fileName + Channels.getInstance().getActiveChannel().getObjectKey();
 		}
+		if(application.getActiveChannel() != null && application.getActiveChannel().getActiveRecordSet() != null) {
+			fileName = fileName + application.getActiveChannel().getActiveRecordSet().getName().replace(") ", GDE.STRING_UNDER_BAR);
+		}
 		return fileName;
 	}
 
@@ -465,9 +468,10 @@ public class FileHandler {
 	 * @param ordinalHeight
 	 * @param ordinalVelocity
 	 * @param isHeightRelative
+	 * @param isExportTmpDir
 	 * @return full qualified file path to the exported KML file
 	 */
-	public String exportFileKML(final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final int ordinalVelocity, final boolean isHeightRelative) {
+	public String exportFileKML(final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final int ordinalVelocity, final boolean isHeightRelative, boolean isExportTmpDir) {
 		String kmlFilePath = GDE.STRING_EMPTY;
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
@@ -482,7 +486,7 @@ public class FileHandler {
 
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String path = isExportTmpDir ? GDE.JAVA_IO_TMPDIR : (deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX);
 		FileUtils.checkDirectoryAndCreate(path);
 		String fileName = path + (activeChannel.getFileName() == null ? this.getFileNameProposal() : activeChannel.getFileName());
 		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;

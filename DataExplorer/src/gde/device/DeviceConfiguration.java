@@ -1990,7 +1990,7 @@ public class DeviceConfiguration {
 	 * export a file of the actual channel/record set
 	 * @return full qualified file path depending of the file ending type
 	 */
-	public String exportFile(String fileEndingType) {
+	public String exportFile(String fileEndingType, boolean isExport2TmpDir) {
 		return GDE.STRING_EMPTY;
 	}
 	

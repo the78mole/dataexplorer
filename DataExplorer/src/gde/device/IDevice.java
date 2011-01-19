@@ -868,7 +868,7 @@ public interface IDevice {
 	 * export a file of the actual channel/record set
 	 * @return full qualified file path depending of the file ending type
 	 */
-	public String exportFile(String fileEndingType);
+	public String exportFile(String fileEndingType, boolean isExportTmpDir);
 	
 	/**
 	 * query the jar name of the active device implementation
