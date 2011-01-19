@@ -752,8 +752,8 @@ public class DataExplorer extends Composite {
 	 * @param requestingRecordSetName
 	 */
 	public void updateDataTable(String requestingRecordSetName, boolean forceClean) {
-		final Channel activeChannel = this.channels.getActiveChannel();
-		final RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+		final Channel activeChannel = this.channels != null ? this.channels.getActiveChannel() : null;
+		final RecordSet activeRecordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 
 		if (activeRecordSet != null && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
 				&& activeRecordSet.getName().equals(requestingRecordSetName)

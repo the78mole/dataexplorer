@@ -132,7 +132,7 @@ public class FileUtils {
 		File dir = new File(directory);
 		if (!dir.exists() && !dir.isDirectory()) {
 			exist = false;
-			if(dir.mkdirs())
+			if(!dir.mkdirs())
 				log.log(Level.WARNING, "failed to create " + directory);
 		}
 		return exist;
@@ -262,14 +262,16 @@ public class FileUtils {
 	public static void cleanFile(String fullQualifiedFilePath) {
 	    
 		if (FileUtils.checkFileExist(fullQualifiedFilePath) || FileUtils.checkDirectoryExist(fullQualifiedFilePath)) {
-		    File fileToBeDeleted = new File(fullQualifiedFilePath);
-			if (!fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite()) 
-				if(fileToBeDeleted.delete())
+			File fileToBeDeleted = new File(fullQualifiedFilePath);
+			if (!fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite()) {
+				if (fileToBeDeleted.delete())
 					log.log(Level.WARNING, "failed to delete " + fullQualifiedFilePath);
-			else if(fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite())
+			}
+			else if (fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite()) {
 				FileUtils.deleteDirectory(fileToBeDeleted.getAbsolutePath());
+			}
 			else
-				log.log(Level.WARNING, fileToBeDeleted.getAbsolutePath() + " is a directory or no delete permission !" ); //$NON-NLS-1$
+				log.log(Level.WARNING, fileToBeDeleted.getAbsolutePath() + " is a directory or no delete permission !"); //$NON-NLS-1$
 		}
 	}
 
@@ -277,7 +279,6 @@ public class FileUtils {
 	 * delete a file list, if exist
 	 */
 	public static void cleanFiles(String fileBasePath, String[] fileNames) {
-		fileBasePath = fileBasePath.endsWith(GDE.FILE_SEPARATOR_UNIX) ? fileBasePath : fileBasePath + GDE.FILE_SEPARATOR_UNIX;
 		Vector<String> fileNamesWildCard = new Vector<String>();
 		for (String fileName : fileNames) {
 			if (fileName.length() >= 2 && !fileName.contains(GDE.STRING_STAR)) { // "a.csv" "GDE", "OSDE"
@@ -1087,12 +1088,6 @@ public class FileUtils {
 			brout = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			while ((line = brout.readLine()) != null) {} // clean std out
 			process.waitFor(); // waits until termination
-			
-			//if (process.exitValue() == 0) {
-			//	System.out.println("success");
-			//}
-			//else
-			//	System.out.println("no success");
 		}
 		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -1257,10 +1252,15 @@ public class FileUtils {
 		String command = System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java -classpath " + jarFilePath + " gde.utils.FileUtils"; //$NON-NLS-1$
 		log.log(Level.TIME, "executing: " + command); //$NON-NLS-1$
 		try {
+//			StringBuilder sb = new StringBuilder();
+//			for (String element : new String[] {"cmd", "/C", "\"" + System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java\"", "-classpath", jarFilePath, "gde.utils.FileUtils"}) {
+//				sb.append(element).append(" ");
+//			}
+//			System.out.println(sb.toString());
 			if (GDE.IS_WINDOWS)
-				new ProcessBuilder("cmd", "/C", System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java", "-classpath", jarFilePath, "gde.utils.FileUtils").start(); //$NON-NLS-1$ //$NON-NLS-2$
+				Runtime.getRuntime().exec(new String[] {"cmd", "/C", "\"" + System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java\"", "-classpath", jarFilePath, "gde.utils.FileUtils"}); //$NON-NLS-1$ //$NON-NLS-2$
 			else
-				new ProcessBuilder("java", "-classpath", jarFilePath, "gde.utils.FileUtils", "&").start(); //$NON-NLS-1$ //$NON-NLS-2$
+				Runtime.getRuntime().exec(new String[] {"java", "-classpath", jarFilePath, "gde.utils.FileUtils", "&"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, "failed executing: " + command); //$NON-NLS-1$
@@ -1271,10 +1271,10 @@ public class FileUtils {
 	 */
 	public static void main(String[] args) {
 		if (GDE.IS_WINDOWS) 
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "WinHelper*.dll", "swtlib-"+GDE.BIT_MODE, }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "WinHelper*.dll", "swtlib-"+GDE.BIT_MODE, "*.gpx", "*.kml"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		else if (GDE.IS_LINUX)
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "*register.sh", "swtlib-"+GDE.BIT_MODE}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "*register.sh", "swtlib-"+GDE.BIT_MODE, "*.gpx", "*.kml"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		else if (GDE.IS_MAC)
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "GDE", "swtlib-"+GDE.BIT_MODE}); //$NON-NLS-1$ //$NON-NLS-2$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "GDE", "swtlib-"+GDE.BIT_MODE, "*.gpx", "*.kml"}); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

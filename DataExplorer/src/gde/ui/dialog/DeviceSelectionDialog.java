@@ -1018,7 +1018,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * @throws NotSupportedException 
 	 */
 	public void setupDevice(String newDeviceName) throws NotSupportedException {
-		int selection = this.activeDevices.indexOf(newDeviceName);
+		newDeviceName = exchangeLegacyDeviceNames(newDeviceName);
+		int selection = this.activeDevices.indexOf(newDeviceName); // is contained in list of active devices
 		if (selection != -1 || getDevices().keySet().contains(newDeviceName)) {
 			if (!this.activeDevices.contains(newDeviceName)) this.activeDevices.add(newDeviceName);
 			DeviceConfiguration tmpDeviceConfig = this.getDevices().get(newDeviceName);
@@ -1032,9 +1033,20 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 			throw e;
 		}
-
 	}
 
+	/**
+	 * exchange legacy name with actual device name
+	 * @param newDeviceName
+	 * @return actual device Nmae
+	 */
+	private String exchangeLegacyDeviceNames(String newDeviceName) {
+		String actualDeviceName = newDeviceName;
+		if(newDeviceName.equals("GPSLogger")) actualDeviceName = "GPS-Logger"; 
+		else if(newDeviceName.equals("QuadroControl")) actualDeviceName = "QC-Copter";
+		return actualDeviceName;
+	}
+	
 	/**
 	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
 	 */
