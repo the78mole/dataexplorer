@@ -22,6 +22,7 @@ adapt the sync record matching algorithm of configurable measurement control to 
 change log entries to avoid string parameter interpretation in time critical exec path
 add LinkVarioDuo
 WStech devices, add calculation of track length, distance from start, azimuth and direction from start
+create menu tool bar exported kml files in temp directory 
 
 Version 2.60 - 01 Dec 2010
 
