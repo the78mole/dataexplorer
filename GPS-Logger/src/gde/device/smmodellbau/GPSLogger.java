@@ -610,13 +610,13 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	 * @return full qualified file path depending of the file ending type
 	 */
 	@Override
-	public String exportFile(String fileEndingType) {
+	public String exportFile(String fileEndingType, boolean isExportTmpDir) {
 		String exportFileName = GDE.STRING_EMPTY;
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KML)) {
-				exportFileName = new FileHandler().exportFileKML(1, 0, 2, 7, true);
+				exportFileName = new FileHandler().exportFileKML(1, 0, 2, 7, true, isExportTmpDir);
 			}
 		}
 		return exportFileName;
