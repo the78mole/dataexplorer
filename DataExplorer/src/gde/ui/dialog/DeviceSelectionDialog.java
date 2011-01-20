@@ -39,6 +39,7 @@ import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -142,12 +143,18 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Thread																listPortsThread;
 	Vector<String>												availablePorts			= new Vector<String>();
 	boolean																isUpdateSerialPorts	= true;
+	HashMap<String,String>								legacyDeviceNames = new HashMap<String,String>(2);
+
 
 	public DeviceSelectionDialog(Shell parent, int style, final DataExplorer currentApplication) {
 		super(parent, style);
 		this.application = currentApplication;
 		this.settings = Settings.getInstance();
 		this.activeDeviceName = this.settings.getActiveDevice();
+		
+		//add this two renamed device plug-ins to the list of legacy devices
+		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
+		this.legacyDeviceNames.put("QuadroControl", "QC-Copter");
 
 		try {
 			initialize();
@@ -1037,14 +1044,14 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 	/**
 	 * exchange legacy name with actual device name
-	 * @param newDeviceName
+	 * @param checkoutDeviceName
 	 * @return actual device Nmae
 	 */
-	private String exchangeLegacyDeviceNames(String newDeviceName) {
-		String actualDeviceName = newDeviceName;
-		if(newDeviceName.equals("GPSLogger")) actualDeviceName = "GPS-Logger"; 
-		else if(newDeviceName.equals("QuadroControl")) actualDeviceName = "QC-Copter";
-		return actualDeviceName;
+	private String exchangeLegacyDeviceNames(String checkoutDeviceName) {
+		if(this.legacyDeviceNames.get(checkoutDeviceName) != null) 
+			return this.legacyDeviceNames.get(checkoutDeviceName); 
+		else 
+			return checkoutDeviceName;
 	}
 	
 	/**
