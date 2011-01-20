@@ -35,14 +35,14 @@
 	    <Channel type="TYPE_CONFIG" name="Konfig 1">
 	        <Measurement>
 	            <name>Roll Integral</name>
-	            <symbol>R</symbol>
+	            <symbol></symbol>
 	            <unit>°</unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Roll Winkel</name>
-	            <symbol>R</symbol>
+	            <symbol></symbol>
 	            <unit>°</unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -50,14 +50,14 @@
 	        </Measurement>
 	        <Measurement>
 	            <name>Nick Integral</name>
-	            <symbol>N</symbol>
+	            <symbol></symbol>
 	            <unit>°</unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Nick Winkel</name>
-	            <symbol>N</symbol>
+	            <symbol></symbol>
 	            <unit>°</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="false" max="true" min="true"/>
@@ -65,46 +65,46 @@
 	        </Measurement>
 	        <Measurement>
 	            <name>Gyro Roll</name>
-	            <symbol>R</symbol>
-	            <unit>i</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Gyro Nick</name>
-	            <symbol>G</symbol>
-	            <unit>i</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Gyro Gier</name>
-	            <symbol>G</symbol>
-	            <unit>i</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	            <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>ACC Roll</name>
-	            <symbol>A</symbol>
-	            <unit>z</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>ACC Nick</name>
-	            <symbol>A</symbol>
-	            <unit>z</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	            <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>ACC Z</name>
-	            <symbol>A</symbol>
-	            <unit>z</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	            <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
@@ -120,14 +120,14 @@
 	        <Measurement>
 	            <name>Motor VL</name>
 	            <symbol></symbol>
-	            <unit>1/min</unit>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Motor VR</name>
 	            <symbol></symbol>
-	            <unit>1/min</unit>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
@@ -135,7 +135,7 @@
 	        <Measurement>
 	            <name>Motor HL</name>
 	            <symbol></symbol>
-	            <unit>1/min</unit>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
@@ -143,50 +143,50 @@
 	        <Measurement>
 	            <name>Motor HR</name>
 	            <symbol></symbol>
-	            <unit>1/min</unit>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	            <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>User-Daten 0</name>
-	            <symbol>Du</symbol>
-	            <unit>x</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>false</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>User-Daten 1</name>
-	            <symbol>Du</symbol>
-	            <unit>x</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>false</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>User-Daten 2</name>
-	            <symbol>Du</symbol>
-	            <unit>x</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>false</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>User-Daten 3</name>
-	            <symbol>Du</symbol>
-	            <unit>x</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>false</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>User-Daten 4</name>
-	            <symbol>Du</symbol>
-	            <unit>x</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>false</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>User-Daten 5</name>
-	            <symbol>Du</symbol>
-	            <unit>x</unit>
+	            <symbol></symbol>
+	            <unit></unit>
 	            <active>false</active>
 	            <statistics sigma="true" avg="true" max="true" min="true"/>
 	        </Measurement>
