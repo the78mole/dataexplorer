@@ -37,6 +37,7 @@ import gde.utils.TimeLine;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.ConsoleHandler;
@@ -76,6 +77,7 @@ public class TestSuperClass extends TestCase {
 	TreeMap<String, DeviceConfiguration>	deviceConfigurations;
 	Vector<String>												activeDevices;
 	File																	dataPath;
+	HashMap<String,String>								legacyDeviceNames = new HashMap<String,String>(2);
 
 	Handler																ch					= new ConsoleHandler();
 	LogFormatter													lf					= new LogFormatter();
@@ -110,6 +112,10 @@ public class TestSuperClass extends TestCase {
 		Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
 
 		this.initialize();
+		
+		//add this two renamed device plug-ins to the list of legacy devices
+		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
+		this.legacyDeviceNames.put("QuadroControl", "QC-Copter");
 
 		Canvas canvas = new Canvas(new Composite(Display.getDefault().getShells()[0], SWT.NONE), SWT.NONE);
 		this.canvasGC = SWTResourceManager.getGC(canvas, "curveArea_" + 0); //$NON-NLS-1$

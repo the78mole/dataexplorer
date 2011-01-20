@@ -330,6 +330,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 							System.out.println("working with : " + file);
 							HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
 							String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
+							if(this.legacyDeviceNames.get(fileDeviceName) != null) 
+								fileDeviceName = this.legacyDeviceNames.get(fileDeviceName); 
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 							IDevice device = this.getInstanceOfDevice(deviceConfig);
 							this.application.setActiveDeviceWoutUI(device);
