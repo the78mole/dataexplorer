@@ -344,16 +344,12 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 
 				points[j] *= 1000;
 			}
-			else { // motor uint8
-				if (DBx_1 + DBx_2 + DBx_3 != 0) { 
-					points[j] = ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
-					points[j] *= 1000;
-					++j;
-					points[j] = ((DBx_2 & 0x0007) << 5) | (DBx_3 & 0x001F);
-					points[j] *= 1000;
-					//System.out.println(points[j-1] + " ; " + points[j]);
-				}
-				else ++j;
+			else { // motor uint8		
+				points[j] = ((DBx_1 & 0x003F) << 2) | ((DBx_2 & 0x0018) >> 3);
+				points[j] *= 1000;
+				++j;
+				points[j] = ((DBx_2 & 0x0007) << 5) | (DBx_3 & 0x001F);
+				points[j] *= 1000;
 			}
 		}
 
@@ -394,6 +390,8 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 		}
 		log.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
 
+		// 0=Roll Integral, 1=Roll Winkel, 2=Nick Integral, 3=Nick Winkel, 4=Gyro Roll, 5=Gyro Nick, 6=Gyro Gier, 7=ACC Roll, 8=ACC Nick, 9=ACC Z, 
+		//10=Akkuspannung, 11=Motor VL, 12=Motor VR, 13=Motor HL, 14=Motor HR, 15=User-Daten 0, 16=User-Daten 1, 17=User-Daten 2, 18=User-Daten 3, 19=User-Daten 4, 20=User-Daten 5
 		for (int i = 0; i < recordDataSize; i++) {
 			log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
@@ -410,6 +408,8 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		updateVisibilityStatus(recordSet, true);
+		recordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**
