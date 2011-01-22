@@ -470,8 +470,7 @@ public class Record extends Vector<Integer> {
 				this.minValue = this.maxValue = point;
 			}
 			else {
-				if (point > this.maxValue)
-					this.maxValue = point;
+				if (point > this.maxValue)			this.maxValue = point;
 				else if (point < this.minValue) this.minValue = point;
 			}
 			if(log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
@@ -487,8 +486,7 @@ public class Record extends Vector<Integer> {
 				this.minValue = this.maxValue = point;
 			}
 			else {
-				if (point > this.maxValue)
-					this.maxValue = point;
+				if (point > this.maxValue)			this.maxValue = point;
 				else if (point < this.minValue) this.minValue = point;
 			}
 			if(log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " setting point = " + point); //$NON-NLS-1$

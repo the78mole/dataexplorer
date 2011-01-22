@@ -115,15 +115,15 @@ import org.eclipse.swt.widgets.TaskItem;
 public class DataExplorer extends Composite {
 	final static String 					$CLASS_NAME 											= DataExplorer.class.getName();
 	final static Logger						log																= Logger.getLogger(DataExplorer.class.getName());
+	{
+		SWTResourceManager.registerResourceUser(this);
+	}
 	
 	final HashMap<String, String>	extensionFilterMap								= new HashMap<String, String>();
 
-	public final static String		APPLICATION_NAME									= "DataExplorer"; //$NON-NLS-1$
-	public final static String		LEGACY_APPLICATION_NAME						= "OpenSerialDataExplorer"; //$NON-NLS-1$
 	public final static String		RECORD_NAME												= "recordName"; //$NON-NLS-1$
 	public final static String		CURVE_SELECTION_ITEM							= "curveSelectedItem"; //$NON-NLS-1$
 	public final static String		OLD_STATE													= "oldState"; //$NON-NLS-1$
-	public final static String		RECORD_SYNC_PLACEHOLDER						= "syncPlaceholder"; //$NON-NLS-1$
 
 	public final static Color			COLOR_WHITE												= SWTResourceManager.getColor(SWT.COLOR_WHITE);
 	public final static Color			COLOR_LIGHT_GREY									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND);
@@ -144,17 +144,14 @@ public class DataExplorer extends Composite {
 	public final static String		COMPARE_RECORD_SET								= "compare_set"; //$NON-NLS-1$
 	public final static String		UTILITY_RECORD_SET								= "utility_set"; //$NON-NLS-1$
 
-	public static DataExplorer						application								= null;
-	public final static Display						display										= Display.getDefault();
-	public final static Shell							shell											= new Shell(display);
+	public static DataExplorer		application												= null;	
+	public static Display					display;
+	public static Shell						shell;
 
 	gde.io.FileHandler						fileHandler;
-
 	CTabFolder										displayTab;
-
 	Settings											settings;
 	IDevice												activeDevice											= null;
-
 	Menu													menu;
 	Label													filler;
 	MenuBar												menuBar;
@@ -212,7 +209,6 @@ public class DataExplorer extends Composite {
 	 */
 	private DataExplorer() {
 		super(shell, SWT.NONE);
-		SWTResourceManager.registerResourceUser(this);
 		this.threadId = Thread.currentThread().getId();
 		
 		this.extensionFilterMap.put(GDE.FILE_ENDING_OSD, Messages.getString(MessageIds.GDE_MSGT0139));
@@ -351,7 +347,7 @@ public class DataExplorer extends Composite {
 
 			shell.setLayout(new FillLayout());
 			shell.setImage(SWTResourceManager.getImage(GDE.IS_MAC ? "gde/resource/DataExplorer_MAC.png" : "gde/resource/DataExplorer.png")); //$NON-NLS-1$ //$NON-NLS-2$
-			shell.setText(APPLICATION_NAME);
+			shell.setText(GDE.NAME_LONG);
 
 			shell.layout();
 			shell.open();
@@ -1167,7 +1163,7 @@ public class DataExplorer extends Composite {
 	}
 
 	public void updateTitleBar(final String objectName, final String deviceName, final String devicePort) {
-		StringBuilder sb = new StringBuilder().append(DataExplorer.APPLICATION_NAME);
+		StringBuilder sb = new StringBuilder().append(GDE.NAME_LONG);
 		String separator = "  -  "; //$NON-NLS-1$
 		String actualFileName = (this.channels != null && this.channels.getActiveChannel() != null) ? this.channels.getActiveChannel().getFileName() : null;
 		if (actualFileName != null && actualFileName.length() > 4) sb.append(separator).append(actualFileName);

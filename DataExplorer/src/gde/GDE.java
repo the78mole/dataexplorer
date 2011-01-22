@@ -18,32 +18,33 @@
 ****************************************************************************************/
 package gde;
 
+import gde.data.RecordSet;
+import gde.exception.ApplicationConfigurationException;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
-import java.util.Date;
 import java.security.PrivilegedAction;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
-
-import gde.data.RecordSet;
-import gde.exception.ApplicationConfigurationException;
-import gde.log.LogFormatter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Winfried Brügmann
@@ -256,6 +257,12 @@ public class GDE {
 		final String $METHOD_NAME = "main"; //$NON-NLS-1$
 		String inputFilePath = STRING_EMPTY;
 		try {
+			//DeviceData	data = new DeviceData();
+			//data.tracking = true;
+			DataExplorer.display														= new Display(); //data);
+			DataExplorer.shell															= new Shell(DataExplorer.display);
+			//Sleak sleak = new Sleak();
+			//sleak.open();
 			GDE.initLogger();
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, GDE.NAME_LONG + GDE.STRING_BLANK + VERSION); //$NON-NLS-1$
 			

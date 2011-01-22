@@ -407,7 +407,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 				@Override
 				public void widgetDisposed(DisposeEvent disposeevent) {
 					log.log(java.util.logging.Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
-					StatisticsTypeTabItem.this.enableContextMenu(false);
+					//StatisticsTypeTabItem.this.enableContextMenu(false);
 				}
 			});
 			this.statisticsComposite = new Composite(this.scrolledComposite, SWT.NONE);
@@ -803,8 +803,8 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 				this.triggerRefOrdinalCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.triggerRefOrdinalCombo.setBounds(245, 105, 110, 20);
 				this.triggerRefOrdinalCombo.setEnabled(false);
-				this.triggerRefOrdinalCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				this.triggerRefOrdinalCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+				this.triggerRefOrdinalCombo.setBackground(DataExplorer.COLOR_WHITE);
+				this.triggerRefOrdinalCombo.setForeground(DataExplorer.COLOR_BLACK);
 			}
 			{
 				this.triggerRefOrdinalText = new Text(this.statisticsComposite, SWT.BORDER);
@@ -860,8 +860,8 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 				this.sumByTriggerRefOrdinalCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.sumByTriggerRefOrdinalCombo.setBounds(245, 130, 110, 20);
 				this.sumByTriggerRefOrdinalCombo.setEnabled(false);
-				this.sumByTriggerRefOrdinalCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				this.sumByTriggerRefOrdinalCombo.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+				this.sumByTriggerRefOrdinalCombo.setBackground(DataExplorer.COLOR_WHITE);
+				this.sumByTriggerRefOrdinalCombo.setForeground(DataExplorer.COLOR_BLACK);
 			}
 			{
 				this.sumTriggerText = new Text(this.statisticsComposite, SWT.BORDER);
@@ -1054,7 +1054,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 		StatisticsTypeTabItem.this.ratioRefOrdinalCombo.select(StatisticsTypeTabItem.this.ratioRefOrdinal == null ? 0 : StatisticsTypeTabItem.this.ratioRefOrdinal);
 		StatisticsTypeTabItem.this.ratioText.setText(StatisticsTypeTabItem.this.ratioComment == null ? GDE.STRING_EMPTY : StatisticsTypeTabItem.this.ratioComment);
 
-		StatisticsTypeTabItem.this.enableContextMenu(true);
+		//StatisticsTypeTabItem.this.enableContextMenu(true);
 	}
 
 }

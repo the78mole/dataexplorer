@@ -183,11 +183,11 @@ public class DevicePropertiesEditor extends Composite {
 
 	public static DevicePropertiesEditor getInstance() {
 		if (DevicePropertiesEditor.devicePropsEditor == null) {
-			DevicePropertiesEditor.dialogShell = new Shell(Display.getDefault(), SWT.DIALOG_TRIM | (GDE.IS_LINUX ? SWT.MODELESS : SWT.PRIMARY_MODAL));
+			DevicePropertiesEditor.dialogShell = new Shell(DataExplorer.display, SWT.DIALOG_TRIM | (GDE.IS_LINUX ? SWT.MODELESS : SWT.PRIMARY_MODAL));
 			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.NULL);
 		}
 		else if (DevicePropertiesEditor.devicePropsEditor.isDisposed()) {
-			DevicePropertiesEditor.dialogShell = new Shell(Display.getDefault(), SWT.DIALOG_TRIM | (GDE.IS_LINUX ? SWT.MODELESS : SWT.PRIMARY_MODAL));
+			DevicePropertiesEditor.dialogShell = new Shell(DataExplorer.display, SWT.DIALOG_TRIM | (GDE.IS_LINUX ? SWT.MODELESS : SWT.PRIMARY_MODAL));
 			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.NULL);
 		}
 
@@ -204,6 +204,11 @@ public class DevicePropertiesEditor extends Composite {
 	 */
 	public static void main(String[] args) {
 		try {
+			//DeviceData data = new DeviceData();
+			//data.tracking = true;
+			DataExplorer.display = new Display(); //data);
+			//Sleak sleak = new Sleak();
+			//sleak.open();
 			DevicePropertiesEditor devicePropsEditor = DevicePropertiesEditor.getInstance();
 			devicePropsEditor.initLogger();
 			devicePropsEditor.open();
@@ -227,9 +232,9 @@ public class DevicePropertiesEditor extends Composite {
 				devicePropsEditor.openDevicePropertiesFile(tmpDevFileName);
 			}
 
-			Display display = Display.getDefault();
+			//Display display = Display.getDefault();
 			while (!DevicePropertiesEditor.dialogShell.isDisposed()) {
-				if (!display.readAndDispatch()) display.sleep();
+				if (!DataExplorer.display.readAndDispatch()) DataExplorer.display.sleep();
 			}
 		}
 		catch (Throwable e) {
@@ -584,7 +589,7 @@ public class DevicePropertiesEditor extends Composite {
 							{
 								this.deviceImplementationButton = new Button(this.devicePropsComposite, SWT.CHECK);
 								this.deviceImplementationButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-								this.deviceImplementationButton.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+								this.deviceImplementationButton.setForeground(DataExplorer.COLOR_BLACK);
 								this.deviceImplementationButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0478));
 								this.deviceImplementationButton.setBounds(0, 30, 22, 22);
 								this.deviceImplementationButton.addSelectionListener(new SelectionAdapter() {
@@ -1177,7 +1182,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockTimeUnitCombo.setBounds(130, GDE.IS_MAC_COCOA ? 75 : 90, 60, 20);
 					this.dataBlockTimeUnitCombo.setItems(TimeUnitTypes.valuesAsStingArray());
 					this.dataBlockTimeUnitCombo.setEditable(false);
-					this.dataBlockTimeUnitCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+					this.dataBlockTimeUnitCombo.setBackground(DataExplorer.COLOR_WHITE);
 					this.dataBlockTimeUnitCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1203,7 +1208,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockSeparatorCombo.setBounds(130, GDE.IS_MAC_COCOA ? 105 : 120, 40, 20);
 					this.dataBlockSeparatorCombo.setItems(CommaSeparatorTypes.valuesAsStingArray());
 					this.dataBlockSeparatorCombo.setEditable(false);
-					this.dataBlockSeparatorCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+					this.dataBlockSeparatorCombo.setBackground(DataExplorer.COLOR_WHITE);
 					this.dataBlockSeparatorCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1226,7 +1231,7 @@ public class DevicePropertiesEditor extends Composite {
 			{
 				this.dataBlockLeaderText = new Text(this.dataBlockRequiredGroup, SWT.BORDER);
 				this.dataBlockLeaderText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.dataBlockLeaderText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				this.dataBlockLeaderText.setBackground(DataExplorer.COLOR_WHITE);
 				this.dataBlockLeaderText.setBounds(130, GDE.IS_MAC_COCOA ? 135 : 150, 30, 20);
 				this.dataBlockLeaderText.setText(GDE.STRING_BLANK + DevicePropertiesEditor.this.dataBlockLeader);
 				this.dataBlockLeaderText.setEnabled(false);
@@ -1252,7 +1257,7 @@ public class DevicePropertiesEditor extends Composite {
 			{
 				this.dataBlockEndingCombo = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
 				this.dataBlockEndingCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.dataBlockEndingCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				this.dataBlockEndingCombo.setBackground(DataExplorer.COLOR_WHITE);
 				this.dataBlockEndingCombo.setBounds(130, GDE.IS_MAC_COCOA ? 165 : 180, 90, 20);
 				this.dataBlockEndingCombo.setItems(LineEndingTypes.valuesAsStingArray());
 				this.dataBlockEndingCombo.setEnabled(false);

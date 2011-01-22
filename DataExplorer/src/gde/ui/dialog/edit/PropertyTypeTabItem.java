@@ -234,7 +234,7 @@ public class PropertyTypeTabItem extends CTabItem {
 				@Override
 				public void widgetDisposed(DisposeEvent disposeevent) {
 					log.log(java.util.logging.Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
-					PropertyTypeTabItem.this.enableContextMenu(false);
+					//PropertyTypeTabItem.this.enableContextMenu(false);
 				}
 			});
 			this.propertyTypeComposite = new Composite(this.parentTabFolder, SWT.NONE);
@@ -468,6 +468,6 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.descriptionText.setText(GDE.STRING_EMPTY);
 
 		}
-		this.enableContextMenu(true);
+		//this.enableContextMenu(true);
 	}
 }
