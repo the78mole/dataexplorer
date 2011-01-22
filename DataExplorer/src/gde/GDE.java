@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde;
 
+import gde.config.Settings;
 import gde.data.RecordSet;
 import gde.exception.ApplicationConfigurationException;
 import gde.log.Level;
@@ -257,6 +258,7 @@ public class GDE {
 		final String $METHOD_NAME = "main"; //$NON-NLS-1$
 		String inputFilePath = STRING_EMPTY;
 		try {
+			Settings.getInstance();
 			//DeviceData	data = new DeviceData();
 			//data.tracking = true;
 			DataExplorer.display														= new Display(); //data);

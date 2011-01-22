@@ -241,7 +241,7 @@ public class Settings extends Properties {
 		}
 		// OPET - start - add
 		else if (GDE.IS_MAC) { //$NON-NLS-1$ //$NON-NLS-2$
-			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX + "DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
+			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG; //$NON-NLS-1$ //$NON-NLS-2$
 			this.settingsFilePath = this.applHomePath  + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + ".properties"; //$NON-NLS-1$
 		}
 		// OPET - end
