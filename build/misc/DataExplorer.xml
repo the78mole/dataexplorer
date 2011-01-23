@@ -10,7 +10,7 @@
   <downloadUrl>http://java.sun.com/javase/downloads/index.jsp</downloadUrl>
   <supportUrl>http://savannah.nongnu.org/projects/dataexplorer</supportUrl>
   <customProcName>false</customProcName>
-  <stayAlive>false</stayAlive>
+  <stayAlive>true</stayAlive>
   <manifest></manifest>
   <icon>F:\workspaces\gnu\build\misc\DataExplorer.ico</icon>
   <classPath>
@@ -26,6 +26,12 @@
     <maxHeapSize>256</maxHeapSize>
     <opt>-Dfile.encoding=UTF-8</opt>
   </jre>
+  <splash>
+    <file>F:\workspaces\gnu\build\misc\splash.bmp</file>
+    <waitForWindow>true</waitForWindow>
+    <timeout>60</timeout>
+    <timeoutErr>false</timeoutErr>
+  </splash>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
     <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>
