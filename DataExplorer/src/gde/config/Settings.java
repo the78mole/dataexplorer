@@ -97,6 +97,7 @@ public class Settings extends Properties {
 	final static String		HEADER_TEXT										= "# -- DataExplorer Settings File -- "; //$NON-NLS-1$
 	final static String		DEVICE_BLOCK									= "#[Actual-Device-Port-Settings]";																				// Picolario;Renschler;COM2 //$NON-NLS-1$
 	final static String		WINDOW_BLOCK									= "#[Window-Settings]"; //$NON-NLS-1$
+	final static String		WINDOW_MAXIMIZED							= "window_maximized"; //$NON-NLS-1$
 	final static String		WINDOW_LEFT										= "window_left"; //$NON-NLS-1$
 	final static String		WINDOW_TOP										= "window_top"; //$NON-NLS-1$
 	final static String		WINDOW_WIDTH									= "window_width"; //$NON-NLS-1$
@@ -195,6 +196,7 @@ public class Settings extends Properties {
 
 
 	Rectangle				window;
+	boolean					isWindowMaximized 						= false;
 	String					cbOrder;
 	private	String					cbWraps;
 	String					cbSizes;
@@ -304,6 +306,8 @@ public class Settings extends Properties {
 
 		log.logp(Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, String.format("settingsFilePath = %s", this.settingsFilePath)); //$NON-NLS-1$
 
+		this.isWindowMaximized = Boolean.parseBoolean(this.getProperty(WINDOW_MAXIMIZED, "false"));
+				
 		if (this.getProperty(WINDOW_LEFT) != null && this.getProperty(WINDOW_TOP) != null
 				&& this.getProperty(WINDOW_WIDTH) != null && this.getProperty(WINDOW_HEIGHT) != null) {
 			this.window = new Rectangle(new Integer(this.getProperty(WINDOW_LEFT).trim()).intValue(), new Integer(this.getProperty(WINDOW_TOP).trim()).intValue(), new Integer(this.getProperty(WINDOW_WIDTH).trim()).intValue(),
@@ -435,6 +439,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", ACTIVE_OBJECT, this.getActiveObject())); //$NON-NLS-1$
 
 			this.writer.write(String.format("%s\n", WINDOW_BLOCK)); // [Fenster Einstellungen] //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", WINDOW_MAXIMIZED, this.isWindowMaximized)); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", WINDOW_LEFT, this.window.x)); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", WINDOW_TOP, this.window.y)); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", WINDOW_WIDTH, this.window.width)); //$NON-NLS-1$
@@ -540,6 +545,14 @@ public class Settings extends Properties {
 
 	public void setWindow(Point location, Point size) {
 		this.window = new Rectangle(location.x, location.y, size.x, size.y);
+	}
+
+	public boolean isWindowMaximized() {
+		return this.isWindowMaximized;
+	}
+
+	public void setWindowMaximized(boolean isMaximized) {
+		this.isWindowMaximized = isMaximized;
 	}
 
 	public void setCoolBarStates(int[] order, int[] wraps, Point[] sizes) {

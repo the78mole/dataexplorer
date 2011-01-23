@@ -329,14 +329,15 @@ public class DataExplorer extends Composite {
 
 			this.isDeviceDialogModal = this.settings.isDeviceDialogsModal();
 
-			Rectangle displayBounds = DataExplorer.shell.getDisplay().getBounds();
-			Rectangle primaryDisplayBounds = DataExplorer.shell.getDisplay().getPrimaryMonitor().getBounds();
+			Rectangle displayBounds = DataExplorer.display.getBounds();
+			Rectangle primaryDisplayBounds = DataExplorer.display.getPrimaryMonitor().getBounds();
 			int x = this.settings.getWindow().x < displayBounds.x || this.settings.getWindow().x > primaryDisplayBounds.width ? 50 : this.settings.getWindow().x;
 			int y = this.settings.getWindow().y < displayBounds.y || this.settings.getWindow().y > primaryDisplayBounds.height ? 50 : this.settings.getWindow().y;
-			shell.setLocation(x, y);
 			int width = this.settings.getWindow().width + x > displayBounds.width ? displayBounds.width-x : this.settings.getWindow().width;
 			int height = this.settings.getWindow().height + y > displayBounds.height ? displayBounds.height-x : this.settings.getWindow().height;
+			shell.setLocation(x, y);
 			shell.setSize(width, height);
+			shell.setMaximized(this.settings.isWindowMaximized());
 			
 			this.fileHandler = new gde.io.FileHandler();
 			this.initGUI();
@@ -466,7 +467,8 @@ public class DataExplorer extends Composite {
 				public void widgetDisposed(DisposeEvent evt) {
 					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, "widgetDisposed", DataExplorer.shell.getLocation().toString() + "event = " + evt); //$NON-NLS-1$ //$NON-NLS-2$
 					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, "widgetDisposed", DataExplorer.shell.getSize().toString()); //$NON-NLS-1$
-					DataExplorer.application.settings.setWindow(DataExplorer.shell.getLocation(), DataExplorer.shell.getSize());
+					if (!DataExplorer.this.settings.isWindowMaximized())
+						DataExplorer.application.settings.setWindow(DataExplorer.shell.getLocation(), DataExplorer.shell.getSize());
 					//cleanup
 					// if help browser is open, dispose it
 					if (DataExplorer.this.helpDialog != null && !DataExplorer.this.helpDialog.isDisposed()) {
@@ -522,6 +524,8 @@ public class DataExplorer extends Composite {
 						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "statusBar.size = " + statusBarSize); //$NON-NLS-1$
 						DataExplorer.this.displayTab.setBounds(0, menuCoolBarSize.y + fillerSize.y, shellSize.x, shellSize.y - menuCoolBarSize.y - statusBarSize.y - fillerSize.y);
 						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "displayTab.bounds = " + DataExplorer.this.displayTab.getBounds()); //$NON-NLS-1$
+						
+						DataExplorer.this.settings.setWindowMaximized(DataExplorer.shell.getMaximized());
 					}
 				}
 			});
