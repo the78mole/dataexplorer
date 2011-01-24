@@ -44,7 +44,14 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -59,7 +66,6 @@ public class GDE {
 	final static String $CLASS_NAME = GDE.class.getName();
 	public final static long 	StartTime 	= new Date().getTime();
 	public static Handler logHandler = null;
-
 	
 	// ****** begin global constants section *******
 	public static final String		VERSION														= "Version 2.70";						//$NON-NLS-1$
@@ -247,6 +253,8 @@ public class GDE {
 	final static Logger	log										= Logger.getLogger(GDE.class.getName());
 	static Logger				rootLogger;
 	static Vector<String> initErrors = new Vector<String>(0);
+	public static Shell splash;
+	public static ProgressBar progBar;
 	
 	static final String	DEVICES_PLUG_IN_DIR		= "devices/"; //$NON-NLS-1$
 	
@@ -263,6 +271,7 @@ public class GDE {
 			//data.tracking = true;
 			DataExplorer.display														= new Display(); //data);
 			DataExplorer.shell															= new Shell(DataExplorer.display);
+			GDE.showSplash();
 			//Sleak sleak = new Sleak();
 			//sleak.open();
 			GDE.initLogger();
@@ -305,6 +314,7 @@ public class GDE {
 	    sb.append("SWT.PLATFORM = ").append(SWT.getPlatform()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	    log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, sb.toString());
 
+			GDE.progBar.setSelection(40);
 			application.execute(inputFilePath);
 		}
 		catch (Throwable e) {
@@ -431,5 +441,45 @@ public class GDE {
 	public static void setInitError(String errorMessage) {
 		GDE.initErrors.add(errorMessage);
 	}
-
+	/**
+	 * display the splash image for the given time inseconds
+	 * @param display
+	 * @param timeoutSec
+	 */
+	private static void showSplash() {
+		final Image image = new Image(DataExplorer.display, GDE.class.getClassLoader().getResourceAsStream("gde/resource/splash.png"));
+		GC gc = new GC(image);
+		gc.drawImage(image, 0, 0);
+		gc.dispose();
+		final Shell splash = new Shell(SWT.ON_TOP|SWT.BORDER);
+		splash.setLayout(null);
+		final ProgressBar bar = new ProgressBar(splash, SWT.NONE);
+		bar.setMaximum(100);
+		final Label label = new Label(splash, SWT.NONE);
+		label.setImage(image);
+		label.setSize(365, 200);
+		bar.setSize(355, 20);
+		bar.setLocation(5, 177);
+		splash.pack();
+		Rectangle splashRect = splash.getBounds();
+		Rectangle displayRect = DataExplorer.display.getPrimaryMonitor().getBounds();
+		int x = (displayRect.width - splashRect.width) / 2;
+		int y = (displayRect.height - splashRect.height) / 3;
+		splash.addDisposeListener(new DisposeListener() {	
+			@Override
+			public void widgetDisposed(DisposeEvent arg0) {
+				splash.close();
+				image.dispose();
+			}
+		});
+		splash.setLocation(x,y);
+		splash.open();
+		bar.setSelection(15);
+		GDE.splash = splash;
+		GDE.progBar = bar;
+	}
+	
+	public static void seStartupProgress(int percent) {
+		if(GDE.progBar != null && !GDE.progBar.isDisposed()) GDE.progBar.setSelection(percent);
+	}
 }

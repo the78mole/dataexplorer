@@ -273,6 +273,7 @@ public class Settings extends Properties {
 		};
 
 		this.load();
+		GDE.seStartupProgress(60);
 		
 		// check existens of application home directory, check XSD version, copy all device XML+XSD and image files
 		FileUtils.checkDirectoryAndCreate(this.applHomePath);

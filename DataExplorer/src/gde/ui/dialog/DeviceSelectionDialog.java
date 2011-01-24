@@ -178,13 +178,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
 		this.activeDevices = new Vector<String>(2, 1);
 
-		//wait until schema is setup
-		while (this.settings.isXsdThreadAlive()) {
-			log.log(java.util.logging.Level.INFO, "waiting for XSD thread");
-			WaitTimer.delay(5);
-		}
-
-		//long startTime = new Date().getTime();
 		for (int i = 0; files != null && i < files.length; i++) {
 			try {
 				// loop through all device properties XML and check if device used

@@ -157,6 +157,7 @@ public class DeviceConfiguration {
 		while (this.settings.isXsdThreadAlive() || this.settings.getUnmarshaller() == null) {
 			WaitTimer.delay(5);
 		}
+		GDE.seStartupProgress(80);
 		this.unmarshaller = this.settings.getUnmarshaller();
 		this.marshaller = this.settings.getMarshaller();
 
