@@ -1,10 +1,28 @@
-GNU DataExplorer - News - comes with version 2.60
+GNU DataExplorer - News - comes with version 2.70
 
-1)add a configuration dialog for GPS/KML velocity limits and colors
-2)add SM GPS-Logger
-3)fix scale synchronization problem while nearly identical data
-4)move package gde.serial to gde.comm
-5)implement starting point of data input simulation capability
+1)fix value format sync problem digital, analog versus graphics
+2)enable one click live data gathering (UniLog/LiPoWatch)
+3)fix value format sync problem digital, analog vs graphics
+4)fix QC-Copter terminal configuration menu display
+5)update QC-Copter English help
+6)fix pan menu item state in menu bar
+7)add balance curve to LiPoWatch, all eStations and clones -> force update by template XSD V05
+8)add test to validate device XMLs in workspace
+9)add capability to remember last used configuration -> force update by device properties XSD V12
+10)enable progress status indicator in task bar for supporting operating systems
+11)update SWT.jar for MAC to 3.7M3
+12)add NMEA Adapter plug-in
+13)fix errors in compare window
+14)sync plug-in name to configuration files
+15)add lov file support for GPS-Logger
+16)add lov file support for NMEA-Adapter
+17)adapt the sync record matching algorithm of configurable measurement control to match first part of measurement name string, delimiter is blank
+18)change log entries to avoid string parameter interpretation in time critical exec path
+19)add LinkVarioDuo
+20)WStech devices, add calculation of track length, distance from start, azimuth and direction from start
+21)create menu tool bar exported kml files in temp directory 
+22)fix error during cleanup phase while exiting application
+23)introduce splash screen
 
 
 
