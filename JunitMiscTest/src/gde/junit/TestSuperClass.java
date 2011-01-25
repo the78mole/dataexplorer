@@ -55,10 +55,16 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 public class TestSuperClass extends TestCase {
 	Logger																rootLogger;
-	
+	static {
+	Settings.getInstance();
+	DataExplorer.display														= new Display();
+	DataExplorer.shell															= new Shell(DataExplorer.display);
+	}
+
 	final DataExplorer										application	= DataExplorer.getInstance();
 	final Channels												channels		= Channels.getInstance();
 	final Settings												settings		= Settings.getInstance();
