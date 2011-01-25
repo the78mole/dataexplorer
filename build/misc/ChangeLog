@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 2.70 - XX Jan 2011
+Version 2.70 - 25 Jan 2011
 
 fix value format sync problem digital, analog versus graphics
 enable one click live data gathering (UniLog/LiPoWatch)
@@ -23,6 +23,8 @@ change log entries to avoid string parameter interpretation in time critical exe
 add LinkVarioDuo
 WStech devices, add calculation of track length, distance from start, azimuth and direction from start
 create menu tool bar exported kml files in temp directory 
+fix error during cleanup phase while exiting application
+introduce splash screen
 
 Version 2.60 - 01 Dec 2010
 
