@@ -2038,8 +2038,10 @@ public class DeviceConfiguration {
 	 * @return the last used channel number
 	 */
 	public void setLastChannelNumber(int channelNumber) {
-		if (this.isChangePropery = this.deviceProps.getChannels().getLastUseOrdinal() != (channelNumber - 1)) 
+		if (this.deviceProps.getChannels().getLastUseOrdinal() != (channelNumber - 1))  {
+			this.isChangePropery = true;
 			this.deviceProps.getChannels().setLastUseOrdinal(channelNumber - 1);
+		}
 	}
 
 	/**
