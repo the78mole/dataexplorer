@@ -642,13 +642,60 @@
 		</junit>
 	</target>
 
+	<taskdef resource="net/sf/antcontrib/antlib.xml" />
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+
 	<target name="signature" description="create and verify gpg signature and verify">
-		<echo>find . -name "*" -type f -exec gpg -b --use-agent {} \;</echo>
-		<echo>find . -name "*.sig" -type f -exec gpg --verify {} \;</echo>
+		<for param="file">
+			<path>
+				<fileset dir="${basedir}/build/target/install" includes="*.sig" />
+			</path>
+			<sequential>
+				<delete file="@{file}" />
+			</sequential>
+		</for>
+		<!-- find . -name "*" -type f -exec gpg -b - -use-agent {} \; -->
+		<for param="file">
+			<path>
+				<fileset dir="${basedir}/build/target/install" includes="**" excludes="*.sig" />
+			</path>
+			<sequential>
+				<echo message="signing: @{file}" />
+				<exec executable="bash" dir="${basedir}/build/target/install">
+					<arg value="-c" />
+					<arg value="gpg --batch -b --use-agent @{file}" />
+				</exec>
+			</sequential>
+		</for>
+		<!-- find . -name "*.sig" -type f -exec gpg - -verify {} \; -->
+		<for param="file">
+			<path>
+				<fileset dir="${basedir}/build/target/install" includes="*.sig" />
+			</path>
+			<sequential>
+				<echo message="verify: @{file}" />
+				<exec executable="gpg" dir="${basedir}/build/target/install">
+					<arg value="--verify" />
+					<arg value="@{file}" />
+				</exec>
+			</sequential>
+		</for>
 	</target>
 
 	<target name="rsync" description="copy new release content while deleting old once">
+		<echo>rsync -vr brueg@dl.sv.nongnu.org:/releases/dataexplorer/</echo>
+		<exec executable="bash" dir="${basedir}/build/target/install">
+			<arg value="-c" />
+			<arg value="rsync -vr --delete install/ brueg@dl.sv.nongnu.org:/releases/dataexplorer/" />
+		</exec>
+	</target>
+
+	<target name="rsync_delete" description="copy new release content while deleting old once">
 		<echo>rsync -vr --delete install/ brueg@dl.sv.nongnu.org:/releases/dataexplorer/</echo>
+		<exec executable="bash" dir="${basedir}/build/target">
+			<arg value="-c" />
+			<arg value="rsync -vr --delete install/ brueg@dl.sv.nongnu.org:/releases/dataexplorer/" />
+		</exec>
 	</target>
 
 </project>
