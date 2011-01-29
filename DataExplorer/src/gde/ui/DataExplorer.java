@@ -338,13 +338,14 @@ public class DataExplorer extends Composite {
 			}
 			else {
 				Rectangle displayBounds = DataExplorer.display.getBounds();
-				Rectangle primaryDisplayBounds = DataExplorer.display.getPrimaryMonitor().getBounds();
-				int x = this.settings.getWindow().x < displayBounds.x || this.settings.getWindow().x > primaryDisplayBounds.width ? 50 : this.settings.getWindow().x;
-				int y = this.settings.getWindow().y < displayBounds.y || this.settings.getWindow().y > primaryDisplayBounds.height ? 50 : this.settings.getWindow().y;
-				int width = this.settings.getWindow().width + x > displayBounds.width ? displayBounds.width - x : this.settings.getWindow().width;
-				int height = this.settings.getWindow().height + y > displayBounds.height ? displayBounds.height - x : this.settings.getWindow().height;
-				shell.setLocation(x, y);
-				shell.setSize(width, height);
+				if (this.settings.getWindow().x < displayBounds.x || this.settings.getWindow().x > (displayBounds.width + displayBounds.x) 				 // check location x,y inside display bounds
+						|| this.settings.getWindow().y < displayBounds.y || this.settings.getWindow().y > (displayBounds.height + displayBounds.y)) {
+					shell.setLocation(50, 50);
+					shell.setSize(this.settings.getWindow().width, this.settings.getWindow().height);
+				}
+				else {
+					shell.setBounds(this.settings.getWindow());
+				}
 			}
 			
 			this.fileHandler = new gde.io.FileHandler();
@@ -478,15 +479,6 @@ public class DataExplorer extends Composite {
 					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", DataExplorer.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					DataExplorer.application.settings.setWindowMaximized(DataExplorer.shell.getMaximized());
 					if (!DataExplorer.application.settings.isWindowMaximized()) {
-						Rectangle displayBounds = DataExplorer.display.getBounds();
-						Rectangle primaryDisplayBounds = DataExplorer.display.getPrimaryMonitor().getBounds();
-						if (displayBounds.x != primaryDisplayBounds.x || displayBounds.y != primaryDisplayBounds.y) {
-							int x = DataExplorer.application.settings.getWindow().x < displayBounds.x || DataExplorer.application.settings.getWindow().x > primaryDisplayBounds.width ? 50
-									: DataExplorer.application.settings.getWindow().x;
-							int y = DataExplorer.application.settings.getWindow().y < displayBounds.y || DataExplorer.application.settings.getWindow().y > primaryDisplayBounds.height ? 50
-									: DataExplorer.application.settings.getWindow().y;
-							shell.setLocation(x, y);
-						}
 						DataExplorer.application.settings.setWindow(DataExplorer.shell.getLocation(), DataExplorer.shell.getSize());
 					}
 				}		
