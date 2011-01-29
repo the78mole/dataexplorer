@@ -480,7 +480,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			public void run() {
 				for (String tmpFileName : fd.getFileNames()) {
 					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-					if (!selectedImportFile.endsWith(GDE.FILE_ENDING_DOT_NMEA)) {
+					if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_NMEA)) {
 						if (selectedImportFile.contains(GDE.STRING_DOT)) {
 							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
 						}
