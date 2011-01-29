@@ -55,6 +55,7 @@ import gde.utils.WebBrowser;
 import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -476,7 +477,18 @@ public class DataExplorer extends Composite {
 				public void controlResized(ControlEvent controlevent) {
 					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", DataExplorer.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					DataExplorer.application.settings.setWindowMaximized(DataExplorer.shell.getMaximized());
-					if (!DataExplorer.application.settings.isWindowMaximized()) DataExplorer.application.settings.setWindow(DataExplorer.shell.getLocation(), DataExplorer.shell.getSize());
+					if (!DataExplorer.application.settings.isWindowMaximized()) {
+						Rectangle displayBounds = DataExplorer.display.getBounds();
+						Rectangle primaryDisplayBounds = DataExplorer.display.getPrimaryMonitor().getBounds();
+						if (displayBounds.x != primaryDisplayBounds.x || displayBounds.y != primaryDisplayBounds.y) {
+							int x = DataExplorer.application.settings.getWindow().x < displayBounds.x || DataExplorer.application.settings.getWindow().x > primaryDisplayBounds.width ? 50
+									: DataExplorer.application.settings.getWindow().x;
+							int y = DataExplorer.application.settings.getWindow().y < displayBounds.y || DataExplorer.application.settings.getWindow().y > primaryDisplayBounds.height ? 50
+									: DataExplorer.application.settings.getWindow().y;
+							shell.setLocation(x, y);
+						}
+						DataExplorer.application.settings.setWindow(DataExplorer.shell.getLocation(), DataExplorer.shell.getSize());
+					}
 				}		
 				@Override
 				public void controlMoved(ControlEvent controlevent) {
@@ -1483,12 +1495,32 @@ public class DataExplorer extends Composite {
 		fileOpenDialog.setText(name);
 		fileOpenDialog.setFileName(fileName == null ? GDE.STRING_EMPTY : fileName);
 		if (extensions != null) {
-			fileOpenDialog.setFilterExtensions(extensions);
-			fileOpenDialog.setFilterNames(getExtensionDescription(extensions));
+			adaptFilter(fileOpenDialog, extensions);
 		}
 		if (path != null) fileOpenDialog.setFilterPath(path);
 		fileOpenDialog.open();
 		return fileOpenDialog;
+	}
+
+	/**
+	 * adapt extensions list to upper and lower case if OS distinguish
+	 * @param fileOpenDialog
+	 * @param extensions
+	 */
+	private void adaptFilter(FileDialog fileOpenDialog, String[] extensions) {
+		if (GDE.IS_LINUX) { // Apples MAC OS seams to reply with case insensitive file names
+			Vector<String> tmpExt = new Vector<String>();
+			for (String extension : extensions) {
+				if (!extension.equals(GDE.FILE_ENDING_STAR_STAR)) {
+					tmpExt.add(extension); // lower case is default
+					tmpExt.add(extension.toUpperCase());
+				}
+				else tmpExt.add(extension);
+			}
+			extensions = tmpExt.toArray(new String[1]);
+		}
+		fileOpenDialog.setFilterExtensions(extensions);
+		fileOpenDialog.setFilterNames(getExtensionDescription(extensions));
 	}
 
 	public FileDialog openFileOpenDialog(Shell parent, String name, String[] extensions, String path, String fileName, int addStyle) {
@@ -1500,8 +1532,7 @@ public class DataExplorer extends Composite {
 		fileOpenDialog.setText(name);
 		fileOpenDialog.setFileName(fileName == null ? GDE.STRING_EMPTY : fileName);
 		if (extensions != null) {
-			fileOpenDialog.setFilterExtensions(extensions);
-			fileOpenDialog.setFilterNames(getExtensionDescription(extensions));
+			adaptFilter(fileOpenDialog, extensions);
 		}
 		if (path != null) fileOpenDialog.setFilterPath(path);
 		fileOpenDialog.open();
@@ -1516,8 +1547,7 @@ public class DataExplorer extends Composite {
 		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileSaveDialog.setText(name);
 		if (extensions != null) {
-			fileSaveDialog.setFilterExtensions(extensions);
-			fileSaveDialog.setFilterNames(getExtensionDescription(extensions));
+			adaptFilter(fileSaveDialog, extensions);
 		}
 		if (path != null) fileSaveDialog.setFilterPath(path);
 		fileSaveDialog.setFileName(fileName != null && fileName.length() > 5 ? fileName : GDE.STRING_EMPTY);
@@ -1532,8 +1562,7 @@ public class DataExplorer extends Composite {
 		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileSaveDialog.setText(name);
 		if (extensions != null) {
-			fileSaveDialog.setFilterExtensions(extensions);
-			fileSaveDialog.setFilterNames(getExtensionDescription(extensions));
+			adaptFilter(fileSaveDialog, extensions);
 		}
 		if (path != null) fileSaveDialog.setFilterPath(path);
 		fileSaveDialog.setFileName(fileName != null && fileName.length() > 5 ? fileName : GDE.STRING_EMPTY);
@@ -1548,9 +1577,15 @@ public class DataExplorer extends Composite {
 		String[] filterNames = new String[extensions.length];
 		for (int i = 0; i < filterNames.length; i++) {
 			int beginIndex = extensions[i].indexOf(GDE.STRING_DOT);
-			filterNames[i] = this.extensionFilterMap.get((beginIndex != -1 ? extensions[i].substring(beginIndex+1) : extensions[i]).toLowerCase());
+			String tmpExt = (beginIndex != -1 ? extensions[i].substring(beginIndex+1) : extensions[i]);			
+			filterNames[i] = this.extensionFilterMap.get(tmpExt.toLowerCase());
+			
 			if (filterNames[i] == null)
 				filterNames[i] = extensions[i];
+			else {
+				String tmpFilterExt = filterNames[i].substring(filterNames[i].indexOf(GDE.STRING_DOT)+1, filterNames[i].length()-1);
+				filterNames[i] = tmpExt.equals(tmpFilterExt) ? filterNames[i] : filterNames[i].replace(tmpFilterExt, tmpExt);
+			}
 		}
 		return filterNames;
 	}
