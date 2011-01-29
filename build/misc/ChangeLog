@@ -3,7 +3,7 @@ Development history / change log, please read from bottom up
 Version 2.71 - xx yyy 2011
 
 fix file import problem while using files with upper case extension on GNU/Linux
-fix problem not displaying application window after switching from secondary monitor to single one
+fix problem after switching from secondary monitor to single one
 
 Version 2.70 - 25 Jan 2011
 
