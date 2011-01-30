@@ -684,17 +684,17 @@
 
 	<target name="rsync" description="copy new release content while deleting old once">
 		<echo>rsync -vr brueg@dl.sv.nongnu.org:/releases/dataexplorer/</echo>
-		<exec executable="bash" dir="${basedir}/build/target/install">
+		<exec executable="bash" dir="${basedir}/build/target/install/">
 			<arg value="-c" />
-			<arg value="rsync -vr --delete install/ brueg@dl.sv.nongnu.org:/releases/dataexplorer/" />
+			<arg value="rsync -v ${basedir}/build/target/install/* brueg@dl.sv.nongnu.org:/releases/dataexplorer/" />
 		</exec>
 	</target>
 
 	<target name="rsync_delete" description="copy new release content while deleting old once">
 		<echo>rsync -vr --delete install/ brueg@dl.sv.nongnu.org:/releases/dataexplorer/</echo>
-		<exec executable="bash" dir="${basedir}/build/target">
+		<exec executable="bash" dir="${basedir}/build/target/">
 			<arg value="-c" />
-			<arg value="rsync -vr --delete install/ brueg@dl.sv.nongnu.org:/releases/dataexplorer/" />
+			<arg value="rsync -vr --delete ${basedir}/build/target/install brueg@dl.sv.nongnu.org:/releases/dataexplorer/" />
 		</exec>
 	</target>
 
