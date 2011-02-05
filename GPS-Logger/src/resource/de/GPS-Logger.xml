@@ -188,7 +188,7 @@
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="16" triggerRefOrdinal="16" sigma="false" avg="false" max="true" min="true"/>
-	            <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+	            <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="2" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Geschwindigkeit_UL</name>
