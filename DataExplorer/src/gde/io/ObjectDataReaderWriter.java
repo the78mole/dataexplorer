@@ -321,13 +321,14 @@ public class ObjectDataReaderWriter {
 			ObjectDataReaderWriter.log.log(Level.FINE, ObjectDataReaderWriter.END_STYLES);
 
 			outZip.putNextEntry(new ZipEntry(this.objectData.getKey() + GDE.FILE_ENDING_DOT_INI));
-			this.objectData.getProperties().store(outZip, "GPS velocity limits and colors"); //$NON-NLS-1$
+			if (this.objectData.getProperties() != null)
+				this.objectData.getProperties().store(outZip, "GPS velocity limits and colors"); //$NON-NLS-1$
 			outZip.closeEntry();
 
 			outZip.flush();
 			outZip.close();
 		}
-		catch (IOException e) {
+		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
