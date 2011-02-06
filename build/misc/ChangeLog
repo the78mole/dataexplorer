@@ -1,5 +1,11 @@
 Development history / change log, please read from bottom up
 
+Version 2.72 - xx yyy 2011
+
+documentation update
+fix error while saving object data without GPS speed configuration
+correct wrong synchronization reference GPS-Logger measurement Height (relative)_UL
+
 Version 2.71 - 30 Jan 2011
 
 fix file import problem while using files with upper case extension on GNU/Linux
