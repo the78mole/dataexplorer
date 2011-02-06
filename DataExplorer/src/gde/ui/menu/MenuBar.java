@@ -433,20 +433,6 @@ public class MenuBar {
 					new MenuItem(this.deviceMenu, SWT.SEPARATOR);
 				}
 				{
-					this.devicePropertyFileEditMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
-					this.devicePropertyFileEditMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0465));
-					this.devicePropertyFileEditMenuItem.setImage(SWTResourceManager.getImage("gde/resource/EditHot.gif")); //$NON-NLS-1$
-					this.devicePropertyFileEditMenuItem.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "devicePropertyFileEditMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							DevicePropertiesEditor.getInstance().openAsDialog(MenuBar.this.application.getActiveDevice().getDeviceConfiguration());
-						}
-					});
-				}
-				{
-					new MenuItem(this.deviceMenu, SWT.SEPARATOR);
-				}
-				{
 					this.portMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
 					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0049));
 					this.portMenuItem.setImage(SWTResourceManager.getImage("gde/resource/BulletHotRed.gif")); //$NON-NLS-1$
@@ -539,6 +525,20 @@ public class MenuBar {
 							else {
 								MenuBar.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0002)); 
 							}
+						}
+					});
+				}
+				{
+					new MenuItem(this.deviceMenu, SWT.SEPARATOR);
+				}
+				{
+					this.devicePropertyFileEditMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
+					this.devicePropertyFileEditMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0465));
+					this.devicePropertyFileEditMenuItem.setImage(SWTResourceManager.getImage("gde/resource/EditHot.gif")); //$NON-NLS-1$
+					this.devicePropertyFileEditMenuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.FINEST, "devicePropertyFileEditMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							DevicePropertiesEditor.getInstance().openAsDialog(MenuBar.this.application.getActiveDevice().getDeviceConfiguration());
 						}
 					});
 				}

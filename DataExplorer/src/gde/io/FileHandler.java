@@ -125,7 +125,7 @@ public class FileHandler {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		FileDialog csvFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, getFileNameProposal());
+		FileDialog csvFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, getFileNameProposal(true));
 		String recordSetKey = activeRecordSet.getName();
 		String csvFilePath = csvFileDialog.open();
 		if (csvFilePath != null && csvFilePath.length() > 4) { // file name has a reasonable length
@@ -148,9 +148,11 @@ public class FileHandler {
 	}
 
 	/**
-	 * @return
+	 * get a filename proposal based on global settings configuration and optionally record set name
+	 * @param addRecordSetName
+	 * @return the file name proposal as string
 	 */
-	String getFileNameProposal() {
+	String getFileNameProposal(boolean addRecordSetName) {
 		String fileName = GDE.STRING_EMPTY;
 		if (Settings.getInstance().getUsageDateAsFileNameLeader()) {
 			String fileDescriptionDate = GDE.STRING_EMPTY;
@@ -172,7 +174,7 @@ public class FileHandler {
 		if (Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null && Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {
 			fileName = fileName + Channels.getInstance().getActiveChannel().getObjectKey();
 		}
-		if(application.getActiveChannel() != null && application.getActiveChannel().getActiveRecordSet() != null) {
+		if(addRecordSetName && application.getActiveChannel() != null && application.getActiveChannel().getActiveRecordSet() != null) {
 			fileName = fileName + application.getActiveChannel().getActiveRecordSet().getName().replace(") ", GDE.STRING_UNDER_BAR);
 		}
 		return fileName;
@@ -309,15 +311,15 @@ public class FileHandler {
 		}
 		FileDialog fileDialog;
 		String osdFilePath;
-		if (fileName == null || fileName.length() < 5 || fileName.equals(getFileNameProposal())) {
-			fileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD }, path + GDE.FILE_SEPARATOR_UNIX, getFileNameProposal());
+		if (fileName == null || fileName.length() < 5 || fileName.equals(getFileNameProposal(false))) {
+			fileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD }, path + GDE.FILE_SEPARATOR_UNIX, getFileNameProposal(false));
 			osdFilePath = fileDialog.open();
 		}
 		else {
 			osdFilePath = path + GDE.FILE_SEPARATOR_UNIX + fileName; // including ending ".osd"
 		}
 
-		if (osdFilePath != null && osdFilePath.length() > 4 && !osdFilePath.endsWith(getFileNameProposal())) { // file name has a reasonable length
+		if (osdFilePath != null && osdFilePath.length() > 4 && !osdFilePath.endsWith(getFileNameProposal(false))) { // file name has a reasonable length
 			while (osdFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_OSD) || osdFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOV)) {
 				osdFilePath = osdFilePath.substring(0, osdFilePath.lastIndexOf('.'));
 			}
@@ -426,7 +428,7 @@ public class FileHandler {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal() : activeChannel.getFileName();
+		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName();
 		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
 		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
 			try {
@@ -439,7 +441,7 @@ public class FileHandler {
 				// ignore
 			}
 		}
-		FileDialog kmlFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_KML }, path, fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal());
+		FileDialog kmlFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_KML }, path, fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal(true));
 		String kmlFilePath = kmlFileDialog.open();
 		if (kmlFilePath != null && kmlFileDialog.getFileName().length() > 4) {
 			if (FileUtils.checkFileExist(kmlFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { kmlFilePath }))) {
@@ -488,7 +490,7 @@ public class FileHandler {
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = isExportTmpDir ? GDE.JAVA_IO_TMPDIR : (deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX);
 		FileUtils.checkDirectoryAndCreate(path);
-		String fileName = path + (activeChannel.getFileName() == null ? this.getFileNameProposal() : activeChannel.getFileName());
+		String fileName = path + (activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName());
 		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
 		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
 			try {
@@ -544,7 +546,7 @@ public class FileHandler {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal() : activeChannel.getFileName();
+		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName();
 		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
 		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
 			try {
@@ -557,7 +559,7 @@ public class FileHandler {
 				// ignore
 			}
 		}
-		FileDialog gpxFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal());
+		FileDialog gpxFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_GPX }, path, fileName != null && fileName.length() > 4 ? fileName : getFileNameProposal(true));
 		String gpxFilePath = gpxFileDialog.open();
 		if (gpxFilePath != null && gpxFilePath.length() > 4) {
 			if (FileUtils.checkFileExist(gpxFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0007, new Object[] { gpxFilePath }))) {
