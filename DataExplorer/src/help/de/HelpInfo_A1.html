@@ -46,7 +46,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Grafikvorlagen"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Ansicht"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Hilfe"</A> </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Kanalwahl-ToolBar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Ausgangswahl-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Konfigurationswahl-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Datensatzauswahl-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_36.html">Google Earth</A> </BR>
@@ -88,7 +88,9 @@ Hiermit werden die Ger&auml;te XML Dateien ver&auml;ndert.
 </P>
 <P>
 &Uuml;ber das Men&uuml; kann eine Ger&auml;tedatei direkt ge&ouml;ffnet werden.
-Ist das der Fall, wird die Ger&auml;tedatei des aktuellen Ger&auml;tes geladen und ein &Auml;ndern der Datei ist m&ouml;glich, wobei nit alle Eigenschaften direkt auf existierende Daten wirken.
+Ist das der Fall, wird die Ger&auml;tedatei des aktuellen Ger&auml;tes geladen und ein &Auml;ndern der Datei ist nun m&ouml;glich.
+Wobei nicht alle ver&auml;nderten Eigenschaften direkt auf aktuell angezeigte Daten wirken.
+Eventuell ist ein erneutes Einlesen der Messdaten n&ouml;tig.
 Wird der DevicePropertiesEditor als eigene Anwendung gestartet kann der Name, falls bekannt kann auch direkt eingegeben werden. Ist der Name der Datei nicht im Ger&auml;teordner enthalten, geht die Anwendung davon aus das eine neue Ger&auml;tedatei angelegt werden soll und fragt danach.
 </BR></BR>
 <IMG SRC="images/DevicePropsEditor_NewDevice.png" NAME="DevicePropsEditor_NewDevice" ALIGN=LEFT>
@@ -128,8 +130,7 @@ F&uuml;r den seriellen Port sind die entsprechenden Konfigurationsparameter einz
 Da hier alle Auswahlm&ouml;glichkeiten &uuml;ber Auswahldialoge eingestellt werden sind weitere Hinweise nicht n&ouml;tig.
 <P><B>Hinweis : </B>Werden Timeoutzeiten angegeben muss die Implementierung so geschrieben sein, dass diese auch benutzt werden.
 </BR>
-Die Beschreibung der seriellen Schnittstelle ist optional, weil es Ger&auml;te gibt, die einen virtuellen seriellen Input &uuml;ber Textdaten erhalten.
-Beispielsweise haben Ger&auml;te die das CSV2SerialAdapter Plug-in benutzen keine serielle Schnittstelle. 
+Die Beschreibung der seriellen Schnittstelle ist optional, weil es Ger&auml;te gibt, die ihre Daten nicht &uuml;ber eine serielle Schnittstelle einlesen..
 </P>
 </P>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
@@ -172,22 +173,22 @@ Die Ger&auml;teimplementierung bestimmt wie die sequenziell angeordneten Zust&au
 <IMG SRC="images/DevicePropsEditor_ChannelConfig.png" NAME="DevicePropsEditor_Config" ALIGN=RIGHT>
 Die Tabulator mit der Beschriftung "Ausgangskanal/Konfiguration" ist die komplizierteste und umfangreichste Konfigurationsseite.
 Hier werden, wenn erwünscht oder nötig, die Ausg&auml;nge von einem Ger&auml;t (entsprechen einem Datenkanal) beschreiben oder eben verschiedene Konfigurationen, die auf die Datens&auml;tze angewendet werden sollen.
-Es gibt also, wie beschrieben, 2 Kanal-Konfigurationstypen, zwischen den entschieden werden muss. 
+Es gibt also, wie beschrieben, 2 Ausgangs- Konfigurations- Typen, zwischen den entschieden werden muss. 
 Bei einem Ladeger&auml;t, an dem zu einer Zeit nur ein Akku geladen werden kann, hat auch nur einen Ausgang, an dem der Akku angeschlossen wird.
 Es wird auch nur ein Ausgang als Datenkanal beschrieben. Das ist in nebenstehenden Beispiel beschrieben.
 </BR>
-Unterhalb der Leiste, &uuml;ber die man den Type und den Namen der Kanal-Konfiguration ausw&auml;hlen kann, befindet sich der Tabulatorbereich, der die einzelnen Messwerte beschreibt.
+Unterhalb der Leiste, &uuml;ber die man den Type und den Namen der Ausgang-Konfiguration ausw&auml;hlen kann, befindet sich der Tabulatorbereich, der die einzelnen Messwerte beschreibt.
 Die Messwertbeschreibung und Konfiguration bestimmt deren Anzeige einschlie&szlig;lich der Einheitenberechnung, sowie nimmt Einfluss auf die statistische Auswertung.
 </BR>
 <B>Hinweis : </B>W&auml;hlt man Konfiguration (TYPE_CONFIG) als Type k&ouml;nnen unterschiedliche Konfigurationen auf ein und dieselben Daten angewendet werden. 
 </BR>
-Möchte man Kanal/Konfigurationen kopieren, um sie zu vervielf&auml;ltigen ist es sinnvoll die zugeh&ouml;rigen Messwerte und deren Beschreibungen vorher zu vervollst&auml;ndigen.
+Möchte man Ausgangskanal/Konfigurationen kopieren, um sie zu vervielf&auml;ltigen ist es sinnvoll die zugeh&ouml;rigen Messwerte und deren Beschreibungen vorher zu vervollst&auml;ndigen.
 </P>
 </P>
 </BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR></BR>
 <P><A NAME="device_properties_measurement"></A>
 <IMG SRC="images/DevicePropsEditor_MeasurementProperty.png" NAME="DevicePropsEditor_MeasurementProperty" ALIGN=RIGHT>
-Messwerte beschreibt man mit dem Namen, welche Einheit sie besitzen, welche Symbol verwendet werden soll und  ob sie aktiv aus dem Ger&auml;t ausgelesen werden k&ouml;nnen, oder ob sie durch Berechnung entstehen.
+Messwerte beschreibt man mit dem Namen, welche Einheit sie besitzen, welches Symbol verwendet werden soll und  ob sie aktiv aus dem Ger&auml;t ausgelesen werden k&ouml;nnen, oder ob sie durch Berechnung entstehen.
 Des weiteren gibt es optionale Eigenschaften, z.B. &uuml;ber Faktor, Offset und Reduktion die Anzeige der (Roh-)Daten beeinflussen.
 <P><B>Hinweis : </B>Ben&ouml;tigt man weitere Eigenschaften oder Statisikeinstellungen kann man diese durch das Kontextmen&uuml; anfordern.
 Nach der Vervollst&auml;ndigung kann man dann die gerade fertiggestellte Messwertkonfiguration in eine Neue, durch Selektion des +Knopfes, kopieren.

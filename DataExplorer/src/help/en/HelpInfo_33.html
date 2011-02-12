@@ -23,7 +23,7 @@
 <HEAD>
 <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
 <TITLE>DataExplorer - Information and Help</TITLE>
-<META NAME="AUTHOR" CONTENT="Winfried Br�gmann">
+<META NAME="AUTHOR" CONTENT="Winfried Bruegmann">
 <LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
 </HEAD>
 <BODY LANG="en-US">
@@ -48,9 +48,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Graphics templates"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"View"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Help"</A> </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Channel-ToolBar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Outlet-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Configuration-ToolBar</A> </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Data set-Toolbar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Data Set-Toolbar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_36.html">Google Earth</A> </BR>
 </BR>
 &nbsp;&nbsp;<A HREF="HelpInfo_4.html">Graphical view</A> </BR>
@@ -94,9 +94,8 @@ the curve selector, like line color, number format, ... The directory to
 the graphic template files &quot;GraphicsTemplates&quot; under the
 application configuration path. 
 </P>
-<P><IMG SRC="images/Menuebar_GraphicsTemplates.png" NAME="graphics1">
-</P>
-<P><UL>
+<P><IMG SRC="images/Menuebar_GraphicsTemplates.png" NAME="graphics1"></P>
+<UL>
 	<LI>&quot;Save Default Graphics Template&quot;, stores a template according
 	channel configuration and device (DeviceName_ChannelConfigurationNumber.xml)
 	<LI>&quot;Load Default Graphics Template&quot; loads a template according
@@ -105,7 +104,15 @@ application configuration path.
 	dialog to save a graphics template with a given name
 	<LI>&quot;Load Graphics Template&quot; opens a open file dialog to
 	select a graphics template to be applied
-</UL></P>
+</UL>
+<P>If there is a reasonable configuration displaying all your important curves found, go ahead and save such graphics configuration as default.
+</P>
+<P><B>Hints : </B>THe apply function of graphics templates overlay with visibility configuration for some devices.
+If there are some curves switched invisible using the visibility configuration of the certain device, they will not be visible by applying the graphics template.
+Some devices switch curves invisible automatically in cases where no real data are contained.
+Devices with visibility configuration are as example CSV2SerialAdapter, WStech Varios, GPS-Logger, NMEA-Adapter, UniLog and some others.
+Using the visibility configuration dialog such curves can be made visible again even if they do not contain reasonable data.
+</P>
 <P ALIGN=LEFT><A HREF="HelpInfo_32.html">&lt;&lt;== previous</A></P>
 <P ALIGN=RIGHT><A HREF="HelpInfo_34.html">next ==&gt;&gt;</A></P>
 </DIV>

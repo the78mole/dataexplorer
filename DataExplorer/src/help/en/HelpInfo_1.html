@@ -23,7 +23,7 @@
 <HEAD>
 <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
 <TITLE>DataExplorer - Information and Help</TITLE>
-<META NAME="AUTHOR" CONTENT="Winfried Br�gmann">
+<META NAME="AUTHOR" CONTENT="Winfried Bruegmann">
 <LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
 </HEAD>
 <BODY LANG="en-US">
@@ -48,9 +48,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Graphics templates"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"View"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Help"</A> </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Channel-ToolBar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Outlet-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Configuration-ToolBar</A> </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Data set-Toolbar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Data Set-Toolbar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_36.html">Google Earth</A> </BR>
 </BR>
 &nbsp;&nbsp;<A HREF="HelpInfo_4.html">Graphical view</A> </BR>
@@ -88,33 +88,33 @@
 
 <P>The settings dialog is used to configure:
 <UL>
-	<LI>The language to be used
-	<LI>The data path, where the application is locking for and
+	<LI>the language to be used
+	<LI>the data path, where the application is locking for and
 	placing the device specific log data files and file links.
-	<LI>The file save dialog might be use the current date and/or object name as leader	of the file name. This will help to find files.
-	<LI>Behavior of the device dialogs. A primary modal behavior is
+	<LI>the file save dialog might be use the current date and/or object name as leader	of the file name. This will help to find files.
+	<LI>behavior of the device dialogs. A primary modal behavior is
 	some times not handy, if some adjustments are the place in parallel while
 	gathering data. Some times this cost more effort while programming
 	this.
-	<LI>Decimal separator and list separator characters. This might
+	<LI>decimal separator and list separator characters. This might
 	be different then the character used from system locale to work together with the spread sheet programs.
 	This adjustment is used for import/export of CSV files, but has no influence while importing <A HREF="HelpInfo_C.html">CSV2SerialAdapter Data Format</A> files.
 <P ALIGN=CENTER><IMG SRC="images/Settingsdialog_1.png" NAME="graphics 1" ALIGN=CENTER >
 </P>
-	<LI>While opening this dialog it scans for available serial ports
+	<LI>using black-list or white-list configuration it is possible to configure according personal problematic ports.
+	This configuration is also valid for the device selection dialog, where device individual ports are selected.
+	Configure the black-list will ignore ports declared. On the other hand the white-list will exclusive use the configured ports.
+	Using the white list it is possible to miss ports dynamically configured by the system. 
+	<LI>while it scans for available serial ports
 	and updates the results delayed. The delay can be reduced on slow
 	systems by switching off the availability check. If this is the case
 	used ports are displayed too which might not be used in future. 
 	At UNIX based systems this is not relevant. 
 	This adjustment reflect also to the device selection dialog
 	which also scans for available serial ports.
-	<LI>If system wide only one serial port is available it is
-	possible to configure global serial port usage, but in most cases the
-	single available port will be found automatically.
-	<LI>Using black-list or white-list configuration it is possible to configure according personal problematic ports.
-	This configuration is also valid for the device selection dialog, where device individual ports are selected.
-	Configure the black-list will ignore ports declared. On the other hand the white-list will exclusive use the configured ports.
-	Using the white list it is possible to miss ports dynamically configured by the system. 
+	<LI>if system wide only one serial port is available it is
+	possible to configure a global serial port usage, but in most cases the
+	single available port will be found automatically. Activating this check box will start the port update scan.
 </UL>
 </P>
 <H2>Miscellaneous Tab</H2>
@@ -152,15 +152,15 @@ Otherwise the amount of log statements is very high.
 <UL>
 	<LI>the global setting of the &quot;trace log&quot; level, is in
 	normal the level INFO
-	<LI>Graphical user interface, here all statements are included
+	<LI>graphical user interface, here all statements are included
 	called during main window execution
-	<LI>Devices, all statements called during device relevant
+	<LI>devices, all statements called during device relevant
 	execution
-	<LI>Data model, all executions involved by the data model itself
-	<LI>Utility functions, all the helper functions, drawing curves,
+	<LI>data model, all executions involved by the data model itself
+	<LI>utility functions, all the helper functions, drawing curves,
 	calculate check sum, etc.
-	<LI>File I/O, function calls involved in file input/output
-	<LI>Serial I/O, will used a memory logger above the level INFO to
+	<LI>file I/O, function calls involved in file input/output
+	<LI>serial I/O, will used a memory logger above the level INFO to
 	archive a low performance impact. As logical consequence the memory
 	usage of the application is higher as before. It might be required to
 	start the application using &quot;java -jar -Xmx512m

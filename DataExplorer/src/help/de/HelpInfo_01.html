@@ -46,7 +46,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Grafikvorlagen"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Ansicht"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Hilfe"</A> </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Kanalwahl-ToolBar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Ausgangswahl-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Konfigurationswahl-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Datensatzauswahl-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_36.html">Google Earth</A> </BR>
@@ -82,10 +82,11 @@
 
 <DIV ID="Content" DIR="LTR">
 <H2><A NAME="directories"></A>Verwendete Verzeichnisse</H2>
-<P>Welche Verzeichnisse bei der Installation angelegt werden ist in
-der README Datei beschrieben. Hier soll es viel mehr um die
-Verzeichnisse gehen, die das Programm zum Ablegen von Einstellungen,
-Grafikvorlagen und Logdateien benutzt.</P>
+<P><B>Hinweis: </B>Bitte verwenden Sie keinen Installationspfad der Umlaute enthält. 
+Java arbeitet mit dem UTF-8 Zeichensatz, beim &Uuml;bersetzen eines Umlautes entstehen kryptische Zeichen, was dann zu Fehlverhalten f&uuml;hrt.
+</P>
+<P>Welche Verzeichnisse bei der Installation verwendet und angelegt werden ist in der README Datei beschrieben. 
+Hier soll es viel mehr um die Verzeichnisse gehen, die das Programm zum Ablegen von Einstellungen, Grafikvorlagen und Tracelogdateien benutzt.</P>
 <P>Als Basisverzeichnis benutzt das Programm</P>
 <UL>
 	<LI>&nbsp;&nbsp;&nbsp;&nbsp;Windows&nbsp;:&nbsp;%APPDATA%\Benutzer\DataExplorer
@@ -96,15 +97,31 @@ Grafikvorlagen und Logdateien benutzt.</P>
 <UL>
 	<LI>&nbsp;&nbsp;&nbsp;&nbsp;Devices&nbsp;:&nbsp;f&uuml;r die
 	Ger&auml;tekonfigurationsdateien (XML) und Ger&auml;tebildchen
-	<LI>&nbsp;&nbsp;&nbsp;&nbsp;Grafikvorlagen:&nbsp;f&uuml;r die vom Benutzer erzeugten
+	<LI>&nbsp;&nbsp;&nbsp;&nbsp;GraphicsTemplates:&nbsp;f&uuml;r die vom Benutzer erzeugten
 	Konfigurationsdateien, welche Kurve sichtbar mit welcher Farbe, ...
-	<LI>&nbsp;&nbsp;&nbsp;&nbsp;Logs&nbsp;:&nbsp;f&uuml;r die Logdateien die das Programm
+	<LI>&nbsp;&nbsp;&nbsp;&nbsp;Logs&nbsp;:&nbsp;f&uuml;r die Tracelogdateien die das Programm
 	schreiben kann, nicht zu verwechseln mit den
 	Ger&auml;tedatenaufzeichnungen
 </UL>
 <P>angelegt. Das soll als &Uuml;bersicht reichen. Sp&auml;ter im
 Text wird dann noch genauer auf den Inhalt der Verzeichnisse
 eingegangen.</P>
+<P>Wie sind die Daten organisiert, die die eigentlichen Messwerte enth&auml;lt.
+Es muss ein Stammordner ausgewählt werden (siehe <A href=HelpInfo1.html>Einstellungsdialog</A>), darunter werden für jedes benutzte Ger&auml;t, Ordner angelegt. 
+Die Ger&auml;teordner entsprechen dem ausgew&auml;ltem Ger&auml;tenamen. Zus&auml;tzlich werden Ordner für jedes angelegte Objekt angelegt. 
+Beim sichern einer Datendatein wird ein Dateiname entsprechend der Konfiguration im <A href=HelpInfo1.html>Einstellungsdialog</A> vorgeschlagen.
+Als Beispiel Datum_Objektname.osd. Hat nun die angezeigte Datenaufnahme einen Bezug zu einem Objekt, ein Objekt ist beim sichern angelegt und ausgewählt, 
+wird zus&auml;tzlich zur Datendatei im Ger&auml;teordner ein Dateilink in dem Objektordner abgelegt. 
+Dateilinks brauchen nur sehr wenig Platz, da sie ja nur einen Verweis auf eine andere Datei darstellen. 
+Es gibt keine Duplizierung von Datendateien. 
+Mit der Verwendung von Objekten sieht man beim öffnen einer Datei nur die objektbezogenen Dateien. 
+Dadurch kann man beispielsweise leicht erkennen, wann der Akku des Objektes XY das letzte mal geladen wurde.
+Beispielhaft soll hier mal ein kleiner Ordnerstrukturausschnitt dargestellt werden:
+</P>
+<P ALIGN=CENTER><IMG SRC="images/DataDirectoryStructure.png"	NAME="Data directory structure" ALIGN=MIDDLE></P>
+<P><B>Hinweis: </B>Da Dateilinks betriebssystemspezifisch sind gibt es die M&ouml;glichkeit die Dateilinks zu entfernen und neu zu erstellen (siehe <A href=HelpInfo1.html>Einstellungsdialog</A>). 
+Dadurch ist ein Umzug der Daten auf ein anderes Betriebssysteme ein Kinderspiel.
+</P>
 <P ALIGN=LEFT><A HREF="HelpInfo.html">&lt;&lt;== zur&uuml;ck</A></P>
 <P ALIGN=RIGHT><A HREF="HelpInfo_02.html">weiter ==&gt;&gt;</A></P>
 </DIV>

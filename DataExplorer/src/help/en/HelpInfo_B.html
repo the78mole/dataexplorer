@@ -23,7 +23,7 @@
 <HEAD>
 <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
 <TITLE>DataExplorer - Information and Help</TITLE>
-<META NAME="AUTHOR" CONTENT="Winfried Br�gmann">
+<META NAME="AUTHOR" CONTENT="Winfried Bruegmann">
 <LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
 </HEAD>
 <BODY LANG="en-US">
@@ -48,9 +48,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Graphics templates"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"View"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Help"</A> </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Channel-ToolBar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Outlet-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Configuration-ToolBar</A> </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Data set-Toolbar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Data Set-Toolbar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_36.html">Google Earth</A> </BR>
 </BR>
 &nbsp;&nbsp;<A HREF="HelpInfo_4.html">Graphical view</A> </BR>
@@ -90,8 +90,10 @@ the configuration data are key value pairs. This enables the capability
 to keep some configuration data optional similar to optional XML
 elements. The read functions will construct at first a HashMap of the
 key/values and apply only the values of existing keys. All other are
-default. The binary format seams for me simpler for the first shot to
-enable asynchronous read capability.</P>
+default. 
+Measurement data point are stored without any change as integer values.
+This enable to have all data files structure the same, there is no difference between devices.
+</P>
 <P ALIGN=CENTER><IMG SRC="images/DataExplorerFormat.png" NAME="graphics1" ALIGN=MIDDLE></P>
 <P ALIGN=LEFT><A HREF="HelpInfo_A1.html">&lt;&lt;== previous</A></P>
 <P ALIGN=RIGHT><A HREF="HelpInfo_C.html">next ==&gt;&gt;</A></P>

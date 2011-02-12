@@ -23,7 +23,7 @@
 <HEAD>
 <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
 <TITLE>DataExplorer - Information and Help</TITLE>
-<META NAME="AUTHOR" CONTENT="Winfried Br�gmann">
+<META NAME="AUTHOR" CONTENT="Winfried Bruegmann">
 <LINK HREF="../HelpInfo.css" REL="STYLESHEET" TYPE="text/css">
 </HEAD>
 <BODY LANG="en-US">
@@ -48,9 +48,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Graphics templates"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"View"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Help"</A> </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Channel-ToolBar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Outlet-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Configuration-ToolBar</A> </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Data set-Toolbar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Data Set-Toolbar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_36.html">Google Earth</A> </BR>
 </BR>
 &nbsp;&nbsp;<A HREF="HelpInfo_4.html">Graphical view</A> </BR>
@@ -97,8 +97,8 @@ icons to make it more intuitive.</P>
 	initializing the application for the active device, are data
 	available which are not saved this operation must be committed
 	<LI>&quot;Open&quot; opens a file open dialog to select a file to
-	be loaded. If the file does not fit to the active device the operation
-	has to be committed.
+	be loaded. If the file does not fit to the active device the device gets switched while opening.
+	File ending for supported input files can be adjusted as usual for your specific operating system.
 	<LI>&quot;Save&quot; opens a file save dialog, are the data
 	already saved overwrite commitment or renaming is required
 	<LI>&quot;Save as...&quot; opens a file save dialog to use a new
@@ -106,17 +106,19 @@ icons to make it more intuitive.</P>
 	<LI>&quot;History&quot; showing the list of last used files with a
 	maximum of 10 entries
 	<LI>&quot;Import&quot; offers the possibility to import comma
-	separated values files (CSV) with absolute or raw data
+	separated values files (CSV) with absolute or raw data. 
+	Please do not mix with CSV data which gets imported with <A HREF="HelpInfo_C.html">CSV2SerialAdapter</A> or derivates which gets imported as initial device data import.
 	<LI>&quot;Export&quot; offers the possibility to export comma
-	separated values&quot; (CSV) files as absolute values or raw data
+	separated values&quot; (CSV) files as absolute values or raw data to be used as spread sheet.
 	<P>
 		<IMG SRC="images/CSV_absolute_sample.png" NAME="CSV_absolute_sample">
 		<IMG SRC="images/CSV_raw_sample.png" NAME="CSV_raw_sample">
 	</P>
+	Some device offers additional data export capability, example KML files generated from GPS data.
 	<LI>&quot;Preferences&quot; opens the preferences dialog to
 	configure application properties
 	<LI>&quot;Print&quot; opens a print configuration dialog to initiate printing
-	<LI>&quot;Exit&quot; close the application
+	<LI>&quot;Exit&quot; close the application (some temporary created files might be also deleted)
 </UL>
 <P><B>Hint : </B>Absolute during CSV export means the same form as
 displayed in the table view. Raw means the data are equivalent to the

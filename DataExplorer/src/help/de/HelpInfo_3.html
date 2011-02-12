@@ -46,7 +46,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_33.html">"Grafikvorlagen"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Ansicht"</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_34.html">"Hilfe"</A> </BR>
-&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Kanalwahl-ToolBar</A> </BR>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Ausgangswahl-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Konfigurationswahl-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_35.html">Datensatzauswahl-ToolBar</A> </BR>
 &nbsp;&nbsp;&nbsp;&nbsp;<A HREF="HelpInfo_36.html">Google Earth</A> </BR>
@@ -89,17 +89,17 @@ verwendet werden.</P>
 <P ALIGN=CENTER><IMG SRC="images/Menuebar_1.png" NAME="graphics1" ALIGN=MIDDLE></P>
 <H2><A NAME="menue_file"></A>&quot;Datei&quot; Men&uuml;</H2>
 <P>Von dem Datei-Men&uuml; aus werden alle Aktionen ausgef&uuml;hrt,
-die einen Datei als Grundlage haben
+die eine Datei als Grundlage haben
 <IMG SRC="images/Menuebar_File.png" NAME="graphics2" ALIGN=RIGHT >
 </P>
 <UL>
 	<LI>&quot;Neu&quot;
 	initialisiert die Anwendung f&uuml;r das eingestellte Ger&auml;t, sind
-	ungesicherte Daten vorhanden wir vor der neuen Initialisierung
+	ungesicherte Daten vorhanden wird vor der neuen Initialisierung
 	nachgefragt
 	<LI>&quot;&Ouml;ffnen&quot; &ouml;ffnet einen Dateiauswahldialog
-	um eine Datei, die geladen werden soll auszuw&auml;hlen, eventuell wird dabei das
-	Ger&auml;t gewechselt
+	um eine Datei, die geladen werden soll auszuw&auml;hlen, unterst&uuml;tzte Datenformate kann man an gewohnter Stelle ausw&auml;hlen, 
+	eventuell wird dabei das Ger&auml;t gewechselt, wenn eine Datei einem anderem Ger&auml;t zugeordnet ist als das momentan aktive
 	<LI>&quot;Speichern&quot; sichert die aktuellen Daten mit dem
 	Bearbeitungsstand, ist noch kein Dateiname vergeben wird nachgefragt,
 	bzw. ein Dateisicherungsdialog ge&ouml;ffnet
@@ -110,18 +110,20 @@ die einen Datei als Grundlage haben
 	ge&ouml;ffneten Dateien, eine Selektion f&uuml;hrt zum Laden der Datei
 	<LI>&quot;Import&quot; bietet die M&ouml;glichkeit &quot;Comma
 	Separated Values&quot; (CSV) Dateien in bearbeiteter Form oder mit
-	Rohdaten zu laden
+	Rohdaten zu laden, bitte nicht mit den CSV Daten verwechseln, die durch den <A HREF="HelpInfo_C.html">CSV2SerialAdapter</A> oder abgeleiteten Ger&auml;ten als initialer Ger&auml;tedatenimport eingelesen werden.
 	<LI>&quot;Export&quot; bietet die M&ouml;glichkeit &quot;Comma
 	Separated Values&quot; (CSV) Dateien in bearbeiteter Form oder mit
-	Rohdaten zu sichern. Die Abbildung zeigt beide Varianten als Gegen&uuml;berstellung
+	Rohdaten zu sichern. Die Umkehrung, vom darüber beschriebenen Import. 
+	Die Abbildung zeigt beide Varianten als Gegen&uuml;berstellung
 	<P>
 		<IMG SRC="images/CSV_absolute_sample.png" NAME="CSV_absolute_sample">
 		<IMG SRC="images/CSV_raw_sample.png" NAME="CSV_raw_sample">	
 	</P>
+	Zus&auml;tzlich gibt es in Abh&auml;ngigkeit des Ger&auml;tes erweiterte Exportm&ouml;glichkeiten, als Beispiel seien hier KML Dateien des Google Earth Formates aufgef&uuml;hrt. 
 	<LI>&quot;Einstellungen&quot; &ouml;ffnet den Einstellungsdialog,
 	um anwendungsweite Einstellungen vorzunehmen
 	<LI>&quot;Drucken&quot; &ouml;ffnet den Druckkonfigurationsdialog
-	<LI>&quot;Exit&quot; beendet die Anwendung
+	<LI>&quot;Exit&quot; beendet die Anwendung (Beim Beenden der Anwendung werden tempor&auml;re Dateien ebenfalls gel&ouml;scht.)
 </UL>
 <P>Die Funktionen aus dem dateiorientierten Bereich sind auch
 &uuml;ber die Toolbar erreichbar.</P>
