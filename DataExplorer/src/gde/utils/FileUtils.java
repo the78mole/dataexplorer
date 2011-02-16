@@ -59,6 +59,8 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -1271,10 +1273,10 @@ public class FileUtils {
 	 */
 	public static void main(String[] args) {
 		if (GDE.IS_WINDOWS) 
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "WinHelper*.dll", "swtlib-"+GDE.BIT_MODE, "*.gpx", "*.kml"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "WinHelper*.dll", "swtlib-"+GDE.BIT_MODE, GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		else if (GDE.IS_LINUX)
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "*register.sh", "swtlib-"+GDE.BIT_MODE, "*.gpx", "*.kml"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "*register.sh", "swtlib-"+GDE.BIT_MODE, GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		else if (GDE.IS_MAC)
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "GDE", "swtlib-"+GDE.BIT_MODE, "*.gpx", "*.kml"}); //$NON-NLS-1$ //$NON-NLS-2$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "GDE", "swtlib-"+GDE.BIT_MODE, GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

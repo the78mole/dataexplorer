@@ -983,9 +983,9 @@ public class MenuToolBar {
 								launcher = new ApplicationLauncher("googleearth.exe", "Google Earth.kmlfile", Messages.getString(MessageIds.GDE_MSGT0600)); //$NON-NLS-1$
 
 							if (launcher.isLaunchable()) {
-								String kmlFilePath = MenuToolBar.this.application.getActiveDevice().exportFile(GDE.FILE_ENDING_KML, true);
+								String kmzFilePath = MenuToolBar.this.application.getActiveDevice().exportFile(GDE.FILE_ENDING_KMZ, true);
 								List<String> argumentList = new ArrayList<String>();
-								argumentList.add(kmlFilePath);
+								argumentList.add(kmzFilePath);
 								launcher.execute(argumentList);
 							}
 						}

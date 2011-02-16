@@ -879,7 +879,7 @@ public interface IDevice {
 	/**
 	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
 	 */
-	public Integer getGPS2KMLMeasurementOrdinal();
+	public Integer getGPS2KMZMeasurementOrdinal();
 
 	/**
 	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML

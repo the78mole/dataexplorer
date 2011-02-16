@@ -220,8 +220,8 @@ public class DataExplorer extends Composite {
 		this.extensionFilterMap.put(GDE.FILE_ENDING_PNG, Messages.getString(MessageIds.GDE_MSGT0213));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_GIF, Messages.getString(MessageIds.GDE_MSGT0214));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_JPG, Messages.getString(MessageIds.GDE_MSGT0215));
-		this.extensionFilterMap.put(GDE.FILE_ENDING_KML, Messages.getString(MessageIds.GDE_MSGT0222));
-		this.extensionFilterMap.put(GDE.FILE_ENDING_GPX, Messages.getString(MessageIds.GDE_MSGT0223));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_KMZ, Messages.getString(MessageIds.GDE_MSGT0222));
+//		this.extensionFilterMap.put(GDE.FILE_ENDING_GPX, Messages.getString(MessageIds.GDE_MSGT0223));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_STAR, Messages.getString(MessageIds.GDE_MSGT0216));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_INI, Messages.getString(MessageIds.GDE_MSGT0368));
 	}
@@ -362,7 +362,7 @@ public class DataExplorer extends Composite {
 			GDE.seStartupProgress(100);
 			shell.layout();
 			shell.open();
-			GDE.splash.dispose();
+			if (GDE.splash != null) GDE.splash.dispose();
 			TaskBar taskBar = DataExplorer.display.getSystemTaskBar();
 			if (taskBar == null)
 				this.taskBarItem = null;

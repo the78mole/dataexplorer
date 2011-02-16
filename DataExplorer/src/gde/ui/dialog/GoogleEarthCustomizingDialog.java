@@ -303,7 +303,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					});
 					avgFactorText.addKeyListener(new KeyAdapter() {
 						public void keyReleased(KeyEvent arg0) {
-							Integer measurementOrdinal = device.getGPS2KMLMeasurementOrdinal();
+							Integer measurementOrdinal = device.getGPS2KMZMeasurementOrdinal();
 							RecordSet activeRecordSet = application.getActiveRecordSet();
 							if (activeRecordSet != null && measurementOrdinal != null) {
 								int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000.0);
@@ -451,7 +451,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 		}
 		else { //device oriented
 			Integer activeChannelNumber = application.getActiveChannelNumber();
-			Integer measurementOrdinal = device.getGPS2KMLMeasurementOrdinal();
+			Integer measurementOrdinal = device.getGPS2KMZMeasurementOrdinal();
 			if(activeChannelNumber != null && measurementOrdinal != null) {
 				PropertyType property = device.getMeasruementProperty(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value());
 				if (property != null) {
@@ -531,7 +531,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 		compositeUpper.setBackground(SWTResourceManager.getColor(upperLimitColor.red,upperLimitColor.green,upperLimitColor.blue));
 
 		if(avgLimitFactor >= 1) {
-			Integer measurementOrdinal = device.getGPS2KMLMeasurementOrdinal();
+			Integer measurementOrdinal = device.getGPS2KMZMeasurementOrdinal();
 			RecordSet activeRecordSet = application.getActiveRecordSet();
 			if (activeRecordSet != null && measurementOrdinal != null) {
 				int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000.0);
@@ -586,7 +586,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 		}
 		else { //device oriented
 			Integer activeChannelNumber = application.getActiveChannelNumber();
-			Integer measurementOrdinal = device.getGPS2KMLMeasurementOrdinal();
+			Integer measurementOrdinal = device.getGPS2KMZMeasurementOrdinal();
 			if(activeChannelNumber != null && measurementOrdinal != null) {
 				if(avgLimitFactor >= 1) {
 					device.setMeasurementPropertyValue(activeChannelNumber.intValue(), measurementOrdinal.intValue(), MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value(), DataTypes.DOUBLE, avgLimitFactor);

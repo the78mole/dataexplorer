@@ -47,7 +47,13 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 
@@ -137,8 +143,7 @@ public class GDE {
 	public static final String		FILE_ENDING_STAR_PNG			= "*.png";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_GIF			= "*.gif";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_XML			= "*.xml";//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_KML			= "*.kml";//$NON-NLS-1$
-	public static final String		FILE_ENDING_STAR_GPX			= "*.gpx";//$NON-NLS-1$
+	public static final String		FILE_ENDING_STAR_KMZ			= "*.kmz";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_HEX			= "*.hex";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_INI			= "*.ini";//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_TXT			= "*.txt";//$NON-NLS-1$
@@ -161,8 +166,8 @@ public class GDE {
 	public static final String		FILE_ENDING_DOT_XML				= ".xml";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_XSD				= ".xsd";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_HEX				= ".hex";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_DOT_KMZ				= ".kmz";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_KML				= ".kml";	//$NON-NLS-1$
-	public static final String		FILE_ENDING_DOT_GPX				= ".gpx";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_EXE				= ".exe";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_INI				= ".ini";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_LOV						= "lov";	//$NON-NLS-1$
@@ -175,8 +180,7 @@ public class GDE {
 	public static final String		FILE_ENDING_GIF						= "gif";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_BAK						= "bak";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_TMP						= "tmp";	//$NON-NLS-1$
-	public static final String		FILE_ENDING_KML						= "kml";	//$NON-NLS-1$
-	public static final String		FILE_ENDING_GPX						= "gpx";	//$NON-NLS-1$
+	public static final String		FILE_ENDING_KMZ						= "kmz";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR					= "*";		//$NON-NLS-1$
 	public static final String		FILE_ENDING_HEX						= "hex";	//$NON-NLS-1$
 	public static final String		FILE_ENDING_EXE						= "exe";	//$NON-NLS-1$
@@ -446,46 +450,44 @@ public class GDE {
 	private static void showSplash() {
 		final SplashScreen startSplash = SplashScreen.getSplashScreen();
     if (startSplash != null) {
-//  		final Image image = new Image(DataExplorer.display, GDE.class.getClassLoader().getResourceAsStream("gde/resource/splash.png"));
-//  		GC gc = new GC(image);
-//  		gc.drawImage(image, 0, 0);
-//  		gc.dispose();
+  		final Image image = new Image(DataExplorer.display, GDE.class.getClassLoader().getResourceAsStream("gde/resource/splash.png"));
+  		GC gc = new GC(image);
+  		gc.drawImage(image, 0, 0);
+  		gc.dispose();
   		final Shell splash = new Shell(SWT.ON_TOP|SWT.BORDER);
   		final ProgressBar bar = new ProgressBar(splash, SWT.NONE);
   		bar.setMaximum(100);
-//  		final Label label = new Label(splash, SWT.NONE);
-//  		label.setImage(image);
-//  		FormLayout layout = new FormLayout();
-//  		splash.setLayout(layout);
-//  		FormData labelData = new FormData();
-//  		labelData.right = new FormAttachment(100, 0);
-//  		labelData.bottom = new FormAttachment(100, 0);
-//  		label.setLayoutData(labelData);
-//  		FormData progressData = new FormData();
-//  		progressData.height = 15;
-//  		progressData.left = new FormAttachment(0, 5);
-//  		progressData.right = new FormAttachment(100, -5);
-//  		progressData.bottom = new FormAttachment(100, -5);
-//  		bar.setLayoutData(progressData);
+  		final Label label = new Label(splash, SWT.NONE);
+  		label.setImage(image);
+  		FormLayout layout = new FormLayout();
+  		splash.setLayout(layout);
+  		FormData labelData = new FormData();
+  		labelData.right = new FormAttachment(100, 0);
+  		labelData.bottom = new FormAttachment(100, 0);
+  		label.setLayoutData(labelData);
+  		FormData progressData = new FormData();
+  		progressData.height = 15;
+  		progressData.left = new FormAttachment(0, 5);
+  		progressData.right = new FormAttachment(100, -5);
+  		progressData.bottom = new FormAttachment(100, -5);
+  		bar.setLayoutData(progressData);
   		java.awt.Rectangle splashRect = startSplash.getBounds();
   		bar.setSize(splashRect.width-20,15);
   		splash.pack();
-  		//Rectangle displayRect = DataExplorer.display.getPrimaryMonitor().getBounds();
-  		int x = (splashRect.x + 10);
-  		int y = (splashRect.y + splashRect.height - 20);
-  		bar.addDisposeListener(new DisposeListener() {	
+  		splash.setLocation(splashRect.x, splashRect.y);
+  		splash.addDisposeListener(new DisposeListener() {	
   			@Override
   			public void widgetDisposed(DisposeEvent arg0) {
   				splash.close();
   				startSplash.close();
   			}
   		});
-  		splash.setLocation(x,y);
   		splash.open();
   		bar.setSelection(15);
   		GDE.splash = splash;
   		GDE.progBar = bar;
     }
+    System.out.println("splash = null");
 
 	}
 	
