@@ -560,49 +560,49 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @param exportMenue
 	 */
 	public void updateFileMenu(Menu exportMenue) {
-		MenuItem											convertKLM3DRelativeItem;
-		MenuItem											convertKLM3DAbsoluteItem;
-		MenuItem											convert2GPXRelativeItem;
-		MenuItem											convert2GPXAbsoluteItem;
+		MenuItem											convertKMZ3DRelativeItem;
+		MenuItem											convertKMZ3DAbsoluteItem;
+//		MenuItem											convert2GPXRelativeItem;
+//		MenuItem											convert2GPXAbsoluteItem;
 		
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
 
-			convertKLM3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertKLM3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT1895));
-			convertKLM3DRelativeItem.addListener(SWT.Selection, new Listener() {
+			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT1895));
+			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					ContextMenu.log.log(Level.FINEST, "convertKLM3DRelativeItem action performed! " + e); //$NON-NLS-1$
 					export2KML3D(DataVario.HEIGHT_RELATIVE);
 				}
 			});
 
-			convertKLM3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertKLM3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1896));
-			convertKLM3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+			convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1896));
+			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					ContextMenu.log.log(Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KML3D(DataVario.HEIGHT_ABSOLUTE);
 				}
 			});
 
-			convert2GPXRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
-			convert2GPXRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT1897));
-			convert2GPXRelativeItem.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event e) {
-					ContextMenu.log.log(Level.FINEST, "convert2GPXRelativeItem action performed! " + e); //$NON-NLS-1$
-					export2GPX(DataVario.HEIGHT_RELATIVE);
-				}
-			});
-
-			convert2GPXAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
-			convert2GPXAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1898));
-			convert2GPXAbsoluteItem.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event e) {
-					ContextMenu.log.log(Level.FINEST, "convert2GPXAbsoluteItem action performed! " + e); //$NON-NLS-1$
-					export2GPX(DataVario.HEIGHT_ABSOLUTE);
-				}
-			});
+//			convert2GPXRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
+//			convert2GPXRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT1897));
+//			convert2GPXRelativeItem.addListener(SWT.Selection, new Listener() {
+//				public void handleEvent(Event e) {
+//					ContextMenu.log.log(Level.FINEST, "convert2GPXRelativeItem action performed! " + e); //$NON-NLS-1$
+//					export2GPX(DataVario.HEIGHT_RELATIVE);
+//				}
+//			});
+//
+//			convert2GPXAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+//			convert2GPXAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1898));
+//			convert2GPXAbsoluteItem.addListener(SWT.Selection, new Listener() {
+//				public void handleEvent(Event e) {
+//					ContextMenu.log.log(Level.FINEST, "convert2GPXAbsoluteItem action performed! " + e); //$NON-NLS-1$
+//					export2GPX(DataVario.HEIGHT_ABSOLUTE);
+//				}
+//			});
 		}
 	}
 
@@ -611,18 +611,19 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @param type DataVario.HEIGHT_RELATIVE | DataVario.HEIGHT_ABSOLUTE
 	 */
 	public void export2KML3D(int type) {
-		//ordinalLongitude, ordinalLatitude, ordinalGPSHeight, inRelative
-		new FileHandler().exportFileKML(Messages.getString(MessageIds.GDE_MSGT1859), 7, 8, 9, 10, type == DataVario.HEIGHT_RELATIVE);
+		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+		//13=tripLength 14=distance 15=azimuth 16=directionStart
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1859), 7, 8, 9, 10, 13, 15, type == DataVario.HEIGHT_RELATIVE);
 	}
 	
-	/**
-	 * exports the actual displayed data set to GPX file format
-	 * @param type DataVario.HEIGHT_RELATIVE | DataVario.HEIGHT_ABSOLUTE
-	 */
-	public void export2GPX(int type) {
-		//ordinalLongitude, ordinalLatitude, ordinalGPSHeight, ordinalVelocity, ordinalHeight, inRelative
-		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT1877), 7, 8, 9, 10, 1, type == DataVario.HEIGHT_RELATIVE);
-	}
+//	/**
+//	 * exports the actual displayed data set to GPX file format
+//	 * @param type DataVario.HEIGHT_RELATIVE | DataVario.HEIGHT_ABSOLUTE
+//	 */
+//	public void export2GPX(int type) {
+//		//ordinalLongitude, ordinalLatitude, ordinalGPSHeight, ordinalVelocity, ordinalHeight, inRelative
+//		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT1877), 7, 8, 9, 10, 1, type == DataVario.HEIGHT_RELATIVE);
+//	}
 	
 	/**
 	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
@@ -649,8 +650,10 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KML)) {
-				exportFileName = new FileHandler().exportFileKML(7, 8, 9, 10, true, isExportTmpDir);
+			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
+				//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+				//13=tripLength 14=distance 15=azimuth 16=directionStart
+				exportFileName = new FileHandler().exportFileKMZ(7, 8, 9, 10, 13, 15, true, isExportTmpDir);
 			}
 		}
 		return exportFileName;
@@ -659,7 +662,9 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
 	 */
-	public Integer getGPS2KMLMeasurementOrdinal() {
+	public Integer getGPS2KMZMeasurementOrdinal() {
+		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+		//13=tripLength 14=distance 15=azimuth 16=directionStart
 		return 10; 
 	}
 
