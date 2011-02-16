@@ -74,7 +74,7 @@ public class KMZWriter {
 	static final String[]			icons					= {"none", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"};
 	static final String				iconsdef 				= "\t<Style id=\"track-%s_n\">" + GDE.LINE_SEPARATOR
 																						+ "\t\t<IconStyle>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t<scale>0.2</scale>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<scale>0.3</scale>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<heading>0</heading>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<Icon>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t\t<href>http://earth.google.com/images/kml-icons/track-directional/track-%s.png</href>" + GDE.LINE_SEPARATOR
@@ -87,7 +87,7 @@ public class KMZWriter {
 																						+ "\t</Style>" + GDE.LINE_SEPARATOR
 																						+ "\t<Style id=\"track-%s_h\">" + GDE.LINE_SEPARATOR
 																						+ "\t\t<IconStyle>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t<scale>0.7</scale>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<scale>0.6</scale>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<heading>0</heading>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<Icon>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t\t<href>http://earth.google.com/images/kml-icons/track-directional/track-%s.png</href>" + GDE.LINE_SEPARATOR
@@ -111,8 +111,8 @@ public class KMZWriter {
 																						+ "\t\t<Snippet maxLines=\"0\"></Snippet>" + GDE.LINE_SEPARATOR
 																						+ "\t\t<description><![CDATA[<table>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<tr><td><b>Distance</b> %.1f km </td></tr>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t<tr><td><b>Min Alt</b> %.1f meters </td></tr>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t<tr><td><b>Max Alt</b> %.1f meters </td></tr>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<tr><td><b>Min Alt</b> %.0f meters </td></tr>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<tr><td><b>Max Alt</b> %.0f(%.0f) meters </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<tr><td><b>Max Speed</b> %.1f km/hour </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<tr><td><b>Avg Speed</b> %.1f km/hour </td></tr>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<tr><td><b>Start Time</b> %sT%sZ  </td></tr>" + GDE.LINE_SEPARATOR
@@ -384,9 +384,9 @@ public class KMZWriter {
 			}
 			String[] velocityColors = new String[] { lowerLimitColor, withinLimitsColor, upperLimitColor };
 
-			//write track summary
+			//write track statistics
 			zipWriter.write(String.format(Locale.ENGLISH, statistics, "Statistics", device.translateValue(recordTripLength, recordTripLength.getMaxValue() / 1000.0),
-					device.translateValue(recordHeight, recordHeight.getMinValue() / 1000.0), device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0),
+					height0, device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0), (device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - height0),
 					device.translateValue(recordVelocity, recordVelocity.getMaxValue() / 1000.0), device.translateValue(recordVelocity, recordVelocity.getAvgValue() / 1000.0), dateString,
 					new SimpleDateFormat("HH:mm:ss").format(date), dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordHeight.size() - 1)), dateString,
 					new SimpleDateFormat("HH:mm:ss").format(date), dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordHeight.size() - 1))).getBytes());
