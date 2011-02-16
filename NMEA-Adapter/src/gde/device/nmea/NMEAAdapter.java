@@ -527,53 +527,53 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * @param exportMenue
 	 */
 	public void updateFileMenu(Menu exportMenue) {
-		MenuItem convertKLM3DRelativeItem;
-		MenuItem convertKLM3DAbsoluteItem;
-		MenuItem convert2GPXRelativeItem;
-		MenuItem convert2GPXAbsoluteItem;
+		MenuItem convertKMZ3DRelativeItem;
+		MenuItem convertKMZDAbsoluteItem;
+//		MenuItem convert2GPXRelativeItem;
+//		MenuItem convert2GPXAbsoluteItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
 
-			convertKLM3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertKLM3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2105));
-			convertKLM3DRelativeItem.addListener(SWT.Selection, new Listener() {
+			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2105));
+			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertKLM3DRelativeItem action performed! " + e); //$NON-NLS-1$
-					export2KML3D(DeviceConfiguration.HEIGHT_RELATIVE);
+					log.log(java.util.logging.Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
+					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
 				}
 			});
 
-			convertKLM3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
-			convertKLM3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2106));
-			convertKLM3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2106));
+			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
-					export2KML3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
+					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
 				}
 			});
 
-			convert2GPXRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
-			convert2GPXRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2107));
-			convert2GPXRelativeItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convert2GPXRelativeItem action performed! " + e); //$NON-NLS-1$
-					export2GPX(DeviceConfiguration.HEIGHT_RELATIVE);
-				}
-			});
-
-			convert2GPXAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
-			convert2GPXAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2108));
-			convert2GPXAbsoluteItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convert2GPXAbsoluteItem action performed! " + e); //$NON-NLS-1$
-					export2GPX(DeviceConfiguration.HEIGHT_ABSOLUTE);
-				}
-			});
+//			convert2GPXRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
+//			convert2GPXRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2107));
+//			convert2GPXRelativeItem.addListener(SWT.Selection, new Listener() {
+//				@Override
+//				public void handleEvent(Event e) {
+//					log.log(java.util.logging.Level.FINEST, "convert2GPXRelativeItem action performed! " + e); //$NON-NLS-1$
+//					export2GPX(DeviceConfiguration.HEIGHT_RELATIVE);
+//				}
+//			});
+//
+//			convert2GPXAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+//			convert2GPXAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2108));
+//			convert2GPXAbsoluteItem.addListener(SWT.Selection, new Listener() {
+//				@Override
+//				public void handleEvent(Event e) {
+//					log.log(java.util.logging.Level.FINEST, "convert2GPXAbsoluteItem action performed! " + e); //$NON-NLS-1$
+//					export2GPX(DeviceConfiguration.HEIGHT_ABSOLUTE);
+//				}
+//			});
 		}
 	}
 
@@ -581,21 +581,21 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * exports the actual displayed data set to KML file format
 	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
 	 */
-	public void export2KML3D(int type) {
+	public void export2KMZ3D(int type) {
 		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
-		new FileHandler().exportFileKML(Messages.getString(MessageIds.GDE_MSGT2103), 1, 0, 2, 7, type == DeviceConfiguration.HEIGHT_RELATIVE);
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2103), 1, 0, 2, 7, 11, 13, type == DeviceConfiguration.HEIGHT_RELATIVE);
 	}
 
-	/**
-	 * exports the actual displayed data set to GPX file format
-	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
-	 */
-	public void export2GPX(int type) {
-		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
-		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
-		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT2104), 1, 0, 2, 7, 9, type == DeviceConfiguration.HEIGHT_RELATIVE);
-	}
+//	/**
+//	 * exports the actual displayed data set to GPX file format
+//	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
+//	 */
+//	public void export2GPX(int type) {
+//		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+//		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
+//		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT2104), 1, 0, 2, 7, 9, type == DeviceConfiguration.HEIGHT_RELATIVE);
+//	}
 
 	/**
 	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
@@ -626,8 +626,10 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KML)) {
-				exportFileName = new FileHandler().exportFileKML(1, 0, 2, 7, true, isExport2TmpDir);
+			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+				//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
+				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, 7, 11, 13, true, isExport2TmpDir);
 			}
 		}
 		return exportFileName;
@@ -637,7 +639,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
 	 */
 	@Override
-	public Integer getGPS2KMLMeasurementOrdinal() {
+	public Integer getGPS2KMZMeasurementOrdinal() {
 		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 		return 7;
