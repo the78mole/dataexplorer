@@ -59,8 +59,6 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -349,7 +347,7 @@ public class FileUtils {
 
 		while ((line = reader.readLine()) != null) {
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, line);
-			if (line.indexOf(placeholderKey) > -1) {
+			while (line.indexOf(placeholderKey) > -1) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(line.substring(0, line.indexOf(placeholderKey)));
 				sb.append(replacement);
