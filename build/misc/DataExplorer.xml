@@ -25,13 +25,8 @@
     <initialHeapSize>32</initialHeapSize>
     <maxHeapSize>256</maxHeapSize>
     <opt>-Dfile.encoding=UTF-8</opt>
+    <opt>-splash:DataExplorerSplash.png</opt>
   </jre>
-  <splash>
-    <file>F:\workspaces\gnu\build\misc\splash.bmp</file>
-    <waitForWindow>true</waitForWindow>
-    <timeout>60</timeout>
-    <timeoutErr>false</timeoutErr>
-  </splash>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
     <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>

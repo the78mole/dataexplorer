@@ -291,6 +291,7 @@
 		<copy todir="${output.windows32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer.exe" />
+			<fileset file="build/misc/DataExplorerSplash.png" />
 			<fileset file="build/misc/DevicePropertiesEditor.exe" />
 			<!--
             <fileset file="build/misc/DataExplorer.ico" />
@@ -306,6 +307,7 @@
 		<copy todir="${output.windows64.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer.exe" />
+			<fileset file="build/misc/DataExplorerSplash.png" />
 			<fileset file="build/misc/DevicePropertiesEditor.exe" />
 			<!--
             <fileset file="build/misc/DataExplorer.ico" />
@@ -324,6 +326,7 @@
 			<fileset file="build/misc/DevicePropertiesEditor.xpm" />
 			<fileset file="build/misc/DataExplorer.xpm" />
 			<fileset file="build/misc/DataExplorer" />
+			<fileset file="build/misc/DataExplorerSplash.png" />
 			<fileset file="build/misc/DataExplorer.desktop" />
 			<fileset file="build/misc/DevicePropertiesEditor" />
 			<fileset file="build/misc/DevicePropertiesEditor.desktop" />
@@ -340,6 +343,7 @@
 			<fileset file="build/misc/DevicePropertiesEditor.xpm" />
 			<fileset file="build/misc/DataExplorer.xpm" />
 			<fileset file="build/misc/DataExplorer" />
+			<fileset file="build/misc/DataExplorerSplash.png" />
 			<fileset file="build/misc/DataExplorer.desktop" />
 			<fileset file="build/misc/DevicePropertiesEditor" />
 			<fileset file="build/misc/DevicePropertiesEditor.desktop" />
@@ -352,7 +356,7 @@
 
 		<copy todir="${output.mac32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
-			<fileset file="build/misc/DataExplorer-mime.xml" />
+			<fileset file="build/misc/DataExplorerSplash.png" />
 			<fileset file="build/misc/DataExplorer.icns" />
 			<fileset file="build/misc/DevicePropertiesEditor.icns" />
 		</copy>
@@ -373,7 +377,7 @@
 
 		<copy todir="${output.mac64.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
-			<fileset file="build/misc/DataExplorer-mime.xml" />
+			<fileset file="build/misc/DataExplorerSplash.png" />
 			<fileset file="build/misc/DataExplorer.icns" />
 			<fileset file="build/misc/DevicePropertiesEditor.icns" />
 		</copy>
