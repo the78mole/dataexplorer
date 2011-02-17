@@ -153,7 +153,6 @@ public class FileHandler {
 	 * @return the file name proposal as string
 	 */
 	String getFileNameProposal(String recordSetName) {
-		System.out.println(recordSetName);
 		String fileName = GDE.STRING_EMPTY;
 		if (Settings.getInstance().getUsageDateAsFileNameLeader()) {
 			String fileDescriptionDate = GDE.STRING_EMPTY;
@@ -178,7 +177,6 @@ public class FileHandler {
 		if(application.getActiveChannel() != null) {
 			fileName = fileName + (fileName.endsWith(GDE.STRING_UNDER_BAR) ? GDE.STRING_EMPTY : GDE.STRING_UNDER_BAR) + recordSetName.replace(") ", GDE.STRING_UNDER_BAR);
 		}
-		System.out.println(fileName);
 		return fileName;
 	}
 

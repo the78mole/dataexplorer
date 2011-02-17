@@ -49,6 +49,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -254,6 +255,7 @@ public class GDE {
 	final static Logger	log										= Logger.getLogger(GDE.class.getName());
 	static Logger				rootLogger;
 	static Vector<String> initErrors = new Vector<String>(0);
+	static SplashScreen startSplash;
 	public static Shell splash;
 	public static ProgressBar progBar;
 	
@@ -448,47 +450,54 @@ public class GDE {
 	 * @param timeoutSec
 	 */
 	private static void showSplash() {
-		final SplashScreen startSplash = SplashScreen.getSplashScreen();
-    if (startSplash != null) {
-  		final Image image = new Image(DataExplorer.display, GDE.class.getClassLoader().getResourceAsStream("gde/resource/splash.png"));
-  		GC gc = new GC(image);
-  		gc.drawImage(image, 0, 0);
-  		gc.dispose();
-  		final Shell splash = new Shell(SWT.ON_TOP|SWT.BORDER);
-  		final ProgressBar bar = new ProgressBar(splash, SWT.NONE);
-  		bar.setMaximum(100);
-  		final Label label = new Label(splash, SWT.NONE);
-  		label.setImage(image);
-  		FormLayout layout = new FormLayout();
-  		splash.setLayout(layout);
-  		FormData labelData = new FormData();
-  		labelData.right = new FormAttachment(100, 0);
-  		labelData.bottom = new FormAttachment(100, 0);
-  		label.setLayoutData(labelData);
-  		FormData progressData = new FormData();
-  		progressData.height = 15;
-  		progressData.left = new FormAttachment(0, 5);
-  		progressData.right = new FormAttachment(100, -5);
-  		progressData.bottom = new FormAttachment(100, -5);
-  		bar.setLayoutData(progressData);
-  		java.awt.Rectangle splashRect = startSplash.getBounds();
-  		bar.setSize(splashRect.width-20,15);
-  		splash.pack();
-  		splash.setLocation(splashRect.x, splashRect.y);
-  		splash.addDisposeListener(new DisposeListener() {	
-  			@Override
-  			public void widgetDisposed(DisposeEvent arg0) {
-  				splash.close();
-  				startSplash.close();
-  			}
-  		});
-  		splash.open();
-  		bar.setSelection(15);
-  		GDE.splash = splash;
-  		GDE.progBar = bar;
-    }
-    System.out.println("splash = null");
+		startSplash = SplashScreen.getSplashScreen();
 
+		final Image image = new Image(DataExplorer.display, GDE.class.getClassLoader().getResourceAsStream("gde/resource/splash.png"));
+		GC gc = new GC(image);
+		gc.drawImage(image, 0, 0);
+		gc.dispose();
+		final Shell splash = new Shell(SWT.ON_TOP | SWT.BORDER);
+		final ProgressBar bar = new ProgressBar(splash, SWT.NONE);
+		bar.setMaximum(100);
+		final Label label = new Label(splash, SWT.NONE);
+		label.setImage(image);
+		FormLayout layout = new FormLayout();
+		splash.setLayout(layout);
+		FormData labelData = new FormData();
+		labelData.right = new FormAttachment(100, 0);
+		labelData.bottom = new FormAttachment(100, 0);
+		label.setLayoutData(labelData);
+		FormData progressData = new FormData();
+		progressData.height = 15;
+		progressData.left = new FormAttachment(0, 5);
+		progressData.right = new FormAttachment(100, -5);
+		progressData.bottom = new FormAttachment(100, -5);
+		bar.setLayoutData(progressData);
+		java.awt.Rectangle splashRect;
+		if (startSplash != null)
+			splashRect = startSplash.getBounds();
+		else {
+			Rectangle primaryMonitorBounds = DataExplorer.display.getPrimaryMonitor().getBounds();
+			splashRect = new java.awt.Rectangle(primaryMonitorBounds.width / 2 - 165, primaryMonitorBounds.height / 2 - 103, 370, 206);
+		}
+		bar.setSize(165, 15);
+		splash.pack();
+		splash.setLocation(splashRect.x, splashRect.y);
+		splash.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent arg0) {
+				splash.close();
+				GDE.splash = null;
+				if (startSplash != null) {
+					startSplash.close();
+				}
+				GDE.startSplash = null;
+			}
+		});
+		splash.open();
+		bar.setSelection(15);
+		GDE.splash = splash;
+		GDE.progBar = bar;
 	}
 	
 	public static void seStartupProgress(int percent) {

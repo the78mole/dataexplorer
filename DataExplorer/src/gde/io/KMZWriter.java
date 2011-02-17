@@ -30,6 +30,7 @@ import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 import gde.utils.GPSHelper;
 import gde.utils.StringHelper;
 
@@ -47,6 +48,10 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
+
 /**
  * Class to write KML XML files
  * @author Winfried Brügmann
@@ -62,6 +67,10 @@ public class KMZWriter {
 																						+ "\t<open>1</open>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t<description>%s</description>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t<LookAt>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+																						+ "\t\t<gx:TimeSpan>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+																						+ "\t\t\t<begin>%sT%sZ</begin>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+																						+ "\t\t\t<end>%sT%sZ</end>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
+																						+ "\t\t</gx:TimeSpan>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t\t<longitude>%.7f</longitude>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t\t<latitude>%.7f</latitude>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t<altitude>0</altitude>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
@@ -71,13 +80,13 @@ public class KMZWriter {
 																						+ "\t\t<altitudeMode>relativeToGround</altitudeMode>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t</LookAt>" + GDE.LINE_SEPARATOR;				//$NON-NLS-1$
 	
-	static final String[]			icons					= {"none", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"};
+	static final String[]			icons					= {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"};
 	static final String				iconsdef 				= "\t<Style id=\"track-%s_n\">" + GDE.LINE_SEPARATOR
 																						+ "\t\t<IconStyle>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t<scale>0.3</scale>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t<heading>0</heading>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<scale>0.4</scale>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<heading>%.1f</heading>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<Icon>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t\t<href>http://earth.google.com/images/kml-icons/track-directional/track-%s.png</href>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t\t<href>track.png</href>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t</Icon>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<gx:headingMode>northUp</gx:headingMode>" + GDE.LINE_SEPARATOR
 																						+ "\t\t</IconStyle>" + GDE.LINE_SEPARATOR
@@ -87,10 +96,10 @@ public class KMZWriter {
 																						+ "\t</Style>" + GDE.LINE_SEPARATOR
 																						+ "\t<Style id=\"track-%s_h\">" + GDE.LINE_SEPARATOR
 																						+ "\t\t<IconStyle>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t<scale>0.6</scale>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t<heading>0</heading>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<scale>1.0</scale>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<heading>%.1f</heading>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<Icon>" + GDE.LINE_SEPARATOR
-																						+ "\t\t\t\t<href>http://earth.google.com/images/kml-icons/track-directional/track-%s.png</href>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t\t<href>track.png</href>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t</Icon>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<gx:headingMode>northUp</gx:headingMode>" + GDE.LINE_SEPARATOR
 																						+ "\t\t</IconStyle>" + GDE.LINE_SEPARATOR
@@ -126,9 +135,11 @@ public class KMZWriter {
 	
 	static final String				pointsLeader		= "\t<Folder>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t\t<name>Data-Track</name>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t\t<visibility>0</visibility>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t\t<open>0</open>" + GDE.LINE_SEPARATOR;
 
 	static final String				dataPoint				= "\t\t<Placemark>" + GDE.LINE_SEPARATOR
+																						+ "\t\t\t<visibility>0</visibility>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<name>t:%ds   v=%.1fkm/h   h=%.0fm</name>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<Snippet maxLines=\"0\"></Snippet>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t<description><![CDATA[<table>" + GDE.LINE_SEPARATOR
@@ -283,7 +294,10 @@ public class KMZWriter {
 						// longitude, latitude, heading, tilt, range, lineColor, lineWidth, extrude
 						positionLongitude = device.translateValue(recordLongitude, recordLongitude.realGet(i) / 1000.0);
 						positionLatitude = device.translateValue(recordLongitude, recordLatitude.realGet(i) / 1000.0);
-						zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.position, recordSet.getName(), recordSet.getRecordSetDescription(), positionLongitude, positionLatitude, -50, 70, 1000).getBytes());
+						zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.position, recordSet.getName(), recordSet.getRecordSetDescription(), 
+								dateString, new SimpleDateFormat("HH:mm:ss").format(date), 
+								dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordHeight.size() - 1)),
+								positionLongitude, positionLatitude, -50, 70, 1000).getBytes());
 						isPositionWritten = true;
 						height0 = isHeightRelative ? device.translateValue(recordHeight, recordHeight.realGet(i) / 1000.0) : 0;
 						break;
@@ -441,13 +455,21 @@ public class KMZWriter {
 			zipWriter.write(pointsTrailer.getBytes());
 			
 			//write track icons style definition
-			for (String s : icons) {
-				zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.iconsdef, s, s, s, s, s, s, s).getBytes());
+			for (int j = 0; j < icons.length; j++) {
+				zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.iconsdef, icons[j], (22.5*j), icons[j], (22.5*j), icons[j], icons[j], icons[j]).getBytes());
 			}
 			
 			zipWriter.write(KMZWriter.footer.getBytes());
 			
 			zipWriter.closeEntry();
+			
+			// save the track icon
+			ImageLoader imageLoader = new ImageLoader();
+			imageLoader.data = new ImageData[] { SWTResourceManager.getImage("gde/resource/track.png").getImageData() };
+			zipWriter.putNextEntry(new ZipEntry("track.png"));
+			imageLoader.save(zipWriter, SWT.IMAGE_PNG);
+			zipWriter.closeEntry();
+			
 			zipWriter.flush();
 			zipWriter.close();
 			zipWriter = null;
@@ -488,37 +510,37 @@ public class KMZWriter {
 	private static String getTrackIcon(double tmpAzimuth) {
 		String trackIcon = "track-" + icons[0];
 		if (tmpAzimuth >= 348.75 && tmpAzimuth <= 360 || tmpAzimuth >= 0 && tmpAzimuth < 11.25)
-			trackIcon = "track-" + icons[1];
+			trackIcon = "track-" + icons[0];
 		else if (tmpAzimuth >= 11.25 && tmpAzimuth < 33.75)
-			trackIcon = "track-" + icons[2];
+			trackIcon = "track-" + icons[1];
 		else if (tmpAzimuth >= 33.75 && tmpAzimuth < 56.25)
-			trackIcon = "track-" + icons[3];
+			trackIcon = "track-" + icons[2];
 		else if (tmpAzimuth >= 56.25 && tmpAzimuth < 78.75)
-			trackIcon = "track-" + icons[4];
+			trackIcon = "track-" + icons[3];
 		else if (tmpAzimuth >= 78.75 && tmpAzimuth < 101.25)
-			trackIcon = "track-" + icons[5];
+			trackIcon = "track-" + icons[4];
 		else if (tmpAzimuth >= 101.25 && tmpAzimuth < 123.75)
-			trackIcon = "track-" + icons[6];
+			trackIcon = "track-" + icons[5];
 		else if (tmpAzimuth >= 123.75 && tmpAzimuth < 146.25)
-			trackIcon = "track-" + icons[7];
+			trackIcon = "track-" + icons[6];
 		else if (tmpAzimuth >= 146.25 && tmpAzimuth < 168.75) 
-			trackIcon = "track-" + icons[8];
+			trackIcon = "track-" + icons[7];
 		else if (tmpAzimuth >= 168.75 && tmpAzimuth < 191.25) 
-			trackIcon = "track-" + icons[9];
+			trackIcon = "track-" + icons[8];
 		else if (tmpAzimuth >= 191.25 && tmpAzimuth < 213.75) 
-			trackIcon = "track-" + icons[10];
+			trackIcon = "track-" + icons[9];
 		else if (tmpAzimuth >= 213.75 && tmpAzimuth < 236.25) 
-			trackIcon = "track-" + icons[11];
+			trackIcon = "track-" + icons[10];
 		else if (tmpAzimuth >= 236.25 && tmpAzimuth < 258.75) 
-			trackIcon = "track-" + icons[12];
+			trackIcon = "track-" + icons[11];
 		else if (tmpAzimuth >= 258.75 && tmpAzimuth < 281.25) 
-			trackIcon = "track-" + icons[13];
+			trackIcon = "track-" + icons[12];
 		else if (tmpAzimuth >= 281.25 && tmpAzimuth < 303.75) 
-			trackIcon = "track-" + icons[14];
+			trackIcon = "track-" + icons[13];
 		else if (tmpAzimuth >= 303.75 && tmpAzimuth < 326.25) 
-			trackIcon = "track-" + icons[15];
+			trackIcon = "track-" + icons[14];
 		else if (tmpAzimuth >= 326.25 && tmpAzimuth < 348.75) 
-			trackIcon = "track-" + icons[16];
+			trackIcon = "track-" + icons[15];
 		
 		return trackIcon;
 	}
