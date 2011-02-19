@@ -455,8 +455,8 @@ public class Record extends Vector<Integer> {
 	 * add a data point to the record data, checks for minimum and maximum to define display range
 	 * @param point
 	 */
-	public boolean add(Integer point, double timeStep_ms) {
-		if (this.timeStep_ms != null) this.timeStep_ms.add(timeStep_ms);
+	public boolean add(Integer point, double useTimeStep_ms) {
+		if (this.timeStep_ms != null) this.timeStep_ms.add(useTimeStep_ms);
 		return this.add(point);
 	}
 	
