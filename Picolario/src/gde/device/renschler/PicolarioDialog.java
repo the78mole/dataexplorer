@@ -415,7 +415,7 @@ public class PicolarioDialog extends DeviceDialog {
 	 * function to reset counter labels fro red and calculated
 	 */
 	public void resetTelegramLabel() {
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
 					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
@@ -433,7 +433,7 @@ public class PicolarioDialog extends DeviceDialog {
 	 */
 	public void setAlreadyRedText(final int newValue) {
 		this.redDatagrams = Integer.valueOf(newValue).toString();
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) PicolarioDialog.this.alreadyRedLabel.setText(PicolarioDialog.this.redDatagrams);
 			}
@@ -444,7 +444,7 @@ public class PicolarioDialog extends DeviceDialog {
 	 * function to reset counter labels fro red and calculated
 	 */
 	public void resetDataSetsLabel() {
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
 					PicolarioDialog.this.redDataSetsText = "0"; //$NON-NLS-1$
@@ -460,7 +460,7 @@ public class PicolarioDialog extends DeviceDialog {
 	 */
 	public void setAlreadyRedDataSets(final String newValue) {
 		this.redDataSetsText = newValue;
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
 					PicolarioDialog.this.redDataSets.setText(newValue);
@@ -481,7 +481,7 @@ public class PicolarioDialog extends DeviceDialog {
 			this.isClosePossible = true;
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
 						PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(true);
@@ -514,7 +514,7 @@ public class PicolarioDialog extends DeviceDialog {
 			PicolarioDialog.this.stopButton.setEnabled(false);
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					PicolarioDialog.this.setClosePossible(true);
 					PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(true);
