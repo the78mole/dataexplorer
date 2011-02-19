@@ -1552,7 +1552,7 @@ public class DeviceConfiguration {
 			List<PropertyType> properties = measurementType.getProperty();
 			Iterator<PropertyType> iter = properties.iterator();
 			while (iter.hasNext()) {
-				PropertyType propertyType = (PropertyType) iter.next();
+				PropertyType propertyType = iter.next();
 				if (propertyType.getName().equals(propertyKey)) {
 					iter.remove();
 					break;

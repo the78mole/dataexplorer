@@ -71,7 +71,7 @@ public class ContextMenu {
 					}
 				}
 			}
-			public void menuHidden(MenuEvent e) {
+			public void menuHidden(MenuEvent e) {// no implementation here 
 			}
 		});
 		this.addSerialPortTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);

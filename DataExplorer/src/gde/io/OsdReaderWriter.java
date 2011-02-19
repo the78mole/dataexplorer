@@ -666,7 +666,7 @@ public class OsdReaderWriter {
 				catch (Exception e) {
 					try {
 						if(data_out != null) data_out.close();
-						if (updatedFile != null && updatedFile.exists()) 
+						if (updatedFile.exists()) 
 							if(updatedFile.delete())
 								log.log(Level.WARNING, "failed to delete " + filePath);
 						if(data_in != null) data_in.close();

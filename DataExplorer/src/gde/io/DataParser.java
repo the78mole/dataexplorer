@@ -101,21 +101,21 @@ public class DataParser {
 			}
 
 			strValue = strValues[this.values.length].trim();
-			int checkSum = Integer.parseInt(strValue);
+			int tmpCheckSum = Integer.parseInt(strValue);
 			boolean isValid = true;
 			if (checkSumType != null) {
 				switch (checkSumType) {
 				case ADD:
-					isValid = checkSum == Checksum.ADD(this.values, 0, this.size);
+					isValid = tmpCheckSum == Checksum.ADD(this.values, 0, this.size);
 					break;
 				case XOR:
-					isValid = checkSum == Checksum.XOR(this.values, 0, this.size);
+					isValid = tmpCheckSum == Checksum.XOR(this.values, 0, this.size);
 					break;
 				case OR:
-					isValid = checkSum == Checksum.OR(this.values, 0, this.size);
+					isValid = tmpCheckSum == Checksum.OR(this.values, 0, this.size);
 					break;
 				case AND:
-					isValid = checkSum == Checksum.AND(this.values, 0, this.size);
+					isValid = tmpCheckSum == Checksum.AND(this.values, 0, this.size);
 					break;
 				}
 			}

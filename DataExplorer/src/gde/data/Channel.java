@@ -305,7 +305,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		RecordSet recordSet = this.get(recordSetKey);
 		if (recordSet != null) {
 			if (this.template != null) this.template.load();
-			if (this.template != null && this.template.isAvailable() && recordSet != null) {
+			if (this.template != null && this.template.isAvailable()) {
 				for (int i = 0; i < recordSet.getRecordNames().length; ++i) {
 					Record record = recordSet.get(recordSet.getRecordNames()[i]);
 					//record.setVisible(new Boolean(this.template.getProperty(recordName + Record.IS_VISIBLE, "true")).booleanValue());
@@ -358,7 +358,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		RecordSet recordSet = this.get(recordSetKey);
 		if (recordSet != null) {
 			if (this.template != null) this.template.load();
-			if (this.template != null && this.template.isAvailable() && recordSet != null) {
+			if (this.template != null && this.template.isAvailable()) {
 				for (int i = 0; i < recordSet.getRecordNames().length; ++i) {
 					Record record = recordSet.get(recordSet.getRecordNames()[i]);
 					record.setVisible(Boolean.valueOf(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
@@ -396,7 +396,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				}
 				recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
-				if (recordSet != null && doUpdateVisibilityStatus) {
+				if (doUpdateVisibilityStatus) {
 					recordSet.device.updateVisibilityStatus(recordSet, false);
 				}
 				if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
@@ -509,10 +509,10 @@ public class Channel extends HashMap<String, RecordSet> {
 	public int findChannelOfRecordSet(String recordSetKey) {
 		int channelNumber = 0;
 		Channels channels = Channels.getInstance();
-		for (Integer number : Channels.getInstance().keySet()) {
-			Channel channel = channels.get(number);
+		for (Integer tmpNumber : Channels.getInstance().keySet()) {
+			Channel channel = channels.get(tmpNumber);
 			if (channel.get(recordSetKey) != null) {
-				channelNumber = number.intValue();
+				channelNumber = tmpNumber.intValue();
 			}
 		}
 		return channelNumber;

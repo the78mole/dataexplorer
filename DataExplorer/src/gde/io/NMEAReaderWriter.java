@@ -111,7 +111,7 @@ public class NMEAReaderWriter {
 				int dataBlockSize = device.getDataBlockSize(); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize < dataBlockSize) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new Object[] { filePath, measurementSize, dataBlockSize }));
-				NMEAParser data = new NMEAParser(device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize, device, activeChannel.getNumber(), (short) device.getUTCdelta());
+				NMEAParser data = new NMEAParser(device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize, device, activeChannel.getNumber(), device.getUTCdelta());
 
 				File inputFile = new File(filePath);
 				long approximateLines = inputFile.length()/65; //average approximately 70 bytes per line
@@ -143,7 +143,7 @@ public class NMEAReaderWriter {
 				//skip SM GPS-Logger setup sentence
 				while ((line = reader.readLine()) == null || line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSETUP.name())
 						|| !line.startsWith(device.getDataBlockLeader())) {
-					if (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSETUP.name())) {
+					if (line != null && (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSETUP.name()))) {
 						Vector<String> setupLine = new Vector<String>();
 						setupLine.add(line);
 						data.parse(setupLine, lineNumber);

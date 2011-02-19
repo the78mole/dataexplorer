@@ -316,7 +316,6 @@ public class ChannelTypeTabItem extends CTabItem implements Cloneable {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
 							((MeasurementTypeTabItem) ChannelTypeTabItem.this.measurementsTabFolder.getSelection()).enableContextMenu(true);
-							;
 						}
 					});
 				}

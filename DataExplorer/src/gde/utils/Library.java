@@ -76,6 +76,7 @@ public class Library {
 						Runtime.getRuntime().exec(new String[] { "chmod", "755", fileName }).waitFor(); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					catch (Throwable e) {
+						//ignore
 					}
 				}
 				log.log(Level.FINE, fileName + " exist " + new File(fileName).exists()); //$NON-NLS-1$
@@ -85,10 +86,14 @@ public class Library {
 			log.log(Level.WARNING, e.getMessage(), e);
 			try {
 				if (os != null) os.close ();
-			} catch (IOException e1) {}
+			} catch (IOException e1) {
+				//ignore
+			}
 			try {
 				if (is != null) is.close ();
-			} catch (IOException e1) {}
+			} catch (IOException e1) {
+				//ignore				
+			}
 		}
 		return false;
 	}
@@ -107,7 +112,9 @@ public class Library {
 				System.loadLibrary (libName);
 			}		
 			return true;
-		} catch (UnsatisfiedLinkError e) {}
+		} catch (UnsatisfiedLinkError e) {
+			//ignore
+		}
 		return false;
 	}
 

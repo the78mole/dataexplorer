@@ -27,7 +27,7 @@ public class DeclinedException extends Exception {
 	/**
 	 * 
 	 */
-	public DeclinedException() {
+	public DeclinedException() { // no implementation here
 	}
 
 	/**

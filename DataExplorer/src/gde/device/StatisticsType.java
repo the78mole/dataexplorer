@@ -81,6 +81,7 @@ public class StatisticsType implements Cloneable {
 	 * default constructor
 	 */
 	public StatisticsType() {
+		//ignore
 	}
 
 	/**

@@ -166,7 +166,9 @@ public class FileHandler {
 						int day = Integer.parseInt(chunks[2].substring(0, 2));
 						fileDescriptionDate = String.format("%04d-%02d-%02d", year, month, day);
 					}
-					catch (NumberFormatException e) {	}
+					catch (NumberFormatException e) {	
+					// ignore
+					}
 				}
 			}
 			fileName = (fileDescriptionDate.length() > 0 ? fileDescriptionDate : StringHelper.getDate()) + GDE.STRING_UNDER_BAR;
@@ -199,7 +201,9 @@ public class FileHandler {
 						int day = Integer.parseInt(chunks[2].substring(0, 2));
 						fileDescriptionDate = String.format("%04d-%02d-%02d", year, month, day);
 					}
-					catch (NumberFormatException e) {	}
+					catch (NumberFormatException e) {	
+						//ignore
+					}
 				}
 			}
 			fileName = (fileDescriptionDate.length() > 0 ? fileDescriptionDate : StringHelper.getDate()) + GDE.STRING_UNDER_BAR;
@@ -536,7 +540,7 @@ public class FileHandler {
 		String path = isExportTmpDir ? GDE.JAVA_IO_TMPDIR : (deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX);
 		FileUtils.checkDirectoryAndCreate(path);
 		String fileName = path + (activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName());
-		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
+		fileName = fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
 		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
 			try {
 				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.STRING_LEFT_BRACKET)+1, activeRecordSet.getName().lastIndexOf(GDE.STRING_RIGHT_BRACKET));
@@ -550,7 +554,7 @@ public class FileHandler {
 		}
 		kmzFilePath = fileName + GDE.FILE_ENDING_DOT_KMZ;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		if (kmzFilePath != null && kmzFilePath.length() > 4) {
+		if (kmzFilePath.length() > 4) {
 			try {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));

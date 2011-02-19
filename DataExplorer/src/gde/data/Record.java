@@ -465,7 +465,7 @@ public class Record extends Vector<Integer> {
 	 * @param point
 	 */
 	@Override
-	public boolean add(Integer point) {
+	public synchronized boolean add(Integer point) {
 		synchronized (this) {
 			final String $METHOD_NAME = "add"; //$NON-NLS-1$
 			if (super.size() == 0) {
@@ -482,7 +482,7 @@ public class Record extends Vector<Integer> {
 	}
 	
 	@Override
-	public Integer set(int index, Integer point) {
+	public synchronized Integer set(int index, Integer point) {
 		synchronized (this) {
 			final String $METHOD_NAME = "set"; //$NON-NLS-1$
 			if (super.size() == 0) {
@@ -901,7 +901,7 @@ public class Record extends Vector<Integer> {
 	 * @param index
 	 */
 	@Override
-	public Integer get(int index) {
+	public synchronized Integer get(int index) {
 		synchronized (this) {
 			int size = elementCount;
 			if (this.parent.isZoomMode) {

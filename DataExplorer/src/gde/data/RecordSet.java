@@ -956,6 +956,7 @@ public class RecordSet extends HashMap<String, Record> {
       		}
 				}
 				catch (InterruptedException e) {
+					//ignore
 				}
 				Channel activeChannel = RecordSet.this.channels.getActiveChannel();
 				if (activeChannel != null) 

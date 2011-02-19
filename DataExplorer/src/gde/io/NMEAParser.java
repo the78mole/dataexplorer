@@ -228,9 +228,9 @@ public class NMEAParser {
 		try {
 			String hexCheckSum = sentence.trim().substring(sentence.indexOf(GDE.STRING_STAR) + 1);
 			if (hexCheckSum.length() == 2) {
-				int checkSum = Integer.parseInt(hexCheckSum, 16);
+				int tmpCheckSum = Integer.parseInt(hexCheckSum, 16);
 				String subSentence = sentence.substring(1, sentence.indexOf(GDE.STRING_STAR));
-				isOK = checkSum == Checksum.XOR(subSentence.toCharArray());
+				isOK = tmpCheckSum == Checksum.XOR(subSentence.toCharArray());
 				if (!isOK) 
 					log.logp(Level.WARNING, $CLASS_NAME, "parse()", String.format("line number %d : checkSum 0x%s missmatch 0x%X in %s!", this.lineNumber, hexCheckSum, Checksum.XOR(subSentence.getBytes()), subSentence)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -758,15 +758,15 @@ public class NMEAParser {
 		final String STRING_GLIDE_RATIO_UNIT = "m/1"; //$NON-NLS-1$
 		for (int i = 0; i < strValues.length && i < 7; i++) {
 			try {
-				String[] values = strValues[i + 1].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
+				String[] tmpValues = strValues[i + 1].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
 				if (i != 6) {
-					this.values[8 + i] = (int) (Double.parseDouble(values[0]) * 1000.0);
-					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals(values[1])) {
-						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(values[1].contains(GDE.STRING_STAR) ? values[1].substring(0, values[1].indexOf(GDE.STRING_STAR)) : values[1]);
+					this.values[8 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
+					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals(tmpValues[1])) {
+						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_STAR)) : tmpValues[1]);
 					}
 				}
 				else {
-					this.values[8 + i] = (int) (Double.parseDouble(values[1]) * 1000.0);
+					this.values[8 + i] = (int) (Double.parseDouble(tmpValues[1]) * 1000.0);
 					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals(STRING_GLIDE_RATIO_UNIT)) {
 						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(STRING_GLIDE_RATIO_UNIT);
 					}
@@ -813,10 +813,10 @@ public class NMEAParser {
 	void parseUNILOG(String[] strValues) {
 		for (int i = 0; i < strValues.length && i < 9; i++) {
 			try {
-				String[] values = strValues[i + 1].trim().split(GDE.STRING_BLANK);
-				this.values[15 + i] = (int) (Double.parseDouble(values[0]) * 1000.0);
-				if (!this.device.getMeasurement(this.channelConfigNumber, 15 + i).getUnit().equals(values[1])) {
-					this.device.getMeasurement(this.channelConfigNumber, 15 + i).setUnit(values[1].contains(GDE.STRING_STAR) ? values[1].substring(0, values[1].indexOf(GDE.STRING_STAR)) : values[1]);
+				String[] tmpValues = strValues[i + 1].trim().split(GDE.STRING_BLANK);
+				this.values[15 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
+				if (!this.device.getMeasurement(this.channelConfigNumber, 15 + i).getUnit().equals(tmpValues[1])) {
+					this.device.getMeasurement(this.channelConfigNumber, 15 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_STAR)) : tmpValues[1]);
 				}
 			}
 			catch (Exception e) {
@@ -862,11 +862,11 @@ public class NMEAParser {
 	void parseMLINK(String[] strValues) {
 		for (int i = 1; i < strValues.length && i < 15; i++) {
 			try {
-				String[] values = strValues[i].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
-				int address = Integer.parseInt(values[0]);
-				this.values[24 + address] = (int) (Double.parseDouble(values[2]) * 1000.0);
-				if (!this.device.getMeasurement(this.channelConfigNumber, 24 + address).getUnit().equals(values[3])) {
-					this.device.getMeasurement(this.channelConfigNumber, 24 + address).setUnit(values[3].contains(GDE.STRING_STAR) ? values[3].substring(0, values[3].indexOf(GDE.STRING_STAR)) : values[3]);
+				String[] tmpValues = strValues[i].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
+				int address = Integer.parseInt(tmpValues[0]);
+				this.values[24 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
+				if (!this.device.getMeasurement(this.channelConfigNumber, 24 + address).getUnit().equals(tmpValues[3])) {
+					this.device.getMeasurement(this.channelConfigNumber, 24 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
 				}
 			}
 			catch (Exception e) {

@@ -104,16 +104,16 @@ public class GraphicsUtils {
 		}
 		
 		if (numberTicks>1) {
-			double deltaMainTickValue = deltaScaleValue / (double) numberTicks; //deltaScale / numberTicks;
+			double deltaMainTickValue = deltaScaleValue / numberTicks; //deltaScale / numberTicks;
 			if (log.isLoggable(Level.FINE))
 				log.log(Level.FINE, String.format("minScaleValue = %10.6f; maxScaleValue = %10.6f; deltaMainTickValue = %10.6f", minScaleValue, maxScaleValue, deltaMainTickValue));
-			double deltaMainTickPixel = deltaScaleValue / deltaScale * (double) height / (double) numberTicks; // height / numberTicks;
-			double deltaPosMini = deltaMainTickPixel / (double) miniticks;
+			double deltaMainTickPixel = deltaScaleValue / deltaScale * height / numberTicks; // height / numberTicks;
+			double deltaPosMini = deltaMainTickPixel / miniticks;
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("numberTicks = %d; deltaMainTickPixel = %10.6f; deltaPosMini = %10.6f", numberTicks, deltaMainTickPixel, deltaPosMini));
 			//draw mini ticks below first main tick
-			double yTickPositionMin = (double) y0 - (Math.abs(minScaleValue - minValue) * ((double) height / deltaScale)); //new Double(y0 - i * deltaMainTickPixel).intValue();
+			double yTickPositionMin = y0 - (Math.abs(minScaleValue - minValue) * (height / deltaScale)); //new Double(y0 - i * deltaMainTickPixel).intValue();
 			for (int j = 1; j < miniticks; j++) {
-				int yPosMini = (int) (yTickPositionMin + ((double) j * deltaPosMini));
+				int yPosMini = (int) (yTickPositionMin + (j * deltaPosMini));
 				if (yPosMini >= y0) break;
 				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "yTickPosition=" + yTickPositionMin + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
 				gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
@@ -121,7 +121,7 @@ public class GraphicsUtils {
 			// draw main ticks and mini ticks
 			for (int i = 0; i <= numberTicks; i++) {
 				//draw the main scale, length = 5 and gap to scale = 2
-				int yTickPosition = (int) (yTickPositionMin - (double) i * deltaMainTickPixel);
+				int yTickPosition = (int) (yTickPositionMin - i * deltaMainTickPixel);
 				gc.drawLine(x0, yTickPosition, x0 - ticklength, yTickPosition);
 				if (isBuildGridVector) horizontalGrid.add(yTickPosition);
 				//draw the sub scale according number of miniTicks
@@ -134,7 +134,7 @@ public class GraphicsUtils {
 				drawTextCentered(df.format(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 			}
 			//draw mini ticks above first main tick
-			double yTickPositionMax = yTickPositionMin - (double) numberTicks * deltaMainTickPixel;
+			double yTickPositionMax = yTickPositionMin - numberTicks * deltaMainTickPixel;
 			for (double j = 1; j < miniticks; j++) {
 				int yPosMini = (int) (yTickPositionMax - (j * deltaPosMini));
 				if (yPosMini < yTop - 1) break;
@@ -143,7 +143,7 @@ public class GraphicsUtils {
 			}
 		}
 		else {
-			int yTickPosition = (int) ((double)y0 - (double) height / 2.0);
+			int yTickPosition = (int) (y0 - height / 2.0);
 			gc.drawLine(x0, yTickPosition, x0 - ticklength, yTickPosition);
 			drawTextCentered(df.format((minScaleValue + minScaleValue) /2.0), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 			if (isBuildGridVector) horizontalGrid.add(yTickPosition);

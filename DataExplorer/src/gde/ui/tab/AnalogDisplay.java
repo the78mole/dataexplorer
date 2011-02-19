@@ -187,7 +187,7 @@ public class AnalogDisplay extends Composite {
 			this.textAnalogLabel.setText(recordText);
 			this.centerX = this.width / 2;
 			this.centerY = (int) (this.height * 0.75);
-			double radiusW = ((double)this.width / 2.0 * 0.80);
+			double radiusW = (this.width / 2.0 * 0.80);
 			//int radiusH = (int) (this.height / 2 * 0.90);
 			double radiusH = this.height * 0.75 - this.textHeight - 40;
 			//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "radiusH = " + radiusH + " radiusLimitH = " + radiusLimitH);

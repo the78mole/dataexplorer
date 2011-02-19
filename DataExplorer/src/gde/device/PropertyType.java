@@ -54,7 +54,9 @@ public class PropertyType implements Cloneable {
     /**
      * default constructor
      */
-    public PropertyType() {}
+    public PropertyType() {
+			//ignore    	
+    }
     
     /**
      * copy constructor - used for clone method

@@ -81,6 +81,7 @@ public class MeasurementContextmenu {
 			}
 
 			public void menuHidden(MenuEvent e) {
+				//ignore
 			}
 		});
 		this.addStatisticsTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
@@ -186,6 +187,7 @@ public class MeasurementContextmenu {
 				}
 			}
 			public void menuHidden(MenuEvent e) {
+				//ignore
 			}
 		});
 		this.offsetPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);

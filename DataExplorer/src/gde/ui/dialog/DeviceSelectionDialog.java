@@ -1039,8 +1039,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	private String exchangeLegacyDeviceNames(String checkoutDeviceName) {
 		if(this.legacyDeviceNames.get(checkoutDeviceName) != null) 
 			return this.legacyDeviceNames.get(checkoutDeviceName); 
-		else 
-			return checkoutDeviceName;
+
+		return checkoutDeviceName;
 	}
 	
 	/**

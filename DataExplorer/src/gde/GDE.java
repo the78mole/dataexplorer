@@ -459,13 +459,13 @@ public class GDE {
 		GC gc = new GC(image);
 		gc.drawImage(image, 0, 0);
 		gc.dispose();
-		final Shell splash = new Shell(GDE.shell, SWT.ON_TOP | SWT.BORDER);
-		final ProgressBar bar = new ProgressBar(splash, SWT.NONE);
+		final Shell splashShell = new Shell(GDE.shell, SWT.ON_TOP | SWT.BORDER);
+		final ProgressBar bar = new ProgressBar(splashShell, SWT.NONE);
 		bar.setMaximum(100);
-		final Label label = new Label(splash, SWT.NONE);
+		final Label label = new Label(splashShell, SWT.NONE);
 		label.setImage(image);
 		FormLayout layout = new FormLayout();
-		splash.setLayout(layout);
+		splashShell.setLayout(layout);
 		FormData labelData = new FormData();
 		labelData.right = new FormAttachment(100, 0);
 		labelData.bottom = new FormAttachment(100, 0);
@@ -485,9 +485,9 @@ public class GDE {
 			splashRect = new java.awt.Rectangle(primaryMonitorBounds.width / 2 - 165, primaryMonitorBounds.height / 2 - 103, 370, 206);
 		}
 		bar.setSize(165, 15);
-		splash.pack();
-		splash.setLocation(splashRect.x, splashRect.y);
-		splash.addDisposeListener(new DisposeListener() {
+		splashShell.pack();
+		splashShell.setLocation(splashRect.x, splashRect.y);
+		splashShell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent arg0) {
 				if (GDE.splash != null && !GDE.splash.isDisposed()) GDE.splash.close();
 				if (GDE.startSplash != null) 	GDE.startSplash.close();
@@ -495,9 +495,9 @@ public class GDE {
 				GDE.startSplash = null;
 			}
 		});
-		splash.open();
+		splashShell.open();
 		bar.setSelection(15);
-		GDE.splash = splash;
+		GDE.splash = splashShell;
 		GDE.progBar = bar;
 	}
 

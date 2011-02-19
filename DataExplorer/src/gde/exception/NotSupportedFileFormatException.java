@@ -13,6 +13,7 @@ public class NotSupportedFileFormatException extends Exception {
 	 * 
 	 */
 	public NotSupportedFileFormatException() {
+		//ignore
 	}
 
 	/**

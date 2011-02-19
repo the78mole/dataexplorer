@@ -36,6 +36,7 @@ public class Messages {
 	static ResourceBundle	deviceResourceBundle	= ResourceBundle.getBundle(BUNDLE_NAME, Settings.getInstance().getLocale());
 
 	private Messages() {
+		//ignore
 	}
 
 //	/**

@@ -584,7 +584,7 @@ public class SettingsDialog extends Dialog {
 								this.useGlobalSerialPort.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.useGlobalSerialPort.setText(Messages.getString(MessageIds.GDE_MSGT0333));
 								this.useGlobalSerialPort.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0334));
-								this.useGlobalSerialPort.setBounds(15, GDE.IS_MAC_COCOA ? 69 : 79, 243, 22);;
+								this.useGlobalSerialPort.setBounds(15, GDE.IS_MAC_COCOA ? 69 : 79, 243, 22);
 								this.useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
 									@SuppressWarnings("deprecation")
 									@Override

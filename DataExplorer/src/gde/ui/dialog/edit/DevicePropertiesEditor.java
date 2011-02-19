@@ -209,7 +209,6 @@ public class DevicePropertiesEditor extends Composite {
 			GDE.display = new Display(); //data);
 			//Sleak sleak = new Sleak();
 			//sleak.open();
-			DevicePropertiesEditor devicePropsEditor = DevicePropertiesEditor.getInstance();
 			devicePropsEditor.initLogger();
 			devicePropsEditor.open();
 			Point size = devicePropsEditor.getSize();
@@ -244,7 +243,6 @@ public class DevicePropertiesEditor extends Composite {
 
 	public void openAsDialog(DeviceConfiguration useDeviceConfiguration) {
 		try {
-			DevicePropertiesEditor devicePropsEditor = DevicePropertiesEditor.getInstance();
 			devicePropsEditor.open();
 			Point size = devicePropsEditor.getSize();
 			DevicePropertiesEditor.dialogShell.setLayout(new FillLayout());
@@ -1048,13 +1046,13 @@ public class DevicePropertiesEditor extends Composite {
 
 	/**
 	 * open a device properties file
-	 * @param devicePropertiesFileName
+	 * @param useDevicePropertiesFileName
 	 */
-	private void openDevicePropertiesFile(String devicePropertiesFileName) {
+	private void openDevicePropertiesFile(String useDevicePropertiesFileName) {
 		try {
-			DevicePropertiesEditor.this.deviceConfig = new DeviceConfiguration(getDevicesPath() + GDE.FILE_SEPARATOR_UNIX + devicePropertiesFileName);
+			DevicePropertiesEditor.this.deviceConfig = new DeviceConfiguration(getDevicesPath() + GDE.FILE_SEPARATOR_UNIX + useDevicePropertiesFileName);
 
-			DevicePropertiesEditor.this.devicePropertiesFileName = devicePropertiesFileName;
+			DevicePropertiesEditor.this.devicePropertiesFileName = useDevicePropertiesFileName;
 			DevicePropertiesEditor.this.deviceFileNameText.setText(DevicePropertiesEditor.this.devicePropertiesFileName);
 			update();
 		}

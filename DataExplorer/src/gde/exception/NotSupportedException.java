@@ -13,6 +13,7 @@ public class NotSupportedException extends Exception {
 	 * 
 	 */
 	public NotSupportedException() {
+		//ignore
 	}
 
 	/**

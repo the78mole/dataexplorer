@@ -440,10 +440,14 @@ public class FileUtils {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			try {
 				if (os != null) os.close ();
-			} catch (IOException e1) {}
+			} catch (IOException e1) {
+				//ignore
+			}
 			try {
 				if (is != null) is.close ();
-			} catch (IOException e1) {}
+			} catch (IOException e1) {
+				//ignore
+			}
 		}
 		return isExtracted;
 	}
@@ -541,11 +545,13 @@ public class FileUtils {
 				if (os != null) os.close();
 			}
 			catch (IOException e1) {
+				//ignore
 			}
 			try {
 				if (is != null) is.close();
 			}
 			catch (IOException e1) {
+				//ignore
 			}
 		}
 	}
@@ -594,11 +600,13 @@ public class FileUtils {
 						if (os != null) os.close();
 					}
 					catch (IOException e1) {
+						//ignore
 					}
 					try {
 						if (is != null) is.close();
 					}
 					catch (IOException e1) {
+						//ignore
 					}
 				}
 			}
@@ -967,7 +975,9 @@ public class FileUtils {
 				}
 				//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "chmod 755 " + fileName);
 				Runtime.getRuntime ().exec (new String []{"chmod", unixPermissions, fullQualifiedFilePath}).waitFor(); //$NON-NLS-1$ //$NON-NLS-2$
-			} catch (Throwable e) {}
+			} catch (Throwable e) {
+				//ignore
+			}
 		}
 	}
 
@@ -1087,7 +1097,8 @@ public class FileUtils {
 			}
 			
 			brout = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			while ((line = brout.readLine()) != null) {} // clean std out
+			while ((line = brout.readLine()) != null) 
+				; // clean std out
 			process.waitFor(); // waits until termination
 		}
 		catch (Throwable e) {
@@ -1120,17 +1131,23 @@ public class FileUtils {
 		while (index < versionStringLength && Character.isDigit(version.charAt(index))) index++;
 		try {
 			if (start < versionStringLength) major = Integer.parseInt(version.substring(start, index));
-		} catch (NumberFormatException e) {}
+		} catch (NumberFormatException e) {
+			//ignore
+		}
 		start = ++index;
 		while (index < versionStringLength && Character.isDigit(version.charAt(index))) index++;
 		try {
 			if (start < versionStringLength) minor = Integer.parseInt(version.substring(start, index));
-		} catch (NumberFormatException e) {}
+		} catch (NumberFormatException e) {
+			//ignore			
+		}
 		start = ++index;
 		while (index < versionStringLength && Character.isDigit(version.charAt(index))) index++;
 		try {
 			if (start < versionStringLength) micro = Integer.parseInt(version.substring(start, index));
-		} catch (NumberFormatException e) {}
+		} catch (NumberFormatException e) {
+			//ignore
+		}
 		
 		return major*100 + minor*10 + micro;
 	}

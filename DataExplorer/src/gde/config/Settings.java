@@ -255,7 +255,6 @@ public class Settings extends Properties {
 		xsdThread = new Thread("xsdValidation") {
 			@Override
 			public void run() {
-				final String $METHOD_NAME = "xsdThread.run()";
 				// device properties context
 				try {
 					Settings.this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(Settings.this.xmlBasePath + Settings.DEVICE_PROPERTIES_XSD_NAME));
@@ -268,7 +267,7 @@ public class Settings extends Properties {
 					log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "schema factory setup time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$		
 				}
 				catch (Exception e) {
-					log.logp(Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+					log.logp(Level.SEVERE, Settings.$CLASS_NAME, "xsdThread.run()", e.getMessage(), e);
 				}
 			}
 		};

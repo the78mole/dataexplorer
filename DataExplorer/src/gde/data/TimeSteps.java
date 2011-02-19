@@ -40,7 +40,8 @@ public class TimeSteps extends Vector<Integer> {
 	 */
 	public TimeSteps(double newTimeStep_ms) {
 		super(1, 1);
-		if (this.isConstant = newTimeStep_ms > 0) 
+		this.isConstant = newTimeStep_ms > 0;
+		if (!this.isConstant) 
 			super.add((int) (newTimeStep_ms * 10));
 	}
 	
@@ -218,7 +219,7 @@ public class TimeSteps extends Vector<Integer> {
 				index = (int) (position + 0.5);
 			}
 			else {
-				index = (int) (time_ms / (double)(this.lastElement() / (double)(this.elementCount - 1) / 10.0) / 2.0);
+				index = (int) (time_ms / (this.lastElement() / (double)(this.elementCount - 1) / 10.0) / 2.0);
 				int value = Double.valueOf(time_ms * 10.0).intValue();
 				for (; index < elementCount; index++) {
 					if (value <= this.get(index)) break;

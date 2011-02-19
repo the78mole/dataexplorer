@@ -77,6 +77,7 @@ public class TabAreaContextMenu {
 				}
 			}
 			public void menuHidden(MenuEvent e) {
+				//ignore
 			}
 		});
 		if (!isCreated) {

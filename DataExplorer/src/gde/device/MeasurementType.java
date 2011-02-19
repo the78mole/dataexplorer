@@ -64,6 +64,7 @@ public class MeasurementType implements Cloneable {
 	 * default constructor
 	 */
 	public MeasurementType() {
+		//ignore
 	}
 
 	/**
