@@ -96,6 +96,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * query the default stem used as record set name
 	 * @return recordSetStemName
 	 */
+	@Override
 	public String getRecordSetStemName() {
 		return Messages.getString(MessageIds.GDE_MSGT1220);
 	}

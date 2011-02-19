@@ -134,13 +134,16 @@ public class PicolarioDialog extends DeviceDialog {
 				}
 			});
 			this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+				@Override
 				public void mouseEnter(MouseEvent evt) {
 					log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
 					fadeOutAplhaBlending(evt, PicolarioDialog.this.getDialogShell().getClientArea(), 10, 10, 10, 15);
 				}
+				@Override
 				public void mouseHover(MouseEvent evt) {
 					log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 				}
+				@Override
 				public void mouseExit(MouseEvent evt) {
 					log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 					fadeInAlpaBlending(evt, PicolarioDialog.this.getDialogShell().getClientArea(), 10, 10, -10, 15);
@@ -216,6 +219,7 @@ public class PicolarioDialog extends DeviceDialog {
 				this.configTabFolder.setBounds(10, 70, 320, 235);
 				this.configTabFolder.addMouseTrackListener(PicolarioDialog.this.mouseTrackerEnterFadeOut);
 				this.configTabFolder.addSelectionListener(new SelectionAdapter() {
+					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
 						int channelNumber = PicolarioDialog.this.configTabFolder.getSelectionIndex() + 1;
