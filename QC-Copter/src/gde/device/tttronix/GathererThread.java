@@ -104,7 +104,7 @@ public class GathererThread extends Thread {
 							terminalText = new StringBuffer();
 							terminalText.append(Messages.getString(MessageIds.GDE_MSGI1903)).append(text);
 							this.dialog.setTerminalText(terminalText.toString());
-//							DataExplorer.display.syncExec(new Runnable() {
+//							GDE.display.syncExec(new Runnable() {
 //								@Override
 //								public void run() {
 //									if (!GathererThread.this.dialog.isDisposed()) {
@@ -273,7 +273,7 @@ public class GathererThread extends Thread {
 			}
 			else {
 				final String useRecordSetKey = this.recordSetKey;
-				DataExplorer.display.asyncExec(new Runnable() {
+				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();

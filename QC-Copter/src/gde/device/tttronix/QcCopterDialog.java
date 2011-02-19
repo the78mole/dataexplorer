@@ -25,7 +25,6 @@ import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
 import java.util.ArrayList;
@@ -324,7 +323,7 @@ public class QcCopterDialog extends DeviceDialog {
 	}
 
 	public void setTerminalText(final String newText) {
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				if (!QcCopterDialog.this.dialogShell.isDisposed()) {
@@ -340,7 +339,7 @@ public class QcCopterDialog extends DeviceDialog {
 	 * toggle the text of start configuration button according comm port state
 	 */
 	void checkPortStatus() {
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				if (!QcCopterDialog.this.startConfiguration.isDisposed()) {
 					if (QcCopterDialog.this.device.serialPort.isConnected()) {
