@@ -147,6 +147,7 @@ public class VC800Dialog extends DeviceDialog {
 						if (!VC800Dialog.this.isConnectionWarned) {
 							try {
 								VC800Dialog.this.updateConfigTread = new Thread("updateConfig") {
+									@Override
 									public void run() {
 										try {
 											updateConfig();
