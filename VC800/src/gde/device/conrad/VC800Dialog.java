@@ -179,7 +179,6 @@ public class VC800Dialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addDisposeListener(new DisposeListener() {
-					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						VC800Dialog.this.dispose();
