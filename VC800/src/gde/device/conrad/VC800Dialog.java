@@ -439,7 +439,7 @@ public class VC800Dialog extends DeviceDialog {
 				this.isBatteryOK = this.device.isBatteryLevelLow(dataBuffer);
 			} while (VC800Dialog.this.configData.get(VC800.INPUT_TYPE) == null || VC800Dialog.this.configData.get(VC800.INPUT_TYPE).equals(Messages.getString(MessageIds.GDE_MSGT1500).split(" ")[0]));
 			if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
-				DataExplorer.display.asyncExec(new Runnable() {
+				GDE.display.asyncExec(new Runnable() {
 					public void run() {
 						VC800Dialog.this.configGroup.redraw();
 					}

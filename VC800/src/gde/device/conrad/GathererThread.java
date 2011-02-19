@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.device.conrad;
 
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
@@ -231,7 +232,7 @@ public class GathererThread extends Thread {
 			}
 			else {
 				final String useRecordSetKey = this.recordSetKey;
-				DataExplorer.display.asyncExec(new Runnable() {
+				GDE.display.asyncExec(new Runnable() {
 					public void run() {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						GathererThread.this.application.updateStatisticsData();
