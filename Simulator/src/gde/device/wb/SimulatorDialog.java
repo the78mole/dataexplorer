@@ -128,6 +128,7 @@ public class SimulatorDialog extends DeviceDialog {
 	/**
 	 * default method where the default controls are defined, this needs to be overwritten by specific device dialog
 	 */
+	@Override
 	public void open() {
 		try {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
@@ -254,6 +255,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.voltageCombo.setLayoutData(voltageComboLData);
 					this.voltageCombo.setText("cCombo1"); //$NON-NLS-1$
 					this.voltageCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINE, "voltageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							//TODO add your code for voltageCombo.widgetSelected
@@ -283,6 +285,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.timeCombo.setItems(new String[] { "1", "2", "3", "4", "5", "10", "20", "50", "100", "1000", "10000" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
 					this.timeCombo.setText(String.format("%.0f", this.device.getTimeStep_ms())); //$NON-NLS-1$
 					this.timeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINE, "timeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							SimulatorDialog.this.device.setTimeStep_ms(new Integer(SimulatorDialog.this.timeCombo.getText()).intValue());
@@ -297,6 +300,7 @@ public class SimulatorDialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addKeyListener(new KeyAdapter() {
+					@Override
 					public void keyReleased(KeyEvent evt) {
 						log.log(Level.FINE, "dialogShell.keyReleased, event=" + evt); //$NON-NLS-1$
 						//TODO add your code for dialogShell.keyReleased
@@ -309,13 +313,16 @@ public class SimulatorDialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+					@Override
 					public void mouseEnter(MouseEvent evt) {
 						log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
 						fadeOutAplhaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, 10, 10);
 					}
+					@Override
 					public void mouseHover(MouseEvent evt) {
 						log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 					}
+					@Override
 					public void mouseExit(MouseEvent evt) {
 						log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 						fadeInAlpaBlending(evt, SimulatorDialog.this.getDialogShell().getClientArea(), 10, 10, -10, 10);
@@ -360,6 +367,7 @@ public class SimulatorDialog extends DeviceDialog {
 					this.startButton.setLayoutData(startButtonLData);
 					this.startButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0274));
 					this.startButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINE, "startButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							SimulatorDialog.this.startButton.setEnabled(false);
