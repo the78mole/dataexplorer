@@ -163,7 +163,7 @@ public class SetupReaderWriter {
 		if (setupFilePath != null && setupFilePath.length() > 4) {
 			File setupFile = new File(setupFilePath);
 			byte[] buffer = new byte[192];
-			int checkSum = 0;
+			int tmpCheckSum = 0;
 
 			try {
 				buffer[0] = (byte) (this.serialNumber & 0x00FF);
@@ -220,9 +220,9 @@ public class SetupReaderWriter {
 				//unused 
 				byte[] chkBuffer = new byte[192 - 2];
 				System.arraycopy(buffer, 0, chkBuffer, 0, chkBuffer.length);
-				checkSum = Checksum.CRC16(chkBuffer, 0);
-				buffer[190] = (byte) (checkSum & 0x00FF);
-				buffer[191] = (byte) ((checkSum & 0xFF00) >> 8);
+				tmpCheckSum = Checksum.CRC16(chkBuffer, 0);
+				buffer[190] = (byte) (tmpCheckSum & 0x00FF);
+				buffer[191] = (byte) ((tmpCheckSum & 0xFF00) >> 8);
 
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "$SETUP," + StringHelper.convertHexInput(buffer));
 				FileOutputStream file_out = new FileOutputStream(setupFile);
