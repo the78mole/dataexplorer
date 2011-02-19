@@ -557,7 +557,7 @@ public class StatisticsWindow extends CTabItem {
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.tabFolder.getClientArea();
-		Image objectImage = new Image(DataExplorer.display, bounds.width, bounds.height);
+		Image objectImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(objectImage);
 		this.composite.print(imageGC);
 		imageGC.dispose();

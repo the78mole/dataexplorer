@@ -611,7 +611,7 @@ public class GraphicsComposite extends Composite {
 			doRedrawGraphics();
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					doRedrawGraphics();
 				}
@@ -1443,7 +1443,7 @@ public class GraphicsComposite extends Composite {
 		RecordSet compareRecordSet = DataExplorer.getInstance().getCompareSet();
 		String[] compareSetNames = compareRecordSet.getRecordNames();
 		int graphicsHeight = isCompareSet ? 30+this.canvasBounds.height+10+compareSetNames.length*20 : 30+this.canvasBounds.height+40;
-		Image graphicsImage = new Image(DataExplorer.display, this.canvasBounds.width, graphicsHeight);
+		Image graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
 		// decide if normal graphics window or compare window should be copied
 		if (this.windowType == GraphicsWindow.TYPE_COMPARE) {
 				GC graphicsGC = new GC(graphicsImage);

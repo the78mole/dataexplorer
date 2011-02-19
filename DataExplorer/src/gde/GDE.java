@@ -21,6 +21,7 @@ package gde;
 import gde.config.Settings;
 import gde.data.RecordSet;
 import gde.exception.ApplicationConfigurationException;
+import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -69,6 +70,9 @@ public class GDE {
 	final static String						$CLASS_NAME											= GDE.class.getName();
 	public final static long			StartTime												= new Date().getTime();
 	public static Handler					logHandler											= null;
+	public static Display					display;
+	public static Shell						shell;
+
 
 	// ****** begin global constants section *******
 	public static final String		VERSION													= "Version 2.72";																																																						//$NON-NLS-1$
@@ -267,16 +271,20 @@ public class GDE {
 		final String $METHOD_NAME = "main"; //$NON-NLS-1$
 		String inputFilePath = GDE.STRING_EMPTY;
 		try {
+			Display.setAppName(GDE.NAME_LONG);
+			Display.setAppVersion(GDE.VERSION);
+			
 			Settings.getInstance();
 			//DeviceData	data = new DeviceData();
 			//data.tracking = true;
-			DataExplorer.display = new Display(); //data);
-			DataExplorer.shell = new Shell(DataExplorer.display);
+			GDE.display = Display.getDefault(); 
+			GDE.shell = GDE.display.getActiveShell() == null ? new Shell(GDE.display) : GDE.display.getActiveShell();
+			
 			GDE.showSplash();
 			//Sleak sleak = new Sleak();
 			//sleak.open();
 			GDE.initLogger();
-			GDE.log.logp(java.util.logging.Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, GDE.NAME_LONG + GDE.STRING_BLANK + GDE.VERSION);
+			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, GDE.NAME_LONG + GDE.STRING_BLANK + GDE.VERSION);
 
 			//build the main thread context classloader to enable dynamic plugin class loading 
 			Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
@@ -289,18 +297,16 @@ public class GDE {
 			//Object o = c.getMethod("getInstance", new Class[0]).invoke(null, new Object[0]);
 			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Class instance loaded successfully");
 
-			Display.setAppName(GDE.NAME_LONG);
-			Display.setAppVersion(GDE.VERSION);
 
 			DataExplorer application = DataExplorer.getInstance();
 			for (int i = 0; i < args.length; ++i) {
-				GDE.log.logp(java.util.logging.Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "commandline arg[" + i + "] = " + args[i]);//$NON-NLS-1$ //$NON-NLS-2$ $NON-NLS-2$
+				log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "commandline arg[" + i + "] = " + args[i]);//$NON-NLS-1$ //$NON-NLS-2$ $NON-NLS-2$
 			}
 			if (args.length > 0) {
 				args[0] = args[0].trim();
 				if (args[0].toLowerCase().endsWith(GDE.FILE_ENDING_DOT_OSD) || args[0].toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOV)) {
 					inputFilePath = args[0];
-					GDE.log.logp(java.util.logging.Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "inputFilePath = " + inputFilePath); //$NON-NLS-1$
+					log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "inputFilePath = " + inputFilePath); //$NON-NLS-1$
 				}
 			}
 
@@ -313,16 +319,16 @@ public class GDE {
 				sb.append(propName).append(" = ").append(props.get(propName)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			sb.append("SWT.PLATFORM = ").append(SWT.getPlatform()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			GDE.log.logp(java.util.logging.Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, sb.toString());
+			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, sb.toString());
 
 			GDE.seStartupProgress(40);
 			application.execute(inputFilePath);
 		}
 		catch (Throwable e) {
-			GDE.log.logp(java.util.logging.Level.SEVERE, GDE.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			log.logp(Level.SEVERE, GDE.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			Throwable t = e;
 			while (t != null) {
-				GDE.log.logp(java.util.logging.Level.SEVERE, GDE.$CLASS_NAME, $METHOD_NAME, t.getMessage(), t);
+				log.logp(Level.SEVERE, GDE.$CLASS_NAME, $METHOD_NAME, t.getMessage(), t);
 				t = t.getCause();
 			}
 		}
@@ -341,12 +347,12 @@ public class GDE {
 		String basePath;
 		final Vector<URL> urls = new Vector<URL>();
 		URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
-		GDE.log.logp(java.util.logging.Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "base URL = " + url.toString()); //$NON-NLS-1$
+		log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "base URL = " + url.toString()); //$NON-NLS-1$
 		if (url.getPath().endsWith(GDE.FILE_SEPARATOR_UNIX)) { // running inside Eclipse
-			GDE.log.logp(java.util.logging.Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "started inside Eclipse"); //$NON-NLS-1$
+			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "started inside Eclipse"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
-			GDE.log.logp(java.util.logging.Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "basePath = " + basePath); //$NON-NLS-1$
+			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "basePath = " + basePath); //$NON-NLS-1$
 			File file = new File(basePath);
 			String[] files = file.list();
 			if (files == null) {
@@ -357,11 +363,11 @@ public class GDE {
 			}
 		}
 		else { // started outside java -jar *.jar
-			GDE.log.logp(java.util.logging.Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "started outside with: java -jar *.jar"); //$NON-NLS-1$
+			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX) + GDE.DEVICES_PLUG_IN_DIR;
 
-			GDE.log.logp(java.util.logging.Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "basePath = " + basePath); //$NON-NLS-1$
+			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "basePath = " + basePath); //$NON-NLS-1$
 			File file = new File(basePath);
 			String[] files = file.list();
 			if (files == null) {
@@ -371,11 +377,11 @@ public class GDE {
 				if (path.endsWith(GDE.FILE_ENDING_DOT_JAR)) {
 					URL fileUrl = new File(basePath + path).toURI().toURL();
 					urls.add(fileUrl);
-					GDE.log.logp(java.util.logging.Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "adding : " + fileUrl.toURI()); //$NON-NLS-1$
+					log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "adding : " + fileUrl.toURI()); //$NON-NLS-1$
 				}
 			}
 		}
-		GDE.log.logp(java.util.logging.Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "using class loader URL = " + urls.toString()); //$NON-NLS-1$
+		log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "using class loader URL = " + urls.toString()); //$NON-NLS-1$
 		ClassLoader newLoader = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>() {
 			@Override
 			public URLClassLoader run() {
@@ -409,13 +415,13 @@ public class GDE {
 		for (Handler handler : handlers) {
 			GDE.rootLogger.removeHandler(handler);
 		}
-		GDE.rootLogger.setLevel(java.util.logging.Level.ALL);
+		GDE.rootLogger.setLevel(Level.ALL);
 
 		if (System.getProperty(GDE.ECLIPSE_STRING) == null) { // running outside eclipse
 			try {
 				GDE.logHandler = new FileHandler(GDE.JAVA_IO_TMPDIR + GDE.BOOTSTRAP_LOG, 50000, 1);
 				GDE.logHandler.setFormatter(lf);
-				GDE.logHandler.setLevel(java.util.logging.Level.INFO);
+				GDE.logHandler.setLevel(Level.INFO);
 				GDE.rootLogger.addHandler(GDE.logHandler);
 			}
 			catch (Exception e) {
@@ -425,7 +431,7 @@ public class GDE {
 		else {
 			GDE.logHandler = new ConsoleHandler();
 			GDE.logHandler.setFormatter(lf);
-			GDE.logHandler.setLevel(java.util.logging.Level.INFO);
+			GDE.logHandler.setLevel(Level.INFO);
 			GDE.rootLogger.addHandler(GDE.logHandler);
 		}
 	}
@@ -450,12 +456,11 @@ public class GDE {
 	 * @param timeoutSec
 	 */
 	private static void showSplash() {
-		GDE.startSplash = SplashScreen.getSplashScreen();
-		final Image image = new Image(DataExplorer.display, GDE.class.getClassLoader().getResourceAsStream("gde/resource/splash.png"));
+		final Image image = new Image(GDE.display, GDE.class.getClassLoader().getResourceAsStream("gde/resource/splash.png"));
 		GC gc = new GC(image);
 		gc.drawImage(image, 0, 0);
 		gc.dispose();
-		final Shell splash = new Shell(SWT.ON_TOP | SWT.BORDER);
+		final Shell splash = new Shell(GDE.shell, SWT.ON_TOP | SWT.BORDER);
 		final ProgressBar bar = new ProgressBar(splash, SWT.NONE);
 		bar.setMaximum(100);
 		final Label label = new Label(splash, SWT.NONE);
@@ -473,10 +478,11 @@ public class GDE {
 		progressData.bottom = new FormAttachment(100, -5);
 		bar.setLayoutData(progressData);
 		java.awt.Rectangle splashRect;
+		GDE.startSplash = SplashScreen.getSplashScreen();
 		if (GDE.startSplash != null)
 			splashRect = GDE.startSplash.getBounds();
 		else {
-			Rectangle primaryMonitorBounds = DataExplorer.display.getPrimaryMonitor().getBounds();
+			Rectangle primaryMonitorBounds = GDE.display.getBounds();
 			splashRect = new java.awt.Rectangle(primaryMonitorBounds.width / 2 - 165, primaryMonitorBounds.height / 2 - 103, 370, 206);
 		}
 		bar.setSize(165, 15);
@@ -485,11 +491,9 @@ public class GDE {
 		splash.addDisposeListener(new DisposeListener() {
 			@Override
 			public void widgetDisposed(DisposeEvent arg0) {
-				GDE.splash.close();
+				if (GDE.splash != null && !GDE.splash.isDisposed()) GDE.splash.close();
+				if (GDE.startSplash != null) 	GDE.startSplash.close();
 				GDE.splash = null;
-				if (GDE.startSplash != null) {
-					GDE.startSplash.close();
-				}
 				GDE.startSplash = null;
 			}
 		});

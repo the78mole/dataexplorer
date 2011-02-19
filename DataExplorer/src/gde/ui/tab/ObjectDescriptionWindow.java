@@ -947,7 +947,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		if(this.isDisposed()) SWT.error(SWT.ERROR_WIDGET_DISPOSED);
 		
 		Rectangle bounds = this.tabFolder.getClientArea();
-		Image objectImage = new Image(DataExplorer.display, bounds.width, bounds.height);
+		Image objectImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(objectImage);
 		this.tabComposite.print(imageGC);
 		imageGC.dispose();

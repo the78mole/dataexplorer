@@ -168,7 +168,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET && this.getActiveChannel().getFileName() != null) {
 					this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 				}
-				DataExplorer.display.asyncExec(new Runnable() {
+				GDE.display.asyncExec(new Runnable() {
 					public void run() {
 						if (!Channels.this.application.getObjectKey().equals(Channels.this.getActiveChannel().getObjectKey())) {
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "switch to channels object key \"" + Channels.this.getActiveChannel().getObjectKey() + "\""); //$NON-NLS-1$

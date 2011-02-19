@@ -291,7 +291,7 @@ public class MenuBar {
 					this.printMenuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							new PrintSelectionDialog(DataExplorer.shell, SWT.NULL).open();
+							new PrintSelectionDialog(GDE.shell, SWT.NULL).open();
 						}
 					});
 				}

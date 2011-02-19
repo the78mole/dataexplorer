@@ -15,5 +15,5 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="gde.GDE"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="DataExplorer"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms40M -Xmx256M -DECLIPSE=true &#13;&#10;-splash:${workspace_loc}/build/misc/DataExplorerSplash.png"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms40M -Xmx256M -DECLIPSE=true &#13;&#10;-splash:${workspace_loc}/build/misc/DataExplorerSplash.png_"/>
 </launchConfiguration>

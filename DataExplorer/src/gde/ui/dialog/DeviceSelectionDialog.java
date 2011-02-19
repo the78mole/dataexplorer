@@ -249,7 +249,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						DeviceSelectionDialog.this.application.setActiveDevice(null);
 					}
 
-					DataExplorer.display.asyncExec(new Runnable() {
+					GDE.display.asyncExec(new Runnable() {
 						@Override
 						public void run() {
 							handleAutoOpenAfterClose();
@@ -1227,7 +1227,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									DeviceSelectionDialog.this.settings.isSerialPortBlackListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
 									DeviceSelectionDialog.this.settings.isSerialPortWhiteListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
 							if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
-								DataExplorer.display.syncExec(new Runnable() {
+								GDE.display.syncExec(new Runnable() {
 									@Override
 									public void run() {
 										if (!DeviceSelectionDialog.this.dialogShell.isDisposed() && DeviceSelectionDialog.this.selectedActiveDeviceConfig != null) {

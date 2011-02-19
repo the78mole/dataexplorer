@@ -18,7 +18,13 @@
 ****************************************************************************************/
 package gde.device;
 
+import gde.GDE;
+import gde.config.Settings;
 import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -28,11 +34,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
-
-import gde.config.Settings;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
 
 /**
  * DeviceDialog is the abstract class as parent for device dialog implementations
@@ -134,7 +135,7 @@ public abstract class DeviceDialog extends Dialog {
 	 * @return the dialogShell
 	 */
 	public Shell getDialogShell() {
-		Shell shell = DataExplorer.shell;
+		Shell shell = GDE.shell;
 		try {
 			shell = this.dialogShell != null && !this.dialogShell.isDisposed() ? this.dialogShell : shell;
 		}

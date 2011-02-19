@@ -194,7 +194,7 @@ public class AnalogWindow extends CTabItem {
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.analogMainComposite.getClientArea();
-		Image tabContentImage = new Image(DataExplorer.display, bounds.width, bounds.height);
+		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.analogMainComposite.print(imageGC);
 		imageGC.dispose();

@@ -457,7 +457,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			updateForSwitchRecordSet(activeChannel, recordSetKey);
 		}
 		else { // execute asynchronous
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					updateForSwitchRecordSet(activeChannel, recordSetKey);
 				}

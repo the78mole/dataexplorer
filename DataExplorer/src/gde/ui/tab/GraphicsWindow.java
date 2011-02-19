@@ -18,7 +18,16 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channels;
 import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.TimeLine;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -29,14 +38,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
-
-import gde.config.Settings;
-import gde.data.Channels;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.TimeLine;
 
 /**
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
@@ -116,7 +117,7 @@ public class GraphicsWindow extends CTabItem {
 			this.curveSelectorComposite.doUpdateCurveSelectorTable();
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					GraphicsWindow.this.graphicsComposite.doRedrawGraphics();
 					GraphicsWindow.this.graphicsComposite.updateCaptions();
@@ -134,7 +135,7 @@ public class GraphicsWindow extends CTabItem {
 			this.graphicsComposite.updateCaptions();
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					GraphicsWindow.this.graphicsComposite.updateCaptions();
 				}
@@ -150,7 +151,7 @@ public class GraphicsWindow extends CTabItem {
 			this.curveSelectorComposite.doUpdateCurveSelectorTable();
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					GraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 				}
@@ -271,7 +272,7 @@ public class GraphicsWindow extends CTabItem {
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.graphicSashForm.getClientArea();
-		Image tabContentImage = new Image(DataExplorer.display, bounds.width, bounds.height);
+		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.graphicSashForm.print(imageGC);
 		imageGC.dispose();

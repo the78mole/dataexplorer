@@ -247,7 +247,7 @@ public class MenuToolBar {
 					this.printToolItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "printToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							new PrintSelectionDialog(DataExplorer.shell, SWT.NULL).open();
+							new PrintSelectionDialog(GDE.shell, SWT.NULL).open();
 						}
 					});
 				}
@@ -1073,7 +1073,7 @@ public class MenuToolBar {
 	 */
 	public void addRecordSetName(String newRecordSetName) {
 		final String recordSetKey = newRecordSetName;
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				Vector<String> newRecordSetItems = new Vector<String>(MenuToolBar.this.recordSelectCombo.getItems().length);
 				String[] recordSetNames = MenuToolBar.this.recordSelectCombo.getItems();
@@ -1098,7 +1098,7 @@ public class MenuToolBar {
 			doUpdateChannelSelector();
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					doUpdateChannelSelector();
 				}
@@ -1137,7 +1137,7 @@ public class MenuToolBar {
 			doUpdateRecordSetSelectCombo(recordSetNames);
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					doUpdateRecordSetSelectCombo(recordSetNames);
 				}
@@ -1247,7 +1247,7 @@ public class MenuToolBar {
 			doUpdateChannelToolItems();
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					doUpdateChannelToolItems();
 				}
@@ -1548,7 +1548,7 @@ public class MenuToolBar {
 			this.googleEarthConfigToolItem.setEnabled(this.application.getActiveDevice().isActualRecordSetWithGpsData());
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					MenuToolBar.this.googleEarthToolItem.setEnabled(MenuToolBar.this.application.getActiveDevice().isActualRecordSetWithGpsData());
 					MenuToolBar.this.googleEarthConfigToolItem.setEnabled(MenuToolBar.this.application.getActiveDevice().isActualRecordSetWithGpsData());

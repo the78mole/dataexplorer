@@ -189,7 +189,7 @@ public class DigitalWindow extends CTabItem {
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.digitalMainComposite.getClientArea();
-		Image tabContentImage = new Image(DataExplorer.display, bounds.width, bounds.height);
+		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.digitalMainComposite.print(imageGC);
 		imageGC.dispose();

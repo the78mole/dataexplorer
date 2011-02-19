@@ -259,7 +259,7 @@ public class FileCommentWindow extends CTabItem {
 	 */
 	public Image getContentAsImage() {
 		Rectangle bounds = this.commentMainComposite.getClientArea();
-		Image tabContentImage = new Image(DataExplorer.display, bounds.width, bounds.height);
+		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.commentMainComposite.print(imageGC);
 		imageGC.dispose();

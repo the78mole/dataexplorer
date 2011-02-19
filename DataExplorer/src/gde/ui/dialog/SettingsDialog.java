@@ -1174,7 +1174,7 @@ public class SettingsDialog extends Dialog {
 						SettingsDialog.this.availablePorts = DeviceSerialPortImpl.listConfiguredSerialPorts(SettingsDialog.this.settings.doPortAvailabilityCheck(), 
 								SettingsDialog.this.settings.isSerialPortBlackListEnabled() ? SettingsDialog.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
 								SettingsDialog.this.settings.isSerialPortWhiteListEnabled() ? SettingsDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
-						DataExplorer.display.syncExec(new Runnable() {
+						GDE.display.syncExec(new Runnable() {
 							public void run() {
 								if (SettingsDialog.this.dialogShell != null && !SettingsDialog.this.dialogShell.isDisposed()) {
 									if (SettingsDialog.this.availablePorts != null && SettingsDialog.this.availablePorts.size() > 0) {

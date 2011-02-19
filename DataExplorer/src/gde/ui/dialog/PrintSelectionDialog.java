@@ -456,7 +456,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 					catch (Exception e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
-						PrintSelectionDialog.this.application.openMessageDialog(DataExplorer.shell, e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+						PrintSelectionDialog.this.application.openMessageDialog(GDE.shell, e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 					}
 				}
 			}
@@ -610,7 +610,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 	//////// backup from pure SWT printing where color problems exist while printing jpeg images (Blaustich) //////////
 	//	// Show the Choose Printer dialog
-	//	PrintDialog dialog = new PrintDialog(DataExplorer.shell, SWT.NULL);
+	//	PrintDialog dialog = new PrintDialog(GDE.shell, SWT.NULL);
 	//	PrinterData printerData = dialog.open();
 	//
 	//	if (printerData != null) {

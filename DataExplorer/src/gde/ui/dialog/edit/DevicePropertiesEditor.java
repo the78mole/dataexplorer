@@ -183,11 +183,11 @@ public class DevicePropertiesEditor extends Composite {
 
 	public static DevicePropertiesEditor getInstance() {
 		if (DevicePropertiesEditor.devicePropsEditor == null) {
-			DevicePropertiesEditor.dialogShell = new Shell(DataExplorer.display, SWT.DIALOG_TRIM | (GDE.IS_LINUX ? SWT.MODELESS : SWT.PRIMARY_MODAL));
+			DevicePropertiesEditor.dialogShell = new Shell(GDE.display, SWT.DIALOG_TRIM | (GDE.IS_LINUX ? SWT.MODELESS : SWT.PRIMARY_MODAL));
 			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.NULL);
 		}
 		else if (DevicePropertiesEditor.devicePropsEditor.isDisposed()) {
-			DevicePropertiesEditor.dialogShell = new Shell(DataExplorer.display, SWT.DIALOG_TRIM | (GDE.IS_LINUX ? SWT.MODELESS : SWT.PRIMARY_MODAL));
+			DevicePropertiesEditor.dialogShell = new Shell(GDE.display, SWT.DIALOG_TRIM | (GDE.IS_LINUX ? SWT.MODELESS : SWT.PRIMARY_MODAL));
 			DevicePropertiesEditor.devicePropsEditor = new DevicePropertiesEditor(DevicePropertiesEditor.dialogShell, SWT.NULL);
 		}
 
@@ -206,7 +206,7 @@ public class DevicePropertiesEditor extends Composite {
 		try {
 			//DeviceData data = new DeviceData();
 			//data.tracking = true;
-			DataExplorer.display = new Display(); //data);
+			GDE.display = new Display(); //data);
 			//Sleak sleak = new Sleak();
 			//sleak.open();
 			DevicePropertiesEditor devicePropsEditor = DevicePropertiesEditor.getInstance();
@@ -234,7 +234,7 @@ public class DevicePropertiesEditor extends Composite {
 
 			//Display display = Display.getDefault();
 			while (!DevicePropertiesEditor.dialogShell.isDisposed()) {
-				if (!DataExplorer.display.readAndDispatch()) DataExplorer.display.sleep();
+				if (!GDE.display.readAndDispatch()) GDE.display.sleep();
 			}
 		}
 		catch (Throwable e) {
@@ -264,7 +264,7 @@ public class DevicePropertiesEditor extends Composite {
 			this.deviceFileNameSelectionButton.setEnabled(false);
 			update();
 
-			Display display = DataExplorer.display; //DevicePropertiesEditor.dialogShell.getDisplay();
+			Display display = GDE.display; //DevicePropertiesEditor.dialogShell.getDisplay();
 			while (!DevicePropertiesEditor.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
 			}
@@ -1592,7 +1592,7 @@ public class DevicePropertiesEditor extends Composite {
 		initializeDeviceProperties();
 		//DeviceType end
 
-		DataExplorer.display.asyncExec( new Runnable() {		
+		GDE.display.asyncExec( new Runnable() {		
 			@Override
 			public void run() {
 				try {
