@@ -336,7 +336,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				});
 			}
 			this.dialogShell.getShell().addListener (SWT.Close, new Listener() {			
-				@Override
 				public void handleEvent (Event evt) {		
 					AkkuMasterC4Dialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (!(getChannelTab(1).isDataColletionActive() || getChannelTab(2).isDataColletionActive() || getChannelTab(3).isDataColletionActive() || getChannelTab(4).isDataColletionActive())) {
@@ -355,7 +354,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				}
 			});
 			this.dialogShell.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (AkkuMasterC4Dialog.this.isDataColletionActive()) {
