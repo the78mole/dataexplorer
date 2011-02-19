@@ -218,6 +218,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.dataRateCombo.setEditable(false);
 					this.dataRateCombo.setBackground(DataExplorer.COLOR_WHITE);
 					this.dataRateCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "dataRateCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.datarate = GPSLoggerSetupConfiguration1.this.dataRateCombo.getSelectionIndex();
@@ -246,6 +247,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.startModusCombo.setEditable(false);
 					this.startModusCombo.setBackground(DataExplorer.COLOR_WHITE);
 					this.startModusCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "startModusCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.startmodus = GPSLoggerSetupConfiguration1.this.startModusCombo.getSelectionIndex();
@@ -274,6 +276,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.timeZoneCombo.setEditable(false);
 					this.timeZoneCombo.setBackground(DataExplorer.COLOR_WHITE);
 					this.timeZoneCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "timeZoneCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.timeZone = (short) (GPSLoggerSetupConfiguration1.this.timeZoneCombo.getSelectionIndex() - 12);
@@ -312,6 +315,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioLimitCombo.setEditable(false);
 					this.varioLimitCombo.setBackground(DataExplorer.COLOR_WHITE);
 					this.varioLimitCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "varioLimitCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.varioThreshold = GPSLoggerSetupConfiguration1.this.varioLimitCombo.getSelectionIndex();
@@ -349,6 +353,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioToneCombo.setEditable(false);
 					this.varioToneCombo.setBackground(DataExplorer.COLOR_WHITE);
 					this.varioToneCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "varioToneCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.varioTon = GPSLoggerSetupConfiguration1.this.varioToneCombo.getSelectionIndex();
@@ -393,6 +398,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.heightButton.setText(Messages.getString(MessageIds.GDE_MSGT2030));
 					this.heightButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_HEIGHT) > 0);
 					this.heightButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "heightButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (GPSLoggerSetupConfiguration1.this.heightButton.getSelection()) {
@@ -416,6 +422,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.heightCombo.setItems(this.heightValues);
 					this.heightCombo.setText(String.format("%5d", this.configuration.heightAlarm)); //$NON-NLS-1$
 					this.heightCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "heightCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.heightAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.heightCombo.getText().trim());
@@ -431,6 +438,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						}
 					});
 					this.heightCombo.addKeyListener(new KeyAdapter() {
+						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "heightCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.heightAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.heightCombo.getText().trim());
@@ -466,6 +474,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.velocityButton.setText(Messages.getString(MessageIds.GDE_MSGT2043));
 					this.velocityButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_SPEED) > 0);
 					this.velocityButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "velocityButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (GPSLoggerSetupConfiguration1.this.heightButton.getSelection()) {
@@ -489,6 +498,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.velocityCombo.setItems(this.speedValues);
 					this.velocityCombo.setText(String.format("%5d", this.configuration.speedAlarm)); //$NON-NLS-1$
 					this.velocityCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "velocityCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.speedAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.velocityCombo.getText().trim());
@@ -504,6 +514,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						}
 					});
 					this.velocityCombo.addKeyListener(new KeyAdapter() {
+						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "velocityCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.speedAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.velocityCombo.getText().trim());
@@ -539,6 +550,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.distanceButton.setText(Messages.getString(MessageIds.GDE_MSGT2045));
 					this.distanceButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_DISTANCE) > 0);
 					this.distanceButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "distanceButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (GPSLoggerSetupConfiguration1.this.heightButton.getSelection()) {
@@ -562,6 +574,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.distanceCombo.setItems(this.distanceValues);
 					this.distanceCombo.setText(String.format("%5d", this.configuration.distanceAlarm)); //$NON-NLS-1$
 					this.distanceCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "distanceCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceCombo.getText().trim());
@@ -575,6 +588,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						}
 					});
 					this.distanceCombo.addKeyListener(new KeyAdapter() {
+						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "distanceCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceCombo.getText().trim());
@@ -610,6 +624,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.tripLengthButton.setText(Messages.getString(MessageIds.GDE_MSGT2047));
 					this.tripLengthButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_TRIP_LENGTH) > 0);
 					this.tripLengthButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "pathLengthButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (GPSLoggerSetupConfiguration1.this.heightButton.getSelection()) {
@@ -633,6 +648,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.tripLengthCombo.setItems(this.tripValues);
 					this.tripLengthCombo.setText(String.format(Locale.ENGLISH, "%5.1f", this.configuration.tripLengthAlarm / 10.0)); //$NON-NLS-1$
 					this.tripLengthCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "tripLengthCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.tripLengthCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
@@ -648,6 +664,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						}
 					});
 					this.distanceCombo.addKeyListener(new KeyAdapter() {
+						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "tripLengthCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.tripLengthCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
@@ -683,6 +700,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.voltageRxButton.setText(Messages.getString(MessageIds.GDE_MSGT2049));
 					this.voltageRxButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_VOLTAGE_RX) > 0);
 					this.voltageRxButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "voltageRxButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (GPSLoggerSetupConfiguration1.this.heightButton.getSelection()) {
@@ -706,6 +724,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.voltageRxCombo.setItems(this.voltageRxValues);
 					this.voltageRxCombo.setText(String.format(Locale.ENGLISH, "%6.2f", this.configuration.voltageRxAlarm / 100.0)); //$NON-NLS-1$
 					this.voltageRxCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "voltageRxCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.voltageRxCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
@@ -721,6 +740,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						}
 					});
 					this.voltageRxCombo.addKeyListener(new KeyAdapter() {
+						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "voltageRxCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.voltageRxCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
