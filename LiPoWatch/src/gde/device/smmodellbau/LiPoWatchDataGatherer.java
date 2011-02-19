@@ -18,13 +18,7 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Vector;
-import gde.log.Level;
-import java.util.logging.Logger;
-
+import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -32,10 +26,17 @@ import gde.device.smmodellbau.lipowatch.MessageIds;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.TimeOutException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
 import gde.utils.WaitTimer;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
 
 /**
  * Thread implementation to gather data from LiPoWatch device
@@ -89,7 +90,7 @@ public class LiPoWatchDataGatherer extends Thread {
 			
 			//update the config display of the dialog to enable comment enichments
 			final byte[] configBuffer = this.serialPort.readConfiguration();
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					LiPoWatchDataGatherer.this.dialog.updateConfigurationValues(configBuffer);
 				}

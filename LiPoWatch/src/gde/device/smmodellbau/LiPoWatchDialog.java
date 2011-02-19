@@ -1063,7 +1063,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cellType = " + this.cellType); //$NON-NLS-1$
 
 		if (this.dialogShell != null && !this.dialogShell.isDisposed()) { //update UI if opened
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					LiPoWatchDialog.this.snLabel.setText(LiPoWatchDialog.this.serialNumber);
 					LiPoWatchDialog.this.firmwareVersionLabel.setText(LiPoWatchDialog.this.lipoWatchVersion);
@@ -1193,7 +1193,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 			if (this.taskBarItem != null) this.taskBarItem.setProgress(0);
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					LiPoWatchDialog.this.numberRedDataSetsText = "0"; //$NON-NLS-1$
 					LiPoWatchDialog.this.numberActualDataSetsText = "0"; //$NON-NLS-1$
@@ -1233,7 +1233,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 				LiPoWatchDialog.this.taskBarItem.setProgressState(SWT.DEFAULT);
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					if (!LiPoWatchDialog.this.readConfigButton.isDisposed()) {
 						LiPoWatchDialog.this.readConfigButton.setEnabled(true);
@@ -1305,7 +1305,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 	 * @param value
 	 */
 	public void setReadDataProgressBar(final int value) {
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				int tmpValue = value < 0 ? 0 : value;
 				tmpValue = value > 100 ? 100 : value;
@@ -1328,7 +1328,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 		this.numberActualDataSetsText = "" + numberRecordSet; //$NON-NLS-1$
 		this.numberReadErrorText = "" + numReadErrors; //$NON-NLS-1$
 		this.numberLess4Text = "" + numLess4Measurements; //$NON-NLS-1$
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				int progress = redTelegrams * 100 / memoryUsed;
 				int tmpValue = progress < 0 ? 0 : progress;

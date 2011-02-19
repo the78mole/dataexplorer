@@ -110,7 +110,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		}
 		catch (ApplicationConfigurationException e) {
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					LiPoWatchLiveGatherer.this.application.getDeviceSelectionDialog().open();
 				}
