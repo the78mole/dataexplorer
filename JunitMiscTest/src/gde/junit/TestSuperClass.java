@@ -61,8 +61,8 @@ public class TestSuperClass extends TestCase {
 	Logger																rootLogger;
 	static {
 	Settings.getInstance();
-	DataExplorer.display														= new Display();
-	DataExplorer.shell															= new Shell(DataExplorer.display);
+	GDE.display														= new Display();
+	GDE.shell															= new Shell(GDE.display);
 	}
 
 	final DataExplorer										application	= DataExplorer.getInstance();
