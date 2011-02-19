@@ -49,6 +49,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -476,17 +477,20 @@ public class GDE {
 		progressData.right = new FormAttachment(100, -5);
 		progressData.bottom = new FormAttachment(100, -5);
 		bar.setLayoutData(progressData);
-		java.awt.Rectangle splashRect;
-		GDE.startSplash = SplashScreen.getSplashScreen();
-		if (GDE.startSplash != null)
-			splashRect = GDE.startSplash.getBounds();
-		else {
-			Rectangle primaryMonitorBounds = GDE.display.getBounds();
-			splashRect = new java.awt.Rectangle(primaryMonitorBounds.width / 2 - 165, primaryMonitorBounds.height / 2 - 103, 370, 206);
-		}
 		bar.setSize(165, 15);
 		splashShell.pack();
-		splashShell.setLocation(splashRect.x, splashRect.y);
+		
+		GDE.startSplash = SplashScreen.getSplashScreen();
+		if (GDE.startSplash != null) {
+			java.awt.Rectangle splashRect = GDE.startSplash.getBounds();
+			splashShell.setLocation(splashRect.x, splashRect.y);
+		}
+		else {
+			Rectangle primaryMonitorBounds = GDE.display.getBounds();
+			Point splashRect = new Point(primaryMonitorBounds.width / 2 - 165, primaryMonitorBounds.height / 2 - 103);
+			splashShell.setLocation(splashRect.x, splashRect.y);
+		}
+		
 		splashShell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent arg0) {
 				if (GDE.splash != null && !GDE.splash.isDisposed()) GDE.splash.close();
