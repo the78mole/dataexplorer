@@ -1497,7 +1497,7 @@ public class UniLogDialog extends DeviceDialog {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("gearRatio = %.1f", this.gearRatio)); //$NON-NLS-1$
 		
 		if (this.dialogShell != null && !this.dialogShell.isDisposed()) { //update UI if opened
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					UniLogDialog.this.firmwareVersionLabel.setText(UniLogDialog.this.unilogVersion);
 					UniLogDialog.this.memUsagePercent.setText(UniLogDialog.this.memoryUsedPercent);
@@ -1660,7 +1660,7 @@ public class UniLogDialog extends DeviceDialog {
 	 * @param value
 	 */
 	public void setReadDataProgressBar(final int value) {
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				int tmpValue = value < 0 ? 0 : value;
 				tmpValue = value > 100 ? 100 : value;
@@ -1691,7 +1691,7 @@ public class UniLogDialog extends DeviceDialog {
 		this.numberActualDataSetsText = "" + numberRecordSet; //$NON-NLS-1$
 		this.numberReadErrorText = "" + numReadErrors; //$NON-NLS-1$
 		this.numberLess2Text = "" + numLess2Measurements; //$NON-NLS-1$
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				int progress = memoryUsed > 0 ? redTelegrams * 100 / memoryUsed : 100;
 				int tmpValue = progress < 0 ? 0 : progress;
@@ -1723,7 +1723,7 @@ public class UniLogDialog extends DeviceDialog {
 			if (this.taskBarItem != null)this.taskBarItem.setProgress(0);
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					UniLogDialog.this.numberRedDataSetsText = "0"; //$NON-NLS-1$
 					UniLogDialog.this.numberActualDataSetsText = "0"; //$NON-NLS-1$
@@ -1754,7 +1754,7 @@ public class UniLogDialog extends DeviceDialog {
 					this.taskBarItem.setProgressState(SWT.DEFAULT);
 			}
 			else {
-				DataExplorer.display.asyncExec(new Runnable() {
+				GDE.display.asyncExec(new Runnable() {
 					public void run() {
 						UniLogDialog.this.setButtonStateLiveGatherer(true);
 						UniLogDialog.this.readAdjustmentButton.setEnabled(true);

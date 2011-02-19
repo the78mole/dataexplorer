@@ -1329,7 +1329,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	 */
 	public void checkUpdateAnalog() {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "visit checkUpdateAnalog");
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				UniLogConfigTab.this.powerGroup.redraw();
 				UniLogConfigTab.this.axModusGroup.redraw();
