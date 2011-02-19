@@ -733,7 +733,7 @@ public class AkkuMasterChannelTab {
 			}
 		}
 		else { // timer stopped
-			if (this.isChargeCurrentAdded = true) {
+			if (this.isChargeCurrentAdded == true) {
 				AkkuMasterChannelTab.this.parent.subtractTotalChargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
 				this.isChargeCurrentAdded = false;				
 			}

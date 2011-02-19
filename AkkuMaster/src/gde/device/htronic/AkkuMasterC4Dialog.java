@@ -24,7 +24,6 @@ import gde.data.Channels;
 import gde.device.DeviceDialog;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
 import java.util.HashMap;
@@ -75,7 +74,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	final Settings								settings;
 	final AkkuMasterC4						device;
 	final AkkuMasterC4SerialPort	serialPort;
-	final DataExplorer						application;
 	final Channels								channels;
 	AkkuMasterChannelTab					channel1Tab, channel2Tab, channel3Tab, channel4Tab;
 
@@ -97,7 +95,6 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		super(parent);
 		this.device = actualDevice;
 		this.serialPort = actualDevice.getSerialPort();
-		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.numberChannels = actualDevice.getChannelCount();
 		this.settings = Settings.getInstance();
@@ -555,11 +552,11 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	/**
 	 * update the version text displayed in version tab
 	 */
-	void updateVersionText(String versionNumberText, String versionDateText, String versionTypeText, String versionPanelText) {
-		this.versionNumberText.setText(versionNumberText);
-		this.versionDateText.setText(versionDateText);
-		this.versionCurrentTypeText.setText(versionTypeText);
-		this.versionFrontplateTypeText.setText(versionPanelText);
+	void updateVersionText(String useVersionNumberText, String useVersionDateText, String useVersionTypeText, String useVersionPanelText) {
+		this.versionNumberText.setText(useVersionNumberText);
+		this.versionDateText.setText(useVersionDateText);
+		this.versionCurrentTypeText.setText(useVersionTypeText);
+		this.versionFrontplateTypeText.setText(useVersionPanelText);
 	}
 
 	/**
