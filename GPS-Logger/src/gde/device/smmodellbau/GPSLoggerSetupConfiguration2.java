@@ -136,7 +136,6 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 		try {
 			this.setLayout(new FormLayout());
 			this.addHelpListener(new HelpListener() {
-				@Override
 				public void helpRequested(HelpEvent evt) {
 					System.out.println("GPSLoggerSetupConfiguration2.helpRequested, event=" + evt); //$NON-NLS-1$
 					GPSLoggerSetupConfiguration2.this.application.openHelpDialog(Messages.getString(MessageIds.GDE_MSGT2010), "HelpInfo.html#configuration");  //$NON-NLS-1$
@@ -213,7 +212,6 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 						}
 					});
 					this.currentCombo.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(java.util.logging.Level.FINEST, "currentCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);

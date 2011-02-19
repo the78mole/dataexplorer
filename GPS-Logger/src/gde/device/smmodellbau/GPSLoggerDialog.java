@@ -115,7 +115,6 @@ public class GPSLoggerDialog extends DeviceDialog {
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addDisposeListener(new DisposeListener() {
-					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (GPSLoggerDialog.this.device.isChangePropery()) {
@@ -130,7 +129,6 @@ public class GPSLoggerDialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
-					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						GPSLoggerDialog.this.application.openHelpDialog(Messages.getString(MessageIds.GDE_MSGT2010), "HelpInfo.html");  //$NON-NLS-1$
@@ -235,7 +233,6 @@ public class GPSLoggerDialog extends DeviceDialog {
 					this.tabFolder.setLayoutData(tabFolderLData);
 					this.tabFolder.setSelection(0);
 					this.tabFolder.addListener(SWT.Selection, new Listener() {
-						@Override
 						public void handleEvent(Event event) {
 							if (GPSLoggerDialog.this.tabFolder.getSelectionIndex() == 1) GPSLoggerDialog.this.loggerSetup.loadSetup();
 							GPSLoggerDialog.this.configuration1Composite.updateValues();
