@@ -18,12 +18,23 @@
 ****************************************************************************************/
 package gde.device.wb;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceDialog;
+import gde.device.wb.simulator.MessageIds;
+import gde.exception.DataInconsitsentException;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.SWTResourceManager;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -47,18 +58,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.device.DeviceDialog;
-import gde.device.wb.simulator.MessageIds;
-import gde.exception.DataInconsitsentException;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-
 /**
  * Dialog sample for the simulator device 
  * @author Winfried Brügmann
@@ -81,7 +80,6 @@ public class SimulatorDialog extends DeviceDialog {
 	CLabel												descriptionLabel;
 	Button												startButton;
 	final SimulatorSerialPort			serialPort;																																// open/close port execute getData()....
-	final DataExplorer	application;																																// interaction with application instance
 	final Channels								channels;																																	// interaction with channels, source of all records
 	final Settings								settings;
 
@@ -120,7 +118,6 @@ public class SimulatorDialog extends DeviceDialog {
 		super(parent);
 		this.serialPort = useDevice.getSerialPort();
 		this.device = useDevice;
-		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
 	}
