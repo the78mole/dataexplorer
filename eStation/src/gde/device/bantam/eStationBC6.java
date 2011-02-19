@@ -57,6 +57,7 @@ public class eStationBC6 extends eStation {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public EStationDialog getDialog() {
 		return this.dialog;
 	}
@@ -67,6 +68,7 @@ public class eStationBC6 extends eStation {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
+	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
@@ -105,6 +107,7 @@ public class eStationBC6 extends eStation {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
+	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];

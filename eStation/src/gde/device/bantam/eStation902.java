@@ -52,6 +52,7 @@ public class eStation902 extends eStation {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public EStationDialog getDialog() {
 		return this.dialog;
 	}

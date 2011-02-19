@@ -162,6 +162,7 @@ public class EStationDialog extends DeviceDialog {
 						// if port is already connected, do not read the data update will be done by gathere thread
 						if (!EStationDialog.this.isConnectionWarned && !EStationDialog.this.serialPort.isConnected()) {
 							EStationDialog.this.updateConfigTread = new Thread("updateConfig") {
+								@Override
 								public void run() {
 									try {
 										EStationDialog.this.configData = new HashMap<String, String>();

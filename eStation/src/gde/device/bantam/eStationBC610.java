@@ -52,6 +52,7 @@ public class eStationBC610 extends eStation {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public EStationDialog getDialog() {
 		return this.dialog;
 	}
