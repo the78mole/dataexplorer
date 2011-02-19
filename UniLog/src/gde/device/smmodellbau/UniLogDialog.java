@@ -738,6 +738,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.a1ModusCombo.setBounds(110, GDE.IS_MAC_COCOA ? 30 : 45, 135, GDE.IS_LINUX ? 22 : 20);
 									this.a1ModusCombo.setBackground(DataExplorer.COLOR_WHITE);
 									this.a1ModusCombo.addSelectionListener(new SelectionAdapter() {
+										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "a1ModusCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.modusA1Position = UniLogDialog.this.a1ModusCombo.getSelectionIndex();
@@ -759,6 +760,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.a2ModusCombo.setBounds(110, GDE.IS_MAC_COCOA ? 55 : 70, 135, GDE.IS_LINUX ? 22 : 20);
 									this.a2ModusCombo.setBackground(DataExplorer.COLOR_WHITE);
 									this.a2ModusCombo.addSelectionListener(new SelectionAdapter() {
+										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "a2ModusCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.modusA2Position = UniLogDialog.this.a2ModusCombo.getSelectionIndex();
@@ -780,6 +782,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.a3ModusCombo.setBounds(110, GDE.IS_MAC_COCOA ? 80 : 95, 135, GDE.IS_LINUX ? 22 : 20);
 									this.a3ModusCombo.setBackground(DataExplorer.COLOR_WHITE);
 									this.a3ModusCombo.addSelectionListener(new SelectionAdapter() {
+										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "a3ModusCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.modusA3Position = UniLogDialog.this.a3ModusCombo.getSelectionIndex();
@@ -821,6 +824,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.limiterEnergyCombo.setEditable(true);
 									this.limiterEnergyCombo.setBackground(DataExplorer.COLOR_WHITE);
 									this.limiterEnergyCombo.addSelectionListener(new SelectionAdapter() {
+										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "limiterEnergyCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
@@ -832,6 +836,7 @@ public class UniLogDialog extends DeviceDialog {
 										}
 									});
 									this.limiterEnergyCombo.addKeyListener(new KeyAdapter() {
+										@Override
 										public void keyPressed(KeyEvent evt) {
 											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "recordSelectCombo.keyPressed, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);

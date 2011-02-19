@@ -93,6 +93,7 @@ public class UniLogLiveGatherer extends Thread {
 		this.calcValues.put(UniLog.PROP_N_100_W, (double)prop_n100W);
 	}
 
+	@Override
 	public void run() {
 		try {
 			if (!this.serialPort.isConnected()) {
@@ -165,6 +166,7 @@ public class UniLogLiveGatherer extends Thread {
 			this.timerTask = new TimerTask() {
 			long measurementCount = 0;
 
+				@Override
 				public void run() {
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
 					try {
