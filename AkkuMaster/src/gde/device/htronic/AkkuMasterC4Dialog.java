@@ -410,7 +410,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	public void addTotalDischargeCurrent(int newDeltaDischargeCurrent) {
 		this.totalDischargeCurrent = this.totalDischargeCurrent + newDeltaDischargeCurrent;
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				AkkuMasterC4Dialog.this.totalDischargeCurrentText.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
 				AkkuMasterC4Dialog.this.totalDischargeCurrentText.update();
@@ -426,7 +426,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	public void subtractTotalDischargeCurrent(int newDeltaDischargeCurrent) {
 		this.totalDischargeCurrent = this.totalDischargeCurrent - newDeltaDischargeCurrent;
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				AkkuMasterC4Dialog.this.totalDischargeCurrentText.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
 				AkkuMasterC4Dialog.this.totalDischargeCurrentText.update();
@@ -442,7 +442,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	public void addTotalChargeCurrent(int newDeltaChargeCurrent) {
 		this.totalChargeCurrent = this.totalChargeCurrent + newDeltaChargeCurrent;
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				AkkuMasterC4Dialog.this.totalChargeCurrentText.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalChargeCurrent));
 				AkkuMasterC4Dialog.this.totalChargeCurrentText.update();
@@ -458,7 +458,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	 */
 	public void subtractTotalChargeCurrent(int newDeltaChargeCurrent) {
 		this.totalChargeCurrent = this.totalChargeCurrent - newDeltaChargeCurrent;
-		DataExplorer.display.asyncExec(new Runnable() {
+		GDE.display.asyncExec(new Runnable() {
 			public void run() {
 				AkkuMasterC4Dialog.this.totalChargeCurrentText.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalChargeCurrent));
 				AkkuMasterC4Dialog.this.totalChargeCurrentText.update();

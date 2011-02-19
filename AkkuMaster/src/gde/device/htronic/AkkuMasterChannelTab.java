@@ -791,7 +791,7 @@ public class AkkuMasterChannelTab {
 			updateDialogAfterStop();
 		}
 		else {
-			DataExplorer.display.asyncExec(new Runnable() {
+			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					updateDialogAfterStop();
 				}
