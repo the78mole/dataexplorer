@@ -118,7 +118,6 @@ public class QcCopterDialog extends DeviceDialog {
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addDisposeListener(new DisposeListener() {
-					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						QcCopterDialog.log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (QcCopterDialog.this.device.isChangePropery()) {
@@ -133,7 +132,6 @@ public class QcCopterDialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
-					@Override
 					public void helpRequested(HelpEvent evt) {
 						QcCopterDialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						QcCopterDialog.this.application.openHelpDialog("QC-Copter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -324,7 +322,6 @@ public class QcCopterDialog extends DeviceDialog {
 
 	public void setTerminalText(final String newText) {
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				if (!QcCopterDialog.this.dialogShell.isDisposed()) {
 					QcCopterDialog.this.terminalText.setText(newText);

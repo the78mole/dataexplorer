@@ -92,7 +92,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
-	@Override
 	public QcCopterDialog getDialog() {
 		return this.dialog;
 	}
@@ -102,7 +101,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
-	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 		// ...
 		return lov2osdMap;
@@ -115,7 +113,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return converted configuration data
 	 */
-	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
 		return ""; //$NON-NLS-1$
@@ -124,7 +121,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	/**
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
-	@Override
 	public int getLovDataByteSize() {
 		return 86; //sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
@@ -137,7 +133,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
-	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
@@ -182,7 +177,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * for calculation which requires more effort or is time consuming it can call a background thread, 
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
-	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//add implementation where data point are calculated
 		//do not forget to make record displayable -> record.setDisplayable(true);
@@ -209,7 +203,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
-	@Override
 	public String[] getUsedPropertyKeys() {
 		return new String[] { IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION };
 	}
@@ -219,7 +212,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
-	@Override
 	public void open_closeCommPort() {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
@@ -276,7 +268,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
-	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int deviceDataBufferSize = this.getDataBlockSize();
@@ -324,7 +315,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		for (int i = 0, j = 0; j < points.length; ++i, ++j) {
 			//DBx_0 = 94 + [ A7 A6 A5 A4 A3 A2 ]
@@ -368,7 +358,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
-	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
@@ -416,7 +405,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
 		String[] dataTableRow = new String[recordSet.size() + 1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
@@ -443,7 +431,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	@Override
 	public double translateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -460,7 +447,6 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
