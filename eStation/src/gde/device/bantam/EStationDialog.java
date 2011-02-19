@@ -25,7 +25,6 @@ import gde.data.Channels;
 import gde.device.DeviceDialog;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
 import java.util.HashMap;
@@ -111,7 +110,6 @@ public class EStationDialog extends DeviceDialog {
 
 	final eStation								device;						// get device specific things, get serial port, ...
 	final EStationSerialPort			serialPort;				// open/close port execute getData()....
-	final DataExplorer	application;			// interaction with application instance
 	final Channels								channels;					// interaction with channels, source of all records
 	final Settings								settings;					// application configuration settings
 
@@ -124,7 +122,6 @@ public class EStationDialog extends DeviceDialog {
 		super(parent);
 		this.serialPort = useDevice.getSerialPort();
 		this.device = useDevice;
-		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
 	}
