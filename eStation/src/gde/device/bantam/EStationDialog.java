@@ -516,7 +516,7 @@ public class EStationDialog extends DeviceDialog {
 				this.configGroup.redraw();
 			}
 			else {
-				DataExplorer.display.asyncExec(new Runnable() {
+				GDE.display.asyncExec(new Runnable() {
 					public void run() {
 						EStationDialog.this.inputLowPowerCutOffText.setText(EStationDialog.this.inputLowPowerCutOff = EStationDialog.this.configData.get(eStation.CONFIG_IN_VOLTAGE_CUT_OFF));
 						EStationDialog.this.capacityCutOffText.setText(EStationDialog.this.capacityCutOff = EStationDialog.this.configData.get(eStation.CONFIG_SET_CAPASITY));
