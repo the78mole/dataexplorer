@@ -99,7 +99,7 @@ public class PicolarioSerialPort extends DeviceCommPort {
 	 * @return hash map containing gathered data points (voltage and height in separate vector)
 	 * @throws Exception 
 	 */
-	public Vector<byte[]> getData(int datagramNumber, Picolario device) throws Exception {
+	public Vector<byte[]> getData(int datagramNumber, Picolario picolario) throws Exception {
 		Vector<byte[]> dataBuffer = new Vector<byte[]>(100);
 		byte[] readBuffer;
 		int numberRed = 0;
@@ -113,7 +113,7 @@ public class PicolarioSerialPort extends DeviceCommPort {
 
 			while (!this.isTransmitFinished) {
 
-				device.getDialog().setAlreadyRedText(numberRed++);
+				picolario.getDialog().setAlreadyRedText(numberRed++);
 				readBuffer = new byte[31];
 				readBuffer = read(readBuffer, 2000, 100); // throws timeout exception
 			
