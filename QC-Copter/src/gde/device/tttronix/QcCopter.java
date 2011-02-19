@@ -194,6 +194,7 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the device communication port
 	 */
+	@Override
 	public QcCopterSerialPort getCommunicationPort() {
 		return this.serialPort;
 	}
