@@ -64,6 +64,7 @@ public abstract class CalculationThread extends Thread {
 	/**
 	 * method which do the calculation
 	 */
+	@Override
 	public abstract void run();
 
 	/**

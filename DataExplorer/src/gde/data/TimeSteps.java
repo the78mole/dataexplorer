@@ -76,6 +76,7 @@ public class TimeSteps extends Vector<Integer> {
 	/**
 	 * overwritten clone method
 	 */
+	@Override
 	public synchronized TimeSteps clone() {
 		super.clone();
   	return new TimeSteps(this);

@@ -158,6 +158,7 @@ public class MenuToolBar {
 					this.newToolItem.setImage(SWTResourceManager.getImage("gde/resource/New.gif")); //$NON-NLS-1$
 					this.newToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/NewHot.gif")); //$NON-NLS-1$
 					this.newToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "newToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuToolBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
@@ -172,6 +173,7 @@ public class MenuToolBar {
 					this.openToolItem.setImage(SWTResourceManager.getImage("gde/resource/Open.gif")); //$NON-NLS-1$
 					this.openToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/OpenHot.gif")); //$NON-NLS-1$
 					this.openToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "openToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.fileHandler.openFileDialog(Messages.getString(MessageIds.GDE_MSGT0004));
@@ -184,6 +186,7 @@ public class MenuToolBar {
 					this.saveToolItem.setImage(SWTResourceManager.getImage("gde/resource/Save.gif")); //$NON-NLS-1$
 					this.saveToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/SaveHot.gif")); //$NON-NLS-1$
 					this.saveToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "saveToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
@@ -202,6 +205,7 @@ public class MenuToolBar {
 					this.saveAsToolItem.setImage(SWTResourceManager.getImage("gde/resource/SaveAs.gif")); //$NON-NLS-1$
 					this.saveAsToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/SaveAsHot.gif")); //$NON-NLS-1$
 					this.saveAsToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "saveAsToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0006), GDE.STRING_EMPTY);
@@ -214,6 +218,7 @@ public class MenuToolBar {
 					this.settingsToolItem.setImage(SWTResourceManager.getImage("gde/resource/Settings.gif")); //$NON-NLS-1$
 					this.settingsToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/SettingsHot.gif")); //$NON-NLS-1$
 					this.settingsToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "settingsToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// check if other none modal dialog is open
@@ -233,6 +238,7 @@ public class MenuToolBar {
 					this.copyToolItem.setImage(SWTResourceManager.getImage("gde/resource/Copy.gif")); //$NON-NLS-1$
 					this.copyToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/CopyHot.gif")); //$NON-NLS-1$
 					this.copyToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "copyToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.copyTabContentAsImage();
@@ -245,6 +251,7 @@ public class MenuToolBar {
 					this.printToolItem.setImage(SWTResourceManager.getImage("gde/resource/Print.gif")); //$NON-NLS-1$
 					this.printToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/PrintHot.gif")); //$NON-NLS-1$
 					this.printToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "printToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							new PrintSelectionDialog(GDE.shell, SWT.NULL).open();
@@ -275,6 +282,7 @@ public class MenuToolBar {
 					this.deviceSelectToolItem.setImage(SWTResourceManager.getImage("gde/resource/DeviceSelection.gif")); //$NON-NLS-1$
 					this.deviceSelectToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/DeviceSelectionHot.gif")); //$NON-NLS-1$
 					this.deviceSelectToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "deviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DeviceSelectionDialog deviceSelection = MenuToolBar.this.application.getDeviceSelectionDialog();
@@ -290,6 +298,7 @@ public class MenuToolBar {
 					this.prevDeviceToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0058));
 					this.prevDeviceToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
 					this.prevDeviceToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "prevDeviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// allow device switch only if port not connected
@@ -328,6 +337,7 @@ public class MenuToolBar {
 					this.nextDeviceToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0059));
 					this.nextDeviceToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
 					this.nextDeviceToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "nextDeviceToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// allow device switch only if port not connected
@@ -365,6 +375,7 @@ public class MenuToolBar {
 					this.toolBoxToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 					this.toolBoxToolItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0060));
 					this.toolBoxToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "toolBoxToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuToolBar.this.application.getDeviceDialog() != null) {
@@ -391,6 +402,7 @@ public class MenuToolBar {
 						this.objectSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
 						this.objectSelectCombo.setVisibleItemCount(this.objectSelectCombo.getItemCount()+1);
 						this.objectSelectCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "objectSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								MenuToolBar.this.application.checkSaveObjectData();
@@ -417,6 +429,7 @@ public class MenuToolBar {
 							}
 						});
 						this.objectSelectCombo.addKeyListener(new KeyAdapter() {
+							@Override
 							public void keyPressed(KeyEvent evt) {
 								log.log(Level.FINEST, "recordSelectCombo.keyPressed, event=" + evt); //$NON-NLS-1$
 								if (evt.character == SWT.CR) {
@@ -501,6 +514,7 @@ public class MenuToolBar {
 					this.newObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0202));
 					this.newObject.setHotImage(SWTResourceManager.getImage("gde/resource/NewObjHot.gif")); //$NON-NLS-1$
 					this.newObject.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "newObject.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Vector<String> tmpObjects = new Vector<String>();
@@ -524,6 +538,7 @@ public class MenuToolBar {
 					this.deleteObject.setHotImage(SWTResourceManager.getImage("gde/resource/RemObjHot.gif")); //$NON-NLS-1$
 					if (this.objectSelectCombo.getItemCount() == 1)	MenuToolBar.this.deleteObject.setEnabled(false);
 					this.deleteObject.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "deleteObject.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuToolBar.this.objectSelectCombo.getSelectionIndex() != 0) {
@@ -559,6 +574,7 @@ public class MenuToolBar {
 					this.editObject.setHotImage(SWTResourceManager.getImage("gde/resource/EditObjHot.gif")); //$NON-NLS-1$
 					if (this.objectSelectCombo.getItemCount() == 1)	MenuToolBar.this.editObject.setEnabled(false);
 					this.editObject.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "editObject.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuToolBar.this.objectSelectCombo.getSelectionIndex() != 0) {
@@ -591,6 +607,7 @@ public class MenuToolBar {
 					this.zoomWindowItem.setHotImage(SWTResourceManager.getImage("gde/resource/ZoomHot.gif")); //$NON-NLS-1$
 					this.zoomWindowItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0061));
 					this.zoomWindowItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "zoomWindowItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_ZOOM, true);
@@ -605,6 +622,7 @@ public class MenuToolBar {
 					this.panItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0062));
 					this.panItem.setEnabled(false);
 					this.panItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "resizeItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_PAN, true);
@@ -617,6 +635,7 @@ public class MenuToolBar {
 					this.cutLeftItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0063));
 					this.cutLeftItem.setEnabled(false);
 					this.cutLeftItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "cutLeftItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setCutModeActive(true, false);
@@ -629,6 +648,7 @@ public class MenuToolBar {
 					this.cutRightItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0064));
 					this.cutRightItem.setEnabled(false);
 					this.cutRightItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "cutRightItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setCutModeActive(false, true);						}
@@ -640,6 +660,7 @@ public class MenuToolBar {
 					this.fitIntoItem.setHotImage(SWTResourceManager.getImage("gde/resource/ExpandHot.gif")); //$NON-NLS-1$
 					this.fitIntoItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0065));
 					this.fitIntoItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "fitIntoItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
@@ -658,6 +679,7 @@ public class MenuToolBar {
 						this.scopePointsCombo.select(0);
 						this.scopePointsCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0072));
 						this.scopePointsCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "scopePointsCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								try {
@@ -700,6 +722,7 @@ public class MenuToolBar {
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "portOpenCloseItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							IDevice activeDevice = MenuToolBar.this.application.getActiveDevice();
@@ -746,6 +769,7 @@ public class MenuToolBar {
 						this.channelSelectCombo.setEditable(false);
 						this.channelSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
 						this.channelSelectCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "kanalCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
@@ -765,6 +789,7 @@ public class MenuToolBar {
 					this.prevChannel.setEnabled(false);
 					this.prevChannel.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
 					this.prevChannel.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "prevChannel.widgetSelected, event=" + evt); //$NON-NLS-1$
 							int selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
@@ -782,6 +807,7 @@ public class MenuToolBar {
 					this.nextChannel.setEnabled(false);
 					this.nextChannel.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
 					this.nextChannel.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "nextChannel.widgetSelected, event=" + evt); //$NON-NLS-1$
 							int selectionIndex = MenuToolBar.this.channelSelectCombo.getSelectionIndex();
@@ -813,6 +839,7 @@ public class MenuToolBar {
 						this.recordSelectCombo.setEditable(false);
 						this.recordSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
 						this.recordSelectCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "recordSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
@@ -820,6 +847,7 @@ public class MenuToolBar {
 							}
 						});
 						this.recordSelectCombo.addKeyListener(new KeyAdapter() {
+							@Override
 							public void keyPressed(KeyEvent evt) {
 								log.log(Level.FINEST, "recordSelectCombo.keyPressed, event=" + evt); //$NON-NLS-1$
 								if (evt.character == SWT.CR) {
@@ -859,6 +887,7 @@ public class MenuToolBar {
 					this.prevRecord.setEnabled(false);
 					this.prevRecord.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
 					this.prevRecord.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "prevRecord.widgetSelected, event=" + evt); //$NON-NLS-1$
 							int selectionIndex = MenuToolBar.this.recordSelectCombo.getSelectionIndex();
@@ -876,6 +905,7 @@ public class MenuToolBar {
 					this.nextRecord.setEnabled(false);
 					this.nextRecord.setHotImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
 					this.nextRecord.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "nextRecord.widgetSelected, event=" + evt); //$NON-NLS-1$
 							int selectionIndex = MenuToolBar.this.recordSelectCombo.getSelectionIndex();
@@ -902,6 +932,7 @@ public class MenuToolBar {
 					this.deleteRecord.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0081));
 					this.deleteRecord.setHotImage(SWTResourceManager.getImage("gde/resource/DeleteHot.gif")); //$NON-NLS-1$
 					this.deleteRecord.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "deleteRecord.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Channel activeChannel = MenuToolBar.this.channels.getActiveChannel();
@@ -941,6 +972,7 @@ public class MenuToolBar {
 					this.editRecord.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0082));
 					this.editRecord.setHotImage(SWTResourceManager.getImage("gde/resource/EditHot.gif")); //$NON-NLS-1$
 					this.editRecord.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "editAufnahme.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuToolBar.this.recordSelectCombo.setEditable(true);
@@ -972,6 +1004,7 @@ public class MenuToolBar {
 					this.googleEarthToolItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/EarthDisabled.gif")); //$NON-NLS-1$
 					this.googleEarthToolItem.setEnabled(false);
 					this.googleEarthToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "googleEarthToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							ApplicationLauncher launcher;
@@ -999,6 +1032,7 @@ public class MenuToolBar {
 					this.googleEarthConfigToolItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/EarthConfigDisabled.gif")); //$NON-NLS-1$
 					this.googleEarthConfigToolItem.setEnabled(false);
 					this.googleEarthConfigToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "googleEarthConfigToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							new GoogleEarthCustomizingDialog(application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL).open();
@@ -1024,6 +1058,7 @@ public class MenuToolBar {
 					this.helpToolItem.setImage(SWTResourceManager.getImage("gde/resource/Question.gif")); //$NON-NLS-1$
 					this.helpToolItem.setHotImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
 					this.helpToolItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "helpToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (MenuToolBar.this.application.getActiveDevice().getDialog() != null && !MenuToolBar.this.application.getActiveDevice().getDialog().isDisposed()) {

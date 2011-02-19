@@ -683,6 +683,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 *	clear the record set compare view 
 	 */
+	@Override
 	public void clear() {
 		super.clear();
 		this.recordNames = new String[0];
@@ -831,6 +832,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * overwrites default HashMap method
 	 */
+	@Override
 	public Record put(String key, Record record) {
 		super.put(key, record);
 		Record newRecord = this.get(key);

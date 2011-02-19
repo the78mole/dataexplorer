@@ -268,6 +268,7 @@ public class Record extends Vector<Integer> {
 	/**
 	 * overwritten clone method used to compare curves
 	 */
+	@Override
 	public synchronized Record clone() {
 		super.clone();
 		return new Record(this);
@@ -463,6 +464,7 @@ public class Record extends Vector<Integer> {
 	 * add a data point to the record data, checks for minimum and maximum to define display range
 	 * @param point
 	 */
+	@Override
 	public boolean add(Integer point) {
 		synchronized (this) {
 			final String $METHOD_NAME = "add"; //$NON-NLS-1$
@@ -479,6 +481,7 @@ public class Record extends Vector<Integer> {
 		}
 	}
 	
+	@Override
 	public Integer set(int index, Integer point) {
 		synchronized (this) {
 			final String $METHOD_NAME = "set"; //$NON-NLS-1$
@@ -865,7 +868,8 @@ public class Record extends Vector<Integer> {
 	/**
 	 * return the 'best fit' number of measurement points in dependency of zoomMode or scopeMode
 	 */
-  public synchronized int size() {
+  @Override
+	public synchronized int size() {
 		int tmpSize = elementCount;
 		
 		if (this.parent.isZoomMode) // record -> recordSet.isZoomMode

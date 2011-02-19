@@ -261,6 +261,7 @@ public class GraphicsComposite extends Composite {
 				}
 			});
 			this.graphicsHeader.addKeyListener( new KeyAdapter() {
+				@Override
 				public void keyPressed(KeyEvent e) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
 					isFileCommentChanged = true;						
@@ -288,17 +289,20 @@ public class GraphicsComposite extends Composite {
 				}
 			});
 			this.graphicCanvas.addMouseTrackListener(new MouseTrackAdapter() {
+				@Override
 				public void mouseExit(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseExit, event=" + evt); //$NON-NLS-1$
 					GraphicsComposite.this.graphicCanvas.setCursor(GraphicsComposite.this.application.getCursor());
 				}
 			});
 			this.graphicCanvas.addMouseListener(new MouseAdapter() {
+				@Override
 				public void mouseDown(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseDown, event=" + evt); //$NON-NLS-1$
 					mouseDownAction(evt);
 				}
 
+				@Override
 				public void mouseUp(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseUp, event=" + evt); //$NON-NLS-1$
 					mouseUpAction(evt);

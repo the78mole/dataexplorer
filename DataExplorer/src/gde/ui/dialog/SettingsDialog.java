@@ -507,6 +507,7 @@ public class SettingsDialog extends Dialog {
 									}
 								});
 								this.serialPortBlackList.addKeyListener(new KeyAdapter() {
+									@Override
 									public void keyReleased(KeyEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "serialPortBlackList.keyReleased, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSerialPortBlackList(SettingsDialog.this.serialPortBlackList.getText());

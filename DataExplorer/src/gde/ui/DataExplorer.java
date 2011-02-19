@@ -576,6 +576,7 @@ public class DataExplorer extends Composite {
 				}
 			});
 			this.displayTab.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "addSelectionListener, event=" + evt); //$NON-NLS-1$
 					CTabFolder tabFolder = (CTabFolder) evt.widget;
@@ -593,6 +594,7 @@ public class DataExplorer extends Composite {
 			this.target = new DropTarget(this, DND.DROP_COPY | DND.DROP_DEFAULT);
 			this.target.setTransfer(this.types);
 			this.target.addDropListener(new DropTargetAdapter() {
+				@Override
 				public void dragEnter(DropTargetEvent event) {
 					if (event.detail == DND.DROP_DEFAULT) {
 						if ((event.operations & DND.DROP_COPY) != 0) {
@@ -613,6 +615,7 @@ public class DataExplorer extends Composite {
 					}
 				}
 
+				@Override
 				public void dragOperationChanged(DropTargetEvent event) {
 					if (event.detail == DND.DROP_DEFAULT) {
 						if ((event.operations & DND.DROP_COPY) != 0) {
@@ -629,6 +632,7 @@ public class DataExplorer extends Composite {
 					}
 				}
 
+				@Override
 				public void drop(DropTargetEvent event) {
 					if (DataExplorer.this.fileTransfer.isSupportedType(event.currentDataType)) {
 						String[] files = (String[]) event.data;

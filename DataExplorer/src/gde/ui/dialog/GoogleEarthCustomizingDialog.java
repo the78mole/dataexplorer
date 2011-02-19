@@ -163,6 +163,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 						lowerLimitButton.setText(Messages.getString(MessageIds.GDE_MSGT0289));
 						lowerLimitButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0293));
 						lowerLimitButton.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST,  "lowerLimitButton.widgetSelected, event="+evt); //$NON-NLS-1$
 								lowerLimitColor = application.openColorDialog();
@@ -197,6 +198,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 						withinLimitsButton.setLayoutData(withinLimitsButtonLData);
 						withinLimitsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0295));
 						withinLimitsButton.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST,  "withinLimitsButton.widgetSelected, event="+evt); //$NON-NLS-1$
 								withinLimitsColor = application.openColorDialog();
@@ -231,6 +233,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 						upperLimitButton.setText(Messages.getString(MessageIds.GDE_MSGT0296));
 						upperLimitButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0297));
 						upperLimitButton.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST,  "upperLimitButton.widgetSelected, event="+evt); //$NON-NLS-1$
 								upperLimitColor = application.openColorDialog();
@@ -302,6 +305,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 						}
 					});
 					avgFactorText.addKeyListener(new KeyAdapter() {
+						@Override
 						public void keyReleased(KeyEvent arg0) {
 							Integer measurementOrdinal = device.getGPS2KMZMeasurementOrdinal();
 							RecordSet activeRecordSet = application.getActiveRecordSet();
@@ -367,6 +371,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				closeButtonLData.bottom =  new FormAttachment(1000, 1000, -12);
 				closeButton.setLayoutData(closeButtonLData);
 				closeButton.addSelectionListener(new SelectionAdapter() {
+					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "closeButton.widgetSelected, event="+evt); //$NON-NLS-1$
 						dialogShell.dispose();

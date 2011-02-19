@@ -969,6 +969,7 @@ public class CurveSelectorContextMenu {
 			this.simpleMeasure = new MenuItem(this.measurementMenu, SWT.CHECK);
 			this.simpleMeasure.setText(Messages.getString(MessageIds.GDE_MSGT0125));
 			this.simpleMeasure.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					log.log(Level.FINEST, "measure.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (!CurveSelectorContextMenu.this.isRecordVisible) {
@@ -989,6 +990,7 @@ public class CurveSelectorContextMenu {
 			this.deltaMeasure = new MenuItem(this.measurementMenu, SWT.CHECK);
 			this.deltaMeasure.setText(Messages.getString(MessageIds.GDE_MSGT0126));
 			this.deltaMeasure.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					log.log(Level.FINEST, "deltaMeasure.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (!CurveSelectorContextMenu.this.isRecordVisible) {

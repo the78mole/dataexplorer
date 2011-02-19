@@ -146,6 +146,7 @@ public class MenuBar {
 					this.newFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0002)); //$NON-NLS-1$
 					this.newFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/NewHot.gif")); //$NON-NLS-1$
 					this.newFileMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "newFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
@@ -159,6 +160,7 @@ public class MenuBar {
 					this.openFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0003)); 
 					this.openFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/OpenHot.gif")); //$NON-NLS-1$
 					this.openFileMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "openFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.fileHandler.openFileDialog(Messages.getString(MessageIds.GDE_MSGT0004));
@@ -170,6 +172,7 @@ public class MenuBar {
 					this.saveFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0005));
 					this.saveFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/SaveHot.gif")); //$NON-NLS-1$
 					this.saveFileMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "saveFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
@@ -187,6 +190,7 @@ public class MenuBar {
 					this.saveAsFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0008));
 					this.saveAsFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/SaveAsHot.gif")); //$NON-NLS-1$
 					this.saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "saveAsFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0006), GDE.STRING_EMPTY); //$NON-NLS-1$
@@ -214,6 +218,7 @@ public class MenuBar {
 							this.csvImportMenuItem1 = new MenuItem(this.importMenu, SWT.PUSH);
 							this.csvImportMenuItem1.setText(Messages.getString(MessageIds.GDE_MSGT0011));
 							this.csvImportMenuItem1.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									MenuBar.log.log(Level.FINEST, "csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 									MenuBar.this.fileHandler.importFileCSV(Messages.getString(MessageIds.GDE_MSGT0012), false);
@@ -224,6 +229,7 @@ public class MenuBar {
 							this.csvImportMenuItem2 = new MenuItem(this.importMenu, SWT.PUSH);
 							this.csvImportMenuItem2.setText(Messages.getString(MessageIds.GDE_MSGT0013));
 							this.csvImportMenuItem2.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									MenuBar.log.log(Level.FINEST, "csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 									MenuBar.this.fileHandler.importFileCSV(Messages.getString(MessageIds.GDE_MSGT0014), true);
@@ -242,6 +248,7 @@ public class MenuBar {
 							this.csvExportMenuItem1 = new MenuItem(this.exportMenu, SWT.CASCADE);
 							this.csvExportMenuItem1.setText(Messages.getString(MessageIds.GDE_MSGT0016));
 							this.csvExportMenuItem1.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									MenuBar.log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 									MenuBar.this.fileHandler.exportFileCSV(Messages.getString(MessageIds.GDE_MSGT0017), false);
@@ -253,6 +260,7 @@ public class MenuBar {
 						this.csvExportMenuItem2 = new MenuItem(this.exportMenu, SWT.CASCADE);
 						this.csvExportMenuItem2.setText(Messages.getString(MessageIds.GDE_MSGT0018));
 						this.csvExportMenuItem2.addSelectionListener(new SelectionAdapter() {
+							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								MenuBar.log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 								MenuBar.this.fileHandler.exportFileCSV(Messages.getString(MessageIds.GDE_MSGT0019), true); 
@@ -268,6 +276,7 @@ public class MenuBar {
 					this.preferencesFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0020));
 					this.preferencesFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/SettingsHot.gif")); //$NON-NLS-1$
 					this.preferencesFileMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "preferencesFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// check if other none modal dialog is open
@@ -289,6 +298,7 @@ public class MenuBar {
 					this.printMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0052));
 					this.printMenuItem.setImage(SWTResourceManager.getImage("gde/resource/PrintHot.gif")); //$NON-NLS-1$
 					this.printMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							new PrintSelectionDialog(GDE.shell, SWT.NULL).open();
@@ -302,6 +312,7 @@ public class MenuBar {
 					this.exitMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
 					this.exitMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0021));
 					this.exitMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
@@ -350,6 +361,7 @@ public class MenuBar {
 					this.activateZoomGraphicMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0023));
 					this.activateZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ZoomHot.gif")); //$NON-NLS-1$
 					this.activateZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "activateZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_ZOOM, true);
@@ -361,6 +373,7 @@ public class MenuBar {
 					this.resetZoomGraphicMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0024));
 					this.resetZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ExpandHot.gif")); //$NON-NLS-1$
 					this.resetZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "resetZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
@@ -373,6 +386,7 @@ public class MenuBar {
 					this.panGraphicMenuItem.setImage(SWTResourceManager.getImage("gde/resource/PanHot.gif")); //$NON-NLS-1$
 					this.panGraphicMenuItem.setEnabled(false);
 					this.panGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "panGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_PAN, true);
@@ -386,6 +400,7 @@ public class MenuBar {
 					this.copyTabContentAsImageMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
 					this.copyTabContentAsImageMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0026));
 					this.copyTabContentAsImageMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "copyTabContentAsImageMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.copyTabContentAsImage();
@@ -396,6 +411,7 @@ public class MenuBar {
 					this.copyGraphicsPrintImageMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
 					this.copyGraphicsPrintImageMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0027));
 					this.copyGraphicsPrintImageMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "copyGraphicsPrintImageMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.copyGraphicsPrintImage();
@@ -421,6 +437,7 @@ public class MenuBar {
 					this.toolBoxDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0029));
 					this.toolBoxDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 					this.toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "toolBoxDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.openDeviceDialog();
@@ -435,6 +452,7 @@ public class MenuBar {
 					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0049));
 					this.portMenuItem.setImage(SWTResourceManager.getImage("gde/resource/BulletHotRed.gif")); //$NON-NLS-1$
 					this.portMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "selectDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							IDevice activeDevice = MenuBar.this.application.getActiveDevice();
@@ -450,6 +468,7 @@ public class MenuBar {
 					this.selectDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0030));
 					this.selectDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/DeviceSelectionHot.gif")); //$NON-NLS-1$
 					this.selectDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "selectDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DeviceSelectionDialog deviceSelection = MenuBar.this.application.getDeviceSelectionDialog();
@@ -464,6 +483,7 @@ public class MenuBar {
 					this.prevDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
 					this.prevDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0031)); 
 					this.prevDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "prevDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.getActiveDevice().getCommunicationPort() == null || !MenuBar.this.application.getActiveDevice().getCommunicationPort().isConnected()) { // allow device switch only if port noct connected
@@ -498,6 +518,7 @@ public class MenuBar {
 					this.nextDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
 					this.nextDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0032)); 
 					this.nextDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "nextDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.getActiveDevice().getCommunicationPort() == null || !MenuBar.this.application.getActiveDevice().getCommunicationPort().isConnected()) { // allow device switch only if port noct connected
@@ -534,6 +555,7 @@ public class MenuBar {
 					this.devicePropertyFileEditMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0465));
 					this.devicePropertyFileEditMenuItem.setImage(SWTResourceManager.getImage("gde/resource/EditHot.gif")); //$NON-NLS-1$
 					this.devicePropertyFileEditMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "devicePropertyFileEditMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DevicePropertiesEditor.getInstance().openAsDialog(MenuBar.this.application.getActiveDevice().getDeviceConfiguration());
@@ -558,6 +580,7 @@ public class MenuBar {
 					this.saveDefaultGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
 					this.saveDefaultGraphicsTemplateItem.setText(Messages.getString(MessageIds.GDE_MSGT0034));
 					this.saveDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.channels.getActiveChannel().saveTemplate();
@@ -568,6 +591,7 @@ public class MenuBar {
 					this.restoreDefaultGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
 					this.restoreDefaultGraphicsTemplateItem.setText(Messages.getString(MessageIds.GDE_MSGT0195));
 					this.restoreDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "restoreDefaultGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
@@ -586,6 +610,7 @@ public class MenuBar {
 					this.saveAsGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
 					this.saveAsGraphicsTemplateItem.setText(Messages.getString(MessageIds.GDE_MSGT0035)); 
 					this.saveAsGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
@@ -609,6 +634,7 @@ public class MenuBar {
 					this.restoreGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
 					this.restoreGraphicsTemplateItem.setText(Messages.getString(MessageIds.GDE_MSGT0037));
 					this.restoreGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
@@ -644,6 +670,7 @@ public class MenuBar {
 					this.curveSelectionMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0040)); 
 					this.curveSelectionMenuItem.setSelection(true);
 					this.curveSelectionMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "kurveSelectionMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.curveSelectionMenuItem.getSelection()) {
@@ -663,6 +690,7 @@ public class MenuBar {
 					this.graphicsHeaderMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0041));
 					this.graphicsHeaderMenuItem.setSelection(false);
 					this.graphicsHeaderMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "graphicsHeaderMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.graphicsHeaderMenuItem.getSelection()) {
@@ -684,6 +712,7 @@ public class MenuBar {
 					this.recordCommentMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0042)); 
 					this.recordCommentMenuItem.setSelection(false);
 					this.recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "recordCommentMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.recordCommentMenuItem.getSelection()) {
@@ -709,6 +738,7 @@ public class MenuBar {
 					this.contentsMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
 					this.contentsMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0044)); 
 					this.contentsMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "contentsMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.getActiveDevice().getDialog() != null && !MenuBar.this.application.getActiveDevice().getDialog().isDisposed()) {
@@ -739,6 +769,7 @@ public class MenuBar {
 					this.webCheckMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
 					this.webCheckMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0045)); 
 					this.webCheckMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "webCheckMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.openWebBrowser(Messages.getString(MessageIds.GDE_MSGT0046));
@@ -749,6 +780,7 @@ public class MenuBar {
 					this.aboutMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
 					this.aboutMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0047)); 
 					this.aboutMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "aboutMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.openAboutDialog();
@@ -786,6 +818,7 @@ public class MenuBar {
 			historyImportMenuItem.setText(shortFileReference);
 			historyImportMenuItem.setData(shortFileReference, fullQualifiedFileReference);
 			historyImportMenuItem.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					MenuBar.log.log(Level.FINEST, "historyImportMenuItem.widgetSelected, event=" + evt);//$NON-NLS-1$
 					String fileName = (String) historyImportMenuItem.getData(historyImportMenuItem.getText());

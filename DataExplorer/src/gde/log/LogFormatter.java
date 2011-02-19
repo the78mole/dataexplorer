@@ -49,6 +49,7 @@ public class LogFormatter extends Formatter {
 	/**
 	 * A Custom format implementation that is designed for brevity.
 	 */
+	@Override
 	public synchronized String format(LogRecord logRecord) {
 		//StringBuilder sb = new StringBuilder();
 		// Minimize memory allocations here.

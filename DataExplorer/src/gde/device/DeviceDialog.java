@@ -57,13 +57,16 @@ public abstract class DeviceDialog extends Dialog {
 	protected final DataExplorer application;
 	
 	public MouseTrackAdapter mouseTrackerEnterFadeOut = new MouseTrackAdapter() {
+		@Override
 		public void mouseEnter(MouseEvent evt) {
 			log.log(Level.FINE, "mouseEnter, event=" + evt); //$NON-NLS-1$
 			fadeOutAplhaBlending();
 		}
+		@Override
 		public void mouseHover(MouseEvent evt) {
 			log.log(Level.FINEST, "mouseHover, event=" + evt); //$NON-NLS-1$
 		}
+		@Override
 		public void mouseExit(MouseEvent evt) {
 			log.log(Level.FINEST, "mouseEnter, event=" + evt); //$NON-NLS-1$
 		}

@@ -1184,7 +1184,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	public boolean isDeviceChanged() {
 		IDevice activeDevice = this.application.getActiveDevice();
 		boolean isFirstConfigSelected = this.selectedActiveDeviceConfig != null && activeDevice == null; // new configuration selected, but no active device
-		@SuppressWarnings("unused")
 		boolean isDeviceSwitched = this.selectedActiveDeviceConfig != null && activeDevice != null && !this.selectedActiveDeviceConfig.getName().equals(activeDevice.getName());
 		log.log(java.util.logging.Level.FINE, GDE.STRING_EMPTY + (isFirstConfigSelected || isDeviceSwitched));
 		return (isFirstConfigSelected || isDeviceSwitched);

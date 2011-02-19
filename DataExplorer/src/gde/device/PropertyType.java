@@ -69,7 +69,8 @@ public class PropertyType implements Cloneable {
     /**
      * clone methods to deep copy PropertyType
      */
-    public PropertyType clone() {
+    @Override
+		public PropertyType clone() {
   		try {
   			super.clone();
   		}

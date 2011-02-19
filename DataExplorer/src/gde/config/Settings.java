@@ -253,6 +253,7 @@ public class Settings extends Properties {
 
 		this.xmlBasePath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + GDE.FILE_SEPARATOR_UNIX;
 		xsdThread = new Thread("xsdValidation") {
+			@Override
 			public void run() {
 				final String $METHOD_NAME = "xsdThread.run()";
 				// device properties context
@@ -534,7 +535,8 @@ public class Settings extends Properties {
 	 * overload Properties method due to loading properties from file returns "null" instead of null
 	 * @see java.util.Properties#getProperty(java.lang.String, java.lang.String)
 	 */
-  public String getProperty(String key, String defaultValue) {
+  @Override
+	public String getProperty(String key, String defaultValue) {
   	String val = getProperty(key);
 		if (val == null || val.equals(GDE.STRING_EMPTY) || val.equals("null")) val = defaultValue; //$NON-NLS-2$
   	return val;

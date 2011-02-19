@@ -912,6 +912,7 @@ public class FileUtils {
 	public static void runOnExitRenamer() {
 		if (FileUtils.onExitRenameJar != null && FileUtils.onExitRenameJar.size() > 0) {
 			Thread onExitThread = new Thread() {
+				@Override
 				public void run() {
 						for (String job : FileUtils.onExitRenameJar) {
 							//log.log(Level.INFO, "onExitRenameJar.job = " + job);

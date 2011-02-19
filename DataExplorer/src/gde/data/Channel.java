@@ -114,6 +114,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * overwrites the size method to return faked size in case of channel type is ChannelTypes.TYPE_CONFIG
 	 * TYPE_CONFIG means the all record sets depends to the object and the different (configuration) channels enable differnt views to it
 	 */
+	@Override
 	public int size() {
 		int size;
 		if(this.type == ChannelTypes.TYPE_OUTLET) {
@@ -638,6 +639,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	/**
 	 * overloaded clear method to enable implementation specific clear actions
 	 */
+	@Override
 	public void clear() {
 		for (String recordSetKey : this.getRecordSetNames()) {
 			if (recordSetKey != null && recordSetKey.length() > 3) this.remove(recordSetKey);

@@ -145,6 +145,7 @@ public class AxisEndValuesDialog extends Dialog {
 				this.okBbutton.setLayoutData(okBbuttonLData);
 				this.okBbutton.setText("OK"); //$NON-NLS-1$
 				this.okBbutton.addSelectionListener(new SelectionAdapter() {
+					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(Level.FINEST, "okBbutton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						AxisEndValuesDialog.this.dialogShell.dispose();
@@ -186,6 +187,7 @@ public class AxisEndValuesDialog extends Dialog {
 				this.maxValueSelect.setItems(this.initialValues);
 				this.maxValueSelect.select(7);
 				this.maxValueSelect.addKeyListener(new KeyAdapter() {
+					@Override
 					public void keyPressed(KeyEvent evt) {
 						log.log(Level.FINEST, "maxValueSelect.keyPressed, event=" + evt); //$NON-NLS-1$
 						if (evt.character == SWT.CR) {
@@ -217,6 +219,7 @@ public class AxisEndValuesDialog extends Dialog {
 				this.minValueSelect.setItems(this.initialValues);
 				this.minValueSelect.select(5);
 				this.minValueSelect.addKeyListener(new KeyAdapter() {
+					@Override
 					public void keyPressed(KeyEvent evt) {
 						log.log(Level.FINEST, "minValueSelect.keyPressed, event=" + evt); //$NON-NLS-1$
 						if (evt.character == SWT.CR) {
