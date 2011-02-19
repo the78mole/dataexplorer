@@ -103,6 +103,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 		this.settings = Settings.getInstance();
 	}
 
+	@Override
 	public void open() {
 		this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
 		this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
@@ -125,13 +126,16 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 			this.dialogShell.setText(DEVICE_NAME + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif"));
 			this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+				@Override
 				public void mouseEnter(MouseEvent evt) {
 					log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
 					fadeOutAplhaBlending(evt, AkkuMasterC4Dialog.this.getDialogShell().getClientArea(), 10, 10, 10, 15);
 				}
+				@Override
 				public void mouseHover(MouseEvent evt) {
 					log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 				}
+				@Override
 				public void mouseExit(MouseEvent evt) {
 					log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 					fadeInAlpaBlending(evt, AkkuMasterC4Dialog.this.getDialogShell().getClientArea(), 10, 10, -10, 15);
@@ -142,6 +146,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.tabFolder.setBounds(0, 0, 430, 425);
 				this.tabFolder.addSelectionListener(new SelectionAdapter() {
+					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						AkkuMasterC4Dialog.log.log(Level.FINEST, "tabFolder.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						AkkuMasterC4Dialog.this.statusComposite.redraw();
@@ -275,6 +280,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					}
 				});
 				this.statusComposite.addFocusListener(new FocusAdapter() {
+					@Override
 					public void focusGained(FocusEvent evt) {
 						AkkuMasterC4Dialog.log.log(Level.WARNING, "statusComposite.focusGained, event=" + evt); //$NON-NLS-1$
 						AkkuMasterC4Dialog.this.totalDischargeCurrentText.setText(String.format("%4d", AkkuMasterC4Dialog.this.totalDischargeCurrent));
@@ -324,6 +330,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				this.closeButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0188));
 				this.closeButton.setBounds(87, 485, 260, 30);
 				this.closeButton.addSelectionListener(new SelectionAdapter() {
+					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						AkkuMasterC4Dialog.log.log(Level.FINEST, "closeButton.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (getChannelTab(1).isDataColletionActive() || getChannelTab(2).isDataColletionActive() || getChannelTab(3).isDataColletionActive() || getChannelTab(4).isDataColletionActive())
@@ -387,6 +394,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 
 	}
 
+	@Override
 	public void close() {
 		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
 			this.channel1Tab.stopTimer();
@@ -486,6 +494,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 				if (this.versionThread == null || !this.versionThread.isAlive()) {
 					this.versionThread = new Thread() {
 						
+						@Override
 						public void run() {
 							try {
 								if (!AkkuMasterC4Dialog.this.serialPort.isConnected()) {

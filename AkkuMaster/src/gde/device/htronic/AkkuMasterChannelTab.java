@@ -381,6 +381,7 @@ public class AkkuMasterChannelTab {
 							this.program.setEditable(false);
 							this.program.setBackground(DataExplorer.COLOR_WHITE);
 							this.program.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(Level.FINEST, "program.widgetSelected, event=" + evt); //$NON-NLS-1$
 									updateProgramSelectionValue();
@@ -402,6 +403,7 @@ public class AkkuMasterChannelTab {
 							this.chargeCurrent.setItems(this.aChargeCurrent_mA);
 							this.chargeCurrent.setText(this.aChargeCurrent_mA[5]);
 							this.chargeCurrent.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(Level.FINEST, "chargeCurrent.widgetSelected, event=" + evt); //$NON-NLS-1$
 									updateChargeCurrentValue();
@@ -425,6 +427,7 @@ public class AkkuMasterChannelTab {
 							this.dischargeCurrent.setItems(this.aDischargeCurrent_mA);
 							this.dischargeCurrent.setText(this.aDischargeCurrent_mA[5]);
 							this.dischargeCurrent.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(Level.FINEST, "dischargeCurrent.widgetSelected, event=" + evt); //$NON-NLS-1$
 									updateDischargeCurrentValue();
@@ -448,6 +451,7 @@ public class AkkuMasterChannelTab {
 							this.memoryNumberCombo.setEditable(false);
 							this.memoryNumberCombo.setBackground(DataExplorer.COLOR_WHITE);
 							this.memoryNumberCombo.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(Level.FINEST, "memoryNumberCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 									updateMemoryNumberValue();
@@ -466,6 +470,7 @@ public class AkkuMasterChannelTab {
 					this.startDataGatheringButton.setSelection(this.isCollectData);
 					this.startDataGatheringButton.setEnabled(false);
 					this.startDataGatheringButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "startAufzeichnungButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (!isCollectData()) {
@@ -516,6 +521,7 @@ public class AkkuMasterChannelTab {
 									setTimerTask(new TimerTask() {
 										HashMap<String, Object>	data; // [8]
 
+										@Override
 										public void run() {
 											/* [0] String Aktueller Prozessname 			"4 ) Laden" = AkkuMaster aktiv Laden
 											 * [1] int 		Aktuelle Fehlernummer				"0" = kein Fehler
@@ -664,6 +670,7 @@ public class AkkuMasterChannelTab {
 					this.stopDataGatheringButton.setEnabled(false);
 					this.stopDataGatheringButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.stopDataGatheringButton.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "stopAuzeichnungButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							updateCurrentStatus();
