@@ -35,6 +35,7 @@ public class TestValidateXML extends TestCase {
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	public void setUp() throws Exception {
     log.setLevel(Level.INFO);
     log.setUseParentHandlers(true);

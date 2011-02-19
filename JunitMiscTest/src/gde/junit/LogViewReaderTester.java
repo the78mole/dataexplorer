@@ -150,6 +150,7 @@ public class LogViewReaderTester extends TestSuperClass {
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		Handler ch = new ConsoleHandler();
