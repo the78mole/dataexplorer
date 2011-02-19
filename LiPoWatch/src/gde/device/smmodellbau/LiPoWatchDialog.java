@@ -18,6 +18,18 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceDialog;
+import gde.device.smmodellbau.lipowatch.MessageIds;
+import gde.exception.ApplicationConfigurationException;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -44,18 +56,6 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TaskBar;
 import org.eclipse.swt.widgets.TaskItem;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.device.DeviceDialog;
-import gde.device.smmodellbau.lipowatch.MessageIds;
-import gde.exception.ApplicationConfigurationException;
-import gde.log.Level;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 /**
  * LiPoWatch device dialog class
@@ -164,7 +164,6 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 	final LiPoWatch								device;																																																								// get device specific things, get serial port, ...
 	final LiPoWatchSerialPort			serialPort;																																																						// open/close port execute getData()....
-	final DataExplorer	application;																																																						// interaction with application instance
 	final Channels								channels;																																																							// interaction with channels, source of all records
 	final Settings								settings;																																																							// application configuration settings
 
@@ -193,7 +192,6 @@ public class LiPoWatchDialog extends DeviceDialog {
 		super(parent);
 		this.serialPort = useDevice.getSerialPort();
 		this.device = useDevice;
-		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
 	}
@@ -1321,16 +1319,16 @@ public class LiPoWatchDialog extends DeviceDialog {
 	 * @param numberRecordSet
 	 * @param numReadErrors
 	 * @param numLess4Measurements
-	 * @param memoryUsed
+	 * @param memoryUsedValue
 	 */
-	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int numLess4Measurements, final int memoryUsed) {
+	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int numLess4Measurements, final int memoryUsedValue) {
 		this.numberRedDataSetsText = "" + redTelegrams; //$NON-NLS-1$
 		this.numberActualDataSetsText = "" + numberRecordSet; //$NON-NLS-1$
 		this.numberReadErrorText = "" + numReadErrors; //$NON-NLS-1$
 		this.numberLess4Text = "" + numLess4Measurements; //$NON-NLS-1$
 		GDE.display.asyncExec(new Runnable() {
 			public void run() {
-				int progress = redTelegrams * 100 / memoryUsed;
+				int progress = redTelegrams * 100 / memoryUsedValue;
 				int tmpValue = progress < 0 ? 0 : progress;
 				tmpValue = progress > 100 ? 100 : progress;
 				LiPoWatchDialog.this.readDataProgressBar.setSelection(tmpValue);
