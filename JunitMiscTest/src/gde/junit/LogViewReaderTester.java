@@ -20,11 +20,9 @@ package gde.junit;
 
 import gde.GDE;
 import gde.io.LogViewReader;
-import gde.log.LogFormatter;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +31,6 @@ public class LogViewReaderTester extends TestSuperClass {
 	Logger	logger = Logger.getLogger(LogViewReaderTester.class.getSimpleName());
 	
 	String				fileRootDir	= null;
-	Logger				rootLogger;
 
 	String[] files_1_13 = {
 	// 1.13
@@ -153,8 +150,6 @@ public class LogViewReaderTester extends TestSuperClass {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		Handler ch = new ConsoleHandler();
-		LogFormatter lf = new LogFormatter();
 		this.rootLogger = Logger.getLogger("");
 		
 		// clean up all handlers from outside
