@@ -327,7 +327,6 @@ public class MenuBar {
 				this.editMenu = new Menu(this.editMenuItem);
 				this.editMenuItem.setMenu(this.editMenu);
 				this.editMenu.addMenuListener(new MenuListener() {				
-					@Override
 					public void menuShown(MenuEvent e) {
 						MenuBar.log.log(Level.FINEST, "editMenu.menuShown, event=" + e); //$NON-NLS-1$
 						Channel activeChannel = MenuBar.this.channels.getActiveChannel();
@@ -342,7 +341,6 @@ public class MenuBar {
 						MenuBar.this.copyTabContentAsImageMenuItem.setEnabled(isRecordSetRelatedCopyable);
 						MenuBar.this.copyGraphicsPrintImageMenuItem.setEnabled((isRecordSetRelatedCopyable  && MenuBar.this.application.getTabSelectionIndex() == 0) || isCompareSetCopyable);
 					}
-					@Override
 					public void menuHidden(MenuEvent e) {
 						MenuBar.log.log(Level.FINEST, "editMenu.menuHidden, event=" + e); //$NON-NLS-1$
 					}

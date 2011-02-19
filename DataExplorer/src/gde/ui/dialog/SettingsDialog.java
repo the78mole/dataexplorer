@@ -501,14 +501,12 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0337));
 								this.serialPortBlackList.setBounds(260, GDE.IS_MAC_COCOA ? 3 : 13, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
-									@Override
 									public void verifyText(VerifyEvent e) {
 										log.log(Level.FINEST, GDE.STRING_EMPTY+StringHelper.verifyPortInput(e.text.trim()));
 										e.doit = StringHelper.verifyPortInput(e.text.trim());
 									}
 								});
 								this.serialPortBlackList.addKeyListener(new KeyAdapter() {
-									@Override
 									public void keyReleased(KeyEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "serialPortBlackList.keyReleased, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSerialPortBlackList(SettingsDialog.this.serialPortBlackList.getText());
@@ -550,7 +548,6 @@ public class SettingsDialog extends Dialog {
 								this.serialPortWhiteList.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0339));
 								this.serialPortWhiteList.setBounds(260, GDE.IS_MAC_COCOA ? 24 : 34, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortWhiteList.addVerifyListener(new VerifyListener() {
-									@Override
 									public void verifyText(VerifyEvent e) {
 										//log.log(Level.FINEST, GDE.STRING_EMPTY+StringHelper.verifyPortInput(e.text));
 										//e.doit = StringHelper.verifyPortInput(e.text);

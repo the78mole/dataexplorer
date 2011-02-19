@@ -67,7 +67,6 @@ public class MeasurementContextmenu {
 	public void create() {
 		SWTResourceManager.registerResourceUser(this.menu);
 		this.menu.addMenuListener(new MenuListener() {
-			@Override
 			public void menuShown(MenuEvent e) {
 				log.log(java.util.logging.Level.FINEST, "menuShown action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.addStatisticsTypeMenuItem.setEnabled(true);
@@ -81,14 +80,12 @@ public class MeasurementContextmenu {
 				MeasurementContextmenu.this.measurementPropertiesTabFolder = MeasurementContextmenu.this.measurementTypeTabItem.measurementPropertiesTabFolder;
 			}
 
-			@Override
 			public void menuHidden(MenuEvent e) {
 			}
 		});
 		this.addStatisticsTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
 		this.addStatisticsTypeMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0533));
 		this.addStatisticsTypeMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "addStatisticsTypeMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createStatisticsTabItem();
@@ -100,7 +97,6 @@ public class MeasurementContextmenu {
 		this.addPropertyTypeMenu = new Menu(this.addPropertyTypeMenuItem);
 		this.addPropertyTypeMenuItem.setMenu(this.addPropertyTypeMenu);
 		this.addPropertyTypeMenu.addMenuListener(new MenuListener() {
-			@Override
 			public void menuShown(MenuEvent e) {
 				log.log(java.util.logging.Level.FINEST, "addPropertyTypeMenu.menuShown action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.offsetPropertyMenuItem.setEnabled(true);
@@ -189,15 +185,12 @@ public class MeasurementContextmenu {
 					}
 				}
 			}
-
-			@Override
 			public void menuHidden(MenuEvent e) {
 			}
 		});
 		this.offsetPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.offsetPropertyMenuItem.setText(MeasurementPropertyTypes.OFFSET.value());
 		this.offsetPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "defaultPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.OFFSET.value());
@@ -206,7 +199,6 @@ public class MeasurementContextmenu {
 		this.factorPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.factorPropertyMenuItem.setText(MeasurementPropertyTypes.FACTOR.value());
 		this.factorPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "factorPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.FACTOR.value());
@@ -215,7 +207,6 @@ public class MeasurementContextmenu {
 		this.reductionPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.reductionPropertyMenuItem.setText(MeasurementPropertyTypes.REDUCTION.value());
 		this.reductionPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "reductionPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REDUCTION.value());
@@ -224,7 +215,6 @@ public class MeasurementContextmenu {
 		this.doSubtractFirstPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.doSubtractFirstPropertyMenuItem.setText(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
 		this.doSubtractFirstPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "doSubtractFirstPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
@@ -233,7 +223,6 @@ public class MeasurementContextmenu {
 		this.doSubtractLastPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.doSubtractLastPropertyMenuItem.setText(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
 		this.doSubtractLastPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "doSubtractLastPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
@@ -242,7 +231,6 @@ public class MeasurementContextmenu {
 		this.regressionIntervalPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.regressionIntervalPropertyMenuItem.setText(MeasurementPropertyTypes.REGRESSION_INTERVAL_SEC.value());
 		this.regressionIntervalPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "regressionIntervalPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REGRESSION_INTERVAL_SEC.value());
@@ -251,7 +239,6 @@ public class MeasurementContextmenu {
 		this.regressionTypeCurvePropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.regressionTypeCurvePropertyMenuItem.setText(MeasurementPropertyTypes.REGRESSION_TYPE_CURVE.value());
 		this.regressionTypeCurvePropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "regressionTypeCurvePropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REGRESSION_TYPE_CURVE.value());
@@ -260,7 +247,6 @@ public class MeasurementContextmenu {
 		this.regressionTypeLinearPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.regressionTypeLinearPropertyMenuItem.setText(MeasurementPropertyTypes.REGRESSION_TYPE_LINEAR.value());
 		this.regressionTypeLinearPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "regressionTypeLinearPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REGRESSION_TYPE_LINEAR.value());
@@ -269,7 +255,6 @@ public class MeasurementContextmenu {
 		this.numberMotorPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.numberMotorPropertyMenuItem.setText(MeasurementPropertyTypes.NUMBER_MOTOR.value());
 		this.numberMotorPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "numberMotorPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.NUMBER_MOTOR.value());
@@ -278,7 +263,6 @@ public class MeasurementContextmenu {
 		this.revolutionFactorPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.revolutionFactorPropertyMenuItem.setText(MeasurementPropertyTypes.REVOLUTION_FACTOR.value());
 		this.revolutionFactorPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "revolutionFactorPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.REVOLUTION_FACTOR.value());
@@ -287,7 +271,6 @@ public class MeasurementContextmenu {
 		this.prop100WPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.prop100WPropertyMenuItem.setText(MeasurementPropertyTypes.PROP_N_100_W.value());
 		this.prop100WPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "prop100WPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.PROP_N_100_W.value());
@@ -296,7 +279,6 @@ public class MeasurementContextmenu {
 		this.numberCellsPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.numberCellsPropertyMenuItem.setText(MeasurementPropertyTypes.NUMBER_CELLS.value());
 		this.numberCellsPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "numberCellsPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.NUMBER_CELLS.value());
@@ -305,7 +287,6 @@ public class MeasurementContextmenu {
 		this.invertCurrentPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.invertCurrentPropertyMenuItem.setText(MeasurementPropertyTypes.IS_INVERT_CURRENT.value());
 		this.invertCurrentPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "invertCurrentPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.IS_INVERT_CURRENT.value());
@@ -314,7 +295,6 @@ public class MeasurementContextmenu {
 		this.scaleSyncRefOrdinal = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.scaleSyncRefOrdinal.setText(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 		this.scaleSyncRefOrdinal.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "scaleSyncRefOrdinal action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
@@ -323,7 +303,6 @@ public class MeasurementContextmenu {
 		this.googleEarthVelocityAvgLimitFactor = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.googleEarthVelocityAvgLimitFactor.setText(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value());
 		this.googleEarthVelocityAvgLimitFactor.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "googleEarthVelocityAvgLimitFactor action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_AVG_LIMIT_FACTOR.value());
@@ -332,7 +311,6 @@ public class MeasurementContextmenu {
 		this.googleEarthVelocityLowerLimit = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.googleEarthVelocityLowerLimit.setText(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value());
 		this.googleEarthVelocityLowerLimit.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "googleEarthVelocityLowerLimit action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_LOWER_LIMIT.value());
@@ -341,7 +319,6 @@ public class MeasurementContextmenu {
 		this.googleEarthVelocityUpperLimit = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.googleEarthVelocityUpperLimit.setText(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value());
 		this.googleEarthVelocityUpperLimit.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "googleEarthVelocityUpperLimit action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value());
@@ -350,7 +327,6 @@ public class MeasurementContextmenu {
 		this.defaultPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.defaultPropertyMenuItem.setText(MeasurementPropertyTypes.NONE_SPECIFIED.value());
 		this.defaultPropertyMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "defaultPropertyMenuItem action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.NONE_SPECIFIED.value());

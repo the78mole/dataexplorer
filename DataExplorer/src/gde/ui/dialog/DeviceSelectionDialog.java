@@ -227,14 +227,12 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.setSize(579, 592);
 			this.dialogShell.setSize(580, 592);
 			this.dialogShell.addHelpListener(new HelpListener() {
-				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(java.util.logging.Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 					DeviceSelectionDialog.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_2.html"); //$NON-NLS-1$
 				}
 			});
 			this.dialogShell.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					// update device configurations if required
@@ -250,7 +248,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 
 					GDE.display.asyncExec(new Runnable() {
-						@Override
 						public void run() {
 							handleAutoOpenAfterClose();
 						}
@@ -487,7 +484,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								this.portSettingsGroup.setText(Messages.getString(MessageIds.GDE_MSGT0166));
 								this.portSettingsGroup.setBounds(12, 409, 524, 115);
 								this.portSettingsGroup.addPaintListener(new PaintListener() {
-									@Override
 									public void paintControl(PaintEvent evt) {
 										log.log(java.util.logging.Level.FINEST, "portSettingsGroup.paintControl, event=" + evt); //$NON-NLS-1$
 										if (DeviceSelectionDialog.this.portSettingsGroup.getEnabled()) {
@@ -1189,7 +1185,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		IDevice activeDevice = this.application.getActiveDevice();
 		boolean isFirstConfigSelected = this.selectedActiveDeviceConfig != null && activeDevice == null; // new configuration selected, but no active device
 		@SuppressWarnings("unused")
-		boolean isLastConfigDeselected = this.selectedActiveDeviceConfig == null && activeDevice != null; // all configurations deselected, but a device is still selected
 		boolean isDeviceSwitched = this.selectedActiveDeviceConfig != null && activeDevice != null && !this.selectedActiveDeviceConfig.getName().equals(activeDevice.getName());
 		log.log(java.util.logging.Level.FINE, GDE.STRING_EMPTY + (isFirstConfigSelected || isDeviceSwitched));
 		return (isFirstConfigSelected || isDeviceSwitched);
@@ -1228,7 +1223,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									DeviceSelectionDialog.this.settings.isSerialPortWhiteListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
 							if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
 								GDE.display.syncExec(new Runnable() {
-									@Override
 									public void run() {
 										if (!DeviceSelectionDialog.this.dialogShell.isDisposed() && DeviceSelectionDialog.this.selectedActiveDeviceConfig != null) {
 											if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {

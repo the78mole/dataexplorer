@@ -70,7 +70,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#open()
 	 */
-	@Override
 	public SerialPort open() throws ApplicationConfigurationException, SerialPortException {
 		return this.port.open();
 	}
@@ -78,7 +77,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#close()
 	 */
-	@Override
 	public void close() {
 		this.port.close();	
 	}
@@ -86,7 +84,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#read(byte[], int)
 	 */
-	@Override
 	public byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
 		return this.port.read(readBuffer, timeout_msec);
 	}
@@ -94,7 +91,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#read(byte[], int, int)
 	 */
-	@Override
 	public byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
 		return this.port.read(readBuffer, timeout_msec, stableIndex);
 	}
@@ -102,7 +98,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#read(byte[], int, java.util.Vector)
 	 */
-	@Override
 	public byte[] read(byte[] readBuffer, int timeout_msec, Vector<Long> waitTimes) throws IOException, TimeOutException {
 		return this.port.read(readBuffer, timeout_msec, waitTimes);
 	}
@@ -110,7 +105,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#write(byte[])
 	 */
-	@Override
 	public void write(byte[] writeBuffer) throws IOException {
 		this.port.write(writeBuffer);
 	}
@@ -118,7 +112,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#wait4Bytes(int)
 	 */
-	@Override
 	public long wait4Bytes(int timeout_msec) throws InterruptedException, TimeOutException, IOException {
 		return this.port.wait4Bytes(timeout_msec);
 	}
@@ -126,7 +119,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#wait4Bytes(int, int)
 	 */
-	@Override
 	public int wait4Bytes(int numBytes, int timeout_msec) throws IOException {
 		return this.port.wait4Bytes(numBytes, timeout_msec);
 	}
@@ -134,7 +126,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#waitForStableReceiveBuffer(int, int, int)
 	 */
-	@Override
 	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex) throws InterruptedException, TimeOutException, IOException {
 		return this.port.waitForStableReceiveBuffer(expectedBytes, timeout_msec, stableIndex);
 	}
@@ -142,7 +133,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#isConnected()
 	 */
-	@Override
 	public boolean isConnected() {
 		return this.port.isConnected();
 	}
@@ -150,7 +140,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#getXferErrors()
 	 */
-	@Override
 	public int getXferErrors() {
 		return this.port.getXferErrors();
 	}
@@ -158,7 +147,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#addXferError()
 	 */
-	@Override
 	public void addXferError() {
 		this.port.addXferError();
 	}
@@ -166,7 +154,6 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#isMatchAvailablePorts(java.lang.String)
 	 */
-	@Override
 	public boolean isMatchAvailablePorts(String newSerialPortStr) {
 		return this.port.isMatchAvailablePorts(newSerialPortStr);
 	}

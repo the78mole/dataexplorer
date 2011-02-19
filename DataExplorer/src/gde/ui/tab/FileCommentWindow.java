@@ -129,7 +129,6 @@ public class FileCommentWindow extends CTabItem {
 			this.infoLabel.setMenu(this.popupmenu);
 			this.infoLabel.setBounds(50, 10, 500, 26);
 			this.infoLabel.addPaintListener(new PaintListener() {
-				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "infoLabel.paintControl " + evt); //$NON-NLS-1$
 					FileCommentWindow.this.contextMenu.createMenu(FileCommentWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
@@ -158,13 +157,10 @@ public class FileCommentWindow extends CTabItem {
 				}
 			});
 			this.fileCommentText.addFocusListener(new FocusListener() {
-				@Override
 				public void focusLost(FocusEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
 					setFileComment();
 				}
-
-				@Override
 				public void focusGained(FocusEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
 				}

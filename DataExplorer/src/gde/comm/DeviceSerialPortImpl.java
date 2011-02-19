@@ -203,7 +203,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @param newSerialPortStr
 	 * @return true if given port string matches one of the available once
 	 */
-	@Override
 	public boolean isMatchAvailablePorts(String newSerialPortStr) {
 		boolean match = false;
 		if (DeviceSerialPortImpl.availablePorts.size() == 0 || (this.serialPortStr != null && !DeviceSerialPortImpl.availablePorts.contains(this.serialPortStr))) {
@@ -225,7 +224,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @throws ApplicationConfigurationException
 	 * @throws SerialPortException
 	 */
-	@Override
 	public SerialPort open() throws ApplicationConfigurationException, SerialPortException {
 		final String $METHOD_NAME = "open"; //$NON-NLS-1$
 		this.xferErrors = 0;
@@ -333,7 +331,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @param writeBuffer writes size of writeBuffer to output stream
 	 * @throws IOException
 	 */
-	@Override
 	public synchronized void write(byte[] writeBuffer) throws IOException {
 		final String $METHOD_NAME = "write"; //$NON-NLS-1$
 		int num = 0;
@@ -371,7 +368,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * - activate the DATA_AVAILABLE notifier to read available data -> dataAvailable = true;
 	 * - activate the OUTPUT_BUFFER_EMPTY notifier -> dataAvailable = false;
 	 */
-	@Override
 	public void serialEvent(SerialPortEvent event) {
 		final String $METHOD_NAME = "serialEvent"; //$NON-NLS-1$
 
@@ -403,7 +399,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	@Override
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		int sleepTime = 2; // ms
@@ -460,7 +455,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	@Override
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, Vector<Long> waitTimes) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		int sleepTime = 4; // ms
@@ -518,7 +512,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @throws TimeOutException 
 	 * @throws IOException 
 	 */
-	@Override
 	public long wait4Bytes(int timeout_msec) throws InterruptedException, TimeOutException, IOException {
 		final String $METHOD_NAME = "wait4Bytes"; //$NON-NLS-1$
 		int sleepTime = 1;
@@ -545,7 +538,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @throws InterruptedException 
 	 * @throws IOException 
 	 */
-	@Override
 	public int wait4Bytes(int numBytes, int timeout_msec) throws IOException {
 		final String $METHOD_NAME = "wait4Bytes"; //$NON-NLS-1$
 		int sleepTime = 1; // msec
@@ -577,7 +569,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	@Override
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		int sleepTime = 4; // ms
@@ -645,7 +636,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @throws TimeOutException 
 	 * @throws IOException 
 	 */
-	@Override
 	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex) throws InterruptedException, TimeOutException, IOException {
 		final String $METHOD_NAME = "waitForStableReceiveBuffer"; //$NON-NLS-1$
 		int sleepTime = 1; // ms
@@ -701,7 +691,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * function to close the serial port
 	 * this is done within a tread since the port can't close if it stays open for a long time period ??
 	 */
-	@Override
 	public synchronized void close() {
 		final String $METHOD_NAME = "close"; //$NON-NLS-1$
 		if (this.isConnected && DeviceSerialPortImpl.this.serialPort != null) {
@@ -742,7 +731,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @return number of bytes available on input stream
 	 * @throws IOException
 	 */
-	@Override
 	public int getAvailableBytes() throws IOException {
 		return this.inputStream.available();
 	}
@@ -755,7 +743,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		return this.outputStream;
 	}
 
-	@Override
 	public boolean isConnected() {
 		return this.isConnected;
 	}
@@ -770,7 +757,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	/**
 	 * @return number of transfer errors occur (checksum)
 	 */
-	@Override
 	public int getXferErrors() {
 		return this.xferErrors;
 	}
@@ -778,7 +764,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	/**
 	 * add up transfer errors
 	 */
-	@Override
 	public void addXferError() {
 		this.xferErrors++;
 	}

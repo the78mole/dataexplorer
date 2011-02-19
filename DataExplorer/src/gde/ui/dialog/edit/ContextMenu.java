@@ -54,7 +54,6 @@ public class ContextMenu {
 	public void create() {
 		SWTResourceManager.registerResourceUser(this.menu);
 		this.menu.addMenuListener(new MenuListener() {
-			@Override
 			public void menuShown(MenuEvent e) {
 				log.log(java.util.logging.Level.FINEST, "menuShown action performed! " + e); //$NON-NLS-1$
 				ContextMenu.this.addSerialPortTypeMenuItem.setEnabled(true);
@@ -72,15 +71,12 @@ public class ContextMenu {
 					}
 				}
 			}
-
-			@Override
 			public void menuHidden(MenuEvent e) {
 			}
 		});
 		this.addSerialPortTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
 		this.addSerialPortTypeMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0512));
 		this.addSerialPortTypeMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "addSerialPortTypeMenuItem action performed! " + e); //$NON-NLS-1$
 				DevicePropertiesEditor.getInstance().createSerialPortTabItem();
@@ -90,7 +86,6 @@ public class ContextMenu {
 		this.addDataBlockTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
 		this.addDataBlockTypeMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0513));
 		this.addDataBlockTypeMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "addSerialPortTypeMenuItem action performed! " + e); //$NON-NLS-1$
 				DevicePropertiesEditor.getInstance().createDataBlockType();
@@ -100,7 +95,6 @@ public class ContextMenu {
 		this.addStateTypeMenuItem = new MenuItem(this.menu, SWT.PUSH);
 		this.addStateTypeMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0514));
 		this.addStateTypeMenuItem.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "addStateTypeMenuItem action performed! " + e); //$NON-NLS-1$
 				DevicePropertiesEditor.getInstance().createStateTabItem();

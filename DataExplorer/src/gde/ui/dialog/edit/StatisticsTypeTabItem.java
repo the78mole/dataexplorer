@@ -404,7 +404,6 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 			this.scrolledComposite = new ScrolledComposite(this.channelConfigMeasurementPropertiesTabFolder, SWT.H_SCROLL);
 			this.setControl(this.scrolledComposite);
 			this.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent disposeevent) {
 					log.log(java.util.logging.Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
 					//StatisticsTypeTabItem.this.enableContextMenu(false);
@@ -413,7 +412,6 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 			this.statisticsComposite = new Composite(this.scrolledComposite, SWT.NONE);
 			this.statisticsComposite.setLayout(null);
 			this.statisticsComposite.addHelpListener(new HelpListener() {			
-				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "statisticsComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_statistics"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -612,7 +610,6 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 					}
 				});
 				this.triggerLevelCombo.addVerifyListener(new VerifyListener() {
-					@Override
 					public void verifyText(VerifyEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "triggerLevelCombo.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -693,7 +690,6 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 					}
 				});
 				this.minTimeSecCombo.addVerifyListener(new VerifyListener() {
-					@Override
 					public void verifyText(VerifyEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "minTimeSecCombo.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);

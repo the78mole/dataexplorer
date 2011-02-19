@@ -85,7 +85,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceSerialPort#open()
 	 */
-	@Override
 	public SerialPort open() throws ApplicationConfigurationException, SerialPortException {
 		try {
 			String path;
@@ -136,7 +135,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceSerialPort#close()
 	 */
-	@Override
 	public void close() {
 		try {
 			if (data_in != null) {
@@ -160,7 +158,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceSerialPort#read(byte[], int)
 	 */
-	@Override
 	public byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
 		try {
 			wait4Bytes(timeout_msec);
@@ -241,7 +238,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceSerialPort#read(byte[], int, int)
 	 */
-	@Override
 	public byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
 		try {
 			waitForStableReceiveBuffer(readBuffer.length, timeout_msec, 100);
@@ -322,7 +318,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceSerialPort#read(byte[], int, java.util.Vector)
 	 */
-	@Override
 	public byte[] read(byte[] readBuffer, int timeout_msec, Vector<Long> waitTimes) throws IOException, TimeOutException {
 		try {
 			wait4Bytes(readBuffer.length, timeout_msec);
@@ -403,7 +398,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceSerialPort#write(byte[])
 	 */
-	@Override
 	public void write(byte[] writeBuffer) throws IOException {
 		log.log(Level.WARNING, "write() not supported in simulation");
 	}
@@ -411,7 +405,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceSerialPort#wait4Bytes(int)
 	 */
-	@Override
 	public long wait4Bytes(int timeout_msec) throws InterruptedException, TimeOutException, IOException {
 		WaitTimer.delay(getWaitTime());
 		return 0;
@@ -420,7 +413,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceSerialPort#wait4Bytes(int, int)
 	 */
-	@Override
 	public int wait4Bytes(int numBytes, int timeout_msec) throws IOException {
 		WaitTimer.delay(getWaitTime());
 		return numBytes;
@@ -429,7 +421,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceSerialPort#waitForStableReceiveBuffer(int, int, int)
 	 */
-	@Override
 	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex) throws InterruptedException, TimeOutException, IOException {
 		WaitTimer.delay(getWaitTime());
 		return expectedBytes;

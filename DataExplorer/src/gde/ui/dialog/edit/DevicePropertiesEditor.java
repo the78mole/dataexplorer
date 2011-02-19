@@ -323,14 +323,12 @@ public class DevicePropertiesEditor extends Composite {
 			this.setSize(680, 500);
 			FormData fd = new FormData();
 			this.addHelpListener(new HelpListener() {			
-				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.getShell().addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (DevicePropertiesEditor.this.deviceConfig != null && DevicePropertiesEditor.this.deviceConfig.isChangePropery()) {
@@ -796,7 +794,6 @@ public class DevicePropertiesEditor extends Composite {
 							this.timeBaseTimeStepText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 							this.timeBaseTimeStepText.setBounds(322, 184, 60, 20);
 							this.timeBaseTimeStepText.addVerifyListener(new VerifyListener() {
-								@Override
 								public void verifyText(VerifyEvent evt) {
 									log.log(java.util.logging.Level.FINEST, "timeBaseTimeStepText.verifyText, event=" + evt); //$NON-NLS-1$
 									evt.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, evt.text);
@@ -1090,7 +1087,6 @@ public class DevicePropertiesEditor extends Composite {
 			this.dataBlockComposite.setLayout(null);
 			this.dataBlockTabItem.setControl(this.dataBlockComposite);
 			this.dataBlockComposite.addHelpListener(new HelpListener() {			
-				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "dataBlockComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_datablock"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1162,7 +1158,6 @@ public class DevicePropertiesEditor extends Composite {
 						}
 					});
 					this.dataBlockSizeText.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "dataBlockSizeText.verifyText, event=" + evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -1393,7 +1388,6 @@ public class DevicePropertiesEditor extends Composite {
 						}
 					});
 					this.preferredDataLocationText.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "preferredDataLocationText.verifyText, event=" + evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.STRING, evt.text);
@@ -1443,7 +1437,6 @@ public class DevicePropertiesEditor extends Composite {
 					}
 				});
 				this.preferredFileExtensionText.addVerifyListener(new VerifyListener() {
-					@Override
 					public void verifyText(VerifyEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "preferredFileExtensionText.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.STRING, evt.text);
@@ -1473,7 +1466,6 @@ public class DevicePropertiesEditor extends Composite {
 			this.stateComposite.setLayout(null);
 			this.stateTabItem.setControl(this.stateComposite);
 			this.stateComposite.addHelpListener(new HelpListener() {			
-				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "stateComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_state"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1593,7 +1585,6 @@ public class DevicePropertiesEditor extends Composite {
 		//DeviceType end
 
 		GDE.display.asyncExec( new Runnable() {		
-			@Override
 			public void run() {
 				try {
 					if (DevicePropertiesEditor.dialogShell != null && !DevicePropertiesEditor.dialogShell.isDisposed()) {

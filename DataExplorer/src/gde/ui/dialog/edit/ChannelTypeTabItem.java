@@ -210,7 +210,6 @@ public class ChannelTypeTabItem extends CTabItem implements Cloneable {
 				this.setControl(this.channelConfigComposite);
 				this.channelConfigComposite.setLayout(new FormLayout());
 				this.channelConfigComposite.addHelpListener(new HelpListener() {			
-					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "channelConfigComposite.helpRequested " + evt); //$NON-NLS-1$
 						DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_channelConfig"); //$NON-NLS-1$ //$NON-NLS-2$

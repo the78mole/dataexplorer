@@ -231,7 +231,6 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.setText(this.tabName);
 			this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent disposeevent) {
 					log.log(java.util.logging.Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
 					//PropertyTypeTabItem.this.enableContextMenu(false);
@@ -242,7 +241,6 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.propertyTypeComposite.setLayout(null);
 			this.propertyTypeComposite.setSize(300, 160);
 			this.propertyTypeComposite.addHelpListener(new HelpListener() {			
-				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "propertyTypeComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -351,7 +349,6 @@ public class PropertyTypeTabItem extends CTabItem {
 					}
 				});
 				this.valueText.addVerifyListener(this.valueVerifyListener = new VerifyListener() {
-					@Override
 					public void verifyText(VerifyEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "valueText.verifyText, event=" + evt); //$NON-NLS-1$
 						log.log(java.util.logging.Level.FINE, evt.text);

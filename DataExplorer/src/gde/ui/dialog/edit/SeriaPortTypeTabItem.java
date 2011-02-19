@@ -109,7 +109,6 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				this.serialPortComposite.setLayout(null);
 				this.setControl(this.serialPortComposite);
 				this.serialPortComposite.addHelpListener(new HelpListener() {			
-					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "serialPortComposite.helpRequested " + evt); //$NON-NLS-1$
 						DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_serial_port"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -368,7 +367,6 @@ public class SeriaPortTypeTabItem extends CTabItem {
 						this._RTOCharDelayTimeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this._RTOCharDelayTimeText.setBounds(162, 100, 70, 20);
 						this._RTOCharDelayTimeText.addVerifyListener(new VerifyListener() {
-							@Override
 							public void verifyText(VerifyEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "_RTOCharDelayTimeText.verifyText, event=" + evt); //$NON-NLS-1$
 								evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -397,7 +395,6 @@ public class SeriaPortTypeTabItem extends CTabItem {
 						this._RTOExtraDelayTimeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this._RTOExtraDelayTimeText.setBounds(162, 130, 70, 20);
 						this._RTOExtraDelayTimeText.addVerifyListener(new VerifyListener() {
-							@Override
 							public void verifyText(VerifyEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "_RTOExtraDelayTimeText.verifyText, event=" + evt); //$NON-NLS-1$
 								evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -426,7 +423,6 @@ public class SeriaPortTypeTabItem extends CTabItem {
 						this._WTOCharDelayTimeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this._WTOCharDelayTimeText.setBounds(162, 160, 70, 20);
 						this._WTOCharDelayTimeText.addVerifyListener(new VerifyListener() {
-							@Override
 							public void verifyText(VerifyEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "_WRTOCharDelayTimeText.verifyText, event=" + evt); //$NON-NLS-1$
 								evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -455,7 +451,6 @@ public class SeriaPortTypeTabItem extends CTabItem {
 						this._WTOExtraDelayTimeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this._WTOExtraDelayTimeText.setBounds(162, 190, 70, 20);
 						this._WTOExtraDelayTimeText.addVerifyListener(new VerifyListener() {
-							@Override
 							public void verifyText(VerifyEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "_WTOExtraDelayTimeText.verifyText, event=" + evt); //$NON-NLS-1$
 								evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);

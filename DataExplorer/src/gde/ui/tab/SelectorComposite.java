@@ -104,7 +104,6 @@ public class SelectorComposite extends Composite {
 		GridData curveSelectorLData = new GridData();
 		this.setLayoutData(curveSelectorLData);
 		this.addPaintListener(new PaintListener() {		
-			@Override
 			public void paintControl(PaintEvent arg0) {
 				doUpdateCurveSelectorTable();
 			}

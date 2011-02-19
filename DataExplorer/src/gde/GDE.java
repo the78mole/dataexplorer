@@ -383,7 +383,6 @@ public class GDE {
 		}
 		log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "using class loader URL = " + urls.toString()); //$NON-NLS-1$
 		ClassLoader newLoader = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>() {
-			@Override
 			public URLClassLoader run() {
 				return new URLClassLoader(urls.toArray(new URL[1]));
 			}
@@ -489,7 +488,6 @@ public class GDE {
 		splash.pack();
 		splash.setLocation(splashRect.x, splashRect.y);
 		splash.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent arg0) {
 				if (GDE.splash != null && !GDE.splash.isDisposed()) GDE.splash.close();
 				if (GDE.startSplash != null) 	GDE.startSplash.close();

@@ -68,7 +68,6 @@ public class TabAreaContextMenu {
 
 	public void createMenu(Menu popupMenu, int type) {
 		popupMenu.addMenuListener(new MenuListener() {
-			@Override
 			public void menuShown(MenuEvent e) {
 				int tabSelectionIndex = TabAreaContextMenu.this.application.getTabSelectionIndex();
 				if (tabSelectionIndex == 0) {
@@ -77,7 +76,6 @@ public class TabAreaContextMenu {
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
 				}
 			}
-			@Override
 			public void menuHidden(MenuEvent e) {
 			}
 		});

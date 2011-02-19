@@ -120,21 +120,18 @@ public class StatisticsWindow extends CTabItem {
 //				}
 //			});
 			this.composite.addHelpListener(new HelpListener() {
-				@Override
 				public void helpRequested(HelpEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.composite.addControlListener(new ControlListener() {
-				@Override
 				public void controlResized(ControlEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.controlResized evt=" + evt); //$NON-NLS-1$
 					StatisticsWindow.this.descriptionGroup.setSize(StatisticsWindow.this.composite.getClientArea().width-20, 110);
 					StatisticsWindow.this.descriptionTextLabel.setSize(StatisticsWindow.this.descriptionGroup.getClientArea().width-15, StatisticsWindow.this.descriptionGroup.getClientArea().height-10);
 					adaptTableSize();
 				}
-				@Override
 				public void controlMoved(ControlEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.controlMoved evt=" + evt); //$NON-NLS-1$
 				}
@@ -148,14 +145,12 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup.setBackground(this.innerAreaBackground);
 				this.descriptionGroup.setMenu(this.popupmenu);			
 				this.descriptionGroup.addHelpListener(new HelpListener() {
-					@Override
 					public void helpRequested(HelpEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionGroup.helpRequested " + evt); //$NON-NLS-1$
 						DataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.descriptionGroup.addPaintListener(new PaintListener() {
-					@Override
 					public void paintControl(PaintEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionGroup.paintControl, event=" + evt); //$NON-NLS-1$
 						StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
@@ -197,14 +192,12 @@ public class StatisticsWindow extends CTabItem {
 				this.dataTable.setBackground(this.innerAreaBackground);
 				this.dataTable.setMenu(this.popupmenu);			
 				this.dataTable.addHelpListener(new HelpListener() {
-					@Override
 					public void helpRequested(HelpEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dataTable.helpRequested " + evt); //$NON-NLS-1$
 						DataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				this.dataTable.addPaintListener(new PaintListener() {
-					@Override
 					public void paintControl(PaintEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dataTable.paintControl, event=" + evt); //$NON-NLS-1$
 						updateStatisticsData(false);

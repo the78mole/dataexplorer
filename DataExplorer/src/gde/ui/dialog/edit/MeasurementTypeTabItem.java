@@ -277,7 +277,6 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 			this.setText(this.tabName);
 			this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "measurementtypeTabItem.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					MeasurementTypeTabItem.this.enableContextMenu(false);
@@ -288,7 +287,6 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 				this.measurementsComposite.setLayout(null);
 				this.setControl(this.measurementsComposite);
 				this.measurementsComposite.addHelpListener(new HelpListener() {			
-					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(Level.FINEST, "measurementsComposite.helpRequested " + evt); //$NON-NLS-1$
 						DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_measurement"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -261,21 +261,17 @@ public class GraphicsComposite extends Composite {
 				}
 			});
 			this.graphicsHeader.addKeyListener( new KeyAdapter() {
-				@Override
 				public void keyPressed(KeyEvent e) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
 					isFileCommentChanged = true;						
 				}
 			});
 			this.graphicsHeader.addFocusListener(new FocusListener() {			
-				@Override
 				public void focusLost(FocusEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
 					isFileCommentChanged = false;
 					setFileComment();						
 				}
-				
-				@Override
 				public void focusGained(FocusEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
 				}
@@ -347,13 +343,10 @@ public class GraphicsComposite extends Composite {
 				}
 			});
 			this.recordSetComment.addFocusListener(new FocusListener() {				
-				@Override
 				public void focusLost(FocusEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "recordSetComment.focusLost() , event=" + evt); //$NON-NLS-1$
 					updateRecordSetComment();					
 				}
-				
-				@Override
 				public void focusGained(FocusEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "recordSetComment.focusGained() , event=" + evt); //$NON-NLS-1$
 				}

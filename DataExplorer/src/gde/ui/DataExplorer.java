@@ -471,7 +471,6 @@ public class DataExplorer extends Composite {
 				}
 			});
 			GDE.shell.addControlListener(new ControlListener() {			
-				@Override
 				public void controlResized(ControlEvent controlevent) {
 					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					DataExplorer.application.settings.setWindowMaximized(GDE.shell.getMaximized());
@@ -479,7 +478,6 @@ public class DataExplorer extends Composite {
 						DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
 					}
 				}		
-				@Override
 				public void controlMoved(ControlEvent controlevent) {
 					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					if (!GDE.shell.getMaximized()) 

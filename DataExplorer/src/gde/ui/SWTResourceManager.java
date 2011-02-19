@@ -183,7 +183,6 @@ public class SWTResourceManager {
 		
 		Menu menu = new Menu(shell, style);
 		menu.addDisposeListener(new DisposeListener() {	
-			@Override
 			public void widgetDisposed(DisposeEvent disposeevent) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "menu.widgetDisposed " + implClassName); //$NON-NLS-1$
 				resources.remove(implClassName);

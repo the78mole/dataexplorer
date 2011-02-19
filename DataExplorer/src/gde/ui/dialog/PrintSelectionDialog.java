@@ -124,8 +124,6 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.pack();
 			this.dialogShell.setSize(400, 320);
 			this.dialogShell.addDisposeListener(new DisposeListener() {
-
-				@Override
 				public void widgetDisposed(DisposeEvent arg0) {
 					PrintSelectionDialog.this.application.resetShellIcon();
 				}
@@ -143,7 +141,6 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				this.configurationGroup.setText(Messages.getString(MessageIds.GDE_MSGT0448));
 				this.configurationGroup.setBounds(7, 36, 168, 206);
 				this.configurationGroup.addPaintListener(new PaintListener() {
-					@Override
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINEST, "configurationGroup.paintControl, event=" + evt); //$NON-NLS-1$
 						Channel activeChannel = Channels.getInstance().getActiveChannel();
@@ -500,9 +497,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		 * @param page
 		 * @return 
 		 */
-		@Override
 		public int print(Graphics g, PageFormat pageFormat, int page) {
-
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY()); // set the origin to 0,0 for the top left corner
 			g2d.setPaint(Color.black);
