@@ -85,6 +85,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 
 	}
 
+	@Override
 	public void run() {
 		this.isTimerRunning = true;
 
@@ -153,6 +154,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		this.timerTask = new TimerTask() {
 			int updateViewCounter = -5;
 
+			@Override
 			public void run() {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
 				try {

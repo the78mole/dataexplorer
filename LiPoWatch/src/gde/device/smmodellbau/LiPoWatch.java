@@ -519,6 +519,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
 	 * set value of -1 to suppress this measurement
 	 */
+	@Override
 	public int[] getCellVoltageOrdinals() {
 		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 		return new int[] { 0, 3 };
@@ -532,6 +533,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
 	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
 	 */
+	@Override
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
 		//check for LiPoWatch file contained record properties for containing balance curve
 		String[] recordKeys = recordSet.getRecordNames();
