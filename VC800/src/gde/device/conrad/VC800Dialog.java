@@ -28,7 +28,6 @@ import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
 import java.io.IOException;
@@ -95,7 +94,6 @@ public class VC800Dialog extends DeviceDialog {
 
 	final VC800										device;						// get device specific things, get serial port, ...
 	final VC800SerialPort					serialPort;				// open/close port execute getData()....
-	final DataExplorer	application;			// interaction with application instance
 	final Channels								channels;					// interaction with channels, source of all records
 	final Settings								settings;					// application configuration settings
 	final HashMap<String, String>	configData = new HashMap<String, String>();
@@ -109,7 +107,6 @@ public class VC800Dialog extends DeviceDialog {
 		super(parent);
 		this.serialPort = useDevice.getSerialPort();
 		this.device = useDevice;
-		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
 	}
