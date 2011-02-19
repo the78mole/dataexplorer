@@ -22,7 +22,6 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 
 import java.io.FileNotFoundException;
 
@@ -37,9 +36,6 @@ import org.eclipse.swt.custom.CTabItem;
  */
 public class LinkVario extends DataVario {
 	
-	final DataExplorer		application;
-	final VarioDialog		dialog;
-
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
@@ -50,8 +46,6 @@ public class LinkVario extends DataVario {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.wstech.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = DataExplorer.getInstance();
-		this.dialog = new VarioDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
@@ -67,8 +61,6 @@ public class LinkVario extends DataVario {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.wstech.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
-		this.application = DataExplorer.getInstance();
-		this.dialog = new VarioDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
