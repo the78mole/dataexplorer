@@ -245,6 +245,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		}
 		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, searchDirectory, null, SWT.MULTI);
 		Thread reader = new Thread("reader") {
+			@Override
 			public void run() {
 				for (String tmpFileName : fd.getFileNames()) {
 					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
@@ -276,6 +277,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
 	 * set value of -1 to suppress this measurement
 	 */
+	@Override
 	public int[] getCellVoltageOrdinals() {
 		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 		return new int[] {0, 3};
@@ -542,6 +544,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	/**
 	 * query if an utility graphics window tab is requested
 	 */
+	@Override
 	public boolean isUtilityGraphicsRequested() {
 		return false;
 	}
@@ -551,6 +554,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * specific curve calculated from point combinations or other specific dialog
 	 * As default the function should return null which stands for no device custom tab item.  
 	 */
+	@Override
 	public CTabItem getUtilityDeviceTabItem() {
 		return new VarioToolTabItem(this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount(), this, true);
 	}
@@ -629,6 +633,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
 	 * set value of -1 to suppress this measurement
 	 */
+	@Override
 	public boolean isActualRecordSetWithGpsData() {
 		boolean containsGPSdata = false; 
 		Channel activeChannel = this.channels.getActiveChannel();
@@ -645,6 +650,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * export a file of the actual channel/record set
 	 * @return full qualified file path depending of the file ending type
 	 */
+	@Override
 	public String exportFile(String fileEndingType, boolean isExportTmpDir) {
 		String exportFileName = GDE.STRING_EMPTY;
 		Channel activeChannel = this.channels.getActiveChannel();
@@ -662,6 +668,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
 	 */
+	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
 		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
 		//13=tripLength 14=distance 15=azimuth 16=directionStart
@@ -676,6 +683,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
 	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
 	 */
+	@Override
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
 		//check for WStech devices file contained record properties for containing calculated measurements
 		String[] recordKeys = recordSet.getRecordNames();

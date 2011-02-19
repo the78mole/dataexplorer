@@ -1713,6 +1713,7 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupSlider16.setIncrement(1);
 							this.setupSlider16.setSelection(this.setupValue16);
 							this.setupSlider16.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									VarioToolTabItem.log.log(Level.FINEST, "setupSlider16.widgetSelected, event=" + evt); //$NON-NLS-1$
 									int tmpValue = VarioToolTabItem.this.setupSlider16.getSelection();
@@ -1776,6 +1777,7 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupButton17.setLayoutData(setupButton17LData);
 							this.setupButton17.setSelection((this.setupValue17 & 0x80) == 0x80);
 							this.setupButton17.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									VarioToolTabItem.log.log(Level.FINEST, "setupButton17.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (VarioToolTabItem.this.setupButton17.getSelection()) {
@@ -1801,6 +1803,7 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupSlider17.setIncrement(5);
 							this.setupSlider17.setSelection(this.setupValue17);
 							this.setupSlider17.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									VarioToolTabItem.log.log(Level.FINEST, "setupSlider17.widgetSelected, event=" + evt); //$NON-NLS-1$
 									int tmpValue = VarioToolTabItem.this.setupSlider17.getSelection();
@@ -1866,6 +1869,7 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupButton18.setLayoutData(setupButton18LData);
 							this.setupButton18.setSelection(this.setupValue18 == 0);
 							this.setupButton18.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									VarioToolTabItem.log.log(Level.FINEST, "setupButton18.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (VarioToolTabItem.this.setupButton18.getSelection()) {
@@ -1897,6 +1901,7 @@ public class VarioToolTabItem extends CTabItem {
 							this.setupSlider18.setSelection(this.setupValue18);
 							this.setupSlider18.setEnabled(this.setupValue18 != 0);
 							this.setupSlider18.addSelectionListener(new SelectionAdapter() {
+								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									VarioToolTabItem.log.log(Level.FINEST, "setupSlider18.widgetSelected, event=" + evt); //$NON-NLS-1$
 									int tmpValue = VarioToolTabItem.this.setupSlider18.getSelection();
@@ -1973,6 +1978,7 @@ public class VarioToolTabItem extends CTabItem {
 								this.setupSlider19.setIncrement(10);
 								this.setupSlider19.setSelection((this.setupValue19 & 0x03) * 10);
 								this.setupSlider19.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										VarioToolTabItem.log.log(Level.FINEST, "setupSlider19.widgetSelected, event=" + evt); //$NON-NLS-1$
 										int tmpValue = VarioToolTabItem.this.setupSlider19.getSelection();
@@ -2027,6 +2033,7 @@ public class VarioToolTabItem extends CTabItem {
 								this.setupButton19a.setText(Messages.getString(MessageIds.GDE_MSGT1885));
 								this.setupButton19a.setSelection((this.setupValue19 & 0x38) == 0x00); // 000000
 								this.setupButton19a.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										VarioToolTabItem.log.log(Level.FINEST, "setupButton19a.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (VarioToolTabItem.this.setupButton19a.getSelection()) {
@@ -2044,6 +2051,7 @@ public class VarioToolTabItem extends CTabItem {
 								this.setupButton19b.setText(Messages.getString(MessageIds.GDE_MSGT1886));
 								this.setupButton19b.setSelection((this.setupValue19 & 0x38) == 0x08); // 001000
 								this.setupButton19b.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										VarioToolTabItem.log.log(Level.FINEST, "setupButton19b.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (VarioToolTabItem.this.setupButton19b.getSelection()) {
@@ -2061,6 +2069,7 @@ public class VarioToolTabItem extends CTabItem {
 								this.setupButton19c.setText(Messages.getString(MessageIds.GDE_MSGT1887));
 								this.setupButton19c.setSelection((this.setupValue19 & 0x38) == 0x10); // 010000
 								this.setupButton19c.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										VarioToolTabItem.log.log(Level.FINEST, "setupButton19c.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (VarioToolTabItem.this.setupButton19c.getSelection()) {
@@ -2078,6 +2087,7 @@ public class VarioToolTabItem extends CTabItem {
 								this.setupButton19d.setText(Messages.getString(MessageIds.GDE_MSGT1888));
 								this.setupButton19d.setSelection((this.setupValue19 & 0x38) == 0x20); // 100000
 								this.setupButton19d.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										VarioToolTabItem.log.log(Level.FINEST, "setupButton19d.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (VarioToolTabItem.this.setupButton19d.getSelection()) {
@@ -2104,6 +2114,7 @@ public class VarioToolTabItem extends CTabItem {
 								this.setupButton19e.setText(Messages.getString(MessageIds.GDE_MSGT1889));
 								this.setupButton19e.setSelection(true);
 								this.setupButton19e.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										VarioToolTabItem.log.log(Level.FINEST, "setupButton19e.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (VarioToolTabItem.this.setupButton19e.getSelection()) {
@@ -2118,6 +2129,7 @@ public class VarioToolTabItem extends CTabItem {
 								this.setupButton19f.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.setupButton19f.setText(Messages.getString(MessageIds.GDE_MSGT1890));
 								this.setupButton19f.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										VarioToolTabItem.log.log(Level.FINEST, "setupButton19f.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (VarioToolTabItem.this.setupButton19f.getSelection()) {
@@ -2132,6 +2144,7 @@ public class VarioToolTabItem extends CTabItem {
 								this.setupButton19g.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.setupButton19g.setText(Messages.getString(MessageIds.GDE_MSGT1891));
 								this.setupButton19g.addSelectionListener(new SelectionAdapter() {
+									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										VarioToolTabItem.log.log(Level.FINEST, "setupButton19g.widgetSelected, event=" + evt); //$NON-NLS-1$
 										if (VarioToolTabItem.this.setupButton19g.getSelection()) {
