@@ -21,7 +21,6 @@ package gde.device.tttronix;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.comm.IDeviceCommPort;
-import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
@@ -51,8 +50,6 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 	final int  terminalDataSize = 345; // configuration menu string
 	int retrys = 0; // re-try temporary error counter
 	
-	final DeviceConfiguration deviceConfig;
-
 	/**
 	 * constructor of default implementation
 	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
@@ -60,7 +57,6 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 	 */
 	public QcCopterSerialPort(IDevice currentDevice, DataExplorer currentApplication) {
 		super(currentDevice, currentApplication);
-		this.deviceConfig = currentDevice.getDeviceConfiguration();
 		this.dataSize = this.deviceConfig.getDataBlockSize();
 	}
 	
