@@ -170,7 +170,6 @@ public class UniLogDialog extends DeviceDialog {
 
 	final Settings								settings;
 	final UniLogSerialPort				serialPort;																																																																	// open/close port execute getData()....
-	final DataExplorer	application;																																																																	// interaction with application instance
 	final UniLog									device;																																																																			// get device specific things, get serial port, ...
 	UniLogDataGatherer						gatherThread;
 	UniLogLiveGatherer						liveThread;
@@ -238,7 +237,6 @@ public class UniLogDialog extends DeviceDialog {
 		super(parent);
 		this.serialPort = useDevice.getSerialPort();
 		this.device = useDevice;
-		this.application = DataExplorer.getInstance();
 		this.settings = Settings.getInstance();
 		UniLogDialog.RX_AUTO_START_MS[UniLogDialog.RX_AUTO_START_MS.length - 1] = Messages.getString(MessageIds.GDE_MSGT1300);
 	}
@@ -1689,16 +1687,16 @@ public class UniLogDialog extends DeviceDialog {
 	 * @param numberRecordSet
 	 * @param numReadErrors
 	 * @param numLess2Measurements
-	 * @param memoryUsed
+	 * @param memoryUsedValue
 	 */
-	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int numLess2Measurements, final int memoryUsed) {
+	public void updateDataGatherProgress(final int redTelegrams, final int numberRecordSet, final int numReadErrors, final int numLess2Measurements, final int memoryUsedValue) {
 		this.numberRedDataSetsText = "" + redTelegrams; //$NON-NLS-1$
 		this.numberActualDataSetsText = "" + numberRecordSet; //$NON-NLS-1$
 		this.numberReadErrorText = "" + numReadErrors; //$NON-NLS-1$
 		this.numberLess2Text = "" + numLess2Measurements; //$NON-NLS-1$
 		GDE.display.asyncExec(new Runnable() {
 			public void run() {
-				int progress = memoryUsed > 0 ? redTelegrams * 100 / memoryUsed : 100;
+				int progress = memoryUsedValue > 0 ? redTelegrams * 100 / memoryUsedValue : 100;
 				int tmpValue = progress < 0 ? 0 : progress;
 				tmpValue = progress > 100 ? 100 : progress;
 				UniLogDialog.this.readDataProgressBar.setSelection(tmpValue);
