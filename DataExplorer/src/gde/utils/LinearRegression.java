@@ -64,6 +64,7 @@ public class LinearRegression extends CalculationThread {
 				record.clear(); // make sure to clean the target record before calculate new data points
 				double timeStep_sec = recordHeight.getAverageTimeStep_ms() / 1000; //TODO enable for variable time steps
 				int timeStepsPerInterval = Double.valueOf(this.calcInterval_sec / timeStep_sec).intValue(); // 4000ms/50ms/point -> 80 points per interval
+				timeStepsPerInterval = timeStepsPerInterval <= 4 ? 4 : timeStepsPerInterval;
 				int pointsPerInterval = timeStepsPerInterval + 1;
 				log.log(Level.FINE, "calcInterval_sec = " + this.calcInterval_sec + " pointsPerInterval = " + pointsPerInterval); //$NON-NLS-1$ //$NON-NLS-2$
 				int pointInterval = 3; // fix number of points where the calculation will result in slope values, rest is overlap
