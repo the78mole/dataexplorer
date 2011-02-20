@@ -217,11 +217,8 @@ public class GPSHelper {
 
 				int lastLongitude = recordLongitude.get(indexGPS);
 
-				double phi_start_rad = device.translateValue(recordLatitude, recordLatitude.get(indexGPS) / 1000.0) * rad;
-				double lambda_start = device.translateValue(recordLongitude, lastLongitude / 1000.0);
-
-				double phi_A_rad = phi_start_rad;
-				double lambda_A = lambda_start;
+				double phi_A_rad = device.translateValue(recordLatitude, recordLatitude.get(indexGPS) / 1000.0) * rad;;
+				double lambda_A = device.translateValue(recordLongitude, lastLongitude / 1000.0);
 				int indexMovement = 0;
 
 				for (; i < recordSize; ++i) {
@@ -238,6 +235,10 @@ public class GPSHelper {
 					alpha = lastLongitude > recordLongitude.get(i) ? 360.0 - alpha : alpha;
 
 					recordAzimuth.add((int) (alpha * 1000.0));
+
+					phi_A_rad = phi_B_rad;
+					lambda_A = lambda_B;
+					lastLongitude = recordLongitude.get(i);
 
 					if (indexMovement == 0) {
 						double zeta = zeta_rad / rad;

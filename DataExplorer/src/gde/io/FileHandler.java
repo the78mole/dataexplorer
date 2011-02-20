@@ -448,11 +448,12 @@ public class FileHandler {
 	 * @param ordinalLatitude
 	 * @param ordinalHeight
 	 * @param ordinalVelocity
+	 * @param ordinalSlope
 	 * @param ordinalTripLength (optional, if not exist -1)
 	 * @param ordinalAzimuth (optional, if not exist -1)
 	 * @param isRelative
 	 */
-	public void exportFileKMZ(final String dialogName, final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final int ordinalVelocity, final int ordinalTripLength, final int ordinalAzimuth, final boolean isRelative) {
+	public void exportFileKMZ(final String dialogName, final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final int ordinalVelocity, final int ordinalSlope, final int ordinalTripLength, final int ordinalAzimuth, final boolean isRelative) {
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005));
@@ -497,7 +498,7 @@ public class FileHandler {
 				kmlFileName = kmlFileName != null && kmlFileName.contains(GDE.STRING_DOT) ? kmlFileName.substring(0, kmlFileName.indexOf(GDE.STRING_DOT)) : kmlFileName;
 				kmlFileName = kmlFileName + GDE.FILE_ENDING_DOT_KML;
 
-				KMZWriter.write(kmzFilePath, kmlFileName, activeChannel.getActiveRecordSet(), ordinalLongitude, ordinalLatitude, ordinalHeight, ordinalVelocity, ordinalTripLength, ordinalAzimuth, isRelative);
+				KMZWriter.write(kmzFilePath, kmlFileName, activeChannel.getActiveRecordSet(), ordinalLongitude, ordinalLatitude, ordinalHeight, ordinalVelocity, ordinalSlope, ordinalTripLength, ordinalAzimuth, isRelative);
 
 			}
 			catch (Exception e) {
@@ -516,13 +517,14 @@ public class FileHandler {
 	 * @param ordinalLatitude
 	 * @param ordinalHeight
 	 * @param ordinalVelocity
+	 * @param ordinalSlope
 	 * @param ordinalTripLength (optional, if not exist -1)
 	 * @param ordinalAzimuth (optional, if not exist -1)
 	 * @param isHeightRelative
 	 * @param isExportTmpDir
 	 * @return full qualified file path to the exported KML file
 	 */
-	public String exportFileKMZ(final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final int ordinalVelocity, final int ordinalTripLength, final int ordinalAzimuth, final boolean isHeightRelative, boolean isExportTmpDir) {
+	public String exportFileKMZ(final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final int ordinalVelocity, final int ordinalSlope, final int ordinalTripLength, final int ordinalAzimuth, final boolean isHeightRelative, boolean isExportTmpDir) {
 		String kmzFilePath = GDE.STRING_EMPTY;
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
@@ -559,7 +561,7 @@ public class FileHandler {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 				
-				KMZWriter.write(kmzFilePath, fileName.substring(fileName.lastIndexOf(GDE.FILE_SEPARATOR)+1) + GDE.FILE_ENDING_DOT_KML, activeRecordSet, ordinalLongitude, ordinalLatitude, ordinalHeight, ordinalVelocity, ordinalTripLength, ordinalAzimuth, isHeightRelative);
+				KMZWriter.write(kmzFilePath, fileName.substring(fileName.lastIndexOf(GDE.FILE_SEPARATOR)+1) + GDE.FILE_ENDING_DOT_KML, activeRecordSet, ordinalLongitude, ordinalLatitude, ordinalHeight, ordinalVelocity, ordinalSlope, ordinalTripLength, ordinalAzimuth, isHeightRelative);
 			}
 			catch (Exception e) {
 				log.log(Level.WARNING, e.getMessage(), e);
