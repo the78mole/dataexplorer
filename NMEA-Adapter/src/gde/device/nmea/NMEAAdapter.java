@@ -569,7 +569,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	public void export2KMZ3D(int type) {
 		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2103), 1, 0, 2, 7, 11, 13, type == DeviceConfiguration.HEIGHT_RELATIVE);
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2103), 1, 0, 2, 7, 10, 11, 13, type == DeviceConfiguration.HEIGHT_RELATIVE);
 	}
 
 //	/**
@@ -614,7 +614,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 				//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
-				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, 7, 11, 13, true, isExport2TmpDir);
+				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, 7, 10, 11, 13, true, isExport2TmpDir);
 			}
 		}
 		return exportFileName;
