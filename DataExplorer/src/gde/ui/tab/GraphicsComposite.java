@@ -312,7 +312,12 @@ public class GraphicsComposite extends Composite {
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "graphicCanvas.paintControl, event=" + evt); //$NON-NLS-1$
 					//System.out.println("width = " + GraphicsComposite.this.getSize().x);
-					drawAreaPaintControl(evt);
+					try {
+						drawAreaPaintControl(evt);
+					}
+					catch (Exception e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+					}
 				}
 			});
 		}

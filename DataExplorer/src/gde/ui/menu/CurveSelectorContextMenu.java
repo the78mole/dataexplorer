@@ -876,7 +876,7 @@ public class CurveSelectorContextMenu {
 					log.log(Level.FINEST, "horizontalGridMain Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordNameKey != null) {
 						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
-						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordOrdinal(CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).getOrdinal());
+						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordOrdinal(CurveSelectorContextMenu.this.recordSet.isCompareSet() ? 0 : CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey).getOrdinal());
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -1042,7 +1042,7 @@ public class CurveSelectorContextMenu {
 								compareSet.setHorizontalGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalColor());
 								compareSet.setTimeGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalType());
 								compareSet.setTimeGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalColor());
-								compareSet.setHorizontalGridRecordOrdinal(0); //compareSet.getRecord(newRecordkey).getOrdinal());
+								compareSet.setHorizontalGridRecordOrdinal(0); 
 							}
 							// check if the new added record exceeds the existing one in time or set draw limit and pad with dummy points
 							double maxRecordTime_ms = compareSet.getCompareSetMaxScaleTime_ms();

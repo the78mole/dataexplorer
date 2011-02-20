@@ -852,6 +852,9 @@ public class RecordSet extends HashMap<String, Record> {
 				newRecord.numberFormat = this.get(0).numberFormat;
 				newRecord.df = (DecimalFormat)this.get(0).df.clone();
 			}
+			else {
+				newRecord.setNumberFormat(-1);
+			}
 			// set all scales of compare set to left
 			newRecord.isPositionLeft = true;
 		}
@@ -863,7 +866,12 @@ public class RecordSet extends HashMap<String, Record> {
 	 * get record based on ordinal
 	 */
 	public Record get(int recordOrdinal) {
-		return this.get(this.recordNames[recordOrdinal]);
+		try {
+			return this.get(this.recordNames[recordOrdinal]);
+		}
+		catch (Exception e) {
+			return this.get(0);
+		}
 	}
 
 	/**
@@ -1387,17 +1395,17 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 	
 	/**
-	 * @return the channe/configuration number
+	 * @return the channel/configuration number
 	 */
 	public int getChannelConfigNumber() {
-		return this.parent.number;
+		return this.parent != null ? this.parent.number : 1; //compare set does not have a parent
 	}
 
 	/**
 	 * @return the channel (or) configuration name
 	 */
 	public String getChannelConfigName() {
-		return this.parent.channelConfigName;
+		return this.parent != null ? this.parent.channelConfigName : GDE.STRING_EMPTY;
 	}
 
 	/**

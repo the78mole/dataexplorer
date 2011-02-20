@@ -41,7 +41,7 @@ public class TimeSteps extends Vector<Integer> {
 	public TimeSteps(double newTimeStep_ms) {
 		super(1, 1);
 		this.isConstant = newTimeStep_ms > 0;
-		if (!this.isConstant) 
+		if (this.isConstant) 
 			super.add((int) (newTimeStep_ms * 10));
 	}
 	
