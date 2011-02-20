@@ -4,7 +4,9 @@ Version 2.72 - xx yyy 2011
 
 documentation update
 fix error while saving object data without GPS speed configuration
-correct wrong synchronization reference GPS-Logger measurement Height (relative)_UL
+correct wrong synchronization reference GPS-Logger measurement Height (relative)_UL in device properties XML
+enhance and combine KML/GPX export to KMZ
+fix problem setting horizontal grid in compare window
 
 Version 2.71 - 30 Jan 2011
 
