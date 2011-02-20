@@ -617,7 +617,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	public void export2KML3D(int type) {
 		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
 		//13=tripLength 14=distance 15=azimuth 16=directionStart
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1859), 7, 8, 9, 10, 13, 15, type == DataVario.HEIGHT_RELATIVE);
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1859), 7, 8, 9, 10, 11, 13, 15, type == DataVario.HEIGHT_RELATIVE);
 	}
 	
 //	/**
@@ -659,7 +659,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
 				//13=tripLength 14=distance 15=azimuth 16=directionStart
-				exportFileName = new FileHandler().exportFileKMZ(7, 8, 9, 10, 13, 15, true, isExportTmpDir);
+				exportFileName = new FileHandler().exportFileKMZ(7, 8, 9, 10, 11, 13, 15, true, isExportTmpDir);
 			}
 		}
 		return exportFileName;
