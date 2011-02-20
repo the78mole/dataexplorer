@@ -1992,6 +1992,7 @@ public class DeviceConfiguration {
 	 * @return full qualified file path depending of the file ending type
 	 */
 	public String exportFile(String fileEndingType, boolean isExport2TmpDir) {
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "fileEndingType = " + fileEndingType + ", isExport2TmpDir = "+ isExport2TmpDir);
 		return GDE.STRING_EMPTY;
 	}
 	
