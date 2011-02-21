@@ -1489,9 +1489,13 @@ public class GraphicsComposite extends Composite {
 					graphicsGC.setBackground(this.surroundingBackground);
 					graphicsGC.setFont(this.graphicsHeader.getFont());
 					graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
-					GraphicsUtils.drawTextCentered(this.graphicsHeader.getText(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
+					if (this.graphicsHeader.getText().length() > 1) {
+						GraphicsUtils.drawTextCentered(this.graphicsHeader.getText(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
+					}
 					graphicsGC.setFont(this.recordSetComment.getFont());
-					GraphicsUtils.drawText(this.recordSetComment.getText(), 20, graphicsHeight - 40, graphicsGC, SWT.HORIZONTAL);
+					if (this.recordSetComment.getText().length() > 1) {
+						GraphicsUtils.drawText(this.recordSetComment.getText(), 20, graphicsHeight - 40, graphicsGC, SWT.HORIZONTAL);
+					}
 					graphicsGC.drawImage(this.canvasImage, 0, 30);
 					graphicsGC.dispose();
 				}
