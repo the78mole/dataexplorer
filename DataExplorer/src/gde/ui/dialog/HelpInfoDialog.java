@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.ui.dialog;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.jar.JarFile;
 import gde.log.Level;
@@ -111,16 +112,25 @@ public class HelpInfoDialog extends Dialog {
 		String helpDir = "help" + GDE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + GDE.FILE_SEPARATOR;
 		String targetDir = GDE.JAVA_IO_TMPDIR + (GDE.IS_WINDOWS ? "" : GDE.FILE_SEPARATOR_UNIX) + "GDE" + GDE.FILE_SEPARATOR_UNIX;
 		
-		if (deviceName.length() >= 1) { // devices/<deviceName>.jar
-			jarBasePath = jarBasePath + "devices" + GDE.FILE_SEPARATOR_UNIX;
-			jarName = deviceName + GDE.FILE_ENDING_DOT_JAR;
-			targetDir = targetDir + deviceName + GDE.FILE_SEPARATOR_UNIX;
-		}
-		
-		log.log(Level.FINE, "jarBasePath = " + jarBasePath + " jarName = " + jarName + " helpDir = " + helpDir); //$NON-NLS-1$
-		
 		try {
-			FileUtils.extractDir(new JarFile(jarBasePath + jarName), helpDir, targetDir, "555");
+			if (!(new File(targetDir)).exists()) {
+				log.log(Level.FINE, "jarBasePath = " + jarBasePath + " jarName = " + jarName + " helpDir = " + helpDir); //$NON-NLS-1$
+				//extract DataExplorer base help content each time if needed to allow references
+				FileUtils.extractDir(new JarFile(jarBasePath + jarName), helpDir, targetDir, "555");
+			}
+			
+			if (deviceName.length() >= 1) { // devices/<deviceName>.jar
+				jarBasePath = jarBasePath + "devices" + GDE.FILE_SEPARATOR_UNIX;
+				jarName = deviceName + GDE.FILE_ENDING_DOT_JAR;
+				targetDir = targetDir + deviceName + GDE.FILE_SEPARATOR_UNIX;
+
+				if (!(new File(targetDir)).exists()) {
+					log.log(Level.FINE, "jarBasePath = " + jarBasePath + " jarName = " + jarName + " helpDir = " + helpDir); //$NON-NLS-1$
+					FileUtils.extractDir(new JarFile(jarBasePath + jarName), helpDir, targetDir, "555");
+				}
+			}
+		
+		
 			String stringUrl = targetDir + helpDir + fileName;
 			log.log(Level.FINE, "stringUrl = " + "file:///" + stringUrl); //$NON-NLS-1$ //$NON-NLS-2$
 			
