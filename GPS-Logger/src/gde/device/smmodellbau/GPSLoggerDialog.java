@@ -346,7 +346,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 					});
 				}
 
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 10));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 375, 10));
 				this.dialogShell.open();
 			}
 			else {
