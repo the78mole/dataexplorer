@@ -150,17 +150,17 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							if (activeRecordSet != null) isRecordSetGraphicsPrintable = activeRecordSet.size() > 0;
 						}
 						PrintSelectionDialog.this.graphicsButton.setEnabled(isRecordSetGraphicsPrintable);
-						PrintSelectionDialog.this.graphicsButton.setSelection(isRecordSetGraphicsPrintable);
+						//PrintSelectionDialog.this.graphicsButton.setSelection(isRecordSetGraphicsPrintable);
 						PrintSelectionDialog.this.statisticsButton.setEnabled(isRecordSetGraphicsPrintable);
-						PrintSelectionDialog.this.statisticsButton.setSelection(isRecordSetGraphicsPrintable);
+						//PrintSelectionDialog.this.statisticsButton.setSelection(isRecordSetGraphicsPrintable);
 
 						boolean isObjectOriented = PrintSelectionDialog.this.application.isObjectoriented();
 						PrintSelectionDialog.this.objectButton.setEnabled(isObjectOriented);
-						PrintSelectionDialog.this.objectButton.setSelection(isObjectOriented);
+						//PrintSelectionDialog.this.objectButton.setSelection(isObjectOriented);
 
 						boolean isCopareWindowPrintable = PrintSelectionDialog.this.application.getCompareSet().size() > 0;
 						PrintSelectionDialog.this.curveCompareButton.setEnabled(isCopareWindowPrintable);
-						PrintSelectionDialog.this.curveCompareButton.setSelection(isCopareWindowPrintable);
+						//PrintSelectionDialog.this.curveCompareButton.setSelection(isCopareWindowPrintable);
 					}
 				});
 				{
