@@ -184,6 +184,8 @@ public class ObjectDescriptionWindow extends CTabItem {
 			this.object.load();
 			if (this.object.getImage() != null)
 				this.image = SWTResourceManager.getImage(this.object.getImage().getImageData(), this.object.getKey(), this.object.getImageWidth(), this.object.getImageHeight(), true);
+			else
+				this.image = null;
 		}
 		else {
 			this.image = null;
@@ -457,7 +459,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 								&& (Boolean) ObjectDescriptionWindow.this.imagePopupMenu.getData("OBJECT_IMAGE_CHANGED")) {
 							String imagePath = (String) ObjectDescriptionWindow.this.imagePopupMenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_PATH);
 							if (imagePath != null) {
-								ObjectDescriptionWindow.this.image = SWTResourceManager.getImage(new Image(ObjectDescriptionWindow.this.imageCanvas.getDisplay(), imagePath).getImageData(),
+								ObjectDescriptionWindow.this.image = SWTResourceManager.getImage(ObjectDescriptionWindow.this.image.getImageData(),
 										ObjectDescriptionWindow.this.object.getKey(), ObjectDescriptionWindow.this.object.getImageWidth(), ObjectDescriptionWindow.this.object.getImageHeight(), true);
 							}
 							else {
@@ -466,7 +468,6 @@ public class ObjectDescriptionWindow extends CTabItem {
 							ObjectDescriptionWindow.this.object.setImage(ObjectDescriptionWindow.this.image);
 							ObjectDescriptionWindow.this.imagePopupMenu.setData("OBJECT_IMAGE_CHANGED", false);
 							ObjectDescriptionWindow.this.isObjectDataSaved = false;
-							//imageCanvas.redraw(0,0,400,300,true);
 						}
 						ObjectDescriptionWindow.this.imageCanvas.setSize(400, 300);
 						if (ObjectDescriptionWindow.this.image != null) {

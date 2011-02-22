@@ -120,7 +120,7 @@ public class SWTResourceManager {
 	
 	public static void listResourceStatus() {
 		Iterator<String> it = resources.keySet().iterator();
-		log.log(Level.INFO, "number collected resources = " + resources.size());
+		log.log(Level.WARNING, "number collected resources = " + resources.size());
 		int numFonts = 0, numColors = 0, numImage = 0, numCursor = 0, numMenu = 0;
 		while (it.hasNext()) {
 			Object resource = resources.get(it.next());
@@ -140,12 +140,12 @@ public class SWTResourceManager {
 				 ++numMenu;
 			}
 		}
-		log.log(Level.INFO, users.size() + " widgets, " + numFonts + " font, " + numColors + " colors, " + numImage + " images, " + numCursor +  " cursors " + numMenu +  " menus ");
+		log.log(Level.WARNING, users.size() + " widgets, " + numFonts + " font, " + numColors + " colors, " + numImage + " images, " + numCursor +  " cursors " + numMenu +  " menus ");
 		StringBuffer sb = new StringBuffer();
 		for (String key : widgets.keySet()) {
 			sb.append(key).append(GDE.STRING_BLANK).append(widgets.get(key)).append(GDE.STRING_COMMA);
 		}
-		log.log(Level.INFO, sb.toString());
+		log.log(Level.WARNING, sb.toString());
 
 	}
 
