@@ -1,7 +1,12 @@
-GNU DataExplorer - News - comes with version 2.71
+GNU DataExplorer - News - comes with version 2.72
 
-1)fix file import problem while using files with upper case extension on GNU/Linux
-2)fix problem not displaying application window after switching from secondary monitor to single one
+1)documentation update
+2)fix error while saving object data without GPS speed configuration
+3)correct wrong synchronization reference GPS-Logger measurement Height (relative)_UL in device properties XML
+4)enhance and combine KML/GPX export to KMZ
+5)fix problem setting horizontal grid in compare window
+6)fix problem while printing graphics without header/comment text visible
+7)fix selection problem in print configuration dialog Mac OS 
 
 
 
