@@ -649,7 +649,15 @@
 	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
 
-	<target name="signature" description="create and verify gpg signature and verify">
+	<target name="copy_docu" description="copy docu pdfs to build/target/install">
+		<copy todir="${build.target.dir}" overwrite="true">
+			<fileset dir="DataExplorer/doc" >
+				<include name="*.pdf" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="signature" description="create and verify gpg signature and verify" depends="copy_docu">
 		<for param="file">
 			<path>
 				<fileset dir="${basedir}/build/target/install" includes="*.sig" />
@@ -667,7 +675,7 @@
 				<echo message="signing: @{file}" />
 				<exec executable="bash" dir="${basedir}/build/target/install">
 					<arg value="-c" />
-					<arg value="gpg --batch -b --use-agent @{file}" />
+					<arg value="gpg --batch -b --use-agent '@{file}'" />
 				</exec>
 			</sequential>
 		</for>
