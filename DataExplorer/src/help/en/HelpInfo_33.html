@@ -106,7 +106,18 @@ application configuration path.
 	select a graphics template to be applied
 </UL>
 <P>If there is a reasonable configuration displaying all your important curves found, go ahead and save such graphics configuration as default.
+</BR>
+The graphic templates contains definitions to adjust scale end values.
+Using devices which support live data gathering this could be important to judge the curves.
+Keep in mind, while displaying curves always the complete scale values margin will be used to display curves if not other specified.
+In cases curves with minimal deviation values could be displayed very similar to curves with ten times of the values. 
+Only the scale end values will change.
+In similar case it would be advisable to configure a graphics template which have the maximum scale end values configured.
+Loading this graphics template at the beginning of live data gathering, the scale end values keep the same as configured until end of measurement.
+As sample a live data gathering of the QuadroControl. The QuadroControl will drive counteraction according to movement direction and force using its tri-axial accelerometer.
+To keep this in mind is important using the <A HREF="HelpInfo_42.html#scope_mode">oscilloscope mode</A>, were only a smaller part of the curve remains visible.
 </P>
+<P ALIGN=CENTER><IMG SRC="images/Menuebar_GraphicsTemplates_QuadroControl.png" NAME="Menuebar_GraphicsTemplates_QuadroControl" ALIGN=MIDDLE></P>
 <P><B>Hints : </B>THe apply function of graphics templates overlay with visibility configuration for some devices.
 If there are some curves switched invisible using the visibility configuration of the certain device, they will not be visible by applying the graphics template.
 Some devices switch curves invisible automatically in cases where no real data are contained.
