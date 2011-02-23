@@ -277,7 +277,10 @@ public class KMZWriter {
 			Record recordTripLength = recordSet.get(ordinalTripLength);
 			Vector<Integer> recordAzimuth;
 			try {
-				recordAzimuth = recordSet.get(ordinalAzimuth);
+				if (ordinalAzimuth >= 0) 
+					recordAzimuth = recordSet.get(ordinalAzimuth);
+				else
+					recordAzimuth = GPSHelper.calculateAzimuth(device, recordSet, ordinalLatitude, ordinalLongitude, ordinalHeight);
 			}
 			catch (Exception e) {
 				recordAzimuth = GPSHelper.calculateAzimuth(device, recordSet, ordinalLatitude, ordinalLongitude, ordinalHeight);
