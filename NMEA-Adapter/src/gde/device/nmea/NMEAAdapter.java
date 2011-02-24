@@ -273,7 +273,18 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+				//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
+				if (j > 1) {
+					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+				}
+				else {
+					//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
+					double value = (record.get(rowIndex) / 1000000.0);
+					int grad = (int)value;
+					double minuten = (value - grad) * 100;
+					dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
+				}
 			}
 		}
 		catch (RuntimeException e) {
@@ -296,10 +307,9 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 		double newValue = 0;
 		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
-			int tValue = (int)(value * 1000);
-			int grad = tValue / 1000000;
-			int tMinuten =  tValue - grad*1000000;   //((int)value - grad * 1000) / 10.0 + (value -(int)value);
-			newValue = grad + ((int)(tMinuten/0.6) / 1000000.0);
+			int grad = ((int)(value / 1000));
+			double minuten = (value - (grad*1000.0))/10.0;
+			newValue = grad + minuten/60.0;
 		}
 		else {
 			newValue = (value - reduction) * factor + offset;
@@ -322,9 +332,9 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 		double newValue = 0;
 		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
-			int grad = (int) value;
-			double minuten = (value - grad * 1.0) * 60.0;
-			newValue = (grad + minuten / 100.0) * 1000.0;
+			int grad = (int)value;
+			double minuten =  (value - grad*1.0) * 60.0;
+			newValue = (grad + minuten/100.0)*1000.0;
 		}
 		else {
 			newValue = (value - offset) / factor + reduction;
