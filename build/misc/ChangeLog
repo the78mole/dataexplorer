@@ -9,6 +9,7 @@ enhance and combine KML/GPX export to KMZ
 fix problem setting horizontal grid in compare window
 fix problem while printing graphics without header/comment text visible
 fix selection problem in print configuration dialog Mac OS 
+fix wrong display of GPS values in table view GPS-Logger, NMEA-Adapter
 
 Version 2.71 - 30 Jan 2011
 

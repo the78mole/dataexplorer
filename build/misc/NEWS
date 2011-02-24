@@ -7,6 +7,8 @@ GNU DataExplorer - News - comes with version 2.72
 5)fix problem setting horizontal grid in compare window
 6)fix problem while printing graphics without header/comment text visible
 7)fix selection problem in print configuration dialog Mac OS 
+8)fix wrong display of GPS values in table view GPS-Logger, NMEA-Adapter
+
 
 
 
