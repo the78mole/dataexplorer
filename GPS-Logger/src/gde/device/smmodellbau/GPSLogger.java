@@ -276,7 +276,20 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
+				//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+				if (j > 1) {
+					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+				}
+				else {
+					//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
+					double value = (record.get(rowIndex) / 1000000.0);
+					int grad = (int)value;
+					double minuten = (value - grad) * 100;
+					dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
+				}
 			}
 		}
 		catch (RuntimeException e) {
@@ -320,9 +333,9 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 
 		double newValue = 0;
 		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
-			int grad = ((int) (value / 1000));
-			double minuten = (value - (grad * 1000.0)) / 10.0;
-			newValue = grad + minuten / 60.0;
+			int grad = ((int)(value / 1000));
+			double minuten = (value - (grad*1000.0))/10.0;
+			newValue = grad + minuten/60.0;
 		}
 		else {
 			newValue = (value - reduction) * factor + offset;
@@ -366,9 +379,9 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 
 		double newValue = 0;
 		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
-			int grad = (int) value;
-			double minuten = (value - grad * 1.0) * 60.0;
-			newValue = (grad + minuten / 100.0) * 1000.0;
+			int grad = (int)value;
+			double minuten =  (value - grad*1.0) * 60.0;
+			newValue = (grad + minuten/100.0)*1000.0;
 		}
 		else {
 			newValue = (value - offset) / factor + reduction;
