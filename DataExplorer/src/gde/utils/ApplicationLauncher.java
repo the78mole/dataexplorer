@@ -103,7 +103,8 @@ public class ApplicationLauncher {
 					}
 				}
 			}
-			if (!fqExecPath.contains(executable)) {
+			String[] executableParts = new String[]{executable.substring(0, executable.indexOf(GDE.STRING_STAR)), executable.substring(executable.indexOf(GDE.STRING_STAR)+1)};
+			if (!(fqExecPath.contains(executableParts[0]) && (executableParts.length>1 && fqExecPath.contains(executableParts[1])))) {
 				DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT0603, new String[] { executable, searchLocationInfo, searchExecutableKey }));
 			}
 			
