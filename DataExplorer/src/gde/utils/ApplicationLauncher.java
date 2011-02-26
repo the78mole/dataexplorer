@@ -72,7 +72,6 @@ public class ApplicationLauncher {
 							path = path.substring(1);
 						}
 						log.log(Level.FINE, "executable = " + path);
-						fqExecPath = executable;
 						break;
 					}
 					log.log(Level.WARNING, "failed find executable according key = " + tmpSearchExecutableKey + " method: " + searchLocationInfo);
@@ -116,10 +115,10 @@ public class ApplicationLauncher {
 
 					if (process.exitValue() == 0 && sb.length() > 4) {
 						log.log(Level.FINE, "executable = " + sb.toString());
-						fqExecPath = executable;
 						break;
 					}
 				}
+				fqExecPath = executable;
 			}
 			else if (GDE.IS_MAC) {
 				for (String tmpSearchExecutableKey : searchKeyVector) {
@@ -131,7 +130,6 @@ public class ApplicationLauncher {
 						String macExecPath = appDirectory + GDE.STRING_MAC_APP_EXE_PATH + tmpSearchExecutableKey;
 						if (FileUtils.checkFileExist(macExecPath)) {
 							log.log(Level.FINE, "executable = " + macExecPath);
-							fqExecPath = executable;
 							break;
 						}
 					}
