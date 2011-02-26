@@ -118,7 +118,6 @@ public class ApplicationLauncher {
 						break;
 					}
 				}
-				fqExecPath = executable;
 			}
 			else if (GDE.IS_MAC) {
 				for (String tmpSearchExecutableKey : searchKeyVector) {
@@ -137,6 +136,7 @@ public class ApplicationLauncher {
 						log.log(Level.WARNING, "failed find executable according key = " + tmpSearchExecutableKey + " method: " + searchLocationInfo);
 				}
 			}
+			fqExecPath = executable;
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
