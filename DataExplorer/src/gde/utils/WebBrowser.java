@@ -75,17 +75,8 @@ public class WebBrowser {
 			if (GDE.IS_WINDOWS) {
 				Runtime.getRuntime().exec("rundll32.exe url.dll,FileProtocolHandler " + stringUrl); //$NON-NLS-1$
 			}
-			else if (GDE.IS_LINUX){
-				String[] browsers = { "firefox", "konqueror", "opera", "epiphany", "mozilla", "netscape" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-				String browser = null;
-				for (int count = 0; count < browsers.length && browser == null; count++)
-					if (Runtime.getRuntime().exec(new String[] { "which", browsers[count] }).waitFor() == 0) browser = browsers[count]; //$NON-NLS-1$
-
-				if (browser == null)
-					throw new Exception(Messages.getString(MessageIds.GDE_MSGE0019, new Object[]
-							{ "firefox, konqueror, opera, epiphany, mozilla, netscape" } )); //$NON-NLS-1$
-				
-				Runtime.getRuntime().exec(browser + GDE.STRING_BLANK + stringUrl);
+			else if (GDE.IS_LINUX){				
+				Runtime.getRuntime().exec("xdg-open" + GDE.STRING_BLANK + stringUrl);
 			}
 			else if (GDE.IS_MAC) {
 		 		Runtime.getRuntime().exec("open" + GDE.STRING_BLANK + stringUrl);

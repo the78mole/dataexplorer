@@ -20,8 +20,6 @@ package gde.utils;
 
 import gde.GDE;
 import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
 import java.io.BufferedReader;
@@ -29,6 +27,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 /**
@@ -51,80 +50,95 @@ public class ApplicationLauncher {
 				}
 				log.log(Level.FINE, "searchExecutableKeys = '" + sb.toString() + GDE.STRING_SINGLE_QUOAT); //$NON-NLS-1$
 			}
-			
-			String searchExecutableKey = GDE.STRING_EMPTY;
+
+			//prepare search keys
+			Vector<String> searchKeyVector = new Vector<String>();
 			for (String tmpSearchExecutableKey : searchExecutableKeys) {
 				if (tmpSearchExecutableKey != null && tmpSearchExecutableKey.length() > 4) {
 					tmpSearchExecutableKey = tmpSearchExecutableKey.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 					if (tmpSearchExecutableKey.contains(GDE.FILE_SEPARATOR_UNIX)) {
 						tmpSearchExecutableKey = tmpSearchExecutableKey.substring(tmpSearchExecutableKey.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
 					}
+					searchKeyVector.add(tmpSearchExecutableKey);
+				}
+			}
 
-					if (GDE.IS_WINDOWS) {
-						String path = WindowsHelper.findApplicationPath(tmpSearchExecutableKey);
-						if (path.length() > 4) {
-							path = path.substring(0, path.toLowerCase().indexOf(GDE.FILE_ENDING_EXE) + 4);
-							if (path.startsWith("\"")) { //$NON-NLS-1$
-								path = path.substring(1);
-							}
-							fqExecPath = path;
-							searchExecutableKey = tmpSearchExecutableKey;
-							break;
+			if (GDE.IS_WINDOWS) {
+				for (String tmpSearchExecutableKey : searchKeyVector) {
+					String path = WindowsHelper.findApplicationPath(tmpSearchExecutableKey);
+					if (path.length() > 4) {
+						path = path.substring(0, path.toLowerCase().indexOf(GDE.FILE_ENDING_EXE) + 4);
+						if (path.startsWith("\"")) { //$NON-NLS-1$
+							path = path.substring(1);
 						}
+						log.log(Level.FINE, "executable = " + path);
+						fqExecPath = executable;
+						break;
 					}
-					else if (GDE.IS_LINUX) {
-						List<String> command = new ArrayList<String>();
-						command.add(Messages.getString(MessageIds.GDE_MSGT0602));
-						command.add(tmpSearchExecutableKey);
-						StringBuilder sb = new StringBuilder();
-						Process process = new ProcessBuilder(command).start(); //$NON-NLS-1$ //$NON-NLS-2$
-						process.waitFor();
-						BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
-						BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-						String line;
-						while ((line = bisr.readLine()) != null) {
-							log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
-							sb.append(line);
-						}
-						while ((line = besr.readLine()) != null) {
-							log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
-						}
-						if (process.exitValue() != 0) {
-							String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-							log.log(Level.SEVERE, msg);
-						}
-						besr.close();
-						bisr.close();
+					log.log(Level.WARNING, "failed find executable according key = " + tmpSearchExecutableKey + " method: " + searchLocationInfo);
+				}
+			}
+			else if (GDE.IS_LINUX) {
+				//String[] browsers = { "firefox", "konqueror", "opera", "epiphany", "mozilla", "netscape" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+				//String browser = null;
+				//for (int count = 0; count < browsers.length && browser == null; count++) {
+				//	if (Runtime.getRuntime().exec(new String[] { "which", browsers[count] }).waitFor() == 0) {
+				//		browser = browsers[count]; //$NON-NLS-1$
+				//		break;
+				//	}
+				//}
+				//if (browser == null)
+				//	throw new Exception(Messages.getString(MessageIds.GDE_MSGE0019, new Object[]
+				//			{ "firefox, konqueror, opera, epiphany, mozilla, netscape" } )); //$NON-NLS-1$
 
-						if (sb.length() > 4) {
-							fqExecPath = sb.toString();
-							searchExecutableKey = tmpSearchExecutableKey;
-							break;
-						}
+				for (String tmpSearchExecutableKey : searchKeyVector) {
+					List<String> command = new ArrayList<String>();
+					command.add("which");//$NON-NLS-1$
+					command.add(tmpSearchExecutableKey);
+					Process process = new ProcessBuilder(command).start(); //$NON-NLS-1$ //$NON-NLS-2$
+					process.waitFor();
+					BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+					BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					StringBuilder sb = new StringBuilder();
+					String line;
+					while ((line = bisr.readLine()) != null) {
+						log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
+						sb.append(line);
 					}
-					else if (GDE.IS_MAC) {
-						if (tmpSearchExecutableKey.toLowerCase().endsWith(GDE.STRING_MAC_DOT_APP)) {
-							tmpSearchExecutableKey = tmpSearchExecutableKey.substring(0, tmpSearchExecutableKey.indexOf(GDE.STRING_MAC_DOT_APP));
-						}
-						String appDirectory = searchLocationInfo;
-						if ((new File(appDirectory)).exists()) {
-							String macExecPath = appDirectory + GDE.STRING_MAC_APP_EXE_PATH + tmpSearchExecutableKey;
-							if (FileUtils.checkFileExist(macExecPath)) {
-								fqExecPath = macExecPath;
-								searchExecutableKey = tmpSearchExecutableKey;
-								break;
-							}
-						}
+					while ((line = besr.readLine()) != null) {
+						log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
+					}
+					if (process.exitValue() != 0) {
+						log.log(Level.WARNING, "failed find executable according key = " + tmpSearchExecutableKey + " method: " + searchLocationInfo);
+					}
+					besr.close();
+					bisr.close();
+
+					if (process.exitValue() == 0 && sb.length() > 4) {
+						log.log(Level.FINE, "executable = " + sb.toString());
+						fqExecPath = executable;
+						break;
 					}
 				}
 			}
-			String[] executableParts = new String[]{executable.substring(0, executable.indexOf(GDE.STRING_STAR)), executable.substring(executable.indexOf(GDE.STRING_STAR)+1)};
-			if (!(fqExecPath.contains(executableParts[0]) && (executableParts.length>1 && fqExecPath.contains(executableParts[1])))) {
-				DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT0603, new String[] { executable, searchLocationInfo, searchExecutableKey }));
+			else if (GDE.IS_MAC) {
+				for (String tmpSearchExecutableKey : searchKeyVector) {
+					if (tmpSearchExecutableKey.toLowerCase().endsWith(GDE.STRING_MAC_DOT_APP)) {
+						tmpSearchExecutableKey = tmpSearchExecutableKey.substring(0, tmpSearchExecutableKey.indexOf(GDE.STRING_MAC_DOT_APP));
+					}
+					String appDirectory = searchLocationInfo;
+					if ((new File(appDirectory)).exists()) {
+						String macExecPath = appDirectory + GDE.STRING_MAC_APP_EXE_PATH + tmpSearchExecutableKey;
+						if (FileUtils.checkFileExist(macExecPath)) {
+							log.log(Level.FINE, "executable = " + macExecPath);
+							fqExecPath = executable;
+							break;
+						}
+					}
+					else
+						log.log(Level.WARNING, "failed find executable according key = " + tmpSearchExecutableKey + " method: " + searchLocationInfo);
+				}
 			}
-			
-			if (GDE.IS_WINDOWS)  fqExecPath = "rundll32.exe";
-			else if (GDE.IS_MAC) fqExecPath = GDE.STRING_MAC_APP_OPEN;
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -142,9 +156,9 @@ public class ApplicationLauncher {
 			if (GDE.IS_WINDOWS) {
 				arguments.add(1, "url.dll,FileProtocolHandler");
 			}
-			if (GDE.IS_LINUX) {
-				arguments.add("&"); //$NON-NLS-1$
-			}
+//			if (GDE.IS_LINUX) {
+//				arguments.add("&"); //$NON-NLS-1$
+//			}
 			for (String string : arguments) {
 				log.log(Level.FINE, GDE.STRING_SINGLE_QUOAT + string + GDE.STRING_SINGLE_QUOAT);
 			}
