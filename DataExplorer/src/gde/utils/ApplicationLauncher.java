@@ -154,15 +154,13 @@ public class ApplicationLauncher {
 			if (GDE.IS_WINDOWS) {
 				arguments.add(1, "url.dll,FileProtocolHandler");
 			}
-//			if (GDE.IS_LINUX) {
-//				arguments.add("&"); //$NON-NLS-1$
-//			}
 			for (String string : arguments) {
 				log.log(Level.FINE, GDE.STRING_SINGLE_QUOAT + string + GDE.STRING_SINGLE_QUOAT);
 			}
 
 			try {
-				Runtime.getRuntime().exec(arguments.toArray(new String[1]));
+				new ProcessBuilder(arguments.toArray(new String[1])).start();
+				//Runtime.getRuntime().exec(arguments.toArray(new String[1]));
 			}
 			catch (Exception e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
