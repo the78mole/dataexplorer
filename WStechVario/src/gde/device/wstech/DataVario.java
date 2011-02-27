@@ -81,7 +81,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.dialog = new VarioDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1858), Messages.getString(MessageIds.GDE_MSGT1858));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}
@@ -99,7 +99,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.dialog = new VarioDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1858), Messages.getString(MessageIds.GDE_MSGT1858));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}

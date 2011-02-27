@@ -47,7 +47,7 @@ public class LinkVario extends DataVario {
 		Messages.setDeviceResourceBundle("gde.device.wstech.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1858), Messages.getString(MessageIds.GDE_MSGT1858));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}
@@ -62,7 +62,7 @@ public class LinkVario extends DataVario {
 		Messages.setDeviceResourceBundle("gde.device.wstech.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1858), Messages.getString(MessageIds.GDE_MSGT1858));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}
