@@ -1940,12 +1940,14 @@ public class DeviceConfiguration {
 	 * method to modify open/close serial port menu toolbar button and device menu entry
 	 * this enable different naming instead open/close start/stop gathering data from device
 	 * and must be called within specific device constructor
-	 * @param useIconSet  DeviceSerialPort.ICON_SET_OPEN_CLOSE | DeviceSerialPort.ICON_SET_START_STOP
+	 * @param useIconSet  DeviceSerialPort.ICON_SET_OPEN_CLOSE | DeviceSerialPort.ICON_SET_START_STOP | DeviceSerialPort.ICON_SET_IMPORT_CLOSE
+	 * @param useToolTipOpen
+	 * @param useToolTipClose
 	 */
-	public void configureSerialPortMenu(int useIconSet) {
+	public void configureSerialPortMenu(int useIconSet, String useToolTipOpen, String useTooTipClose) {
 		DataExplorer application = DataExplorer.getInstance();
 		if (application.getMenuBar() != null)	application.getMenuBar().setSerialPortIconSet(useIconSet);
-		if (application.getMenuToolBar() != null)	application.getMenuToolBar().setSerialPortIconSet(useIconSet);
+		if (application.getMenuToolBar() != null)	application.getMenuToolBar().setSerialPortIconSet(useIconSet, useToolTipOpen, useTooTipClose);
 	}
 
 	/**

@@ -844,8 +844,10 @@ public interface IDevice {
 	 * this enable different naming instead open/close start/stop gathering data from device
 	 * and must be called within specific device constructor
 	 * @param useIconSet  DeviceSerialPort.ICON_SET_OPEN_CLOSE | DeviceSerialPort.ICON_SET_START_STOP
+	 * @param useToolTipOpen
+	 * @param useToolTipClose
 	 */
-	void configureSerialPortMenu(int useIconSet); 
+	void configureSerialPortMenu(int useIconSet, String useToolTipOpen, String useTooTipClose); 
 	
 	/**
 	 * get calculation thread to enable join , isAlive, ...

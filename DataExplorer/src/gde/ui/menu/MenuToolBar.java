@@ -107,6 +107,8 @@ public class MenuToolBar {
 	ToolBar												portToolBar;
 	ToolItem											portOpenCloseItem;
 	int														iconSet = DeviceCommPort.ICON_SET_OPEN_CLOSE; 
+	String												toolTipOpen = GDE.STRING_EMPTY;
+	String												toolTipClose = GDE.STRING_EMPTY;
 	
 	CoolItem											dataCoolItem;
 	ToolBar												dataToolBar;
@@ -1303,13 +1305,19 @@ public class MenuToolBar {
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortCloseDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortClose.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortCloseHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0067));
+					if(this.toolTipOpen != null && this.toolTipOpen.length()>5)
+						this.portOpenCloseItem.setToolTipText(this.toolTipOpen);
+					else
+						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0067));
 				}
 				else {
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0066));
+					if(this.toolTipClose != null && this.toolTipClose.length()>5)
+						this.portOpenCloseItem.setToolTipText(this.toolTipClose);
+					else
+						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0066));
 				}
 				break;
 			case 1: // DeviceSerialPort.ICON_SET_START_STOP
@@ -1317,13 +1325,19 @@ public class MenuToolBar {
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StopGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StopGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StopGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0069));
+					if(this.toolTipOpen != null && this.toolTipOpen.length()>5)
+						this.portOpenCloseItem.setToolTipText(this.toolTipOpen);
+					else
+						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0069));
 				}
 				else {
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StartGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StartGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StartGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0068));
+					if(this.toolTipClose != null && this.toolTipClose.length()>5)
+						this.portOpenCloseItem.setToolTipText(this.toolTipClose);
+					else
+						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0068));
 				}
 				break;
 			case 2: // DeviceSerialPort.ICON_SET_IMPORT_CLOSE
@@ -1331,13 +1345,19 @@ public class MenuToolBar {
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportActiveDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportActiveHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportActive.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0069));
+					if(this.toolTipOpen != null && this.toolTipOpen.length()>5)
+						this.portOpenCloseItem.setToolTipText(this.toolTipOpen);
+					else
+						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0223));
 				}
 				else {
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportDataDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportData.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportDataHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0068));
+					if(this.toolTipClose != null && this.toolTipClose.length()>5)
+						this.portOpenCloseItem.setToolTipText(this.toolTipClose);
+					else
+						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0223));
 				}
 				break;
 			}
@@ -1346,10 +1366,14 @@ public class MenuToolBar {
 	
 	/**
 	 * method to switch icon set by active device
-	 * @param newIconSet
+	 * @param newIconSet DeviceSerialPort.ICON_SET_OPEN_CLOSE | DeviceSerialPort.ICON_SET_START_STOP | DeviceSerialPort.ICON_SET_IMPORT_CLOSE
+	 * @param newToolTipOpen
+	 * @param newToolTipClose
 	 */
-	public void setSerialPortIconSet(int newIconSet) {
+	public void setSerialPortIconSet(int newIconSet, String newToolTipOpen, String newToolTipClose) {
 		this.iconSet = newIconSet;
+		if(newToolTipOpen != null) this.toolTipOpen = newToolTipOpen;
+		if(newToolTipClose != null) this.toolTipClose = newToolTipClose;
 		this.setPortConnected(false);
 	}
 

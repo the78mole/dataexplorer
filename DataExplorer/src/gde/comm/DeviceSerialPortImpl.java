@@ -252,14 +252,8 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 					throw new ApplicationConfigurationException(Messages.getString(MessageIds.GDE_MSGE0010));
 				}
 			}
-			log
-					.logp(
-							Level.FINE,
-							DeviceSerialPortImpl.$CLASS_NAME,
-							$METHOD_NAME,
-							String
-									.format(
-											"serialPortString = %s; baudeRate = %d; dataBits = %s; stopBits = %s; parity = %s; flowControlMode = %s; RTS = %s; DTR = %s", this.serialPortStr, this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity(), this.deviceConfig.getFlowCtrlMode(), this.deviceConfig.isRTS(), this.deviceConfig.isDTR())); //$NON-NLS-1$
+			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME,
+				String.format("serialPortString = %s; baudeRate = %d; dataBits = %s; stopBits = %s; parity = %s; flowControlMode = %s; RTS = %s; DTR = %s", this.serialPortStr, this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity(), this.deviceConfig.getFlowCtrlMode(), this.deviceConfig.isRTS(), this.deviceConfig.isDTR())); //$NON-NLS-1$
 
 			this.portId = CommPortIdentifier.getPortIdentifier(this.serialPortStr);
 			this.serialPort = (SerialPort) this.portId.open("DataExplorer", 10000); //$NON-NLS-1$
