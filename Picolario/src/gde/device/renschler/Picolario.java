@@ -73,7 +73,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 	}
 	
 	/**
@@ -434,6 +434,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+					this.application.getDeviceSelectionDialog().open();
 				}
 			}
 			else {
