@@ -30,7 +30,7 @@
 	<echo message="Building using ${build.properties}" />
 	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}, OS short name = ${build.os.shortname}" />
 
-	<property name="module.output" location="build/classes"/>
+	<property name="module.output" location="bin"/>
 
 	<path id="compile.classpath">
 		<pathelement location="../build/lib/RXTXcomm.jar" />
@@ -43,6 +43,13 @@
 		<javac destdir="${module.output}" classpathref="compile.classpath" compiler="javac1.6" encoding="UTF-8" debug="true" includeantruntime="false">
 			<src path="src" />
 		</javac>
+		<copy todir="${module.output}">
+			<fileset dir="${basedir}/src/" includes="gde/resource/**/*" excludes="**/.cvsignore" />
+			<fileset dir="${basedir}/src/" includes="gde/messages/*.properties" />
+			<fileset dir="${basedir}/src/" includes="help/**/*" excludes="**/.cvsignore" />
+			<fileset dir="${basedir}/src/" includes="resource/*" excludes="**/.cvsignore" />
+			<fileset dir="${basedir}/src/" includes="META-INF/*" excludes="**/.cvsignore" />
+		</copy>
 	</target>
 
 	<target name="package" depends="compile">
