@@ -84,7 +84,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
 		this.dialog = new LiPoWatchDialog(this.application.getShell(), this);
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new LiPoWatchSerialPort(this, this.application);
 		this.dialog = new LiPoWatchDialog(this.application.getShell(), this);
-		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 	}
 
 	/**
