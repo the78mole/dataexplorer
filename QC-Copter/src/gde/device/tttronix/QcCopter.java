@@ -68,7 +68,7 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 		this.serialPort = new QcCopterSerialPort(this, this.application);
 		this.dialog = new QcCopterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 		}
 	}
 
@@ -85,7 +85,7 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 		this.serialPort = new QcCopterSerialPort(this, this.application);
 		this.dialog = new QcCopterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 		}
 	}
 
