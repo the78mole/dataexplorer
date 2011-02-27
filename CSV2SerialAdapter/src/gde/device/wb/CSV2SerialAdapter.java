@@ -29,6 +29,7 @@ import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
+import gde.device.wb.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.io.CSVSerialDataReaderWriter;
 import gde.io.DataParser;
@@ -69,7 +70,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1703), Messages.getString(MessageIds.GDE_MSGT1703));
 	}
 
 	/**
@@ -83,7 +84,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
-		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1703), Messages.getString(MessageIds.GDE_MSGT1703));
 	}
 
 	/**
