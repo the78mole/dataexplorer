@@ -32,5 +32,6 @@ public class MessageIds {
 	public final static String	GDE_MSGT1055 = "GDE_MSGT1055";
 	public final static String	GDE_MSGT1056 = "GDE_MSGT1056";
 	public final static String	GDE_MSGT1057 = "GDE_MSGT1057";
+	public final static String	GDE_MSGT1058 = "GDE_MSGT1058";
 
  }
