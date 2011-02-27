@@ -84,7 +84,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.dialog = new NMEAAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2104), Messages.getString(MessageIds.GDE_MSGT2104));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}
@@ -102,7 +102,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.dialog = new NMEAAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2104), Messages.getString(MessageIds.GDE_MSGT2104));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}
