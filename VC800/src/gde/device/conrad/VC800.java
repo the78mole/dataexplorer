@@ -69,7 +69,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new VC800SerialPort(this, this.application);
 		this.dialog = new VC800Dialog(this.application.getShell(), this);
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new VC800SerialPort(this, this.application);
 		this.dialog = new VC800Dialog(this.application.getShell(), this);
-		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 	}
 
 	/**
