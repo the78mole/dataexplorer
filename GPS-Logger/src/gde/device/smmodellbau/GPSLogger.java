@@ -83,7 +83,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.dialog = new GPSLoggerDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2004), Messages.getString(MessageIds.GDE_MSGT2004));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}
@@ -101,7 +101,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		this.channels = Channels.getInstance();
 		this.dialog = new GPSLoggerDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE);
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2004), Messages.getString(MessageIds.GDE_MSGT2004));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
 		}
 	}

@@ -29,6 +29,7 @@ public class MessageIds {
 	public final static String	GDE_MSGT2001 = "GDE_MSGT2001";
 	public final static String	GDE_MSGT2002 = "GDE_MSGT2002";
 	public final static String	GDE_MSGT2003 = "GDE_MSGT2003";
+	public final static String	GDE_MSGT2004 = "GDE_MSGT2004";
 	public final static String	GDE_MSGT2005 = "GDE_MSGT2005";
 	public final static String	GDE_MSGT2006 = "GDE_MSGT2006";
 	public final static String	GDE_MSGT2009 = "GDE_MSGT2009";
