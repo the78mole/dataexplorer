@@ -506,6 +506,12 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 							}
 							catch (Exception e) {
 								AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0024, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+								GDE.display.syncExec(new Runnable() {
+									public void run() {
+										AkkuMasterC4Dialog.this.dispose();
+										AkkuMasterC4Dialog.this.application.getDeviceSelectionDialog().open();
+									}
+								});
 								return;
 							}
 						}
