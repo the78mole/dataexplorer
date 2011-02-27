@@ -888,7 +888,11 @@ public class DeviceConfiguration {
 	}
 	
 	public String getDataBlockPreferredDataLocation() {
-		return this.dataBlock != null ? (this.dataBlock.getPreferredDataLocation() != null ? this.dataBlock.getPreferredDataLocation() : GDE.STRING_BLANK) : GDE.STRING_BLANK;
+		String preferredDataLocation = this.dataBlock != null ? (this.dataBlock.getPreferredDataLocation() != null ? this.dataBlock.getPreferredDataLocation() : GDE.STRING_BLANK) : GDE.STRING_BLANK;
+		if(GDE.IS_WINDOWS) preferredDataLocation = preferredDataLocation.indexOf(GDE.STRING_WINDOWS_EXTERN_MEDIA_DIR, 1) >= 0 ? preferredDataLocation : GDE.STRING_BLANK;
+		else if(GDE.IS_MAC) preferredDataLocation = preferredDataLocation.startsWith(GDE.STRING_MAC_EXTERN_MEDIA_DIR) && preferredDataLocation.length() > GDE.STRING_MAC_EXTERN_MEDIA_DIR.length() ? preferredDataLocation : GDE.STRING_BLANK;
+		else if(GDE.IS_LINUX) preferredDataLocation = preferredDataLocation.startsWith(GDE.STRING_LINUX_EXTERN_MEDIA_DIR) && preferredDataLocation.length() > GDE.STRING_LINUX_EXTERN_MEDIA_DIR.length() ? preferredDataLocation : GDE.STRING_BLANK;
+		return preferredDataLocation;
 	}
 
 	public void setDataBlockPreferredDataLocation(String value) {

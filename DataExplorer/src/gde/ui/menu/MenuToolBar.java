@@ -1011,11 +1011,11 @@ public class MenuToolBar {
 							log.log(Level.FINEST, "googleEarthToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							ApplicationLauncher launcher;
 							if (GDE.IS_MAC)
-								launcher = new ApplicationLauncher("open", new String[]{"Google Earth"}, GDE.STRING_MAC_APP_BASE_PATH + "Google Earth" + GDE.STRING_MAC_DOT_APP); //$NON-NLS-1$ //$NON-NLS-2$
+								launcher = new ApplicationLauncher(GDE.STRING_MAC_APP_OPEN, new String[]{"Google Earth"}, GDE.STRING_MAC_APP_BASE_PATH + "Google Earth" + GDE.STRING_MAC_DOT_APP); //$NON-NLS-1$ //$NON-NLS-2$
 							else if (GDE.IS_LINUX)
-								launcher = new ApplicationLauncher("xdg-open", new String[]{"googleearth", "google-earth"}, "which"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								launcher = new ApplicationLauncher(GDE.STRING_LINUX_APP_OPEN, new String[]{"googleearth", "google-earth"}, "which"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							else //GDE.IS_WINDOWS
-								launcher = new ApplicationLauncher("rundll32.exe",  new String[]{"Google Earth.kmzfile", "Google Earth.kmlfile"}, "Registry - HKEY_CLASSES_ROOT und HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes"); //$NON-NLS-1$
+								launcher = new ApplicationLauncher(GDE.STRING_WINDOWS_APP_OPEN,  new String[]{"Google Earth.kmzfile", "Google Earth.kmlfile"}, "Registry - HKEY_CLASSES_ROOT und HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes"); //$NON-NLS-1$
 
 							if (launcher.isLaunchable()) {
 								String kmzFilePath = MenuToolBar.this.application.getActiveDevice().exportFile(GDE.FILE_ENDING_KMZ, true);

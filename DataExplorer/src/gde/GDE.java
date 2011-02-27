@@ -134,11 +134,19 @@ public class GDE {
 
 	public static final String[]	STRING_ARRAY_TRUE_FALSE					= new String[] { "true", "false" };																																													//$NON-NLS-1$ //$NON-NLS-2$
 
+	public static final String		STRING_WINDOWS_APP_OPEN					= "rundll32.exe";																																																										//$NON-NLS-1$
+	public static final String		STRING_WINDOWS_EXTERN_DEF_DIR		= "G:\\";																																																										//$NON-NLS-1$
+	public static final String		STRING_WINDOWS_EXTERN_MEDIA_DIR	= ":\\";																																																										//$NON-NLS-1$
+
+	public static final String		STRING_LINUX_APP_OPEN						= "xdg-open";																																																										//$NON-NLS-1$
+	public static final String		STRING_LINUX_EXTERN_MEDIA_DIR		= "/media";																																																										//$NON-NLS-1$
+
 	public static final String		STRING_MAC_APP_BASE_PATH				= "/Applications/";																																																					//$NON-NLS-1$
 	public static final String		STRING_MAC_DOT_APP							= ".app";																																																										//$NON-NLS-1$
 	public static final String		STRING_MAC_APP_EXE_PATH					= "/Contents/MacOS/";																																																				//$NON-NLS-1$
 	public static final String		STRING_MAC_APP_RES_PATH					= "/Contents/Resources";																																																			//$NON-NLS-1$
 	public static final String		STRING_MAC_APP_OPEN							= "open";																																																										//$NON-NLS-1$
+	public static final String		STRING_MAC_EXTERN_MEDIA_DIR			= "/Volumes";																																																										//$NON-NLS-1$
 
 	public static final String		FILE_ENDING_STAR_LOV						= "*.lov";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_OSD						= "*.osd";																																																										//$NON-NLS-1$
