@@ -159,8 +159,19 @@ public class ApplicationLauncher {
 			}
 
 			try {
+				StringBuilder sb = new StringBuilder();
+				boolean isBeginParam = true;
+				for (String argument : arguments) {
+					sb.append(argument).append(GDE.STRING_BLANK);
+					if (isBeginParam) {
+						sb.append(GDE.STRING_SINGLE_QUOAT);
+						isBeginParam = false;
+					}
+				}
+				sb.deleteCharAt(sb.length()-1).append(GDE.STRING_SINGLE_QUOAT);
+				log.log(Level.OFF, sb.toString());
+				
 				new ProcessBuilder(arguments.toArray(new String[1])).start();
-				//Runtime.getRuntime().exec(arguments.toArray(new String[1]));
 			}
 			catch (Exception e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
