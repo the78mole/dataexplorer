@@ -1,5 +1,10 @@
 Development history / change log, please read from bottom up
 
+Version 2.7x - xx yyy 2011
+
+enable device specific action tool tip (serial port/import) 
+use xdg-open to execute google earth with KMZ GNU/Linux
+
 Version 2.72 - 23 Feb 2011
 
 documentation update
