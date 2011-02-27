@@ -40,6 +40,7 @@
 	<target name="compile" description="compile the project">
 		<property name="include.debug.info" value="yes" />
 		<mkdir dir="${module.output}" />
+		<mkdir dir="build" />
 		<javac destdir="${module.output}" classpathref="compile.classpath" compiler="javac1.6" encoding="UTF-8" debug="true" includeantruntime="false">
 			<src path="src" />
 		</javac>
@@ -49,6 +50,7 @@
 			<fileset dir="${basedir}/src/" includes="help/**/*" excludes="**/.cvsignore" />
 			<fileset dir="${basedir}/src/" includes="resource/*" excludes="**/.cvsignore" />
 			<fileset dir="${basedir}/src/" includes="META-INF/*" excludes="**/.cvsignore" />
+			<fileset dir="${basedir}/src/" includes="*" excludes="**/.cvsignore" />
 		</copy>
 	</target>
 
@@ -84,5 +86,6 @@
 
 	<target name="clean">
 		<delete dir="build" />
+		<delete dir="bin" />
 	</target>
 </project>
