@@ -572,16 +572,17 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * replace a record name with a new one
-	 * @param oldRecordName
+	 * @param oldRecord
 	 * @param newRecordName
 	 */
-	public void replaceRecordName(String oldRecordName, String newRecordName) {
+	public void replaceRecordName(Record oldRecord, String newRecordName) {
+		// replace in recordNames array
 		for (int i = 0; i < this.recordNames.length; i++) {
-			if (this.recordNames[i].equals(oldRecordName)) this.recordNames[i] = newRecordName;
+			if (this.recordNames[i].equals(oldRecord.name)) this.recordNames[i] = newRecordName;
 		}
 		if (this.get(newRecordName) == null) { // record may be created previously
-			this.put(newRecordName, this.get(oldRecordName).clone(newRecordName));
-			this.remove(oldRecordName);
+			this.put(newRecordName, oldRecord.clone(newRecordName));
+			this.remove(oldRecord.name);
 		}
 	}
 

@@ -525,8 +525,8 @@ public class Record extends Vector<Integer> {
 	}
 
 	public void setName(String newName) {
-		if (!this.name.equals(newName)) {
-			this.parent.replaceRecordName(this.name, newName);
+		if (newName != null && newName.length() > 1 && !this.name.equals(newName)) {
+			this.parent.replaceRecordName(this, newName);
 			this.name = newName;
 		}
 	}
