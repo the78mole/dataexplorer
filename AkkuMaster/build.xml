@@ -30,7 +30,7 @@
 	<echo message="Building using ${build.properties}" />
 	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
-	<property name="module.output" location="bin"/>
+	<property name="module.output" location="classes"/>
 
 	<path id="compile.classpath">
 		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
@@ -81,5 +81,6 @@
 	<target name="clean">
 		<delete dir="build" />
 		<delete dir="bin" />
+		<delete dir="classes" />
 	</target>
 </project>
