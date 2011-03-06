@@ -86,6 +86,7 @@
 
 	<target name="clean">
 		<delete dir="build" />
+		<delete dir="bin" />
 		<delete dir="classes" />
 	</target>
 </project>
