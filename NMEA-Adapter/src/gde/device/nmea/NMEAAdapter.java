@@ -551,25 +551,14 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 				}
 			});
 
-//			convert2GPXRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
-//			convert2GPXRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2107));
-//			convert2GPXRelativeItem.addListener(SWT.Selection, new Listener() {
-//				@Override
-//				public void handleEvent(Event e) {
-//					log.log(java.util.logging.Level.FINEST, "convert2GPXRelativeItem action performed! " + e); //$NON-NLS-1$
-//					export2GPX(DeviceConfiguration.HEIGHT_RELATIVE);
-//				}
-//			});
-//
-//			convert2GPXAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
-//			convert2GPXAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2108));
-//			convert2GPXAbsoluteItem.addListener(SWT.Selection, new Listener() {
-//				@Override
-//				public void handleEvent(Event e) {
-//					log.log(java.util.logging.Level.FINEST, "convert2GPXAbsoluteItem action performed! " + e); //$NON-NLS-1$
-//					export2GPX(DeviceConfiguration.HEIGHT_ABSOLUTE);
-//				}
-//			});
+			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2107));
+			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
+				}
+			});
 		}
 	}
 
@@ -580,18 +569,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	public void export2KMZ3D(int type) {
 		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2103), 1, 0, 2, 7, 10, 11, 13, type == DeviceConfiguration.HEIGHT_RELATIVE);
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2103), 1, 0, 2, 7, 10, 11, 13, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
-
-//	/**
-//	 * exports the actual displayed data set to GPX file format
-//	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
-//	 */
-//	public void export2GPX(int type) {
-//		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
-//		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
-//		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT2104), 1, 0, 2, 7, 9, type == DeviceConfiguration.HEIGHT_RELATIVE);
-//	}
 
 	/**
 	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
