@@ -591,44 +591,26 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 				}
 			});
 
-//			convert2GPXRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
-//			convert2GPXRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT1897));
-//			convert2GPXRelativeItem.addListener(SWT.Selection, new Listener() {
-//				public void handleEvent(Event e) {
-//					ContextMenu.log.log(Level.FINEST, "convert2GPXRelativeItem action performed! " + e); //$NON-NLS-1$
-//					export2GPX(DataVario.HEIGHT_RELATIVE);
-//				}
-//			});
-//
-//			convert2GPXAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
-//			convert2GPXAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1898));
-//			convert2GPXAbsoluteItem.addListener(SWT.Selection, new Listener() {
-//				public void handleEvent(Event e) {
-//					ContextMenu.log.log(Level.FINEST, "convert2GPXAbsoluteItem action performed! " + e); //$NON-NLS-1$
-//					export2GPX(DataVario.HEIGHT_ABSOLUTE);
-//				}
-//			});
+			convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT1897));
+			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					ContextMenu.log.log(Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					export2KML3D(DataVario.HEIGHT_CLAMPTOGROUND);
+				}
+			});
 		}
 	}
 
 	/**
 	 * exports the actual displayed data set to KML file format
-	 * @param type DataVario.HEIGHT_RELATIVE | DataVario.HEIGHT_ABSOLUTE
+	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE | DeviceConfiguration.HEIGHT_CLAMPTOGROUND
 	 */
 	public void export2KML3D(int type) {
 		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
 		//13=tripLength 14=distance 15=azimuth 16=directionStart
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1859), 7, 8, 9, 10, 11, 13, 15, type == DataVario.HEIGHT_RELATIVE);
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1859), 7, 8, 9, 10, 11, 13, 15, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
-	
-//	/**
-//	 * exports the actual displayed data set to GPX file format
-//	 * @param type DataVario.HEIGHT_RELATIVE | DataVario.HEIGHT_ABSOLUTE
-//	 */
-//	public void export2GPX(int type) {
-//		//ordinalLongitude, ordinalLatitude, ordinalGPSHeight, ordinalVelocity, ordinalHeight, inRelative
-//		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT1877), 7, 8, 9, 10, 1, type == DataVario.HEIGHT_RELATIVE);
-//	}
 	
 	/**
 	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
