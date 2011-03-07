@@ -537,38 +537,27 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				}
 			});
 
-//			convert2GPXRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
-//			convert2GPXRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2007));
-//			convert2GPXRelativeItem.addListener(SWT.Selection, new Listener() {
-//				@Override
-//				public void handleEvent(Event e) {
-//					log.log(java.util.logging.Level.FINEST, "convert2GPXRelativeItem action performed! " + e); //$NON-NLS-1$
-//					export2GPX(DeviceConfiguration.HEIGHT_RELATIVE);
-//				}
-//			});
-//
-//			convert2GPXAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
-//			convert2GPXAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2008));
-//			convert2GPXAbsoluteItem.addListener(SWT.Selection, new Listener() {
-//				@Override
-//				public void handleEvent(Event e) {
-//					log.log(java.util.logging.Level.FINEST, "convert2GPXAbsoluteItem action performed! " + e); //$NON-NLS-1$
-//					export2GPX(DeviceConfiguration.HEIGHT_ABSOLUTE);
-//				}
-//			});
+			convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2007));
+			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+				}
+			});
 		}
 	}
 
 	/**
 	 * exports the actual displayed data set to KML file format
-	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
+	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE | DeviceConfiguration.HEIGHT_CLAMPTOGROUND
 	 */
 	public void export2KMZ3D(int type) {
 		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
 		//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
 		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2003), 1, 0, 2, 7, 9, 11, -1, type == DeviceConfiguration.HEIGHT_RELATIVE);
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2003), 1, 0, 2, 7, 9, 11, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 
 //	/**
