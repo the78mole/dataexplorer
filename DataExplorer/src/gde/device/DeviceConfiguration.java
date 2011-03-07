@@ -90,6 +90,7 @@ public class DeviceConfiguration {
 	
 	public final static int										HEIGHT_RELATIVE						= 0;
 	public final static int										HEIGHT_ABSOLUTE						= 1;
+	public final static int										HEIGHT_CLAMPTOGROUND			= 2;
 
 
 	
