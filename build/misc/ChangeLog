@@ -5,6 +5,7 @@ Version 2.7x - xx yyy 2011
 enable device specific action tool tip (serial port/import) 
 use xdg-open to execute google earth with KMZ GNU/Linux
 prevent potential error while renaming records
+add clampToGround altitude mode for GPS export data
 
 
 Version 2.72 - 23 Feb 2011
