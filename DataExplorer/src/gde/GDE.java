@@ -67,7 +67,7 @@ import org.eclipse.swt.widgets.Shell;
  *  - class defines also generic constants used for DataExplorer (GDE)
  */
 public class GDE {
-	public static final String		STRING_WITHIN_ECLIPSE						= "/bin/";
+	public static final String		STRING_WITHIN_ECLIPSE						= "/classes/";
 	final static String						$CLASS_NAME											= GDE.class.getName();
 	public final static long			StartTime												= new Date().getTime();
 	public static Handler					logHandler											= null;
