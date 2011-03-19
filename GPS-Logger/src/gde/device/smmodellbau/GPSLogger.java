@@ -450,6 +450,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public GPSLoggerDialog getDialog() {
 		return this.dialog;
 	}
