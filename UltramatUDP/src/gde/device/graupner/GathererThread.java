@@ -1,0 +1,425 @@
+/**************************************************************************************
+  	This file is part of GNU DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GNU DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright (c) 2008,2009,2010,2011 Winfried Bruegmann
+****************************************************************************************/
+package gde.device.graupner;
+
+import gde.GDE;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.exception.ApplicationConfigurationException;
+import gde.exception.DataInconsitsentException;
+import gde.exception.SerialPortException;
+import gde.exception.TimeOutException;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.TimeLine;
+import gde.utils.WaitTimer;
+
+import java.util.logging.Logger;
+
+/**
+ * Thread implementation to gather data from eStation device
+ * @author Winfied Brügmann
+ */
+public class GathererThread extends Thread {
+	final static String				$CLASS_NAME									= GathererThread.class.getName();
+	final static Logger				log													= Logger.getLogger(GathererThread.class.getName());
+	final static int					TIME_STEP_DEFAULT						= 1000;
+	final static int					WAIT_TIME_RETRYS						= 180;
+
+
+	final DataExplorer application;
+	final UltramatSerialPort	serialPort;
+	final Ultramat						device;
+	final UltraDuoPlusDialog	dialog;
+	final Channels						channels;
+	
+	String										recordSetKey1								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
+	String										recordSetKey2								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
+	String										recordSetKey3								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
+	boolean										isPortOpenedByLiveGatherer	= false;
+	boolean										isGatheredRecordSetVisible	= true;
+	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;	// 36 * 5 sec timeout = 180 sec
+	boolean										isCollectDataStopped				= false;
+
+	boolean isProgrammExecuting1 = false;
+	boolean isProgrammExecuting2 = false;
+	boolean isProgrammExecuting3 = false;
+	long startCycleTime1 = 0;
+	long startCycleTime2 = 0;
+	long startCycleTime3 = 0;
+	long measurementCount1 = 0;
+	long measurementCount2 = 0;
+	long measurementCount3 = 0;
+
+	private static GathererThread gathererTread = null;
+	
+	/**
+	 * get the singleton instance of this data gatherer thread
+	 * @return
+	 * @throws ApplicationConfigurationException
+	 * @throws SerialPortException
+	 */
+	public static GathererThread getInstance() throws ApplicationConfigurationException, SerialPortException {
+		return GathererThread.isInstance() ? gathererTread : (gathererTread = new GathererThread());
+	}
+	
+	/**
+	 * check for gatherer thread instance
+	 * @return
+	 */
+	public static boolean isInstance() {
+		return GathererThread.gathererTread != null;
+	}
+
+	/**
+	 * data gatherer thread definition 
+	 * @throws SerialPortException 
+	 * @throws ApplicationConfigurationException 
+	 * @throws Exception 
+	 */
+	private GathererThread() throws ApplicationConfigurationException, SerialPortException {
+		super("dataGatherer");
+		this.application = DataExplorer.getInstance();
+		this.device = (Ultramat)this.application.getActiveDevice();
+		this.dialog = (UltraDuoPlusDialog) this.device.getDialog();
+		this.serialPort = this.device.getCommunicationPort();
+		this.channels = Channels.getInstance();
+
+		if (!this.serialPort.isConnected()) {
+			this.serialPort.open();
+			this.isPortOpenedByLiveGatherer = true;
+		}
+		this.setPriority(Thread.MAX_PRIORITY);
+	}
+
+	@Override
+	public void run() {
+		final String $METHOD_NAME = "run"; //$NON-NLS-1$
+		RecordSet recordSet1 = null;
+		RecordSet recordSet2 = null;
+		RecordSet recordSet3 = null;
+		int[] points1 = new int[this.device.getMeasurementNames(1).length];
+		int[] points2 = new int[this.device.getMeasurementNames(2).length];
+		int[] points3 = new int[this.device.getMeasurementNames(3).length];
+//		boolean isCycleMode1 = false;
+//		boolean isCycleMode2 = false;
+		byte[] dataBuffer = null;
+		//double newTimeStep_ms = 0;
+		
+		isProgrammExecuting1 = false;
+		isProgrammExecuting2 = false;
+		isProgrammExecuting3 = false;
+		startCycleTime1 = 0;
+		startCycleTime2 = 0;
+		startCycleTime3 = 0;
+		measurementCount1 = 0;
+		measurementCount2 = 0;
+		measurementCount3 = 0;
+
+		this.isCollectDataStopped = false;
+		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
+
+		while (!this.isCollectDataStopped) {
+			try {
+				// get data from device
+				if (this.serialPort.isConnected()) 
+					dataBuffer = this.serialPort.getData();
+				//else break;
+
+				// check if device is ready for data capturing, discharge or charge allowed only
+				// else wait for 180 seconds max. for actions
+				isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
+				isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
+				isProgrammExecuting3 = this.device.isLinkedMode(isProgrammExecuting1, isProgrammExecuting2, dataBuffer);
+
+				if (isProgrammExecuting1 || isProgrammExecuting2) {
+					if (isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
+						Object[] ch3 = processDataChannel(3, recordSet2, recordSetKey3, dataBuffer, points3, measurementCount3, startCycleTime3);
+						recordSet3 = (RecordSet) ch3[0];
+						recordSetKey3 = (String) ch3[1];
+						measurementCount3 = (Long) ch3[2];
+						startCycleTime3 = (Long) ch3[3];
+					}
+					else {
+						if (isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
+							Object[] ch1 = processDataChannel(1, recordSet1, recordSetKey1, dataBuffer, points1, measurementCount1, startCycleTime1);
+							recordSet1 = (RecordSet) ch1[0];
+							recordSetKey1 = (String) ch1[1];
+							measurementCount1 = (Long) ch1[2];
+							startCycleTime1 = (Long) ch1[3];
+						}
+						if (isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
+							byte[] buffer = new byte[this.device.getDataBlockSize() / 2];
+							System.arraycopy(dataBuffer, buffer.length-5, buffer, 0, buffer.length);
+							Object[] ch2 = processDataChannel(2, recordSet2, recordSetKey2, buffer, points2, measurementCount2, startCycleTime2);
+							recordSet2 = (RecordSet) ch2[0];
+							recordSetKey2 = (String) ch2[1];
+							measurementCount2 = (Long) ch2[2];
+							startCycleTime2 = (Long) ch2[3];
+						}
+					}
+				}
+				else { // no program is executing, wait for 180 seconds max. for actions
+					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2200));
+					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation"); //$NON-NLS-1$
+
+					if (recordSet1 != null && recordSet1.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
+						finalizeRecordSet(recordSet1.getName(), false);
+						isProgrammExecuting1 = false;
+						recordSet1 = null;
+						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGI2204, new String[] {"1"}));
+					}
+					if (recordSet2 != null && recordSet2.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
+						finalizeRecordSet(recordSet2.getName(), false);
+						isProgrammExecuting2 = false;
+						recordSet2 = null;
+						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGI2204, new String[] {"2"}));
+					}
+					if (recordSet3 != null && recordSet3.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
+						finalizeRecordSet(recordSet3.getName(), false);
+						isProgrammExecuting3 = false;
+						recordSet3 = null;
+						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGI2204, new String[] {"3"}));
+					}
+					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
+						log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
+						this.application.openMessageDialogAsync(this.dialog != null ? this.dialog.getDialogShell(): null, Messages.getString(MessageIds.GDE_MSGI2203));
+						stopDataGatheringThread(false, null);
+					}
+				}
+					
+			}
+			catch (DataInconsitsentException e) {
+				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}); 
+				if (recordSet1 != null) cleanup(recordSet1.getName(), message);
+				if (recordSet2 != null) cleanup(recordSet2.getName(), message);
+				if (recordSet3 != null) cleanup(recordSet3.getName(), message);
+			}
+			catch (Throwable e) {
+				// this case will be reached while NiXx Akku discharge/charge/discharge cycle
+				if (e instanceof TimeOutException) {
+					if (recordSet1 != null) {
+						finalizeRecordSet(recordSet1.getName(), false);
+						recordSet1 = null;
+						WaitTimer.delay(1000);
+					}
+					if (recordSet2 != null) {
+						finalizeRecordSet(recordSet2.getName(), false);
+						recordSet2 = null;
+						WaitTimer.delay(1000);
+					}
+					if (recordSet3 != null) {
+						finalizeRecordSet(recordSet3.getName(), false);
+						recordSet3 = null;
+						WaitTimer.delay(1000);
+					}
+				}
+				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
+				else if (e instanceof TimeOutException && !isProgrammExecuting1 || !isProgrammExecuting2) {
+					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2200));
+					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
+					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
+						log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
+						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGI2200));
+						stopDataGatheringThread(false, null);
+					}
+				}
+				// program end or unexpected exception occurred, stop data gathering to enable save data by user
+				else {
+					log.log(Level.FINE, "program end detected"); //$NON-NLS-1$
+					stopDataGatheringThread(true, e);
+				}
+			}
+		}
+		this.application.setStatusMessage(""); //$NON-NLS-1$
+		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+	}
+	
+	/**
+	 * process a outlet channel
+	 * @param number
+	 * @param recordSet
+	 * @param recordSetKey
+	 * @param dataBuffer
+	 * @param points
+	 * @param measurementCount
+	 * @param startCycleTime
+	 * @param numCells
+	 * @return object array with updated values {recordSet, recordSetKey, measurementCount, startCycleTime, numCells}
+	 * @throws DataInconsitsentException
+	 */
+	private Object[] processDataChannel(int number, RecordSet recordSet, String recordSetKey, byte[] dataBuffer, int[] points, long measurementCount, long startCycleTime) throws DataInconsitsentException {
+		final String $METHOD_NAME = "processOutlet";
+		Object[] result = new Object[4];
+		String processName = this.device.USAGE_MODE[this.device.getProcessingMode(dataBuffer)];
+
+		Channel channel = this.channels.get(number);
+		if (channel != null) {		
+			// check if a record set matching for re-use is available and prepare a new if required
+			if (recordSet == null || !recordSetKey.contains(processName)) { //$NON-NLS-1$
+				this.application.setStatusMessage(""); //$NON-NLS-1$
+				setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset to 180 sec
+				// record set does not exist or is outdated, build a new name and create
+				String extend = this.device.getProcessingType(dataBuffer).length() > 3 ? GDE.STRING_BLANK_LEFT_BRACKET + this.device.getProcessingType(dataBuffer) + GDE.STRING_RIGHT_BRACKET : GDE.STRING_EMPTY;
+				recordSetKey = channel.getNextRecordSetNumber() + ") " + processName + extend; //$NON-NLS-1$
+				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
+				channel.applyTemplateBasics(recordSetKey);
+				log.logp(Level.OFF, GathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
+				recordSet = channel.get(recordSetKey);
+				recordSet.setAllDisplayable();
+				channel.applyTemplate(recordSetKey, false);
+				// switch the active record set if the current record set is child of active channel
+				this.channels.switchChannel(channel.getNumber(), recordSetKey);
+				measurementCount = 0;
+				startCycleTime = 0;
+			}
+	
+			// prepare the data for adding to record set
+			this.isGatheredRecordSetVisible = recordSetKey.equals(channel.getActiveRecordSet().getName());
+			long tmpCycleTime = System.nanoTime()/1000000;
+			if (measurementCount++ == 0) {
+				startCycleTime = tmpCycleTime;
+			}
+
+			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
+			log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
+	
+			GathererThread.this.application.updateAllTabs(false);
+			
+			if (measurementCount < 3 || measurementCount % 10 == 0) {		
+				this.device.updateVisibilityStatus(recordSet, true);
+			}
+		}
+		result[0] = recordSet;
+		result[1] = recordSetKey;
+		result[2] = measurementCount;
+		result[3] = startCycleTime;
+		return result;
+	}
+
+	/**
+	 * stop the data gathering and check if reasonable data in record set to finalize or clear
+	 * @param enableEndMessage
+	 * @param throwable
+	 */
+	void stopDataGatheringThread(boolean enableEndMessage, Throwable throwable) {
+		final String $METHOD_NAME = "stopDataGatheringThread"; //$NON-NLS-1$
+
+		if (throwable != null) {
+			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
+		}
+		
+		this.isCollectDataStopped = true;
+		
+		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
+			log.log(Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (this.serialPort != null && this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
+			this.serialPort.close();
+		}
+
+		GathererThread.gathererTread = null;
+	}
+
+	/**
+	 * close port, set isDisplayable according channel configuration and calculate slope
+	 */
+	void finalizeRecordSet(String recordSetKey, boolean doClosePort) {
+		if (doClosePort && this.isPortOpenedByLiveGatherer && this.serialPort.isConnected()) this.serialPort.close();
+
+		RecordSet tmpRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
+		if (tmpRecordSet != null) {
+			this.device.updateVisibilityStatus(tmpRecordSet, true);
+			this.device.makeInActiveDisplayable(tmpRecordSet);
+			this.application.updateStatisticsData();
+			this.application.updateDataTable(recordSetKey, false);
+			
+			//this.device.setAverageTimeStep_ms(tmpRecordSet.getAverageTimeStep_ms());
+			log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms());
+		}
+	}
+
+	/**
+	 * cleanup all allocated resources and display the message
+	 * @param this.recordSetKey
+	 * @param message
+	 * @param e
+	 */
+	void cleanup(String recordSetKey, final String message) {
+		RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
+		if (activeRecordSet != null) {
+			activeRecordSet.clear();
+			this.channels.getActiveChannel().remove(recordSetKey);
+			if (Thread.currentThread().getId() == this.application.getThreadId()) {
+				this.application.getMenuToolBar().updateRecordSetSelectCombo();
+				this.application.updateStatisticsData();
+				this.application.updateDataTable(recordSetKey, true);
+				this.application.openMessageDialog(GathererThread.this.dialog.getDialogShell(), message);
+				//this.device.getDialog().resetButtons();
+			}
+			else {
+				final String useRecordSetKey = recordSetKey;
+				GDE.display.asyncExec(new Runnable() {
+					public void run() {
+						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
+						GathererThread.this.application.updateStatisticsData();
+						GathererThread.this.application.updateDataTable(useRecordSetKey, true);
+						GathererThread.this.application.openMessageDialog(GathererThread.this.dialog.getDialogShell(), message);
+						//GathererThread.this.device.getDialog().resetButtons();
+					}
+				});
+			}
+		}
+		else
+			this.application.openMessageDialog(this.dialog.getDialogShell(), message);
+	}
+
+	/**
+	 * @param enabled the isCollectDataStopped to set
+	 */
+	void setCollectDataStopped(boolean enabled) {
+		this.isCollectDataStopped = enabled;
+	}
+
+	/**
+	 * @return the isCollectDataStopped
+	 */
+	boolean isCollectDataStopped() {
+		return this.isCollectDataStopped;
+	}
+
+	/**
+	 * @return the retryCounter
+	 */
+	int getRetryCounter() {
+		return this.retryCounter;
+	}
+
+	/**
+	 * @param newRetryCounter the retryCounter to set
+	 */
+	int setRetryCounter(int newRetryCounter) {
+		return this.retryCounter = newRetryCounter;
+	}
+}
