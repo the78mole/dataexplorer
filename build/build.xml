@@ -48,6 +48,9 @@
 		<condition property="build.os.shortname" value="Windows">
 			<os name="Windows 2003" />
 		</condition>
+		<condition property="build.os.shortname" value="Windows">
+			<os name="Windows 7" />
+		</condition>
 
 		<condition property="build.os.shortname" value="MAC">
 			<os name="Mac OS" />
@@ -167,6 +170,7 @@
 		<ant antfile="build.xml" target="clean" dir="QC-Copter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="GPS-Logger" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="NMEA-Adapter" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="UltramatUDP" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -264,6 +268,7 @@
 		<ant antfile="build.xml" target="package" dir="QC-Copter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="GPS-Logger" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="NMEA-Adapter" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="UltramatUDP" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -281,6 +286,7 @@
 			<include name="QC-Copter/build/*.jar" />
 			<include name="GPS-Logger/build/*.jar" />
 			<include name="NMEA-Adapter/build/*.jar" />
+			<include name="UltramatUDP/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
