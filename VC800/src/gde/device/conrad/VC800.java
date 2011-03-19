@@ -399,6 +399,7 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public VC800Dialog getDialog() {
 		return this.dialog;
 	}
@@ -406,7 +407,8 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the serialPort
 	 */
-	public VC800SerialPort getSerialPort() {
+	@Override
+	public VC800SerialPort getCommunicationPort() {
 		return this.serialPort;
 	}
 

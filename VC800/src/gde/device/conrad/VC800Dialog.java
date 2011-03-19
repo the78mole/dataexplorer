@@ -105,7 +105,7 @@ public class VC800Dialog extends DeviceDialog {
 	 */
 	public VC800Dialog(Shell parent, VC800 useDevice) {
 		super(parent);
-		this.serialPort = useDevice.getSerialPort();
+		this.serialPort = useDevice.getCommunicationPort();
 		this.device = useDevice;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
