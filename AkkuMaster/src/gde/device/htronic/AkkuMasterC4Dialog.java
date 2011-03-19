@@ -94,7 +94,7 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 	public AkkuMasterC4Dialog(Shell parent, AkkuMasterC4 actualDevice) {
 		super(parent);
 		this.device = actualDevice;
-		this.serialPort = actualDevice.getSerialPort();
+		this.serialPort = actualDevice.getCommunicationPort();
 		this.channels = Channels.getInstance();
 		this.numberChannels = actualDevice.getChannelCount();
 		this.settings = Settings.getInstance();

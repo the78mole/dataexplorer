@@ -278,7 +278,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
-		recordSet.setAllVisibleAndDisplayable();
+		recordSet.setAllDisplayable();
 	}
 	
 	/**
@@ -325,6 +325,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the device dialog
 	 */
+	@Override
 	public AkkuMasterC4Dialog getDialog() {
 		return this.dialog;
 	}
@@ -332,7 +333,8 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the device serialPort
 	 */
-	public AkkuMasterC4SerialPort getSerialPort() {
+	@Override
+	public AkkuMasterC4SerialPort getCommunicationPort() {
 		return this.serialPort;
 	}
 
