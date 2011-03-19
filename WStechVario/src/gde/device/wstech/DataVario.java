@@ -107,6 +107,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public VarioDialog getDialog() {
 		return this.dialog;
 	}
