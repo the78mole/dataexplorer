@@ -18,6 +18,19 @@
 ****************************************************************************************/
 package gde.ui.dialog.edit;
 
+import gde.GDE;
+import gde.device.DataTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
+import gde.device.ObjectFactory;
+import gde.device.PropertyType;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -39,20 +52,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 
-import gde.GDE;
-import gde.device.DataTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.MeasurementPropertyTypes;
-import gde.device.MeasurementType;
-import gde.device.ObjectFactory;
-import gde.device.PropertyType;
-import gde.device.StatisticsType;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-
 /**
  * class defining a CTabItem with MeasurementType configuration data
  * @author Winfried Brügmann
@@ -68,7 +67,7 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 	Text													measurementNameText, measurementSymbolText, measurementUnitText;
 	Button												measurementActiveButton;
 	CTabFolder										channelConfigMeasurementPropertiesTabFolder;
-	Button												addMeasurementButton;
+	Button												addMeasurementButton, removeMeasurementButton;
 	Label													measurementTypeLabel;
 	Menu													popupMenu;
 	MeasurementContextmenu				contextMenu;
@@ -96,12 +95,6 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 
 	@Override
 	public synchronized MeasurementTypeTabItem clone() {
-		try {
-			super.clone();
-		}
-		catch (CloneNotSupportedException e) {
-			// ignore
-		}
 		return new MeasurementTypeTabItem(this);
 	}
 
@@ -118,7 +111,7 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 		this.measurementUnit = copyFrom.measurementUnit;
 		this.isMeasurementActive = copyFrom.isMeasurementActive;
 
-		this.deviceConfig = copyFrom.deviceConfig;
+		this.deviceConfig = this.propsEditor.deviceConfig;
 		this.channelConfigNumber = copyFrom.channelConfigNumber;
 		this.tabName = GDE.STRING_BLANK + (this.deviceConfig != null ? this.measurementName : (this.measurementsTabFolder.getItemCount())) + GDE.STRING_BLANK;
 
@@ -130,10 +123,9 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 			this.deviceConfig.addMeasurement2Channel(this.channelConfigNumber, this.measurementType);
 
 			//update statistics
-			if (this.statisticsTypeTabItem != null) {
-				StatisticsType tmpStatisticsType = this.measurementType.getStatistics().clone();
-				tmpStatisticsType.removeTrigger();
-				this.statisticsTypeTabItem.setStatisticsType(this.deviceConfig, tmpStatisticsType, this.channelConfigNumber);
+			if (this.statisticsTypeTabItem != null && this.measurementType.getStatistics() != null) {
+				this.measurementType.getStatistics().removeTrigger();
+				this.statisticsTypeTabItem.setStatisticsType(this.deviceConfig, this.measurementType.getStatistics(), this.channelConfigNumber);
 			}
 
 			// update properties
@@ -175,8 +167,9 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 			}
 			else {
 				this.measurementPropertiesTabFolder.setSelection(0);
-			}
+			}	
 		}
+		initialize();
 	}
 
 	/**
@@ -280,6 +273,9 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "measurementtypeTabItem.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					MeasurementTypeTabItem.this.enableContextMenu(false);
+					if (MeasurementTypeTabItem.this.propsEditor.deviceConfig != null) {
+						MeasurementTypeTabItem.this.propsEditor.enableSaveButton(true);
+					}
 				}
 			});
 			{
@@ -303,7 +299,7 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 					this.addMeasurementButton.setText(GDE.STRING_PLUS);
 					this.addMeasurementButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0548));
 					this.addMeasurementButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.addMeasurementButton.setBounds(180, 10, 40, 20);
+					this.addMeasurementButton.setBounds(170, 10, 20, 20);
 					this.addMeasurementButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -311,6 +307,24 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 							MeasurementTypeTabItem.this.measurementsTabFolder.getItem(MeasurementTypeTabItem.this.measurementsTabFolder.getItemCount() - 1).setShowClose(false);
 							MeasurementTypeTabItem.this.measurementsTabFolder.setSelection(MeasurementTypeTabItem.this.clone());
 							MeasurementTypeTabItem.this.propsEditor.enableSaveButton(true);
+						}
+					});
+				}
+				{
+					this.removeMeasurementButton = new Button(this.measurementsComposite, SWT.PUSH | SWT.CENTER);
+					this.removeMeasurementButton.setText(GDE.STRING_MINUS);
+					this.removeMeasurementButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0600));
+					this.removeMeasurementButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.removeMeasurementButton.setBounds(200, 10, 20, 20);
+					this.removeMeasurementButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "removeMeasurementButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (MeasurementTypeTabItem.this.deviceConfig != null) {
+								MeasurementTypeTabItem.this.deviceConfig.removeMeasurementFromChannel(MeasurementTypeTabItem.this.channelConfigNumber, MeasurementTypeTabItem.this.measurementType);
+								MeasurementTypeTabItem.this.dispose();
+								MeasurementTypeTabItem.this.propsEditor.enableSaveButton(true);
+							}
 						}
 					});
 				}
@@ -413,10 +427,13 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 					}
 					{
 						createMeasurementPropertyTabItemWithSubTabFolder();
-						{
-							createMeasurementPropertyTabItem(MeasurementPropertyTypes.OFFSET.value());
-							createMeasurementPropertyTabItem(MeasurementPropertyTypes.FACTOR.value());
-							createMeasurementPropertyTabItem(MeasurementPropertyTypes.REDUCTION.value());
+						if (this.measurementType != null) {
+							for (PropertyType tmpPropertyType : this.measurementType.getProperty()) {
+								createMeasurementPropertyTabItem(tmpPropertyType.getName());
+								//createMeasurementPropertyTabItem(MeasurementPropertyTypes.OFFSET.value());
+								//createMeasurementPropertyTabItem(MeasurementPropertyTypes.FACTOR.value());
+								//createMeasurementPropertyTabItem(MeasurementPropertyTypes.REDUCTION.value());
+							}
 						}
 						this.measurementPropertiesTabFolder.setSelection(0);
 						this.measurementPropertiesTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
@@ -675,11 +692,11 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 	 * initialize widgets states
 	 */
 	private void initialize() {
-		if (MeasurementTypeTabItem.this.measurementType != null) {
-			MeasurementTypeTabItem.this.measurementNameText.setText(MeasurementTypeTabItem.this.measurementName);
-			MeasurementTypeTabItem.this.measurementSymbolText.setText(MeasurementTypeTabItem.this.measurementSymbol);
-			MeasurementTypeTabItem.this.measurementUnitText.setText(MeasurementTypeTabItem.this.measurementUnit);
-			MeasurementTypeTabItem.this.measurementActiveButton.setSelection(MeasurementTypeTabItem.this.isMeasurementActive);
+		if (this.measurementType != null) {
+			MeasurementTypeTabItem.this.measurementNameText.setText(this.measurementName = this.measurementType.getName());
+			MeasurementTypeTabItem.this.measurementSymbolText.setText(this.measurementSymbol = this.measurementType.getSymbol());
+			MeasurementTypeTabItem.this.measurementUnitText.setText(this.measurementUnit = this.measurementType.getUnit());
+			MeasurementTypeTabItem.this.measurementActiveButton.setSelection(this.isMeasurementActive = this.measurementType.isActive());
 		}
 	}
 }

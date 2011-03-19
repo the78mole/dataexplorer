@@ -209,6 +209,7 @@ public class DevicePropertiesEditor extends Composite {
 			GDE.display = new Display(); //data);
 			//Sleak sleak = new Sleak();
 			//sleak.open();
+			devicePropsEditor = getInstance();
 			devicePropsEditor.initLogger();
 			devicePropsEditor.open();
 			Point size = devicePropsEditor.getSize();
@@ -340,6 +341,7 @@ public class DevicePropertiesEditor extends Composite {
 							}
 						}
 					}
+					DevicePropertiesEditor.this.deviceConfig = null; //signal properties editor shut down
 				}
 			});
 			{

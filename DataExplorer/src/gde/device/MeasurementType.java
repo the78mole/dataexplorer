@@ -77,14 +77,10 @@ public class MeasurementType implements Cloneable {
 		this.unit = measurement.unit;
 		this.active = measurement.active;
 		this.statistics = measurement.statistics != null ? measurement.statistics.clone() : null;
-		if (measurement.property != null) {
+		if(measurement.getProperty().size() != 0)
 			this.property = new ArrayList<PropertyType>();
-			for (PropertyType tmpProperty : this.property) {
-				this.property.add(tmpProperty.clone());
-			}
-		}
-		else {
-			this.property = null; //new ArrayList<PropertyType>();
+		for (PropertyType tmpProperty : measurement.getProperty()) {
+			this.property.add(tmpProperty.clone());
 		}
 	}
 
@@ -93,12 +89,6 @@ public class MeasurementType implements Cloneable {
 	 */
 	@Override
 	public MeasurementType clone() {
-		try {
-			super.clone();
-		}
-		catch (CloneNotSupportedException e) {
-			// ignore
-		}
 		return new MeasurementType(this);
 	}
 
