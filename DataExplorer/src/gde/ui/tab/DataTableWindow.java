@@ -57,7 +57,7 @@ public class DataTableWindow extends CTabItem {
 	Table													dataTable;
 	TableColumn										timeColumn;
 
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final Channels								channels;
 	final CTabFolder							tabFolder;
 

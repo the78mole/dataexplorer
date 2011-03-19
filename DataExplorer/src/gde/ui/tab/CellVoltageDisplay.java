@@ -191,7 +191,7 @@ public class CellVoltageDisplay extends Composite {
 		this.layout(true);
 		if (this.voltage != newVoltage) {
 			this.voltage = newVoltage;
-			String valueText = String.format("%.2f", new Double(this.voltage / 1000.0)); //$NON-NLS-1$
+			String valueText = String.format("%.3f", new Double(this.voltage / 1000.0)); //$NON-NLS-1$
 			this.cellVoltageDigitalLabel.setText(valueText);
 
 			Rectangle rect = this.cellCanvas.getClientArea();
@@ -220,7 +220,7 @@ public class CellVoltageDisplay extends Composite {
 	 */
 	void voltagePaintControl() {
 		//this.cellTextLabel.setText(this.displayHeaderText);
-		String valueText = String.format("%.2f", new Double(this.voltage / 1000.0)); //$NON-NLS-1$
+		String valueText = String.format("%.3f", new Double(this.voltage / 1000.0)); //$NON-NLS-1$
 		this.cellVoltageDigitalLabel.setText(valueText);
 
 		Rectangle rect = this.cellCanvas.getClientArea();

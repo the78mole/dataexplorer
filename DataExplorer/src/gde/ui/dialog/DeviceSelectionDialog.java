@@ -325,7 +325,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 												log.log(java.util.logging.Level.FINE, "activeName = " + DeviceSelectionDialog.this.activeDeviceName); //$NON-NLS-1$
 												DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.activeDeviceName);
 												// if a device tool box is open, dispose it
-												if (DeviceSelectionDialog.this.application.getActiveDevice() != null && !DeviceSelectionDialog.this.application.getDeviceDialog().isDisposed()) {
+												if (DeviceSelectionDialog.this.application.getActiveDevice() != null 
+														&& DeviceSelectionDialog.this.application.getDeviceDialog() != null && !DeviceSelectionDialog.this.application.getDeviceDialog().isDisposed()) {
 													DeviceSelectionDialog.this.application.getDeviceDialog().dispose();
 												}
 												updateDialogEntries();

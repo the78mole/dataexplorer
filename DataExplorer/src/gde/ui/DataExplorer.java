@@ -496,9 +496,10 @@ public class DataExplorer extends Composite {
 					if (DataExplorer.application.getActiveDevice() != null) {
 						DataExplorer.application.getActiveDevice().storeDeviceProperties();
 						
-						if (!DataExplorer.application.getDeviceDialog().isDisposed()) {// if a device tool box is open, dispose it
+						if (DataExplorer.application.getDeviceDialog() != null && !DataExplorer.application.getDeviceDialog().isDisposed()) {// if a device tool box is open, dispose it
 							DataExplorer.application.getDeviceDialog().forceDispose();
 						}					
+						//close open communication ports
 						if (DataExplorer.application.getActiveDevice().getCommunicationPort() != null) {// if serial port still open, close it
 							DataExplorer.application.getActiveDevice().getCommunicationPort().close();
 							DataExplorer.application.getActiveDevice().storeDeviceProperties();

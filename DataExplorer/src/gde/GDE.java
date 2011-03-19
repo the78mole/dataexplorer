@@ -120,6 +120,7 @@ public class GDE {
 	public static final String		STRING_DOT											= ".";																																																												//$NON-NLS-1$
 	public static final String		STRING_EQUAL										= "=";																																																												//$NON-NLS-1$
 	public static final String		STRING_STAR											= "*";																																																												//$NON-NLS-1$
+	public static final String		STRING_BLANK_LEFT_BRACKET				= " [";																																																												//$NON-NLS-1$
 	public static final String		STRING_LEFT_BRACKET							= "[";																																																												//$NON-NLS-1$
 	public static final String		STRING_RIGHT_BRACKET						= "]";																																																												//$NON-NLS-1$
 	public static final String		STRING_OR												= "|";																																																												//$NON-NLS-1$
@@ -128,6 +129,7 @@ public class GDE {
 	public static final String		STRING_UTF_8										= "UTF-8";																																																										//$NON-NLS-1$
 	public static final String		STRING_ISO_8895_1								= "ISO-8859-1";																																																							//$NON-NLS-1$
 	public static final String		STRING_PLUS											= "+";																																																												//$NON-NLS-1$
+	public static final String		STRING_MINUS										= "-";																																																												//$NON-NLS-1$
 	public static final String		STRING_TRUE											= "true";																																																										//$NON-NLS-1$
 	public static final String		STRING_FALSE										= "false";																																																										//$NON-NLS-1$
 	public static final String		STRING_SINGLE_QUOAT							= "'";																																																												//$NON-NLS-1$

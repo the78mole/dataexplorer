@@ -39,7 +39,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	static Channels								channles								= null;
 	int														activeChannelNumber			= 1;		// default at least one channel must exist
 	String[]											channelNames 						= new String[1];
-	final DataExplorer	application;
+	final DataExplorer						application;
 
 	/**
 	 *  getInstance returns the instance of this singleton, this may called during creation time of the application

@@ -1190,11 +1190,11 @@ public class DeviceConfiguration {
 	/**
 	 * remove a MeasurementType object from channel with channel number as given
 	 * @param channelConfigNumber
-	 * @param newMeasurementType
+	 * @param removeMeasurementType
 	 */
-	public void removeMeasurementFromChannel(int channelConfigNumber, MeasurementType newMeasurementType) {
+	public void removeMeasurementFromChannel(int channelConfigNumber, MeasurementType removeMeasurementType) {
 		this.isChangePropery = true;
-		this.getChannel(channelConfigNumber).measurement.remove(newMeasurementType);
+		this.getChannel(channelConfigNumber).measurement.remove(removeMeasurementType);
 	}
 	
 	/**
@@ -2051,6 +2051,13 @@ public class DeviceConfiguration {
 			this.deviceProps.getChannels().setLastUseOrdinal(channelNumber - 1);
 		}
 	}
+	/**
+	 * @return the device specific dialog instance
+	 */
+	public DeviceDialog getDialog() {
+		return null;
+	}
+	
 
 	/**
 	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML

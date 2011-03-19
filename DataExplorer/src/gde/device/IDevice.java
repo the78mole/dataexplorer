@@ -56,7 +56,7 @@ public interface IDevice {
 	public boolean isChangePropery();
 
 	/**
-	 * @return the device dialog
+	 * @return the device specific dialog instance
 	 */
 	public DeviceDialog getDialog();
 	
@@ -64,7 +64,7 @@ public interface IDevice {
 	 * @return the device communication port
 	 */
 	public IDeviceCommPort getCommunicationPort();
-		
+	
 	/**
 	 * @return the device name
 	 */
