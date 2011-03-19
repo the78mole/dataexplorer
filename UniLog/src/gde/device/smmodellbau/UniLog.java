@@ -850,6 +850,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public UniLogDialog getDialog() {
 		return this.dialog;
 	}
@@ -857,7 +858,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the serialPort
 	 */
-	public UniLogSerialPort getSerialPort() {
+	@Override
+	public UniLogSerialPort getCommunicationPort() {
 		return this.serialPort;
 	}
 

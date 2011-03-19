@@ -91,7 +91,7 @@ public class UniLogTelemetryTab extends org.eclipse.swt.widgets.Composite {
 		super(parent, SWT.NONE);
 		this.device = useDevice;
 		this.dialog = useDevice.getDialog();
-		this.serialPort = this.device.getSerialPort();
+		this.serialPort = this.device.getCommunicationPort();
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		initGUI();

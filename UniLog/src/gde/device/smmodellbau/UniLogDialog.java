@@ -235,7 +235,7 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public UniLogDialog(Shell parent, UniLog useDevice) {
 		super(parent);
-		this.serialPort = useDevice.getSerialPort();
+		this.serialPort = useDevice.getCommunicationPort();
 		this.device = useDevice;
 		this.settings = Settings.getInstance();
 		UniLogDialog.RX_AUTO_START_MS[UniLogDialog.RX_AUTO_START_MS.length - 1] = Messages.getString(MessageIds.GDE_MSGT1300);
