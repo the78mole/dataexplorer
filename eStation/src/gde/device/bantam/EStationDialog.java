@@ -120,7 +120,7 @@ public class EStationDialog extends DeviceDialog {
 	 */
 	public EStationDialog(Shell parent, eStation useDevice) {
 		super(parent);
-		this.serialPort = useDevice.getSerialPort();
+		this.serialPort = useDevice.getCommunicationPort();
 		this.device = useDevice;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();

@@ -487,7 +487,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		String[] recordKeys = recordSet.getRecordNames();
 
-		//recordSet.setAllVisibleAndDisplayable();
+		recordSet.setAllDisplayable();
 		for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
 			recordSet.get(recordKey).setActive(true);
 		}
@@ -572,7 +572,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the serialPort
 	 */
-	public EStationSerialPort getSerialPort() {
+	@Override
+	public EStationSerialPort getCommunicationPort() {
 		return this.serialPort;
 	}
 
@@ -588,6 +589,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public EStationDialog getDialog() {
 		return this.dialog;
 	}
