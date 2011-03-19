@@ -403,15 +403,9 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public CSV2SerialAdapterDialog getDialog() {
 		return this.dialog;
-	}
-
-	/**
-	 * @return the serialPort
-	 */
-	public DeviceCommPort getSerialPort() {
-		return null;
 	}
 
 	/**
