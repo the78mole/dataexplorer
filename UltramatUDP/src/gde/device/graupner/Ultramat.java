@@ -60,7 +60,7 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 	protected final DataExplorer									application;
 	protected final UltramatSerialPort						serialPort;
 	protected final Channels											channels;
-	protected UltraDuoPlusDialog									dialog = null;
+	protected UltraDuoPlusDialog									dialog;
 
 	protected HashMap<String, CalculationThread>	calculationThreads	= new HashMap<String, CalculationThread>();
 
@@ -83,6 +83,7 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 		this.serialPort = new UltramatSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
+		this.dialog = new UltraDuoPlusDialog(this.application.getShell(), this);
 	}
 
 	/**
@@ -103,6 +104,7 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 		this.serialPort = new UltramatSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
+		this.dialog = new UltraDuoPlusDialog(this.application.getShell(), this);
 	}
 
 	/**
@@ -224,6 +226,8 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 		points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 		points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
 		points[5] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
+		String sign = String.format("%c%c", (char) dataBuffer[37], (char) dataBuffer[38]);
+		if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[5] = -1 * points[5]; 
 		points[6] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
 		points[7] = 0;
 
@@ -239,88 +243,6 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 		points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 
 		return points;
-	}
-
-	/**
-	 * check if one of the outlet channels are in processing mode
-	 * @param outletNum 1 or 2
-	 * @param dataBuffer
-	 * @return true if channel 1 or 2 is active 
-	 */
-	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
-		if(outletNum == 1) {
-			String operationModeOut1 = String.format("%c%c", (char) dataBuffer[15], (char) dataBuffer[16]);
-			if(log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "operationModeOut1 = " + (operationModeOut1 != null && operationModeOut1.length() > 0 ? USAGE_MODE[Integer.parseInt(operationModeOut1)] : operationModeOut1));
-			}
-			return operationModeOut1 != null && operationModeOut1.length() == 2 && !(operationModeOut1.equals("00") || operationModeOut1.equals("06"));
-		}
-		else if (outletNum == 2) {
-			String operationModeOut2 = String.format("%c%c", (char) dataBuffer[79], (char) dataBuffer[80]);
-			if(log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, "operationModeOut2 = " + (operationModeOut2 != null && operationModeOut2.length() > 0 ? USAGE_MODE[Integer.parseInt(operationModeOut2)] : operationModeOut2));
-			}
-			return operationModeOut2 != null && operationModeOut2.length() == 2 && !(operationModeOut2.equals("00") || operationModeOut2.equals("06"));
-		}
-		else 
-			return false;
-	}
-
-	/**
-	 * query the processing mode, main modes are charge/discharge, make sure the data buffer contains at index 15,16 the processing modes
-	 * @param dataBuffer 
-	 * @return 0 = no processing, 1 = charge, 2 = discharge, 3 = delay, 4 = pause, 5 = current operation finished, 6 = error, 7 = balancer, 8 = tire heater, 9 = motor
-	 */
-	public int getProcessingMode(byte[] dataBuffer) {
-		String operationMode = String.format("%c%c", (char) dataBuffer[15], (char) dataBuffer[16]);
-		return operationMode != null && operationMode.length() > 0 ? Integer.parseInt(operationMode) : 0;
-	}
-
-	/**
-	 * query the charge mode, main modes are automatic/normal/CVCC, make sure the data buffer contains at index 15,16 the processing modes, type at index 17,18
-	 * @param dataBuffer
-	 * @return string of charge mode
-	 */
-	public String getProcessingType(byte[] dataBuffer) {
-		String type = GDE.STRING_EMPTY;
-		String operationMode = String.format("%c%c", (char) dataBuffer[15], (char) dataBuffer[16]);
-		int opMode = operationMode != null && operationMode.length() > 0 ? Integer.parseInt(operationMode) : 0;
-		String operationType = String.format("%c%c", (char) dataBuffer[17], (char) dataBuffer[18]);
-		switch (opMode) {
-		case 1: //charge
-			type = operationType != null && operationType.length() > 0 ? CHARGE_MODE[Integer.parseInt(operationType)] : GDE.STRING_EMPTY;
-			break;
-		case 2: //discharge
-			type = operationType != null && operationType.length() > 0 ? DISCHARGE_MODE[Integer.parseInt(operationType)] : GDE.STRING_EMPTY;
-			break;
-		case 3: //delay
-			type = operationType != null && operationType.length() > 0 ? DELAY_MODE[Integer.parseInt(operationType)] : GDE.STRING_EMPTY;
-			break;
-		case 5: //last current 
-			type = operationType != null && operationType.length() > 0 ? CURRENT_MODE[Integer.parseInt(operationType)] : GDE.STRING_EMPTY;
-			break;
-		case 6: //error
-			this.application.setStatusMessage(Messages.getString("GDE_MSGT22"+operationType), SWT.COLOR_RED);
-			break;
-		}
-		return type;
-	}
-
-	/**
-	 * query if outlets are linked together to charge identical batteries in parallel
-	 * @param dataBuffer
-	 * @return true | false
-	 */
-	public boolean isLinkedMode(boolean isProcessing1, boolean isProcessing2, byte[] dataBuffer) {
-		int masterOutlet = isProcessing1 == true && isProcessing2 == false ? 1 : isProcessing1 == false && isProcessing2 == true ? 2 : 1;
-		int dataOffset = masterOutlet == 1 ? 0 : dataBuffer.length/2-5;
-		String operationMode = String.format("%c%c", (char) dataBuffer[dataOffset+15], (char) dataBuffer[dataOffset+16]);
-		int opMode = operationMode != null && operationMode.length() > 0 ? Integer.parseInt(operationMode) : 0;
-		String operationType = String.format("%c%c", (char) dataBuffer[17], (char) dataBuffer[18]);
-		if(opMode == 2) { //discharge
-			return operationType != null && operationType.length() > 0 ? operationType.equals("05") : false;
-		}
-		return operationType != null && operationType.length() > 0 ? operationType.equals("10") : false;
 	}
 
 	/**
@@ -547,6 +469,14 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * @return the device specific dialog instance
+	 */
+	@Override
+	public UltraDuoPlusDialog getDialog() {
+		return this.dialog;
+	}
+
+	/**
 	 * query for all the property keys this device has in use
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
@@ -615,6 +545,95 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
 		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
 		// 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10 19=SpannungZelle11 20=SpannungZelle12 21=SpannungZelle13 22=SpannungZelle14
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature1 6=BatteryTemperature2 7=VersorgungsSpg1 8=VersorgungsSpg2 9=Balance 
+		// 10=SpannungZelle1 11=SpannungZelle2 12=SpannungZelle3 13=SpannungZelle4 14=SpannungZelle5 15=SpannungZelle6 16=SpannungZelle7 
+		// 17=SpannungZelle8 18=SpannungZelle9 19=SpannungZelle10 20=SpannungZelle11 21=SpannungZelle12 22=SpannungZelle13 23=SpannungZelle14
+		// 24=Spannung1 25=Spannung2 26=Strom1 27=Strom2 28=Ladung1 29=Ladung2 30=Leistung1 31=Leistung2 32=Energie1 33=Energie2 
 		return new int[] {0, 2};
+	}
+
+	/**
+	 * check if one of the outlet channels are in processing mode
+	 * @param outletNum 1 or 2
+	 * @param dataBuffer
+	 * @return true if channel 1 or 2 is active 
+	 */
+	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
+		if(outletNum == 1) {
+			String operationModeOut1 = String.format("%c%c", (char) dataBuffer[15], (char) dataBuffer[16]);
+			if(log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "operationModeOut1 = " + (operationModeOut1 != null && operationModeOut1.length() > 0 ? USAGE_MODE[Integer.parseInt(operationModeOut1)] : operationModeOut1));
+			}
+			return operationModeOut1 != null && operationModeOut1.length() == 2 && !(operationModeOut1.equals("00") || operationModeOut1.equals("06"));
+		}
+		else if (outletNum == 2) {
+			String operationModeOut2 = String.format("%c%c", (char) dataBuffer[79], (char) dataBuffer[80]);
+			if(log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "operationModeOut2 = " + (operationModeOut2 != null && operationModeOut2.length() > 0 ? USAGE_MODE[Integer.parseInt(operationModeOut2)] : operationModeOut2));
+			}
+			return operationModeOut2 != null && operationModeOut2.length() == 2 && !(operationModeOut2.equals("00") || operationModeOut2.equals("06"));
+		}
+		else 
+			return false;
+	}
+
+	/**
+	 * query the processing mode, main modes are charge/discharge, make sure the data buffer contains at index 15,16 the processing modes
+	 * @param dataBuffer 
+	 * @return 0 = no processing, 1 = charge, 2 = discharge, 3 = delay, 4 = pause, 5 = current operation finished, 6 = error, 7 = balancer, 8 = tire heater, 9 = motor
+	 */
+	public int getProcessingMode(byte[] dataBuffer) {
+		String operationMode = String.format("%c%c", (char) dataBuffer[15], (char) dataBuffer[16]);
+		return operationMode != null && operationMode.length() > 0 ? Integer.parseInt(operationMode) : 0;
+	}
+
+	/**
+	 * query the charge mode, main modes are automatic/normal/CVCC, make sure the data buffer contains at index 15,16 the processing modes, type at index 17,18
+	 * @param dataBuffer
+	 * @return string of charge mode
+	 */
+	public String getProcessingType(byte[] dataBuffer) {
+		String type = GDE.STRING_EMPTY;
+		String operationMode = String.format("%c%c", (char) dataBuffer[15], (char) dataBuffer[16]);
+		int opMode = operationMode != null && operationMode.length() > 0 ? Integer.parseInt(operationMode) : 0;
+		String operationType = String.format("%c%c", (char) dataBuffer[17], (char) dataBuffer[18]);
+		switch (opMode) {
+		case 1: //charge
+			type = operationType != null && operationType.length() > 0 ? CHARGE_MODE[Integer.parseInt(operationType)] : GDE.STRING_EMPTY;
+			break;
+		case 2: //discharge
+			type = operationType != null && operationType.length() > 0 ? DISCHARGE_MODE[Integer.parseInt(operationType)] : GDE.STRING_EMPTY;
+			break;
+		case 3: //delay
+			type = operationType != null && operationType.length() > 0 ? DELAY_MODE[Integer.parseInt(operationType)] : GDE.STRING_EMPTY;
+			break;
+		case 5: //last current 
+			type = operationType != null && operationType.length() > 0 ? CURRENT_MODE[Integer.parseInt(operationType)] : GDE.STRING_EMPTY;
+			break;
+		case 6: //error
+			this.application.setStatusMessage(Messages.getString("GDE_MSGT22"+operationType), SWT.COLOR_RED);
+			break;
+		}
+		return type;
+	}
+
+	/**
+	 * query if outlets are linked together to charge identical batteries in parallel
+	 * @param dataBuffer
+	 * @return true | false
+	 */
+	public boolean isLinkedMode(byte[] dataBuffer) {
+		String operationMode1 = String.format("%c%c", (char) dataBuffer[15], (char) dataBuffer[16]);
+		String operationMode2 = String.format("%c%c", (char) dataBuffer[79], (char) dataBuffer[80]);
+		String operationType1 = String.format("%c%c", (char) dataBuffer[17], (char) dataBuffer[18]);
+		String operationType2 = String.format("%c%c", (char) dataBuffer[81], (char) dataBuffer[82]);
+		return operationMode1.equals(operationMode2) && operationType1.equals(operationType2) && (operationType1.equals("09") || operationType1.equals("05"));
+	}
+	
+	public void setTemperatureUnit(RecordSet recordSet, byte[] dataBuffer) {
+		String unit = String.format("%c%c", (char) dataBuffer[39], (char) dataBuffer[40]);
+		if (unit != null && unit.length() > 0)
+			if (Integer.parseInt(unit) == 0)      this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 5, "°C");
+			else if (Integer.parseInt(unit) == 1) this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 5, "°F");
 	}
 }
