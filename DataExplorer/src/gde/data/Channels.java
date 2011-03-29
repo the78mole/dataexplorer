@@ -95,7 +95,16 @@ public class Channels extends HashMap<Integer, Channel> {
 			}
 			else // old file contnet "Outlet 2" use the last digit to calculate the channel number
 				if (channelName.contains(GDE.STRING_BLANK) && channelName.split(GDE.STRING_BLANK).length > 1 && Character.isDigit(channelName.split(GDE.STRING_BLANK)[1].trim().charAt(0))) {
-					return new Integer(channelName.split(GDE.STRING_BLANK)[1].trim());
+					try {
+						return new Integer(channelName.split(GDE.STRING_BLANK)[1].trim());
+					}
+					catch (NumberFormatException e) {
+						if(channelName.split(GDE.STRING_BLANK)[1].trim().contains("+")) {
+							String tmpNum = channelName.split(GDE.STRING_BLANK)[1].trim();
+							log.log(Level.WARNING, "channel name = " + channelName);
+							return new Integer(tmpNum.substring(0, tmpNum.indexOf(GDE.STRING_PLUS))) + new Integer(tmpNum.substring(tmpNum.indexOf(GDE.STRING_PLUS)+1));
+						}
+					}
 			}
 			else {
 				for (String name : this.getChannelNames()) {

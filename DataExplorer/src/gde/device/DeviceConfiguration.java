@@ -2051,13 +2051,13 @@ public class DeviceConfiguration {
 			this.deviceProps.getChannels().setLastUseOrdinal(channelNumber - 1);
 		}
 	}
+
 	/**
 	 * @return the device specific dialog instance
 	 */
 	public DeviceDialog getDialog() {
 		return null;
 	}
-	
 
 	/**
 	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
