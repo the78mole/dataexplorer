@@ -304,38 +304,37 @@ public class UltramatUDP extends Ultramat {
 				log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize);
 				System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
 				// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
-				points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
-				points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
-				points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
-				points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
-				points[4] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
-				points[5] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
-				points[6] = (((convertBuffer[24]&0xff) << 24) + ((convertBuffer[25]&0xff) << 16) + ((convertBuffer[26]&0xff) << 8) + ((convertBuffer[27]&0xff) << 0));
-				points[7] = (((convertBuffer[28]&0xff) << 24) + ((convertBuffer[29]&0xff) << 16) + ((convertBuffer[30]&0xff) << 8) + ((convertBuffer[31]&0xff) << 0));
-				points[8] = (((convertBuffer[32]&0xff) << 24) + ((convertBuffer[33]&0xff) << 16) + ((convertBuffer[34]&0xff) << 8) + ((convertBuffer[35]&0xff) << 0));
+				points[1] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
+				points[2] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
+				points[0] = points[1] + points[2];
+				points[4] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
+				points[5] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
+				points[3] = points[4] + points[5];
+				points[7] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
+				points[8] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
+				points[6] = points[7] + points[8];
 				points[9] =  Double.valueOf(points[0] / 1000.0 * points[3]).intValue(); 						// power U*I [W]
 				points[10] = Double.valueOf(points[1] / 1000.0 * points[4]).intValue(); 						// power U*I [W]
 				points[11] = Double.valueOf(points[2] / 1000.0 * points[5]).intValue(); 						// power U*I [W]
 				points[12] = Double.valueOf(points[0] / 1000.0 * points[6]).intValue();							// energy U*C [Wh]
 				points[13] = Double.valueOf(points[0] / 1000.0 * points[7]).intValue();							// energy U*C [Wh]
 				points[14] = Double.valueOf(points[0] / 1000.0 * points[8]).intValue();							// energy U*C [Wh]
-				points[15] = (((convertBuffer[36]&0xff) << 24) + ((convertBuffer[37]&0xff) << 16) + ((convertBuffer[38]&0xff) << 8) + ((convertBuffer[39]&0xff) << 0));
-				points[16] = (((convertBuffer[40]&0xff) << 24) + ((convertBuffer[41]&0xff) << 16) + ((convertBuffer[42]&0xff) << 8) + ((convertBuffer[43]&0xff) << 0));
-				points[17] = (((convertBuffer[44]&0xff) << 24) + ((convertBuffer[45]&0xff) << 16) + ((convertBuffer[46]&0xff) << 8) + ((convertBuffer[47]&0xff) << 0));
-				points[18] = (((convertBuffer[48]&0xff) << 24) + ((convertBuffer[49]&0xff) << 16) + ((convertBuffer[50]&0xff) << 8) + ((convertBuffer[51]&0xff) << 0));
-				points[19] = 0;
+				points[15] = (((convertBuffer[24]&0xff) << 24) + ((convertBuffer[25]&0xff) << 16) + ((convertBuffer[26]&0xff) << 8) + ((convertBuffer[27]&0xff) << 0));
+				points[16] = (((convertBuffer[28]&0xff) << 24) + ((convertBuffer[29]&0xff) << 16) + ((convertBuffer[30]&0xff) << 8) + ((convertBuffer[31]&0xff) << 0));
+				points[17] = (((convertBuffer[32]&0xff) << 24) + ((convertBuffer[33]&0xff) << 16) + ((convertBuffer[34]&0xff) << 8) + ((convertBuffer[35]&0xff) << 0));
+				points[18] = 0;
 	
 				// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7 
 				// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
 				for (int j=0, k=0; j<points.length - 20; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
-					points[j + 20] = (((convertBuffer[k + 52] & 0xff) << 24) + ((convertBuffer[k + 53] & 0xff) << 16) + ((convertBuffer[k + 54] & 0xff) << 8) + ((convertBuffer[k + 55] & 0xff) << 0));
-					if (points[j + 20] > 0) {
-						maxVotage = points[j + 20] > maxVotage ? points[j + 20] : maxVotage;
-						minVotage = points[j + 20] < minVotage ? points[j + 20] : minVotage;
+					points[j + 19] = (((convertBuffer[k + 36] & 0xff) << 24) + ((convertBuffer[k + 37] & 0xff) << 16) + ((convertBuffer[k + 38] & 0xff) << 8) + ((convertBuffer[k + 39] & 0xff) << 0));
+					if (points[j + 19] > 0) {
+						maxVotage = points[j + 19] > maxVotage ? points[j + 19] : maxVotage;
+						minVotage = points[j + 19] < minVotage ? points[j + 19] : minVotage;
 					}
 				}
 				//calculate balance on the fly
-				points[19] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+				points[18] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 				
 				recordSet.addPoints(points);
 				
@@ -386,7 +385,7 @@ public class UltramatUDP extends Ultramat {
 	public int getDesktopTargetReferenceOrdinal(DesktopPropertyTypes desktopPropertyType) {
 		DesktopPropertyType property = this.getDesktopProperty(desktopPropertyType);
 		if(channels.getActiveChannelNumber() == 3) {
-			return property != null ? property.getTargetReferenceOrdinal() + 12 : -1; 
+			return property != null ? property.getTargetReferenceOrdinal() + 11 : -1; 
 		}
 		return property != null ? property.getTargetReferenceOrdinal() : -1; 
 	}
@@ -401,9 +400,9 @@ public class UltramatUDP extends Ultramat {
 		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
 		// 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10 19=SpannungZelle11 20=SpannungZelle12 21=SpannungZelle13 22=SpannungZelle14
 		
-		// 0=Spannung 1=Spannung1 2=Spannung 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=VersorgungsSpg2 19=Balance 
-		// 20=SpannungZelle1 21=SpannungZelle2 22=SpannungZelle3 23=SpannungZelle4 24=SpannungZelle5 25=SpannungZelle6 26=SpannungZelle7 
-		// 27=SpannungZelle8 28=SpannungZelle9 29=SpannungZelle10 30=SpannungZelle11 31=SpannungZelle12 32=SpannungZelle13 33=SpannungZelle14
+		// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
+		// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7 
+		// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
 		return new int[] {0, channels.getActiveChannelNumber() == 3 ? 6 : 2};
 	}
 }

@@ -20,13 +20,11 @@ package gde.device.graupner;
 
 import gde.comm.DeviceCommPort;
 import gde.device.IDevice;
-import gde.exception.ApplicationConfigurationException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
-import gde.utils.StringHelper;
 
 import java.io.IOException;
 import java.util.logging.Logger;
