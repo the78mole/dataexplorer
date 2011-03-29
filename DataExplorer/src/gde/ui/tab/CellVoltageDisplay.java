@@ -36,6 +36,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 
 import gde.config.Settings;
@@ -64,6 +65,7 @@ public class CellVoltageDisplay extends Composite {
 	Composite						fillRight;
 	Composite						fillLeft;
 	Composite						cellComposite;
+	Label upperVoltage, middleVoltage, lowerVoltage;
 	
 	final CellVoltageWindow				parent;
 	final DataExplorer	application;
@@ -124,7 +126,7 @@ public class CellVoltageDisplay extends Composite {
 	public void create() {
 		{
 			this.cellTextLabel = new CLabel(this, SWT.CENTER | SWT.EMBEDDED);
-			this.cellTextLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.BOLD));
+			this.cellTextLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 			this.cellTextLabel.setBackground(this.backgroundColor);
 			this.cellTextLabel.setText(this.displayHeaderText);
 			this.cellTextLabel.setMenu(this.popupmenu);
@@ -163,6 +165,12 @@ public class CellVoltageDisplay extends Composite {
 				this.fillLeft.setDragDetect(false);
 				this.fillLeft.setEnabled(false);
 				this.fillLeft.setBackground(this.backgroundColor);
+				this.upperVoltage = new Label(this.fillLeft, SWT.NONE);
+				this.upperVoltage.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+				this.middleVoltage = new Label(this.fillLeft, SWT.NONE);
+				this.middleVoltage.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+				this.lowerVoltage = new Label(this.fillLeft, SWT.NONE);
+				this.lowerVoltage.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 			}
 			{
 				this.cellCanvas = new Canvas(this.cellComposite, SWT.NONE);
@@ -231,6 +239,14 @@ public class CellVoltageDisplay extends Composite {
 		Point topHeight = calculateBarGraph(rect);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, valueText + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		rect = new Rectangle(0, topHeight.x, rect.width-1, topHeight.y);
+		
+		if(this.lastTop != topHeight.x)
+		this.upperVoltage.setLocation(10, rect.x);
+		this.upperVoltage.setText(String.format("%.1f", upperLimitVoltage/1000.0));
+		this.middleVoltage.setLocation(10, 200);
+		this.middleVoltage.setText(String.format("%.1f", (lowerLimitVoltage+(upperLimitVoltage-lowerLimitVoltage)/2)/1000.0));
+		this.lowerVoltage.setLocation(10, 300);
+		this.lowerVoltage.setText(String.format("%.1f", lowerLimitVoltage/1000.0));
 		this.lastTop = topHeight.x;
 
 		this.lastVoltageLevel = checkVoltageLevel();

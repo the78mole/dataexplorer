@@ -572,16 +572,17 @@ public class CellVoltageWindow extends CTabItem {
 	 */
 	void updateAndResize() {
 		boolean isSomeVoltagechanged = updateCellVoltageVector();
-		Point mainSize = CellVoltageWindow.this.cellVoltageMainComposite.getSize();
+		Rectangle mainSize = CellVoltageWindow.this.cellVoltageMainComposite.getClientArea();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "mainSize = " + mainSize.toString()); //$NON-NLS-1$
 		if (this.voltageVector.size() > 0) {
-			int cellWidth = mainSize.x / 6;
-			int x = (6 - CellVoltageWindow.this.voltageVector.size()) * cellWidth / 2;
-			int width = mainSize.x - (2 * x);
-			Rectangle bounds = new Rectangle(x, 45, width, mainSize.y - 100);
+			int cellWidth = mainSize.width / this.voltageVector.size();
+			cellWidth = Math.min(cellWidth, 180);
+			int x = (mainSize.width  - this.voltageVector.size() * cellWidth) / 2; //round to integer gap
+			int width = mainSize.width - (2 * x);
+			Rectangle bounds = new Rectangle(x, 45, width, mainSize.height - 100);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cover bounds = " + bounds.toString()); //$NON-NLS-1$
 			CellVoltageWindow.this.coverComposite.setBounds(bounds);
-			CellVoltageWindow.this.digitalComposite.setBounds((mainSize.x - 350) / 2, mainSize.y - 50, 350, 50);
+			CellVoltageWindow.this.digitalComposite.setBounds((mainSize.width - 350) / 2, mainSize.height - 50, 350, 50);
 
 		}
 		else {
