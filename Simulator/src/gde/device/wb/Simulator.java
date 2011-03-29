@@ -44,7 +44,7 @@ import javax.xml.bind.JAXBException;
 public class Simulator extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(Simulator.class.getName());
 
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final SimulatorSerialPort			serialPort;
 	final SimulatorDialog					dialog;
 
@@ -248,6 +248,7 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public SimulatorDialog getDialog() {
 		return this.dialog;
 	}
@@ -255,7 +256,8 @@ public class Simulator extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the serialPort
 	 */
-	public SimulatorSerialPort getSerialPort() {
+	@Override
+	public SimulatorSerialPort getCommunicationPort() {
 		return this.serialPort;
 	}
 

@@ -116,7 +116,7 @@ public class SimulatorDialog extends DeviceDialog {
 	 */
 	public SimulatorDialog(Shell parent, Simulator useDevice) {
 		super(parent);
-		this.serialPort = useDevice.getSerialPort();
+		this.serialPort = useDevice.getCommunicationPort();
 		this.device = useDevice;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
