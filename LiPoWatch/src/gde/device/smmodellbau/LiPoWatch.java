@@ -442,6 +442,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public LiPoWatchDialog getDialog() {
 		return this.dialog;
 	}
@@ -449,7 +450,8 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the serialPort
 	 */
-	public LiPoWatchSerialPort getSerialPort() {
+	@Override
+	public LiPoWatchSerialPort getCommunicationPort() {
 		return this.serialPort;
 	}
 

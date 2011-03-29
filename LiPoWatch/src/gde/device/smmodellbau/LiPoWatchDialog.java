@@ -190,7 +190,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 	 */
 	public LiPoWatchDialog(Shell parent, LiPoWatch useDevice) {
 		super(parent);
-		this.serialPort = useDevice.getSerialPort();
+		this.serialPort = useDevice.getCommunicationPort();
 		this.device = useDevice;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
