@@ -204,7 +204,7 @@ public class UltramatUDP extends Ultramat {
 		}
 		else if (dataBuffer.length == this.getDataBlockSize()) {
 			if(this.isLinkedMode(dataBuffer)) {
-				// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=VersorgungsSpg2 19=Balance 
+				// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
 				points[1] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
 				points[2] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[85], (char) dataBuffer[86], (char) dataBuffer[87], (char) dataBuffer[88]), 16);
 				points[0] = points[1] + points[2];
@@ -226,28 +226,28 @@ public class UltramatUDP extends Ultramat {
 				points[16] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[97], (char) dataBuffer[98], (char) dataBuffer[99], (char) dataBuffer[100]), 16);
 				sign = String.format("%c%c", (char) dataBuffer[37], (char) dataBuffer[38]);
 				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[16] = -1 * points[16]; 
-				points[17] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
-				points[18] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[75], (char) dataBuffer[76], (char) dataBuffer[77], (char) dataBuffer[78]), 16);
-				points[19] = 0;
+				points[17] = (Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16)
+											+ Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[75], (char) dataBuffer[76], (char) dataBuffer[77], (char) dataBuffer[78]), 16)) / 2;
+				points[18] = 0;
 
-				// 20=SpannungZelle1 21=SpannungZelle2 22=SpannungZelle3 23=SpannungZelle4 24=SpannungZelle5 25=SpannungZelle6 26=SpannungZelle7 
+				// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7 
 				for (int i = 0, j = 0; i < 7; ++i, j += 4) {
-					points[i + 20] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
-					if (points[i + 20] > 0) {
-						maxVotage = points[i + 20] > maxVotage ? points[i + 20] : maxVotage;
-						minVotage = points[i + 20] < minVotage ? points[i + 20] : minVotage;
+					points[i + 19] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
+					if (points[i + 19] > 0) {
+						maxVotage = points[i + 19] > maxVotage ? points[i + 19] : maxVotage;
+						minVotage = points[i + 19] < minVotage ? points[i + 19] : minVotage;
 					}
 				}
-				// 27=SpannungZelle8 28=SpannungZelle9 29=SpannungZelle10 30=SpannungZelle11 31=SpannungZelle12 32=SpannungZelle13 33=SpannungZelle14
+				// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
 				for (int i = 0, j = 0; i < 7; ++i, j += 4) {
-					points[i + 27] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[105 + j], (char) dataBuffer[106 + j], (char) dataBuffer[107 + j], (char) dataBuffer[108 + j]), 16);
-					if (points[i + 27] > 0) {
-						maxVotage = points[i + 27] > maxVotage ? points[i + 27] : maxVotage;
-						minVotage = points[i + 27] < minVotage ? points[i + 27] : minVotage;
+					points[i + 26] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[105 + j], (char) dataBuffer[106 + j], (char) dataBuffer[107 + j], (char) dataBuffer[108 + j]), 16);
+					if (points[i + 26] > 0) {
+						maxVotage = points[i + 26] > maxVotage ? points[i + 26] : maxVotage;
+						minVotage = points[i + 26] < minVotage ? points[i + 26] : minVotage;
 					}
 				}
 				//calculate balance on the fly
-				points[19] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+				points[18] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 			}
 			else {
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
