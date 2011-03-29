@@ -464,6 +464,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public NMEAAdapterDialog getDialog() {
 		return this.dialog;
 	}
