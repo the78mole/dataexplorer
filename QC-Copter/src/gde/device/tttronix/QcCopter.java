@@ -92,6 +92,7 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public QcCopterDialog getDialog() {
 		return this.dialog;
 	}
