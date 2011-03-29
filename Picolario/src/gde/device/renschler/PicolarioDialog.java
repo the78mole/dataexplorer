@@ -94,7 +94,7 @@ public class PicolarioDialog extends DeviceDialog {
 	public PicolarioDialog(Shell parent, Picolario useDevice) {
 		super(parent);
 		this.device = useDevice;
-		this.serialPort = useDevice.getSerialPort();
+		this.serialPort = useDevice.getCommunicationPort();
 		this.settings = Settings.getInstance();
 	}
 

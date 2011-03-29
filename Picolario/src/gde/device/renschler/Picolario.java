@@ -367,7 +367,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
-		recordSet.setAllVisibleAndDisplayable();
+		recordSet.setAllDisplayable();
 	}
 
 	/**
@@ -411,6 +411,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the dialog
 	 */
+	@Override
 	public PicolarioDialog getDialog() {
 		return this.dialog;
 	}
@@ -418,7 +419,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	/**
 	 * @return the serialPort
 	 */
-	public PicolarioSerialPort getSerialPort() {
+	@Override
+	public PicolarioSerialPort getCommunicationPort() {
 		return this.serialPort;
 	}
 	
