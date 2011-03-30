@@ -489,15 +489,17 @@ public class KMZWriter {
 				double slope = device.translateValue(recordSlope, recordSlope.get(i) / 1000.0);
 				double slopeLast = i==0 ? slope : device.translateValue(recordSlope, recordSlope.get(i-1) / 1000.0);
 				boolean isSlope0 = speed > 2 && ((slope <= 0 && slopeLast > 0) || (slope > 0 && slopeLast <= 0) || slope == 0);
+				height = device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0;
 				zipWriter.write(String.format(Locale.ENGLISH, dataPoint, 
-						recordSet.getTime(i) / 1000 / 10, speed, device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0, 
-						device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0), device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0, speed, recordAzimuth.get(i) / 1000.0, 
+						recordSet.getTime(i) / 1000 / 10, speed, height, 
+						device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0), height, speed, recordAzimuth.get(i) / 1000.0, 
 						dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(i)),
-						device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0),	device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0, recordAzimuth.get(i) / 1000.0, 
+						device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0),	height, recordAzimuth.get(i) / 1000.0, 
 						dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(i)),
 						isSlope0 ? getTrackIcon(recordAzimuth.get(i) / 1000.0) : "none", 
 						altitudeMode,
-						device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0), device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0).getBytes());
+						device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0), 
+						height < 0 ? 0 : height).getBytes()); //correct visualization while height < 0
 			}
 			zipWriter.write(pointsTrailer.getBytes());
 			
