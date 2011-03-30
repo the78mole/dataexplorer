@@ -129,21 +129,21 @@ public class NMEAReaderWriter {
 				if (!lineEndingOcurred) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0042, new Object[] { chars, filePath }));
 				if (new String(buffer).indexOf(NMEAParser.NMEA.SETUP.toString(), 1) > -1) {
 					try {
-						//byte[] buffer = StringHelper.convert2ByteArray(strValues[1]);
+						//SETUP for GPS-Logger firmware <=1.00
 						data.timeOffsetUTC = (short) ((buffer[7+7] << 8) + (buffer[7+6] & 0x00FF));
 						data.timeOffsetUTC = data.timeOffsetUTC > 12 ? 12 : data.timeOffsetUTC < -12 ? -12 : data.timeOffsetUTC;
 					}
 					catch (Exception e) {
-						log.log(Level.WARNING, "failed interpreting binary data, time offset to UTC not set!");
+						log.log(Level.WARNING, "failed interpreting binary data, time offset to UTC not set!"); //$NON-NLS-1$
 					}
 				}
 
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$		
 				Vector<String> lines = new Vector<String>();
 				//skip SM GPS-Logger setup sentence
-				while ((line = reader.readLine()) == null || line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSETUP.name())
+				while ((line = reader.readLine()) == null || line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name())
 						|| !line.startsWith(device.getDataBlockLeader())) {
-					if (line != null && (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSETUP.name()))) {
+					if (line != null && (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name()))) {
 						Vector<String> setupLine = new Vector<String>();
 						setupLine.add(line);
 						data.parse(setupLine, lineNumber);
@@ -155,7 +155,7 @@ public class NMEAReaderWriter {
 				}
 
 				String signature = line.substring(0, 6);
-				log.log(Level.FINE, "sync with signature: " + signature);
+				log.log(Level.FINE, "sync with signature: " + signature); //$NON-NLS-1$
 
 				--lineNumber; // correct do to do-while
 				do {
@@ -222,7 +222,10 @@ public class NMEAReaderWriter {
 							// ignore and state as not outdated
 						}
 						if (!isOutdated) {
-							recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+							String description = device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime;
+							if(!data.deviceSerialNumber.equals(GDE.STRING_EMPTY)) description = description + GDE.LINE_SEPARATOR + "S/N : " + data.deviceSerialNumber; //$NON-NLS-1$
+							if(!data.firmwareVersion.equals(GDE.STRING_EMPTY)) description = description.contains(GDE.LINE_SEPARATOR) ? description + "; Firmware  : " + data.firmwareVersion : GDE.LINE_SEPARATOR + "Firmware  : " + data.firmwareVersion; //$NON-NLS-1$ //$NON-NLS-2$
+							recordSet.setRecordSetDescription(description);
 							activeChannel.setFileDescription(dateTime.substring(0, 10) + activeChannel.getFileDescription().substring(10));
 						}
 						else {

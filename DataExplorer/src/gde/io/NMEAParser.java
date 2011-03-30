@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  */
 public class NMEAParser {
 	private static final Logger	log												= Logger.getLogger(NMEAParser.class.getName());
-	private final String				$CLASS_NAME								= "NMEAParser.";
+	private final String				$CLASS_NAME								= "NMEAParser."; //$NON-NLS-1$
 	private static final String	STRING_SENTENCE_SPLITTER	= " |:";																				//$NON-NLS-1$
 
 	int													time_ms;
@@ -57,6 +57,8 @@ public class NMEAParser {
 	int													numGSVsentence 						= 1; //check if GSV sentences are in sync
 	int													numSattelites							= 0;
 	Vector<String>							missingImpleWarned				= new Vector<String>();
+	String 											deviceSerialNumber				= GDE.STRING_EMPTY;
+	String											firmwareVersion           = GDE.STRING_EMPTY;
 
 	final int										size;
 	final String								separator;
@@ -71,7 +73,7 @@ public class NMEAParser {
 		//NMEA sentences
 		GPRMC, GPGSA, GPGGA, GPVTG, GPGSV, GPRMB, GPGLL, GPZDA, 
 		//additional SM-Modellbau GPS-Logger NMEA sentences
-		GPSETUP, SETUP, SMGPS, MLINK, UNILOG, KOMMENTAR, COMMENT
+		GPSSETUP, SETUP, SMGPS, MLINK, UNILOG, KOMMENTAR, COMMENT
 	}
 
 	/**
@@ -94,11 +96,11 @@ public class NMEAParser {
 	}
 
 	public void parse(Vector<String> inputLines, int lastLineNumber) throws Exception {
-		final String $METHOD_NAME = "parse()";
+		final String $METHOD_NAME = "parse()"; //$NON-NLS-1$
 		try {
 			int indexRMC = 0;
 			for (; indexRMC < inputLines.size(); ++indexRMC) {
-				if (inputLines.elementAt(indexRMC).indexOf("RMC", 1) > -1) {
+				if (inputLines.elementAt(indexRMC).indexOf("RMC", 1) > -1) { //$NON-NLS-1$
 					this.lineNumber = lastLineNumber - inputLines.size() + indexRMC + 1;
 					parse(inputLines.elementAt(indexRMC));
 					inputLines.remove(indexRMC);
@@ -113,11 +115,11 @@ public class NMEAParser {
 			}
 		}
 		catch (NumberFormatException e) {
-			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage(), e);
+			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage(), e); //$NON-NLS-1$
 			//do not re-throw and skip sentence set
 		}
 		catch (Exception e) {
-			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage(), e);
+			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage(), e); //$NON-NLS-1$
 			throw e;
 		}
 	}
@@ -128,8 +130,8 @@ public class NMEAParser {
 	 * @throws DevicePropertiesInconsistenceException
 	 * @throws Exception
 	 */
-	private void parse(String inputLine) throws DevicePropertiesInconsistenceException, Exception {
-		final String $METHOD_NAME = "parse()";
+	public void parse(String inputLine) throws DevicePropertiesInconsistenceException, Exception {
+		final String $METHOD_NAME = "parse()"; //$NON-NLS-1$
 		log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
 		if (!inputLine.startsWith(this.leader)) 
 			throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0046, new Object[] { this.leader, this.lineNumber }));
@@ -184,8 +186,11 @@ public class NMEAParser {
 					this.comment = this.comment.endsWith(GDE.STRING_STAR) ? this.comment.substring(0, this.comment.length() - 1) : this.comment;
 
 					break;
-				case GPSETUP:
-					//not yet implemented, future
+				case GPSSETUP:// setup SM GPS-Logger firmware >= 1.01
+					//$GPSSETUP,2F5A,1,1,2,0,5,0,0,0,0,0,0,0,0,0,0,0,17,12C,96,3E8,1EA,1F4,64,7C,64,7D0,0,0,0,0,0,0,0,0,0,0,0,1,3,4,6,7,2,5,8,9,A,B,0,0,0,0,67,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9A67*09
+					this.deviceSerialNumber = String.format("%d", Integer.parseInt(strValues[1].trim(), 16)); //$NON-NLS-1$
+					this.timeOffsetUTC = (short) Integer.parseInt(strValues[4].trim(), 16);
+					this.firmwareVersion = String.format("%.2f", Integer.parseInt(strValues[54].trim(), 16)/100.0); //$NON-NLS-1$
 					break;
 				case SETUP: // setup SM GPS-Logger firmware 1.00
 //							try {
@@ -207,7 +212,7 @@ public class NMEAParser {
 			catch (Exception e) {
 				if (e instanceof IllegalArgumentException && e.getMessage().contains("No enum")) { //$NON-NLS-1$
 					if (!missingImpleWarned.contains(strValues[0].substring(1))) {
-						log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + " - NMEA sentence = " + strValues[0].substring(1) + " actually not implementes!"); //$NON-NLS-1$ //$NON-NLS-2$
+						log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + " - NMEA sentence = " + strValues[0].substring(1) + " actually not implementes!"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						missingImpleWarned.add(strValues[0].substring(1));
 					}
 				}
@@ -236,7 +241,7 @@ public class NMEAParser {
 			}
 		}
 		catch (Exception e) {
-			log.logp(Level.WARNING, $CLASS_NAME, "isChecksumOK()", "line number " + this.lineNumber + GDE.STRING_BLANK + e.getClass().getSimpleName() + GDE.STRING_BLANK + e.getMessage() + " in " + sentence); //$NON-NLS-1$
+			log.logp(Level.WARNING, $CLASS_NAME, "isChecksumOK()", "line number " + this.lineNumber + GDE.STRING_BLANK + e.getClass().getSimpleName() + GDE.STRING_BLANK + e.getMessage() + " in " + sentence); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		return isOK;
 	}
@@ -261,7 +266,7 @@ public class NMEAParser {
 	 * @param strValues
 	 */
 	void parseRMC(String[] strValues) {
-		if (strValues[2].equals("A") || strValues[2].equals("V")) { //$NON-NLS-1$
+		if (strValues[2].equals("A") || strValues[2].equals("V")) { //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.date == null) {
 				String strValueDate = strValues[9].trim();
 				this.year = Integer.parseInt(strValueDate.substring(4));
@@ -285,14 +290,14 @@ public class NMEAParser {
 				int latitude, longitude, velocity, magneticVariation;
 				try {
 					latitude = Integer.parseInt(strValues[3].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
-					latitude = strValues[4].trim().equalsIgnoreCase("N") ? latitude : -1 * latitude; 
+					latitude = strValues[4].trim().equalsIgnoreCase("N") ? latitude : -1 * latitude;  //$NON-NLS-1$
 				}
 				catch (Exception e) {
 					latitude = this.values[0];
 				}
 				try {
 					longitude = Integer.parseInt(strValues[5].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
-					longitude = strValues[6].trim().equalsIgnoreCase("E") ? longitude : -1 * longitude; 
+					longitude = strValues[6].trim().equalsIgnoreCase("E") ? longitude : -1 * longitude;  //$NON-NLS-1$
 				}
 				catch (Exception e) {
 					longitude = this.values[1];
@@ -369,7 +374,7 @@ public class NMEAParser {
 				try {
 					if (this.values[0] == 0) {
 						latitude = Integer.parseInt(strValues[2].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
-						latitude = strValues[3].trim().equalsIgnoreCase("N") ? latitude : -1 * latitude;
+						latitude = strValues[3].trim().equalsIgnoreCase("N") ? latitude : -1 * latitude; //$NON-NLS-1$
 					} 
 					else
 						latitude = this.values[0];
@@ -380,7 +385,7 @@ public class NMEAParser {
 				try {
 					if (this.values[1] == 0) {
 						longitude = Integer.parseInt(strValues[4].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
-						longitude = strValues[5].trim().equalsIgnoreCase("E") ? longitude : -1 * longitude;
+						longitude = strValues[5].trim().equalsIgnoreCase("E") ? longitude : -1 * longitude; //$NON-NLS-1$
 					} 
 					else
 						longitude = this.values[1];
@@ -502,7 +507,7 @@ public class NMEAParser {
 				}
 				else {
 					numGSVsentence = 1;
-					log.log(Level.WARNING, "GSV sentences out of sync, skip and reset!");
+					log.log(Level.WARNING, "GSV sentences out of sync, skip and reset!"); //$NON-NLS-1$
 					return;
 				}
 			}
@@ -522,7 +527,7 @@ public class NMEAParser {
 					}
 					else 
 						signalNoiseRation = Integer.parseInt(strValues[7 + 4*i]);
-					log.log(Level.WARNING, "numSattelite = " + numSattelite + " elevation = " + elevationDegrees + " azimuth = " + azimuthDegrees + " signalNoiseRation = " + signalNoiseRation);
+					log.log(Level.WARNING, "numSattelite = " + numSattelite + " elevation = " + elevationDegrees + " azimuth = " + azimuthDegrees + " signalNoiseRation = " + signalNoiseRation); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				}
 			}
 			catch (Exception e) {
@@ -628,7 +633,7 @@ public class NMEAParser {
 				try {
 					if (this.values[0] == 0) {
 						latitude = Integer.parseInt(strValues[2].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
-						latitude = strValues[3].trim().equalsIgnoreCase("N") ? latitude : -1 * latitude;
+						latitude = strValues[3].trim().equalsIgnoreCase("N") ? latitude : -1 * latitude; //$NON-NLS-1$
 					} 
 					else
 						latitude = this.values[0];
@@ -639,7 +644,7 @@ public class NMEAParser {
 				try {
 					if (this.values[1] == 0) {
 						longitude = Integer.parseInt(strValues[4].trim().replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
-						longitude = strValues[5].trim().equalsIgnoreCase("E") ? longitude : -1 * longitude;
+						longitude = strValues[5].trim().equalsIgnoreCase("E") ? longitude : -1 * longitude; //$NON-NLS-1$
 					} 
 					else
 						longitude = this.values[1];
