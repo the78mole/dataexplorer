@@ -2,6 +2,8 @@ Development history / change log, please read from bottom up
 
 add Graupner Ultra Duo Plus 60
 fix launching problem of external device properties editor
+add GPS-Logger firmware >= 1.03 support
+circumvent Google Earth relativ2ground visualization problem
 
 Version 2.74 - 12 Mar 2011
 
