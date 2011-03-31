@@ -107,6 +107,7 @@ public class GDE {
 	public final static int				SIZE_UTF_SIGNATURE							= 2;																																																													// 2 byte UTF line header 
 
 	public final static String		STRING_NEW_LINE									= "\n";																																																											// is OS dependent //$NON-NLS-1$
+	public final static String		STRING_RETURN										= "\r";																																																											// is OS dependent //$NON-NLS-1$
 	public static final String		STRING_MESSAGE_CONCAT						= " - ";																																																											//$NON-NLS-1$
 	public static final String		STRING_DASH											= "-";																																																												//$NON-NLS-1$
 	public static final String		STRING_UNDER_BAR								= "_";																																																												//$NON-NLS-1$
