@@ -301,16 +301,16 @@ public class KMZWriter {
 				String[] arrayDescription = recordSet.getRecordSetDescription().split(GDE.STRING_BLANK);
 				int[] intDate = new int[3];
 				for (String strDate : arrayDescription) {
-					String[] tmp = strDate.replace(GDE.STRING_COMMA, GDE.STRING_EMPTY).replace(GDE.STRING_SEMICOLON, GDE.STRING_EMPTY).split(GDE.STRING_DASH);
-					if (tmp.length == 3) {
+					String[] tmp = strDate.replace(GDE.STRING_COMMA, GDE.STRING_DASH).replace(GDE.STRING_SEMICOLON, GDE.STRING_DASH).replace(GDE.STRING_RETURN, GDE.STRING_DASH).replace(GDE.STRING_NEW_LINE, GDE.STRING_DASH).split(GDE.STRING_DASH);
+					if (tmp.length >= 3 && Character.isDigit(tmp[0].charAt(0)) && Character.isDigit(tmp[1].charAt(0)) && Character.isDigit(tmp[2].charAt(0))) {
 						intDate = new int[] { Integer.parseInt(tmp[0]), Integer.parseInt(tmp[1]), Integer.parseInt(tmp[2]) };
 						break;
 					}
 				}
 				int[] intTime = new int[3];
 				for (String strTime : arrayDescription) {
-					String[] tmp = strTime.replace(GDE.STRING_COMMA, GDE.STRING_EMPTY).replace(GDE.STRING_SEMICOLON, GDE.STRING_EMPTY).split(GDE.STRING_COLON);
-					if (tmp.length == 3) {
+					String[] tmp = strTime.replace(GDE.STRING_COMMA, GDE.STRING_COLON).replace(GDE.STRING_SEMICOLON, GDE.STRING_COLON).replace(GDE.STRING_RETURN, GDE.STRING_COLON).replace(GDE.STRING_NEW_LINE, GDE.STRING_COLON).split(GDE.STRING_COLON);
+					if (tmp.length >= 3 && Character.isDigit(tmp[0].charAt(0)) && Character.isDigit(tmp[1].charAt(0)) && Character.isDigit(tmp[2].charAt(0))) {
 						intTime = new int[] { Integer.parseInt(tmp[0]), Integer.parseInt(tmp[1]), Integer.parseInt(tmp[2]) };
 						break;
 					}
