@@ -85,5 +85,8 @@ public class MessageIds {
 	public final static String	GDE_MSGT2064 = "GDE_MSGT2064";
 	public final static String	GDE_MSGT2065 = "GDE_MSGT2065";
 	public final static String	GDE_MSGT2066 = "GDE_MSGT2066";
+	public final static String	GDE_MSGT2067 = "GDE_MSGT2067";
+	public final static String	GDE_MSGT2068 = "GDE_MSGT2068";
+	public final static String	GDE_MSGT2069 = "GDE_MSGT2069";
 
  }

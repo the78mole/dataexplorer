@@ -79,12 +79,19 @@ public class SetupReaderWriter {
 	//short[] B = new short[10]; // 28-37
 	int									mLinkAddressVario						= 0;																										// 38 0 - 15, "--"
 	int									mLinkAddressSpeed						= 1;																										// 39
-	int									mLinkAddressDirection				= 4;																										// 40
-	int									mLinkAddressHeight					= 2;																										// 41
-	int									mLinkAddressDistance				= 5;																										// 42
-	int									mLinkAddressTripLength			= 3;																										// 43
+	int									mLinkAddressDirection				= 3;																										// 40
+	int									mLinkAddressHeight					= 4;																										// 41
+	int									mLinkAddressDistance				= 6;																										// 42
+	int									mLinkAddressTripLength			= 7;																										// 43
+	int									mLinkAddressSpeedMax				= 2;																										// 44
+	int									mLinkAddressHeightMax				= 5;																										// 45
+	int									mLinkAddressVoltageUL				= 8;																										// 46
+	int									mLinkAddressCurrentUL				= 9;																										// 47
+	int									mLinkAddressRevolutionUL		= 10;																										// 48
+	int									mLinkAddressCapacityUL			= 11;																										// 49
 	//short[] C = short int[10]; // 44-53
-	int									firmwareVersion							= 100;																									// 54
+	int									firmwareVersion							= 103;																									// 54
+	int									modusIGC										= 1;																										// 55
 	//int[]								unused										= new int[192 - 55 * 2];
 	short								checkSum;																																						// 55
 
@@ -131,14 +138,21 @@ public class SetupReaderWriter {
 				this.voltageUlAlarm 				= (buffer[51] << 8) + (buffer[50] & 0x00FF);
 				this.capacityUlAlarm 				= (buffer[53] << 8) + (buffer[52] & 0x00FF);
 				//B[10]
-				this.mLinkAddressVario 			= (buffer[75] << 8) + (buffer[74] & 0x00FF);
-				this.mLinkAddressSpeed 			= (buffer[77] << 8) + (buffer[76] & 0x00FF);
-				this.mLinkAddressDirection 	= (buffer[79] << 8) + (buffer[78] & 0x00FF);
-				this.mLinkAddressHeight 		= (buffer[81] << 8) + (buffer[80] & 0x00FF);
-				this.mLinkAddressDistance 	= (buffer[83] << 8) + (buffer[82] & 0x00FF);
-				this.mLinkAddressTripLength = (buffer[85] << 8) + (buffer[84] & 0x00FF);
+				this.mLinkAddressVario 				= (buffer[75] << 8) + (buffer[74] & 0x00FF);
+				this.mLinkAddressSpeed 				= (buffer[77] << 8) + (buffer[76] & 0x00FF);
+				this.mLinkAddressDirection 		= (buffer[79] << 8) + (buffer[78] & 0x00FF);
+				this.mLinkAddressHeight 			= (buffer[81] << 8) + (buffer[80] & 0x00FF);
+				this.mLinkAddressDistance 		= (buffer[83] << 8) + (buffer[82] & 0x00FF);
+				this.mLinkAddressTripLength 	= (buffer[85] << 8) + (buffer[84] & 0x00FF);
+				this.mLinkAddressSpeedMax			= (buffer[87] << 8) + (buffer[86] & 0x00FF);		// 44
+				this.mLinkAddressHeightMax		= (buffer[89] << 8) + (buffer[88] & 0x00FF);		// 45
+				this.mLinkAddressVoltageUL		= (buffer[91] << 8) + (buffer[90] & 0x00FF);		// 46
+				this.mLinkAddressCurrentUL		= (buffer[93] << 8) + (buffer[92] & 0x00FF);		// 47
+				this.mLinkAddressRevolutionUL	= (buffer[95] << 8) + (buffer[94] & 0x00FF);		// 48
+				this.mLinkAddressCapacityUL		= (buffer[97] << 8) + (buffer[96] & 0x00FF);		// 49
 				//C[10]
-				this.firmwareVersion = (buffer[107] << 8) + (buffer[106] & 0x00FF);
+				this.firmwareVersion 		= (buffer[107] << 8) + (buffer[106] & 0x00FF);
+				this.modusIGC 					= (buffer[109] << 8) + (buffer[108] & 0x00FF);				//55
 				//unused
 				this.checkSum = (short) (((buffer[191] & 0x00FF) << 8) + (buffer[190] & 0x00FF));
 
@@ -214,9 +228,23 @@ public class SetupReaderWriter {
 				buffer[83] = (byte) ((this.mLinkAddressDistance & 0xFF00) >> 8);
 				buffer[84] = (byte) (this.mLinkAddressTripLength & 0x00FF);
 				buffer[85] = (byte) ((this.mLinkAddressTripLength & 0xFF00) >> 8);
+				buffer[86] = (byte) (this.mLinkAddressSpeedMax & 0x00FF);					// 44
+				buffer[87] = (byte) ((this.mLinkAddressSpeedMax & 0xFF00) >> 8);	// 44
+				buffer[88] = (byte) (this.mLinkAddressHeightMax & 0x00FF);				// 45
+				buffer[89] = (byte) ((this.mLinkAddressHeightMax & 0xFF00) >> 8);	// 45
+				buffer[90] = (byte) (this.mLinkAddressVoltageUL & 0x00FF);				// 46
+				buffer[91] = (byte) ((this.mLinkAddressVoltageUL & 0xFF00) >> 8);	// 46
+				buffer[92] = (byte) (this.mLinkAddressCurrentUL & 0x00FF);				// 47
+				buffer[93] = (byte) ((this.mLinkAddressCurrentUL & 0xFF00) >> 8);	// 47
+				buffer[94] = (byte) (this.mLinkAddressRevolutionUL & 0x00FF);				// 48
+				buffer[95] = (byte) ((this.mLinkAddressRevolutionUL & 0xFF00) >> 8);// 48
+				buffer[96] = (byte) (this.mLinkAddressCapacityUL & 0x00FF);					// 49
+				buffer[97] = (byte) ((this.mLinkAddressCapacityUL & 0xFF00) >> 8);	// 49
 				//C 10
 				buffer[106] = (byte) (this.firmwareVersion & 0x00FF);
 				buffer[107] = (byte) ((this.firmwareVersion & 0xFF00) >> 8);
+				buffer[108] = (byte) (this.modusIGC & 0x00FF);										//55
+				buffer[109] = (byte) ((this.modusIGC & 0xFF00) >> 8);							//55
 				//unused 
 				byte[] chkBuffer = new byte[192 - 2];
 				System.arraycopy(buffer, 0, chkBuffer, 0, chkBuffer.length);

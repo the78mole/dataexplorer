@@ -64,6 +64,9 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 	Composite								fillerComposite;
 
 	Group										unilogTelemtryAlarmsGroup;
+	CLabel									addressLabel1UL, addressLabel2UL, addressLabel3UL, addressLabel4UL;
+	Text										addressText1UL, addressText2UL, addressText3UL, addressText4UL;
+	Slider									addressSlider1UL, addressSlider2UL, addressSlider3UL, addressSlider4UL;
 	Button									currentButton, voltageStartButton, voltageButton, capacityButton;
 	CCombo									currentCombo, voltageStartCombo, voltageCombo, capacityCombo;
 	CLabel									currentLabel, voltageStartLabel, voltageLabel, capacityLabel;
@@ -72,9 +75,9 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 	final int								comboWidth					= 83;
 
 	Group										mLinkAddressesGroup;
-	CLabel									addressLabel1, addressLabel2, addressLabel3, addressLabel4, addressLabel5, addressLabel6;
-	Text										addressText1, addressText2, addressText3, addressText4, addressText5, addressText6;
-	Slider									addressSlider1, addressSlider2, addressSlider3, addressSlider4, addressSlider5, addressSlider6;
+	CLabel									addressLabel1, addressLabel2, addressLabel2max, addressLabel3, addressLabel3max, addressLabel4, addressLabel5, addressLabel6;
+	Text										addressText1, addressText2, addressText2max, addressText3, addressText3max, addressText4, addressText5, addressText6;
+	Slider									addressSlider1, addressSlider2, addressSlider2max, addressSlider3, addressSlider3max, addressSlider4, addressSlider5, addressSlider6;
 	final int								labelWidth					= 115;
 	final int								textWidth						= 25;
 	final int								sliderWidth					= 125;
@@ -109,6 +112,32 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 	}
 
 	public void updateValues() {
+		this.addressSlider1.setSelection(this.configuration.mLinkAddressVario);
+		this.addressText1.setText(sliderValues[this.configuration.mLinkAddressVario]);
+		this.addressSlider2.setSelection(this.configuration.mLinkAddressSpeed);
+		this.addressText2.setText(sliderValues[this.configuration.mLinkAddressSpeed]);
+		this.addressSlider2max.setSelection(this.configuration.mLinkAddressSpeedMax);
+		this.addressText2max.setText(sliderValues[this.configuration.mLinkAddressSpeedMax]);
+		this.addressSlider3.setSelection(this.configuration.mLinkAddressHeight);
+		this.addressText3.setText(sliderValues[this.configuration.mLinkAddressHeight]);
+		this.addressSlider3max.setSelection(this.configuration.mLinkAddressHeightMax);
+		this.addressText3max.setText(sliderValues[this.configuration.mLinkAddressHeightMax]);
+		this.addressSlider4.setSelection(this.configuration.mLinkAddressDistance);
+		this.addressText4.setText(sliderValues[this.configuration.mLinkAddressDistance]);
+		this.addressSlider5.setSelection(this.configuration.mLinkAddressDirection);
+		this.addressText5.setText(sliderValues[this.configuration.mLinkAddressDirection]);
+		this.addressSlider6.setSelection(this.configuration.mLinkAddressTripLength);
+		this.addressText6.setText(sliderValues[this.configuration.mLinkAddressTripLength]);
+
+		this.addressSlider1UL.setSelection(this.configuration.mLinkAddressVoltageUL);
+		this.addressText1UL.setText(sliderValues[this.configuration.mLinkAddressVoltageUL]);
+		this.addressSlider2UL.setSelection(this.configuration.mLinkAddressCurrentUL);
+		this.addressText2UL.setText(sliderValues[this.configuration.mLinkAddressCurrentUL]);
+		this.addressSlider3UL.setSelection(this.configuration.mLinkAddressRevolutionUL);
+		this.addressText3UL.setText(sliderValues[this.configuration.mLinkAddressRevolutionUL]);
+		this.addressSlider4UL.setSelection(this.configuration.mLinkAddressCapacityUL);
+		this.addressText4UL.setText(sliderValues[this.configuration.mLinkAddressCapacityUL]);
+
 		this.currentButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_CURRENT_UL) > 0);
 		this.currentCombo.setText(String.format(Locale.ENGLISH, "%5d", this.configuration.currentUlAlarm)); //$NON-NLS-1$
 		this.voltageStartButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_VOLTAGE_START_UL) > 0);
@@ -117,19 +146,6 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 		this.voltageCombo.setText(String.format(Locale.ENGLISH, "%5.1f", this.configuration.voltageUlAlarm / 10.0)); //$NON-NLS-1$
 		this.capacityButton.setSelection((this.configuration.telemetryAlarms & SetupReaderWriter.TEL_ALARM_CAPACITY_UL) > 0);
 		this.capacityCombo.setText(String.format(Locale.ENGLISH, "%5d", this.configuration.capacityUlAlarm)); //$NON-NLS-1$
-
-		this.addressSlider1.setSelection(this.configuration.mLinkAddressVario);
-		this.addressText1.setText(sliderValues[this.configuration.mLinkAddressVario]);
-		this.addressSlider2.setSelection(this.configuration.mLinkAddressSpeed);
-		this.addressText2.setText(sliderValues[this.configuration.mLinkAddressSpeed]);
-		this.addressSlider3.setSelection(this.configuration.mLinkAddressHeight);
-		this.addressText3.setText(sliderValues[this.configuration.mLinkAddressHeight]);
-		this.addressSlider4.setSelection(this.configuration.mLinkAddressDistance);
-		this.addressText4.setText(sliderValues[this.configuration.mLinkAddressDistance]);
-		this.addressSlider5.setSelection(this.configuration.mLinkAddressDirection);
-		this.addressText5.setText(sliderValues[this.configuration.mLinkAddressDirection]);
-		this.addressSlider6.setSelection(this.configuration.mLinkAddressTripLength);
-		this.addressText6.setText(sliderValues[this.configuration.mLinkAddressTripLength]);
 	}
 
 	void initGUI() {
@@ -142,13 +158,330 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				}
 			});
 			{
+				this.mLinkAddressesGroup = new Group(this, SWT.NONE);
+				RowLayout mLinkAddressesGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+				this.mLinkAddressesGroup.setLayout(mLinkAddressesGroupLayout);
+				FormData mLinkAddressesGroupLData = new FormData();
+				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 10);
+				mLinkAddressesGroupLData.width = 290;
+				mLinkAddressesGroupLData.height = 197;
+				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
+				this.mLinkAddressesGroup.setLayoutData(mLinkAddressesGroupLData);
+				this.mLinkAddressesGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.mLinkAddressesGroup.setText(Messages.getString(MessageIds.GDE_MSGT2058));
+				{
+					this.addressLabel1 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel1LData = new RowData();
+					addressLabel1LData.width = labelWidth;
+					addressLabel1LData.height = 21;
+					this.addressLabel1.setLayoutData(addressLabel1LData);
+					this.addressLabel1.setText(Messages.getString(MessageIds.GDE_MSGT2059));
+				}
+				{
+					this.addressText1 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText1LData = new RowData();
+					addressText1LData.width = textWidth;
+					addressText1LData.height = 13;
+					this.addressText1.setLayoutData(addressText1LData);
+					this.addressText1.setText(sliderValues[this.configuration.mLinkAddressVario]);
+				}
+				{
+					this.addressSlider1 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider1.setMinimum(sliderMinimum);
+					this.addressSlider1.setMaximum(sliderMaximum);
+					this.addressSlider1.setIncrement(sliderIncrement);
+					RowData addressSlider1LData = new RowData();
+					addressSlider1LData.width = sliderWidth;
+					addressSlider1LData.height = 17;
+					this.addressSlider1.setLayoutData(addressSlider1LData);
+					this.addressSlider1.setSelection(this.configuration.mLinkAddressVario);
+					this.addressSlider1.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider1.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressVario = GPSLoggerSetupConfiguration2.this.addressSlider1.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText1.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressVario]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel2 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel2LData = new RowData();
+					addressLabel2LData.width = labelWidth;
+					addressLabel2LData.height = 21;
+					this.addressLabel2.setLayoutData(addressLabel2LData);
+					this.addressLabel2.setText(Messages.getString(MessageIds.GDE_MSGT2060));
+				}
+				{
+					this.addressText2 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText2LData = new RowData();
+					addressText2LData.width = textWidth;
+					addressText2LData.height = 13;
+					this.addressText2.setLayoutData(addressText2LData);
+					this.addressText2.setText(sliderValues[this.configuration.mLinkAddressSpeed]);
+				}
+				{
+					this.addressSlider2 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider2.setMinimum(sliderMinimum);
+					this.addressSlider2.setMaximum(sliderMaximum);
+					this.addressSlider2.setIncrement(sliderIncrement);
+					RowData addressSlider2LData = new RowData();
+					addressSlider2LData.width = sliderWidth;
+					addressSlider2LData.height = 17;
+					this.addressSlider2.setLayoutData(addressSlider2LData);
+					this.addressSlider2.setSelection(this.configuration.mLinkAddressSpeed);
+					this.addressSlider2.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider2.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressSpeed = GPSLoggerSetupConfiguration2.this.addressSlider2.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText2.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressSpeed]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel2max = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel2max.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel2maxLData = new RowData();
+					addressLabel2maxLData.width = labelWidth;
+					addressLabel2maxLData.height = 21;
+					this.addressLabel2max.setLayoutData(addressLabel2maxLData);
+					this.addressLabel2max.setText(Messages.getString(MessageIds.GDE_MSGT2060) + "_max");
+				}
+				{
+					this.addressText2max = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText2max.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText2maxLData = new RowData();
+					addressText2maxLData.width = textWidth;
+					addressText2maxLData.height = 13;
+					this.addressText2max.setLayoutData(addressText2maxLData);
+					this.addressText2max.setText(sliderValues[this.configuration.mLinkAddressSpeedMax]);
+				}
+				{
+					this.addressSlider2max = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider2max.setMinimum(sliderMinimum);
+					this.addressSlider2max.setMaximum(sliderMaximum);
+					this.addressSlider2max.setIncrement(sliderIncrement);
+					RowData addressSlider2maxLData = new RowData();
+					addressSlider2maxLData.width = sliderWidth;
+					addressSlider2maxLData.height = 17;
+					this.addressSlider2max.setLayoutData(addressSlider2maxLData);
+					this.addressSlider2max.setSelection(this.configuration.mLinkAddressSpeedMax);
+					this.addressSlider2max.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider2max.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressSpeedMax = GPSLoggerSetupConfiguration2.this.addressSlider2max.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText2max.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressSpeedMax]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel3 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel3LData = new RowData();
+					addressLabel3LData.width = labelWidth;
+					addressLabel3LData.height = 21;
+					this.addressLabel3.setLayoutData(addressLabel3LData);
+					this.addressLabel3.setText(Messages.getString(MessageIds.GDE_MSGT2061));
+				}
+				{
+					this.addressText3 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText3LData = new RowData();
+					addressText3LData.width = textWidth;
+					addressText3LData.height = 13;
+					this.addressText3.setLayoutData(addressText3LData);
+					this.addressText3.setText(sliderValues[this.configuration.mLinkAddressHeight]);
+				}
+				{
+					this.addressSlider3 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider3.setMinimum(sliderMinimum);
+					this.addressSlider3.setMaximum(sliderMaximum);
+					this.addressSlider3.setIncrement(sliderIncrement);
+					RowData addressSlider3LData = new RowData();
+					addressSlider3LData.width = sliderWidth;
+					addressSlider3LData.height = 17;
+					this.addressSlider3.setLayoutData(addressSlider3LData);
+					this.addressSlider3.setSelection(this.configuration.mLinkAddressHeight);
+					this.addressSlider3.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider3.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressHeight = GPSLoggerSetupConfiguration2.this.addressSlider3.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText3.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressHeight]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel3max = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel3max.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel3maxLData = new RowData();
+					addressLabel3maxLData.width = labelWidth;
+					addressLabel3maxLData.height = 21;
+					this.addressLabel3max.setLayoutData(addressLabel3maxLData);
+					this.addressLabel3max.setText(Messages.getString(MessageIds.GDE_MSGT2061) + "_max");
+				}
+				{
+					this.addressText3max = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText3max.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText3maxLData = new RowData();
+					addressText3maxLData.width = textWidth;
+					addressText3maxLData.height = 13;
+					this.addressText3max.setLayoutData(addressText3maxLData);
+					this.addressText3max.setText(sliderValues[this.configuration.mLinkAddressHeightMax]);
+				}
+				{
+					this.addressSlider3max = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider3max.setMinimum(sliderMinimum);
+					this.addressSlider3max.setMaximum(sliderMaximum);
+					this.addressSlider3max.setIncrement(sliderIncrement);
+					RowData addressSlider3maxLData = new RowData();
+					addressSlider3maxLData.width = sliderWidth;
+					addressSlider3maxLData.height = 17;
+					this.addressSlider3max.setLayoutData(addressSlider3maxLData);
+					this.addressSlider3max.setSelection(this.configuration.mLinkAddressHeightMax);
+					this.addressSlider3max.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider3max.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressHeightMax = GPSLoggerSetupConfiguration2.this.addressSlider3max.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText3max.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressHeightMax]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel4 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel4LData = new RowData();
+					addressLabel4LData.width = labelWidth;
+					addressLabel4LData.height = 21;
+					this.addressLabel4.setLayoutData(addressLabel4LData);
+					this.addressLabel4.setText(Messages.getString(MessageIds.GDE_MSGT2062));
+				}
+				{
+					this.addressText4 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText4LData = new RowData();
+					addressText4LData.width = textWidth;
+					addressText4LData.height = 13;
+					this.addressText4.setLayoutData(addressText4LData);
+					this.addressText4.setText(sliderValues[this.configuration.mLinkAddressDistance]);
+				}
+				{
+					this.addressSlider4 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider4.setMinimum(sliderMinimum);
+					this.addressSlider4.setMaximum(sliderMaximum);
+					this.addressSlider4.setIncrement(sliderIncrement);
+					RowData addressSlider4LData = new RowData();
+					addressSlider4LData.width = sliderWidth;
+					addressSlider4LData.height = 17;
+					this.addressSlider4.setLayoutData(addressSlider4LData);
+					this.addressSlider4.setSelection(this.configuration.mLinkAddressDistance);
+					this.addressSlider4.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider4.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressDistance = GPSLoggerSetupConfiguration2.this.addressSlider4.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText4.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressDistance]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel5 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel5LData = new RowData();
+					addressLabel5LData.width = labelWidth;
+					addressLabel5LData.height = 21;
+					this.addressLabel5.setLayoutData(addressLabel5LData);
+					this.addressLabel5.setText(Messages.getString(MessageIds.GDE_MSGT2063));
+				}
+				{
+					this.addressText5 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText5LData = new RowData();
+					addressText5LData.width = textWidth;
+					addressText5LData.height = 13;
+					this.addressText5.setLayoutData(addressText5LData);
+					this.addressText5.setText(sliderValues[this.configuration.mLinkAddressDirection]);
+				}
+				{
+					this.addressSlider5 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider5.setMinimum(sliderMinimum);
+					this.addressSlider5.setMaximum(sliderMaximum);
+					this.addressSlider5.setIncrement(sliderIncrement);
+					RowData addressSlider5LData = new RowData();
+					addressSlider5LData.width = sliderWidth;
+					addressSlider5LData.height = 17;
+					this.addressSlider5.setLayoutData(addressSlider5LData);
+					this.addressSlider5.setSelection(this.configuration.mLinkAddressDirection);
+					this.addressSlider5.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider5.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressDirection = GPSLoggerSetupConfiguration2.this.addressSlider5.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText5.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressDirection]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel6 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.addressLabel6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel6LData = new RowData();
+					addressLabel6LData.width = labelWidth;
+					addressLabel6LData.height = 21;
+					this.addressLabel6.setLayoutData(addressLabel6LData);
+					this.addressLabel6.setText(Messages.getString(MessageIds.GDE_MSGT2064));
+				}
+				{
+					this.addressText6 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText6LData = new RowData();
+					addressText6LData.width = textWidth;
+					addressText6LData.height = 13;
+					this.addressText6.setLayoutData(addressText6LData);
+					this.addressText6.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
+				}
+				{
+					this.addressSlider6 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.addressSlider6.setMinimum(sliderMinimum);
+					this.addressSlider6.setMaximum(sliderMaximum);
+					this.addressSlider6.setIncrement(sliderIncrement);
+					RowData addressSlider6LData = new RowData();
+					addressSlider6LData.width = sliderWidth;
+					addressSlider6LData.height = 17;
+					this.addressSlider6.setLayoutData(addressSlider6LData);
+					this.addressSlider6.setSelection(this.configuration.mLinkAddressTripLength);
+					this.addressSlider6.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider6.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength = GPSLoggerSetupConfiguration2.this.addressSlider6.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText6.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+			}
+			{
 				this.unilogTelemtryAlarmsGroup = new Group(this, SWT.NONE);
 				RowLayout unilogTelemtryAlarmsGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.unilogTelemtryAlarmsGroup.setLayout(unilogTelemtryAlarmsGroupLayout);
 				FormData unilogTelemtryAlarmsGroupLData = new FormData();
 				unilogTelemtryAlarmsGroupLData.width = 290;
-				unilogTelemtryAlarmsGroupLData.height = 159;
-				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 12);
+				unilogTelemtryAlarmsGroupLData.height = 200;
+				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 230);
 				unilogTelemtryAlarmsGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.unilogTelemtryAlarmsGroup.setLayoutData(unilogTelemtryAlarmsGroupLData);
 				this.unilogTelemtryAlarmsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -157,8 +490,160 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fillerComposite = new Composite(this.unilogTelemtryAlarmsGroup, SWT.NONE);
 					RowData fillerCompositeRA1LData = new RowData();
 					fillerCompositeRA1LData.width = 280;
-					fillerCompositeRA1LData.height = 20;
+					fillerCompositeRA1LData.height = 2;
 					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					this.addressLabel1UL = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.RIGHT);
+					this.addressLabel1UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel1ULLData = new RowData();
+					addressLabel1ULLData.width = labelWidth;
+					addressLabel1ULLData.height = 21;
+					this.addressLabel1UL.setLayoutData(addressLabel1ULLData);
+					this.addressLabel1UL.setText(Messages.getString(MessageIds.GDE_MSGT2054));
+				}
+				{
+					this.addressText1UL = new Text(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText1UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText1ULLData = new RowData();
+					addressText1ULLData.width = textWidth;
+					addressText1ULLData.height = 13;
+					this.addressText1UL.setLayoutData(addressText1ULLData);
+					this.addressText1UL.setText(sliderValues[this.configuration.mLinkAddressVoltageUL]);
+				}
+				{
+					this.addressSlider1UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
+					this.addressSlider1UL.setMinimum(sliderMinimum);
+					this.addressSlider1UL.setMaximum(sliderMaximum);
+					this.addressSlider1UL.setIncrement(sliderIncrement);
+					RowData addressSlider1ULLData = new RowData();
+					addressSlider1ULLData.width = sliderWidth;
+					addressSlider1ULLData.height = 17;
+					this.addressSlider1UL.setLayoutData(addressSlider1ULLData);
+					this.addressSlider1UL.setSelection(this.configuration.mLinkAddressVoltageUL);
+					this.addressSlider1UL.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider1UL.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressVoltageUL = GPSLoggerSetupConfiguration2.this.addressSlider1UL.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText1UL.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressVoltageUL]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel2UL = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.RIGHT);
+					this.addressLabel2UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel2ULLData = new RowData();
+					addressLabel2ULLData.width = labelWidth;
+					addressLabel2ULLData.height = 21;
+					this.addressLabel2UL.setLayoutData(addressLabel2ULLData);
+					this.addressLabel2UL.setText(Messages.getString(MessageIds.GDE_MSGT2066));
+				}
+				{
+					this.addressText2UL = new Text(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText2UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText2ULLData = new RowData();
+					addressText2ULLData.width = textWidth;
+					addressText2ULLData.height = 13;
+					this.addressText2UL.setLayoutData(addressText2ULLData);
+					this.addressText2UL.setText(sliderValues[this.configuration.mLinkAddressCurrentUL]);
+				}
+				{
+					this.addressSlider2UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
+					this.addressSlider2UL.setMinimum(sliderMinimum);
+					this.addressSlider2UL.setMaximum(sliderMaximum);
+					this.addressSlider2UL.setIncrement(sliderIncrement);
+					RowData addressSlider2ULLData = new RowData();
+					addressSlider2ULLData.width = sliderWidth;
+					addressSlider2ULLData.height = 17;
+					this.addressSlider2UL.setLayoutData(addressSlider2ULLData);
+					this.addressSlider2UL.setSelection(this.configuration.mLinkAddressCurrentUL);
+					this.addressSlider2UL.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider2UL.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressCurrentUL = GPSLoggerSetupConfiguration2.this.addressSlider2UL.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText2UL.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressCurrentUL]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel3UL = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.RIGHT);
+					this.addressLabel3UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel3ULLData = new RowData();
+					addressLabel3ULLData.width = labelWidth;
+					addressLabel3ULLData.height = 21;
+					this.addressLabel3UL.setLayoutData(addressLabel3ULLData);
+					this.addressLabel3UL.setText(Messages.getString(MessageIds.GDE_MSGT2067));
+				}
+				{
+					this.addressText3UL = new Text(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText3UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText3ULLData = new RowData();
+					addressText3ULLData.width = textWidth;
+					addressText3ULLData.height = 13;
+					this.addressText3UL.setLayoutData(addressText3ULLData);
+					this.addressText3UL.setText(sliderValues[this.configuration.mLinkAddressRevolutionUL]);
+				}
+				{
+					this.addressSlider3UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
+					this.addressSlider3UL.setMinimum(sliderMinimum);
+					this.addressSlider3UL.setMaximum(sliderMaximum);
+					this.addressSlider3UL.setIncrement(sliderIncrement);
+					RowData addressSlider3ULLData = new RowData();
+					addressSlider3ULLData.width = sliderWidth;
+					addressSlider3ULLData.height = 17;
+					this.addressSlider3UL.setLayoutData(addressSlider3ULLData);
+					this.addressSlider3UL.setSelection(this.configuration.mLinkAddressRevolutionUL);
+					this.addressSlider3UL.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider3UL.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressRevolutionUL = GPSLoggerSetupConfiguration2.this.addressSlider3UL.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText3UL.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressRevolutionUL]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.addressLabel4UL = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.RIGHT);
+					this.addressLabel4UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel4ULLData = new RowData();
+					addressLabel4ULLData.width = labelWidth;
+					addressLabel4ULLData.height = 21;
+					this.addressLabel4UL.setLayoutData(addressLabel4ULLData);
+					this.addressLabel4UL.setText(Messages.getString(MessageIds.GDE_MSGT2056));
+				}
+				{
+					this.addressText4UL = new Text(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.addressText4UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText4ULLData = new RowData();
+					addressText4ULLData.width = textWidth;
+					addressText4ULLData.height = 13;
+					this.addressText4UL.setLayoutData(addressText4ULLData);
+					this.addressText4UL.setText(sliderValues[this.configuration.mLinkAddressCapacityUL]);
+				}
+				{
+					this.addressSlider4UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
+					this.addressSlider4UL.setMinimum(sliderMinimum);
+					this.addressSlider4UL.setMaximum(sliderMaximum);
+					this.addressSlider4UL.setIncrement(sliderIncrement);
+					RowData addressSlider4ULLData = new RowData();
+					addressSlider4ULLData.width = sliderWidth;
+					addressSlider4ULLData.height = 17;
+					this.addressSlider4UL.setLayoutData(addressSlider4ULLData);
+					this.addressSlider4UL.setSelection(this.configuration.mLinkAddressCapacityUL);
+					this.addressSlider4UL.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "addressSlider4UL.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressCapacityUL = GPSLoggerSetupConfiguration2.this.addressSlider4UL.getSelection();
+							GPSLoggerSetupConfiguration2.this.addressText4UL.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressCapacityUL]);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
 				}
 				{
 					this.fillerComposite = new Composite(this.unilogTelemtryAlarmsGroup, SWT.NONE);
@@ -464,254 +949,6 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.capacityLabel.setLayoutData(voltageRxULLabelLData);
 					this.capacityLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.capacityLabel.setText(Messages.getString(MessageIds.GDE_MSGT2057));
-				}
-			}
-			{
-				this.mLinkAddressesGroup = new Group(this, SWT.NONE);
-				RowLayout mLinkAddressesGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				this.mLinkAddressesGroup.setLayout(mLinkAddressesGroupLayout);
-				FormData mLinkAddressesGroupLData = new FormData();
-				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 230);
-				mLinkAddressesGroupLData.width = 290;
-				mLinkAddressesGroupLData.height = 180;
-				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
-				this.mLinkAddressesGroup.setLayoutData(mLinkAddressesGroupLData);
-				this.mLinkAddressesGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.mLinkAddressesGroup.setText(Messages.getString(MessageIds.GDE_MSGT2058));
-				{
-					this.fillerComposite = new Composite(this.mLinkAddressesGroup, SWT.NONE);
-					RowData fillerCompositeRALData = new RowData();
-					fillerCompositeRALData.width = 280;
-					fillerCompositeRALData.height = 13;
-					this.fillerComposite.setLayoutData(fillerCompositeRALData);
-				}
-				{
-					this.addressLabel1 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
-					this.addressLabel1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressLabel1LData = new RowData();
-					addressLabel1LData.width = labelWidth;
-					addressLabel1LData.height = 21;
-					this.addressLabel1.setLayoutData(addressLabel1LData);
-					this.addressLabel1.setText(Messages.getString(MessageIds.GDE_MSGT2059));
-				}
-				{
-					this.addressText1 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
-					this.addressText1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressText1LData = new RowData();
-					addressText1LData.width = textWidth;
-					addressText1LData.height = 13;
-					this.addressText1.setLayoutData(addressText1LData);
-					this.addressText1.setText(sliderValues[this.configuration.mLinkAddressVario]);
-				}
-				{
-					this.addressSlider1 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
-					this.addressSlider1.setMinimum(sliderMinimum);
-					this.addressSlider1.setMaximum(sliderMaximum);
-					this.addressSlider1.setIncrement(sliderIncrement);
-					RowData addressSlider1LData = new RowData();
-					addressSlider1LData.width = sliderWidth;
-					addressSlider1LData.height = 17;
-					this.addressSlider1.setLayoutData(addressSlider1LData);
-					this.addressSlider1.setSelection(this.configuration.mLinkAddressVario);
-					this.addressSlider1.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "addressSlider1.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressVario = GPSLoggerSetupConfiguration2.this.addressSlider1.getSelection();
-							GPSLoggerSetupConfiguration2.this.addressText1.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressVario]);
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-						}
-					});
-				}
-				{
-					this.addressLabel2 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
-					this.addressLabel2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressLabel2LData = new RowData();
-					addressLabel2LData.width = labelWidth;
-					addressLabel2LData.height = 21;
-					this.addressLabel2.setLayoutData(addressLabel2LData);
-					this.addressLabel2.setText(Messages.getString(MessageIds.GDE_MSGT2060));
-				}
-				{
-					this.addressText2 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
-					this.addressText2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressText2LData = new RowData();
-					addressText2LData.width = textWidth;
-					addressText2LData.height = 13;
-					this.addressText2.setLayoutData(addressText2LData);
-					this.addressText2.setText(sliderValues[this.configuration.mLinkAddressSpeed]);
-				}
-				{
-					this.addressSlider2 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
-					this.addressSlider2.setMinimum(sliderMinimum);
-					this.addressSlider2.setMaximum(sliderMaximum);
-					this.addressSlider2.setIncrement(sliderIncrement);
-					RowData addressSlider2LData = new RowData();
-					addressSlider2LData.width = sliderWidth;
-					addressSlider2LData.height = 17;
-					this.addressSlider2.setLayoutData(addressSlider2LData);
-					this.addressSlider2.setSelection(this.configuration.mLinkAddressSpeed);
-					this.addressSlider2.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "addressSlider2.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressSpeed = GPSLoggerSetupConfiguration2.this.addressSlider2.getSelection();
-							GPSLoggerSetupConfiguration2.this.addressText2.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressSpeed]);
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-						}
-					});
-				}
-				{
-					this.addressLabel3 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
-					this.addressLabel3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressLabel3LData = new RowData();
-					addressLabel3LData.width = labelWidth;
-					addressLabel3LData.height = 21;
-					this.addressLabel3.setLayoutData(addressLabel3LData);
-					this.addressLabel3.setText(Messages.getString(MessageIds.GDE_MSGT2061));
-				}
-				{
-					this.addressText3 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
-					this.addressText3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressText3LData = new RowData();
-					addressText3LData.width = textWidth;
-					addressText3LData.height = 13;
-					this.addressText3.setLayoutData(addressText3LData);
-					this.addressText3.setText(sliderValues[this.configuration.mLinkAddressHeight]);
-				}
-				{
-					this.addressSlider3 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
-					this.addressSlider3.setMinimum(sliderMinimum);
-					this.addressSlider3.setMaximum(sliderMaximum);
-					this.addressSlider3.setIncrement(sliderIncrement);
-					RowData addressSlider3LData = new RowData();
-					addressSlider3LData.width = sliderWidth;
-					addressSlider3LData.height = 17;
-					this.addressSlider3.setLayoutData(addressSlider3LData);
-					this.addressSlider3.setSelection(this.configuration.mLinkAddressHeight);
-					this.addressSlider3.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "addressSlider3.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressHeight = GPSLoggerSetupConfiguration2.this.addressSlider3.getSelection();
-							GPSLoggerSetupConfiguration2.this.addressText3.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressHeight]);
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-						}
-					});
-				}
-				{
-					this.addressLabel4 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
-					this.addressLabel4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressLabel4LData = new RowData();
-					addressLabel4LData.width = labelWidth;
-					addressLabel4LData.height = 21;
-					this.addressLabel4.setLayoutData(addressLabel4LData);
-					this.addressLabel4.setText(Messages.getString(MessageIds.GDE_MSGT2062));
-				}
-				{
-					this.addressText4 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
-					this.addressText4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressText4LData = new RowData();
-					addressText4LData.width = textWidth;
-					addressText4LData.height = 13;
-					this.addressText4.setLayoutData(addressText4LData);
-					this.addressText4.setText(sliderValues[this.configuration.mLinkAddressDistance]);
-				}
-				{
-					this.addressSlider4 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
-					this.addressSlider4.setMinimum(sliderMinimum);
-					this.addressSlider4.setMaximum(sliderMaximum);
-					this.addressSlider4.setIncrement(sliderIncrement);
-					RowData addressSlider4LData = new RowData();
-					addressSlider4LData.width = sliderWidth;
-					addressSlider4LData.height = 17;
-					this.addressSlider4.setLayoutData(addressSlider4LData);
-					this.addressSlider4.setSelection(this.configuration.mLinkAddressDistance);
-					this.addressSlider4.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "addressSlider4.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressDistance = GPSLoggerSetupConfiguration2.this.addressSlider4.getSelection();
-							GPSLoggerSetupConfiguration2.this.addressText4.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressDistance]);
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-						}
-					});
-				}
-				{
-					this.addressLabel5 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
-					this.addressLabel5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressLabel5LData = new RowData();
-					addressLabel5LData.width = labelWidth;
-					addressLabel5LData.height = 21;
-					this.addressLabel5.setLayoutData(addressLabel5LData);
-					this.addressLabel5.setText(Messages.getString(MessageIds.GDE_MSGT2063));
-				}
-				{
-					this.addressText5 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
-					this.addressText5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressText5LData = new RowData();
-					addressText5LData.width = textWidth;
-					addressText5LData.height = 13;
-					this.addressText5.setLayoutData(addressText5LData);
-					this.addressText5.setText(sliderValues[this.configuration.mLinkAddressDirection]);
-				}
-				{
-					this.addressSlider5 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
-					this.addressSlider5.setMinimum(sliderMinimum);
-					this.addressSlider5.setMaximum(sliderMaximum);
-					this.addressSlider5.setIncrement(sliderIncrement);
-					RowData addressSlider5LData = new RowData();
-					addressSlider5LData.width = sliderWidth;
-					addressSlider5LData.height = 17;
-					this.addressSlider5.setLayoutData(addressSlider5LData);
-					this.addressSlider5.setSelection(this.configuration.mLinkAddressDirection);
-					this.addressSlider5.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "addressSlider5.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressDirection = GPSLoggerSetupConfiguration2.this.addressSlider5.getSelection();
-							GPSLoggerSetupConfiguration2.this.addressText5.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressDirection]);
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-						}
-					});
-				}
-				{
-					this.addressLabel6 = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
-					this.addressLabel6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressLabel6LData = new RowData();
-					addressLabel6LData.width = labelWidth;
-					addressLabel6LData.height = 21;
-					this.addressLabel6.setLayoutData(addressLabel6LData);
-					this.addressLabel6.setText(Messages.getString(MessageIds.GDE_MSGT2064));
-				}
-				{
-					this.addressText6 = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
-					this.addressText6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					RowData addressText6LData = new RowData();
-					addressText6LData.width = textWidth;
-					addressText6LData.height = 13;
-					this.addressText6.setLayoutData(addressText6LData);
-					this.addressText6.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
-				}
-				{
-					this.addressSlider6 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
-					this.addressSlider6.setMinimum(sliderMinimum);
-					this.addressSlider6.setMaximum(sliderMaximum);
-					this.addressSlider6.setIncrement(sliderIncrement);
-					RowData addressSlider6LData = new RowData();
-					addressSlider6LData.width = sliderWidth;
-					addressSlider6LData.height = 17;
-					this.addressSlider6.setLayoutData(addressSlider6LData);
-					this.addressSlider6.setSelection(this.configuration.mLinkAddressTripLength);
-					this.addressSlider6.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "addressSlider6.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength = GPSLoggerSetupConfiguration2.this.addressSlider6.getSelection();
-							GPSLoggerSetupConfiguration2.this.addressText6.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
-						}
-					});
 				}
 			}
 			this.layout();
