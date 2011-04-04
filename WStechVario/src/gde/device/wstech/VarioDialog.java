@@ -179,7 +179,6 @@ public class VarioDialog extends DeviceDialog {
 						helpButtonLData.left = new FormAttachment(0, 1000, GDE.IS_MAC ? 129 : 132);
 						helpButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 						this.helpButton.setLayoutData(helpButtonLData);
-						this.helpButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.helpButton.setImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
 						this.helpButton.addSelectionListener(new SelectionAdapter() {
 							@Override
