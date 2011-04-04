@@ -74,7 +74,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @throws FileNotFoundException 
 	 */
 	public eStation(String deviceProperties) throws FileNotFoundException, JAXBException {
-		super(deviceProperties);		Messages.setDeviceResourceBundle("gde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.bantam.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT1400), Messages.getString(MessageIds.GDE_MSGT1401), Messages.getString(MessageIds.GDE_MSGT1402)};
