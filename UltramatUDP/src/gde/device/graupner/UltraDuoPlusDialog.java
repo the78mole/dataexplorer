@@ -830,10 +830,11 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						restoreButton = new Button(boundsComposite, SWT.PUSH | SWT.CENTER);
 						FormData restoreButtonLData = new FormData();
 						restoreButtonLData.width = 118;
-						restoreButtonLData.height = 27;
+						restoreButtonLData.height = GDE.IS_MAC ? 33 : 30;
 						restoreButtonLData.left =  new FormAttachment(0, 1000, 165);
 						restoreButtonLData.bottom =  new FormAttachment(1000, 1000, -4);
 						restoreButton.setLayoutData(restoreButtonLData);
+						restoreButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						restoreButton.setText("restore");
 						restoreButton.setEnabled(false);
 						restoreButton.addSelectionListener(new SelectionAdapter() {
@@ -848,8 +849,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										UltraDuoPlusType tmpUltraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(fileDialog.getFilterPath()));
 										copyUltraDuoPlusSetup(tmpUltraDuoPlusSetup);
 
-//										synchronizerWrite = new UltraDuoPlusSychronizer(UltraDuoPlusDialog.this, serialPort, ultraDuoPlusSetup, UltraDuoPlusSychronizer.SYNC_TYPE.WRITE);
-//										synchronizerWrite.start();
+										synchronizerWrite = new UltraDuoPlusSychronizer(UltraDuoPlusDialog.this, serialPort, ultraDuoPlusSetup, UltraDuoPlusSychronizer.SYNC_TYPE.WRITE);
+										synchronizerWrite.start();
 									}
 									catch (Exception e) {
 										log.log(Level.SEVERE, e.getMessage(), e);
@@ -875,10 +876,11 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						backupButton = new Button(boundsComposite, SWT.PUSH | SWT.CENTER);
 						FormData backupButtonLData = new FormData();
 						backupButtonLData.width = 118;
-						backupButtonLData.height = 27;
+						backupButtonLData.height = GDE.IS_MAC ? 33 : 30;
 						backupButtonLData.left =  new FormAttachment(0, 1000, 29);
 						backupButtonLData.bottom =  new FormAttachment(1000, 1000, -4);
 						backupButton.setLayoutData(backupButtonLData);
+						backupButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						backupButton.setText("backup");
 						backupButton.setEnabled(false);
 						backupButton.addSelectionListener(new SelectionAdapter() {
@@ -899,10 +901,11 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						closeButton = new Button(boundsComposite, SWT.PUSH | SWT.CENTER);
 						FormData writeButtonLData = new FormData();
 						writeButtonLData.width = 118;
-						writeButtonLData.height = 27;
+						writeButtonLData.height = GDE.IS_MAC ? 33 : 30;
 						writeButtonLData.bottom =  new FormAttachment(1000, 1000, -4);
 						writeButtonLData.right =  new FormAttachment(1000, 1000, -21);
 						closeButton.setLayoutData(writeButtonLData);
+						closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						closeButton.setText("close");
 						closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -914,10 +917,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					}
 					{
 						helpButton = new Button(boundsComposite, SWT.PUSH | SWT.CENTER);
-						helpButton.setText("help");
+						helpButton.setImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
 						FormData LoadButtonLData = new FormData();
 						LoadButtonLData.width = 118;
-						LoadButtonLData.height = 27;
+						LoadButtonLData.height = GDE.IS_MAC ? 33 : 30;
 						LoadButtonLData.bottom =  new FormAttachment(1000, 1000, -4);
 						LoadButtonLData.right =  new FormAttachment(1000, 1000, -158);
 						helpButton.setLayoutData(LoadButtonLData);

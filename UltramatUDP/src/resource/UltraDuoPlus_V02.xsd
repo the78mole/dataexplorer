@@ -12,7 +12,6 @@
 							<xs:extension base="xs:string">
 								<xs:attribute name="Synced" type="xs:boolean" use="optional" default="false"/>
 								<xs:attribute name="Changed" type="xs:boolean" use="optional" default="false"/>
-								<xs:attribute name="Updated" type="xs:boolean" use="optional" default="false"/>
 							</xs:extension>
 						</xs:simpleContent>
 					</xs:complexType>
@@ -23,7 +22,6 @@
 							<xs:extension base="xs:string">
 								<xs:attribute name="Synced" type="xs:boolean" use="optional" default="false"/>
 								<xs:attribute name="Changed" type="xs:boolean" use="optional" default="false"/>
-								<xs:attribute name="Updated" type="xs:boolean" use="optional" default="false"/>
 							</xs:extension>
 						</xs:simpleContent>
 					</xs:complexType>
@@ -35,7 +33,6 @@
 							<xs:extension base="xs:string">
 								<xs:attribute name="Synced" type="xs:boolean" use="optional" default="false"/>
 								<xs:attribute name="Changed" type="xs:boolean" use="optional" default="false"/>
-								<xs:attribute name="Updated" type="xs:boolean" use="optional" default="false"/>
 							</xs:extension>
 						</xs:simpleContent>
 					</xs:complexType>
@@ -46,7 +43,6 @@
 							<xs:extension base="xs:string">
 								<xs:attribute name="Synced" type="xs:boolean" use="optional" default="false"/>
 								<xs:attribute name="Changed" type="xs:boolean" use="optional" default="false"/>
-								<xs:attribute name="Updated" type="xs:boolean" use="optional" default="false"/>
 							</xs:extension>
 						</xs:simpleContent>
 					</xs:complexType>
@@ -64,7 +60,6 @@
 						<xs:extension base="xs:string">
 							<xs:attribute name="Synced" type="xs:boolean" use="optional" default="false"/>
 							<xs:attribute name="Changed" type="xs:boolean" use="optional" default="false"/>
-							<xs:attribute name="Updated" type="xs:boolean" use="optional" default="false"/>
 						</xs:extension>
 					</xs:simpleContent>
 				</xs:complexType>
@@ -75,7 +70,6 @@
 						<xs:extension base="xs:string">
 							<xs:attribute name="Synced" type="xs:boolean" use="optional" default="false"/>
 							<xs:attribute name="Changed" type="xs:boolean" use="optional" default="false"/>
-							<xs:attribute name="Updated" type="xs:boolean" use="optional" default="false"/>
 						</xs:extension>
 					</xs:simpleContent>
 				</xs:complexType>
@@ -86,7 +80,6 @@
 						<xs:extension base="xs:string">
 							<xs:attribute name="Synced" type="xs:boolean" use="optional" default="false"/>
 							<xs:attribute name="Changed" type="xs:boolean" use="optional" default="false"/>
-							<xs:attribute name="Updated" type="xs:boolean" use="optional" default="false"/>
 						</xs:extension>
 					</xs:simpleContent>
 				</xs:complexType>
@@ -97,7 +90,6 @@
 						<xs:extension base="xs:string">
 							<xs:attribute name="Synced" type="xs:boolean" use="optional" default="false"/>
 							<xs:attribute name="Changed" type="xs:boolean" use="optional" default="false"/>
-							<xs:attribute name="Updated" type="xs:boolean" use="optional" default="false"/>
 						</xs:extension>
 					</xs:simpleContent>
 				</xs:complexType>
@@ -106,6 +98,5 @@
 		<xs:attribute name="Name" type="xs:string" use="required"/>
 		<xs:attribute name="Synced" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="Changed" type="xs:boolean" use="optional" default="false"/>
-		<xs:attribute name="Updated" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 </xs:schema>
