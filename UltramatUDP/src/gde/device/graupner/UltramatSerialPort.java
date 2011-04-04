@@ -18,9 +18,11 @@
 ****************************************************************************************/
 package gde.device.graupner;
 
+import gde.GDE;
 import gde.comm.DeviceCommPort;
+import gde.comm.DeviceSerialPortImpl;
+import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
-import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.ui.DataExplorer;
@@ -41,28 +43,37 @@ public class UltramatSerialPort extends DeviceCommPort {
 	final static byte		END					= 0x0D;
 	final static byte		ACK					= 0x06;
 	final static byte		NAK					= 0x15;
-	final static byte[]	RESET_BEGIN				= new byte[] { BEGIN, 0x41, 0x37, 0x30, 0x30, 0x30, 0x30, 0x44, 0x38, END }; //1000 1111
-	final static byte[]	RESET_END					= new byte[] { BEGIN, 0x43, 0x30, 0x30, 0x30, 0x30, 0x30, 0x44, 0x33, END }; //1000 1111
-	static byte[]	READ_MEMORY_NAME				= new byte[] { BEGIN, '8', '0', '0', '0', '0', '0', '0', '0', END }; //1000 0000
-	static byte[]	WRITE_MEMORY_NAME				= new byte[] { BEGIN, '0', '0', '0', '0', '0', '0', '0', '0', END }; //0000 0000
-	static byte[]	READ_MEMORY_SETUP				= new byte[] { BEGIN, '8', '1', '0', '0', '0', '0', '0', '0', END }; //1000 0001
-	static byte[]	WRITE_MEMORY_SETUP			= new byte[] { BEGIN, '0', '1', '0', '0', '0', '0', '0', '0', END }; //0000 0001
-	static byte[]	READ_STEP_CHARGE_SETUP	= new byte[] { BEGIN, '8', '2', '0', '0', '0', '0', '0', '0', END }; //1000 0010
-	static byte[]	WRITE_STEP_CHARGE_SETUP	= new byte[] { BEGIN, '0', '2', '0', '0', '0', '0', '0', '0', END }; //0000 0010
-	static byte[]	READ_CYCLE_DATA					= new byte[] { BEGIN, '8', '3', '0', '0', '0', '0', '0', '0', END }; //1000 0011
-	static byte[]	WRITE_CYCLE_DATA				= new byte[] { BEGIN, '0', '3', '0', '0', '0', '0', '0', '0', END }; //0000 0011
-	static byte[]	READ_TRACE_DATA					= new byte[] { BEGIN, '8', '4', '0', '0', '0', '0', '0', '0', END }; //1000 0100
-	static byte[]	WRITE_TRACE_DATA				= new byte[] { BEGIN, '0', '4', '0', '0', '0', '0', '0', '0', END }; //0000 0100
-	static byte[]	READ_TIRE_HEATER				= new byte[] { BEGIN, '8', '5', '0', '0', '0', '0', '0', '0', END }; //1000 0101
-	static byte[]	WRITE_TIRE_HEATER				= new byte[] { BEGIN, '0', '5', '0', '0', '0', '0', '0', '0', END }; //0000 0101
-	static byte[]	READ_MOTOR_RUN					= new byte[] { BEGIN, '8', '6', '0', '0', '0', '0', '0', '0', END }; //1000 0110
-	static byte[]	WRITE_MOTOR_RUN					= new byte[] { BEGIN, '0', '6', '0', '0', '0', '0', '0', '0', END }; //0000 0110
-	static byte[]	READ_CHANNEL_SETUP			= new byte[] { BEGIN, '8', '7', '0', '0', '0', '0', '0', '0', END }; //1000 0111
-	static byte[]	WRITE_USER_SETUP				= new byte[] { BEGIN, '0', '7', '0', '0', '0', '0', '0', '0', END }; //0000 0111
-	static byte[]	READ_USER_NAME					= new byte[] { BEGIN, '8', '8', '0', '0', '0', '0', '0', '0', END }; //1000 1000
-	static byte[]	WRITE_USER_NAME					= new byte[] { BEGIN, '0', '8', '0', '0', '0', '0', '0', '0', END }; //0000 1000
-	static byte[]	READ_GRAPHICS_DATA			= new byte[] { BEGIN, '8', '9', '0', '0', '0', '0', '0', '0', END }; //1000 1001
-	static byte[]	WRITE_GRAPHICS_DATA			= new byte[] { BEGIN, '0', '9', '0', '0', '0', '0', '0', '0', END }; //0000 1001
+	final static byte[]	RESET_BEGIN										= new byte[] { BEGIN, 0x41, 0x37, 0x30, 0x30, 0x30, 0x30, 0x44, 0x38, END };	//1000 1111
+	final static byte[]	RESET_END											= new byte[] { BEGIN, 0x43, 0x30, 0x30, 0x30, 0x30, 0x30, 0x44, 0x33, END };	//1000 1111
+	static byte[]				READ_MEMORY_NAME							= new byte[] { BEGIN, '8', '0', '0', '0', '0', '0', '0', '0', END };					//1000 0000
+	static byte[]				WRITE_MEMORY_NAME							= new byte[] { BEGIN, '0', '0' };																							//0000 0000
+	static byte[]				READ_MEMORY_SETUP							= new byte[] { BEGIN, '8', '1', '0', '0', '0', '0', '0', '0', END };					//1000 0001
+	static byte[]				WRITE_MEMORY_SETUP						= new byte[] { BEGIN, '0', '1' };																							//0000 0001
+	static byte[]				READ_MEMORY_STEP_CHARGE_SETUP	= new byte[] { BEGIN, '8', '2', '0', '0', '0', '0', '0', '0', END };					//1000 0010
+	static byte[]				WRITE_STEP_CHARGE_SETUP				= new byte[] { BEGIN, '0', '2' };																							//0000 0010
+	static byte[]				READ_MEMORY_CYCLE_DATA				= new byte[] { BEGIN, '8', '3', '0', '0', '0', '0', '0', '0', END };					//1000 0011
+	static byte[]				WRITE_CYCLE_DATA							= new byte[] { BEGIN, '0', '3' };																							//0000 0011
+	static byte[]				READ_MEMORY_TRACE_DATA				= new byte[] { BEGIN, '8', '4', '0', '0', '0', '0', '0', '0', END };					//1000 0100
+	static byte[]				WRITE_TRACE_DATA							= new byte[] { BEGIN, '0', '4' };																							//0000 0100
+	static byte[]				READ_TIRE_HEATER							= new byte[] { BEGIN, '8', '5', '0', '0', '0', '0', '0', '0', END };					//1000 0101
+	static byte[]				WRITE_TIRE_HEATER							= new byte[] { BEGIN, '0', '5' };																							//0000 0101
+	static byte[]				READ_MOTOR_RUN								= new byte[] { BEGIN, '8', '6', '0', '0', '0', '0', '0', '0', END };					//1000 0110
+	static byte[]				WRITE_MOTOR_RUN								= new byte[] { BEGIN, '0', '6' };																							//0000 0110
+	static byte[]				READ_CHANNEL_SETUP						= new byte[] { BEGIN, '8', '7', '0', '0', '0', '0', '0', '0', END };					//1000 0111
+	static byte[]				WRITE_CHANNEL_SETUP						= new byte[] { BEGIN, '0', '7' };																							//0000 0111
+	static byte[]				READ_DEVICE_IDENTIFIER_NAME		= new byte[] { BEGIN, '8', '8', '0', '0', '0', '0', '0', '0', END };					//1000 1000
+	static byte[]				WRITE_DEVICE_IDENTIFIER_NAME	= new byte[] { BEGIN, '0', '8' };																							//0000 1000
+	static byte[]				READ_GRAPHICS_DATA						= new byte[] { BEGIN, '8', '9', '0', '0', '0', '0', '0', '0', END };					//1000 1001
+	static byte[]				WRITE_GRAPHICS_DATA						= new byte[] { BEGIN, '0', '9' };																							//0000 1001
+	
+	static int					SIZE_MEMORY_SETUP							= 28;
+	static int					SIZE_MEMORY_STEP_CHARGE_SETUP	= 20;
+	static int					SIZE_MEMORY_TRACE							= 6;
+	static int					SIZE_MEMORY_CYCLE							= 121;
+	static int					SIZE_CHANNEL_1_SETUP					= 16;
+	static int					SIZE_CHANNEL_2_SETUP					= 4;
+	static int					SIZE_TIRE_HEATER_SETUP				= 8;
+	static int					SIZE_MOTOR_RUN_SETUP					= 17;
 
 	boolean isInSync = false;
 	
@@ -76,12 +87,21 @@ public class UltramatSerialPort extends DeviceCommPort {
 	}
 
 	/**
+	 * constructor for testing purpose
+	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
+	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
+	 */
+	public UltramatSerialPort(DeviceConfiguration deviceConfiguration) {
+		super(deviceConfiguration);
+	}
+
+	/**
 	 * method to gather data from device, implementation is individual for device
 	 * @return byte array containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
 	public synchronized byte[] getData() throws Exception {
-		final String $METHOD_NAME = "getData";
+		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
 		byte[] data = new byte[Math.abs(this.device.getDataBlockSize())];
 		byte[] answer = new byte[] {0x00};
 
@@ -109,11 +129,11 @@ public class UltramatSerialPort extends DeviceCommPort {
 				answer = this.read(answer, 3000);
 			}
 			if (log.isLoggable(Level.FINER)) {
-				StringBuilder sb = new StringBuilder().append("<FF>");
+				StringBuilder sb = new StringBuilder().append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
 				for (int i = 1; i < answer.length - 1; ++i) {
 					sb.append(String.format("%c", (char) answer[i])); //$NON-NLS-1$
 				}
-				sb.append("<CR>");
+				sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
 				log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 
@@ -148,8 +168,8 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @throws TimeOutException
 	 */
 	public String readDeviceUserName() throws IOException, TimeOutException  {
-			byte[] answer = this.readCommand(READ_USER_NAME, 23, 2);
-			return String.format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12], answer[13], answer[14], answer[15], answer[16]);
+			byte[] answer = this.readConfigData(READ_DEVICE_IDENTIFIER_NAME, 23, 2);
+			return String.format(DeviceSerialPortImpl.FORMAT_16_CHAR, answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12], answer[13], answer[14], answer[15], answer[16]);
 	}
 	
 	/**
@@ -159,21 +179,14 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public int[] readChannelData(int channelNumber) throws IOException, TimeOutException {
-		int[] values = new int[0];
-		byte[] answer = new byte[0];
+	public String readChannelData(int channelNumber) throws IOException, TimeOutException {
 		if (channelNumber == 1) {
-			answer = this.readCommand(READ_CHANNEL_SETUP, 71, 1);
-			values = new int[16];
+			return new String(this.readConfigData(READ_CHANNEL_SETUP, SIZE_CHANNEL_1_SETUP * 4 + 7, channelNumber)).substring(1, SIZE_CHANNEL_1_SETUP * 4 + 1);
 		}
-		else {
-			answer = this.readCommand(READ_CHANNEL_SETUP, 23, 2);
-			values = new int[4];
+		else if (channelNumber == 2) {
+			return new String(this.readConfigData(READ_CHANNEL_SETUP, SIZE_CHANNEL_2_SETUP * 4 + 7, channelNumber)).substring(1, SIZE_CHANNEL_2_SETUP * 4 + 1);
 		}
-		for (int i = 0; i < values.length; i++) {
-			values[i] = Integer.parseInt(String.format("%c%c%c%c", (char) answer[i*4+1], (char) answer[i*4+2], (char) answer[i*4+3], (char) answer[i*4+4]), 16);
-		}
-		return values;
+		return GDE.STRING_EMPTY;
 	}
 
 	/**
@@ -183,9 +196,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public String readMemoryName(int number) throws IOException, TimeOutException {
-		byte[] answer = this.readCommand(READ_MEMORY_NAME, 23, number);
-		return String.format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12], answer[13], answer[14], answer[15], answer[16]);
+	public synchronized String readMemoryName(int number) throws IOException, TimeOutException {
+		byte[] answer = this.readConfigData(READ_MEMORY_NAME, 23, number);
+		return String.format(DeviceSerialPortImpl.FORMAT_16_CHAR, answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12], answer[13], answer[14], answer[15], answer[16]);
 	}
 	
 	/**
@@ -195,94 +208,73 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public int[] readMemorySetup(int number) throws IOException, TimeOutException {
-		int[] values = new int[28];
-		byte[] answer = this.readCommand(READ_MEMORY_SETUP, 119, number);
-		
-		for (int i = 0; i < values.length; i++) {
-			values[i] = Integer.parseInt(String.format("%c%c%c%c", (char) answer[i*4+1], (char) answer[i*4+2], (char) answer[i*4+3], (char) answer[i*4+4]), 16);
-		}
-		return values;
+	public synchronized String readMemorySetup(int number) throws IOException, TimeOutException {
+		return new String(this.readConfigData(READ_MEMORY_SETUP, SIZE_MEMORY_SETUP * 4 + 7, number)).substring(1, SIZE_MEMORY_SETUP * 4+1);
 	}
 	
-	public void readSetup() throws SerialPortException {
-		final String $METHOD_NAME = "readSetup";
-		boolean isConnectedByMe = false;
-		try {
-			if (!this.isConnected()) {
-				this.open();
-				isConnectedByMe = true;
-			}
-			this.write(RESET_BEGIN);
-
-			//read user name 
-			byte[] answer = this.readCommand(READ_USER_NAME, 23, 2);
-			//read user setup 
-			answer = this.readCommand(READ_CHANNEL_SETUP, 71, 1);
-			answer = this.readCommand(READ_CHANNEL_SETUP, 23, 2);
-
-			//read memory names
-			for (int j = 0; j <= 60; j++) {
-				System.out.print(j + " = ");
-				answer = this.readCommand(READ_MEMORY_NAME, 23, j);
-			}
-			//			//read memory setup
-			//			for (int j = 0; j < 40; j++) {
-			//				answer = this.readCommand(READ_MEMORY_SETUP, 119, j);
-			//			}
-			//			//read step charge memory
-			//			for (int j = 0; j < 40; j++) {
-			//				answer = this.readCommand(READ_STEP_CHARGE_SETUP, 87, j);
-			//			}
-			//			//read cycle data memory
-			//			for (int j = 0; j < 40; j++) {
-			//				answer = this.readCommand(READ_CYCLE_DATA, 491, j);
-			//			}
-			//			//read trace data memory
-			//			for (int j = 0; j < 40; j++) {
-			//				answer = this.readCommand(READ_TRACE_DATA, 27, j);
-			//			}
-			//			//read tire data memory
-			//			for (int j = 0; j < 40; j++) {
-			//				answer = this.readCommand(READ_TIRE_HEATER, 39, j);
-			//			}
-			//			//read motor run channel
-			//			for (int j = 0; j < 40; j++) {
-			//				answer = this.readCommand(READ_MOTOR_RUN, 75, j);
-			//			}
-
-			this.write(RESET_END);
-		}
-		catch (Exception e) {
-			throw new SerialPortException(e.getMessage());
-		}
-		finally {
-			if (isConnectedByMe) {
-				this.close();
-			}
-		}
+	/**
+	 * read the memory trace data for given memory number
+	 * @param number
+	 * @return
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public synchronized String readMemoryTrace(int number) throws IOException, TimeOutException {
+		return new String(this.readConfigData(READ_MEMORY_TRACE_DATA, SIZE_MEMORY_TRACE * 4 + 7, number)).substring(1, SIZE_MEMORY_TRACE * 4+1);
+	}
+	
+	/**
+	 * read the memory cycle data for given memory number
+	 * @param number
+	 * @return
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public synchronized String readMemoryCycle(int number) throws IOException, TimeOutException {
+		return new String(this.readConfigData(READ_MEMORY_CYCLE_DATA, SIZE_MEMORY_CYCLE * 4 + 7, number)).substring(1, SIZE_MEMORY_CYCLE * 4+1);
+	}
+	
+	/**
+	 * read the memory step charge data for given memory number
+	 * @param number
+	 * @return
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public synchronized String readMemoryStepChargeSetup(int number) throws IOException, TimeOutException {
+		return new String(this.readConfigData(READ_MEMORY_STEP_CHARGE_SETUP, SIZE_MEMORY_STEP_CHARGE_SETUP * 4 + 7, number)).substring(1, SIZE_MEMORY_STEP_CHARGE_SETUP * 4+1);
 	}
 
-	public byte[] readCommand(byte[] command, int anserSize, int number) throws IOException, TimeOutException {
-		final String $METHOD_NAME = "readCommand";
-		byte[] writeBuffer = command;
-		byte[] num = String.format("%02X", number).getBytes();
+	/**
+	 * read configuration data according given type and expected data size for a given index (channel, memory number, ...)
+	 * @param type
+	 * @param expectedDataSize
+	 * @param index
+	 * @return byte array containing the requested configuration data
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public synchronized byte[] readConfigData(byte[] type, int expectedDataSize, int index) throws IOException, TimeOutException {
+		final String $METHOD_NAME = "readConfigData"; //$NON-NLS-1$
+		log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
+		byte[] writeBuffer = type;
+		byte[] num = String.format("%02X", index).getBytes(); //$NON-NLS-1$
 		System.arraycopy(num, 0, writeBuffer, 3, 2);
 		byte[] checkSum = getChecksum(writeBuffer);
 		System.arraycopy(checkSum, 0, writeBuffer, 5, 4);
 		
-		if(log.isLoggable(Level.OFF)) {
+		if(log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i<writeBuffer.length; ++i) {
-				if (writeBuffer[i] == BEGIN) sb.append("<FF>");
-				else if (writeBuffer[i] == END) sb.append("<CR>");
+				if (writeBuffer[i] == BEGIN) sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
+				else if (writeBuffer[i] == END) sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
 				else sb.append((char)writeBuffer[i]);
 			}
-			log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "write = " + sb.toString()); //$NON-NLS-1$
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "write = " + sb.toString()); //$NON-NLS-1$
 		}
 		this.write(writeBuffer);
 		
-		byte[] readBuffer = new byte[anserSize];
+		byte[] readBuffer = new byte[expectedDataSize];
 		byte[] answer = this.read(readBuffer, 3000);
 		
 		while (answer[0] != BEGIN) {
@@ -304,22 +296,75 @@ public class UltramatSerialPort extends DeviceCommPort {
 		if (!(readBuffer[0] == BEGIN && readBuffer[readBuffer.length-1] == ACK && isCommandChecksumOK(readBuffer))) {
 			this.addXferError();
 			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-			readBuffer = readCommand(command, anserSize, number);
+			readBuffer = readConfigData(type, expectedDataSize, index);
 		}
 		
-		if (log.isLoggable(Level.OFF)) {
+		if (log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < readBuffer.length; ++i) {
-				if (readBuffer[i] == BEGIN)					sb.append("<FF>");
-				else if (readBuffer[i] == END)			sb.append("<CR>");
-				else if (readBuffer[i] == ACK)			sb.append("<ACK>");
-				else if (readBuffer[i] == NAK)			sb.append("<NAK>");
-				else if (i == readBuffer.length-6)	sb.append("|").append((char) readBuffer[i]);
+				if (readBuffer[i] == BEGIN)					sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
+				else if (readBuffer[i] == END)			sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
+				else if (readBuffer[i] == ACK)			sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
+				else if (readBuffer[i] == NAK)			sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
+				else if (i == readBuffer.length-6)	sb.append(GDE.STRING_OR).append((char) readBuffer[i]);
 				else																sb.append((char) readBuffer[i]);
 			}
-			log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "answer = " + sb.toString()); //$NON-NLS-1$
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "answer = " + sb.toString()); //$NON-NLS-1$
 		}
 		return readBuffer;
+	}
+
+	/**
+	 * write configuration data according given type and expected data size for a given index (channel, memory number, ...)
+	 * @param type
+	 * @param configData
+	 * @param index
+	 * @throws IOException if writing configuration data failed
+	 * @throws TimeOutException
+	 */
+	public synchronized void writeConfigData(byte[] type, byte[] configData, int index) throws IOException, TimeOutException {
+		final String $METHOD_NAME = "writeConfigData"; //$NON-NLS-1$
+		log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
+		byte[] writeBuffer = new byte[configData.length + 10]; //0x0C, type, index, data..., checksum, 0x0D
+		System.arraycopy(type, 0, writeBuffer, 0, 3);
+		writeBuffer[writeBuffer.length - 1] = END;
+		byte[] num = String.format("%02X", index).getBytes(); //$NON-NLS-1$
+		System.arraycopy(num, 0, writeBuffer, 3, 2);
+		System.arraycopy(configData, 0, writeBuffer, 5, configData.length);
+		byte[] checkSum = getChecksum(writeBuffer);
+		System.arraycopy(checkSum, 0, writeBuffer, writeBuffer.length - 5, 4);
+		
+		if (log.isLoggable(Level.FINE)) {
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < writeBuffer.length; ++i) {
+				if (writeBuffer[i] == BEGIN)					sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
+				else if (writeBuffer[i] == END)			sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
+				else if (writeBuffer[i] == ACK)			sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
+				else if (writeBuffer[i] == NAK)			sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
+				else if (i == writeBuffer.length-5)	sb.append(GDE.STRING_OR).append((char) writeBuffer[i]);
+				else																sb.append((char) writeBuffer[i]);
+			}
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "answer = " + sb.toString()); //$NON-NLS-1$
+		}
+		this.write(writeBuffer);
+		
+		byte[] answer = this.read(new byte[1], 3000);		
+		if (log.isLoggable(Level.FINE)) {
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < answer.length; ++i) {
+				if (answer[i] == BEGIN)					sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
+				else if (answer[i] == END)			sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
+				else if (answer[i] == ACK)			sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
+				else if (answer[i] == NAK)			sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
+				else if (i == answer.length-6)	sb.append(GDE.STRING_OR).append((char) answer[i]); //$NON-NLS-1$
+				else														sb.append((char) answer[i]);
+			}
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "answer = " + sb.toString()); //$NON-NLS-1$
+		}
+		if ((answer[0] == NAK)) {
+			log.log(Level.WARNING, "Writing UltraDuoPlus configuration data failed!"); //$NON-NLS-1$
+			throw new IOException("Writing UltraDuoPlus configuration data failed!"); //$NON-NLS-1$
+		}
 	}
 	
 	/**
@@ -328,11 +373,11 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return true/false
 	 */
 	private boolean isChecksumOK(byte[] buffer) {
-		final String $METHOD_NAME = "isChecksumOK";
+		final String $METHOD_NAME = "isChecksumOK"; //$NON-NLS-1$
 		boolean isOK = false;
 		int length = Math.abs(this.device.getDataBlockSize());
 		int check_sum = Checksum.ADD(buffer, 1, length-6);
-		if (check_sum == Integer.parseInt(String.format("%c%c%c%c", (char) buffer[length-5], (char) buffer[length-4], (char) buffer[length-3], (char) buffer[length-2]), 16))
+		if (check_sum == Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length-5], (char) buffer[length-4], (char) buffer[length-3], (char) buffer[length-2]), 16)) //$NON-NLS-1$
 			isOK = true;
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
 		return isOK;
@@ -343,11 +388,11 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return true/false
 	 */
 	private boolean isCommandChecksumOK(byte[] buffer) {
-		final String $METHOD_NAME = "isChecksumOK";
+		final String $METHOD_NAME = "isChecksumOK"; //$NON-NLS-1$
 		boolean isOK = false;
 		int length = buffer.length;
 		int check_sum = Checksum.ADD(buffer, 1, length-7);
-		if (check_sum == Integer.parseInt(String.format("%c%c%c%c", (char) buffer[length-6], (char) buffer[length-5], (char) buffer[length-4], (char) buffer[length-3]), 16))
+		if (check_sum == Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length-6], (char) buffer[length-5], (char) buffer[length-4], (char) buffer[length-3]), 16))
 			isOK = true;
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
 		return isOK;
@@ -359,8 +404,8 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return
 	 */
 	private byte[] getChecksum(byte[] buffer) {
-		final String $METHOD_NAME = "getChecksum";
-		String check_sum = String.format("%04X", Checksum.ADD(buffer, 1, buffer.length-6));
+		final String $METHOD_NAME = "getChecksum"; //$NON-NLS-1$
+		String check_sum = String.format("%04X", Checksum.ADD(buffer, 1, buffer.length-6)); //$NON-NLS-1$
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Check_sum char[]= " + check_sum); //$NON-NLS-1$
 		return check_sum.getBytes();
 	}

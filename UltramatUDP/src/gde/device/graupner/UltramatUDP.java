@@ -20,6 +20,7 @@ package gde.device.graupner;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
+import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
 import gde.data.RecordSet;
 import gde.device.DesktopPropertyType;
@@ -27,7 +28,6 @@ import gde.device.DesktopPropertyTypes;
 import gde.device.DeviceConfiguration;
 import gde.exception.DataInconsitsentException;
 import gde.io.LogViewReader;
-import gde.log.Level;
 import gde.messages.Messages;
 
 import java.io.FileNotFoundException;
@@ -35,12 +35,14 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import org.eclipse.swt.SWT;
+
 /**
- * eStation base device class
+ * Graupner Ultra Duo Plus base class which extends the Ultramat base class
  * @author Winfried Brügmann
  */
 public class UltramatUDP extends Ultramat {
-	final static Logger						logger	= Logger.getLogger(UltramatUDP.class.getName());
+	final static Logger	logger	= Logger.getLogger(UltramatUDP.class.getName());
 
 	/**
 	 * constructor using properties file
@@ -49,14 +51,23 @@ public class UltramatUDP extends Ultramat {
 	 */
 	public UltramatUDP(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
-		Messages.setDeviceResourceBundle("gde.device.htronic.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2200), Messages.getString(MessageIds.GDE_MSGT2201), Messages.getString(MessageIds.GDE_MSGT2202), Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGT2204), Messages.getString(MessageIds.GDE_MSGT2205), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2207), Messages.getString(MessageIds.GDE_MSGT2208), Messages.getString(MessageIds.GDE_MSGT2209)};
-		this.CHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212), Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2214), Messages.getString(MessageIds.GDE_MSGT2215), Messages.getString(MessageIds.GDE_MSGT2216), Messages.getString(MessageIds.GDE_MSGT2217), Messages.getString(MessageIds.GDE_MSGT2218), Messages.getString(MessageIds.GDE_MSGT2219), Messages.getString(MessageIds.GDE_MSGT2220), Messages.getString(MessageIds.GDE_MSGT2221), Messages.getString(MessageIds.GDE_MSGT2222)};
-		this.DISCHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212), Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2223), Messages.getString(MessageIds.GDE_MSGT2224), Messages.getString(MessageIds.GDE_MSGT2220), Messages.getString(MessageIds.GDE_MSGT2222)};
-		this.DELAY_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2225), Messages.getString(MessageIds.GDE_MSGT2226), Messages.getString(MessageIds.GDE_MSGT2227), Messages.getString(MessageIds.GDE_MSGT2228)}; 
-		this.CURRENT_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2229), Messages.getString(MessageIds.GDE_MSGT2230), Messages.getString(MessageIds.GDE_MSGT2231), Messages.getString(MessageIds.GDE_MSGT2232), Messages.getString(MessageIds.GDE_MSGT2233), Messages.getString(MessageIds.GDE_MSGT2234), Messages.getString(MessageIds.GDE_MSGT2235), Messages.getString(MessageIds.GDE_MSGT2236),  Messages.getString(MessageIds.GDE_MSGT2237)};
+		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2200), Messages.getString(MessageIds.GDE_MSGT2201), Messages.getString(MessageIds.GDE_MSGT2202),
+				Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGT2204), Messages.getString(MessageIds.GDE_MSGT2205), Messages.getString(MessageIds.GDE_MSGT2206),
+				Messages.getString(MessageIds.GDE_MSGT2207), Messages.getString(MessageIds.GDE_MSGT2208), Messages.getString(MessageIds.GDE_MSGT2209) };
+		this.CHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212),
+				Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2214), Messages.getString(MessageIds.GDE_MSGT2215), Messages.getString(MessageIds.GDE_MSGT2216),
+				Messages.getString(MessageIds.GDE_MSGT2217), Messages.getString(MessageIds.GDE_MSGT2218), Messages.getString(MessageIds.GDE_MSGT2219), Messages.getString(MessageIds.GDE_MSGT2220),
+				Messages.getString(MessageIds.GDE_MSGT2221), Messages.getString(MessageIds.GDE_MSGT2222) };
+		this.DISCHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212),
+				Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2223), Messages.getString(MessageIds.GDE_MSGT2224), Messages.getString(MessageIds.GDE_MSGT2220),
+				Messages.getString(MessageIds.GDE_MSGT2222) };
+		this.DELAY_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2225), Messages.getString(MessageIds.GDE_MSGT2226), Messages.getString(MessageIds.GDE_MSGT2227),
+				Messages.getString(MessageIds.GDE_MSGT2228) };
+		this.CURRENT_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2229), Messages.getString(MessageIds.GDE_MSGT2230), Messages.getString(MessageIds.GDE_MSGT2231),
+				Messages.getString(MessageIds.GDE_MSGT2232), Messages.getString(MessageIds.GDE_MSGT2233), Messages.getString(MessageIds.GDE_MSGT2234), Messages.getString(MessageIds.GDE_MSGT2235),
+				Messages.getString(MessageIds.GDE_MSGT2236), Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 	}
@@ -69,11 +80,21 @@ public class UltramatUDP extends Ultramat {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2200), Messages.getString(MessageIds.GDE_MSGT2201), Messages.getString(MessageIds.GDE_MSGT2202), Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGT2204), Messages.getString(MessageIds.GDE_MSGT2205), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2207), Messages.getString(MessageIds.GDE_MSGT2208), Messages.getString(MessageIds.GDE_MSGT2209)};
-		this.CHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212), Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2214), Messages.getString(MessageIds.GDE_MSGT2215), Messages.getString(MessageIds.GDE_MSGT2216), Messages.getString(MessageIds.GDE_MSGT2217), Messages.getString(MessageIds.GDE_MSGT2218), Messages.getString(MessageIds.GDE_MSGT2219), Messages.getString(MessageIds.GDE_MSGT2220), Messages.getString(MessageIds.GDE_MSGT2221), Messages.getString(MessageIds.GDE_MSGT2222)};
-		this.DISCHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212), Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2223), Messages.getString(MessageIds.GDE_MSGT2224), Messages.getString(MessageIds.GDE_MSGT2220), Messages.getString(MessageIds.GDE_MSGT2222)};
-		this.DELAY_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2225), Messages.getString(MessageIds.GDE_MSGT2226), Messages.getString(MessageIds.GDE_MSGT2227), Messages.getString(MessageIds.GDE_MSGT2228)}; 
-		this.CURRENT_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2229), Messages.getString(MessageIds.GDE_MSGT2230), Messages.getString(MessageIds.GDE_MSGT2231), Messages.getString(MessageIds.GDE_MSGT2232), Messages.getString(MessageIds.GDE_MSGT2233), Messages.getString(MessageIds.GDE_MSGT2234), Messages.getString(MessageIds.GDE_MSGT2235), Messages.getString(MessageIds.GDE_MSGT2236),  Messages.getString(MessageIds.GDE_MSGT2237)};
+		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2200), Messages.getString(MessageIds.GDE_MSGT2201), Messages.getString(MessageIds.GDE_MSGT2202),
+				Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGT2204), Messages.getString(MessageIds.GDE_MSGT2205), Messages.getString(MessageIds.GDE_MSGT2206),
+				Messages.getString(MessageIds.GDE_MSGT2207), Messages.getString(MessageIds.GDE_MSGT2208), Messages.getString(MessageIds.GDE_MSGT2209) };
+		this.CHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212),
+				Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2214), Messages.getString(MessageIds.GDE_MSGT2215), Messages.getString(MessageIds.GDE_MSGT2216),
+				Messages.getString(MessageIds.GDE_MSGT2217), Messages.getString(MessageIds.GDE_MSGT2218), Messages.getString(MessageIds.GDE_MSGT2219), Messages.getString(MessageIds.GDE_MSGT2220),
+				Messages.getString(MessageIds.GDE_MSGT2221), Messages.getString(MessageIds.GDE_MSGT2222) };
+		this.DISCHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212),
+				Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2223), Messages.getString(MessageIds.GDE_MSGT2224), Messages.getString(MessageIds.GDE_MSGT2220),
+				Messages.getString(MessageIds.GDE_MSGT2222) };
+		this.DELAY_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2225), Messages.getString(MessageIds.GDE_MSGT2226), Messages.getString(MessageIds.GDE_MSGT2227),
+				Messages.getString(MessageIds.GDE_MSGT2228) };
+		this.CURRENT_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2229), Messages.getString(MessageIds.GDE_MSGT2230), Messages.getString(MessageIds.GDE_MSGT2231),
+				Messages.getString(MessageIds.GDE_MSGT2232), Messages.getString(MessageIds.GDE_MSGT2233), Messages.getString(MessageIds.GDE_MSGT2234), Messages.getString(MessageIds.GDE_MSGT2235),
+				Messages.getString(MessageIds.GDE_MSGT2236), Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 	}
@@ -141,17 +162,15 @@ public class UltramatUDP extends Ultramat {
 
 				StringBuilder sb = new StringBuilder();
 				byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize - 4];
-				//sb.append(timeBuffer.length).append(" - ");
+				//sb.append(timeBuffer.length).append(GDE.STRING_MESSAGE_CONCAT);
 				System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
-				String timeStamp = new String(timeBuffer).substring(0, timeBuffer.length - 8) + "0000000000";
+				String timeStamp = new String(timeBuffer).substring(0, timeBuffer.length - 8) + "0000000000"; //$NON-NLS-1$
 				long dateTime = new Long(timeStamp.substring(6, 17));
-				logger.log(java.util.logging.Level.FINEST, timeStamp + " " + timeStamp.substring(6, 17) + " " + dateTime);
+				logger.log(java.util.logging.Level.FINEST, timeStamp + GDE.STRING_BLANK + timeStamp.substring(6, 17) + GDE.STRING_BLANK + dateTime);
 				sb.append(dateTime);
-				//System.arraycopy(dataBuffer, offset - 4, sizeBuffer, 0, 4);
-				//sb.append(" ? ").append(LogViewReader.parse2Int(sizeBuffer));
 				deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime) / 1000 - 217; // value 217 is a compromis manual selected
-				sb.append(" - ").append(deltaTime);
-				sb.append(" - ").append(sumTimeDelta += deltaTime);
+				sb.append(GDE.STRING_MESSAGE_CONCAT).append(deltaTime);
+				sb.append(GDE.STRING_MESSAGE_CONCAT).append(sumTimeDelta += deltaTime);
 				logger.log(java.util.logging.Level.FINER, sb.toString());
 				lastDateTime = dateTime;
 
@@ -159,8 +178,6 @@ public class UltramatUDP extends Ultramat {
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 			}
-			//			recordSet.setTimeStep_ms((double)sumTimeDelta/recordDataSize);
-			//			log.log(Level.FINE, sumTimeDelta/recordDataSize + " " + sumTimeDelta);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		updateVisibilityStatus(recordSet, true);
@@ -180,20 +197,21 @@ public class UltramatUDP extends Ultramat {
 
 		if (dataBuffer.length == this.getDataBlockSize() / 2) {
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 8=SpannungZelle1 9=SpannungZelle2...
-			points[0] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
-			points[1] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
-			points[2] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
+			points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
+			points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
+			points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
 			points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 			points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-			points[5] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
-			String sign = String.format("%c%c", (char) dataBuffer[37], (char) dataBuffer[38]);
-			if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[5] = -1 * points[5]; 
-			points[6] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
+			points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
+			String sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[37], (char) dataBuffer[38]);
+			if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[5] = -1 * points[5];
+			points[6] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
 			points[7] = 0;
 
 			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7
 			for (int i = 0, j = 0; i < points.length - 8; ++i, j += 4) {
-				points[i + 8] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
+				points[i + 8] = Integer
+						.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
 				if (points[i + 8] > 0) {
 					maxVotage = points[i + 8] > maxVotage ? points[i + 8] : maxVotage;
 					minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
@@ -203,16 +221,16 @@ public class UltramatUDP extends Ultramat {
 			points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 		}
 		else if (dataBuffer.length == this.getDataBlockSize()) {
-			if(this.isLinkedMode(dataBuffer)) {
+			if (this.isLinkedMode(dataBuffer)) {
 				// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
-				points[1] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
-				points[2] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[85], (char) dataBuffer[86], (char) dataBuffer[87], (char) dataBuffer[88]), 16);
+				points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
+				points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[85], (char) dataBuffer[86], (char) dataBuffer[87], (char) dataBuffer[88]), 16);
 				points[0] = points[1] + points[2];
-				points[4] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
-				points[5] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[89], (char) dataBuffer[90], (char) dataBuffer[91], (char) dataBuffer[92]), 16);
+				points[4] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
+				points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[89], (char) dataBuffer[90], (char) dataBuffer[91], (char) dataBuffer[92]), 16);
 				points[3] = points[4] + points[5];
-				points[7] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
-				points[8] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[93], (char) dataBuffer[94], (char) dataBuffer[95], (char) dataBuffer[96]), 16);
+				points[7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
+				points[8] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[93], (char) dataBuffer[94], (char) dataBuffer[95], (char) dataBuffer[96]), 16);
 				points[6] = points[7] + points[8];
 				points[10] = Double.valueOf(points[1] * points[4] / 1000.0).intValue(); // power U*I [W]
 				points[11] = Double.valueOf(points[2] * points[5] / 1000.0).intValue(); // power U*I [W]
@@ -220,19 +238,19 @@ public class UltramatUDP extends Ultramat {
 				points[13] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
 				points[14] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
 				points[12] = points[13] + points[14];
-				points[15] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
-				String sign = String.format("%c%c", (char) dataBuffer[37], (char) dataBuffer[38]);
-				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[15] = -1 * points[15]; 
-				points[16] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[97], (char) dataBuffer[98], (char) dataBuffer[99], (char) dataBuffer[100]), 16);
-				sign = String.format("%c%c", (char) dataBuffer[37], (char) dataBuffer[38]);
-				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[16] = -1 * points[16]; 
-				points[17] = (Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16)
-											+ Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[75], (char) dataBuffer[76], (char) dataBuffer[77], (char) dataBuffer[78]), 16)) / 2;
+				points[15] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
+				String sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[37], (char) dataBuffer[38]);
+				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[15] = -1 * points[15];
+				points[16] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[97], (char) dataBuffer[98], (char) dataBuffer[99], (char) dataBuffer[100]), 16);
+				sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[37], (char) dataBuffer[38]);
+				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[16] = -1 * points[16];
+				points[17] = (Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16) 
+						+ Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[75], (char) dataBuffer[76], (char) dataBuffer[77], (char) dataBuffer[78]), 16)) / 2;
 				points[18] = 0;
 
 				// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7 
 				for (int i = 0, j = 0; i < 7; ++i, j += 4) {
-					points[i + 19] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
+					points[i + 19] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]),	16);
 					if (points[i + 19] > 0) {
 						maxVotage = points[i + 19] > maxVotage ? points[i + 19] : maxVotage;
 						minVotage = points[i + 19] < minVotage ? points[i + 19] : minVotage;
@@ -240,7 +258,8 @@ public class UltramatUDP extends Ultramat {
 				}
 				// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
 				for (int i = 0, j = 0; i < 7; ++i, j += 4) {
-					points[i + 26] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[105 + j], (char) dataBuffer[106 + j], (char) dataBuffer[107 + j], (char) dataBuffer[108 + j]), 16);
+					points[i + 26] = Integer.parseInt(
+							String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[105 + j], (char) dataBuffer[106 + j], (char) dataBuffer[107 + j], (char) dataBuffer[108 + j]), 16);
 					if (points[i + 26] > 0) {
 						maxVotage = points[i + 26] > maxVotage ? points[i + 26] : maxVotage;
 						minVotage = points[i + 26] < minVotage ? points[i + 26] : minVotage;
@@ -251,20 +270,20 @@ public class UltramatUDP extends Ultramat {
 			}
 			else {
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
-				points[0] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
-				points[1] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
-				points[2] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
+				points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
+				points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
+				points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
 				points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 				points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-				points[5] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
-				String sign = String.format("%c%c", (char) dataBuffer[37], (char) dataBuffer[38]);
-				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[5] = -1 * points[5]; 
-				points[6] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
+				points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
+				String sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[37], (char) dataBuffer[38]);
+				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[5] = -1 * points[5];
+				points[6] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
 				points[7] = 0;
-	
+
 				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7 
 				for (int i = 0, j = 0; i < points.length - 8; ++i, j += 4) {
-					points[i + 8] = Integer.parseInt(String.format("%c%c%c%c", (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
+					points[i + 8] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
 					if (points[i + 8] > 0) {
 						maxVotage = points[i + 8] > maxVotage ? points[i + 8] : maxVotage;
 						minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
@@ -298,35 +317,35 @@ public class UltramatUDP extends Ultramat {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-		
-		if (recordSet.getChannelConfigNumber() == 3) {
-			for (int i = 0; i < recordDataSize; i++) {			
-				log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize);
-				System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
+
+		if (recordSet.getChannelConfigNumber() == 3) { //LINK
+			for (int i = 0; i < recordDataSize; i++) {
+				logger.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
+				System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
 				// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
-				points[1] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
-				points[2] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
+				points[1] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
+				points[2] = (((convertBuffer[4] & 0xff) << 24) + ((convertBuffer[5] & 0xff) << 16) + ((convertBuffer[6] & 0xff) << 8) + ((convertBuffer[7] & 0xff) << 0));
 				points[0] = points[1] + points[2];
-				points[4] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
-				points[5] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
+				points[4] = (((convertBuffer[8] & 0xff) << 24) + ((convertBuffer[9] & 0xff) << 16) + ((convertBuffer[10] & 0xff) << 8) + ((convertBuffer[11] & 0xff) << 0));
+				points[5] = (((convertBuffer[12] & 0xff) << 24) + ((convertBuffer[13] & 0xff) << 16) + ((convertBuffer[14] & 0xff) << 8) + ((convertBuffer[15] & 0xff) << 0));
 				points[3] = points[4] + points[5];
-				points[7] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
-				points[8] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
+				points[7] = (((convertBuffer[16] & 0xff) << 24) + ((convertBuffer[17] & 0xff) << 16) + ((convertBuffer[18] & 0xff) << 8) + ((convertBuffer[19] & 0xff) << 0));
+				points[8] = (((convertBuffer[20] & 0xff) << 24) + ((convertBuffer[21] & 0xff) << 16) + ((convertBuffer[22] & 0xff) << 8) + ((convertBuffer[23] & 0xff) << 0));
 				points[6] = points[7] + points[8];
-				points[9] =  Double.valueOf(points[0] / 1000.0 * points[3]).intValue(); 						// power U*I [W]
-				points[10] = Double.valueOf(points[1] / 1000.0 * points[4]).intValue(); 						// power U*I [W]
-				points[11] = Double.valueOf(points[2] / 1000.0 * points[5]).intValue(); 						// power U*I [W]
-				points[12] = Double.valueOf(points[0] / 1000.0 * points[6]).intValue();							// energy U*C [Wh]
-				points[13] = Double.valueOf(points[0] / 1000.0 * points[7]).intValue();							// energy U*C [Wh]
-				points[14] = Double.valueOf(points[0] / 1000.0 * points[8]).intValue();							// energy U*C [Wh]
-				points[15] = (((convertBuffer[24]&0xff) << 24) + ((convertBuffer[25]&0xff) << 16) + ((convertBuffer[26]&0xff) << 8) + ((convertBuffer[27]&0xff) << 0));
-				points[16] = (((convertBuffer[28]&0xff) << 24) + ((convertBuffer[29]&0xff) << 16) + ((convertBuffer[30]&0xff) << 8) + ((convertBuffer[31]&0xff) << 0));
-				points[17] = (((convertBuffer[32]&0xff) << 24) + ((convertBuffer[33]&0xff) << 16) + ((convertBuffer[34]&0xff) << 8) + ((convertBuffer[35]&0xff) << 0));
+				points[9] = Double.valueOf(points[0] / 1000.0 * points[3]).intValue(); // power U*I [W]
+				points[10] = Double.valueOf(points[1] / 1000.0 * points[4]).intValue(); // power U*I [W]
+				points[11] = Double.valueOf(points[2] / 1000.0 * points[5]).intValue(); // power U*I [W]
+				points[12] = Double.valueOf(points[0] / 1000.0 * points[6]).intValue(); // energy U*C [Wh]
+				points[13] = Double.valueOf(points[0] / 1000.0 * points[7]).intValue(); // energy U*C [Wh]
+				points[14] = Double.valueOf(points[0] / 1000.0 * points[8]).intValue(); // energy U*C [Wh]
+				points[15] = (((convertBuffer[24] & 0xff) << 24) + ((convertBuffer[25] & 0xff) << 16) + ((convertBuffer[26] & 0xff) << 8) + ((convertBuffer[27] & 0xff) << 0));
+				points[16] = (((convertBuffer[28] & 0xff) << 24) + ((convertBuffer[29] & 0xff) << 16) + ((convertBuffer[30] & 0xff) << 8) + ((convertBuffer[31] & 0xff) << 0));
+				points[17] = (((convertBuffer[32] & 0xff) << 24) + ((convertBuffer[33] & 0xff) << 16) + ((convertBuffer[34] & 0xff) << 8) + ((convertBuffer[35] & 0xff) << 0));
 				points[18] = 0;
-	
+
 				// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7 
 				// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
-				for (int j=0, k=0; j<points.length - 20; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+				for (int j = 0, k = 0; j < points.length - 20; ++j, k += GDE.SIZE_BYTES_INTEGER) {
 					points[j + 19] = (((convertBuffer[k + 36] & 0xff) << 24) + ((convertBuffer[k + 37] & 0xff) << 16) + ((convertBuffer[k + 38] & 0xff) << 8) + ((convertBuffer[k + 39] & 0xff) << 0));
 					if (points[j + 19] > 0) {
 						maxVotage = points[j + 19] > maxVotage ? points[j + 19] : maxVotage;
@@ -335,29 +354,29 @@ public class UltramatUDP extends Ultramat {
 				}
 				//calculate balance on the fly
 				points[18] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-				
+
 				recordSet.addPoints(points);
-				
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
+
+				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 2500) / recordDataSize), sThreadId);
 			}
 		}
 		else {
-			for (int i = 0; i < recordDataSize; i++) {			
-				log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize);
-				System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
+			for (int i = 0; i < recordDataSize; i++) {
+				logger.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
+				System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
 				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
-				points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
-				points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
-				points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
-				points[3] = Double.valueOf(points[0] / 1000.0 * points[1]).intValue(); 							// power U*I [W]
-				points[4] = Double.valueOf(points[0] / 1000.0 * points[2]).intValue();							// energy U*C [Wh]
-				points[5] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
-				points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
+				points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
+				points[1] = (((convertBuffer[4] & 0xff) << 24) + ((convertBuffer[5] & 0xff) << 16) + ((convertBuffer[6] & 0xff) << 8) + ((convertBuffer[7] & 0xff) << 0));
+				points[2] = (((convertBuffer[8] & 0xff) << 24) + ((convertBuffer[9] & 0xff) << 16) + ((convertBuffer[10] & 0xff) << 8) + ((convertBuffer[11] & 0xff) << 0));
+				points[3] = Double.valueOf(points[0] / 1000.0 * points[1]).intValue(); // power U*I [W]
+				points[4] = Double.valueOf(points[0] / 1000.0 * points[2]).intValue(); // energy U*C [Wh]
+				points[5] = (((convertBuffer[12] & 0xff) << 24) + ((convertBuffer[13] & 0xff) << 16) + ((convertBuffer[14] & 0xff) << 8) + ((convertBuffer[15] & 0xff) << 0));
+				points[6] = (((convertBuffer[16] & 0xff) << 24) + ((convertBuffer[17] & 0xff) << 16) + ((convertBuffer[18] & 0xff) << 8) + ((convertBuffer[19] & 0xff) << 0));
 				points[7] = 0;
-	
+
 				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
-				for (int j=0, k=0; j<points.length - 8; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+				for (int j = 0, k = 0; j < points.length - 8; ++j, k += GDE.SIZE_BYTES_INTEGER) {
 					points[j + 8] = (((convertBuffer[k + 20] & 0xff) << 24) + ((convertBuffer[k + 21] & 0xff) << 16) + ((convertBuffer[k + 22] & 0xff) << 8) + ((convertBuffer[k + 23] & 0xff) << 0));
 					if (points[j + 8] > 0) {
 						maxVotage = points[j + 8] > maxVotage ? points[j + 8] : maxVotage;
@@ -366,17 +385,17 @@ public class UltramatUDP extends Ultramat {
 				}
 				//calculate balance on the fly
 				points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-				
+
 				recordSet.addPoints(points);
-				
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
+
+				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 2500) / recordDataSize), sThreadId);
 			}
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
 	}
-	
+
 	/**
 	 * query if the target measurement reference ordinal used by the given desktop type
 	 * @return the target measurement reference ordinal, -1 if reference ordinal not set
@@ -384,10 +403,10 @@ public class UltramatUDP extends Ultramat {
 	@Override
 	public int getDesktopTargetReferenceOrdinal(DesktopPropertyTypes desktopPropertyType) {
 		DesktopPropertyType property = this.getDesktopProperty(desktopPropertyType);
-		if(channels.getActiveChannelNumber() == 3) {
-			return property != null ? property.getTargetReferenceOrdinal() + 11 : -1; 
+		if (this.channels.getActiveChannelNumber() == 3) {
+			return property != null ? property.getTargetReferenceOrdinal() + 11 : -1;
 		}
-		return property != null ? property.getTargetReferenceOrdinal() : -1; 
+		return property != null ? property.getTargetReferenceOrdinal() : -1;
 	}
 
 	/**
@@ -399,10 +418,122 @@ public class UltramatUDP extends Ultramat {
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
 		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
 		// 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10 19=SpannungZelle11 20=SpannungZelle12 21=SpannungZelle13 22=SpannungZelle14
-		
+
+		// LINK
 		// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
 		// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7 
 		// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
-		return new int[] {0, channels.getActiveChannelNumber() == 3 ? 6 : 2};
+		return new int[] { 0, this.channels.getActiveChannelNumber() == 3 ? 6 : 2 };
+	}
+
+	/**
+	 * check if one of the outlet channels are in processing mode
+	 * @param outletNum 1 or 2
+	 * @param dataBuffer
+	 * @return true if channel 1 or 2 is active 
+	 */
+	@Override
+	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
+		if (outletNum == 1) {
+			String operationModeOut1 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[15], (char) dataBuffer[16]);
+			if (logger.isLoggable(java.util.logging.Level.FINE)) {
+				logger.log(java.util.logging.Level.FINE,
+						"operationModeOut1 = " + (operationModeOut1 != null && operationModeOut1.length() > 0 ? this.USAGE_MODE[Integer.parseInt(operationModeOut1, 16)] : operationModeOut1)); //$NON-NLS-1$
+			}
+			return operationModeOut1 != null && operationModeOut1.length() == 2 && !(operationModeOut1.equals(Ultramat.OPERATIONS_MODE_NONE) || operationModeOut1.equals(Ultramat.OPERATIONS_MODE_ERROR));
+		}
+		else if (outletNum == 2) {
+			String operationModeOut2 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[79], (char) dataBuffer[80]);
+			if (logger.isLoggable(java.util.logging.Level.FINE)) {
+				logger.log(java.util.logging.Level.FINE,
+						"operationModeOut2 = " + (operationModeOut2 != null && operationModeOut2.length() > 0 ? this.USAGE_MODE[Integer.parseInt(operationModeOut2, 16)] : operationModeOut2)); //$NON-NLS-1$
+			}
+			return operationModeOut2 != null && operationModeOut2.length() == 2 && !(operationModeOut2.equals(Ultramat.OPERATIONS_MODE_NONE) || operationModeOut2.equals(Ultramat.OPERATIONS_MODE_ERROR));
+		}
+		else
+			return false;
+	}
+
+	/**
+	 * query the processing mode, main modes are charge/discharge, make sure the data buffer contains at index 15,16 the processing modes
+	 * @param dataBuffer 
+	 * @return 0 = no processing, 1 = charge, 2 = discharge, 3 = delay, 4 = pause, 5 = current operation finished, 6 = error, 7 = balancer, 8 = tire heater, 9 = motor
+	 */
+	@Override
+	public int getProcessingMode(byte[] dataBuffer) {
+		String operationMode = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[15], (char) dataBuffer[16]);
+		return operationMode != null && operationMode.length() > 0 ? Integer.parseInt(operationMode, 16) : 0;
+	}
+
+	/**
+	 * query the charge mode, main modes are automatic/normal/CVCC, make sure the data buffer contains at index 15,16 the processing modes, type at index 17,18
+	 * @param dataBuffer
+	 * @return string of charge mode
+	 */
+	@Override
+	public String getProcessingType(byte[] dataBuffer) {
+		String type = GDE.STRING_EMPTY;
+		String operationMode = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[15], (char) dataBuffer[16]);
+		int opMode = operationMode != null && operationMode.length() > 0 ? Integer.parseInt(operationMode, 16) : 0;
+		String operationType = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[17], (char) dataBuffer[18]);
+		switch (opMode) {
+		case 1: //charge
+			type = operationType != null && operationType.length() > 0 ? this.CHARGE_MODE[Integer.parseInt(operationType, 16)] : GDE.STRING_EMPTY;
+			break;
+		case 2: //discharge
+			type = operationType != null && operationType.length() > 0 ? this.DISCHARGE_MODE[Integer.parseInt(operationType, 16)] : GDE.STRING_EMPTY;
+			break;
+		case 3: //delay
+			type = operationType != null && operationType.length() > 0 ? this.DELAY_MODE[Integer.parseInt(operationType, 16)] : GDE.STRING_EMPTY;
+			break;
+		case 5: //last active
+			type = operationType != null && operationType.length() > 0 ? this.CURRENT_MODE[Integer.parseInt(operationType, 16)] : GDE.STRING_EMPTY;
+			break;
+		case 6: //error
+			this.application.setStatusMessage(Messages.getString("GDE_MSGT22" + String.format("%02d", Integer.parseInt(operationType, 16))), SWT.COLOR_RED); //$NON-NLS-1$
+			break;
+		}
+		return type;
+	}
+
+	/**
+	 * query if outlets are linked together to charge identical batteries in parallel
+	 * @param dataBuffer
+	 * @return true | false
+	 */
+	@Override
+	public boolean isLinkedMode(byte[] dataBuffer) {
+		String operationMode1 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[15], (char) dataBuffer[16]);
+		String operationMode2 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[79], (char) dataBuffer[80]);
+		String operationType1 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[17], (char) dataBuffer[18]);
+		String operationType2 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[81], (char) dataBuffer[82]);
+		return operationMode1.equals(operationMode2) && operationType1.equals(operationType2)
+				&& (operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_CHARGE) || operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_DISCHARGE));
+	}
+
+	/**
+	 * set the temperature unit right after creating a record set according to the used oultet channel
+	 * @param channelNumber
+	 * @param recordSet
+	 * @param dataBuffer
+	 */
+	@Override
+	public void setTemperatureUnit(int channelNumber, RecordSet recordSet, byte[] dataBuffer) {
+		String unit = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[39], (char) dataBuffer[40]);
+		if (unit != null && unit.length() > 0) if (channelNumber == 3) {
+			if (Integer.parseInt(unit) == 0) {
+				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 15, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
+				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 16, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
+			}
+			else if (Integer.parseInt(unit) == 1) {
+				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 15, DeviceConfiguration.UNIT_DEGREE_FAHRENHEIT);
+				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 16, DeviceConfiguration.UNIT_DEGREE_FAHRENHEIT);
+			}
+		}
+		else {
+			if (Integer.parseInt(unit) == 0)
+				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 5, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
+			else if (Integer.parseInt(unit) == 1) this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 5, DeviceConfiguration.UNIT_DEGREE_FAHRENHEIT);
+		}
 	}
 }
