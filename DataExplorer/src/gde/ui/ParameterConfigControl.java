@@ -17,7 +17,9 @@ along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
 Copyright (c) 2011 Winfried Bruegmann
 ****************************************************************************************/
-import gde.log.Level;
+import gde.GDE;
+import gde.device.DataTypes;
+import gde.utils.StringHelper;
 
 import java.util.logging.Logger;
 
@@ -32,6 +34,7 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 
@@ -44,195 +47,343 @@ public class ParameterConfigControl {
 	final Slider				slider;
 
 	int									controlHeight	= 20;
-	
+
+	int									value					= 0;
+	int									offset				= 0;
+
 	/**
-	 * create a parameter configuration group, calculate with total height of 30
+	 * create a parameter configuration control for number values with factor and offset, calculate with total height of 25 to 30
 	 * @param parent
 	 * @param valueArray
-	 * @param valuePosition
+	 * @param valueIndex
 	 * @param parameterName
+	 * @param nameWidth
 	 * @param parameterDescription
-	 * @param isValueEditable
+	 * @param descriptionWidth
+	 * @param isTextValueEditable
+	 * @param textFieldWidth
+	 * @param sliderWidth
 	 * @param sliderMinValue
 	 * @param sliderMaxValue
 	 * @param sliderFactor
 	 * @param sliderOffset
 	 */
-	public ParameterConfigControl(Composite parent, final int[] valueArray, final int valuePosition, final String parameterName, final String parameterDescription, final boolean isValueEditable,
-			final int sliderMinValue, final int sliderMaxValue, final double sliderFactor, final int sliderOffset) {
-		RowData separatorLData = new RowData();
-		separatorLData.width = 5;
-		separatorLData.height = controlHeight;
-
-		baseComposite = new Composite(parent, SWT.NONE);
+	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String parameterName, final int nameWidth, final String parameterDescription,
+			final int descriptionWidth, final boolean isTextValueEditable, final int textFieldWidth, final int sliderWidth, final int sliderMinValue, final int sliderMaxValue, final int sliderOffset) {
+		this.value = valueArray[valueIndex];
+		this.offset = sliderOffset;
+		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-		baseComposite.setLayout(group1Layout);
+		this.baseComposite.setLayout(group1Layout);
 		{
-			new Composite(baseComposite, SWT.NONE).setLayoutData(separatorLData);
-		}
-		{
-			nameLabel = new CLabel(baseComposite, SWT.NONE);
+			this.nameLabel = new CLabel(this.baseComposite, SWT.RIGHT);
 			RowData nameLabelLData = new RowData();
-			nameLabelLData.width = 150;
-			nameLabelLData.height = controlHeight;
-			nameLabel.setLayoutData(nameLabelLData);
-			nameLabel.setText(parameterName);
+			nameLabelLData.width = nameWidth;
+			nameLabelLData.height = this.controlHeight;
+			this.nameLabel.setLayoutData(nameLabelLData);
+			this.nameLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.nameLabel.setText(parameterName);
 		}
 		{
-			text = new Text(baseComposite, SWT.CENTER | SWT.BORDER);
+			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
 			RowData textLData = new RowData();
-			textLData.width = 50;
-			textLData.height = controlHeight - 5;
-			text.setLayoutData(textLData);
-			text.setText(String.format("%d", valueArray[valuePosition]));
-			text.setEditable(isValueEditable);
-			text.setBackground(SWTResourceManager.getColor(isValueEditable ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
-			if (isValueEditable) {
-				text.addVerifyListener(new VerifyListener() {
+			textLData.width = textFieldWidth;
+			textLData.height = this.controlHeight - 5;
+			this.text.setLayoutData(textLData);
+			this.text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.text.setEditable(isTextValueEditable);
+			this.text.setBackground(SWTResourceManager.getColor(isTextValueEditable ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
+			if (isTextValueEditable) {
+				this.text.addVerifyListener(new VerifyListener() {
+					@Override
 					public void verifyText(VerifyEvent evt) {
-						log.log(Level.FINEST, "text.verifyText, event=" + evt);
-						evt.doit = true; //TODO
+						log.log(java.util.logging.Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
+						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
 					}
 				});
-				text.addKeyListener(new KeyAdapter() {
+				this.text.addKeyListener(new KeyAdapter() {
+					@Override
+					public void keyReleased(KeyEvent evt) {
+						log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
+						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText());
+						if (ParameterConfigControl.this.value < sliderMinValue) {
+							ParameterConfigControl.this.value = sliderMinValue;
+							ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+						}
+						if (ParameterConfigControl.this.value > sliderMaxValue) {
+							ParameterConfigControl.this.value = sliderMaxValue;
+							ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+						}
+						valueArray[valueIndex] = ParameterConfigControl.this.value;
+						ParameterConfigControl.this.slider.setSelection(ParameterConfigControl.this.value + ParameterConfigControl.this.offset);
+						ParameterConfigControl.this.slider.notifyListeners(SWT.Selection, new Event());
+						Event changeEvent = new Event();
+						changeEvent.index = valueIndex;
+						parent.notifyListeners(SWT.Selection, changeEvent);
+					}
+
 					@Override
 					public void keyPressed(KeyEvent evt) {
-						log.log(Level.FINEST, "text.keyPressed, event=" + evt);
-						valueArray[valuePosition] = Integer.parseInt(text.getText());
+						log.log(java.util.logging.Level.FINEST, "text.keyPressed, event=" + evt); //$NON-NLS-1$
 					}
 				});
 			}
 		}
 		{
-			new Composite(baseComposite, SWT.NONE).setLayoutData(separatorLData);
-		}
-		{
-			descriptionLabel = new CLabel(baseComposite, SWT.NONE);
+			this.descriptionLabel = new CLabel(this.baseComposite, SWT.LEFT);
 			RowData descriptionLabelLData = new RowData();
-			descriptionLabelLData.width = 150;
-			descriptionLabelLData.height = controlHeight;
-			descriptionLabel.setLayoutData(descriptionLabelLData);
-			descriptionLabel.setText(parameterDescription);
+			descriptionLabelLData.width = descriptionWidth;
+			descriptionLabelLData.height = this.controlHeight;
+			this.descriptionLabel.setLayoutData(descriptionLabelLData);
+			this.descriptionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.descriptionLabel.setText(parameterDescription);
 		}
 		{
 			RowData sliderLData = new RowData();
-			sliderLData.width = 150;
-			sliderLData.height = controlHeight;
-			slider = new Slider(baseComposite, SWT.NONE);
-			slider.setLayoutData(sliderLData);
-			slider.setMinimum(sliderMinValue);
-			slider.setMaximum(sliderMaxValue);
-			System.out.println(valueArray[valuePosition] + " - " + (int) ((valueArray[valuePosition] - sliderOffset) / sliderFactor));
-			slider.setSelection((int) ((valueArray[valuePosition] - sliderOffset) / sliderFactor));
-			slider.addSelectionListener(new SelectionAdapter() {
+			sliderLData.width = sliderWidth;
+			sliderLData.height = this.controlHeight;
+			this.slider = new Slider(this.baseComposite, SWT.NONE);
+			this.slider.setLayoutData(sliderLData);
+			this.slider.setMinimum(sliderMinValue + this.offset);
+			this.slider.setMaximum(sliderMaxValue + this.offset + 10);
+			this.slider.setIncrement((sliderMaxValue - this.offset) >= 1000 ? 10 : 1);
+			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(Level.FINEST, "slider.widgetSelected, event=" + evt);
-					valueArray[valuePosition] = (int) (slider.getSelection() * sliderFactor + sliderOffset);
-					text.setText(String.format("%d", valueArray[valuePosition]));
+					log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
+					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection() - ParameterConfigControl.this.offset;
+					ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+					valueArray[valueIndex] = ParameterConfigControl.this.value;
+					Event changeEvent = new Event();
+					changeEvent.index = valueIndex;
+					parent.notifyListeners(SWT.Selection, changeEvent);
 				}
 			});
 		}
-		}
+	}
 
 	/**
-	 * create a parameter configuration group, calculate with total height of 30
+	 * create a parameter configuration control for number values with factor and without offset, calculate with total height of 25 to 30
 	 * @param parent
 	 * @param valueArray
-	 * @param valuePosition
+	 * @param valueIndex
 	 * @param parameterName
+	 * @param nameWidth
 	 * @param parameterDescription
-	 * @param isValueEditable
+	 * @param descriptionWidth
+	 * @param isTextValueEditable
+	 * @param textFieldWidth
+	 * @param sliderWidth
 	 * @param sliderMinValue
 	 * @param sliderMaxValue
 	 * @param sliderFactor
 	 */
-	public ParameterConfigControl(Composite parent, final int[] valueArray, final int valuePosition, final String parameterName, final String parameterDescription, final boolean isValueEditable,
-			final int sliderMinValue, final int sliderMaxValue, final double sliderFactor) {
-		RowData separatorLData = new RowData();
-		separatorLData.width = 5;
-		separatorLData.height = controlHeight;
-
-		baseComposite = new Composite(parent, SWT.NONE);
+	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String parameterName, final int nameWidth, final String parameterDescription,
+			final int descriptionWidth, final boolean isTextValueEditable, final int textFieldWidth, final int sliderWidth, final int sliderMinValue, final int sliderMaxValue) {
+		this.value = valueArray[valueIndex];
+		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-		baseComposite.setLayout(group1Layout);
+		this.baseComposite.setLayout(group1Layout);
 		{
-			new Composite(baseComposite, SWT.NONE).setLayoutData(separatorLData);
-		}
-		{
-			nameLabel = new CLabel(baseComposite, SWT.NONE);
+			this.nameLabel = new CLabel(this.baseComposite, SWT.RIGHT);
 			RowData nameLabelLData = new RowData();
-			nameLabelLData.width = 150;
-			nameLabelLData.height = controlHeight;
-			nameLabel.setLayoutData(nameLabelLData);
-			nameLabel.setText(parameterName);
+			nameLabelLData.width = nameWidth;
+			nameLabelLData.height = this.controlHeight;
+			this.nameLabel.setLayoutData(nameLabelLData);
+			this.nameLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.nameLabel.setText(parameterName);
 		}
 		{
-			text = new Text(baseComposite, SWT.CENTER | SWT.BORDER);
+			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
 			RowData textLData = new RowData();
-			textLData.width = 50;
-			textLData.height = controlHeight - 5;
-			text.setLayoutData(textLData);
-			text.setText(String.format("%d", valueArray[valuePosition]));
-			text.setEditable(isValueEditable);
-			text.setBackground(SWTResourceManager.getColor(isValueEditable ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
-			if (isValueEditable) {
-				text.addVerifyListener(new VerifyListener() {
+			textLData.width = textFieldWidth;
+			textLData.height = this.controlHeight - 5;
+			this.text.setLayoutData(textLData);
+			this.text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.text.setEditable(isTextValueEditable);
+			this.text.setBackground(SWTResourceManager.getColor(isTextValueEditable ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
+			if (isTextValueEditable) {
+				this.text.addVerifyListener(new VerifyListener() {
+					@Override
 					public void verifyText(VerifyEvent evt) {
-						log.log(Level.FINEST, "text.verifyText, event=" + evt);
-						evt.doit = true; //TODO
+						log.log(java.util.logging.Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
+						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
 					}
 				});
-				text.addKeyListener(new KeyAdapter() {
+				this.text.addKeyListener(new KeyAdapter() {
+					@Override
+					public void keyReleased(KeyEvent evt) {
+						log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
+						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText());
+						if (ParameterConfigControl.this.value < sliderMinValue) {
+							ParameterConfigControl.this.value = sliderMinValue;
+							ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+						}
+						if (ParameterConfigControl.this.value > sliderMaxValue) {
+							ParameterConfigControl.this.value = sliderMaxValue;
+							ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+						}
+						valueArray[valueIndex] = ParameterConfigControl.this.value;
+						ParameterConfigControl.this.slider.setSelection(ParameterConfigControl.this.value);
+						ParameterConfigControl.this.slider.notifyListeners(SWT.Selection, new Event());
+						Event changeEvent = new Event();
+						changeEvent.index = valueIndex;
+						parent.notifyListeners(SWT.Selection, changeEvent);
+					}
+
 					@Override
 					public void keyPressed(KeyEvent evt) {
-						log.log(Level.FINEST, "text.keyPressed, event=" + evt);
-						valueArray[valuePosition] = Integer.parseInt(text.getText());
+						log.log(java.util.logging.Level.FINEST, "text.keyPressed, event=" + evt); //$NON-NLS-1$
 					}
 				});
 			}
 		}
 		{
-			new Composite(baseComposite, SWT.NONE).setLayoutData(separatorLData);
-		}
-		{
-			descriptionLabel = new CLabel(baseComposite, SWT.NONE);
+			this.descriptionLabel = new CLabel(this.baseComposite, SWT.LEFT);
 			RowData descriptionLabelLData = new RowData();
-			descriptionLabelLData.width = 150;
-			descriptionLabelLData.height = controlHeight;
-			descriptionLabel.setLayoutData(descriptionLabelLData);
-			descriptionLabel.setText(parameterDescription);
+			descriptionLabelLData.width = descriptionWidth;
+			descriptionLabelLData.height = this.controlHeight;
+			this.descriptionLabel.setLayoutData(descriptionLabelLData);
+			this.descriptionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.descriptionLabel.setText(parameterDescription);
 		}
 		{
 			RowData sliderLData = new RowData();
-			sliderLData.width = 150;
-			sliderLData.height = controlHeight;
-			slider = new Slider(baseComposite, SWT.NONE);
-			slider.setLayoutData(sliderLData);
-			slider.setMinimum(sliderMinValue);
-			slider.setMaximum(sliderMaxValue);
-			System.out.println(valueArray[valuePosition] + " - " + (int) (valueArray[valuePosition] * sliderFactor));
-			slider.setSelection((int) (valueArray[valuePosition] / sliderFactor));
-			slider.addSelectionListener(new SelectionAdapter() {
+			sliderLData.width = sliderWidth;
+			sliderLData.height = this.controlHeight;
+			this.slider = new Slider(this.baseComposite, SWT.NONE);
+			this.slider.setLayoutData(sliderLData);
+			this.slider.setMinimum(sliderMinValue);
+			this.slider.setMaximum(sliderMaxValue + 10);
+			this.slider.setIncrement((sliderMaxValue - this.offset) >= 1000 ? 10 : 1);
+			this.slider.setSelection(this.value);
+			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.log(Level.FINEST, "slider.widgetSelected, event=" + evt);
-					valueArray[valuePosition] = (int) (slider.getSelection() * sliderFactor);
-					text.setText(String.format("%d", valueArray[valuePosition]));
+					log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
+					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection();
+					ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+					valueArray[valueIndex] = ParameterConfigControl.this.value;
+					Event changeEvent = new Event();
+					changeEvent.index = valueIndex;
+					parent.notifyListeners(SWT.Selection, changeEvent);
 				}
 			});
 		}
 	}
-	
-	public void setVisible(boolean enable) {
-		nameLabel.setVisible(enable);
-		text.setEnabled(enable);
-		descriptionLabel.setVisible(enable);
-		slider.setEnabled(enable);
+
+	/**
+	 * create a parameter configuration control for values array, where the array size drives the slider, calculate with total height of 25 to 30
+	 * @param parent
+	 * @param valueArray
+	 * @param valueIndex
+	 * @param nameWidth
+	 * @param parameterDescription
+	 * @param descriptionWidth
+	 * @param textFiledValues
+	 * @param textFieldWidth
+	 * @param sliderWidth
+	 */
+	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String parameterName, final int nameWidth, final String parameterDescription,
+			final int descriptionWidth, final String[] textFiledValues, final int textFieldWidth, final int sliderWidth) {
+		this.value = valueArray[valueIndex];
+		this.baseComposite = new Composite(parent, SWT.NONE);
+		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+		this.baseComposite.setLayout(group1Layout);
+		{
+			this.nameLabel = new CLabel(this.baseComposite, SWT.RIGHT);
+			RowData nameLabelLData = new RowData();
+			nameLabelLData.width = nameWidth;
+			nameLabelLData.height = this.controlHeight;
+			this.nameLabel.setLayoutData(nameLabelLData);
+			this.nameLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.nameLabel.setText(parameterName);
+		}
+		{
+			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
+			RowData textLData = new RowData();
+			textLData.width = textFieldWidth;
+			textLData.height = this.controlHeight - 5;
+			this.text.setLayoutData(textLData);
+			this.text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.text.setEditable(false);
+			this.text.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+		}
+		{
+			this.descriptionLabel = new CLabel(this.baseComposite, SWT.LEFT);
+			RowData descriptionLabelLData = new RowData();
+			descriptionLabelLData.width = descriptionWidth;
+			descriptionLabelLData.height = this.controlHeight;
+			this.descriptionLabel.setLayoutData(descriptionLabelLData);
+			this.descriptionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.descriptionLabel.setText(parameterDescription);
+		}
+		{
+			RowData sliderLData = new RowData();
+			sliderLData.width = sliderWidth;
+			sliderLData.height = this.controlHeight;
+			this.slider = new Slider(this.baseComposite, SWT.NONE);
+			this.slider.setLayoutData(sliderLData);
+			this.slider.setMinimum(0);
+			this.slider.setMaximum(textFiledValues.length < 10 ? 10 + textFiledValues.length - 1 : textFiledValues.length + 1);
+			this.slider.setSelection(this.value);
+			this.slider.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent evt) {
+					log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
+					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection();
+					ParameterConfigControl.this.text.setText(textFiledValues[ParameterConfigControl.this.value]);
+					valueArray[valueIndex] = ParameterConfigControl.this.value;
+					Event changeEvent = new Event();
+					changeEvent.index = valueIndex;
+					parent.notifyListeners(SWT.Selection, changeEvent);
+				}
+			});
+		}
 	}
-	
+
+	public void setVisible(boolean enable) {
+		this.nameLabel.setVisible(enable);
+		this.text.setEnabled(enable);
+		this.descriptionLabel.setVisible(enable);
+		this.slider.setEnabled(enable);
+	}
+
 	public ParameterConfigControl dispose() {
-		baseComposite.dispose();		
+		this.baseComposite.dispose();
 		return null;
+	}
+
+	/**
+	 * set the slider selection index
+	 * @param useValue the value to be set in dependency of factor and offset if applicable
+	 */
+	public void setSliderSelection(int useValue) {
+		this.value = useValue;
+		if (!this.slider.isDisposed()) {
+			this.slider.setSelection(this.value - this.offset);
+			this.slider.notifyListeners(SWT.Selection, new Event());
+		}
+	}
+
+	/**
+	 * get the slider selection index
+	 */
+	public int getSliderSelectionIndex() {
+		return this.slider.getSelection();
+	}
+
+	/**
+	 * @return the slider
+	 */
+	public Slider getSlider() {
+		return this.slider;
+	}
+
+	/**
+	 * redraw the control widget
+	 */
+	public void redraw() {
+		this.baseComposite.redraw();
 	}
 }

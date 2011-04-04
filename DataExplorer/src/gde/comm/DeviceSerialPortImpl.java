@@ -58,6 +58,14 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	final static String										$CLASS_NAME								= DeviceSerialPortImpl.class.getName();
 	final static Logger										log												= Logger.getLogger(DeviceSerialPortImpl.$CLASS_NAME);
 
+	public static final String						STRING_NAK								= "<NAK>";
+	public static final String						STRING_ACK								= "<ACK>";
+	public static final String						STRING_CR									= "<CR>";
+	public static final String						STRING_FF									= "<FF>";
+	public static final String						FORMAT_2_CHAR							= "%c%c";																																												//2 char to string formating
+	public static final String						FORMAT_4_CHAR							= "%c%c%c%c";																																										//4 char to string formating
+	public static final String						FORMAT_16_CHAR						= "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c";
+
 	final static Vector<String>						availablePorts						= new Vector<String>();																																					//available port vector used by all application dialogs
 	final static TreeMap<Integer, String>	windowsPorts							= new TreeMap<Integer, String>();
 
