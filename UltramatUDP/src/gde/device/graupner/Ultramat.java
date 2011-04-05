@@ -703,7 +703,7 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 	public synchronized String convert2String(int[] values) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < values.length; i++) {
-			sb.append(String.format("%04x", values[i]));
+			sb.append(String.format("%04X", values[i]));
 		}
 		log.log(Level.OFF, sb.toString());
 		return sb.toString();
