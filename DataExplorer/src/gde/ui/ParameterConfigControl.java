@@ -146,7 +146,7 @@ public class ParameterConfigControl {
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(sliderMinValue + this.offset);
 			this.slider.setMaximum(sliderMaxValue + this.offset + 10);
-			this.slider.setIncrement((sliderMaxValue - this.offset) >= 1000 ? 10 : 1);
+			this.slider.setIncrement((sliderMaxValue + this.offset) >= 1000 ? 10 : 1);
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
@@ -255,7 +255,7 @@ public class ParameterConfigControl {
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(sliderMinValue);
 			this.slider.setMaximum(sliderMaxValue + 10);
-			this.slider.setIncrement((sliderMaxValue - this.offset) >= 1000 ? 10 : 1);
+			this.slider.setIncrement(sliderMaxValue >= 1000 ? 10 : 1);
 			this.slider.setSelection(this.value);
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -361,7 +361,7 @@ public class ParameterConfigControl {
 	public void setSliderSelection(int useValue) {
 		this.value = useValue;
 		if (!this.slider.isDisposed()) {
-			this.slider.setSelection(this.value - this.offset);
+			this.slider.setSelection(this.value + this.offset);
 			this.slider.notifyListeners(SWT.Selection, new Event());
 		}
 	}
