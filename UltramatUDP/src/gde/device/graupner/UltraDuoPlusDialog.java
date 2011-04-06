@@ -319,7 +319,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		this.settings = Settings.getInstance();
 
 		this.memoryParameterChangeListener = new Listener() {
-			@Override
 			public void handleEvent(Event evt) {
 				if (UltraDuoPlusDialog.this.lastMemorySelectionIndex >= 0 && UltraDuoPlusDialog.this.lastMemorySelectionIndex < 60) {
 					log.log(java.util.logging.Level.FINE, "memoryComposite.handleEvent, (" + UltraDuoPlusDialog.this.lastMemorySelectionIndex + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName() + " memoryValues[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
@@ -408,14 +407,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.dialogShell.pack();
 				this.dialogShell.setSize(625, 650);
 				this.dialogShell.addHelpListener(new HelpListener() {
-					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						UltraDuoPlusDialog.this.application.openHelpDialog(UltraDuoPlusDialog.DEVICE_JAR_NAME, "HelpInfo.html"); //$NON-NLS-1$ 
 					}
 				});
 				this.dialogShell.addDisposeListener(new DisposeListener() {
-					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (UltraDuoPlusDialog.this.serialPort != null && UltraDuoPlusDialog.this.serialPort.isConnected()) {
@@ -476,7 +473,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						userNameTextLData.top = new FormAttachment(0, 1000, 7);
 						this.userNameText.setLayoutData(userNameTextLData);
 						this.userNameText.addVerifyListener(new VerifyListener() {
-							@Override
 							public void verifyText(VerifyEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "evt.doit = " + (evt.text.length() <= 16)); //$NON-NLS-1$
 								evt.doit = evt.text.length() <= 16;
@@ -543,14 +539,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.scollableDeviceComposite.setContent(this.baseDeviceSetupComposite);
 										this.baseDeviceSetupComposite.setSize(615, 390);
 										this.scollableDeviceComposite.addControlListener(new ControlListener() {
-
-											@Override
 											public void controlResized(ControlEvent evt) {
 												log.log(java.util.logging.Level.FINEST, "baseDeviceSetupComposite.controlResized, event=" + evt); //$NON-NLS-1$
 												UltraDuoPlusDialog.this.baseDeviceSetupComposite.setSize(UltraDuoPlusDialog.this.scollableDeviceComposite.getClientArea().width, 390);
 											}
-
-											@Override
 											public void controlMoved(ControlEvent evt) {
 												log.log(java.util.logging.Level.FINEST, "baseDeviceSetupComposite.controlMoved, event=" + evt); //$NON-NLS-1$
 												UltraDuoPlusDialog.this.baseDeviceSetupComposite.setSize(UltraDuoPlusDialog.this.scollableDeviceComposite.getClientArea().width, 390);
@@ -582,14 +574,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.scollableDeviceComposite1.setContent(this.baseDeviceSetupComposite1);
 										this.baseDeviceSetupComposite1.setSize(620, 150);
 										this.scollableDeviceComposite1.addControlListener(new ControlListener() {
-
-											@Override
 											public void controlResized(ControlEvent evt) {
 												log.log(java.util.logging.Level.FINEST, "baseDeviceSetupComposite1.controlResized, event=" + evt); //$NON-NLS-1$
 												UltraDuoPlusDialog.this.baseDeviceSetupComposite1.setSize(UltraDuoPlusDialog.this.scollableDeviceComposite1.getClientArea().width, 150);
 											}
-
-											@Override
 											public void controlMoved(ControlEvent evt) {
 												log.log(java.util.logging.Level.FINEST, "baseDeviceSetupComposite1.controlMoved, event=" + evt); //$NON-NLS-1$
 												UltraDuoPlusDialog.this.baseDeviceSetupComposite1.setSize(UltraDuoPlusDialog.this.scollableDeviceComposite1.getClientArea().width, 150);
@@ -620,14 +608,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.scollableDeviceComposite2.setContent(this.baseDeviceSetupComposite2);
 										this.baseDeviceSetupComposite.setSize(620, 150);
 										this.scollableDeviceComposite2.addControlListener(new ControlListener() {
-
-											@Override
 											public void controlResized(ControlEvent evt) {
 												log.log(java.util.logging.Level.FINEST, "baseDeviceSetupComposite2.controlResized, event=" + evt); //$NON-NLS-1$
 												UltraDuoPlusDialog.this.baseDeviceSetupComposite2.setSize(UltraDuoPlusDialog.this.scollableDeviceComposite2.getClientArea().width, 150);
 											}
-
-											@Override
 											public void controlMoved(ControlEvent evt) {
 												log.log(Level.FINEST, "baseDeviceSetupComposite2.controlMoved, event=" + evt); //$NON-NLS-1$
 												UltraDuoPlusDialog.this.baseDeviceSetupComposite2.setSize(UltraDuoPlusDialog.this.scollableDeviceComposite2.getClientArea().width, 150);
@@ -829,13 +813,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									this.scrolledMemoryComposite.setContent(this.memoryComposite);
 									this.memoryComposite.setSize(620, this.memorySelectHeight);
 									this.scrolledMemoryComposite.addControlListener(new ControlListener() {
-										@Override
 										public void controlResized(ControlEvent evt) {
 											log.log(Level.FINEST, "scrolledMemoryComposite.controlResized, event=" + evt); //$NON-NLS-1$
 											UltraDuoPlusDialog.this.memoryComposite.setSize(UltraDuoPlusDialog.this.scrolledMemoryComposite.getClientArea().width, UltraDuoPlusDialog.this.memorySelectHeight);
 										}
-
-										@Override
 										public void controlMoved(ControlEvent evt) {
 											log.log(Level.FINEST, "scrolledMemoryComposite.controlMoved, event=" + evt); //$NON-NLS-1$
 											UltraDuoPlusDialog.this.memoryComposite.setSize(UltraDuoPlusDialog.this.scrolledMemoryComposite.getClientArea().width, UltraDuoPlusDialog.this.memorySelectHeight);
@@ -1072,21 +1053,18 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		}
 		log.log(Level.FINEST, "add handler"); //$NON-NLS-1$
 		this.baseDeviceSetupComposite.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event evt) {
 				log.log(Level.FINEST, "baseDeviceSetupComposite.handleEvent, channelValues1[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$
 				UltraDuoPlusDialog.this.ultraDuoPlusSetup.getChannelData1().setChanged(true);
 			}
 		});
 		this.baseDeviceSetupComposite1.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event evt) {
 				log.log(Level.FINEST, "baseDeviceSetupComposite1.handleEvent, channelValues1[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$
 				UltraDuoPlusDialog.this.ultraDuoPlusSetup.getChannelData1().setChanged(true);
 			}
 		});
 		this.baseDeviceSetupComposite2.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(Event evt) {
 				log.log(Level.FINEST, "baseDeviceSetupComposite2.handleEvent, channelValues2[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$
 				UltraDuoPlusDialog.this.ultraDuoPlusSetup.getChannelData2().setChanged(true);

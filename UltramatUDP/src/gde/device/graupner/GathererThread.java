@@ -381,7 +381,6 @@ public class GathererThread extends Thread {
 			else {
 				final String useRecordSetKey = recordSetKey;
 				GDE.display.asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						GathererThread.this.application.updateStatisticsData();
