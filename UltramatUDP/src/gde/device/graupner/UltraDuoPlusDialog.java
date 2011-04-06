@@ -152,7 +152,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	UltraDuoPlusType					ultraDuoPlusSetup;
 	UltraDuoPlusSychronizer		synchronizerRead, synchronizerWrite;
 
-	String										deviceIdentifierName			= " NEW BATT NAME ";																																																									//$NON-NLS-1$
+	String										deviceIdentifierName			= "NEW USER NAME";																																																									//$NON-NLS-1$
 
 	int[]											channelValues1						= new int[UltramatSerialPort.SIZE_CHANNEL_1_SETUP];
 	int[]											channelValues2						= new int[UltramatSerialPort.SIZE_CHANNEL_2_SETUP];
@@ -345,12 +345,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	@Override
 	public void open() {
 		try {
-			if (this.serialPort != null && !this.serialPort.isConnected()) {
-				try {
-					this.serialPort.open();
-					this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
-					this.deviceIdentifierName = this.serialPort.readDeviceUserName();
-
+//			if (this.serialPort != null && !this.serialPort.isConnected()) {
+//				try {
+//					this.serialPort.open();
+//					this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
+//					this.deviceIdentifierName = this.serialPort.readDeviceUserName();
+//
 					this.jc = JAXBContext.newInstance("gde.device.graupner"); //$NON-NLS-1$
 					this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
 							new StreamSource(UltraDuoPlusDialog.class.getClassLoader().getResourceAsStream("resource/" + UltraDuoPlusDialog.ULTRA_DUO_PLUS_XSD))); //$NON-NLS-1$
@@ -372,24 +372,24 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						else
 							throw e;
 					}
-
-					this.synchronizerRead = new UltraDuoPlusSychronizer(this, this.serialPort, this.ultraDuoPlusSetup, UltraDuoPlusSychronizer.SYNC_TYPE.READ);
-					this.synchronizerRead.start();
-				}
-				catch (Exception e) {
-					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(null,
-							Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
-					this.application.getDeviceSelectionDialog().open();
-					return;
-				}
-			}
-			else {
-				log.log(java.util.logging.Level.SEVERE, "serial port == null"); //$NON-NLS-1$
-				this.application.openMessageDialog(null, Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
-				this.application.getDeviceSelectionDialog().open();
-				return;
-			}
+//
+//					this.synchronizerRead = new UltraDuoPlusSychronizer(this, this.serialPort, this.ultraDuoPlusSetup, UltraDuoPlusSychronizer.SYNC_TYPE.READ);
+//					this.synchronizerRead.start();
+//				}
+//				catch (Exception e) {
+//					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+//					this.application.openMessageDialog(null,
+//							Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
+//					this.application.getDeviceSelectionDialog().open();
+//					return;
+//				}
+//			}
+//			else {
+//				log.log(java.util.logging.Level.SEVERE, "serial port == null"); //$NON-NLS-1$
+//				this.application.openMessageDialog(null, Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+//				this.application.getDeviceSelectionDialog().open();
+//				return;
+//			}
 
 			log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {

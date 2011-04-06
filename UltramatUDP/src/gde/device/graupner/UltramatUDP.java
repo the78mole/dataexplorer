@@ -314,12 +314,12 @@ public class UltramatUDP extends Ultramat {
 		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
-		int maxVotage = Integer.MIN_VALUE;
-		int minVotage = Integer.MAX_VALUE;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 		if (recordSet.getChannelConfigNumber() == 3) { //LINK
 			for (int i = 0; i < recordDataSize; i++) {
+				int maxVotage = Integer.MIN_VALUE;
+				int minVotage = Integer.MAX_VALUE;
 				logger.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
 				System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
 				// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
@@ -362,6 +362,8 @@ public class UltramatUDP extends Ultramat {
 		}
 		else {
 			for (int i = 0; i < recordDataSize; i++) {
+				int maxVotage = Integer.MIN_VALUE;
+				int minVotage = Integer.MAX_VALUE;
 				logger.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
 				System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
