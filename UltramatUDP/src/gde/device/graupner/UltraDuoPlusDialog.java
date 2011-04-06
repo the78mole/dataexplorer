@@ -662,7 +662,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.memoryCombo.setVisibleItemCount(20);
 										RowData memoryComboLData = new RowData();
 										memoryComboLData.width = 165;
-										memoryComboLData.height = GDE.IS_MAC ? 18 : 16;
+										memoryComboLData.height = GDE.IS_WINDOWS ? 16 : 18;
 										this.memoryCombo.setLayoutData(memoryComboLData);
 										this.memoryCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2252));
 										this.memoryCombo.select(0);
