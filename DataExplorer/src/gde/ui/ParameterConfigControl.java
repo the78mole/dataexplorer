@@ -88,7 +88,7 @@ public class ParameterConfigControl {
 			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
 			RowData textLData = new RowData();
 			textLData.width = textFieldWidth;
-			textLData.height = this.controlHeight - 5;
+			textLData.height = this.controlHeight - (GDE.IS_LINUX ? 8 : 5);
 			this.text.setLayoutData(textLData);
 			this.text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.text.setEditable(isTextValueEditable);
@@ -196,7 +196,7 @@ public class ParameterConfigControl {
 			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
 			RowData textLData = new RowData();
 			textLData.width = textFieldWidth;
-			textLData.height = this.controlHeight - 5;
+			textLData.height = this.controlHeight - (GDE.IS_LINUX ? 8 : 5);
 			this.text.setLayoutData(textLData);
 			this.text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.text.setEditable(isTextValueEditable);
@@ -301,7 +301,7 @@ public class ParameterConfigControl {
 			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
 			RowData textLData = new RowData();
 			textLData.width = textFieldWidth;
-			textLData.height = this.controlHeight - 5;
+			textLData.height = this.controlHeight - (GDE.IS_LINUX ? 8 : 5);
 			this.text.setLayoutData(textLData);
 			this.text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.text.setEditable(false);
