@@ -57,11 +57,11 @@ public class ParameterHeaderControl {
 		controlComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(SWT.HORIZONTAL);
 		controlComposite.setLayout(group1Layout);
-		controlComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+		controlComposite.setBackground(SWTResourceManager.getColor(GDE.IS_MAC ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
 		{
 			Composite filler = new Composite(controlComposite, SWT.NONE);
 			filler.setLayoutData(separatorLData);
-			filler.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+			filler.setBackground(SWTResourceManager.getColor(GDE.IS_MAC ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
 		}
 		{
 			nameLabel = new CLabel(controlComposite, SWT.CENTER);
@@ -69,7 +69,7 @@ public class ParameterHeaderControl {
 			nameLabelLData.width = nameWidth;
 			nameLabelLData.height = controlHeight;
 			nameLabel.setLayoutData(nameLabelLData);
-			nameLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+			nameLabel.setBackground(SWTResourceManager.getColor(GDE.IS_MAC ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
 			nameLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			nameLabel.setText(parameterName);
 		}
@@ -79,14 +79,14 @@ public class ParameterHeaderControl {
 			valueLabelLData.width = valueWidth;
 			valueLabelLData.height = controlHeight;
 			valueLabel.setLayoutData(valueLabelLData);
-			valueLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+			valueLabel.setBackground(SWTResourceManager.getColor(GDE.IS_MAC ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
 			valueLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			valueLabel.setText(valueDescription);
 		}
 		{
 			Composite filler = new Composite(controlComposite, SWT.NONE);
 			filler.setLayoutData(separatorLData);
-			filler.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+			filler.setBackground(SWTResourceManager.getColor(GDE.IS_MAC ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
 		}
 		{
 			descriptionLabel = new CLabel(controlComposite, SWT.CENTER);
@@ -94,7 +94,7 @@ public class ParameterHeaderControl {
 			descriptionLabelLData.width = descriptionWidth;
 			descriptionLabelLData.height = controlHeight;
 			descriptionLabel.setLayoutData(descriptionLabelLData);
-			descriptionLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+			descriptionLabel.setBackground(SWTResourceManager.getColor(GDE.IS_MAC ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_LIGHT_SHADOW));
 			descriptionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			descriptionLabel.setText(parameterDescription);
 		}
