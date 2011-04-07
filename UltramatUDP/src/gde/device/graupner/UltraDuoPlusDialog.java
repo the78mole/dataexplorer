@@ -160,6 +160,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 
 	String[]									memoryNames								= new String[60];
 	int[]											memoryValues							= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
+	int[]											memoryValuesNiCd					= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
+	int[]											memoryValuesNiMh					= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
+	int[]											memoryValuesLiIo					= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
+	int[]											memoryValuesLiPo					= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
+	int[]											memoryValuesLiFe					= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
+	int[]											memoryValuesPb 						= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
 	ParameterConfigControl[]	memoryParameters					= new ParameterConfigControl[UltramatSerialPort.SIZE_MEMORY_SETUP];
 	int												lastMemorySelectionIndex	= -1;
 	int												lastCellSelectionIndex		= -1;
@@ -317,6 +323,15 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		this.device = useDevice;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
+
+		//TODO create initial values for the different cell types 
+		//cellType,numCells,capacity,2011,04,30,chargeCurrent, 
+		memoryValuesNiCd[0] = 0; memoryValuesNiCd[5] = 1500; memoryValuesNiCd[7] = 1000;
+		memoryValuesNiMh[0] = 1;
+		memoryValuesLiIo[0] = 2;
+		memoryValuesLiPo[0] = 3;
+		memoryValuesLiFe[0] = 4;
+		memoryValuesPb[0] = 5;
 
 		this.memoryParameterChangeListener = new Listener() {
 			public void handleEvent(Event evt) {
