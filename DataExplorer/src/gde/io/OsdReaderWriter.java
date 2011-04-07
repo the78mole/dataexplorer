@@ -377,7 +377,7 @@ public class OsdReaderWriter {
 				log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// fourth line : size channel/config type , channel/config type
 				sb = new StringBuilder();
-				sb.append(GDE.CHANNEL_CONFIG_TYPE).append(Channels.getInstance().getActiveChannel().getType().name()).append(GDE.STRING_NEW_LINE);
+				sb.append(GDE.CHANNEL_CONFIG_TYPE).append(activeChannel.getType().name()).append(GDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
 				filePointer += GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
 				log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -398,8 +398,10 @@ public class OsdReaderWriter {
 				String[] recordSetNames = activeChannel.getRecordSetNames();
 				// prepare all record set describing data
 				for (int i = 0; i < activeChannel.size(); ++i) {
+					//if ChannelTypes.TYPE_OUTLET only record sets associated to that channel goes into one file
+					//if ChannelTypes.TYPE_CONFIG all record sets with different configurations goes into one file
 					//RecordSetName :: ChannelConfigurationName :: RecordSetComment :: RecordSetProperties :: RecordDataSize :: RecordSetDataPointer
-					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
+					Channel recordSetChannel = activeChannel.getType().equals(ChannelTypes.TYPE_OUTLET) ? activeChannel : Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
 					if (recordSetChannel != null) {
 						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 						if (recordSet != null) {
