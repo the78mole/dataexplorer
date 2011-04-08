@@ -75,6 +75,7 @@ public class ParameterConfigControl {
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 		this.baseComposite.setLayout(group1Layout);
+		this.baseComposite.setBackground(parent.getBackground());
 		{
 			this.nameLabel = new CLabel(this.baseComposite, SWT.RIGHT);
 			RowData nameLabelLData = new RowData();
@@ -83,6 +84,7 @@ public class ParameterConfigControl {
 			this.nameLabel.setLayoutData(nameLabelLData);
 			this.nameLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.nameLabel.setText(parameterName);
+			this.nameLabel.setBackground(parent.getBackground());
 		}
 		{
 			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
@@ -136,6 +138,7 @@ public class ParameterConfigControl {
 			this.descriptionLabel.setLayoutData(descriptionLabelLData);
 			this.descriptionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.descriptionLabel.setText(parameterDescription);
+			this.descriptionLabel.setBackground(parent.getBackground());
 		}
 		{
 			RowData sliderLData = new RowData();
@@ -183,6 +186,7 @@ public class ParameterConfigControl {
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 		this.baseComposite.setLayout(group1Layout);
+		this.baseComposite.setBackground(parent.getBackground());
 		{
 			this.nameLabel = new CLabel(this.baseComposite, SWT.RIGHT);
 			RowData nameLabelLData = new RowData();
@@ -191,6 +195,7 @@ public class ParameterConfigControl {
 			this.nameLabel.setLayoutData(nameLabelLData);
 			this.nameLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.nameLabel.setText(parameterName);
+			this.nameLabel.setBackground(parent.getBackground());
 		}
 		{
 			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
@@ -244,6 +249,7 @@ public class ParameterConfigControl {
 			this.descriptionLabel.setLayoutData(descriptionLabelLData);
 			this.descriptionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.descriptionLabel.setText(parameterDescription);
+			this.descriptionLabel.setBackground(parent.getBackground());
 		}
 		{
 			RowData sliderLData = new RowData();
@@ -288,6 +294,7 @@ public class ParameterConfigControl {
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 		this.baseComposite.setLayout(group1Layout);
+		this.baseComposite.setBackground(parent.getBackground());
 		{
 			this.nameLabel = new CLabel(this.baseComposite, SWT.RIGHT);
 			RowData nameLabelLData = new RowData();
@@ -296,6 +303,7 @@ public class ParameterConfigControl {
 			this.nameLabel.setLayoutData(nameLabelLData);
 			this.nameLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.nameLabel.setText(parameterName);
+			this.nameLabel.setBackground(parent.getBackground());
 		}
 		{
 			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
@@ -315,6 +323,7 @@ public class ParameterConfigControl {
 			this.descriptionLabel.setLayoutData(descriptionLabelLData);
 			this.descriptionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.descriptionLabel.setText(parameterDescription);
+			this.descriptionLabel.setBackground(parent.getBackground());
 		}
 		{
 			RowData sliderLData = new RowData();
