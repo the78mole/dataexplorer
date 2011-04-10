@@ -19,6 +19,7 @@ Copyright (c) 2011 Winfried Bruegmann
 ****************************************************************************************/
 import gde.GDE;
 import gde.device.DataTypes;
+import gde.log.Level;
 import gde.utils.StringHelper;
 
 import java.util.logging.Logger;
@@ -42,20 +43,21 @@ public class ParameterConfigControl {
 	final static Logger	log						= Logger.getLogger(ParameterConfigControl.class.getName());
 	final Composite			baseComposite;
 	final CLabel				nameLabel, descriptionLabel;
-	Composite						separator;
 	final Text					text;
 	final Slider				slider;
 
-	int									controlHeight	= 20;
-
+	final int									controlHeight	= 20;
+	final int									offset;
+	final String							format;
+	
 	int									value					= 0;
-	int									offset				= 0;
 
 	/**
 	 * create a parameter configuration control for number values with factor and offset, calculate with total height of 25 to 30
 	 * @param parent
 	 * @param valueArray
 	 * @param valueIndex
+	 * @param valueFormat string, if empty no formating like "%d"
 	 * @param parameterName
 	 * @param nameWidth
 	 * @param parameterDescription
@@ -68,9 +70,10 @@ public class ParameterConfigControl {
 	 * @param sliderFactor
 	 * @param sliderOffset
 	 */
-	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String parameterName, final int nameWidth, final String parameterDescription,
+	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String valueFormat, final String parameterName, final int nameWidth, final String parameterDescription,
 			final int descriptionWidth, final boolean isTextValueEditable, final int textFieldWidth, final int sliderWidth, final int sliderMinValue, final int sliderMaxValue, final int sliderOffset) {
 		this.value = valueArray[valueIndex];
+		this.format = valueFormat.equals(GDE.STRING_EMPTY) ?  "%d" : valueFormat; //$NON-NLS-1$
 		this.offset = sliderOffset;
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -109,11 +112,11 @@ public class ParameterConfigControl {
 						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText());
 						if (ParameterConfigControl.this.value < sliderMinValue) {
 							ParameterConfigControl.this.value = sliderMinValue;
-							ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+							ParameterConfigControl.this.text.setText(String.format(format, ParameterConfigControl.this.value)); //$NON-NLS-1$
 						}
 						if (ParameterConfigControl.this.value > sliderMaxValue) {
 							ParameterConfigControl.this.value = sliderMaxValue;
-							ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+							ParameterConfigControl.this.text.setText(String.format(format, ParameterConfigControl.this.value)); //$NON-NLS-1$
 						}
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
 						ParameterConfigControl.this.slider.setSelection(ParameterConfigControl.this.value + ParameterConfigControl.this.offset);
@@ -154,11 +157,13 @@ public class ParameterConfigControl {
 				public void widgetSelected(SelectionEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
 					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection() - ParameterConfigControl.this.offset;
-					ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+					ParameterConfigControl.this.text.setText(String.format(format, ParameterConfigControl.this.value)); //$NON-NLS-1$
 					valueArray[valueIndex] = ParameterConfigControl.this.value;
-					Event changeEvent = new Event();
-					changeEvent.index = valueIndex;
-					parent.notifyListeners(SWT.Selection, changeEvent);
+					if (evt.data == null) {
+						Event changeEvent = new Event();
+						changeEvent.index = valueIndex;
+						parent.notifyListeners(SWT.Selection, changeEvent);
+					}
 				}
 			});
 		}
@@ -169,6 +174,7 @@ public class ParameterConfigControl {
 	 * @param parent
 	 * @param valueArray
 	 * @param valueIndex
+	 * @param valueFormat string, if empty no formating like "%d"
 	 * @param parameterName
 	 * @param nameWidth
 	 * @param parameterDescription
@@ -180,9 +186,11 @@ public class ParameterConfigControl {
 	 * @param sliderMaxValue
 	 * @param sliderFactor
 	 */
-	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String parameterName, final int nameWidth, final String parameterDescription,
+	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String valueFormat, final String parameterName, final int nameWidth, final String parameterDescription,
 			final int descriptionWidth, final boolean isTextValueEditable, final int textFieldWidth, final int sliderWidth, final int sliderMinValue, final int sliderMaxValue) {
 		this.value = valueArray[valueIndex];
+		this.format = valueFormat.equals(GDE.STRING_EMPTY) ?  "%d" : valueFormat; //$NON-NLS-1$
+		this.offset = 0;
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 		this.baseComposite.setLayout(group1Layout);
@@ -220,11 +228,11 @@ public class ParameterConfigControl {
 						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText());
 						if (ParameterConfigControl.this.value < sliderMinValue) {
 							ParameterConfigControl.this.value = sliderMinValue;
-							ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+							ParameterConfigControl.this.text.setText(String.format(format, ParameterConfigControl.this.value)); //$NON-NLS-1$
 						}
 						if (ParameterConfigControl.this.value > sliderMaxValue) {
 							ParameterConfigControl.this.value = sliderMaxValue;
-							ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+							ParameterConfigControl.this.text.setText(String.format(format, ParameterConfigControl.this.value)); //$NON-NLS-1$
 						}
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
 						ParameterConfigControl.this.slider.setSelection(ParameterConfigControl.this.value);
@@ -266,11 +274,13 @@ public class ParameterConfigControl {
 				public void widgetSelected(SelectionEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
 					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection();
-					ParameterConfigControl.this.text.setText(String.format("%d", ParameterConfigControl.this.value)); //$NON-NLS-1$
+					ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value)); 
 					valueArray[valueIndex] = ParameterConfigControl.this.value;
-					Event changeEvent = new Event();
-					changeEvent.index = valueIndex;
-					parent.notifyListeners(SWT.Selection, changeEvent);
+					if (evt.data == null) {
+						Event changeEvent = new Event();
+						changeEvent.index = valueIndex;
+						parent.notifyListeners(SWT.Selection, changeEvent);
+					}
 				}
 			});
 		}
@@ -291,6 +301,8 @@ public class ParameterConfigControl {
 	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String parameterName, final int nameWidth, final String parameterDescription,
 			final int descriptionWidth, final String[] textFiledValues, final int textFieldWidth, final int sliderWidth) {
 		this.value = valueArray[valueIndex];
+		this.format = GDE.STRING_EMPTY;
+		this.offset = 0;
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 		this.baseComposite.setLayout(group1Layout);
@@ -341,19 +353,14 @@ public class ParameterConfigControl {
 					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection();
 					ParameterConfigControl.this.text.setText(textFiledValues[ParameterConfigControl.this.value]);
 					valueArray[valueIndex] = ParameterConfigControl.this.value;
-					Event changeEvent = new Event();
-					changeEvent.index = valueIndex;
-					parent.notifyListeners(SWT.Selection, changeEvent);
+					if (evt.data == null) {
+						Event changeEvent = new Event();
+						changeEvent.index = valueIndex;
+						parent.notifyListeners(SWT.Selection, changeEvent);
+					}
 				}
 			});
 		}
-	}
-
-	public void setVisible(boolean enable) {
-		this.nameLabel.setVisible(enable);
-		this.text.setEnabled(enable);
-		this.descriptionLabel.setVisible(enable);
-		this.slider.setEnabled(enable);
 	}
 
 	public ParameterConfigControl dispose() {
@@ -369,15 +376,11 @@ public class ParameterConfigControl {
 		this.value = useValue;
 		if (!this.slider.isDisposed()) {
 			this.slider.setSelection(this.value + this.offset);
-			this.slider.notifyListeners(SWT.Selection, new Event());
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "slider value = " + this.value + " offset = " + this.offset);
+			Event updateEvent = new Event();
+			updateEvent.data = new Object();
+			this.slider.notifyListeners(SWT.Selection, updateEvent);
 		}
-	}
-
-	/**
-	 * get the slider selection index
-	 */
-	public int getSliderSelectionIndex() {
-		return this.slider.getSelection();
 	}
 
 	/**
@@ -392,5 +395,17 @@ public class ParameterConfigControl {
 	 */
 	public void redraw() {
 		this.baseComposite.redraw();
+	}
+	
+	/**
+	 * update control description and slider range (cell type change -> charge max capacity)
+	 * @param newParameterDescription
+	 * @param newMinSliderValue
+	 * @param newMaxSliderValue
+	 */
+	public void updateValueRange(String newParameterDescription, int newMinSliderValue, int newMaxSliderValue) {
+		this.descriptionLabel.setText(newParameterDescription);
+		this.slider.setMinimum(newMinSliderValue);
+		this.slider.setMaximum(newMaxSliderValue);
 	}
 }
