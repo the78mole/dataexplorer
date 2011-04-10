@@ -83,44 +83,45 @@ public class UltraDuoPlusSychronizer extends Thread {
 	 * @throws TimeOutException
 	 */
 	private void syncRead() throws IOException, TimeOutException {
-		//read memory names first
-		List<MemoryType> cellMemories = this.ultraDuoPlusSetup.getMemory();
-		Iterator<MemoryType> iterator = cellMemories.iterator();
-		for (int i = 1; iterator.hasNext(); ++i) {
-			MemoryType cellMemory = iterator.next();
-			if (!cellMemory.isSynced()) {
-				cellMemory.setName(this.serialPort.readMemoryName(i));
-				cellMemory.setSynced(true);
+		if (this.serialPort.isConnected()) {
+			//read memory names first
+			List<MemoryType> cellMemories = this.ultraDuoPlusSetup.getMemory();
+			Iterator<MemoryType> iterator = cellMemories.iterator();
+			for (int i = 1; iterator.hasNext(); ++i) {
+				MemoryType cellMemory = iterator.next();
+				if (!cellMemory.isSynced()) {
+					cellMemory.setName(this.serialPort.readMemoryName(i));
+					cellMemory.setSynced(true);
+				}
+				log.log(java.util.logging.Level.FINE, "read memory name " + i + " time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
-			log.log(java.util.logging.Level.FINE, "read memory name " + i + " time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-
-		//read basic setup data
-		if (this.ultraDuoPlusSetup.getChannelData1() == null || !this.ultraDuoPlusSetup.getChannelData1().isSynced()) {
-			ChannelData1 channelData1 = new ObjectFactory().createUltraDuoPlusTypeChannelData1();
-			channelData1.setValue(this.serialPort.readChannelData(1));
-			this.ultraDuoPlusSetup.setChannelData1(channelData1);
-		}
-		if (this.ultraDuoPlusSetup.getChannelData2() == null || !this.ultraDuoPlusSetup.getChannelData2().isSynced()) {
-			ChannelData2 channelData2 = new ObjectFactory().createUltraDuoPlusTypeChannelData2();
-			channelData2.setValue(this.serialPort.readChannelData(2));
-			this.ultraDuoPlusSetup.setChannelData2(channelData2);
-		}
-
-		log.log(java.util.logging.Level.FINE, "read basics time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-
-		//read all memory setup data
-		iterator = cellMemories.iterator();
-		for (int i = 1; iterator.hasNext(); ++i) {
-			MemoryType cellMemory = iterator.next();
-			if (!cellMemory.getSetupData().isSynced()) {
-				MemoryType.SetupData setupData = cellMemory.getSetupData();
-				setupData.setValue(this.serialPort.readMemorySetup(i));
-				cellMemory.setSetupData(setupData);
-				setupData.setSynced(true);
+	
+			//read basic setup data
+			if (this.ultraDuoPlusSetup.getChannelData1() == null || !this.ultraDuoPlusSetup.getChannelData1().isSynced()) {
+				ChannelData1 channelData1 = new ObjectFactory().createUltraDuoPlusTypeChannelData1();
+				channelData1.setValue(this.serialPort.readChannelData(1));
+				this.ultraDuoPlusSetup.setChannelData1(channelData1);
 			}
-			log.log(java.util.logging.Level.FINE, "read memory setup" + i + " time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
+			if (this.ultraDuoPlusSetup.getChannelData2() == null || !this.ultraDuoPlusSetup.getChannelData2().isSynced()) {
+				ChannelData2 channelData2 = new ObjectFactory().createUltraDuoPlusTypeChannelData2();
+				channelData2.setValue(this.serialPort.readChannelData(2));
+				this.ultraDuoPlusSetup.setChannelData2(channelData2);
+			}
+	
+			log.log(java.util.logging.Level.FINE, "read basics time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+	
+			//read all memory setup data
+			iterator = cellMemories.iterator();
+			for (int i = 1; iterator.hasNext(); ++i) {
+				MemoryType cellMemory = iterator.next();
+				if (!cellMemory.getSetupData().isSynced()) {
+					MemoryType.SetupData setupData = cellMemory.getSetupData();
+					setupData.setValue(this.serialPort.readMemorySetup(i));
+					cellMemory.setSetupData(setupData);
+					setupData.setSynced(true);
+				}
+				log.log(java.util.logging.Level.FINE, "read memory setup" + i + " time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
 
 //		//start optional entries, temporary comment out to reduce serial I/O
 //		//memory step charge data
@@ -195,8 +196,9 @@ public class UltraDuoPlusSychronizer extends Thread {
 //			}
 //		}
 
-		log.log(java.util.logging.Level.FINE, "read complete memory setup time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-		if (this.dialog != null) this.dialog.setBackupRetoreButtons(true);
+			log.log(java.util.logging.Level.FINE, "read complete memory setup time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			if (this.dialog != null) this.dialog.setBackupRetoreButtons(true);
+		}
 	}
 
 	/**
@@ -205,73 +207,73 @@ public class UltraDuoPlusSychronizer extends Thread {
 	 * @throws TimeOutException
 	 */
 	private void syncWrite() throws IOException, TimeOutException {
-		//device Identifier name
-		if (this.ultraDuoPlusSetup.isChanged()) {
-			this.serialPort.writeConfigData(UltramatSerialPort.WRITE_DEVICE_IDENTIFIER_NAME, this.ultraDuoPlusSetup.getIdentifierName().getBytes(), 0);
-			this.ultraDuoPlusSetup.changed = null;
-		}
-
-		//basic setup data
-		if (this.ultraDuoPlusSetup.getChannelData1().isChanged()) {
+		if (this.serialPort.isConnected()) {
+			//device Identifier name
+			if (this.ultraDuoPlusSetup.isChanged()) {
+				this.serialPort.writeConfigData(UltramatSerialPort.WRITE_DEVICE_IDENTIFIER_NAME, this.ultraDuoPlusSetup.getIdentifierName().getBytes(), 0);
+				this.ultraDuoPlusSetup.changed = null;
+			}
+	
+			//basic setup data, write channel 1 alway to sync the time
 			this.serialPort.writeConfigData(UltramatSerialPort.WRITE_CHANNEL_SETUP, this.ultraDuoPlusSetup.getChannelData1().getValue().getBytes(), 1);
 			this.ultraDuoPlusSetup.getChannelData1().changed = null;
+	
+			if (this.ultraDuoPlusSetup.getChannelData2().isChanged()) {
+				this.serialPort.writeConfigData(UltramatSerialPort.WRITE_CHANNEL_SETUP, this.ultraDuoPlusSetup.getChannelData2().getValue().getBytes(), 2);
+				this.ultraDuoPlusSetup.getChannelData2().changed = null;
+			}
+	
+			//battery memory
+			List<MemoryType> cellMemories = this.ultraDuoPlusSetup.getMemory();
+			Iterator<MemoryType> iterator = cellMemories.iterator();
+			for (int i = 0; iterator.hasNext(); ++i) {
+				MemoryType cellMemory = iterator.next();
+				//memory name
+				if (cellMemory.isChanged()) {
+					this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_NAME, cellMemory.getName().getBytes(), i + 1);
+					this.ultraDuoPlusSetup.getMemory().get(i).changed = null;
+				}
+				//memory setup data
+				if (cellMemory.getSetupData().isChanged()) {
+					this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_SETUP, cellMemory.getSetupData().getValue().getBytes(), i + 1);
+					this.ultraDuoPlusSetup.getMemory().get(i).getSetupData().changed = null;
+				}
+				//memory step charge data
+				if (cellMemory.getStepChargeData() != null && cellMemory.getStepChargeData().isChanged()) {
+					this.serialPort.writeConfigData(UltramatSerialPort.WRITE_STEP_CHARGE_SETUP, cellMemory.getStepChargeData().getValue().getBytes(), i + 1);
+					this.ultraDuoPlusSetup.getMemory().get(i).getStepChargeData().changed = null;
+				}
+				//memory trace data
+				if (cellMemory.getTraceData() != null && cellMemory.getTraceData().isChanged()) {
+					this.serialPort.writeConfigData(UltramatSerialPort.WRITE_TRACE_DATA, cellMemory.getTraceData().getValue().getBytes(), i + 1);
+					this.ultraDuoPlusSetup.getMemory().get(i).getTraceData().changed = null;
+				}
+				//memory cycle data
+				if (cellMemory.getCycleData() != null && cellMemory.getCycleData().isChanged()) {
+					this.serialPort.writeConfigData(UltramatSerialPort.WRITE_CYCLE_DATA, cellMemory.getCycleData().getValue().getBytes(), i + 1);
+					this.ultraDuoPlusSetup.getMemory().get(i).getCycleData().changed = null;
+				}
+			}
+	
+			Iterator<TireHeaterData> tireIterator = this.ultraDuoPlusSetup.getTireHeaterData().iterator();
+			for (int i = 0; tireIterator.hasNext(); ++i) {
+				TireHeaterData tireHeaterData = tireIterator.next();
+				if (tireHeaterData != null && tireHeaterData.isChanged()) {
+					this.serialPort.writeConfigData(UltramatSerialPort.WRITE_TIRE_HEATER, tireHeaterData.getValue().getBytes(), i + 1);
+					this.ultraDuoPlusSetup.getTireHeaterData().get(i).changed = null;
+				}
+			}
+			Iterator<MotorRunData> motorIterator = this.ultraDuoPlusSetup.getMotorRunData().iterator();
+			for (int i = 0; motorIterator.hasNext(); ++i) {
+				MotorRunData motorRunData = motorIterator.next();
+				if (motorRunData != null && motorRunData.isChanged()) {
+					this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MOTOR_RUN, motorRunData.getValue().getBytes(), i + 1);
+					this.ultraDuoPlusSetup.getMotorRunData().get(i).changed = null;
+				}
+			}
+	
+			log.log(java.util.logging.Level.FINE, "complete update (write) time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			if (this.dialog != null) this.dialog.setBackupRetoreButtons(true);
 		}
-		if (this.ultraDuoPlusSetup.getChannelData2().isChanged()) {
-			this.serialPort.writeConfigData(UltramatSerialPort.WRITE_CHANNEL_SETUP, this.ultraDuoPlusSetup.getChannelData2().getValue().getBytes(), 2);
-			this.ultraDuoPlusSetup.getChannelData2().changed = null;
-		}
-
-		//battery memory
-		List<MemoryType> cellMemories = this.ultraDuoPlusSetup.getMemory();
-		Iterator<MemoryType> iterator = cellMemories.iterator();
-		for (int i = 0; iterator.hasNext(); ++i) {
-			MemoryType cellMemory = iterator.next();
-			//memory name
-			if (cellMemory.isChanged()) {
-				this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_NAME, cellMemory.getName().getBytes(), i + 1);
-				this.ultraDuoPlusSetup.getMemory().get(i).changed = null;
-			}
-			//memory setup data
-			if (cellMemory.getSetupData().isChanged()) {
-				this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_SETUP, cellMemory.getSetupData().getValue().getBytes(), i + 1);
-				this.ultraDuoPlusSetup.getMemory().get(i).getSetupData().changed = null;
-			}
-			//memory step charge data
-			if (cellMemory.getStepChargeData() != null && cellMemory.getStepChargeData().isChanged()) {
-				this.serialPort.writeConfigData(UltramatSerialPort.WRITE_STEP_CHARGE_SETUP, cellMemory.getStepChargeData().getValue().getBytes(), i + 1);
-				this.ultraDuoPlusSetup.getMemory().get(i).getStepChargeData().changed = null;
-			}
-			//memory trace data
-			if (cellMemory.getTraceData() != null && cellMemory.getTraceData().isChanged()) {
-				this.serialPort.writeConfigData(UltramatSerialPort.WRITE_TRACE_DATA, cellMemory.getTraceData().getValue().getBytes(), i + 1);
-				this.ultraDuoPlusSetup.getMemory().get(i).getTraceData().changed = null;
-			}
-			//memory cycle data
-			if (cellMemory.getCycleData() != null && cellMemory.getCycleData().isChanged()) {
-				this.serialPort.writeConfigData(UltramatSerialPort.WRITE_CYCLE_DATA, cellMemory.getCycleData().getValue().getBytes(), i + 1);
-				this.ultraDuoPlusSetup.getMemory().get(i).getCycleData().changed = null;
-			}
-		}
-
-		Iterator<TireHeaterData> tireIterator = this.ultraDuoPlusSetup.getTireHeaterData().iterator();
-		for (int i = 0; tireIterator.hasNext(); ++i) {
-			TireHeaterData tireHeaterData = tireIterator.next();
-			if (tireHeaterData != null && tireHeaterData.isChanged()) {
-				this.serialPort.writeConfigData(UltramatSerialPort.WRITE_TIRE_HEATER, tireHeaterData.getValue().getBytes(), i + 1);
-				this.ultraDuoPlusSetup.getTireHeaterData().get(i).changed = null;
-			}
-		}
-		Iterator<MotorRunData> motorIterator = this.ultraDuoPlusSetup.getMotorRunData().iterator();
-		for (int i = 0; motorIterator.hasNext(); ++i) {
-			MotorRunData motorRunData = motorIterator.next();
-			if (motorRunData != null && motorRunData.isChanged()) {
-				this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MOTOR_RUN, motorRunData.getValue().getBytes(), i + 1);
-				this.ultraDuoPlusSetup.getMotorRunData().get(i).changed = null;
-			}
-		}
-
-		log.log(java.util.logging.Level.FINE, "complete update (write) time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - this.startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-		if (this.dialog != null) this.dialog.setBackupRetoreButtons(true);
 	}
-
 }

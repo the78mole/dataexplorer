@@ -257,59 +257,66 @@ public class UltramatSerialPort extends DeviceCommPort {
 	public synchronized byte[] readConfigData(byte[] type, int expectedDataSize, int index) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "readConfigData"; //$NON-NLS-1$
 		log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
-		byte[] writeBuffer = type;
-		byte[] num = String.format("%02X", index).getBytes(); //$NON-NLS-1$
-		System.arraycopy(num, 0, writeBuffer, 3, 2);
-		byte[] checkSum = getChecksum(writeBuffer);
-		System.arraycopy(checkSum, 0, writeBuffer, 5, 4);
-		
-		if(log.isLoggable(Level.FINE)) {
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i<writeBuffer.length; ++i) {
-				if (writeBuffer[i] == BEGIN) sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
-				else if (writeBuffer[i] == END) sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
-				else sb.append((char)writeBuffer[i]);
-			}
-			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "write = " + sb.toString()); //$NON-NLS-1$
-		}
-		this.write(writeBuffer);
-		
 		byte[] readBuffer = new byte[expectedDataSize];
-		byte[] answer = this.read(readBuffer, 3000);
 		
-		while (answer[0] != BEGIN) {
-			this.isInSync = false;
-			for (int i = 1; i < answer.length; i++) {
-				if(answer[i] == BEGIN){
-					System.arraycopy(answer, i, readBuffer, 0, readBuffer.length-i);
-					answer = new byte[i];
-					answer = this.read(answer, 1000);
-					System.arraycopy(answer, 0, readBuffer, readBuffer.length-i, i);
-					this.isInSync = true;
-					log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
-					break; //sync
+		if (this.isConnected()) {
+			byte[] writeBuffer = type;
+			byte[] num = String.format("%02X", index).getBytes(); //$NON-NLS-1$
+			System.arraycopy(num, 0, writeBuffer, 3, 2);
+			byte[] checkSum = getChecksum(writeBuffer);
+			System.arraycopy(checkSum, 0, writeBuffer, 5, 4);
+			if (log.isLoggable(Level.FINE)) {
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < writeBuffer.length; ++i) {
+					if (writeBuffer[i] == BEGIN)
+						sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
+					else if (writeBuffer[i] == END)
+						sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
+					else
+						sb.append((char) writeBuffer[i]);
 				}
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "write = " + sb.toString()); //$NON-NLS-1$
 			}
-			if(this.isInSync)
-				break;
-		}
-		if (!(readBuffer[0] == BEGIN && readBuffer[readBuffer.length-1] == ACK && isCommandChecksumOK(readBuffer))) {
-			this.addXferError();
-			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-			readBuffer = readConfigData(type, expectedDataSize, index);
-		}
-		
-		if (log.isLoggable(Level.FINE)) {
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < readBuffer.length; ++i) {
-				if (readBuffer[i] == BEGIN)					sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
-				else if (readBuffer[i] == END)			sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
-				else if (readBuffer[i] == ACK)			sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
-				else if (readBuffer[i] == NAK)			sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
-				else if (i == readBuffer.length-6)	sb.append(GDE.STRING_OR).append((char) readBuffer[i]);
-				else																sb.append((char) readBuffer[i]);
+			this.write(writeBuffer);
+			byte[] answer = this.read(readBuffer, 3000);
+			while (answer[0] != BEGIN) {
+				this.isInSync = false;
+				for (int i = 1; i < answer.length; i++) {
+					if (answer[i] == BEGIN) {
+						System.arraycopy(answer, i, readBuffer, 0, readBuffer.length - i);
+						answer = new byte[i];
+						answer = this.read(answer, 1000);
+						System.arraycopy(answer, 0, readBuffer, readBuffer.length - i, i);
+						this.isInSync = true;
+						log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+						break; //sync
+					}
+				}
+				if (this.isInSync) break;
 			}
-			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "answer = " + sb.toString()); //$NON-NLS-1$
+			if (!(readBuffer[0] == BEGIN && readBuffer[readBuffer.length - 1] == ACK && isCommandChecksumOK(readBuffer))) {
+				this.addXferError();
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				readBuffer = readConfigData(type, expectedDataSize, index);
+			}
+			if (log.isLoggable(Level.FINE)) {
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < readBuffer.length; ++i) {
+					if (readBuffer[i] == BEGIN)
+						sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
+					else if (readBuffer[i] == END)
+						sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
+					else if (readBuffer[i] == ACK)
+						sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
+					else if (readBuffer[i] == NAK)
+						sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
+					else if (i == readBuffer.length - 6)
+						sb.append(GDE.STRING_OR).append((char) readBuffer[i]);
+					else
+						sb.append((char) readBuffer[i]);
+				}
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "answer = " + sb.toString()); //$NON-NLS-1$
+			}
 		}
 		return readBuffer;
 	}
@@ -326,44 +333,57 @@ public class UltramatSerialPort extends DeviceCommPort {
 		final String $METHOD_NAME = "writeConfigData"; //$NON-NLS-1$
 		log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 		byte[] writeBuffer = new byte[configData.length + 10]; //0x0C, type, index, data..., checksum, 0x0D
-		System.arraycopy(type, 0, writeBuffer, 0, 3);
-		writeBuffer[writeBuffer.length - 1] = END;
-		byte[] num = String.format("%02X", index).getBytes(); //$NON-NLS-1$
-		System.arraycopy(num, 0, writeBuffer, 3, 2);
-		System.arraycopy(configData, 0, writeBuffer, 5, configData.length);
-		byte[] checkSum = getChecksum(writeBuffer);
-		System.arraycopy(checkSum, 0, writeBuffer, writeBuffer.length - 5, 4);
 		
-		if (log.isLoggable(Level.FINE)) {
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < writeBuffer.length; ++i) {
-				if (writeBuffer[i] == BEGIN)					sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
-				else if (writeBuffer[i] == END)			sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
-				else if (writeBuffer[i] == ACK)			sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
-				else if (writeBuffer[i] == NAK)			sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
-				else if (i == writeBuffer.length-5)	sb.append(GDE.STRING_OR).append((char) writeBuffer[i]);
-				else																sb.append((char) writeBuffer[i]);
+		if (this.isConnected()) {
+			System.arraycopy(type, 0, writeBuffer, 0, 3);
+			writeBuffer[writeBuffer.length - 1] = END;
+			byte[] num = String.format("%02X", index).getBytes(); //$NON-NLS-1$
+			System.arraycopy(num, 0, writeBuffer, 3, 2);
+			System.arraycopy(configData, 0, writeBuffer, 5, configData.length);
+			byte[] checkSum = getChecksum(writeBuffer);
+			System.arraycopy(checkSum, 0, writeBuffer, writeBuffer.length - 5, 4);
+			if (log.isLoggable(Level.FINE)) {
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < writeBuffer.length; ++i) {
+					if (writeBuffer[i] == BEGIN)
+						sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
+					else if (writeBuffer[i] == END)
+						sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
+					else if (writeBuffer[i] == ACK)
+						sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
+					else if (writeBuffer[i] == NAK)
+						sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
+					else if (i == writeBuffer.length - 5)
+						sb.append(GDE.STRING_OR).append((char) writeBuffer[i]);
+					else
+						sb.append((char) writeBuffer[i]);
+				}
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "answer = " + sb.toString()); //$NON-NLS-1$
 			}
-			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "answer = " + sb.toString()); //$NON-NLS-1$
-		}
-		this.write(writeBuffer);
-		
-		byte[] answer = this.read(new byte[1], 3000);		
-		if (log.isLoggable(Level.FINE)) {
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < answer.length; ++i) {
-				if (answer[i] == BEGIN)					sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
-				else if (answer[i] == END)			sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
-				else if (answer[i] == ACK)			sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
-				else if (answer[i] == NAK)			sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
-				else if (i == answer.length-6)	sb.append(GDE.STRING_OR).append((char) answer[i]); //$NON-NLS-1$
-				else														sb.append((char) answer[i]);
+			this.write(writeBuffer);
+			byte[] answer = this.read(new byte[1], 3000);
+			if (log.isLoggable(Level.FINE)) {
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < answer.length; ++i) {
+					if (answer[i] == BEGIN)
+						sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
+					else if (answer[i] == END)
+						sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
+					else if (answer[i] == ACK)
+						sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
+					else if (answer[i] == NAK)
+						sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
+					else if (i == answer.length - 6)
+						sb.append(GDE.STRING_OR).append((char) answer[i]); //$NON-NLS-1$
+					else
+						sb.append((char) answer[i]);
+				}
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "answer = " + sb.toString()); //$NON-NLS-1$
 			}
-			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "answer = " + sb.toString()); //$NON-NLS-1$
-		}
-		if ((answer[0] == NAK)) {
-			log.log(Level.WARNING, "Writing UltraDuoPlus configuration data failed!"); //$NON-NLS-1$
-			throw new IOException("Writing UltraDuoPlus configuration data failed!"); //$NON-NLS-1$
+			if ((answer[0] == NAK)) {
+				log.log(Level.WARNING, "Writing UltraDuoPlus configuration data failed!"); //$NON-NLS-1$
+				throw new IOException("Writing UltraDuoPlus configuration data failed!"); //$NON-NLS-1$
+			}
 		}
 	}
 	
