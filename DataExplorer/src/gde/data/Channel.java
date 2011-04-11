@@ -595,23 +595,28 @@ public class Channel extends HashMap<String, RecordSet> {
 	/**
 	 * check if all record sets have its data loaded, if required load data from file
 	 * this method can be used to check prior to save modified data
-	 * the behavior which recordset data is checked and loaded depends on the method this.getRecordSetNames() 
+	 * the behavior which record set data is checked and loaded depends on the method this.getRecordSetNames() 
 	 */
 	public void checkAndLoadData() {
 		String fullQualifiedFileName = this.getFullQualifiedFileName();
 		for (String tmpRecordSetName : this.getRecordSetNames()) {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpRecordSetName = " + tmpRecordSetName); //$NON-NLS-1$
-			Channel selectedChannel = Channels.getInstance().get(this.findChannelOfRecordSet(tmpRecordSetName));
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "selectedChannel = " + (selectedChannel != null ? selectedChannel.getName() : "null")); //$NON-NLS-1$ //$NON-NLS-2$
-			if (selectedChannel != null) {
-				RecordSet tmpRecordSet = selectedChannel.get(tmpRecordSetName);
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpRecordSet = " + (tmpRecordSet != null ? tmpRecordSet.getName() : "null")); //$NON-NLS-1$ //$NON-NLS-2$
-				if (tmpRecordSet != null && !tmpRecordSet.hasDisplayableData()) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpRecordSetName needs data to loaded"); //$NON-NLS-1$
-					if (tmpRecordSet.fileDataSize != 0 && tmpRecordSet.fileDataPointer != 0) {
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "loading data ..."); //$NON-NLS-1$
-						tmpRecordSet.loadFileData(fullQualifiedFileName, this.application.getStatusBar() != null);
-					}	
+			Channel activeChannel = Channels.getInstance().getActiveChannel();
+			if (activeChannel != null) {
+				//if ChannelTypes.TYPE_OUTLET only record sets associated to that channel goes into one file
+				//if ChannelTypes.TYPE_CONFIG all record sets with different configurations goes into one file
+				Channel selectedChannel = activeChannel.getType().equals(ChannelTypes.TYPE_OUTLET) ? activeChannel : Channels.getInstance().get(this.findChannelOfRecordSet(tmpRecordSetName));
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "selectedChannel = " + (selectedChannel != null ? selectedChannel.getName() : "null")); //$NON-NLS-1$ //$NON-NLS-2$
+				if (selectedChannel != null) {
+					RecordSet tmpRecordSet = selectedChannel.get(tmpRecordSetName);
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpRecordSet = " + (tmpRecordSet != null ? tmpRecordSet.getName() : "null")); //$NON-NLS-1$ //$NON-NLS-2$
+					if (tmpRecordSet != null && !tmpRecordSet.hasDisplayableData()) {
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpRecordSetName needs data to loaded"); //$NON-NLS-1$
+						if (tmpRecordSet.fileDataSize != 0 && tmpRecordSet.fileDataPointer != 0) {
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "loading data ..."); //$NON-NLS-1$
+							tmpRecordSet.loadFileData(fullQualifiedFileName, this.application.getStatusBar() != null);
+						}
+					}
 				}
 			}
 		}

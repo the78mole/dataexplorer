@@ -433,8 +433,10 @@ public class OsdReaderWriter {
 				}
 				// prepare all record set data pointer
 				for (int i = 0; i < activeChannel.size(); ++i) {
+					//if ChannelTypes.TYPE_OUTLET only record sets associated to that channel goes into one file
+					//if ChannelTypes.TYPE_CONFIG all record sets with different configurations goes into one file
 					//RecordSetName :: ChannelConfigurationName :: RecordSetComment :: RecordSetProperties :: RecordDataSize :: RecordSetDataPointer
-					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
+					Channel recordSetChannel = activeChannel.getType().equals(ChannelTypes.TYPE_OUTLET) ? activeChannel : Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
 					if (recordSetChannel != null) {
 						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 						if (recordSet != null) {
@@ -451,10 +453,12 @@ public class OsdReaderWriter {
 						}
 					}
 				}
-				// check if all involved record sets have data (if loaded from file it meight be possible that some record set lack of its data)
+				// check if all involved record sets have data (if loaded from file it might be possible that some record set lack of its data)
 				long startTime = new Date().getTime();
 				for (int i = 0; i < activeChannel.size(); ++i) {
-					Channel recordSetChannel = Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
+					//if ChannelTypes.TYPE_OUTLET only record sets associated to that channel goes into one file
+					//if ChannelTypes.TYPE_CONFIG all record sets with different configurations goes into one file
+					Channel recordSetChannel = activeChannel.getType().equals(ChannelTypes.TYPE_OUTLET) ? activeChannel : Channels.getInstance().get(activeChannel.findChannelOfRecordSet(recordSetNames[i]));
 					if (recordSetChannel != null) {
 						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 						if (recordSet != null) {
