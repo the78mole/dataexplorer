@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011 Winfried Bruegmann
+    Copyright (c) 2011 Winfried Bruegmann
 ************************************************************************************** 
 -->
 <HTML>
@@ -31,24 +31,56 @@
 </HEAD>
 <BODY LANG="de-DE" DIR="LTR">
 <DIV TYPE=HEADER>
-	<H2><A NAME="einleitung"></A><FONT FACE="Arial"><FONT SIZE=4><I>eStation
-	Ger&auml;tedialog Einleitung</I></FONT></FONT></H2>
+	<H2><A NAME="introduction"></A><FONT FACE="Arial"><FONT SIZE=4><I>Ultra Duo Plus Ger&auml;tedialog Einleitung</I></FONT></FONT></H2>
 </DIV>
-<P>Der eStation Ger&auml;tedialog dient zum Auslesen der verf&uuml;gbaren
-Daten, die bei einem Lade- bzw. Entladevorgang gemessen werden. 
+<P>Der Ultra Duo Plus Ger&auml;tedialog dient zum Konfigurieren des Ger&auml;tes selbst, Identifikationsname, Tastenton, u.s.w.
+Das Wichtigste ist aber die Konfiguration der Batteriespeicher mit dem Zellentyp, der Kapazität und den Lade-/Entlade-/Zyklus-Parametern.
 </P>
 <H2><FONT FACE="Arial"><FONT SIZE=4><I>Bedienung</I></FONT></FONT></H2>
-<P>Nachdem der serielle Schnittstelle &uuml;ber den
-Ger&auml;teauswahldialog eingestellt ist und dieser Ger&auml;tedialog
-aufgerufen wurde, kann durch dr&uuml;cken von „Start“ zyklisch
-Werte aus dem Ger&auml;t abgerufen und angezeigt werden. 
+<P>Nachdem der serielle Schnittstelle &uuml;ber den Ger&auml;teauswahldialog eingestellt ist und dieser Ger&auml;tedialog
+aufgerufen wurde, wird automatisch die Kommunikationsschnittstelle geöffnet und die wichtigsten Daten ausgelesen.
+Hierzu geh&ouml;hren die Basiskonfigurationswerte des Ger&auml;tes selbst.
+Die Auswahl der Batteriespeicher erfolgt durch Auswahl mittels der Dropdownbox. 
+Die Einstellung der Werte selbst erfolgt &uuml;ber den Schieber, oder bei weiss hinterlegten Feldern dur Tasteneingabe.
 </P>
-<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_1.png" NAME="Bild1" ALT="Bild1" ALIGN=BOTTOM WIDTH=350 HEIGHT=465 BORDER=0>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_1.png" NAME="Bild1" ALT="Bild1">
 </P>
-<P>Die Umschaltung der Lade- bzw. Entlade-Kurven erfolgt automatisch,
-da die vom Ger&auml;t gelieferten Daten diese Information enthalten.
-Ist das Ger&auml;t &uuml;ber einen gewissen Zeitraum inaktiv, wird
-der serielle Port geschlossen. 
+<P><B>Hinweis : </B>Wichtig ist einen Ger&auml;tenamen anzulegen, da dieser Name für die Identifikation eies Datencache benutzt wird. 
+Dieser Datencache wird beim ertmaligen &ouml;ffnen des Dialogen initial gefüllt. Deshalb dauert das &Ouml;ffnen auch etwas l&auml;nger.
+Das der Datencache gefüllt ist kann man an der Aktivierung der Kn&ouml;pfe erkennen, die f&uuml;r die Verwaltung von Sicherungskopien gedacht sind.
+</P>
+<P>Die nachfolgenden Bilder zeigen Lade-, Entlade- und Zyklus-Parameter für einen NiMh Beispielakku.
+</P>
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_2_NiMh.png" NAME="Bild2 Ladeparameter NiMh" ALT="Bild2 Ladeparameter NiMh">
+</P>
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_3_NiMh.png" NAME="Bild3 Entladeparameter NiMh" ALT="Bild3 Entladeparameter NiMh">
+</P>
+</P>
+<P>Die nachfolgenden Bilder zeigen Lade-, Entlade- und Zyklus-Parameter für einen LiPo Beispielakku.
+</P>
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_4_LiPo.png" NAME="Bild4 Ladeparameter LiPo" ALT="Bild4 Ladeparameter LiPo">
+</P>
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_5_LiPo.png" NAME="Bild5 Entladeparameter LiPo" ALT="Bild5 Entladeparameter LiPo">
+</P>
+<P><B>Hinweis : </B>Es werden nur die Parameter zur Einstellung angeboten, die für den gew&auml;hlten Batterietyp Relevanz haben.
+Die Konfiguration von Stufenladungen wird zur Zeit nicht angeboten und ist einer sp&auml;teren Version vorbehalten. 
+</P>
+<H2><FONT FACE="Arial"><FONT SIZE=4><I>Datenaufzeichnung</I></FONT></FONT></H2>
+<P>Die Aufnahme von Datenkurven wird einfach durch Dr&uuml;cken der "Start Aufnahme" Taste gestartet.
+Die Umschaltung der Lade- bzw. Entlade-Kurven erfolgt automatisch, da die vom Ger&auml;t gelieferten Daten diese Information enthalten.
+Die Anzeige springt automatisch auf den Datenkanal, der als letztes Daten liefert.
+Im Bild ist ein Ladevorgang eines zusammengeschlossenen LiPo Akku mit 8 Zellen zu sehen.
+Es werden nur die Kurven angezeigt, die auch Daten enthalten, dadurch entsteht der Sprung von ZellenSpannung 4 nach 8, 
+was den Balancerausg&auml;ngen des Ladeger&auml;tes entspricht.
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_6.png" NAME="Bild6 Datenaufnahme LiPo LINK" ALT="Bild6 Datenaufnahme LiPo LINK">
+</P>
+<P>
+Ist das Ger&auml;t &uuml;ber einen gewissen Zeitraum inaktiv, wird der serielle Port geschlossen. 
 </P>
 </BODY>
 </HTML>

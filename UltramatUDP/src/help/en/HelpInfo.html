@@ -32,24 +32,56 @@
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <DIV TYPE=HEADER>
-	<H2><A NAME="einleitung"></A><FONT FACE="Arial"><FONT SIZE=4><I>eStation
-	Device Dialog Introduction</I></FONT></FONT></H2>
-	<P><BR><BR>
-	</P>
+	<H2><A NAME="introduction"></A><FONT FACE="Arial"><FONT SIZE=4><I>Ultra Duo Plus Device Dialog Introduction</I></FONT></FONT></H2>
 </DIV>
-<P>The eStation device dialog is only used to start and stop data
-collection of charge and discharge processes. 
+<P>With the Ultra Duo Plus device dialog you are able to configure device identification name, button sound, etc..
+The main configuration tasks are the naming from battery memories and its battery type, capacity and charge, discharge and cycle parameter.
 </P>
 <H2><FONT FACE="Arial"><FONT SIZE=4><I>Usage</I></FONT></FONT></H2>
-<P>Afterwards the serial communication port adjustments are done
-using the device selection dialog the start button can be used to
-initiate data collection. 
+<P>If the serial communication port is selected using the device selection dialog, the port will be automatically opened while opening the dialog.
+While opening the main configuration data will be gathered from the device.
+To select the battery memories the drop down gets used.
+The adjustment of the parameter values can be done by using the slider on right hand side or when valuefiled has white background by typing.
 </P>
-<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_1.png" NAME="Bild1" ALT="Bild1" ALIGN=BOTTOM WIDTH=350 HEIGHT=465 BORDER=0>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_1.png" NAME="Image1" ALT="Image1">
 </P>
-<P>For NiMh and NiCd batteries the switch from discharge to charge
-will be done automatically. If the serial communication port signals
-no data the port will be closed after waiting a few minutes. 
+<P><B>Hint : </B>It is important to specify an device identifier name. Since this name is used as identifier for an data cache.
+The data cache gets created during first opening of the configuration dialog.
+Therefore the first open takes a few seconds longer than afterwards.
+If the cache is filled and in sync with the device data can be seen by activating the backup/restore buttons.
+</P>
+<P>The following pictures displays charge, discharge and cycle parameters for a NiMh sample battery.
+</P>
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_2_NiMh.png" NAME="Image2 charge parameter NiMh" ALT="Image2 charge parameter NiMh">
+</P>
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_3_NiMh.png" NAME="Image3 discharge parameter NiMh" ALT="Image3 discharge paramter NiMh">
+</P>
+</P>
+<P>The following pictures displays charge, discharge and cycle parameters for a LiPo sample battery.
+</P>
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_4_LiPo.png" NAME="Image4 charge parameter LiPo" ALT="Image4 charge parameter LiPo">
+</P>
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_5_LiPo.png" NAME="Image5 discharge parameter LiPo" ALT="Image5 discharge parameter LiPo">
+</P>
+<P><B>Hint : </B>Only parameters gets displayed for configuration purpose which has an relevance for the selected cell type.
+The configuration of step charge parameters are actually not possible and is part of future release.
+</P>
+<H2><FONT FACE="Arial"><FONT SIZE=4><I>Data gathering</I></FONT></FONT></H2>
+<P>To start data capturing simply push the "start gathering" button.
+Switching between charge, discharge and other curve types is enabled automatically by values received from the device.
+While a new curve gets created the graphical visualization switches to this data set at the certain outlet data channel.
+The picture below showing a graph of a linked charged LiPo battery with 8 cells.
+Only curves gets dispalyed which contain data. Therefore there is a skip in CellVoltage numbers between 4 and 8. 
+This relates to the balancer outlets where the batteries are connected.
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_6.png" NAME="Image6 charge process LiPo LINK" ALT="Image6 charge process LiPo LINK">
+</P>
+<P>
+If the device is inactive for a certain time frame the serial communication port gets closed.
 </P>
 </BODY>
 </HTML>

@@ -680,7 +680,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 																		UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGI2205,	new Object[] { 
 																				UltraDuoPlusDialog.this.lastMemorySelectionIndex, UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName(),
 																				(actualSelectionIndex+1), UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName() }))) {
-																	//copy memory name and setup data of lastMemorySelectionIndex to memoryCombo.getSelectionIndex()
+																	//copy memory name and setup data of lastMemorySelectionIndex to memoryCombo.getSelectionIndex()																
 																	log.log(Level.FINE, "copy memory: (" + UltraDuoPlusDialog.this.lastMemorySelectionIndex + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName()//$NON-NLS-1$
 																			+ " to (" + (actualSelectionIndex+1) + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName()); //$NON-NLS-1$
 																	if (log.isLoggable(Level.FINE)) {
@@ -698,7 +698,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 																	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().changed = null;
 																	UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getSetupData().setValue(UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().getValue());
 
-																	UltraDuoPlusDialog.this.memoryCombo.setText(String.format(UltraDuoPlusDialog.STRING_FORMAT_02d_s, actualSelectionIndex+1, UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName()));
+																	String newMemoryName = String.format(UltraDuoPlusDialog.STRING_FORMAT_02d_s, actualSelectionIndex+1, UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName());
+																	UltraDuoPlusDialog.this.memoryCombo.setText(newMemoryName);
+																	UltraDuoPlusDialog.this.memoryNames[actualSelectionIndex] = (newMemoryName + STRING_16_BLANK).substring(5, 16+5);
+																	UltraDuoPlusDialog.this.memoryCombo.setItem(actualSelectionIndex, newMemoryName);
 																}
 															}
 														}
@@ -1168,7 +1171,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				}
 				log.log(Level.FINE, sb.toString());
 			}
-			//if (this.memoryParameters[0] != null && !this.memoryParameters[0].getSlider().isDisposed()) 
+			if (this.memoryParameters[0] != null && !this.memoryParameters[0].getSlider().isDisposed()) 
 				updateBatteryMemoryParameter(this.memoryValues[0]);
 
 			for (int i = 0; i < UltramatSerialPort.SIZE_MEMORY_SETUP; i++) {
@@ -1224,7 +1227,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.memoryParameters[8] = this.memoryParameters[8] != null ? this.memoryParameters[8].dispose() : null;
 				this.memoryParameters[9] = this.memoryParameters[9] != null ? this.memoryParameters[9].dispose() : null;
 				this.memoryParameters[13] = this.memoryParameters[13] != null ? this.memoryParameters[13].dispose() : null;
-				this.memoryParameters[14] = this.memoryParameters[26] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2267), 175,	"1000 ~ 4300 mV", 220, true, 50, 150, 1000, 4300, -1000) : this.memoryParameters[14]; //$NON-NLS-1$ 
+				this.memoryParameters[14] = this.memoryParameters[14] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2267), 175,	"1000 ~ 4300 mV", 220, true, 50, 150, 1000, 4300, -1000) : this.memoryParameters[14]; //$NON-NLS-1$ 
 				this.memoryParameters[15] = this.memoryParameters[15] != null ? this.memoryParameters[15].dispose() : null;
 				this.memoryParameters[16] = this.memoryParameters[16] != null ? this.memoryParameters[16].dispose() : null;
 				this.memoryParameters[21] = this.memoryParameters[21] != null ? this.memoryParameters[21].dispose() : null;
@@ -1238,7 +1241,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.memoryParameters[8] = this.memoryParameters[8] != null ? this.memoryParameters[8].dispose() : null;
 				this.memoryParameters[9] = this.memoryParameters[9] != null ? this.memoryParameters[9].dispose() : null;
 				this.memoryParameters[13] = this.memoryParameters[13] != null ? this.memoryParameters[13].dispose() : null;
-				this.memoryParameters[14] = this.memoryParameters[26] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2267), 175,	"1000 ~ 4300 mV", 220, true, 50, 150, 1000, 4300, -1000) : this.memoryParameters[14]; //$NON-NLS-1$ 
+				this.memoryParameters[14] = this.memoryParameters[14] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 14, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2267), 175,	"1000 ~ 4300 mV", 220, true, 50, 150, 1000, 4300, -1000) : this.memoryParameters[14]; //$NON-NLS-1$ 
 				this.memoryParameters[15] = this.memoryParameters[15] == null ? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 15, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2281), 175,	"1 ~ 30min", 220, false, 50, 150, 1, 30) : this.memoryParameters[15]; //$NON-NLS-1$ 
 				this.memoryParameters[16] = this.memoryParameters[16] != null ? this.memoryParameters[16].dispose() : null;
 				this.memoryParameters[21] = this.memoryParameters[21] != null ? this.memoryParameters[21].dispose() : null;
