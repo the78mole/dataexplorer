@@ -562,6 +562,24 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 		return new int[] { 0, 2 };
 	}
 
+	/**
+	 * query the firmware version
+	 * @param dataBuffer 
+	 * @return v2.0
+	 */
+	public String getFirmwareVersion(byte[] dataBuffer) {
+		return String.format("v%c.%c", (char) dataBuffer[1], (char) dataBuffer[2]);
+	}
+
+	/**
+	 * query the product code 0=Ultramat50, 1=Ultramat40, 2=Ultramat14Trio, 3=Ultramat18, 4=ultramat45, 5=Ultramat60, 6=Ultramat80
+	 * @param dataBuffer 
+	 * @return v2.0
+	 */
+	public String getProductCode(byte[] dataBuffer) {
+		return String.format("%c.%c", (char) dataBuffer[3], (char) dataBuffer[4]);
+	}
+
 	//TODO - check for other than Ultra Duo Plus devices the listed functions needs to be modified
 	/**
 	 * check if one of the outlet channels are in processing mode
