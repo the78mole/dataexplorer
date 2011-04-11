@@ -560,6 +560,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.baseDeviceSetupGroup.setLayout(baseDeviceSetupCompositeLayout);
 										this.baseDeviceSetupGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.baseDeviceSetupGroup.setText(Messages.getString(MessageIds.GDE_MSGT2291));
+										this.baseDeviceSetupGroup.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 	
 										//new ParameterHeaderControl(this.baseDeviceSetupComposite, Messages.getString(MessageIds.GDE_MSGT2247), 175, Messages.getString(MessageIds.GDE_MSGT2248), 50, Messages.getString(MessageIds.GDE_MSGT2249), 175, 20);
 										this.channelParameters[4] = new ParameterConfigControl(this.baseDeviceSetupGroup, this.channelValues1, 4, Messages.getString(MessageIds.GDE_MSGT2293), 175,	"°C - °F", 175, UltraDuoPlusDialog.temperatureDegreeType, 50, 150); //$NON-NLS-1$ 
@@ -587,6 +588,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.baseDeviceSetupGroup1.setLayout(composite1Layout);
 										this.baseDeviceSetupGroup1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.baseDeviceSetupGroup1.setText(Messages.getString(MessageIds.GDE_MSGT2304));
+										this.baseDeviceSetupGroup1.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 	
 										//new ParameterHeaderControl(this.baseDeviceSetupComposite1, Messages.getString(MessageIds.GDE_MSGT2247), 175, Messages.getString(MessageIds.GDE_MSGT2248), 50,	Messages.getString(MessageIds.GDE_MSGT2249), 175, 20);
 										this.channelParameters[0] = new ParameterConfigControl(this.baseDeviceSetupGroup1, this.channelValues1, 0, Messages.getString(MessageIds.GDE_MSGT2306), 175, Messages.getString(MessageIds.GDE_MSGT2313), 175, UltraDuoPlusDialog.soundTime, 50, 150); //$NON-NLS-1$ 
@@ -606,6 +608,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.baseDeviceSetupGroup2.setLayout(composite1Layout);
 										this.baseDeviceSetupGroup2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.baseDeviceSetupGroup2.setText(Messages.getString(MessageIds.GDE_MSGT2309));
+										this.baseDeviceSetupGroup2.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 	
 										//new ParameterHeaderControl(this.baseDeviceSetupComposite2, Messages.getString(MessageIds.GDE_MSGT2247), 175, Messages.getString(MessageIds.GDE_MSGT2248), 50,	Messages.getString(MessageIds.GDE_MSGT2249), 175, 20);
 										this.channelParameters[UltramatSerialPort.SIZE_CHANNEL_1_SETUP + 0] = new ParameterConfigControl(this.baseDeviceSetupGroup2, this.channelValues2, 0, Messages.getString(MessageIds.GDE_MSGT2255), 175, Messages.getString(MessageIds.GDE_MSGT2313), 175, UltraDuoPlusDialog.soundTime, 50, 150); //$NON-NLS-1$ 
@@ -743,7 +746,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									}
 									{
 										CLabel filler = new CLabel(this.memorySelectComposite, SWT.RIGHT);
-										filler.setLayoutData(new RowData(120, 20));
+										filler.setLayoutData(new RowData(140, 20));
 										filler.setText("<---------   "); //$NON-NLS-1$
 										filler.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
 									}
@@ -765,9 +768,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									//battery capacity
 									this.memoryParameters[2] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 2, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2259), 175,	"100 ~ 50000 mAh", 220, true, 50, 150, 100, 50000, -100); //$NON-NLS-1$ 
 									//year, month, day
-									this.memoryParameters[3] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 3, STRING_FORMAT_02D, Messages.getString(MessageIds.GDE_MSGT2260), 100,	GDE.STRING_EMPTY, 5, false, 50, 70, 0, 99);
-									this.memoryParameters[4] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 4, STRING_FORMAT_02D, Messages.getString(MessageIds.GDE_MSGT2261), 50,	GDE.STRING_EMPTY, 5, false, 30, 80, 1, 12);
-									this.memoryParameters[5] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 5, STRING_FORMAT_02D, Messages.getString(MessageIds.GDE_MSGT2262), 43,	GDE.STRING_EMPTY, 5, false, 30, 80, 1, 31);
+									this.memoryParameters[3] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 3, STRING_FORMAT_02D, Messages.getString(MessageIds.GDE_MSGT2260), 100,	GDE.STRING_EMPTY, 5, false, 30, 70, 0, 99);
+									this.memoryParameters[4] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 4, STRING_FORMAT_02D, Messages.getString(MessageIds.GDE_MSGT2261), 60,	GDE.STRING_EMPTY, 5, false, 30, 80, 1, 12);
+									this.memoryParameters[5] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 5, STRING_FORMAT_02D, Messages.getString(MessageIds.GDE_MSGT2262), 55,	GDE.STRING_EMPTY, 5, false, 30, 80, 1, 31);
 									//new ParameterHeaderControl(this.memorySelectComposite, Messages.getString(MessageIds.GDE_MSGT2247), 175, Messages.getString(MessageIds.GDE_MSGT2248), 50,	Messages.getString(MessageIds.GDE_MSGT2249), 180, 20);
 								}
 								{
@@ -802,6 +805,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												this.chargeGroup.setLayout(memoryCompositeLayout);
 												this.chargeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 												this.chargeGroup.setText(Messages.getString(MessageIds.GDE_MSGT2299));
+												this.chargeGroup.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 												//charge parameter
 												this.memoryParameters[6] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 6, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2263), 175,	"100 ~ 20000 mA", 220, true, 50, 150, 100, 20000, -100); //$NON-NLS-1$ 
 												this.memoryParameters[11] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 11, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2265), 175,	Messages.getString(MessageIds.GDE_MSGT2310), 220, true, 50, 150, 10, 155); //$NON-NLS-1$ 
@@ -848,6 +852,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												FillLayout memoryCompositeLayout = new FillLayout(SWT.VERTICAL);
 												this.dischargeGroup.setLayout(memoryCompositeLayout);
 												this.dischargeGroup.setText(Messages.getString(MessageIds.GDE_MSGT2301));											
+												this.dischargeGroup.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 												//discharge parameter
 												this.memoryParameters[17] = new ParameterConfigControl(this.dischargeGroup, this.memoryValues, 17, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2268), 175,	"100 ~ 10000 mA", 220, true, 50, 150, 100, 10000, -100); //$NON-NLS-1$ 
 												this.memoryParameters[18] = new ParameterConfigControl(this.dischargeGroup, this.memoryValues, 18, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2269), 175,	"100 ~ 4200 mV", 220, true, 50, 150, 100, 4200, -100); //$NON-NLS-1$ 
@@ -864,6 +869,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												FillLayout memoryCompositeLayout = new FillLayout(SWT.VERTICAL);
 												this.cycleGroup.setLayout(memoryCompositeLayout);
 												this.cycleGroup.setText(Messages.getString(MessageIds.GDE_MSGT2302));											
+												this.cycleGroup.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 												//cycle parameter
 												this.memoryParameters[22] = new ParameterConfigControl(this.cycleGroup, this.memoryValues, 22, Messages.getString(MessageIds.GDE_MSGT2272), 175,	Messages.getString(MessageIds.GDE_MSGT2292), 220, UltraDuoPlusDialog.cycleDirectionTypes, 50, 150);
 												this.memoryParameters[23] = new ParameterConfigControl(this.cycleGroup, this.memoryValues, 23, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2273), 175,	"1 ~ 10", 220, false, 50, 150, 1, 10); //$NON-NLS-1$ 
