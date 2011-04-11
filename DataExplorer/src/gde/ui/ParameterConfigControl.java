@@ -146,7 +146,7 @@ public class ParameterConfigControl {
 		{
 			RowData sliderLData = new RowData();
 			sliderLData.width = sliderWidth;
-			sliderLData.height = this.controlHeight;
+			sliderLData.height = this.controlHeight - (GDE.IS_MAC ? 3 : 0);
 			this.slider = new Slider(this.baseComposite, SWT.NONE);
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(sliderMinValue + this.offset);
@@ -262,7 +262,7 @@ public class ParameterConfigControl {
 		{
 			RowData sliderLData = new RowData();
 			sliderLData.width = sliderWidth;
-			sliderLData.height = this.controlHeight;
+			sliderLData.height = this.controlHeight - (GDE.IS_MAC ? 3 : 0);
 			this.slider = new Slider(this.baseComposite, SWT.NONE);
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(sliderMinValue);
@@ -340,7 +340,7 @@ public class ParameterConfigControl {
 		{
 			RowData sliderLData = new RowData();
 			sliderLData.width = sliderWidth;
-			sliderLData.height = this.controlHeight;
+			sliderLData.height = this.controlHeight - (GDE.IS_MAC ? 3 : 0);
 			this.slider = new Slider(this.baseComposite, SWT.NONE);
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(0);
