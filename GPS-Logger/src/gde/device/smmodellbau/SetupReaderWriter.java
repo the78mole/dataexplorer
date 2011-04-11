@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * class implementation to read/write SM GPS-Logger configuration in binary format (firmware 1.00)
+ * class implementation to read/write SM GPS-Logger configuration in binary format (firmware 1.03)
  */
 public class SetupReaderWriter {
 	final static Logger	log													= Logger.getLogger(SetupReaderWriter.class.getName());
