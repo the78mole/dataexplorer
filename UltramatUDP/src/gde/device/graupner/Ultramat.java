@@ -576,8 +576,8 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer 
 	 * @return v2.0
 	 */
-	public String getProductCode(byte[] dataBuffer) {
-		return String.format("%c.%c", (char) dataBuffer[3], (char) dataBuffer[4]);
+	public int getProductCode(byte[] dataBuffer) {
+		return Integer.parseInt(String.format("%c%c", (char) dataBuffer[3], (char) dataBuffer[4]));
 	}
 
 	//TODO - check for other than Ultra Duo Plus devices the listed functions needs to be modified
@@ -710,7 +710,7 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < values.length; i++) {
 			sb.append(String.format("%04X", values[i]));
 		}
-		log.log(Level.OFF, sb.toString());
+		if(log.isLoggable(Level.FINE)) log.log(Level.FINE, sb.toString());
 		return sb.toString();
 	}
 

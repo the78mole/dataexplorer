@@ -158,7 +158,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	int[]											channelValues2						= new int[UltramatSerialPort.SIZE_CHANNEL_2_SETUP];
 	ParameterConfigControl[]	channelParameters					= new ParameterConfigControl[UltramatSerialPort.SIZE_CHANNEL_1_SETUP + UltramatSerialPort.SIZE_CHANNEL_2_SETUP];
 
-	static int                       numberMemories						= 60;
+	static int                numberMemories						= 60;
+	int[]											memorySizes								= {50, 40, 0, 0, 45, 60, 80};
 	String[]									memoryNames								= new String[numberMemories];
 	int[]											memoryValues							= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
 	int[]											memoryValuesNiCd					= new int[UltramatSerialPort.SIZE_MEMORY_SETUP];
@@ -364,6 +365,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			if (this.serialPort != null && !this.serialPort.isConnected()) {
 				try {
 					this.serialPort.open();
+					UltraDuoPlusDialog.numberMemories = this.memorySizes[this.device.getProductCode(this.serialPort.getData())];
 					this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
 					this.deviceIdentifierName = this.serialPort.readDeviceUserName();
 
@@ -728,13 +730,13 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												log.log(java.util.logging.Level.FINEST, "memoryCombo.keyPressed, event=" + evt); //$NON-NLS-1$
 												if (evt.character == SWT.CR) {
 													try {
-														UltraDuoPlusDialog.this.memoryNames[UltraDuoPlusDialog.this.lastMemorySelectionIndex] = String.format(UltraDuoPlusDialog.STRING_FORMAT_02d_s,
-																UltraDuoPlusDialog.this.lastMemorySelectionIndex + 1, (UltraDuoPlusDialog.this.memoryCombo.getText() + UltraDuoPlusDialog.STRING_16_BLANK).substring(5, 16 + 5));
-														UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex)
-																.setName(UltraDuoPlusDialog.this.memoryNames[UltraDuoPlusDialog.this.lastMemorySelectionIndex].substring(5));
-														UltraDuoPlusDialog.this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_NAME,
-																UltraDuoPlusDialog.this.memoryNames[UltraDuoPlusDialog.this.lastMemorySelectionIndex].substring(5).getBytes(), UltraDuoPlusDialog.this.lastMemorySelectionIndex + 1);
-														//UltraDuoPlusDialog.this.memoryCombo.setItems(UltraDuoPlusDialog.this.memoryNames);
+														String newMemoryName = String.format(UltraDuoPlusDialog.STRING_FORMAT_02d_s,	UltraDuoPlusDialog.this.lastMemorySelectionIndex + 1, (UltraDuoPlusDialog.this.memoryCombo.getText() + UltraDuoPlusDialog.STRING_16_BLANK).substring(5, 16 + 5));
+														UltraDuoPlusDialog.this.memoryNames[UltraDuoPlusDialog.this.lastMemorySelectionIndex] = newMemoryName;
+														UltraDuoPlusDialog.this.memoryCombo.setText(newMemoryName);
+														UltraDuoPlusDialog.this.memoryCombo.setItem(UltraDuoPlusDialog.this.lastMemorySelectionIndex, newMemoryName);
+
+														UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).setName(UltraDuoPlusDialog.this.memoryNames[UltraDuoPlusDialog.this.lastMemorySelectionIndex].substring(5));
+														UltraDuoPlusDialog.this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_NAME, UltraDuoPlusDialog.this.memoryNames[UltraDuoPlusDialog.this.lastMemorySelectionIndex].substring(5).getBytes(), UltraDuoPlusDialog.this.lastMemorySelectionIndex + 1);
 													}
 													catch (Exception e) {
 														UltraDuoPlusDialog.this.application.openMessageDialog(UltraDuoPlusDialog.this.dialogShell,
@@ -900,17 +902,24 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "restoreButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								FileDialog fileDialog = UltraDuoPlusDialog.this.application.openFileOpenDialog(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2284),
-										new String[] { GDE.FILE_ENDING_DOT_XML }, UltraDuoPlusDialog.this.settings.getDataFilePath(), GDE.STRING_EMPTY, SWT.SINGLE);
+										new String[] { GDE.FILE_ENDING_STAR_XML, GDE.FILE_ENDING_STAR }, UltraDuoPlusDialog.this.settings.getDataFilePath(), GDE.STRING_EMPTY, SWT.SINGLE);
 								if (fileDialog.getFileName().length() > 4) {
 									try {
 										Unmarshaller unmarshaller = UltraDuoPlusDialog.this.jc.createUnmarshaller();
 										unmarshaller.setSchema(UltraDuoPlusDialog.this.schema);
-										UltraDuoPlusType tmpUltraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(fileDialog.getFilterPath()));
+										UltraDuoPlusType tmpUltraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(fileDialog.getFilterPath()+ GDE.FILE_SEPARATOR + fileDialog.getFileName()));
 										copyUltraDuoPlusSetup(tmpUltraDuoPlusSetup);
 
-										UltraDuoPlusDialog.this.synchronizerWrite = new UltraDuoPlusSychronizer(UltraDuoPlusDialog.this, UltraDuoPlusDialog.this.serialPort, UltraDuoPlusDialog.this.ultraDuoPlusSetup,
-												UltraDuoPlusSychronizer.SYNC_TYPE.WRITE);
+										UltraDuoPlusDialog.this.setBackupRetoreButtons(false);
+										
+										UltraDuoPlusDialog.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+										UltraDuoPlusDialog.this.synchronizerWrite = new UltraDuoPlusSychronizer(UltraDuoPlusDialog.this, UltraDuoPlusDialog.this.serialPort, UltraDuoPlusDialog.this.ultraDuoPlusSetup,	UltraDuoPlusSychronizer.SYNC_TYPE.WRITE);
 										UltraDuoPlusDialog.this.synchronizerWrite.start();
+										UltraDuoPlusDialog.this.synchronizerWrite.join();
+										
+										UltraDuoPlusDialog.this.synchronizerRead = new UltraDuoPlusSychronizer(UltraDuoPlusDialog.this, UltraDuoPlusDialog.this.serialPort, UltraDuoPlusDialog.this.ultraDuoPlusSetup,	UltraDuoPlusSychronizer.SYNC_TYPE.READ);
+										UltraDuoPlusDialog.this.synchronizerRead.start();
+										UltraDuoPlusDialog.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 									}
 									catch (Exception e) {
 										log.log(Level.SEVERE, e.getMessage(), e);
@@ -948,8 +957,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "backupButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								SimpleDateFormat date = new SimpleDateFormat("yyyy-mm-dd-HH-mm");
 								FileDialog fileDialog = UltraDuoPlusDialog.this.application.prepareFileSaveDialog(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2285),
-										new String[] { GDE.FILE_ENDING_DOT_XML }, UltraDuoPlusDialog.this.settings.getDataFilePath(), UltraDuoPlusDialog.this.device.getName() + GDE.STRING_UNDER_BAR);
+										new String[] { GDE.FILE_ENDING_STAR_XML, GDE.FILE_ENDING_STAR }, UltraDuoPlusDialog.this.settings.getDataFilePath(), date.format(new Date().getTime()) + GDE.STRING_UNDER_BAR + UltraDuoPlusDialog.this.device.getName());
 								String configFilePath = fileDialog.open();
 								if (configFilePath != null && fileDialog.getFileName().length() > 4) {
 									if (FileUtils.checkFileExist(configFilePath)) {
@@ -1547,7 +1557,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			}
 		}
 		updateBatterySetup(this.memoryCombo.getSelectionIndex());
-
+		if (this.memoryCombo != null && !this.memoryCombo.isDisposed()) 
+			this.memoryCombo.setItems(this.memoryNames);
+		
 		//tire heater data
 		List<TireHeaterData> tireHeaters = this.ultraDuoPlusSetup.getTireHeaterData();
 		List<TireHeaterData> tmpTireHeaters = tmpUltraDuoPlusSetup.getTireHeaterData();

@@ -138,8 +138,7 @@ public class GathererThread extends Thread {
 			try {
 				// get data from device
 				if (this.serialPort.isConnected()) dataBuffer = this.serialPort.getData();
-				//else break;
-
+				
 				// check if device is ready for data capturing, discharge or charge allowed only
 				// else wait for 180 seconds max. for actions
 				this.isProgrammExecuting3 = this.device.isLinkedMode(dataBuffer);
@@ -289,6 +288,7 @@ public class GathererThread extends Thread {
 				recordSet = channel.get(recordSetKey);
 				this.device.setTemperatureUnit(number, recordSet, dataBuffer); //°C or °F
 				recordSet.setAllDisplayable();
+				recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR + "Firmware  : " + device.getFirmwareVersion(dataBuffer));
 				channel.applyTemplate(recordSetKey, false);
 				// switch the active record set if the current record set is child of active channel
 				this.channels.switchChannel(channel.getNumber(), recordSetKey);
