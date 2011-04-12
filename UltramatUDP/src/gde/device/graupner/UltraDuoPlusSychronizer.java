@@ -208,6 +208,8 @@ public class UltraDuoPlusSychronizer extends Thread {
 	 */
 	private void syncWrite() throws IOException, TimeOutException {
 		if (this.serialPort.isConnected()) {
+			if (this.dialog != null) this.dialog.setBackupRetoreButtons(false);
+			
 			//device Identifier name
 			if (this.ultraDuoPlusSetup.isChanged()) {
 				this.serialPort.writeConfigData(UltramatSerialPort.WRITE_DEVICE_IDENTIFIER_NAME, this.ultraDuoPlusSetup.getIdentifierName().getBytes(), 0);

@@ -167,7 +167,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public String readDeviceUserName() throws IOException, TimeOutException  {
+	public synchronized String readDeviceUserName() throws IOException, TimeOutException  {
 			byte[] answer = this.readConfigData(READ_DEVICE_IDENTIFIER_NAME, 23, 2);
 			return String.format(DeviceSerialPortImpl.FORMAT_16_CHAR, answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12], answer[13], answer[14], answer[15], answer[16]);
 	}
@@ -179,7 +179,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public String readChannelData(int channelNumber) throws IOException, TimeOutException {
+	public synchronized String readChannelData(int channelNumber) throws IOException, TimeOutException {
 		if (channelNumber == 1) {
 			return new String(this.readConfigData(READ_CHANNEL_SETUP, SIZE_CHANNEL_1_SETUP * 4 + 7, channelNumber)).substring(1, SIZE_CHANNEL_1_SETUP * 4 + 1);
 		}
@@ -381,8 +381,8 @@ public class UltramatSerialPort extends DeviceCommPort {
 				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "answer = " + sb.toString()); //$NON-NLS-1$
 			}
 			if ((answer[0] == NAK)) {
-				log.log(Level.WARNING, "Writing UltraDuoPlus configuration data failed!"); //$NON-NLS-1$
-				throw new IOException("Writing UltraDuoPlus configuration data failed!"); //$NON-NLS-1$
+				log.log(Level.WARNING, "Writing UltraDuoPlus configuration type (" + new String(type) + ") data failed!"); //$NON-NLS-1$ //$NON-NLS-2$
+				throw new IOException("Writing UltraDuoPlus configuration type (" + new String(type) + ") data failed!"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -392,7 +392,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @param buffer
 	 * @return true/false
 	 */
-	private boolean isChecksumOK(byte[] buffer) {
+	private synchronized boolean isChecksumOK(byte[] buffer) {
 		final String $METHOD_NAME = "isChecksumOK"; //$NON-NLS-1$
 		boolean isOK = false;
 		int length = Math.abs(this.device.getDataBlockSize());
@@ -407,7 +407,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @param buffer
 	 * @return true/false
 	 */
-	private boolean isCommandChecksumOK(byte[] buffer) {
+	private synchronized boolean isCommandChecksumOK(byte[] buffer) {
 		final String $METHOD_NAME = "isChecksumOK"; //$NON-NLS-1$
 		boolean isOK = false;
 		int length = buffer.length;
@@ -423,7 +423,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @param buffer
 	 * @return
 	 */
-	private byte[] getChecksum(byte[] buffer) {
+	private synchronized byte[] getChecksum(byte[] buffer) {
 		final String $METHOD_NAME = "getChecksum"; //$NON-NLS-1$
 		String check_sum = String.format("%04X", Checksum.ADD(buffer, 1, buffer.length-6)); //$NON-NLS-1$
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Check_sum char[]= " + check_sum); //$NON-NLS-1$

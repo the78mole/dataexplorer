@@ -905,21 +905,23 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										new String[] { GDE.FILE_ENDING_STAR_XML, GDE.FILE_ENDING_STAR }, UltraDuoPlusDialog.this.settings.getDataFilePath(), GDE.STRING_EMPTY, SWT.SINGLE);
 								if (fileDialog.getFileName().length() > 4) {
 									try {
+										UltraDuoPlusDialog.this.setBackupRetoreButtons(false);
+										UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+
 										Unmarshaller unmarshaller = UltraDuoPlusDialog.this.jc.createUnmarshaller();
 										unmarshaller.setSchema(UltraDuoPlusDialog.this.schema);
-										UltraDuoPlusType tmpUltraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(fileDialog.getFilterPath()+ GDE.FILE_SEPARATOR + fileDialog.getFileName()));
-										copyUltraDuoPlusSetup(tmpUltraDuoPlusSetup);
-
-										UltraDuoPlusDialog.this.setBackupRetoreButtons(false);
-										
-										UltraDuoPlusDialog.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+										//merge loaded configuration into active
+										mergeUltraDuoPlusSetup((UltraDuoPlusType) unmarshaller.unmarshal(new File(fileDialog.getFilterPath()+ GDE.FILE_SEPARATOR + fileDialog.getFileName())));
+										//write updated entries while merging
 										UltraDuoPlusDialog.this.synchronizerWrite = new UltraDuoPlusSychronizer(UltraDuoPlusDialog.this, UltraDuoPlusDialog.this.serialPort, UltraDuoPlusDialog.this.ultraDuoPlusSetup,	UltraDuoPlusSychronizer.SYNC_TYPE.WRITE);
 										UltraDuoPlusDialog.this.synchronizerWrite.start();
 										UltraDuoPlusDialog.this.synchronizerWrite.join();
-										
-										UltraDuoPlusDialog.this.synchronizerRead = new UltraDuoPlusSychronizer(UltraDuoPlusDialog.this, UltraDuoPlusDialog.this.serialPort, UltraDuoPlusDialog.this.ultraDuoPlusSetup,	UltraDuoPlusSychronizer.SYNC_TYPE.READ);
-										UltraDuoPlusDialog.this.synchronizerRead.start();
-										UltraDuoPlusDialog.this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+										//check and sync active configuration with device content
+										updateBatterySetup(0);
+										if (UltraDuoPlusDialog.this.memoryCombo != null && !UltraDuoPlusDialog.this.memoryCombo.isDisposed()) {
+											UltraDuoPlusDialog.this.memoryCombo.setItems(UltraDuoPlusDialog.this.memoryNames);
+											UltraDuoPlusDialog.this.memoryCombo.select(0);
+										}
 									}
 									catch (Exception e) {
 										log.log(Level.SEVERE, e.getMessage(), e);
@@ -937,6 +939,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										else
 											UltraDuoPlusDialog.this.application.openMessageDialog(UltraDuoPlusDialog.this.dialogShell,
 													Messages.getString(gde.messages.MessageIds.GDE_MSGE0007, new String[] { e.getMessage() }));
+									}
+									finally {
+										UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+										UltraDuoPlusDialog.this.setBackupRetoreButtons(true);
 									}
 								}
 							}
@@ -982,6 +988,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						this.closeButton.setLayoutData(writeButtonLData);
 						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.closeButton.setText(Messages.getString(MessageIds.GDE_MSGT2287));
+						this.closeButton.setEnabled(false);
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -1134,7 +1141,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 * @throws TimeOutException
 	 */
 	private void updateBatterySetup(int memoryNumber) {
-		log.log(Level.FINEST, GDE.STRING_ENTRY);
+		log.log(Level.FINEST, GDE.STRING_ENTRY + memoryNumber);
 		try {
 			if (this.chargeGroup != null && !this.chargeGroup.isDisposed()) {
 				log.log(Level.FINEST, "remove event handler"); //$NON-NLS-1$
@@ -1177,8 +1184,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.memoryValues[4] = 1;
 				this.memoryValues[5] = 1;
 			}
-			if (this.memoryCombo != null && !this.memoryCombo.isDisposed() && this.memoryCombo.getItems().length == 0) 
-				this.memoryCombo.setItems(this.memoryNames);
 
 			if (log.isLoggable(Level.FINE)) {
 				StringBuffer sb = new StringBuffer();
@@ -1449,15 +1454,24 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 */
 	public void setBackupRetoreButtons(final boolean enable) {
 		if (!this.dialogShell.isDisposed()) {
-			GDE.display.asyncExec(new Runnable() {
-				public void run() {
-					if (UltraDuoPlusDialog.this.restoreButton != null && UltraDuoPlusDialog.this.backupButton != null && !UltraDuoPlusDialog.this.restoreButton.isDisposed()
-							&& !UltraDuoPlusDialog.this.backupButton.isDisposed()) {
-						UltraDuoPlusDialog.this.restoreButton.setEnabled(enable);
-						UltraDuoPlusDialog.this.backupButton.setEnabled(enable);
-					}
+			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+				if (UltraDuoPlusDialog.this.restoreButton != null && UltraDuoPlusDialog.this.backupButton != null && !UltraDuoPlusDialog.this.restoreButton.isDisposed() && !UltraDuoPlusDialog.this.backupButton.isDisposed()) {
+					this.restoreButton.setEnabled(enable);
+					this.backupButton.setEnabled(enable);
+					this.closeButton.setEnabled(enable);
 				}
-			});
+			}
+			else {
+				GDE.display.asyncExec(new Runnable() {
+					public void run() {
+						if (UltraDuoPlusDialog.this.restoreButton != null && UltraDuoPlusDialog.this.backupButton != null && !UltraDuoPlusDialog.this.restoreButton.isDisposed() && !UltraDuoPlusDialog.this.backupButton.isDisposed()) {
+							UltraDuoPlusDialog.this.restoreButton.setEnabled(enable);
+							UltraDuoPlusDialog.this.backupButton.setEnabled(enable);
+							UltraDuoPlusDialog.this.closeButton.setEnabled(enable);
+						}
+					}
+				});
+			}
 		}
 	}
 
@@ -1465,7 +1479,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 * deep copy of complete ultraDuoPlusSetup data
 	 * @param tmpUltraDuoPlusSetup
 	 */
-	private void copyUltraDuoPlusSetup(UltraDuoPlusType tmpUltraDuoPlusSetup) {
+	private void mergeUltraDuoPlusSetup(UltraDuoPlusType tmpUltraDuoPlusSetup) {
 		if (!this.ultraDuoPlusSetup.getIdentifierName().equals(tmpUltraDuoPlusSetup.getIdentifierName())) {
 			this.deviceIdentifierName = (tmpUltraDuoPlusSetup.getIdentifierName() + UltraDuoPlusDialog.STRING_16_BLANK).substring(0, 16);
 			this.ultraDuoPlusSetup.setIdentifierName(this.deviceIdentifierName);
@@ -1556,9 +1570,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				cellMemory.getCycleData().setChanged(true);
 			}
 		}
-		updateBatterySetup(this.memoryCombo.getSelectionIndex());
-		if (this.memoryCombo != null && !this.memoryCombo.isDisposed()) 
-			this.memoryCombo.setItems(this.memoryNames);
 		
 		//tire heater data
 		List<TireHeaterData> tireHeaters = this.ultraDuoPlusSetup.getTireHeaterData();
