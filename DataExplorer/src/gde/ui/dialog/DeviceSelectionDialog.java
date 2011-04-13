@@ -224,8 +224,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DeviceSelection.gif")); //$NON-NLS-1$
 			this.dialogShell.setLayout(new FormLayout());
-			this.dialogShell.setSize(579, 592);
-			this.dialogShell.setSize(580, 592);
+			this.dialogShell.layout();
+			this.dialogShell.pack();
+			this.dialogShell.setSize(566, 644);
+			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0189));
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(java.util.logging.Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
@@ -782,10 +784,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			{
 				this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 				FormData closeButtonLData = new FormData();
-				closeButtonLData.left = new FormAttachment(0, 1000, 12);
-				closeButtonLData.top = new FormAttachment(0, 1000, 573);
-				closeButtonLData.width = 529;
-				closeButtonLData.height = 26;
+				closeButtonLData.left = new FormAttachment(0, 1000, 15);
+				closeButtonLData.bottom = new FormAttachment(1000, 1000, -10);
+				closeButtonLData.right = new FormAttachment(1000, 1000, -15);
+				closeButtonLData.height = 30;
 				this.closeButton.setLayoutData(closeButtonLData);
 				this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.closeButton.setText(Messages.getString(MessageIds.GDE_MSGT0188));
@@ -799,10 +801,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 			initializeUI(); // update all the entries according active device configuration			
 			updateAvailablePorts();
-			this.dialogShell.layout();
-			this.dialogShell.pack();
-			this.dialogShell.setSize(566, 644);
-			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0189));
 			this.dialogShell.setLocation(getParent().toDisplay(100, 10));
 			this.dialogShell.open();
 			Display display = this.dialogShell.getDisplay();
