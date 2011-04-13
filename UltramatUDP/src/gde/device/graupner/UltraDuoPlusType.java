@@ -49,7 +49,7 @@ import javax.xml.bind.annotation.XmlValue;
  *             &lt;/simpleContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element name="Memory" type="{}MemoryType" minOccurs="1"/>
+ *         &lt;element name="Memory" type="{}MemoryType" maxOccurs="100" minOccurs="10"/>
  *         &lt;element name="TireHeaterData" maxOccurs="2" minOccurs="0">
  *           &lt;complexType>
  *             &lt;simpleContent>
