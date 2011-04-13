@@ -292,31 +292,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		}
 	}
 
-	//	private Shell dialogShell;
-	//
-	//	/**
-	//	* Auto-generated main method to display this 
-	//	* org.eclipse.swt.widgets.Dialog inside a new Shell.
-	//	*/
-	//	public static void main(String[] args) {
-	//		try {
-	//			Display display = Display.getDefault();
-	//			Shell shell = new Shell(display);
-	//			UltraDuoPlusDialog inst = new UltraDuoPlusDialog(shell, SWT.NULL);
-	//			inst.open();
-	//		} catch (Exception e) {
-	//			e.printStackTrace();
-	//		}
-	//	}
-	//	
-	//	public UltraDuoPlusDialog(Shell parent, int style) {
-	//		super(parent);
-	//		serialPort = null;
-	//		device = null;
-	//		channels = Channels.getInstance();
-	//		settings = Settings.getInstance();
-	//	}
-
 	/**
 	 * default constructor initialize all variables required
 	 * @param parent Shell
@@ -396,10 +371,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				}
 				catch (Exception e) {
 					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(null,
-							Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
+					this.serialPort.close();
+					this.application.openMessageDialog(null, Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 					this.application.getDeviceSelectionDialog().open();
-					//return;
 				}
 			}
 			else {
@@ -438,11 +412,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 							try {
 								UltraDuoPlusDialog.this.synchronizerRead.join();
 								try {
-									//this.channelParameters[10] = new ParameterConfigControl(this.baseDeviceSetupComposite, this.channelValues1, 10, Messages.getString(MessageIds.GDE_MSGT2298), 175,	"1 ~ 31", 175, false, 50, 150, 1, 31); //$NON-NLS-1$ 
-									//this.channelParameters[11] = new ParameterConfigControl(this.baseDeviceSetupComposite, this.channelValues1, 11, Messages.getString(MessageIds.GDE_MSGT2299), 175,	"1 ~ 12", 175, false, 50, 150, 1, 12); //$NON-NLS-1$ 
-									//this.channelParameters[12] = new ParameterConfigControl(this.baseDeviceSetupComposite, this.channelValues1, 12, "%02d", Messages.getString(MessageIds.GDE_MSGT2300), 175,	"0 ~ 99", 175, false, 50, 150, 0, 99); //$NON-NLS-1$ 
-									//this.channelParameters[13] = new ParameterConfigControl(this.baseDeviceSetupComposite, this.channelValues1, 13, "%02d", Messages.getString(MessageIds.GDE_MSGT2302), 175,	"0 ~ 12", 175, false, 50, 150, 0, 12); //$NON-NLS-1$ 
-									//this.channelParameters[14] = new ParameterConfigControl(this.baseDeviceSetupComposite, this.channelValues1, 14, "%02d", Messages.getString(MessageIds.GDE_MSGT2301), 175,	"0 ~ 59", 175, false, 50, 150, 0, 59); //$NON-NLS-1$
 									//set the date to sync with PC time
 									String[] date = new SimpleDateFormat("yy:MM:dd:hh:mm").format(new Date().getTime()).split(GDE.STRING_COLON); //$NON-NLS-1$
 									UltraDuoPlusDialog.this.channelValues1[10] = Integer.parseInt(date[0]);
@@ -452,7 +421,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									UltraDuoPlusDialog.this.channelValues1[14] = Integer.parseInt(date[4]);
 									ChannelData1 value = new ChannelData1();
 									value.setValue(device.convert2String(channelValues1));
-									ultraDuoPlusSetup.setChannelData1(value);
+									UltraDuoPlusDialog.this.ultraDuoPlusSetup.setChannelData1(value);
 									UltraDuoPlusDialog.this.synchronizerWrite = new UltraDuoPlusSychronizer(UltraDuoPlusDialog.this, UltraDuoPlusDialog.this.serialPort, UltraDuoPlusDialog.this.ultraDuoPlusSetup,	UltraDuoPlusSychronizer.SYNC_TYPE.WRITE);
 									UltraDuoPlusDialog.this.synchronizerWrite.start();
 									UltraDuoPlusDialog.this.synchronizerWrite.join();
@@ -988,7 +957,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						this.closeButton.setLayoutData(writeButtonLData);
 						this.closeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.closeButton.setText(Messages.getString(MessageIds.GDE_MSGT2287));
-						this.closeButton.setEnabled(false);
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {

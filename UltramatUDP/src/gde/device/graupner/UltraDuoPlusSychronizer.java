@@ -84,6 +84,8 @@ public class UltraDuoPlusSychronizer extends Thread {
 	 */
 	private void syncRead() throws IOException, TimeOutException {
 		if (this.serialPort.isConnected()) {
+			if (this.dialog != null) this.dialog.setBackupRetoreButtons(false);
+			
 			//read memory names first
 			List<MemoryType> cellMemories = this.ultraDuoPlusSetup.getMemory();
 			Iterator<MemoryType> iterator = cellMemories.iterator();
