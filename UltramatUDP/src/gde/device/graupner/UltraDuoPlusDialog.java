@@ -310,10 +310,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					if (UltraDuoPlusDialog.this.ultraDuoPlusSetup != null) {
 						log.log(java.util.logging.Level.FINE, "memoryComposite.handleEvent, (" + UltraDuoPlusDialog.this.lastMemorySelectionIndex + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName() + " memoryValues[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
 						UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().setChanged(true);
+						UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().setValue(UltraDuoPlusDialog.this.device.convert2String(UltraDuoPlusDialog.this.memoryValues));
 					}
 					
 					if(evt.index == 0) {
 						updateBatteryMemoryParameter(memoryValues[0]);
+						updateBatteryParameterValues();
 					}
 					else if(evt.index == 2) { // capacity change
 						updateBatteryParameterValues();
@@ -340,7 +342,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			if (this.serialPort != null && !this.serialPort.isConnected()) {
 				try {
 					this.serialPort.open();
-					UltraDuoPlusDialog.numberMemories = this.memorySizes[this.device.getProductCode(this.serialPort.getData())];
+					byte[] answer = this.serialPort.getData();
+					if (this.device.isProcessing(1, answer) || this.device.isProcessing(2, answer)) {
+						this.application.openMessageDialogAsync(null, Messages.getString(MessageIds.GDE_MSGW2201));
+						return;
+					}
+					UltraDuoPlusDialog.numberMemories = this.memorySizes[this.device.getProductCode(answer)];
 					this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
 					this.deviceIdentifierName = this.serialPort.readDeviceUserName();
 
@@ -822,6 +829,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												this.dischargeGroup.setLayoutData(dischargeGroupLData);
 												FillLayout memoryCompositeLayout = new FillLayout(SWT.VERTICAL);
 												this.dischargeGroup.setLayout(memoryCompositeLayout);
+												this.dischargeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 												this.dischargeGroup.setText(Messages.getString(MessageIds.GDE_MSGT2301));											
 												this.dischargeGroup.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 												//discharge parameter
@@ -839,6 +847,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												this.cycleGroup.setLayoutData(cycleGroupLData);
 												FillLayout memoryCompositeLayout = new FillLayout(SWT.VERTICAL);
 												this.cycleGroup.setLayout(memoryCompositeLayout);
+												this.cycleGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 												this.cycleGroup.setText(Messages.getString(MessageIds.GDE_MSGT2302));											
 												this.cycleGroup.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 												//cycle parameter
@@ -1247,7 +1256,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			this.dischargeGroup.layout(true);
 			this.dischargeCycleComposite.layout(true);
 			
-			updateBatteryParameterValues();
+			//updateBatteryParameterValues();
 			this.lastCellSelectionIndex = this.memoryValues[0];
 		}
 		log.log(Level.FINEST, GDE.STRING_EXIT);
@@ -1282,6 +1291,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			this.memoryValues[13] = 1; //rePeakCycle
 			this.memoryValues[15] = 3; //rePaekDelay min
 			this.memoryValues[7] = 1; //flatLimitCheck
+			this.memoryValues[18] = 1000; //dischargeVoltage/cell
 			this.memoryValues[19] = this.channelValues1[4] == 0 ? 45 : (9/5)*45+32; //dischargeOffTemperature
 			break;
 		case 1: //NiMh
@@ -1294,6 +1304,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			this.memoryValues[13] = 1; //rePeakCycle
 			this.memoryValues[15] = 3; //rePaekDelay min
 			this.memoryValues[7] = 1; //flatLimitCheck
+			this.memoryValues[18] = 1000; //dischargeVoltage/cell
 			this.memoryValues[19] = this.channelValues1[4] == 0 ? 45 : (9/5)*45+32; //dischargeOffTemperature
 			this.memoryValues[21] = 1250; //NiMhMatchVoltage
 			break;
@@ -1421,25 +1432,23 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 * @param enable
 	 */
 	public void setBackupRetoreButtons(final boolean enable) {
-		if (!this.dialogShell.isDisposed()) {
-			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-				if (UltraDuoPlusDialog.this.restoreButton != null && UltraDuoPlusDialog.this.backupButton != null && !UltraDuoPlusDialog.this.restoreButton.isDisposed() && !UltraDuoPlusDialog.this.backupButton.isDisposed()) {
-					this.restoreButton.setEnabled(enable);
-					this.backupButton.setEnabled(enable);
-					this.closeButton.setEnabled(enable);
-				}
+		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+			if (!UltraDuoPlusDialog.this.dialogShell.isDisposed() && UltraDuoPlusDialog.this.restoreButton != null && UltraDuoPlusDialog.this.backupButton != null && !UltraDuoPlusDialog.this.restoreButton.isDisposed() && !UltraDuoPlusDialog.this.backupButton.isDisposed()) {
+				this.restoreButton.setEnabled(enable);
+				this.backupButton.setEnabled(enable);
+				this.closeButton.setEnabled(enable);
 			}
-			else {
-				GDE.display.asyncExec(new Runnable() {
-					public void run() {
-						if (UltraDuoPlusDialog.this.restoreButton != null && UltraDuoPlusDialog.this.backupButton != null && !UltraDuoPlusDialog.this.restoreButton.isDisposed() && !UltraDuoPlusDialog.this.backupButton.isDisposed()) {
-							UltraDuoPlusDialog.this.restoreButton.setEnabled(enable);
-							UltraDuoPlusDialog.this.backupButton.setEnabled(enable);
-							UltraDuoPlusDialog.this.closeButton.setEnabled(enable);
-						}
+		}
+		else {
+			GDE.display.asyncExec(new Runnable() {
+				public void run() {
+					if (!UltraDuoPlusDialog.this.dialogShell.isDisposed() && UltraDuoPlusDialog.this.restoreButton != null && UltraDuoPlusDialog.this.backupButton != null && !UltraDuoPlusDialog.this.restoreButton.isDisposed() && !UltraDuoPlusDialog.this.backupButton.isDisposed()) {
+						UltraDuoPlusDialog.this.restoreButton.setEnabled(enable);
+						UltraDuoPlusDialog.this.backupButton.setEnabled(enable);
+						UltraDuoPlusDialog.this.closeButton.setEnabled(enable);
 					}
-				});
-			}
+				}
+			});
 		}
 	}
 

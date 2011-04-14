@@ -123,8 +123,8 @@ public class UltramatSerialPort extends DeviceCommPort {
 						break; //sync
 					}
 				}
-				if(this.isInSync)
-					break;
+				if(this.isInSync)	break;
+				
 				answer = new byte[data.length];
 				answer = this.read(answer, 3000);
 			}
@@ -293,6 +293,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 					}
 				}
 				if (this.isInSync) break;
+				
+				answer = new byte[expectedDataSize];
+				answer = this.read(answer, 3000);
 			}
 			if (!(readBuffer[0] == BEGIN && readBuffer[readBuffer.length - 1] == ACK && isCommandChecksumOK(readBuffer))) {
 				this.addXferError();

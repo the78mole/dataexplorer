@@ -512,6 +512,42 @@ public class UltramatUDP extends Ultramat {
 		return operationMode1.equals(operationMode2) && operationType1.equals(operationType2)
 				&& (operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_CHARGE) || operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_DISCHARGE));
 	}
+	
+	/**
+	 * query the battery memory number of the given outlet channel
+	 * @param outletNum
+	 * @param dataBuffer
+	 * @return
+	 */
+	@Override
+	public int getBatteryMemoryNumber(int outletNum, byte[] dataBuffer) {
+		String batteryMemoryNumber = "0";
+		if (outletNum == 1) {
+			batteryMemoryNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[5], (char) dataBuffer[6]);
+		}
+		else if (outletNum == 2) {
+			batteryMemoryNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[69], (char) dataBuffer[70]);
+		}
+		return Integer.parseInt(batteryMemoryNumber, 16);
+	}
+	
+	/**
+	 * query the cycle number of the given outlet channel
+	 * @param outletNum
+	 * @param dataBuffer
+	 * @return
+	 */
+	@Override
+	public int getCycleNumber(int outletNum, byte[] dataBuffer) {
+		String cycleNumber = "0";
+		if (outletNum == 1) {
+			cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[19], (char) dataBuffer[20]);
+		}
+		else if (outletNum == 2) {
+			cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[83], (char) dataBuffer[84]);
+		}
+		return Integer.parseInt(cycleNumber, 16);
+	}
 
 	/**
 	 * set the temperature unit right after creating a record set according to the used oultet channel

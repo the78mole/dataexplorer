@@ -281,14 +281,15 @@ public class GathererThread extends Thread {
 				setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset to 180 sec
 				// record set does not exist or is outdated, build a new name and create
 				String extend = this.device.getProcessingType(dataBuffer).length() > 3 ? GDE.STRING_BLANK_LEFT_BRACKET + this.device.getProcessingType(dataBuffer) + GDE.STRING_RIGHT_BRACKET : GDE.STRING_EMPTY;
-				recordSetKey = channel.getNextRecordSetNumber() + ") " + processName + extend; //$NON-NLS-1$
+				extend = this.device.getCycleNumber(number, dataBuffer) > 0 ? extend + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT2302) + GDE.STRING_COLON + this.device.getCycleNumber(number, dataBuffer) : extend;
+				recordSetKey = channel.getNextRecordSetNumber() + ") " + processName + GDE.STRING_BLANK + extend; //$NON-NLS-1$ //$NON-NLS-2$
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
 				channel.applyTemplateBasics(recordSetKey);
 				log.logp(java.util.logging.Level.OFF, GathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
 				recordSet = channel.get(recordSetKey);
 				this.device.setTemperatureUnit(number, recordSet, dataBuffer); //°C or °F
 				recordSet.setAllDisplayable();
-				recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR + "Firmware  : " + device.getFirmwareVersion(dataBuffer));
+				recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR + "Firmware  : " + device.getFirmwareVersion(dataBuffer) + "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer));
 				channel.applyTemplate(recordSetKey, false);
 				// switch the active record set if the current record set is child of active channel
 				this.channels.switchChannel(channel.getNumber(), recordSetKey);
