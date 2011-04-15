@@ -340,7 +340,7 @@ public class GathererThread extends Thread {
 						+ "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer); 								//$NON-NLS-1$
 				try {
 					if (this.ultraDuoPlusSetup != null && this.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)) != null)
-						description = description + GDE.STRING_MESSAGE_CONCAT + this.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)).getName();
+						description = description + GDE.STRING_MESSAGE_CONCAT + this.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)-1).getName();
 				}
 				catch (Exception e) {
 					// ignore and do not append memory name
