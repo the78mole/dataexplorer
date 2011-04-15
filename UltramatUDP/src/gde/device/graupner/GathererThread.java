@@ -19,6 +19,7 @@
 package gde.device.graupner;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -32,7 +33,15 @@ import gde.ui.DataExplorer;
 import gde.utils.TimeLine;
 import gde.utils.WaitTimer;
 
+import java.io.File;
 import java.util.logging.Logger;
+
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 /**
  * Thread implementation to gather data from eStation device
@@ -57,6 +66,10 @@ public class GathererThread extends Thread {
 	boolean												isGatheredRecordSetVisible	= true;
 	int														retryCounter								= GathererThread.WAIT_TIME_RETRYS;													// 36 * 5 sec timeout = 180 sec
 	boolean												isCollectDataStopped				= false;
+
+	Schema												schema;
+	JAXBContext										jc;
+	UltraDuoPlusType							ultraDuoPlusSetup;
 
 	boolean												isProgrammExecuting1				= false;
 	boolean												isProgrammExecuting2				= false;
@@ -106,6 +119,29 @@ public class GathererThread extends Thread {
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();
 			this.isPortOpenedByLiveGatherer = true;
+			try {
+				byte[] dataBuffer = this.serialPort.getData();
+				if (this.device.isProcessing(1, dataBuffer) || this.device.isProcessing(2, dataBuffer)) {
+					this.application.openMessageDialogAsync(null, Messages.getString(MessageIds.GDE_MSGW2201));
+					return;
+				}
+				//TODO check if device fits this.device.getProductCode(dataBuffer); else ask for switch ?? don't know if this is required
+				this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
+				String deviceIdentifierName = this.serialPort.readDeviceUserName();
+				this.serialPort.write(UltramatSerialPort.RESET_END);
+
+				this.jc = JAXBContext.newInstance("gde.device.graupner"); //$NON-NLS-1$
+				this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
+						new StreamSource(UltraDuoPlusDialog.class.getClassLoader().getResourceAsStream("resource/" + UltraDuoPlusDialog.ULTRA_DUO_PLUS_XSD))); //$NON-NLS-1$
+				Unmarshaller unmarshaller = this.jc.createUnmarshaller();
+				unmarshaller.setSchema(this.schema);
+				this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(Settings.getInstance().getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
+						+ deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
+			}
+			catch (Exception e) {
+				// ignore
+				e.printStackTrace();
+			}
 		}
 		this.setPriority(Thread.MAX_PRIORITY);
 	}
@@ -279,17 +315,37 @@ public class GathererThread extends Thread {
 			if (recordSet == null || !recordSetKey.contains(processName)) {
 				this.application.setStatusMessage(""); //$NON-NLS-1$
 				setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset to 180 sec
+				
 				// record set does not exist or is outdated, build a new name and create
-				String extend = this.device.getProcessingType(dataBuffer).length() > 3 ? GDE.STRING_BLANK_LEFT_BRACKET + this.device.getProcessingType(dataBuffer) + GDE.STRING_RIGHT_BRACKET : GDE.STRING_EMPTY;
-				extend = this.device.getCycleNumber(number, dataBuffer) > 0 ? extend + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT2302) + GDE.STRING_COLON + this.device.getCycleNumber(number, dataBuffer) : extend;
-				recordSetKey = channel.getNextRecordSetNumber() + ") " + processName + GDE.STRING_BLANK + extend; //$NON-NLS-1$ //$NON-NLS-2$
+				StringBuilder extend = new StringBuilder();
+				if (this.device.getProcessingType(dataBuffer).length() > 3 || this.device.getCycleNumber(number, dataBuffer) > 0) extend.append(GDE.STRING_BLANK_LEFT_BRACKET);
+				if (this.device.getProcessingType(dataBuffer).length() > 3) extend.append(this.device.getProcessingType(dataBuffer));
+				if (this.device.getCycleNumber(number, dataBuffer) > 0) {
+					if (this.device.getProcessingType(dataBuffer).equals(Messages.getString(MessageIds.GDE_MSGT2302)))
+						extend.append(GDE.STRING_COLON).append(this.device.getCycleNumber(number, dataBuffer));
+					else
+						extend.append(GDE.STRING_MINUS).append(Messages.getString(MessageIds.GDE_MSGT2302)).append(GDE.STRING_COLON).append(this.device.getCycleNumber(number, dataBuffer));
+				}
+				if (this.device.getProcessingType(dataBuffer).length() > 3 || this.device.getCycleNumber(number, dataBuffer) > 0) extend.append(GDE.STRING_RIGHT_BRACKET);
+				recordSetKey = channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName + extend.toString();
+
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
 				channel.applyTemplateBasics(recordSetKey);
 				log.logp(java.util.logging.Level.OFF, GathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
 				recordSet = channel.get(recordSetKey);
 				this.device.setTemperatureUnit(number, recordSet, dataBuffer); //°C or °F
 				recordSet.setAllDisplayable();
-				recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR + "Firmware  : " + device.getFirmwareVersion(dataBuffer) + "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer));
+				String description = recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR 
+						+ "Firmware  : " + device.getFirmwareVersion(dataBuffer)  															//$NON-NLS-1$
+						+ "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer); 								//$NON-NLS-1$
+				try {
+					if (this.ultraDuoPlusSetup != null && this.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)) != null)
+						description = description + GDE.STRING_MESSAGE_CONCAT + this.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)).getName();
+				}
+				catch (Exception e) {
+					// ignore and do not append memory name
+				}
+				recordSet.setRecordSetDescription(description);
 				channel.applyTemplate(recordSetKey, false);
 				// switch the active record set if the current record set is child of active channel
 				this.channels.switchChannel(channel.getNumber(), recordSetKey);

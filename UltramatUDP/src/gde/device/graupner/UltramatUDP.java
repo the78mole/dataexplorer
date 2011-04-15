@@ -521,12 +521,14 @@ public class UltramatUDP extends Ultramat {
 	 */
 	@Override
 	public int getBatteryMemoryNumber(int outletNum, byte[] dataBuffer) {
-		String batteryMemoryNumber = "0";
-		if (outletNum == 1) {
-			batteryMemoryNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[5], (char) dataBuffer[6]);
-		}
-		else if (outletNum == 2) {
-			batteryMemoryNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[69], (char) dataBuffer[70]);
+		String batteryMemoryNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[5], (char) dataBuffer[6]);
+		if (outletNum == 2) {
+			try {
+				batteryMemoryNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[69], (char) dataBuffer[70]);
+			}
+			catch (Exception e) {
+				// ignore and use values from outlet channel 1 (data buffer will be copied)
+			}
 		}
 		return Integer.parseInt(batteryMemoryNumber, 16);
 	}
@@ -539,12 +541,14 @@ public class UltramatUDP extends Ultramat {
 	 */
 	@Override
 	public int getCycleNumber(int outletNum, byte[] dataBuffer) {
-		String cycleNumber = "0";
-		if (outletNum == 1) {
-			cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[19], (char) dataBuffer[20]);
-		}
-		else if (outletNum == 2) {
-			cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[83], (char) dataBuffer[84]);
+		String cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[19], (char) dataBuffer[20]);
+		if (outletNum == 2) {
+			try {
+				cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[83], (char) dataBuffer[84]);
+			}
+			catch (Exception e) {
+				// ignore and use values from outlet channel 1 (data buffer will be copied)
+			}
 		}
 		return Integer.parseInt(cycleNumber, 16);
 	}
