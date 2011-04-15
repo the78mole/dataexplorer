@@ -122,6 +122,7 @@ public class GDE {
 	public static final String		STRING_EQUAL										= "=";																																																												//$NON-NLS-1$
 	public static final String		STRING_STAR											= "*";																																																												//$NON-NLS-1$
 	public static final String		STRING_RIGHT_PARENTHESIS				= ")";																																																												//$NON-NLS-1$
+	public static final String		STRING_RIGHT_PARENTHESIS_BLANK	= ") ";																																																												//$NON-NLS-1$
 	public static final String		STRING_BLANK_LEFT_BRACKET				= " [";																																																												//$NON-NLS-1$
 	public static final String		STRING_LEFT_BRACKET							= "[";																																																												//$NON-NLS-1$
 	public static final String		STRING_RIGHT_BRACKET						= "]";																																																												//$NON-NLS-1$
