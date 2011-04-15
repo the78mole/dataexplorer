@@ -81,6 +81,7 @@ public class GathererThread extends Thread {
 	long													measurementCount1						= 0;
 	long													measurementCount2						= 0;
 	long													measurementCount3						= 0;
+	String 												firmware										= GDE.STRING_MINUS;
 
 	private static GathererThread	gathererTread								= null;
 
@@ -121,22 +122,21 @@ public class GathererThread extends Thread {
 			this.isPortOpenedByLiveGatherer = true;
 			try {
 				byte[] dataBuffer = this.serialPort.getData();
-				if (this.device.isProcessing(1, dataBuffer) || this.device.isProcessing(2, dataBuffer)) {
-					this.application.openMessageDialogAsync(null, Messages.getString(MessageIds.GDE_MSGW2201));
-					return;
-				}
-				//TODO check if device fits this.device.getProductCode(dataBuffer); else ask for switch ?? don't know if this is required
-				this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
-				String deviceIdentifierName = this.serialPort.readDeviceUserName();
-				this.serialPort.write(UltramatSerialPort.RESET_END);
+				this.firmware = this.device.getFirmwareVersion(dataBuffer);
+				if (!(this.device.isProcessing(1, dataBuffer) || this.device.isProcessing(2, dataBuffer))) {
+					//TODO check if device fits this.device.getProductCode(dataBuffer); else ask for switch ?? don't know if this is required
+					this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
+					String deviceIdentifierName = this.serialPort.readDeviceUserName();
+					this.serialPort.write(UltramatSerialPort.RESET_END);
 
-				this.jc = JAXBContext.newInstance("gde.device.graupner"); //$NON-NLS-1$
-				this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
-						new StreamSource(UltraDuoPlusDialog.class.getClassLoader().getResourceAsStream("resource/" + UltraDuoPlusDialog.ULTRA_DUO_PLUS_XSD))); //$NON-NLS-1$
-				Unmarshaller unmarshaller = this.jc.createUnmarshaller();
-				unmarshaller.setSchema(this.schema);
-				this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(Settings.getInstance().getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
-						+ deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
+					this.jc = JAXBContext.newInstance("gde.device.graupner"); //$NON-NLS-1$
+					this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
+							new StreamSource(UltraDuoPlusDialog.class.getClassLoader().getResourceAsStream("resource/" + UltraDuoPlusDialog.ULTRA_DUO_PLUS_XSD))); //$NON-NLS-1$
+					Unmarshaller unmarshaller = this.jc.createUnmarshaller();
+					unmarshaller.setSchema(this.schema);
+					this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(Settings.getInstance().getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
+							+ deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
+				}
 			}
 			catch (Exception e) {
 				// ignore
@@ -336,7 +336,7 @@ public class GathererThread extends Thread {
 				this.device.setTemperatureUnit(number, recordSet, dataBuffer); //°C or °F
 				recordSet.setAllDisplayable();
 				String description = recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR 
-						+ "Firmware  : " + device.getFirmwareVersion(dataBuffer)  															//$NON-NLS-1$
+						+ "Firmware  : " + this.firmware  																											//$NON-NLS-1$
 						+ "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer); 								//$NON-NLS-1$
 				try {
 					if (this.ultraDuoPlusSetup != null && this.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)) != null)
