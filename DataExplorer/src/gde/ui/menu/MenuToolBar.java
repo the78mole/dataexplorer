@@ -402,7 +402,7 @@ public class MenuToolBar {
 						this.objectSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0201));
 						this.objectSelectCombo.setEditable(false);
 						this.objectSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
-						this.objectSelectCombo.setVisibleItemCount(this.objectSelectCombo.getItemCount()+1);
+						this.objectSelectCombo.setVisibleItemCount(20);
 						this.objectSelectCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -765,10 +765,11 @@ public class MenuToolBar {
 						this.channelSelectComposite.setLayout(null);
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
 						this.channelSelectCombo.setFont(SWTResourceManager.getFont(this.application, GDE.IS_LINUX ? 9 : GDE.IS_MAC ? 12 : 10, SWT.NORMAL));
-						this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
+						//this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
 						this.channelSelectCombo.select(0);
 						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0075));
 						this.channelSelectCombo.setEditable(false);
+						this.channelSelectCombo.setVisibleItemCount(5);
 						this.channelSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
 						this.channelSelectCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -837,7 +838,7 @@ public class MenuToolBar {
 						this.recordSelectCombo.setItems(new String[] { GDE.STRING_BLANK }); // later "2) Flugaufzeichnung", "3) laden" });
 						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0078));
 						this.recordSelectCombo.setTextLimit(RecordSet.MAX_NAME_LENGTH);
-						//this.recordSelectSize.x = SWTResourceManager.getGC(this.recordSelectCombo.getDisplay()).stringExtent("012345678901234567890123456789012345678901234567890".substring(0, RecordSet.MAX_NAME_LENGTH)).x;
+						this.recordSelectCombo.setVisibleItemCount(20);
 						this.recordSelectCombo.setEditable(false);
 						this.recordSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
 						this.recordSelectCombo.addSelectionListener(new SelectionAdapter() {
@@ -1536,6 +1537,11 @@ public class MenuToolBar {
 		this.application.setObjectDescriptionTabVisible(this.isObjectoriented);
 		this.application.updateObjectDescriptionWindow();
 	}
+	
+	public void selectObjectKey(int index) {
+		this.objectSelectCombo.select(index);
+		this.objectSelectCombo.notifyListeners(SWT.Selection, new Event());
+	}
 
 	public void selectObjectKeyDeviceOriented() {
 		this.objectSelectCombo.select(0);
@@ -1580,7 +1586,6 @@ public class MenuToolBar {
 		this.settings.setObjectList(newObjectKeyList, newObjectKey);
 		this.objectSelectCombo.setItems(this.settings.getObjectList());
 		this.objectSelectCombo.select(this.settings.getActiveObjectIndex());
-		this.objectSelectCombo.setVisibleItemCount(this.objectSelectCombo.getItemCount()+1);
 		this.updateObjectSelector();
 	}
 	

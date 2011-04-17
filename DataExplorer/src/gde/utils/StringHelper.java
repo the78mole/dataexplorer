@@ -124,6 +124,13 @@ public class StringHelper {
 	}
 	
 	/**
+	 * method to receive formated data and time with given format string like "yyyy-MM-dd, HH:mm:ss"
+	 */
+	public static String getDateAndTime(String format) {
+		return  new SimpleDateFormat(format).format(new Date().getTime()); //$NON-NLS-1$
+	}
+	
+	/**
 	 * method to get current date
 	 */
 	public static String getDate() {
