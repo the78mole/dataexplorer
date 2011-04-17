@@ -1473,6 +1473,10 @@ public class RecordSet extends HashMap<String, Record> {
 	public String getHorizontalGridRecordName(boolean isSyncRecordIncluded) {
 		String gridRecordName = this.horizontalGridRecordOrdinal == -1 || this.horizontalGridRecordOrdinal > this.getRecordNames().length-1
 		? GDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
+		if (this.get(gridRecordName) != null && !(this.get(gridRecordName).isVisible && this.get(gridRecordName).isDisplayable)) {
+			gridRecordName = this.getFirstRecordName();
+			log.log(Level.FINE, "gridRecordName = " + gridRecordName); //$NON-NLS-1$
+		}
 		if (this.isCompareSet) {
 			gridRecordName = this.realSize() == 0 ? GDE.STRING_DASH : this.getFirstRecordName();
 			log.log(Level.FINE, "gridRecordName = " + gridRecordName); //$NON-NLS-1$
