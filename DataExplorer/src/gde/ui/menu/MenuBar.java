@@ -741,7 +741,7 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "contentsMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuBar.this.application.getActiveDevice().getDialog() != null && !MenuBar.this.application.getActiveDevice().getDialog().isDisposed()) {
+							if (MenuBar.this.application.getActiveDevice() != null && MenuBar.this.application.getActiveDevice().getDialog() != null && !MenuBar.this.application.getActiveDevice().getDialog().isDisposed()) {
 								MenuBar.this.application.getActiveDevice().getDialog().getDialogShell().getShell().notifyListeners(SWT.Help, new Event());
 							}
 							else {

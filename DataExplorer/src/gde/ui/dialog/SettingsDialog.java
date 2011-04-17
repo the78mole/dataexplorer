@@ -186,7 +186,7 @@ public class SettingsDialog extends Dialog {
 				this.settingsTabFolder = new CTabFolder(this.dialogShell, SWT.FLAT | SWT.BORDER);
 				this.settingsTabFolder.setSimple(false);
 				FormData cTabFolder1LData = new FormData();
-				cTabFolder1LData.height = 475;
+				cTabFolder1LData.height = 480;
 				cTabFolder1LData.left = new FormAttachment(0, 1000, 0);
 				cTabFolder1LData.right = new FormAttachment(1000, 1000, 0);
 				cTabFolder1LData.top = new FormAttachment(0, 1000, 0);
@@ -198,7 +198,7 @@ public class SettingsDialog extends Dialog {
 					this.generalTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0301));
 					{
 						FormData tabComposite1LData = new FormData();
-						tabComposite1LData.height = 425;
+						tabComposite1LData.height = 430;
 						tabComposite1LData.left = new FormAttachment(0, 1000, 10);
 						tabComposite1LData.right = new FormAttachment(1000, 1000, -10);
 						tabComposite1LData.top = new FormAttachment(0, 1000, 0);
@@ -463,14 +463,14 @@ public class SettingsDialog extends Dialog {
 							serialPortGroupLData.left = new FormAttachment(0, 1000, 12);
 							serialPortGroupLData.right = new FormAttachment(1000, 1000, -12);
 							serialPortGroupLData.top = new FormAttachment(0, 1000, 335);
-							serialPortGroupLData.height = 112;
+							serialPortGroupLData.height = 117;
 							this.serialPortGroup.setLayoutData(serialPortGroupLData);
 							this.serialPortGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.serialPortGroup.setText(Messages.getString(MessageIds.GDE_MSGT0330));
 							{
 								this.enableBlackListButton = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 								this.enableBlackListButton.setText(Messages.getString(MessageIds.GDE_MSGT0336));
-								this.enableBlackListButton.setBounds(15, GDE.IS_MAC_COCOA ? 3 : 13, 243, 22);
+								this.enableBlackListButton.setBounds(15, GDE.IS_MAC_COCOA ? 8 : 18, 243, 22);
 								this.enableBlackListButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.enableBlackListButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0337));
 								this.enableBlackListButton.addSelectionListener(new SelectionAdapter() {
@@ -499,7 +499,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortBlackList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortBlackList.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.serialPortBlackList.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0337));
-								this.serialPortBlackList.setBounds(260, GDE.IS_MAC_COCOA ? 3 : 13, 181, GDE.IS_LINUX ? 22 : 20);
+								this.serialPortBlackList.setBounds(260, GDE.IS_MAC_COCOA ? 8 : 18, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortBlackList.addVerifyListener(new VerifyListener() {
 									public void verifyText(VerifyEvent e) {
 										log.log(Level.FINEST, GDE.STRING_EMPTY+StringHelper.verifyPortInput(e.text.trim()));
@@ -517,7 +517,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.enableWhiteListButton = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
 								this.enableWhiteListButton.setText(Messages.getString(MessageIds.GDE_MSGT0338));
-								this.enableWhiteListButton.setBounds(15, GDE.IS_MAC_COCOA ? 24 : 34, 243, 22);
+								this.enableWhiteListButton.setBounds(15, GDE.IS_MAC_COCOA ? 29 : 39, 243, 22);
 								this.enableWhiteListButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.enableWhiteListButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0339));
 								this.enableWhiteListButton.addSelectionListener(new SelectionAdapter() {
@@ -547,7 +547,7 @@ public class SettingsDialog extends Dialog {
 								this.serialPortWhiteList = new Text(this.serialPortGroup, SWT.BORDER);
 								this.serialPortWhiteList.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.serialPortWhiteList.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0339));
-								this.serialPortWhiteList.setBounds(260, GDE.IS_MAC_COCOA ? 24 : 34, 181, GDE.IS_LINUX ? 22 : 20);
+								this.serialPortWhiteList.setBounds(260, GDE.IS_MAC_COCOA ? 29 : 39, 181, GDE.IS_LINUX ? 22 : 20);
 								this.serialPortWhiteList.addVerifyListener(new VerifyListener() {
 									public void verifyText(VerifyEvent e) {
 										//log.log(Level.FINEST, GDE.STRING_EMPTY+StringHelper.verifyPortInput(e.text));
@@ -564,7 +564,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.doPortAvailabilityCheck = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
-								this.doPortAvailabilityCheck.setBounds(15, GDE.IS_MAC_COCOA ? 47 : 57, 243, 22);
+								this.doPortAvailabilityCheck.setBounds(15, GDE.IS_MAC_COCOA ? 53 : 63, 243, 22);
 								this.doPortAvailabilityCheck.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.doPortAvailabilityCheck.setText(Messages.getString(MessageIds.GDE_MSGT0331));
 								this.doPortAvailabilityCheck.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0332));
@@ -584,7 +584,7 @@ public class SettingsDialog extends Dialog {
 								this.useGlobalSerialPort.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.useGlobalSerialPort.setText(Messages.getString(MessageIds.GDE_MSGT0333));
 								this.useGlobalSerialPort.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0334));
-								this.useGlobalSerialPort.setBounds(15, GDE.IS_MAC_COCOA ? 69 : 79, 243, 22);
+								this.useGlobalSerialPort.setBounds(15, GDE.IS_MAC_COCOA ? 74 : 84, 243, 22);
 								this.useGlobalSerialPort.addSelectionListener(new SelectionAdapter() {
 									@SuppressWarnings("deprecation")
 									@Override
@@ -610,12 +610,12 @@ public class SettingsDialog extends Dialog {
 								this.portLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.portLabel.setText(Messages.getString(MessageIds.GDE_MSGT0164));
 								this.portLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0165));
-								this.portLabel.setBounds(12, GDE.IS_MAC_COCOA ? 91 : 101, 120, 20);
+								this.portLabel.setBounds(12, GDE.IS_MAC_COCOA ? 96 : 106, 120, 20);
 							}
 							{
 								this.serialPort = new CCombo(this.serialPortGroup, SWT.BORDER);
 								this.serialPort.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.serialPort.setBounds(135, GDE.IS_MAC_COCOA ? 91 : 101, 307, GDE.IS_LINUX ? 22 : 20);
+								this.serialPort.setBounds(135, GDE.IS_MAC_COCOA ? 96 : 106, 307, GDE.IS_LINUX ? 22 : 20);
 								this.serialPort.setText(Messages.getString(MessageIds.GDE_MSGT0199));
 								this.serialPort.setEditable(false);
 								this.serialPort.setBackground(SWTResourceManager.getColor(255, 255, 255));
