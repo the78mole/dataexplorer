@@ -1,3 +1,4 @@
+package gde.device.graupner;
 /**************************************************************************************
   	This file is part of GNU DataExplorer.
 
@@ -16,7 +17,7 @@
     
     Copyright (c) 2008,2009,2010,2011 Winfried Bruegmann
 ****************************************************************************************/
-package gde.device.graupner;
+
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -40,15 +41,15 @@ import org.eclipse.swt.SWT;
  * Graupner Ultra Duo Plus base class which extends the Ultramat base class
  * @author Winfried Brügmann
  */
-public class UltramatUDP extends Ultramat {
-	final static Logger	logger	= Logger.getLogger(UltramatUDP.class.getName());
+public class UltraDuoPlus45 extends Ultramat {
+	final static Logger	logger	= Logger.getLogger(UltraDuoPlus45.class.getName());
 
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
 	 * @throws FileNotFoundException 
 	 */
-	public UltramatUDP(String deviceProperties) throws FileNotFoundException, JAXBException {
+	public UltraDuoPlus45(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
@@ -75,7 +76,7 @@ public class UltramatUDP extends Ultramat {
 	 * constructor using existing device configuration
 	 * @param deviceConfig device configuration
 	 */
-	public UltramatUDP(DeviceConfiguration deviceConfig) {
+	public UltraDuoPlus45(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
@@ -367,15 +368,6 @@ public class UltramatUDP extends Ultramat {
 	}
 
 	/**
-	 * query the device identifier to differentiate between different device implementations
-	 * @return 	-1=Ultramat16 1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, 6=Ultramat16S
-	 */
-	@Override
-	public GraupnerDeviceType getDeviceTypeIdentifier() {
-		return GraupnerDeviceType.UltraDuoPlus60;
-	}
-
-	/**
 	 * query if the target measurement reference ordinal used by the given desktop type
 	 * @return the target measurement reference ordinal, -1 if reference ordinal not set
 	 */
@@ -403,6 +395,15 @@ public class UltramatUDP extends Ultramat {
 		// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7 
 		// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
 		return new int[] { 0, this.channels.getActiveChannelNumber() == 3 ? 6 : 2 };
+	}
+
+	/**
+	 * query the device identifier to differentiate between different device implementations
+	 * @return 	-1=Ultramat16 1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, 6=Ultramat16S
+	 */
+	@Override
+	public GraupnerDeviceType getDeviceTypeIdentifier() {
+		return GraupnerDeviceType.UltraDuoPlus45;
 	}
 
 	/**

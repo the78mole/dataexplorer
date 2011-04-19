@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011 Winfried Bruegmann
+    Copyright (c) 2011 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
 
@@ -26,21 +26,29 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.device.DesktopPropertyType;
+import gde.device.DesktopPropertyTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
-import gde.io.LogViewReader;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.swt.SWT;
 
@@ -48,9 +56,11 @@ import org.eclipse.swt.SWT;
  * Graupner Ultramat base class
  * @author Winfried Brügmann
  */
-public class Ultramat extends DeviceConfiguration implements IDevice {
+public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	final static Logger														log															= Logger.getLogger(Ultramat.class.getName());
 
+	public enum GraupnerDeviceType { UltraDuoPlus50, Ultramat40, UltramatTrio14, Ultramat18, UltraDuoPlus45, UltraDuoPlus60, UltramatTrio16S, /*unknown*/ Ultramat16 };
+	
 	protected String[]														USAGE_MODE;
 	protected String[]														CHARGE_MODE;
 	protected String[]														DISCHARGE_MODE;
@@ -63,12 +73,16 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 	protected static final String									OPERATIONS_MODE_ERROR						= "06";																			//$NON-NLS-1$
 	protected static final String									OPERATIONS_MODE_NONE						= "00";																			//$NON-NLS-1$
 
+	protected Schema															schema;
+	protected JAXBContext													jc;
+	protected UltraDuoPlusType										ultraDuoPlusSetup;
+	protected String 															firmware												= GDE.STRING_MINUS;
+	protected GathererThread 											dataGatherThread;
+
 	protected final DataExplorer									application;
 	protected final UltramatSerialPort						serialPort;
 	protected final Channels											channels;
 	protected UltraDuoPlusDialog									dialog;
-
-	protected HashMap<String, CalculationThread>	calculationThreads							= new HashMap<String, CalculationThread>();
 
 	/**
 	 * constructor using properties file
@@ -79,22 +93,6 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		//TODO - check for other than Ultra Duo Plus devices the listed modes needs to be modified
-		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2200), Messages.getString(MessageIds.GDE_MSGT2201), Messages.getString(MessageIds.GDE_MSGT2202),
-				Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGT2204), Messages.getString(MessageIds.GDE_MSGT2205), Messages.getString(MessageIds.GDE_MSGT2206),
-				Messages.getString(MessageIds.GDE_MSGT2207), Messages.getString(MessageIds.GDE_MSGT2208), Messages.getString(MessageIds.GDE_MSGT2209) };
-		this.CHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212),
-				Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2214), Messages.getString(MessageIds.GDE_MSGT2215), Messages.getString(MessageIds.GDE_MSGT2216),
-				Messages.getString(MessageIds.GDE_MSGT2217), Messages.getString(MessageIds.GDE_MSGT2218), Messages.getString(MessageIds.GDE_MSGT2219), Messages.getString(MessageIds.GDE_MSGT2220),
-				Messages.getString(MessageIds.GDE_MSGT2221), Messages.getString(MessageIds.GDE_MSGT2222) };
-		this.DISCHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212),
-				Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2223), Messages.getString(MessageIds.GDE_MSGT2224), Messages.getString(MessageIds.GDE_MSGT2220),
-				Messages.getString(MessageIds.GDE_MSGT2222) };
-		this.DELAY_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2225), Messages.getString(MessageIds.GDE_MSGT2226), Messages.getString(MessageIds.GDE_MSGT2227),
-				Messages.getString(MessageIds.GDE_MSGT2228) };
-		this.CURRENT_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2229), Messages.getString(MessageIds.GDE_MSGT2230), Messages.getString(MessageIds.GDE_MSGT2231),
-				Messages.getString(MessageIds.GDE_MSGT2232), Messages.getString(MessageIds.GDE_MSGT2233), Messages.getString(MessageIds.GDE_MSGT2234), Messages.getString(MessageIds.GDE_MSGT2235),
-				Messages.getString(MessageIds.GDE_MSGT2236), Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new UltramatSerialPort(this, this.application);
@@ -111,22 +109,6 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		//TODO - check for other than Ultra Duo Plus devices the listed modes needs to be modified
-		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2200), Messages.getString(MessageIds.GDE_MSGT2201), Messages.getString(MessageIds.GDE_MSGT2202),
-				Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGT2204), Messages.getString(MessageIds.GDE_MSGT2205), Messages.getString(MessageIds.GDE_MSGT2206),
-				Messages.getString(MessageIds.GDE_MSGT2207), Messages.getString(MessageIds.GDE_MSGT2208), Messages.getString(MessageIds.GDE_MSGT2209) };
-		this.CHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212),
-				Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2214), Messages.getString(MessageIds.GDE_MSGT2215), Messages.getString(MessageIds.GDE_MSGT2216),
-				Messages.getString(MessageIds.GDE_MSGT2217), Messages.getString(MessageIds.GDE_MSGT2218), Messages.getString(MessageIds.GDE_MSGT2219), Messages.getString(MessageIds.GDE_MSGT2220),
-				Messages.getString(MessageIds.GDE_MSGT2221), Messages.getString(MessageIds.GDE_MSGT2222) };
-		this.DISCHARGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2210), Messages.getString(MessageIds.GDE_MSGT2211), Messages.getString(MessageIds.GDE_MSGT2212),
-				Messages.getString(MessageIds.GDE_MSGT2213), Messages.getString(MessageIds.GDE_MSGT2223), Messages.getString(MessageIds.GDE_MSGT2224), Messages.getString(MessageIds.GDE_MSGT2220),
-				Messages.getString(MessageIds.GDE_MSGT2222) };
-		this.DELAY_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2225), Messages.getString(MessageIds.GDE_MSGT2226), Messages.getString(MessageIds.GDE_MSGT2227),
-				Messages.getString(MessageIds.GDE_MSGT2228) };
-		this.CURRENT_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2229), Messages.getString(MessageIds.GDE_MSGT2230), Messages.getString(MessageIds.GDE_MSGT2231),
-				Messages.getString(MessageIds.GDE_MSGT2232), Messages.getString(MessageIds.GDE_MSGT2233), Messages.getString(MessageIds.GDE_MSGT2234), Messages.getString(MessageIds.GDE_MSGT2235),
-				Messages.getString(MessageIds.GDE_MSGT2236), Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new UltramatSerialPort(this, this.application);
@@ -175,66 +157,7 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
-	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = this.getDataBlockSize(); // const.
-		int[] points = new int[this.getNumberOfMeasurements(1)];
-		int offset = 4;
-		int progressCycle = 0;
-		int lovDataSize = this.getLovDataByteSize();
-		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0;
-		//int outputChannel = recordSet.getChannelConfigNumber(); 
-
-		if (dataBuffer[offset] == 0x0C) {
-			byte[] convertBuffer = new byte[deviceDataBufferSize];
-			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-
-			for (int i = 0; i < recordDataSize; i++) {
-				System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
-				recordSet.addPoints(convertDataBytes(points, convertBuffer));
-
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
-			}
-
-			recordSet.setTimeStep_ms(this.getAverageTimeStep_ms() != null ? this.getAverageTimeStep_ms() : 1000); // no average time available, use a hard coded one
-		}
-		else { // none constant time steps
-			byte[] sizeBuffer = new byte[4];
-			byte[] convertBuffer = new byte[deviceDataBufferSize];
-
-			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-			for (int i = 0; i < recordDataSize; i++) {
-				System.arraycopy(dataBuffer, offset, sizeBuffer, 0, 4);
-				lovDataSize = 4 + LogViewReader.parse2Int(sizeBuffer);
-				System.arraycopy(dataBuffer, offset + 4, convertBuffer, 0, deviceDataBufferSize);
-				recordSet.addPoints(convertDataBytes(points, convertBuffer));
-				offset += lovDataSize;
-
-				StringBuilder sb = new StringBuilder();
-				byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize - 4];
-				//sb.append(timeBuffer.length).append(GDE.STRING_MESSAGE_CONCAT);
-				System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
-				String timeStamp = new String(timeBuffer).substring(0, timeBuffer.length - 8) + "0000000000"; //$NON-NLS-1$
-				long dateTime = new Long(timeStamp.substring(6, 17));
-				log.log(java.util.logging.Level.FINEST, timeStamp + GDE.STRING_BLANK + timeStamp.substring(6, 17) + GDE.STRING_BLANK + dateTime);
-				sb.append(dateTime);
-				//System.arraycopy(dataBuffer, offset - 4, sizeBuffer, 0, 4);
-				//sb.append(" ? ").append(LogViewReader.parse2Int(sizeBuffer));
-				deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime) / 1000 - 217; // value 217 is a compromis manual selected
-				sb.append(GDE.STRING_MESSAGE_CONCAT).append(deltaTime);
-				sb.append(GDE.STRING_MESSAGE_CONCAT).append(sumTimeDelta += deltaTime);
-				log.log(java.util.logging.Level.FINER, sb.toString());
-				lastDateTime = dateTime;
-
-				recordSet.addTimeStep_ms(sumTimeDelta);
-
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
-			}
-		}
-		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		updateVisibilityStatus(recordSet, true);
-		recordSet.syncScaleOfSyncableRecords();
-	}
+	public abstract void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException;
 
 	/**
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
@@ -242,35 +165,7 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte array with the data to be converted
 	 */
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
-		int maxVotage = Integer.MIN_VALUE;
-		int minVotage = Integer.MAX_VALUE;
-
-		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
-		points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
-		points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
-		points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
-		points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
-		points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-		points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
-		String sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[37], (char) dataBuffer[38]);
-		if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[5] = -1 * points[5];
-		points[6] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
-		points[7] = 0;
-
-		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
-		for (int i = 0, j = 0; i < points.length - 8; ++i, j += 4) {
-			points[i + 8] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
-			if (points[i + 8] > 0) {
-				maxVotage = points[i + 8] > maxVotage ? points[i + 8] : maxVotage;
-				minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
-			}
-		}
-		//calculate balance on the fly
-		points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-
-		return points;
-	}
+	public abstract int[] convertDataBytes(int[] points, byte[] dataBuffer);
 
 	/**
 	 * add record data size points from file stream to each measurement
@@ -283,49 +178,7 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
-	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
-		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.size()];
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int progressCycle = 0;
-		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-
-		for (int i = 0; i < recordDataSize; i++) {
-			log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
-			System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
-			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
-			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
-			points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
-			points[1] = (((convertBuffer[4] & 0xff) << 24) + ((convertBuffer[5] & 0xff) << 16) + ((convertBuffer[6] & 0xff) << 8) + ((convertBuffer[7] & 0xff) << 0));
-			points[2] = (((convertBuffer[8] & 0xff) << 24) + ((convertBuffer[9] & 0xff) << 16) + ((convertBuffer[10] & 0xff) << 8) + ((convertBuffer[11] & 0xff) << 0));
-			points[3] = Double.valueOf(points[0] / 1000.0 * points[1]).intValue(); // power U*I [W]
-			points[4] = Double.valueOf(points[0] / 1000.0 * points[2]).intValue(); // energy U*C [Wh]
-			points[5] = (((convertBuffer[12] & 0xff) << 24) + ((convertBuffer[13] & 0xff) << 16) + ((convertBuffer[14] & 0xff) << 8) + ((convertBuffer[15] & 0xff) << 0));
-			points[6] = (((convertBuffer[16] & 0xff) << 24) + ((convertBuffer[17] & 0xff) << 16) + ((convertBuffer[18] & 0xff) << 8) + ((convertBuffer[19] & 0xff) << 0));
-			points[7] = 0;
-			int maxVotage = Integer.MIN_VALUE;
-			int minVotage = Integer.MAX_VALUE;
-
-			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
-			for (int j = 0, k = 0; j < points.length - 8; ++j, k += GDE.SIZE_BYTES_INTEGER) {
-				points[j + 8] = (((convertBuffer[k + 20] & 0xff) << 24) + ((convertBuffer[k + 21] & 0xff) << 16) + ((convertBuffer[k + 22] & 0xff) << 8) + ((convertBuffer[k + 23] & 0xff) << 0));
-				if (points[j + 8] > 0) {
-					maxVotage = points[j + 8] > maxVotage ? points[j + 8] : maxVotage;
-					minVotage = points[j + 8] < minVotage ? points[j + 8] : minVotage;
-				}
-			}
-			//calculate balance on the fly
-			points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-
-			recordSet.addPoints(points);
-
-			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 2500) / recordDataSize), sThreadId);
-		}
-		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		updateVisibilityStatus(recordSet, true);
-		recordSet.syncScaleOfSyncableRecords();
-	}
+	public abstract void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException;
 
 	/**
 	 * function to prepare a data table row of record set while translating available measurement values
@@ -419,61 +272,7 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		// since there are live measurement points only the calculation will take place directly after switch all to displayable
-		if (recordSet.isRaw()) {
-			// calculate the values required
-			try {
-				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
-				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
-				String[] recordNames = recordSet.getRecordNames();
-				int displayableCounter = 0;
-
-				// check if measurements isActive == false and set to isDisplayable == false
-				for (String measurementKey : recordNames) {
-					Record record = recordSet.get(measurementKey);
-
-					if (record.isActive() && (record.getOrdinal() <= 5 || record.getRealMaxValue() != 0 || record.getRealMinValue() != record.getRealMaxValue())) {
-						++displayableCounter;
-					}
-				}
-
-				String recordKey = recordNames[3]; //3=Leistung
-				Record record = recordSet.get(recordKey);
-				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
-					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
-					try {
-						this.calculationThreads.get(recordKey).start();
-					}
-					catch (RuntimeException e) {
-						log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-					}
-				}
-				++displayableCounter;
-
-				recordKey = recordNames[4]; //4=Energie
-				record = recordSet.get(recordKey);
-				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
-					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
-					try {
-						this.calculationThreads.get(recordKey).start();
-					}
-					catch (RuntimeException e) {
-						log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-					}
-				}
-				++displayableCounter;
-
-				log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
-				recordSet.setConfiguredDisplayable(displayableCounter);
-
-				if (recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
-					this.application.updateGraphicsWindow();
-				}
-			}
-			catch (RuntimeException e) {
-				log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-			}
-		}
+		//all data points get calculated while convertDataBytes()
 	}
 
 	/**
@@ -508,9 +307,33 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
 				try {
+					this.serialPort.open();
+					try {
+						byte[] dataBuffer = this.serialPort.getData();
+						this.firmware = this.getFirmwareVersion(dataBuffer);
+						if (!(this.isProcessing(1, dataBuffer) || this.isProcessing(2, dataBuffer))) {
+							//TODO check if device fits this.device.getProductCode(dataBuffer); else ask for switch ?? don't know if this is required
+							this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
+							String deviceIdentifierName = this.serialPort.readDeviceUserName();
+							this.serialPort.write(UltramatSerialPort.RESET_END);
+
+							this.jc = JAXBContext.newInstance("gde.device.graupner"); //$NON-NLS-1$
+							this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
+									new StreamSource(UltraDuoPlusDialog.class.getClassLoader().getResourceAsStream("resource/" + UltraDuoPlusDialog.ULTRA_DUO_PLUS_XSD))); //$NON-NLS-1$
+							Unmarshaller unmarshaller = this.jc.createUnmarshaller();
+							unmarshaller.setSchema(this.schema);
+							this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(Settings.getInstance().getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
+									+ deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
+						}
+					}
+					catch (Exception e) {
+						// ignore
+						e.printStackTrace();
+					}
+
 					Channel activChannel = Channels.getInstance().getActiveChannel();
 					if (activChannel != null) {
-						GathererThread dataGatherThread = GathererThread.getInstance();
+						this.dataGatherThread = new GathererThread();
 						try {
 							if (this.serialPort.isConnected()) {
 								dataGatherThread.start();
@@ -538,9 +361,9 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 				}
 			}
 			else {
-				if (GathererThread.isInstance()) {
+				if (this.dataGatherThread != null) {
 					try {
-						GathererThread.getInstance().stopDataGatheringThread(false, null);
+						this.dataGatherThread.stopDataGatheringThread(false, null);
 					}
 					catch (Exception e) {
 						// ignore, while stopping no exception will be thrown
@@ -563,6 +386,22 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * query if the target measurement reference ordinal used by the given desktop type
+	 * @return the target measurement reference ordinal, -1 if reference ordinal not set
+	 */
+	@Override
+	public int getDesktopTargetReferenceOrdinal(DesktopPropertyTypes desktopPropertyType) {
+		DesktopPropertyType property = this.getDesktopProperty(desktopPropertyType);
+		return property != null ? property.getTargetReferenceOrdinal() : -1;
+	}
+
+	/**
+	 * query the device identifier to differentiate between different device implementations
+	 * @return 1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, 6=Ultramat16S ?=Ultramat16
+	 */
+	public abstract GraupnerDeviceType getDeviceTypeIdentifier();
+	
+	/**
 	 * query the firmware version
 	 * @param dataBuffer 
 	 * @return v2.0
@@ -577,6 +416,7 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @return v2.0
 	 */
 	public int getProductCode(byte[] dataBuffer) {
+		//1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, 6=Ultramat16S
 		return Integer.parseInt(String.format("%c%c", (char) dataBuffer[3], (char) dataBuffer[4]));
 	}
 
@@ -646,6 +486,31 @@ public class Ultramat extends DeviceConfiguration implements IDevice {
 			break;
 		}
 		return type;
+	}
+	
+	/**
+	 * find best match of memory name with object key and select, if no match no object key will be changed
+	 * @param batteryMemoryName
+	 * @return
+	 */
+	public void matchBatteryMemory2ObjectKey(String batteryMemoryName) {
+		Object[] tmpResult = null;
+		for (String tmpObjectKey : this.application.getObjectKeys()) {
+			String[] batteryNameParts = batteryMemoryName.split(" |-|_");
+			int hitCount = 0;
+			for (String namePart : batteryNameParts) {
+				if (namePart.length() > 1 && tmpObjectKey.contains(namePart)) ++hitCount;
+			}
+			if (hitCount > 0) {
+				if (tmpResult == null || hitCount > (Integer)tmpResult[1]) {
+					tmpResult = new Object[] {tmpObjectKey, hitCount};
+					log.log(Level.FINE, "result updated = " + tmpObjectKey + " hitCount = " + hitCount);
+				}
+			}
+		}
+		if (tmpResult != null) {
+			this.application.selectObjectKey((String)tmpResult[0]);
+		}
 	}
 	
 	/**

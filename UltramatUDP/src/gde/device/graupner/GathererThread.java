@@ -19,7 +19,6 @@
 package gde.device.graupner;
 
 import gde.GDE;
-import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -33,15 +32,7 @@ import gde.ui.DataExplorer;
 import gde.utils.TimeLine;
 import gde.utils.WaitTimer;
 
-import java.io.File;
 import java.util.logging.Logger;
-
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 /**
  * Thread implementation to gather data from eStation device
@@ -62,14 +53,9 @@ public class GathererThread extends Thread {
 	String												recordSetKey1								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 	String												recordSetKey2								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 	String												recordSetKey3								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
-	boolean												isPortOpenedByLiveGatherer	= false;
 	boolean												isGatheredRecordSetVisible	= true;
 	int														retryCounter								= GathererThread.WAIT_TIME_RETRYS;													// 36 * 5 sec timeout = 180 sec
 	boolean												isCollectDataStopped				= false;
-
-	Schema												schema;
-	JAXBContext										jc;
-	UltraDuoPlusType							ultraDuoPlusSetup;
 
 	boolean												isProgrammExecuting1				= false;
 	boolean												isProgrammExecuting2				= false;
@@ -81,27 +67,6 @@ public class GathererThread extends Thread {
 	long													measurementCount1						= 0;
 	long													measurementCount2						= 0;
 	long													measurementCount3						= 0;
-	String 												firmware										= GDE.STRING_MINUS;
-
-	private static GathererThread	gathererTread								= null;
-
-	/**
-	 * get the singleton instance of this data gatherer thread
-	 * @return
-	 * @throws ApplicationConfigurationException
-	 * @throws SerialPortException
-	 */
-	public static GathererThread getInstance() throws ApplicationConfigurationException, SerialPortException {
-		return GathererThread.isInstance() ? GathererThread.gathererTread : (GathererThread.gathererTread = new GathererThread());
-	}
-
-	/**
-	 * check for gatherer thread instance
-	 * @return
-	 */
-	public static boolean isInstance() {
-		return GathererThread.gathererTread != null;
-	}
 
 	/**
 	 * data gatherer thread definition 
@@ -109,7 +74,7 @@ public class GathererThread extends Thread {
 	 * @throws ApplicationConfigurationException 
 	 * @throws Exception 
 	 */
-	private GathererThread() throws ApplicationConfigurationException, SerialPortException {
+	public GathererThread() throws ApplicationConfigurationException, SerialPortException {
 		super("dataGatherer"); //$NON-NLS-1$
 		this.application = DataExplorer.getInstance();
 		this.device = (Ultramat) this.application.getActiveDevice();
@@ -117,32 +82,6 @@ public class GathererThread extends Thread {
 		this.serialPort = this.device.getCommunicationPort();
 		this.channels = Channels.getInstance();
 
-		if (!this.serialPort.isConnected()) {
-			this.serialPort.open();
-			this.isPortOpenedByLiveGatherer = true;
-			try {
-				byte[] dataBuffer = this.serialPort.getData();
-				this.firmware = this.device.getFirmwareVersion(dataBuffer);
-				if (!(this.device.isProcessing(1, dataBuffer) || this.device.isProcessing(2, dataBuffer))) {
-					//TODO check if device fits this.device.getProductCode(dataBuffer); else ask for switch ?? don't know if this is required
-					this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
-					String deviceIdentifierName = this.serialPort.readDeviceUserName();
-					this.serialPort.write(UltramatSerialPort.RESET_END);
-
-					this.jc = JAXBContext.newInstance("gde.device.graupner"); //$NON-NLS-1$
-					this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
-							new StreamSource(UltraDuoPlusDialog.class.getClassLoader().getResourceAsStream("resource/" + UltraDuoPlusDialog.ULTRA_DUO_PLUS_XSD))); //$NON-NLS-1$
-					Unmarshaller unmarshaller = this.jc.createUnmarshaller();
-					unmarshaller.setSchema(this.schema);
-					this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(Settings.getInstance().getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
-							+ deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
-				}
-			}
-			catch (Exception e) {
-				// ignore
-				e.printStackTrace();
-			}
-		}
 		this.setPriority(Thread.MAX_PRIORITY);
 	}
 
@@ -174,41 +113,92 @@ public class GathererThread extends Thread {
 			try {
 				// get data from device
 				if (this.serialPort.isConnected()) dataBuffer = this.serialPort.getData();
+
+				switch (this.device.getDeviceTypeIdentifier()) {
 				
-				// check if device is ready for data capturing, discharge or charge allowed only
-				// else wait for 180 seconds max. for actions
-				this.isProgrammExecuting3 = this.device.isLinkedMode(dataBuffer);
-				if (!this.isProgrammExecuting3 && !this.isCombinedMode) { // outlet channel 1+2 combined 
+				case UltraDuoPlus60:
+					this.isProgrammExecuting3 = this.device.isLinkedMode(dataBuffer);
+					if (!this.isProgrammExecuting3 && !this.isCombinedMode) { // outlet channel 1+2 combined 
+						this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
+						this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
+					}
+					break;
+					
+				case Ultramat16:
+				case Ultramat18:
+					this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
+					this.isProgrammExecuting2 = this.isProgrammExecuting3 = false;
+					break;
+					
+				case UltramatTrio14:
+				case UltramatTrio16S:
 					this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
 					this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
+					this.isProgrammExecuting3 = this.device.isProcessing(3, dataBuffer);
+					break;
+					
+				case UltraDuoPlus45:
+				case UltraDuoPlus50:
+					this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
+					this.isProgrammExecuting2 = this.isProgrammExecuting3 = false;
+					break;
 				}
 
+				// check if device is ready for data capturing, discharge or charge allowed only
+				// else wait for 180 seconds max. for actions
 				if (this.isProgrammExecuting1 || this.isProgrammExecuting2 || this.isProgrammExecuting3) {
-					if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
-						this.isCombinedMode = true;
-						Object[] ch3 = processDataChannel(3, recordSet3, this.recordSetKey3, dataBuffer, points3, this.measurementCount3, this.startCycleTime3);
-						recordSet3 = (RecordSet) ch3[0];
-						this.recordSetKey3 = (String) ch3[1];
-						this.measurementCount3 = (Long) ch3[2];
-						this.startCycleTime3 = (Long) ch3[3];
-					}
-					else {
-						if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
-							Object[] ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
-							recordSet1 = (RecordSet) ch1[0];
-							this.recordSetKey1 = (String) ch1[1];
-							this.measurementCount1 = (Long) ch1[2];
-							this.startCycleTime1 = (Long) ch1[3];
+					switch (this.device.getDeviceTypeIdentifier()) {
+					
+					case UltraDuoPlus60:
+						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
+							this.isCombinedMode = true;
+							Object[] ch3 = processDataChannel(3, recordSet3, this.recordSetKey3, dataBuffer, points3, this.measurementCount3, this.startCycleTime3);
+							recordSet3 = (RecordSet) ch3[0];
+							this.recordSetKey3 = (String) ch3[1];
+							this.measurementCount3 = (Long) ch3[2];
+							this.startCycleTime3 = (Long) ch3[3];
 						}
-						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
-							byte[] buffer = new byte[this.device.getDataBlockSize() / 2];
-							System.arraycopy(dataBuffer, buffer.length - 5, buffer, 0, buffer.length);
-							Object[] ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
-							recordSet2 = (RecordSet) ch2[0];
-							this.recordSetKey2 = (String) ch2[1];
-							this.measurementCount2 = (Long) ch2[2];
-							this.startCycleTime2 = (Long) ch2[3];
+						else {
+							if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
+								Object[] ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
+								recordSet1 = (RecordSet) ch1[0];
+								this.recordSetKey1 = (String) ch1[1];
+								this.measurementCount1 = (Long) ch1[2];
+								this.startCycleTime1 = (Long) ch1[3];
+							}
+							if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
+								byte[] buffer = new byte[this.device.getDataBlockSize() / 2];
+								System.arraycopy(dataBuffer, buffer.length - 5, buffer, 0, buffer.length);
+								Object[] ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
+								recordSet2 = (RecordSet) ch2[0];
+								this.recordSetKey2 = (String) ch2[1];
+								this.measurementCount2 = (Long) ch2[2];
+								this.startCycleTime2 = (Long) ch2[3];
+							}
 						}
+						break;
+						
+					case Ultramat16:
+					case Ultramat18:
+						Object[] ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
+						recordSet1 = (RecordSet) ch1[0];
+						this.recordSetKey1 = (String) ch1[1];
+						this.measurementCount1 = (Long) ch1[2];
+						this.startCycleTime1 = (Long) ch1[3];
+						break;
+						
+					case UltramatTrio14:
+					case UltramatTrio16S:
+						this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
+						this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
+						this.isProgrammExecuting3 = this.device.isProcessing(3, dataBuffer);
+						break;
+						
+					case UltraDuoPlus45:
+					case UltraDuoPlus50:
+						this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
+						this.isProgrammExecuting2 = this.isProgrammExecuting3 = false;
+						break;
 					}
 				}
 				else { // no program is executing, wait for 180 seconds max. for actions
@@ -216,21 +206,21 @@ public class GathererThread extends Thread {
 					log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation"); //$NON-NLS-1$
 
 					if (recordSet1 != null && recordSet1.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
-						finalizeRecordSet(recordSet1.getName(), false);
+						finalizeRecordSet(recordSet1.getName());
 						this.isProgrammExecuting1 = false;
 						recordSet1 = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
 						this.application.openMessageDialogAsync(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2204, new String[] { "1" })); //$NON-NLS-1$
 					}
 					if (recordSet2 != null && recordSet2.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
-						finalizeRecordSet(recordSet2.getName(), false);
+						finalizeRecordSet(recordSet2.getName());
 						this.isProgrammExecuting2 = false;
 						recordSet2 = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
 						this.application.openMessageDialogAsync(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2204, new String[] { "2" })); //$NON-NLS-1$
 					}
 					if (recordSet3 != null && recordSet3.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
-						finalizeRecordSet(recordSet3.getName(), false);
+						finalizeRecordSet(recordSet3.getName());
 						this.isProgrammExecuting3 = false;
 						recordSet3 = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
@@ -254,17 +244,17 @@ public class GathererThread extends Thread {
 				// this case will be reached while NiXx Akku discharge/charge/discharge cycle
 				if (e instanceof TimeOutException) {
 					if (recordSet1 != null) {
-						finalizeRecordSet(recordSet1.getName(), false);
+						finalizeRecordSet(recordSet1.getName());
 						recordSet1 = null;
 						WaitTimer.delay(1000);
 					}
 					if (recordSet2 != null) {
-						finalizeRecordSet(recordSet2.getName(), false);
+						finalizeRecordSet(recordSet2.getName());
 						recordSet2 = null;
 						WaitTimer.delay(1000);
 					}
 					if (recordSet3 != null) {
-						finalizeRecordSet(recordSet3.getName(), false);
+						finalizeRecordSet(recordSet3.getName());
 						recordSet3 = null;
 						WaitTimer.delay(1000);
 					}
@@ -318,16 +308,19 @@ public class GathererThread extends Thread {
 				
 				// record set does not exist or is outdated, build a new name and create
 				StringBuilder extend = new StringBuilder();
-				if (this.device.getProcessingType(dataBuffer).length() > 3 || this.device.getCycleNumber(number, dataBuffer) > 0) extend.append(GDE.STRING_BLANK_LEFT_BRACKET);
-				if (this.device.getProcessingType(dataBuffer).length() > 3) extend.append(this.device.getProcessingType(dataBuffer));
-				if (this.device.getCycleNumber(number, dataBuffer) > 0) {
-					if (this.device.getProcessingType(dataBuffer).equals(Messages.getString(MessageIds.GDE_MSGT2302)))
-						extend.append(GDE.STRING_COLON).append(this.device.getCycleNumber(number, dataBuffer));
-					else
-						extend.append(GDE.STRING_MINUS).append(Messages.getString(MessageIds.GDE_MSGT2302)).append(GDE.STRING_COLON).append(this.device.getCycleNumber(number, dataBuffer));
+				if (this.device.getProcessingMode(dataBuffer) < 5) {
+					if (this.device.getProcessingType(dataBuffer).length() > 3 || this.device.getCycleNumber(number, dataBuffer) > 0) extend.append(GDE.STRING_BLANK_LEFT_BRACKET);
+					if (this.device.getProcessingType(dataBuffer).length() > 3) extend.append(this.device.getProcessingType(dataBuffer));
+					if (this.device.getCycleNumber(number, dataBuffer) > 0) {
+						if (this.device.getProcessingType(dataBuffer).equals(Messages.getString(MessageIds.GDE_MSGT2302)))
+							extend.append(GDE.STRING_COLON).append(this.device.getCycleNumber(number, dataBuffer));
+						else
+							extend.append(GDE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.GDE_MSGT2302)).append(GDE.STRING_COLON).append(this.device.getCycleNumber(number, dataBuffer));
+					}
+					if (this.device.getProcessingType(dataBuffer).length() > 3 || this.device.getCycleNumber(number, dataBuffer) > 0) extend.append(GDE.STRING_RIGHT_BRACKET);
 				}
-				if (this.device.getProcessingType(dataBuffer).length() > 3 || this.device.getCycleNumber(number, dataBuffer) > 0) extend.append(GDE.STRING_RIGHT_BRACKET);
 				recordSetKey = channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName + extend.toString();
+				recordSetKey = recordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetKey : recordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
 				channel.applyTemplateBasics(recordSetKey);
@@ -336,13 +329,17 @@ public class GathererThread extends Thread {
 				this.device.setTemperatureUnit(number, recordSet, dataBuffer); //°C or °F
 				recordSet.setAllDisplayable();
 				String description = recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR 
-						+ "Firmware  : " + this.firmware  																											//$NON-NLS-1$
+						+ "Firmware  : " + this.device.firmware  																											//$NON-NLS-1$
 						+ "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer); 								//$NON-NLS-1$
 				try {
-					if (this.ultraDuoPlusSetup != null && this.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)) != null)
-						description = description + GDE.STRING_MESSAGE_CONCAT + this.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)-1).getName();
+					if (this.device.ultraDuoPlusSetup != null && this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)) != null) {
+						String batteryMemoryName = this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)-1).getName();
+						description = description + GDE.STRING_MESSAGE_CONCAT + batteryMemoryName;
+						this.device.matchBatteryMemory2ObjectKey(batteryMemoryName);
+					}
 				}
 				catch (Exception e) {
+					e.printStackTrace();
 					// ignore and do not append memory name
 				}
 				recordSet.setRecordSetDescription(description);
@@ -394,18 +391,13 @@ public class GathererThread extends Thread {
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
 			log.log(java.util.logging.Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		if (this.serialPort != null && this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
-			this.serialPort.close();
-		}
-
-		GathererThread.gathererTread = null;
 	}
 
 	/**
 	 * close port, set isDisplayable according channel configuration and calculate slope
 	 */
-	void finalizeRecordSet(String recordSetKey, boolean doClosePort) {
-		if (doClosePort && this.isPortOpenedByLiveGatherer && this.serialPort.isConnected()) this.serialPort.close();
+	void finalizeRecordSet(String recordSetKey) {
+		//if (doClosePort && this.isPortOpenedByLiveGatherer && this.serialPort.isConnected()) this.serialPort.close();
 
 		RecordSet tmpRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
 		if (tmpRecordSet != null) {

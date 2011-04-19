@@ -43,7 +43,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -381,6 +380,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					this.serialPort.close();
 					this.application.openMessageDialog(null, Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 					this.application.getDeviceSelectionDialog().open();
+					if (!this.application.getActiveDevice().equals(this.device)) //check if device was changed
+						return;
 				}
 			}
 			else {
@@ -420,7 +421,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 								UltraDuoPlusDialog.this.synchronizerRead.join();
 								try {
 									//set the date to sync with PC time
-									String[] date = new SimpleDateFormat("yy:MM:dd:hh:mm").format(new Date().getTime()).split(GDE.STRING_COLON); //$NON-NLS-1$
+									String[] date = StringHelper.getDateAndTime("yy:MM:dd:hh:mm").split(GDE.STRING_COLON); //$NON-NLS-1$
 									UltraDuoPlusDialog.this.channelValues1[10] = Integer.parseInt(date[0]);
 									UltraDuoPlusDialog.this.channelValues1[11] = Integer.parseInt(date[1]);
 									UltraDuoPlusDialog.this.channelValues1[12] = Integer.parseInt(date[2]);
@@ -474,6 +475,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						this.userNameText = new Text(this.boundsComposite, SWT.SINGLE | SWT.BORDER);
 						this.userNameText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.userNameText.setText(this.deviceIdentifierName);
+						this.userNameText.setTextLimit(16);
 						FormData userNameTextLData = new FormData();
 						userNameTextLData.width = 120;
 						userNameTextLData.height = 16;
@@ -631,6 +633,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.memoryCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.memoryCombo.setItems(this.memoryNames);
 										this.memoryCombo.setVisibleItemCount(20);
+										this.memoryCombo.setTextLimit(5+16);
 										RowData memoryComboLData = new RowData();
 										memoryComboLData.width = 165;
 										memoryComboLData.height = GDE.IS_WINDOWS ? 16 : 18;
@@ -941,9 +944,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "backupButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								SimpleDateFormat date = new SimpleDateFormat("yyyy-mm-dd-HH-mm");
 								FileDialog fileDialog = UltraDuoPlusDialog.this.application.prepareFileSaveDialog(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2285),
-										new String[] { GDE.FILE_ENDING_STAR_XML, GDE.FILE_ENDING_STAR }, UltraDuoPlusDialog.this.settings.getDataFilePath(), date.format(new Date().getTime()) + GDE.STRING_UNDER_BAR + UltraDuoPlusDialog.this.device.getName());
+										new String[] { GDE.FILE_ENDING_STAR_XML, GDE.FILE_ENDING_STAR }, UltraDuoPlusDialog.this.settings.getDataFilePath(), 
+										StringHelper.getDateAndTime("yyyy-MM-dd-HH-mm-ss") + GDE.STRING_UNDER_BAR + UltraDuoPlusDialog.this.device.getName());
 								String configFilePath = fileDialog.open();
 								if (configFilePath != null && fileDialog.getFileName().length() > 4) {
 									if (FileUtils.checkFileExist(configFilePath)) {
