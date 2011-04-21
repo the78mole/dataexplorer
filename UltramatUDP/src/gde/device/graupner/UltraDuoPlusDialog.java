@@ -28,6 +28,7 @@ import gde.device.graupner.UltraDuoPlusType.ChannelData1;
 import gde.device.graupner.UltraDuoPlusType.ChannelData2;
 import gde.device.graupner.UltraDuoPlusType.MotorRunData;
 import gde.device.graupner.UltraDuoPlusType.TireHeaterData;
+import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -1060,8 +1061,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 * update basic setup data from cache or actual red
 	 * @throws TimeOutException 
 	 * @throws IOException 
+	 * @throws SerialPortException 
 	 */
-	private void updateBaseSetup() throws IOException, TimeOutException {
+	private void updateBaseSetup() throws IOException, TimeOutException, SerialPortException {
 		log.log(Level.FINEST, GDE.STRING_ENTRY);
 		if (this.ultraDuoPlusSetup != null) {
 			if (this.ultraDuoPlusSetup.getChannelData1() == null || !this.ultraDuoPlusSetup.getChannelData1().isSynced()) {

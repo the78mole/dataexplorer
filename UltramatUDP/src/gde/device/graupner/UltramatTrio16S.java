@@ -36,8 +36,8 @@ import javax.xml.bind.JAXBException;
  * Graupner Ultramat Trio 16 S
  * @author Winfried Brügmann
  */
-public class UltramatTrio16S extends Ultramat {
-	final static Logger														logger															= Logger.getLogger(Ultramat.class.getName());
+public class UltramatTrio16S extends UltramatTrio14 {
+	final static Logger														logg															= Logger.getLogger(Ultramat.class.getName());
 
 
 	/**
@@ -207,7 +207,7 @@ public class UltramatTrio16S extends Ultramat {
 			for (int i = 0; i < recordDataSize; i++) {
 				int maxVotage = Integer.MIN_VALUE;
 				int minVotage = Integer.MAX_VALUE;
-				logger.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
+				logg.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
 				System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 7=SpannungZelle1 8=SpannungZelle2....
 				// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6 
@@ -239,7 +239,7 @@ public class UltramatTrio16S extends Ultramat {
 			for (int i = 0; i < recordDataSize; i++) {
 				int maxVotage = Integer.MIN_VALUE;
 				int minVotage = Integer.MAX_VALUE;
-				logger.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
+				logg.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
 				System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
 				// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3

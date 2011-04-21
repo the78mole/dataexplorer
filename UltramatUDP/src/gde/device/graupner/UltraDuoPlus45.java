@@ -23,6 +23,7 @@ import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
+import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DesktopPropertyType;
 import gde.device.DesktopPropertyTypes;
@@ -395,6 +396,34 @@ public class UltraDuoPlus45 extends Ultramat {
 		// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7 
 		// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
 		return new int[] { 0, this.channels.getActiveChannelNumber() == 3 ? 6 : 2 };
+	}
+	
+	/**
+	 * check and update visibility status of all records according the available device configuration
+	 * this function must have only implementation code if the device implementation supports different configurations
+	 * where some curves are hided for better overview 
+	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
+	 * it makes less sense to display voltage and current curves, if only height has measurement data
+	 * at least an update of the graphics window should be included at the end of this method
+	 */
+	@Override
+	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
+		String[] recordKeys = recordSet.getRecordNames();
+
+		recordSet.setAllDisplayable();
+		int numCells = recordSet.getChannelConfigNumber() < 3 ? 7 : 14;
+		for (int i = recordKeys.length - numCells - 1; i < recordKeys.length; ++i) {
+			Record record = recordSet.get(recordKeys[i]);
+			record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
+			log.log(java.util.logging.Level.FINER, recordKeys[i] + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData())); //$NON-NLS-1$
+		}
+
+		if (log.isLoggable(java.util.logging.Level.FINE)) {
+			for (String recordKey : recordKeys) {
+				Record record = recordSet.get(recordKey);
+				log.log(java.util.logging.Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
+		}
 	}
 
 	/**

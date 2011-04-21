@@ -6,6 +6,7 @@ import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
+import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.exception.DataInconsitsentException;
@@ -255,6 +256,34 @@ public class UltramatTrio14 extends Ultramat {
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
+	}
+
+	/**
+	 * check and update visibility status of all records according the available device configuration
+	 * this function must have only implementation code if the device implementation supports different configurations
+	 * where some curves are hided for better overview 
+	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
+	 * it makes less sense to display voltage and current curves, if only height has measurement data
+	 * at least an update of the graphics window should be included at the end of this method
+	 */
+	@Override
+	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
+		String[] recordKeys = recordSet.getRecordNames();
+
+		recordSet.setAllDisplayable();
+		int numCells = 12; //TODO
+		for (int i = recordKeys.length - numCells - 1; i < recordKeys.length; ++i) {
+			Record record = recordSet.get(recordKeys[i]);
+			record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
+			log.log(java.util.logging.Level.FINER, recordKeys[i] + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData())); //$NON-NLS-1$
+		}
+
+		if (log.isLoggable(java.util.logging.Level.FINE)) {
+			for (String recordKey : recordKeys) {
+				Record record = recordSet.get(recordKey);
+				log.log(java.util.logging.Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
+		}
 	}
 
 	/**

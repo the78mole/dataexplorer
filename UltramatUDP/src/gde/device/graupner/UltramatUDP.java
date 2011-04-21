@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
+import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DesktopPropertyType;
 import gde.device.DesktopPropertyTypes;
@@ -364,6 +365,61 @@ public class UltramatUDP extends Ultramat {
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
+	}
+
+	/**
+	 * function to prepare a data table row of record set while translating available measurement values
+	 * @return pointer to filled data table row with formated values
+	 */
+	@Override
+	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
+		String[] dataTableRow = new String[recordSet.size() + 1]; // this.device.getMeasurementNames(this.channelNumber).length
+		try {
+			String[] recordNames = recordSet.getRecordNames();
+			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
+			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
+			int numberRecords = recordNames.length;
+
+			dataTableRow[0] = String.format("%.3f", (recordSet.getTime_ms(rowIndex) / 1000.0)); //$NON-NLS-1$
+			for (int j = 0; j < numberRecords; j++) {
+				Record record = recordSet.get(recordNames[j]);
+				double reduction = record.getReduction();
+				double factor = record.getFactor(); // != 1 if a unit translation is required
+				dataTableRow[j + 1] = record.getDecimalFormat().format((((record.get(rowIndex) / 1000.0) - reduction) * factor));
+			}
+		}
+		catch (RuntimeException e) {
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+		}
+		return dataTableRow;
+	}
+	
+	/**
+	 * check and update visibility status of all records according the available device configuration
+	 * this function must have only implementation code if the device implementation supports different configurations
+	 * where some curves are hided for better overview 
+	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
+	 * it makes less sense to display voltage and current curves, if only height has measurement data
+	 * at least an update of the graphics window should be included at the end of this method
+	 */
+	@Override
+	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
+		String[] recordKeys = recordSet.getRecordNames();
+
+		recordSet.setAllDisplayable();
+		int numCells = recordSet.getChannelConfigNumber() < 3 ? 7 : 14;
+		for (int i = recordKeys.length - numCells - 1; i < recordKeys.length; ++i) {
+			Record record = recordSet.get(recordKeys[i]);
+			record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
+			log.log(java.util.logging.Level.FINER, recordKeys[i] + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData())); //$NON-NLS-1$
+		}
+
+		if (log.isLoggable(java.util.logging.Level.FINE)) {
+			for (String recordKey : recordKeys) {
+				Record record = recordSet.get(recordKey);
+				log.log(java.util.logging.Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
+		}
 	}
 
 	/**

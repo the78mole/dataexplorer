@@ -23,6 +23,7 @@ import gde.device.graupner.UltraDuoPlusType.ChannelData1;
 import gde.device.graupner.UltraDuoPlusType.ChannelData2;
 import gde.device.graupner.UltraDuoPlusType.MotorRunData;
 import gde.device.graupner.UltraDuoPlusType.TireHeaterData;
+import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.utils.StringHelper;
 
@@ -81,8 +82,9 @@ public class UltraDuoPlusSychronizer extends Thread {
 	 * synchronizes cached ultraDuoPlusSetup
 	 * @throws IOException
 	 * @throws TimeOutException
+	 * @throws SerialPortException 
 	 */
-	private void syncRead() throws IOException, TimeOutException {
+	private void syncRead() throws IOException, TimeOutException, SerialPortException {
 		if (this.serialPort.isConnected()) {
 			if (this.dialog != null) this.dialog.setBackupRetoreButtons(false);
 			

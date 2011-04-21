@@ -23,6 +23,7 @@ import gde.comm.DeviceCommPort;
 import gde.comm.DeviceSerialPortImpl;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.ui.DataExplorer;
@@ -128,13 +129,13 @@ public class UltramatSerialPort extends DeviceCommPort {
 				answer = new byte[data.length];
 				answer = this.read(answer, 3000);
 			}
-			if (log.isLoggable(Level.FINER)) {
+			if (log.isLoggable(Level.OFF)) {
 				StringBuilder sb = new StringBuilder().append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
 				for (int i = 1; i < answer.length - 1; ++i) {
 					sb.append(String.format("%c", (char) answer[i])); //$NON-NLS-1$
 				}
 				sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
-				log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, sb.toString());
+				log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 
 			if (answer[0] == BEGIN && answer[data.length-1] == END) {
@@ -143,12 +144,14 @@ public class UltramatSerialPort extends DeviceCommPort {
 			else {
 				this.addXferError();
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
 				data = getData();
 			}
 
 			if (!isChecksumOK(data)) {
 				this.addXferError();
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
 				data = getData();
 			}
 		}
@@ -166,8 +169,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return string configured in device
 	 * @throws IOException
 	 * @throws TimeOutException
+	 * @throws SerialPortException 
 	 */
-	public synchronized String readDeviceUserName() throws IOException, TimeOutException  {
+	public synchronized String readDeviceUserName() throws IOException, TimeOutException, SerialPortException  {
 			byte[] answer = this.readConfigData(READ_DEVICE_IDENTIFIER_NAME, 23, 2);
 			return String.format(DeviceSerialPortImpl.FORMAT_16_CHAR, answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12], answer[13], answer[14], answer[15], answer[16]);
 	}
@@ -178,8 +182,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return values integer array
 	 * @throws IOException
 	 * @throws TimeOutException
+	 * @throws SerialPortException 
 	 */
-	public synchronized String readChannelData(int channelNumber) throws IOException, TimeOutException {
+	public synchronized String readChannelData(int channelNumber) throws IOException, TimeOutException, SerialPortException {
 		if (channelNumber == 1) {
 			return new String(this.readConfigData(READ_CHANNEL_SETUP, SIZE_CHANNEL_1_SETUP * 4 + 7, channelNumber)).substring(1, SIZE_CHANNEL_1_SETUP * 4 + 1);
 		}
@@ -195,8 +200,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return
 	 * @throws IOException
 	 * @throws TimeOutException
+	 * @throws SerialPortException 
 	 */
-	public synchronized String readMemoryName(int number) throws IOException, TimeOutException {
+	public synchronized String readMemoryName(int number) throws IOException, TimeOutException, SerialPortException {
 		byte[] answer = this.readConfigData(READ_MEMORY_NAME, 23, number);
 		return String.format(DeviceSerialPortImpl.FORMAT_16_CHAR, answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12], answer[13], answer[14], answer[15], answer[16]);
 	}
@@ -207,8 +213,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return
 	 * @throws IOException
 	 * @throws TimeOutException
+	 * @throws SerialPortException 
 	 */
-	public synchronized String readMemorySetup(int number) throws IOException, TimeOutException {
+	public synchronized String readMemorySetup(int number) throws IOException, TimeOutException, SerialPortException {
 		return new String(this.readConfigData(READ_MEMORY_SETUP, SIZE_MEMORY_SETUP * 4 + 7, number)).substring(1, SIZE_MEMORY_SETUP * 4+1);
 	}
 	
@@ -218,8 +225,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return
 	 * @throws IOException
 	 * @throws TimeOutException
+	 * @throws SerialPortException 
 	 */
-	public synchronized String readMemoryTrace(int number) throws IOException, TimeOutException {
+	public synchronized String readMemoryTrace(int number) throws IOException, TimeOutException, SerialPortException {
 		return new String(this.readConfigData(READ_MEMORY_TRACE_DATA, SIZE_MEMORY_TRACE * 4 + 7, number)).substring(1, SIZE_MEMORY_TRACE * 4+1);
 	}
 	
@@ -229,8 +237,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return
 	 * @throws IOException
 	 * @throws TimeOutException
+	 * @throws SerialPortException 
 	 */
-	public synchronized String readMemoryCycle(int number) throws IOException, TimeOutException {
+	public synchronized String readMemoryCycle(int number) throws IOException, TimeOutException, SerialPortException {
 		return new String(this.readConfigData(READ_MEMORY_CYCLE_DATA, SIZE_MEMORY_CYCLE * 4 + 7, number)).substring(1, SIZE_MEMORY_CYCLE * 4+1);
 	}
 	
@@ -240,8 +249,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return
 	 * @throws IOException
 	 * @throws TimeOutException
+	 * @throws SerialPortException 
 	 */
-	public synchronized String readMemoryStepChargeSetup(int number) throws IOException, TimeOutException {
+	public synchronized String readMemoryStepChargeSetup(int number) throws IOException, TimeOutException, SerialPortException {
 		return new String(this.readConfigData(READ_MEMORY_STEP_CHARGE_SETUP, SIZE_MEMORY_STEP_CHARGE_SETUP * 4 + 7, number)).substring(1, SIZE_MEMORY_STEP_CHARGE_SETUP * 4+1);
 	}
 
@@ -253,8 +263,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return byte array containing the requested configuration data
 	 * @throws IOException
 	 * @throws TimeOutException
+	 * @throws SerialPortException 
 	 */
-	public synchronized byte[] readConfigData(byte[] type, int expectedDataSize, int index) throws IOException, TimeOutException {
+	public synchronized byte[] readConfigData(byte[] type, int expectedDataSize, int index) throws IOException, TimeOutException, SerialPortException {
 		final String $METHOD_NAME = "readConfigData"; //$NON-NLS-1$
 		log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 		byte[] readBuffer = new byte[expectedDataSize];
@@ -300,6 +311,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 			if (!(readBuffer[0] == BEGIN && readBuffer[readBuffer.length - 1] == ACK && isCommandChecksumOK(readBuffer))) {
 				this.addXferError();
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
 				readBuffer = readConfigData(type, expectedDataSize, index);
 			}
 			if (log.isLoggable(Level.FINE)) {
@@ -400,11 +412,17 @@ public class UltramatSerialPort extends DeviceCommPort {
 		boolean isOK = false;
 		int length = Math.abs(this.device.getDataBlockSize());
 		int check_sum = Checksum.ADD(buffer, 1, length-6);
-		if (check_sum == Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length-5], (char) buffer[length-4], (char) buffer[length-3], (char) buffer[length-2]), 16)) //$NON-NLS-1$
+		int buffer_check_sum = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length-5], (char) buffer[length-4], (char) buffer[length-3], (char) buffer[length-2]), 16);
+		if (check_sum == buffer_check_sum)
 			isOK = true;
-		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
+		else {
+			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "check sum missmatch detected, calculates check_sum = " + check_sum + "; delta to data contained delta = " + (buffer_check_sum - check_sum));
+			if (check_sum == (buffer_check_sum - 384))
+				isOK = true;
+		}
 		return isOK;
 	}
+	
 	/**
 	 * check check sum of data buffer
 	 * @param buffer
@@ -415,7 +433,8 @@ public class UltramatSerialPort extends DeviceCommPort {
 		boolean isOK = false;
 		int length = buffer.length;
 		int check_sum = Checksum.ADD(buffer, 1, length-7);
-		if (check_sum == Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length-6], (char) buffer[length-5], (char) buffer[length-4], (char) buffer[length-3]), 16))
+		int buffer_check_sum = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length-6], (char) buffer[length-5], (char) buffer[length-4], (char) buffer[length-3]), 16);
+		if (check_sum == buffer_check_sum)
 			isOK = true;
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
 		return isOK;

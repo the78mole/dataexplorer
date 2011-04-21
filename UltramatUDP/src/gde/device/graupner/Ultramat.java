@@ -50,8 +50,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.eclipse.swt.SWT;
-
 /**
  * Graupner Ultramat base class
  * @author Winfried Brügmann
@@ -188,16 +186,16 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 		String[] dataTableRow = new String[recordSet.size() + 1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
 			String[] recordNames = recordSet.getRecordNames();
-			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
-			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
+			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
+			// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6
+			// 13=SpannungZelle7 14=SpannungZelle8 15=SpannungZelle9 16=SpannungZelle10 17=SpannungZelle11 18=SpannungZelle12
 			int numberRecords = recordNames.length;
 
 			dataTableRow[0] = String.format("%.3f", (recordSet.getTime_ms(rowIndex) / 1000.0)); //$NON-NLS-1$
 			for (int j = 0; j < numberRecords; j++) {
 				Record record = recordSet.get(recordNames[j]);
-				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				dataTableRow[j + 1] = record.getDecimalFormat().format((((record.get(rowIndex) / 1000.0) - reduction) * factor));
+				dataTableRow[j + 1] = record.getDecimalFormat().format(((record.get(rowIndex) / 1000.0) * factor));
 			}
 		}
 		catch (RuntimeException e) {
@@ -212,6 +210,9 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
+		// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6
+		// 13=SpannungZelle7 14=SpannungZelle8 15=SpannungZelle9 16=SpannungZelle10 17=SpannungZelle11 18=SpannungZelle12
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
 		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
@@ -228,6 +229,9 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
+		// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6
+		// 13=SpannungZelle7 14=SpannungZelle8 15=SpannungZelle9 16=SpannungZelle10 17=SpannungZelle11 18=SpannungZelle12
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
 		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
@@ -246,24 +250,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
-	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
-		String[] recordKeys = recordSet.getRecordNames();
-
-		recordSet.setAllDisplayable();
-		int numCells = recordSet.getChannelConfigNumber() < 3 ? 7 : 14;
-		for (int i = recordKeys.length - numCells - 1; i < recordKeys.length; ++i) {
-			Record record = recordSet.get(recordKeys[i]);
-			record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
-			log.log(java.util.logging.Level.FINER, recordKeys[i] + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData())); //$NON-NLS-1$
-		}
-
-		if (log.isLoggable(java.util.logging.Level.FINE)) {
-			for (String recordKey : recordKeys) {
-				Record record = recordSet.get(recordKey);
-				log.log(java.util.logging.Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			}
-		}
-	}
+	public abstract void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck);
 
 	/**
 	 * function to calculate values for inactive records, data not readable from device
@@ -272,7 +259,35 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		//all data points get calculated while convertDataBytes()
+		// since there are live measurement points only the calculation will take place directly after switch all to displayable
+		if (recordSet.isRaw()) {
+			// calculate the values required
+			try {
+				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
+				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
+				String[] recordNames = recordSet.getRecordNames();
+				int displayableCounter = 0;
+
+				// check if measurements isActive == false and set to isDisplayable == false
+				for (String measurementKey : recordNames) {
+					Record record = recordSet.get(measurementKey);
+
+					if (record.hasReasonableData()) {
+						++displayableCounter;
+					}
+				}
+
+				log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+				recordSet.setConfiguredDisplayable(displayableCounter);
+
+				if (recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
+					this.application.updateGraphicsWindow();
+				}
+			}
+			catch (RuntimeException e) {
+				log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			}
+		}
 	}
 
 	/**
@@ -311,19 +326,27 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 					try {
 						byte[] dataBuffer = this.serialPort.getData();
 						this.firmware = this.getFirmwareVersion(dataBuffer);
-						if (!(this.isProcessing(1, dataBuffer) || this.isProcessing(2, dataBuffer))) {
-							//TODO check if device fits this.device.getProductCode(dataBuffer); else ask for switch ?? don't know if this is required
-							this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
-							String deviceIdentifierName = this.serialPort.readDeviceUserName();
-							this.serialPort.write(UltramatSerialPort.RESET_END);
+						//TODO check if device fits this.device.getProductCode(dataBuffer); else ask for switch ?? don't know if this is required
+						
+						//load cached memory configurations to enable memory name to object key match
+						switch (this.getDeviceTypeIdentifier()) {
+						case UltraDuoPlus45:
+						case UltraDuoPlus50:
+						case UltraDuoPlus60:
+							if (!(this.isProcessing(1, dataBuffer) || this.isProcessing(2, dataBuffer))) {
+								this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
+								String deviceIdentifierName = this.serialPort.readDeviceUserName();
+								this.serialPort.write(UltramatSerialPort.RESET_END);
 
-							this.jc = JAXBContext.newInstance("gde.device.graupner"); //$NON-NLS-1$
-							this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
-									new StreamSource(UltraDuoPlusDialog.class.getClassLoader().getResourceAsStream("resource/" + UltraDuoPlusDialog.ULTRA_DUO_PLUS_XSD))); //$NON-NLS-1$
-							Unmarshaller unmarshaller = this.jc.createUnmarshaller();
-							unmarshaller.setSchema(this.schema);
-							this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(Settings.getInstance().getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
-									+ deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
+								this.jc = JAXBContext.newInstance("gde.device.graupner"); //$NON-NLS-1$
+								this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
+										new StreamSource(UltraDuoPlusDialog.class.getClassLoader().getResourceAsStream("resource/" + UltraDuoPlusDialog.ULTRA_DUO_PLUS_XSD))); //$NON-NLS-1$
+								Unmarshaller unmarshaller = this.jc.createUnmarshaller();
+								unmarshaller.setSchema(this.schema);
+								this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(Settings.getInstance().getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
+										+ deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
+							}
+							break;
 						}
 					}
 					catch (Exception e) {
@@ -407,7 +430,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @return v2.0
 	 */
 	public String getFirmwareVersion(byte[] dataBuffer) {
-		return String.format("v%c.%c", (char) dataBuffer[1], (char) dataBuffer[2]);
+		return String.format("v%.2f", (Integer.parseInt(String.format("%c%c", (char) dataBuffer[1], (char) dataBuffer[2]), 16) / 10.0));
 	}
 
 	/**
@@ -423,39 +446,35 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	//TODO - check for other than Ultra Duo Plus devices the listed functions needs to be modified
 	/**
 	 * check if one of the outlet channels are in processing mode
-	 * @param outletNum 1 or 2
+	 * @param outletNum 1
 	 * @param dataBuffer
-	 * @return true if channel 1 or 2 is active 
+	 * @return true if channel 1 is active 
 	 */
 	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
 		if (outletNum == 1) {
-			String operationModeOut1 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[15], (char) dataBuffer[16]);
-			if (log.isLoggable(java.util.logging.Level.FINE)) {
-				log.log(java.util.logging.Level.FINE,
-						"operationModeOut1 = " + (operationModeOut1 != null && operationModeOut1.length() > 0 ? this.USAGE_MODE[Integer.parseInt(operationModeOut1, 16)] : operationModeOut1)); //$NON-NLS-1$
+			try {
+				int operationMode1 = getProcessingMode(dataBuffer);
+				if (log.isLoggable(java.util.logging.Level.FINE)) {
+					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode1);
+				}
+				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
+				return operationMode1 > 0 && operationMode1 < 4; 
 			}
-			return operationModeOut1 != null && operationModeOut1.length() == 2 && !(operationModeOut1.equals(Ultramat.OPERATIONS_MODE_NONE) || operationModeOut1.equals(Ultramat.OPERATIONS_MODE_ERROR));
-		}
-		else if (outletNum == 2) {
-			String operationModeOut2 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[79], (char) dataBuffer[80]);
-			if (log.isLoggable(java.util.logging.Level.FINE)) {
-				log.log(java.util.logging.Level.FINE,
-						"operationModeOut2 = " + (operationModeOut2 != null && operationModeOut2.length() > 0 ? this.USAGE_MODE[Integer.parseInt(operationModeOut2, 16)] : operationModeOut2)); //$NON-NLS-1$
+			catch (NumberFormatException e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+				return false;
 			}
-			return operationModeOut2 != null && operationModeOut2.length() == 2 && !(operationModeOut2.equals(Ultramat.OPERATIONS_MODE_NONE) || operationModeOut2.equals(Ultramat.OPERATIONS_MODE_ERROR));
 		}
-		else
-			return false;
+		return false;
 	}
 
 	/**
 	 * query the processing mode, main modes are charge/discharge, make sure the data buffer contains at index 15,16 the processing modes
 	 * @param dataBuffer 
-	 * @return 0 = no processing, 1 = charge, 2 = discharge, 3 = delay, 4 = pause, 5 = current operation finished, 6 = error, 7 = balancer, 8 = tire heater, 9 = motor
+	 * @return 0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
 	 */
 	public int getProcessingMode(byte[] dataBuffer) {
-		String operationMode = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[15], (char) dataBuffer[16]);
-		return operationMode != null && operationMode.length() > 0 ? Integer.parseInt(operationMode, 16) : 0;
+		return Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]), 16);
 	}
 
 	/**
@@ -464,28 +483,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @return string of charge mode
 	 */
 	public String getProcessingType(byte[] dataBuffer) {
-		String type = GDE.STRING_EMPTY;
-		String operationMode = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[15], (char) dataBuffer[16]);
-		int opMode = operationMode != null && operationMode.length() > 0 ? Integer.parseInt(operationMode, 16) : 0;
-		String operationType = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[17], (char) dataBuffer[18]);
-		switch (opMode) {
-		case 1: //charge
-			type = operationType != null && operationType.length() > 0 ? this.CHARGE_MODE[Integer.parseInt(operationType, 16)] : GDE.STRING_EMPTY;
-			break;
-		case 2: //discharge
-			type = operationType != null && operationType.length() > 0 ? this.DISCHARGE_MODE[Integer.parseInt(operationType, 16)] : GDE.STRING_EMPTY;
-			break;
-		case 3: //delay
-			type = operationType != null && operationType.length() > 0 ? this.DELAY_MODE[Integer.parseInt(operationType, 16)] : GDE.STRING_EMPTY;
-			break;
-		case 5: //last active
-			type = operationType != null && operationType.length() > 0 ? this.CURRENT_MODE[Integer.parseInt(operationType, 16)] : GDE.STRING_EMPTY;
-			break;
-		case 6: //error
-			this.application.setStatusMessage(Messages.getString("GDE_MSGT22" + String.format("%02d", Integer.parseInt(operationType, 16))), SWT.COLOR_RED); //$NON-NLS-1$
-			break;
-		}
-		return type;
+		return GDE.STRING_EMPTY;
 	}
 	
 	/**
@@ -520,16 +518,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public int getBatteryMemoryNumber(int outletNum, byte[] dataBuffer) {
-		String batteryMemoryNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[5], (char) dataBuffer[6]);
-		if (outletNum == 2) {
-			try {
-				batteryMemoryNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[69], (char) dataBuffer[70]);
-			}
-			catch (Exception e) {
-				// ignore and use values from outlet channel 1 (data buffer will be copied)
-			}
-		}
-		return Integer.parseInt(batteryMemoryNumber, 16);
+		return -1;
 	}
 	
 	/**
@@ -539,15 +528,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	public int getCycleNumber(int outletNum, byte[] dataBuffer) {
-		String cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[19], (char) dataBuffer[20]);
-		if (outletNum == 2) {
-			try {
-				cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[83], (char) dataBuffer[84]);
-			}
-			catch (Exception e) {
-				// ignore and use values from outlet channel 1 (data buffer will be copied)
-			}
-		}
+		String cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[11], (char) dataBuffer[12]);
 		return Integer.parseInt(cycleNumber, 16);
 	}
 
@@ -557,12 +538,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @return true | false
 	 */
 	public boolean isLinkedMode(byte[] dataBuffer) {
-		String operationMode1 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[15], (char) dataBuffer[16]);
-		String operationMode2 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[79], (char) dataBuffer[80]);
-		String operationType1 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[17], (char) dataBuffer[18]);
-		String operationType2 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[81], (char) dataBuffer[82]);
-		return operationMode1.equals(operationMode2) && operationType1.equals(operationType2)
-				&& (operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_CHARGE) || operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_DISCHARGE));
+		return false;
 	}
 
 	/**
@@ -572,22 +548,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 */
 	public void setTemperatureUnit(int channelNumber, RecordSet recordSet, byte[] dataBuffer) {
-		String unit = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[39], (char) dataBuffer[40]);
-		if (unit != null && unit.length() > 0) if (channelNumber == 3) {
-			if (Integer.parseInt(unit) == 0) {
-				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 15, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
-				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 16, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
-			}
-			else if (Integer.parseInt(unit) == 1) {
-				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 15, DeviceConfiguration.UNIT_DEGREE_FAHRENHEIT);
-				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 16, DeviceConfiguration.UNIT_DEGREE_FAHRENHEIT);
-			}
-		}
-		else {
-			if (Integer.parseInt(unit) == 0)
-				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 5, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
-			else if (Integer.parseInt(unit) == 1) this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 5, DeviceConfiguration.UNIT_DEGREE_FAHRENHEIT);
-		}
+		//no temperature available
 	}
 	
 	/**

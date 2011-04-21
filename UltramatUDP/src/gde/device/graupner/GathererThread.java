@@ -315,7 +315,9 @@ public class GathererThread extends Thread {
 						if (this.device.getProcessingType(dataBuffer).equals(Messages.getString(MessageIds.GDE_MSGT2302)))
 							extend.append(GDE.STRING_COLON).append(this.device.getCycleNumber(number, dataBuffer));
 						else
-							extend.append(GDE.STRING_MESSAGE_CONCAT).append(Messages.getString(MessageIds.GDE_MSGT2302)).append(GDE.STRING_COLON).append(this.device.getCycleNumber(number, dataBuffer));
+							if (this.device.getProcessingType(dataBuffer).length() > 3)
+								extend.append(GDE.STRING_MESSAGE_CONCAT);
+							extend.append(Messages.getString(MessageIds.GDE_MSGT2302)).append(GDE.STRING_COLON).append(this.device.getCycleNumber(number, dataBuffer));
 					}
 					if (this.device.getProcessingType(dataBuffer).length() > 3 || this.device.getCycleNumber(number, dataBuffer) > 0) extend.append(GDE.STRING_RIGHT_BRACKET);
 				}
@@ -330,7 +332,7 @@ public class GathererThread extends Thread {
 				recordSet.setAllDisplayable();
 				String description = recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR 
 						+ "Firmware  : " + this.device.firmware  																											//$NON-NLS-1$
-						+ "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer); 								//$NON-NLS-1$
+						+ (this.device.getBatteryMemoryNumber(number, dataBuffer) > 1 ? "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer) : GDE.STRING_EMPTY); 	//$NON-NLS-1$
 				try {
 					if (this.device.ultraDuoPlusSetup != null && this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)) != null) {
 						String batteryMemoryName = this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)-1).getName();
