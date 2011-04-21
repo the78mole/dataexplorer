@@ -93,7 +93,6 @@ public class DataTableWindow extends CTabItem {
 						int index = DataTableWindow.this.dataTable.indexOf(item);
 						item.setText("Item " + index);
 						item.setText(activeRecordSet.getDataTableRow(index));
-						//System.out.println(item.getText());
 					}
 				}
 			}

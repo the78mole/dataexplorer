@@ -22,7 +22,7 @@ package gde.exception;
  * Exception class to be used if the serial port can not be openend due to internal errors, not configuration error
  * @author Winfried Brügmann
  */
-public class SerialPortException extends Exception {
+public class SerialPortException extends RuntimeException {
 	static final long serialVersionUID = 26031957;
 
 	/**
