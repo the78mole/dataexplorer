@@ -33,11 +33,11 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 /**
- * Graupner Ultramat Trio 16 S
+ * Graupner Ultramat Trio Plus 16 S
  * @author Winfried Brügmann
  */
-public class UltramatTrio16S extends UltramatTrio14 {
-	final static Logger														logg															= Logger.getLogger(Ultramat.class.getName());
+public class UltramatTrioPlus16S extends UltramatTrioPlus14 {
+	final static Logger														logg															= Logger.getLogger(UltramatTrioPlus16S.class.getName());
 
 
 	/**
@@ -45,7 +45,7 @@ public class UltramatTrio16S extends UltramatTrio14 {
 	 * @throws JAXBException 
 	 * @throws FileNotFoundException 
 	 */
-	public UltramatTrio16S(String deviceProperties) throws FileNotFoundException, JAXBException {
+	public UltramatTrioPlus16S(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
@@ -65,7 +65,7 @@ public class UltramatTrio16S extends UltramatTrio14 {
 	 * constructor using existing device configuration
 	 * @param deviceConfig device configuration
 	 */
-	public UltramatTrio16S(DeviceConfiguration deviceConfig) {
+	public UltramatTrioPlus16S(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
@@ -103,7 +103,7 @@ public class UltramatTrio16S extends UltramatTrio14 {
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = this.getDataBlockSize(); 
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize());; 
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
 		int offset = 4;
 		int progressCycle = 0;

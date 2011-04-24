@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2006 rel. 3 sp1 (http://www.altova.com) by Winfried Brügmann (IBM DEUTSCHLAND) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="qualified">
 	<xs:element name="UltraDuoPlusType">
 		<xs:annotation>
@@ -16,7 +17,7 @@
 						</xs:simpleContent>
 					</xs:complexType>
 				</xs:element>
-				<xs:element name="ChannelData2">
+				<xs:element name="ChannelData2" minOccurs="0">
 					<xs:complexType>
 						<xs:simpleContent>
 							<xs:extension base="xs:string">

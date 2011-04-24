@@ -38,7 +38,7 @@ import javax.xml.bind.JAXBException;
 import org.eclipse.swt.SWT;
 
 /**
- * Graupner Ultra Duo Plus base class which extends the Ultramat base class
+ * Graupner Ultra Duo Plus 60 base class
  * @author Winfried Brügmann
  */
 public class UltramatUDP extends Ultramat {
@@ -121,7 +121,7 @@ public class UltramatUDP extends Ultramat {
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = this.getDataBlockSize(); // const.
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize()); // const.
 		int deviceDataBufferSize2 = deviceDataBufferSize / 2;
 		int channel2Offset = deviceDataBufferSize2 - 5;
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
@@ -164,7 +164,7 @@ public class UltramatUDP extends Ultramat {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
 
-		if (dataBuffer.length == this.getDataBlockSize() / 2) {
+		if (dataBuffer.length == Math.abs(this.getDataBlockSize()) / 2) {
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 8=SpannungZelle1 9=SpannungZelle2...
 			points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
 			points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
@@ -189,7 +189,7 @@ public class UltramatUDP extends Ultramat {
 			//calculate balance on the fly
 			points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 		}
-		else if (dataBuffer.length == this.getDataBlockSize()) {
+		else if (dataBuffer.length == Math.abs(this.getDataBlockSize())) {
 			if (this.isLinkedMode(dataBuffer)) {
 				// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
 				points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);

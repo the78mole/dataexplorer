@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
     <Device>
-        <name implementation="gde.device.graupner.Ultramat18">Ultramat18</name>
+        <name implementation="gde.device.graupner.Ultramat16S">Ultramat16S</name>
         <manufacturer>Graupner</manufacturer>
         <manufacturerURL>http://www.graupner.de</manufacturerURL>
         <group>charger</group>
-        <image>Ultramat18.jpg</image>
+        <image>Ultramat16S.jpg</image>
         <usage>false</usage>
     </Device>
     <SerialPort>
@@ -25,7 +25,7 @@
         <timeStep>1000.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="78" type="BINARY"/>
+        <format size="52" type="BINARY"/>
         <checkSum type="ADD" format="BINARY"/>
     </DataBlock>
     <Channels>
@@ -119,54 +119,6 @@
             </Measurement>
             <Measurement>
                 <name>CellVoltage 6</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 7</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 8</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 9</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 10</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 11</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 12</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>

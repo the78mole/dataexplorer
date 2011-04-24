@@ -34,18 +34,18 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 /**
- * Graupner Ultramat 18
+ * Graupner Ultramat 16 S
  * @author Winfried Brügmann
  */
-public class Ultramat18 extends Ultramat {
-	final static Logger	logger	= Logger.getLogger(Ultramat18.class.getName());
+public class Ultramat16S extends Ultramat {
+	final static Logger	logger	= Logger.getLogger(Ultramat16S.class.getName());
 
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
 	 * @throws FileNotFoundException 
 	 */
-	public Ultramat18(String deviceProperties) throws FileNotFoundException, JAXBException {
+	public Ultramat16S(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
@@ -61,7 +61,7 @@ public class Ultramat18 extends Ultramat {
 	 * constructor using existing device configuration
 	 * @param deviceConfig device configuration
 	 */
-	public Ultramat18(DeviceConfiguration deviceConfig) {
+	public Ultramat16S(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
@@ -78,7 +78,7 @@ public class Ultramat18 extends Ultramat {
 	 */
 	@Override
 	public int getLovDataByteSize() {
-		return 86;
+		return 60;
 	}
 
 	/**
@@ -96,9 +96,8 @@ public class Ultramat18 extends Ultramat {
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int deviceDataBufferSize = Math.abs(this.getDataBlockSize());
-		;
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
-		int offset = 0;
+		int offset = 4;
 		int progressCycle = 0;
 		int lovDataSize = this.getLovDataByteSize();
 
@@ -132,18 +131,17 @@ public class Ultramat18 extends Ultramat {
 		int minVotage = Integer.MAX_VALUE;
 
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 7=SpannungZelle1 8=SpannungZelle2....
-		points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[13], (char) dataBuffer[14], (char) dataBuffer[15], (char) dataBuffer[16]), 16);
-		points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[17], (char) dataBuffer[18], (char) dataBuffer[19], (char) dataBuffer[20]), 16);
-		points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
+		points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
+		points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[15], (char) dataBuffer[16], (char) dataBuffer[17], (char) dataBuffer[18]), 16);
+		points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[19], (char) dataBuffer[20], (char) dataBuffer[21], (char) dataBuffer[22]), 16);
 		points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 		points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-		points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16);
+		points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[3], (char) dataBuffer[4], (char) dataBuffer[5], (char) dataBuffer[6]), 16);
 		points[6] = 0;
 
 		// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6 
-		// 13=SpannungZelle7 14=SpannungZelle8 15=SpannungZelle9 16=SpannungZelle10 17=SpannungZelle11 18=SpannungZelle126 
-		for (int i = 0, j = 0; i < 12; ++i, j += 4) {
-			points[i + 7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25 + j], (char) dataBuffer[26 + j], (char) dataBuffer[27 + j], (char) dataBuffer[28 + j]),
+		for (int i = 0, j = 0; i < 6; ++i, j += 4) {
+			points[i + 7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[23 + j], (char) dataBuffer[24 + j], (char) dataBuffer[25 + j], (char) dataBuffer[26 + j]),
 					16);
 			if (points[i + 7] > 0) {
 				maxVotage = points[i + 7] > maxVotage ? points[i + 7] : maxVotage;
@@ -191,8 +189,7 @@ public class Ultramat18 extends Ultramat {
 			points[6] = 0;
 
 			// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6 
-			// 13=SpannungZelle7 14=SpannungZelle8 15=SpannungZelle9 16=SpannungZelle10 17=SpannungZelle11 18=SpannungZelle126 
-			for (int j = 0, k = 0; j < 12; ++j, k += GDE.SIZE_BYTES_INTEGER) {
+			for (int j = 0, k = 0; j < 6; ++j, k += GDE.SIZE_BYTES_INTEGER) {
 				points[j + 7] = (((convertBuffer[k + 16] & 0xff) << 24) + ((convertBuffer[k + 17] & 0xff) << 16) + ((convertBuffer[k + 18] & 0xff) << 8) + ((convertBuffer[k + 19] & 0xff) << 0));
 				if (points[j + 7] > 0) {
 					maxVotage = points[j + 7] > maxVotage ? points[j + 7] : maxVotage;
@@ -225,7 +222,7 @@ public class Ultramat18 extends Ultramat {
 		String[] recordKeys = recordSet.getRecordNames();
 
 		recordSet.setAllDisplayable();
-		int numCells = 12;
+		int numCells = 6;
 		for (int i = recordKeys.length - numCells - 1; i < recordKeys.length; ++i) {
 			Record record = recordSet.get(recordKeys[i]);
 			record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
@@ -246,7 +243,7 @@ public class Ultramat18 extends Ultramat {
 	 */
 	@Override
 	public GraupnerDeviceType getDeviceTypeIdentifier() {
-		return GraupnerDeviceType.Ultramat18;
+		return GraupnerDeviceType.Ultramat16S;
 	}
 
 	/**
@@ -256,8 +253,8 @@ public class Ultramat18 extends Ultramat {
 	 */
 	@Override
 	public int getProductCode(byte[] dataBuffer) {
-		//1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, 6=Ultramat16S
-		return 3;
+		//1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, 6=Ultramat16S ?=Ultramat16
+		return GraupnerDeviceType.Ultramat16S.ordinal();
 	}
 
 	/**
@@ -292,7 +289,7 @@ public class Ultramat18 extends Ultramat {
 	 */
 	@Override
 	public int getProcessingMode(byte[] dataBuffer) {
-		return Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]), 16);
+		return Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[7], (char) dataBuffer[8]), 16);
 	}
 
 	/**
@@ -303,7 +300,7 @@ public class Ultramat18 extends Ultramat {
 	 */
 	@Override
 	public int getCycleNumber(int outletNum, byte[] dataBuffer) {
-		String cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[11], (char) dataBuffer[12]);
+		String cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]);
 		return Integer.parseInt(cycleNumber, 16);
 	}
 }

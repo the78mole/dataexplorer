@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
     <Device>
-        <name implementation="gde.device.graupner.UltraDuoPlus45">UltraDuoPlus45</name>
+        <name implementation="gde.device.graupner.UltramatTrioPlus16S">UltramatTrioPlus16S</name>
         <manufacturer>Graupner</manufacturer>
         <manufacturerURL>http://www.graupner.de</manufacturerURL>
         <group>charger</group>
-        <image>UltraDuoPlus45.jpg</image>
+        <image>UltramatTrioPlus16S.jpg</image>
         <usage>false</usage>
     </Device>
     <SerialPort>
@@ -25,7 +25,7 @@
         <timeStep>1000.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="146" type="BINARY"/>
+        <format size="106" type="BINARY"/>
         <checkSum type="ADD" format="BINARY"/>
     </DataBlock>
     <Channels>
@@ -65,14 +65,6 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>BatteryTemperature</name>
-                <symbol>Tb</symbol>
-                <unit>°C</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="100.0" name="factor"/>
-            </Measurement>
-            <Measurement>
                 <name>SupplyVoltage</name>
                 <symbol>Uin</symbol>
                 <unit>V</unit>
@@ -99,7 +91,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 3</name>
@@ -107,7 +99,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 4</name>
@@ -115,7 +107,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 5</name>
@@ -123,7 +115,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 6</name>
@@ -131,71 +123,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 7</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 8</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 9</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 10</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 11</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 12</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 13</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 14</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_OUTLET" name="Outlet 2">
@@ -234,12 +162,77 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>BatteryTemperature</name>
-                <symbol>Tb</symbol>
-                <unit>°C</unit>
+                <name>SupplyVoltage</name>
+                <symbol>Uin</symbol>
+                <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="100.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Balance</name>
+                <symbol>Bal</symbol>
+                <unit>mV</unit>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1000.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage 1</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage 2</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage 3</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+        </Channel>
+        <Channel type="TYPE_OUTLET" name="Outlet 3">
+            <Measurement>
+                <name>Voltage</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Current</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Capacity</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1000.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Power</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Energy</name>
+                <symbol>E</symbol>
+                <unit>Wh</unit>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>SupplyVoltage</name>
@@ -268,7 +261,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 3</name>
@@ -276,15 +269,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>CellVoltage 4</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
     </Channels>
@@ -292,7 +277,7 @@
         <property value="true" name="table_tab"/>
         <property value="true" name="digital_tab"/>
         <property value="true" name="analog_tab"/>
-        <property target_reference_ordinal="8" value="true" name="voltage_per_cell_tab"/>
+        <property target_reference_ordinal="7" value="true" name="voltage_per_cell_tab"/>
         <property description="UTILITY_GRAPHICS_TAB" value="false" name="utility_garphics_tab"/>
         <property description="UTILITY_DEVICE_TAB" value="false" name="utility_device_tab"/>
     </Desktop>

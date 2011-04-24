@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
     <Device>
-        <name implementation="gde.device.graupner.UltramatTrio14">UltramatTrio14</name>
+        <name implementation="gde.device.graupner.UltramatTrioPlus14">UltramatTrioPlus14</name>
         <manufacturer>Graupner</manufacturer>
         <manufacturerURL>http://www.graupner.de</manufacturerURL>
         <group>charger</group>
-        <image>UltramatTrio14.jpg</image>
+        <image>UltramatTrioPlus14.jpg</image>
         <usage>false</usage>
     </Device>
     <SerialPort>

@@ -1,6 +1,22 @@
+/**************************************************************************************
+  	This file is part of GNU DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GNU DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright (c) 2011 Winfried Bruegmann
+****************************************************************************************/
 package gde.device.graupner;
-
-
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -10,6 +26,7 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.exception.DataInconsitsentException;
+import gde.log.Level;
 import gde.messages.Messages;
 
 import java.io.FileNotFoundException;
@@ -18,19 +35,18 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 /**
- * Graupner Ultramat Trio 16 S
+ * Graupner Ultramat Trio Plus 14
  * @author Winfried Brügmann
  */
-public class UltramatTrio14 extends Ultramat {
-	final static Logger														logger															= Logger.getLogger(Ultramat.class.getName());
-
+public class UltramatTrioPlus14 extends Ultramat {
+	final static Logger														logger															= Logger.getLogger(UltramatTrioPlus14.class.getName());
 
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
 	 * @throws FileNotFoundException 
 	 */
-	public UltramatTrio14(String deviceProperties) throws FileNotFoundException, JAXBException {
+	public UltramatTrioPlus14(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
@@ -50,7 +66,7 @@ public class UltramatTrio14 extends Ultramat {
 	 * constructor using existing device configuration
 	 * @param deviceConfig device configuration
 	 */
-	public UltramatTrio14(DeviceConfiguration deviceConfig) {
+	public UltramatTrioPlus14(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
@@ -88,7 +104,7 @@ public class UltramatTrio14 extends Ultramat {
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = this.getDataBlockSize(); 
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize()); 
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
 		int offset = 4;
 		int progressCycle = 0;
@@ -303,5 +319,52 @@ public class UltramatTrio14 extends Ultramat {
 	@Override
 	public void matchBatteryMemory2ObjectKey(String batteryMemoryName) {
 		//no memory can be matched here
+	}
+
+	/**
+	 * check if one of the outlet channels are in processing mode
+	 * @param outletNum 1
+	 * @param dataBuffer
+	 * @return true if channel 1 is active 
+	 */
+	@Override
+	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
+		if (outletNum == 1) {
+			try {
+				int operationMode1 = getProcessingMode(dataBuffer);
+				if (log.isLoggable(java.util.logging.Level.FINE)) {
+					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode1);
+				}
+				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
+				return operationMode1 > 0 && operationMode1 < 4; 
+			}
+			catch (NumberFormatException e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+				return false;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * query the processing mode, main modes are charge/discharge, make sure the data buffer contains at index 15,16 the processing modes
+	 * @param dataBuffer 
+	 * @return 0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
+	 */
+	@Override
+	public int getProcessingMode(byte[] dataBuffer) {
+		return Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]), 16);
+	}
+
+	/**
+	 * query the cycle number of the given outlet channel
+	 * @param outletNum
+	 * @param dataBuffer
+	 * @return
+	 */
+	@Override
+	public int getCycleNumber(int outletNum, byte[] dataBuffer) {
+		String cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[11], (char) dataBuffer[12]);
+		return Integer.parseInt(cycleNumber, 16);
 	}
 }
