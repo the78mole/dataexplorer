@@ -12,13 +12,29 @@ Actual the following devices are available as plug-in:
 											 - UniLog (SM-Modellbau) multi measurement device
 											 - LiPoWatch (SM-Modellbau) motor driver LiPo saver
 											 - GPS-Logger (SM-Modellbau) GPS, multi measurement device
-											 - eStation BC6, BC610, BC8, 902 (Bantam) charger/discharger 
-											 - Pichler P6 , P60 (Pichler) charger/discharger 
-											 - VC820, VC840 (Conrad/VoltCraft) multimeter
+											 - eStation BC6 (Bantam) charger/discharger 
+											 - eStation BC6102 (Bantam) charger/discharger 
+											 - eStation BC8 (Bantam) charger/discharger 
+											 - eStation 902 (Bantam) charger/discharger 
+											 - Pichler P6 (Pichler) charger/discharger 
+											 - Pichler P60 (Pichler) charger/discharger 
+											 - VC820 (Conrad/VoltCraft) multimeter
+											 - VC840 (Conrad/VoltCraft) multimeter
 											 - CSV2SerialAdapter, enables to import CVS files as log data
-											 - DataVario, DataVarioDuo, LinkVario, LinkVarioDuo (WStech) variometer, GPS, multi measurement device
+											 - DataVario (WStech) variometer, GPS, multi measurement device
+											 - DataVarioDuo (WStech) variometer, GPS, multi measurement device
+											 - LinkVario (WStech) variometer, GPS, multi measurement device
+											 - LinkVarioDuo (WStech) variometer, GPS, multi measurement device
 											 - NMEA-Adapter  GPS
 											 - QC-Copter (tt-tronix) control unit
+											 - Ultramat 12 (Graupner) charger/discharger
+											 - Ultramat 16 (Graupner) charger/discharger
+											 - Ultramat 16S (Graupner) charger/discharger
+											 - Ultramat Trio Plus 14 (Graupner) 3 outlet charger/discharger
+											 - Ultramat Trio Plus 16S (Graupner) 3 outlet charger/discharger
+											 - Ultramat 18 (Graupner) charger/discharger
+											 - Ultra Duo Plus 45 (Graupner) 2 outlet charger/discharger with battery memory
+											 - Ultra Duo PLus 60 (Graupner) 2 equivalent outlet charger/discharger with battery memory
 											 - Simulator test plug-in
 
 More device are under construction. Help doing this is very welcome.		

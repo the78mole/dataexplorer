@@ -12,13 +12,29 @@ Zur Zeit sind folgende Geräte eingebunden:
 											 - UniLog (SM-Modellbau) Mulitmessgerät
 											 - LiPoWatch (SM-Modellbau) Motorsteller LiPo-Saver
 											 - GPS-Logger (SM-Modellbau) GPS, Multimessgerät
-											 - eStation BC6, BC610, BC8, 902 (Bantam) Lade-/Entlade-gerät
-											 - Pichler P6 , P60 (Pichler) Lade-/Entlade-gerät
-											 - VC820, VC840 (Conrad/VoltCraft) Multimeter
+											 - eStation BC6 (Bantam) Lade-/Entlade-gerät
+											 - eStation BC610 (Bantam) Lade-/Entlade-gerät
+											 - eStation BC8 (Bantam) Lade-/Entlade-gerät
+											 - eStation 902 (Bantam) Lade-/Entlade-gerät
+											 - Pichler P6 (Pichler) Lade-/Entlade-gerät
+											 - Pichler P60 (Pichler) Lade-/Entlade-gerät
+											 - VC820 (Conrad/VoltCraft) Multimeter
+											 - VC840 (Conrad/VoltCraft) Multimeter
 											 - CSV2SerialAdapter, ermöglicht CVS als Log-Daten zu importieren
-											 - DataVario, DataVarioDuo, LinkVario, LinkVarioDuo (WStech) Variometer, GPS, Mulitmessgerät
+											 - DataVario (WStech) Variometer, GPS, Mulitmessgerät
+											 - DataVarioDuo (WStech) Variometer, GPS, Mulitmessgerät
+											 - LinkVario (WStech) Variometer, GPS, Mulitmessgerät
+											 - LinkVarioDuo (WStech) Variometer, GPS, Mulitmessgerät
 											 - NMEA-Adapter  GPS
 											 - QC-Copter (tt-tronix) Kontrolleinheit
+											 - Ultramat 12 (Graupner) Lade-/Entlade-gerät
+											 - Ultramat 16 (Graupner) Lade-/Entlade-gerät
+											 - Ultramat 16S (Graupner) Lade-/Entlade-gerät
+											 - Ultramat Trio Plus 14 (Graupner) Lade-/Entlade-gerät
+											 - Ultramat Trio Plus 16S (Graupner) Lade-/Entlade-gerät
+											 - Ultramat 18 (Graupner) Lade-/Entlade-gerät
+											 - Ultra Duo Plus 45 (Graupner) 2 Ausgänge Lade-/Entlade-gerät mit Batteriespeicher
+											 - Ultra Duo PLus 60 (Graupner) 2 gleichwertige Ausgänge Lade-/Entlade-gerät mit Batteriespeicher
 											 - Simulator Test Plug-in
 											 
 Weitere Geräte sind in Arbeit. Hilfe bei der Einbindung von zusätzlichen Geräten ist herzlich willkommen.
