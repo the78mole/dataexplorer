@@ -411,15 +411,15 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 					this.application.openMessageDialog(this.dialog != null ? this.dialog.getDialogShell() : null,
 							Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
+					this.serialPort.close();
 				}
 				catch (ApplicationConfigurationException e) {
 					this.application.openMessageDialog(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 					this.application.getDeviceSelectionDialog().open();
+					this.serialPort.close();
 				}
 				catch (Throwable e) {
 					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-				}
-				finally {
 					this.serialPort.close();
 				}
 			}

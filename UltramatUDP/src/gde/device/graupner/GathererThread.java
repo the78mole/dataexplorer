@@ -42,7 +42,7 @@ public class GathererThread extends Thread {
 	final static String				$CLASS_NAME									= GathererThread.class.getName();
 	final static Logger				log													= Logger.getLogger(GathererThread.class.getName());
 	final static int					TIME_STEP_DEFAULT						= 1000;
-	final static int					WAIT_TIME_RETRYS						= 180;
+	final static int					WAIT_TIME_RETRYS						= 180;																											// 180 * 1 sec
 
 	final DataExplorer				application;
 	final UltramatSerialPort	serialPort;
@@ -54,7 +54,7 @@ public class GathererThread extends Thread {
 	String										recordSetKey2								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 	String										recordSetKey3								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 	boolean										isGatheredRecordSetVisible	= true;
-	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;													// 36 * 5 sec timeout = 180 sec
+	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;													// 180 * 1 sec
 	boolean										isCollectDataStopped				= false;
 
 	boolean										isProgrammExecuting1				= false;
@@ -112,8 +112,7 @@ public class GathererThread extends Thread {
 
 		while (!this.isCollectDataStopped) {
 			try {
-				// get data from device
-				if (this.serialPort.isConnected()) dataBuffer = this.serialPort.getData();
+				dataBuffer = this.serialPort.getData(); // get data from device
 
 				switch (this.device.getDeviceTypeIdentifier()) {
 
@@ -275,8 +274,8 @@ public class GathererThread extends Thread {
 						WaitTimer.delay(1000);
 					}
 				}
-				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
-				else if (e instanceof TimeOutException && !this.isProgrammExecuting1 || !this.isProgrammExecuting2) {
+				// this case will be reached while program is started, checked and the check not asap committed, stop pressed
+				else if (e instanceof TimeOutException && !(this.isProgrammExecuting1 || this.isProgrammExecuting2 || this.isProgrammExecuting3)) {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2200));
 					log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
