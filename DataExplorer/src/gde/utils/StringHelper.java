@@ -456,15 +456,29 @@ public class StringHelper {
 	}
 
 	/**
-	 * convert a hexadecimal input byte array into string
-	 * @param byteBuffer
+	 * convert a byte array into a 2 hex character string representation
+	 * @param bytes
 	 * @return string with converted characters
 	 */
-	public static String convertHexInput(byte[] byteBuffer) {
+	public static String byte2Hex2CharString(byte[] bytes) {
 		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < byteBuffer.length; i++) {
-			sb.append(String.format("%02X", byteBuffer[i])); //$NON-NLS-1$
+		for (int i = 0; i < bytes.length; i++) {
+			sb.append(String.format("%02X", bytes[i])); //$NON-NLS-1$
 		}
+		return sb.toString();
+	}
+
+	/**
+	 * convert a integer array to a 4 hex character string representation
+	 * @param values
+	 * @return
+	 */
+	public static String integer2Hex4ByteString(int[] values) {
+		StringBuilder sb = new StringBuilder();
+		for (int value : values) {
+			sb.append(String.format("%04X", value));
+		}
+		if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, sb.toString());
 		return sb.toString();
 	}
 	
@@ -481,6 +495,29 @@ public class StringHelper {
 			buffer[i] = (byte)Integer.parseInt(twoCharsPerByte.substring(j, j+2), 16);
 		}
 		return buffer;
+	}
+
+	/**
+	 * @param buffer
+	 * @return a string were special characters are converted to readable, all others to character
+	 */
+	public static String convert2CharString(byte[] buffer) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < buffer.length; ++i) {
+			if (buffer[i] == DeviceSerialPortImpl.FF)
+				sb.append(DeviceSerialPortImpl.STRING_FF); //$NON-NLS-1$
+			else if (buffer[i] == DeviceSerialPortImpl.CR)
+				sb.append(DeviceSerialPortImpl.STRING_CR); //$NON-NLS-1$
+			else if (buffer[i] == DeviceSerialPortImpl.ACK)
+				sb.append(DeviceSerialPortImpl.STRING_ACK); //$NON-NLS-1$
+			else if (buffer[i] == DeviceSerialPortImpl.NAK)
+				sb.append(DeviceSerialPortImpl.STRING_NAK); //$NON-NLS-1$
+			else if (i == buffer.length - 6)
+				sb.append(GDE.STRING_OR).append((char) buffer[i]); //$NON-NLS-1$
+			else
+				sb.append((char) buffer[i]);
+		}
+		return sb.toString();
 	}
 	
 	/**

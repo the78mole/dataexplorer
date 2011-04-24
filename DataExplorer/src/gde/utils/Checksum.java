@@ -241,7 +241,7 @@ public class Checksum {
 	/**
 	 * calculate ADD operation
 	 * @param b byte array to compute
-	 * @param len length of checksum if part of the byte array
+	 * @param len used for calculation, attention checksum if part of the byte array
 	 * @return 16-bit result
 	 */
 	public static int ADD(byte[] b, int start, int len) {

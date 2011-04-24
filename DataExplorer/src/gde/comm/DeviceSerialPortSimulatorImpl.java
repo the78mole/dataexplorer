@@ -168,7 +168,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		if (this.isConnected) {
 			if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
 				if (data_in.read(readBuffer) > 0) {
-					int size2Read = this.device.getLovDataByteSize() - this.device.getDataBlockSize();
+					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize());
 					if (data_in.read(new byte[size2Read]) != size2Read) {
 						log.log(Level.WARNING, "expected byte size to  read does not macht really red size of bytes !");
 					}
@@ -216,7 +216,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 									sb.delete(readBuffer.length*2, sb.length()-1);
 								}
 								else if (sb.length() < readBuffer.length*2) {
-									sb.append(StringHelper.convertHexInput(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
+									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
 								}
 							}
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
@@ -248,7 +248,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		if (this.isConnected) {
 			if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
 				if (data_in.read(readBuffer) > 0) {
-					int size2Read = this.device.getLovDataByteSize() - this.device.getDataBlockSize();
+					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize());
 					if (data_in.read(new byte[size2Read]) != size2Read) {
 						log.log(Level.WARNING, "expected byte size to  read does not macht really red size of bytes !");
 					}
@@ -296,7 +296,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 									sb.delete(readBuffer.length*2, sb.length()-1);
 								}
 								else if (sb.length() < readBuffer.length*2) {
-									sb.append(StringHelper.convertHexInput(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
+									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
 								}
 							}
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
@@ -328,7 +328,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		if (this.isConnected) {
 			if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
 				if (data_in.read(readBuffer) > 0) {
-					int size2Read = this.device.getLovDataByteSize() - this.device.getDataBlockSize();
+					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize());
 					if (data_in.read(new byte[size2Read]) != size2Read) {
 						log.log(Level.WARNING, "expected byte size to  read does not macht really red size of bytes !");
 					}
@@ -376,7 +376,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 									sb.delete(readBuffer.length*2, sb.length()-1);
 								}
 								else if (sb.length() < readBuffer.length*2) {
-									sb.append(StringHelper.convertHexInput(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
+									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
 								}
 							}
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());

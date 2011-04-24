@@ -58,6 +58,10 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	final static String										$CLASS_NAME								= DeviceSerialPortImpl.class.getName();
 	final static Logger										log												= Logger.getLogger(DeviceSerialPortImpl.$CLASS_NAME);
 
+	public final static byte							FF												= 0x0C;
+	public final static byte							CR												= 0x0D;
+	public final static byte							ACK												= 0x06;
+	public final static byte							NAK												= 0x15;
 	public static final String						STRING_NAK								= "<NAK>";
 	public static final String						STRING_ACK								= "<ACK>";
 	public static final String						STRING_CR									= "<CR>";
