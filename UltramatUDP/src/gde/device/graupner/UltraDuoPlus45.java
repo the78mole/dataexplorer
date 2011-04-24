@@ -104,7 +104,7 @@ public class UltraDuoPlus45 extends Ultramat {
 	 */
 	@Override
 	public int getLovDataByteSize() {
-		return 150;
+		return 158;
 	}
 
 	/**
@@ -122,8 +122,8 @@ public class UltraDuoPlus45 extends Ultramat {
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int deviceDataBufferSize = Math.abs(this.getDataBlockSize()); // const.
-		int deviceDataBufferSize2 = deviceDataBufferSize / 2;
-		int channel2Offset = deviceDataBufferSize2 - 5;
+		int channel2Offset1 = 97;
+		int channel2Offset2 = 105;
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
 		int offset = 4;
 		int progressCycle = 0;
@@ -136,10 +136,13 @@ public class UltraDuoPlus45 extends Ultramat {
 
 			for (int i = 0; i < recordDataSize; i++) {
 				if (outputChannel == 1)
-					System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize2);
-				else if (outputChannel == 2)
-					System.arraycopy(dataBuffer, channel2Offset + offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize2);
-				else if (outputChannel == 3) System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+					System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+				else if (outputChannel == 2) {
+					System.arraycopy(dataBuffer, channel2Offset1 + offset + i * lovDataSize, convertBuffer, 11, 8); //sync to same value positions, only point array length is different
+					convertBuffer[19] = convertBuffer[20] = 48; //blank out cycle number
+					System.arraycopy(dataBuffer, channel2Offset2 + offset + i * lovDataSize, convertBuffer, 21, 41);
+				}
+
 				recordSet.addPoints(convertDataBytes(points, convertBuffer));
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);

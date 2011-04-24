@@ -21,7 +21,9 @@ package gde.device.graupner;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
+import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
+import gde.exception.DataInconsitsentException;
 import gde.messages.Messages;
 
 import java.io.FileNotFoundException;
@@ -64,5 +66,51 @@ public class Ultramat12 extends Ultramat16S {
 
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 		this.dialog = null;
+	}
+
+	/**
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 */
+	@Override
+	public int getLovDataByteSize() {
+		return 60;
+	}
+
+	/**
+	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
+	 * adaption from LogView stream data format into the device data buffer format is required
+	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * this method is more usable for real logger, where data can be stored and converted in one block
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 * @param doUpdateProgressBar
+	 * @throws DataInconsitsentException 
+	 */
+	@Override
+	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize());
+		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
+		int offset = 0;
+		int progressCycle = 0;
+		int lovDataSize = this.getLovDataByteSize();
+
+		if (dataBuffer[offset] == 0x0C) {
+			byte[] convertBuffer = new byte[deviceDataBufferSize];
+			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+
+			for (int i = 0; i < recordDataSize; i++) {
+				System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
+				recordSet.addPoints(convertDataBytes(points, convertBuffer));
+			}
+
+			recordSet.setTimeStep_ms(this.getAverageTimeStep_ms() != null ? this.getAverageTimeStep_ms() : 1000);
+		}
+
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		updateVisibilityStatus(recordSet, true);
+		recordSet.syncScaleOfSyncableRecords();
 	}
 }

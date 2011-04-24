@@ -432,6 +432,9 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 				catch (Throwable e) {
 					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 				}
+				finally {
+					this.serialPort.close();
+				}
 			}
 			else {
 				if (this.dataGatherThread != null) {
@@ -525,6 +528,10 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	public void matchBatteryMemory2ObjectKey(String batteryMemoryName) {
 		Object[] tmpResult = null;
 		for (String tmpObjectKey : this.application.getObjectKeys()) {
+			if (tmpObjectKey.equals(batteryMemoryName)) {
+				tmpResult = new Object[] { tmpObjectKey, 100 };
+				break;
+			}
 			String[] batteryNameParts = batteryMemoryName.split(" |-|_");
 			int hitCount = 0;
 			for (String namePart : batteryNameParts) {
