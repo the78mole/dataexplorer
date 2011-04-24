@@ -52,8 +52,8 @@ import gde.ui.SWTResourceManager;
 import gde.ui.menu.CurveSelectorContextMenu;
 
 /**
- * This class defines a composite whith a header (Curve Selector, ..) and a table with checkable table items
- * The table has a popup menu to manipulate properies of the items behind the table items
+ * This class defines a composite with a header (Curve Selector, ..) and a table with checkable table items
+ * The table has a popup menu to manipulate properties of the items behind the table items
  * @author Winfried Brügmann
  */
 public class SelectorComposite extends Composite {

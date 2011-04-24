@@ -779,8 +779,8 @@ public class DataExplorer extends Composite {
 
 		if (activeRecordSet != null && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
 				&& activeRecordSet.getName().equals(requestingRecordSetName)
-				&& activeRecordSet.getDevice().isTableTabRequested() 
-				&& activeRecordSet.checkAllRecordsDisplayable()) {
+				&& activeRecordSet.getDevice().isTableTabRequested() ){
+//TODO check if still required				&& activeRecordSet.checkAllRecordsDisplayable()) {
 			if (forceClean) {
 				GDE.display.syncExec(new Runnable() {
 					public void run() {

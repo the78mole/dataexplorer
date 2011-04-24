@@ -80,7 +80,12 @@ public class LogViewReader {
 		deviceMap.put("qc copter", "QC-Copter"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("sm gps logger", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("nmea 0183", "NMEA-Adapter"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("graupner ultra duo plus 45", "UltraDuoPlus45"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("graupner ultra duo plus 60", "UltraDuoPlus60"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("graupner ultramat 18", "Ultramat18"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("graupner ultramat 12 plus pocket", "Ultramat12"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("graupner ultramat 16", "Ultramat16"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("graupner ultramat 16s", "Ultramat16S"); //$NON-NLS-1$ //$NON-NLS-2$
 		// add more supported devices here, key in lower case
 	}
 
