@@ -299,7 +299,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
-		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), this.getDataBlockSize());
+		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), Math.abs(this.getDataBlockSize()));
 		int[] startLength = new int[] {0,0};
 		byte[] lineBuffer = null;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -380,7 +380,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[this.getDataBlockSize()]; // use data block size to retrieve size of none calculation measurements
+		int[] points = new int[Math.abs(this.getDataBlockSize())]; // use data block size to retrieve size of none calculation measurements
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
@@ -673,7 +673,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
 		if (recordKeys.length > fileRecordsProperties.length) {
-			for (int i = 0; i < this.getDataBlockSize(); ++i) {
+			for (int i = 0; i < Math.abs(this.getDataBlockSize()); ++i) {
 				cleanedRecordNames.add(recordKeys[i]);
 			}
 			recordKeys = cleanedRecordNames.toArray(new String[1]);
