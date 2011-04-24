@@ -352,6 +352,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	public void open() {
 		long openStartTime = new Date().getTime();
 		try {
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+			
 			if (this.serialPort != null && !this.serialPort.isConnected()) {
 				try {
 					this.serialPort.open();
@@ -1122,6 +1124,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						}
 					});
 				} // end boundsComposite
+				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 300, 100));
 				this.dialogShell.open();
 				this.lastMemorySelectionIndex = -1;
@@ -1130,6 +1133,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.memoryCombo.notifyListeners(SWT.Selection, new Event());
 			}
 			else {
+				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 				this.dialogShell.setVisible(true);
 				this.dialogShell.setActive();
 				this.lastMemorySelectionIndex = -1;
@@ -1147,6 +1151,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		finally {
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+			this.application.resetShellIcon();
 			if (this.serialPort != null && this.serialPort.isConnected()) {
 				try {
 					this.serialPort.write(UltramatSerialPort.RESET_END);

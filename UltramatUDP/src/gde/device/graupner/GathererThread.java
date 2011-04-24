@@ -281,7 +281,7 @@ public class GathererThread extends Thread {
 					log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGI2200));
+						this.application.openMessageDialogAsync(this.dialog != null && this.dialog.getDialogShell() != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2200));
 						stopDataGatheringThread(false, null);
 					}
 				}
