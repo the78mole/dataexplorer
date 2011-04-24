@@ -205,7 +205,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 		if (log.isLoggable(Level.WARNING)) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Read before data: "); //$NON-NLS-1$
-			sb.append(StringHelper.convertHexInput(readBuffer));
+			sb.append(StringHelper.byte2Hex2CharString(readBuffer));
 			log.logp(Level.WARNING, "UniLogSerialPort", "readRetry", sb.toString());
 		}
 		
@@ -218,7 +218,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 		if (log.isLoggable(Level.WARNING)) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Read after data: "); //$NON-NLS-1$
-			sb.append(StringHelper.convertHexInput(readBuffer));
+			sb.append(StringHelper.byte2Hex2CharString(readBuffer));
 			log.logp(Level.WARNING, "UniLogSerialPort", "readRetry", sb.toString());
 		}
 		
