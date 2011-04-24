@@ -314,7 +314,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		this.memoryNames[1] = " initial ";
 
 		this.memoryParameterChangeListener = new Listener() {
-			@Override
 			public void handleEvent(Event evt) {
 				if (UltraDuoPlusDialog.this.lastMemorySelectionIndex >= 0 && UltraDuoPlusDialog.this.lastMemorySelectionIndex < UltraDuoPlusDialog.numberMemories) {
 					if (UltraDuoPlusDialog.this.ultraDuoPlusSetup != null) {
@@ -423,14 +422,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.dialogShell.pack();
 				this.dialogShell.setSize(655, 655);
 				this.dialogShell.addHelpListener(new HelpListener() {
-					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						UltraDuoPlusDialog.this.application.openHelpDialog(UltraDuoPlusDialog.DEVICE_JAR_NAME, "HelpInfo.html"); //$NON-NLS-1$ 
 					}
 				});
 				this.dialogShell.addDisposeListener(new DisposeListener() {
-					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (UltraDuoPlusDialog.this.serialPort != null && UltraDuoPlusDialog.this.serialPort.isConnected()) {
@@ -511,7 +508,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						userNameTextLData.top = new FormAttachment(0, 1000, 7);
 						this.userNameText.setLayoutData(userNameTextLData);
 						this.userNameText.addVerifyListener(new VerifyListener() {
-							@Override
 							public void verifyText(VerifyEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "evt.doit = " + (evt.text.length() <= 16)); //$NON-NLS-1$
 								evt.doit = evt.text.length() <= 16;
@@ -920,13 +916,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 											this.scrolledchargeComposite.setContent(this.chargeGroup);
 											this.chargeGroup.setSize(620, this.chargeSelectHeight);
 											this.scrolledchargeComposite.addControlListener(new ControlListener() {
-												@Override
 												public void controlResized(ControlEvent evt) {
 													log.log(java.util.logging.Level.FINEST, "scrolledMemoryComposite.controlResized, event=" + evt); //$NON-NLS-1$
 													UltraDuoPlusDialog.this.chargeGroup.setSize(UltraDuoPlusDialog.this.scrolledchargeComposite.getClientArea().width, UltraDuoPlusDialog.this.chargeSelectHeight);
 												}
-
-												@Override
 												public void controlMoved(ControlEvent evt) {
 													log.log(java.util.logging.Level.FINEST, "scrolledMemoryComposite.controlMoved, event=" + evt); //$NON-NLS-1$
 													UltraDuoPlusDialog.this.chargeGroup.setSize(UltraDuoPlusDialog.this.scrolledchargeComposite.getClientArea().width, UltraDuoPlusDialog.this.chargeSelectHeight);
@@ -1124,7 +1117,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						});
 					}
 					this.boundsComposite.addPaintListener(new PaintListener() {
-						@Override
 						public void paintControl(PaintEvent evt) {
 							log.log(java.util.logging.Level.FINER, "boundsComposite.paintControl() " + evt); //$NON-NLS-1$
 						}
@@ -1225,7 +1217,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				log.log(java.util.logging.Level.FINEST, "add handler"); //$NON-NLS-1$
 				//don't need a change listener handler for baseDeviceSetupGroup and baseDeviceSetupGroup1, it will always written to sync date and time
 				this.baseDeviceSetupGroup2.addListener(SWT.Selection, new Listener() {
-					@Override
 					public void handleEvent(Event evt) {
 						log.log(java.util.logging.Level.FINEST, "baseDeviceSetupComposite2.handleEvent, channelValues2[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$
 						ChannelData2 value = new ChannelData2();
@@ -1594,7 +1585,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					if (!UltraDuoPlusDialog.this.dialogShell.isDisposed() && UltraDuoPlusDialog.this.restoreButton != null && UltraDuoPlusDialog.this.backupButton != null
 							&& !UltraDuoPlusDialog.this.restoreButton.isDisposed() && !UltraDuoPlusDialog.this.backupButton.isDisposed()) {

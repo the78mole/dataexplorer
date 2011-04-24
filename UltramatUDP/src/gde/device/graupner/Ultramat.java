@@ -122,7 +122,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
-	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 		// no device specific mapping required
 		return lov2osdMap;
@@ -135,7 +134,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return converted configuration data
 	 */
-	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
 		return GDE.STRING_EMPTY;
@@ -144,7 +142,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	/**
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
-	@Override
 	public int getLovDataByteSize() {
 		return 150;
 	}
@@ -160,7 +157,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
-	@Override
 	public abstract void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException;
 
 	/**
@@ -169,7 +165,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte array with the data to be converted
 	 */
-	@Override
 	public abstract int[] convertDataBytes(int[] points, byte[] dataBuffer);
 
 	/**
@@ -183,14 +178,12 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
-	@Override
 	public abstract void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException;
 
 	/**
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
 		String[] dataTableRow = new String[recordSet.size() + 1]; // this.device.getMeasurementNames(this.channelNumber).length
 		try {
@@ -218,7 +211,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	@Override
 	public double translateValue(Record record, double value) {
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
 		// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6
@@ -238,7 +230,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
 		// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6
@@ -261,7 +252,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
-	@Override
 	public abstract void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck);
 
 	/**
@@ -270,7 +260,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * for calculation which requires more effort or is time consuming it can call a background thread, 
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
-	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are live measurement points only the calculation will take place directly after switch all to displayable
 		if (recordSet.isRaw()) {
@@ -350,7 +339,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
-	@Override
 	public String[] getUsedPropertyKeys() {
 		return new String[] { IDevice.OFFSET, IDevice.FACTOR };
 	}
@@ -358,7 +346,6 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
-	@Override
 	public void open_closeCommPort() {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
