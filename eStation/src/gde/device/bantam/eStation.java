@@ -491,7 +491,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
 			recordSet.get(recordKey).setActive(true);
 		}
-		for (int i=6; i<recordKeys.length; ++i) {
+		for (int i=5; i<recordKeys.length; ++i) {
 				Record record = recordSet.get(recordKeys[i]);
 				record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
 				log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData()));
