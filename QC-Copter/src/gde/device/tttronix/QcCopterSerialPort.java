@@ -94,7 +94,7 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 
 				if (log.isLoggable(Level.FINER)) {
 					StringBuilder sb = new StringBuilder();
-					sb.append(StringHelper.convertHexInput(data));
+					sb.append(StringHelper.byte2Hex2CharString(data));
 					log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, sb.toString());
 				}
 				
