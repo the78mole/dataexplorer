@@ -29,7 +29,6 @@ import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
-import gde.device.wb.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.io.CSVSerialDataReaderWriter;
 import gde.io.DataParser;
@@ -128,7 +127,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
-		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), this.getDataBlockSize());
+		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), Math.abs(this.getDataBlockSize()));
 		int[] startLength = new int[] {0,0};
 		byte[] lineBuffer = null;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
