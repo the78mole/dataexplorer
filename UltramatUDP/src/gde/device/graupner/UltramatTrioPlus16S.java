@@ -25,6 +25,7 @@ import gde.config.Settings;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.exception.DataInconsitsentException;
+import gde.log.Level;
 import gde.messages.Messages;
 
 import java.io.FileNotFoundException;
@@ -125,62 +126,6 @@ public class UltramatTrioPlus16S extends UltramatTrioPlus14 {
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
-	}
-
-	/**
-	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
-	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
-	 * @param points pointer to integer array to be filled with converted data
-	 * @param dataBuffer byte array with the data to be converted
-	 */
-	@Override
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
-		int maxVotage = Integer.MIN_VALUE;
-		int minVotage = Integer.MAX_VALUE;
-
-		if (points.length == 13) {
-			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 7=SpannungZelle1 8=SpannungZelle2....
-			points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[13], (char) dataBuffer[14], (char) dataBuffer[15], (char) dataBuffer[16]), 16);
-			points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[17], (char) dataBuffer[18], (char) dataBuffer[19], (char) dataBuffer[20]), 16);
-			points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
-			points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
-			points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-			points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16);
-			points[6] = 0;
-			// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6 
-			for (int i = 0, j = 0; i < 6; ++i, j += 4) {
-				points[i + 7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25 + j], (char) dataBuffer[26 + j], (char) dataBuffer[27 + j], (char) dataBuffer[28 + j]),
-						16);
-				if (points[i + 7] > 0) {
-					maxVotage = points[i + 7] > maxVotage ? points[i + 7] : maxVotage;
-					minVotage = points[i + 7] < minVotage ? points[i + 7] : minVotage;
-				}
-			}
-			//calculate balance on the fly
-			points[6] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-		}
-		else { //points.length = 10; dataBuffer is prepared by System.arrayCopy for outlet channel 2 and 3
-			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
-			points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[13], (char) dataBuffer[14], (char) dataBuffer[15], (char) dataBuffer[16]), 16);
-			points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[17], (char) dataBuffer[18], (char) dataBuffer[19], (char) dataBuffer[20]), 16);
-			points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
-			points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
-			points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-			points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16);
-			points[6] = 0;
-			// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3
-			for (int i = 0, j = 0; i < 3; ++i, j += 4) {
-				points[i + 7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25 + j], (char) dataBuffer[26 + j], (char) dataBuffer[27 + j], (char) dataBuffer[28 + j]),
-						16);
-				if (points[i + 7] > 0) {
-					maxVotage = points[i + 7] > maxVotage ? points[i + 7] : maxVotage;
-					minVotage = points[i + 7] < minVotage ? points[i + 7] : minVotage;
-				}
-			}
-			//calculate balance on the fly
-			points[6] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-		}
-		return points;
 	}
 
 	/**
@@ -290,5 +235,58 @@ public class UltramatTrioPlus16S extends UltramatTrioPlus14 {
 	@Override
 	public void matchBatteryMemory2ObjectKey(String batteryMemoryName) {
 		//no memory can be matched here
+	}
+
+	/**
+	 * check if one of the outlet channels are in processing mode
+	 * @param outletNum 1
+	 * @param dataBuffer
+	 * @return true if channel 1 is active 
+	 */
+	@Override
+	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
+		if (outletNum == 1) {
+			try {
+				int operationMode1 = getProcessingMode(dataBuffer);
+				if (log.isLoggable(java.util.logging.Level.FINE)) {
+					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode1);
+				}
+				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
+				return operationMode1 > 0 && operationMode1 < 4; 
+			}
+			catch (NumberFormatException e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+				return false;
+			}
+		}
+		else if (outletNum == 2) {
+			try {
+				int operationMode2 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[57], (char) dataBuffer[58]), 16);
+				if (log.isLoggable(java.util.logging.Level.FINE)) {
+					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode2);
+				}
+				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
+				return operationMode2 > 0 && operationMode2 < 4; 
+			}
+			catch (NumberFormatException e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+				return false;
+			}
+		}
+		else if (outletNum == 3) {
+			try {
+				int operationMode3 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[83], (char) dataBuffer[84]), 16);
+				if (log.isLoggable(java.util.logging.Level.FINE)) {
+					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode3);
+				}
+				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
+				return operationMode3 > 0 && operationMode3 < 4; 
+			}
+			catch (NumberFormatException e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+				return false;
+			}
+		}
+		return false;
 	}
 }

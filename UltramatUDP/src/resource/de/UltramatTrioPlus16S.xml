@@ -25,7 +25,7 @@
         <timeStep>1000.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="106" type="BINARY"/>
+        <format size="114" type="BINARY"/>
         <checkSum type="ADD" format="BINARY"/>
     </DataBlock>
     <Channels>

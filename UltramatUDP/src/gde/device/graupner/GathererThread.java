@@ -159,10 +159,71 @@ public class GathererThread extends Thread {
 						break;
 
 					case UltramatTrio14:
+						if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
+							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
+							recordSet1 = (RecordSet) ch1[0];
+							this.recordSetKey1 = (String) ch1[1];
+							this.measurementCount1 = (Long) ch1[2];
+							this.startCycleTime1 = (Long) ch1[3];
+						}
+						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
+							System.arraycopy(dataBuffer, 49, buffer, 10, 2); //copy operation mode
+							buffer[12] = buffer[13] = 48; //blank out cycle number, channel 2 does not support cycles
+							System.arraycopy(dataBuffer, 51, buffer, 14, 24);
+							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
+							recordSet2 = (RecordSet) ch2[0];
+							this.recordSetKey2 = (String) ch2[1];
+							this.measurementCount2 = (Long) ch2[2];
+							this.startCycleTime2 = (Long) ch2[3];
+						}
+						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
+							System.arraycopy(dataBuffer, 75, buffer, 10, 2); //copy operation mode
+							buffer[12] = buffer[13] = 48; //blank out cycle number, channel 2 does not support cycles
+							System.arraycopy(dataBuffer, 77, buffer, 14, 24);
+							ch3 = processDataChannel(3, recordSet3, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
+							recordSet3 = (RecordSet) ch3[0];
+							this.recordSetKey2 = (String) ch3[1];
+							this.measurementCount2 = (Long) ch3[2];
+							this.startCycleTime2 = (Long) ch3[3];
+						}
+						break;
+						
 					case UltramatTrio16S:
-						this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
-						this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
-						this.isProgrammExecuting3 = this.device.isProcessing(3, dataBuffer);
+						if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
+							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
+							recordSet1 = (RecordSet) ch1[0];
+							this.recordSetKey1 = (String) ch1[1];
+							this.measurementCount1 = (Long) ch1[2];
+							this.startCycleTime1 = (Long) ch1[3];
+						}
+						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
+							System.arraycopy(dataBuffer, 57, buffer, 10, 2); //copy operation mode
+							buffer[12] = buffer[13] = 48; //blank out cycle number, channel 2 does not support cycles
+							System.arraycopy(dataBuffer, 59, buffer, 14, 24);
+							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
+							recordSet2 = (RecordSet) ch2[0];
+							this.recordSetKey2 = (String) ch2[1];
+							this.measurementCount2 = (Long) ch2[2];
+							this.startCycleTime2 = (Long) ch2[3];
+						}
+						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
+							System.arraycopy(dataBuffer, 83, buffer, 10, 2); //copy operation mode
+							buffer[12] = buffer[13] = 48; //blank out cycle number, channel 2 does not support cycles
+							System.arraycopy(dataBuffer, 85, buffer, 14, 24);
+							ch3 = processDataChannel(3, recordSet3, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
+							recordSet3 = (RecordSet) ch3[0];
+							this.recordSetKey2 = (String) ch3[1];
+							this.measurementCount2 = (Long) ch3[2];
+							this.startCycleTime2 = (Long) ch3[3];
+						}
 						break;
 
 					case UltraDuoPlus45:
