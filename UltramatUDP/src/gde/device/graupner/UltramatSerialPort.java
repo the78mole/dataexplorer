@@ -42,37 +42,38 @@ public class UltramatSerialPort extends DeviceCommPort {
 
 	final static byte[]	RESET_BEGIN										= new byte[] { DeviceSerialPortImpl.FF, 0x41, 0x37, 0x30, 0x30, 0x30, 0x30, 0x44, 0x38, DeviceSerialPortImpl.CR };	//1000 1111
 	final static byte[]	RESET_END											= new byte[] { DeviceSerialPortImpl.FF, 0x43, 0x30, 0x30, 0x30, 0x30, 0x30, 0x44, 0x33, DeviceSerialPortImpl.CR };	//1000 1111
-	static byte[]				READ_MEMORY_NAME							= new byte[] { DeviceSerialPortImpl.FF, '8', '0', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0000
-	static byte[]				WRITE_MEMORY_NAME							= new byte[] { DeviceSerialPortImpl.FF, '0', '0' };																																	//0000 0000
-	static byte[]				READ_MEMORY_SETUP							= new byte[] { DeviceSerialPortImpl.FF, '8', '1', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0001
-	static byte[]				WRITE_MEMORY_SETUP						= new byte[] { DeviceSerialPortImpl.FF, '0', '1' };																																	//0000 0001
-	static byte[]				READ_MEMORY_STEP_CHARGE_SETUP	= new byte[] { DeviceSerialPortImpl.FF, '8', '2', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0010
-	static byte[]				WRITE_STEP_CHARGE_SETUP				= new byte[] { DeviceSerialPortImpl.FF, '0', '2' };																																	//0000 0010
-	static byte[]				READ_MEMORY_CYCLE_DATA				= new byte[] { DeviceSerialPortImpl.FF, '8', '3', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0011
-	static byte[]				WRITE_CYCLE_DATA							= new byte[] { DeviceSerialPortImpl.FF, '0', '3' };																																	//0000 0011
-	static byte[]				READ_MEMORY_TRACE_DATA				= new byte[] { DeviceSerialPortImpl.FF, '8', '4', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0100
-	static byte[]				WRITE_TRACE_DATA							= new byte[] { DeviceSerialPortImpl.FF, '0', '4' };																																	//0000 0100
-	static byte[]				READ_TIRE_HEATER							= new byte[] { DeviceSerialPortImpl.FF, '8', '5', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0101
-	static byte[]				WRITE_TIRE_HEATER							= new byte[] { DeviceSerialPortImpl.FF, '0', '5' };																																	//0000 0101
-	static byte[]				READ_MOTOR_RUN								= new byte[] { DeviceSerialPortImpl.FF, '8', '6', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0110
-	static byte[]				WRITE_MOTOR_RUN								= new byte[] { DeviceSerialPortImpl.FF, '0', '6' };																																	//0000 0110
-	static byte[]				READ_CHANNEL_SETUP						= new byte[] { DeviceSerialPortImpl.FF, '8', '7', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0111
-	static byte[]				WRITE_CHANNEL_SETUP						= new byte[] { DeviceSerialPortImpl.FF, '0', '7' };																																	//0000 0111
-	static byte[]				READ_DEVICE_IDENTIFIER_NAME		= new byte[] { DeviceSerialPortImpl.FF, '8', '8', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 1000
-	static byte[]				WRITE_DEVICE_IDENTIFIER_NAME	= new byte[] { DeviceSerialPortImpl.FF, '0', '8' };																																	//0000 1000
-	static byte[]				READ_GRAPHICS_DATA						= new byte[] { DeviceSerialPortImpl.FF, '8', '9', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 1001
-	static byte[]				WRITE_GRAPHICS_DATA						= new byte[] { DeviceSerialPortImpl.FF, '0', '9' };																																	//0000 1001
+	final static byte[]	READ_MEMORY_NAME							= new byte[] { DeviceSerialPortImpl.FF, '8', '0', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0000
+	final static byte[]	WRITE_MEMORY_NAME							= new byte[] { DeviceSerialPortImpl.FF, '0', '0' };																																//0000 0000
+	final static byte[]	READ_MEMORY_SETUP							= new byte[] { DeviceSerialPortImpl.FF, '8', '1', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0001
+	final static byte[]	WRITE_MEMORY_SETUP						= new byte[] { DeviceSerialPortImpl.FF, '0', '1' };																																//0000 0001
+	final static byte[]	READ_MEMORY_STEP_CHARGE_SETUP	= new byte[] { DeviceSerialPortImpl.FF, '8', '2', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0010
+	final static byte[]	WRITE_STEP_CHARGE_SETUP				= new byte[] { DeviceSerialPortImpl.FF, '0', '2' };																																//0000 0010
+	final static byte[]	READ_MEMORY_CYCLE_DATA				= new byte[] { DeviceSerialPortImpl.FF, '8', '3', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0011
+	final static byte[]	WRITE_CYCLE_DATA							= new byte[] { DeviceSerialPortImpl.FF, '0', '3' };																																//0000 0011
+	final static byte[]	READ_MEMORY_TRACE_DATA				= new byte[] { DeviceSerialPortImpl.FF, '8', '4', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0100
+	final static byte[]	WRITE_TRACE_DATA							= new byte[] { DeviceSerialPortImpl.FF, '0', '4' };																																//0000 0100
+	final static byte[]	READ_TIRE_HEATER							= new byte[] { DeviceSerialPortImpl.FF, '8', '5', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0101
+	final static byte[]	WRITE_TIRE_HEATER							= new byte[] { DeviceSerialPortImpl.FF, '0', '5' };																																//0000 0101
+	final static byte[]	READ_MOTOR_RUN								= new byte[] { DeviceSerialPortImpl.FF, '8', '6', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0110
+	final static byte[]	WRITE_MOTOR_RUN								= new byte[] { DeviceSerialPortImpl.FF, '0', '6' };																																//0000 0110
+	final static byte[]	READ_CHANNEL_SETUP						= new byte[] { DeviceSerialPortImpl.FF, '8', '7', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0111
+	final static byte[]	WRITE_CHANNEL_SETUP						= new byte[] { DeviceSerialPortImpl.FF, '0', '7' };																																//0000 0111
+	final static byte[]	READ_DEVICE_IDENTIFIER_NAME		= new byte[] { DeviceSerialPortImpl.FF, '8', '8', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 1000
+	final static byte[]	WRITE_DEVICE_IDENTIFIER_NAME	= new byte[] { DeviceSerialPortImpl.FF, '0', '8' };																																//0000 1000
+	final static byte[]	READ_GRAPHICS_DATA						= new byte[] { DeviceSerialPortImpl.FF, '8', '9', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 1001
+	final static byte[]	WRITE_GRAPHICS_DATA						= new byte[] { DeviceSerialPortImpl.FF, '0', '9' };																																//0000 1001
 
-	final static int					SIZE_MEMORY_SETUP							= 28;
-	final static int					SIZE_MEMORY_STEP_CHARGE_SETUP	= 20;
-	final static int					SIZE_MEMORY_TRACE							= 6;
-	final static int					SIZE_MEMORY_CYCLE							= 121;
-	static int								SIZE_CHANNEL_1_SETUP					= 16;
-	final static int					SIZE_CHANNEL_2_SETUP					= 4;
-	final static int					SIZE_TIRE_HEATER_SETUP				= 8;
-	final static int					SIZE_MOTOR_RUN_SETUP					= 17;
+	final static int		SIZE_MEMORY_SETUP							= 28;
+	final static int		SIZE_MEMORY_STEP_CHARGE_SETUP	= 20;
+	final static int		SIZE_MEMORY_TRACE							= 6;
+	final static int		SIZE_MEMORY_CYCLE							= 121;
+	static int					SIZE_CHANNEL_1_SETUP					= 16;
+	final static int		SIZE_CHANNEL_2_SETUP					= 4;
+	final static int		SIZE_TIRE_HEATER_SETUP				= 8;
+	final static int		SIZE_MOTOR_RUN_SETUP					= 17;
 
 	boolean							isInSync											= false;
+	boolean							isMissmatchWarningWritten			= false;
 
 	/**
 	 * constructor of default implementation
@@ -360,11 +361,13 @@ public class UltramatSerialPort extends DeviceCommPort {
 		if (check_sum == buffer_check_sum)
 			isOK = true;
 		else {
-			log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "check sum missmatch detected, calculates check_sum = " + check_sum
-					+ "; delta to data contained delta = " + (buffer_check_sum - check_sum));
-			log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
-
-			//tolerate UltraTrioPlus14, Ultramat18 and UltraDuoPlus45 checksum delta
+			if (!this.isMissmatchWarningWritten) {
+				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "check sum missmatch detected, calculates check_sum = " + check_sum + "; delta to data contained delta = "
+						+ (buffer_check_sum - check_sum));
+				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+				this.isMissmatchWarningWritten = true;
+			}
+				//tolerate UltraTrioPlus14, Ultramat18 and UltraDuoPlus45 checksum delta
 			//can not make sure that offset is the same after any firmware update the offset get logged, but will always return isOK=true
 			//if (check_sum == (buffer_check_sum - 576) || check_sum == (buffer_check_sum - 384) || check_sum == (buffer_check_sum - 1152)) 
 				isOK = true;
