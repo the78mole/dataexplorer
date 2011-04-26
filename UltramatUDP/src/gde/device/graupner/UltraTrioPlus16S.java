@@ -87,7 +87,7 @@ public class UltraTrioPlus16S extends UltraTrioPlus14 {
 	 */
 	@Override
 	public int getLovDataByteSize() {
-		return 150;
+		return 126;
 	}
 
 	/**
@@ -109,13 +109,27 @@ public class UltraTrioPlus16S extends UltraTrioPlus14 {
 		int offset = 4;
 		int progressCycle = 0;
 		int lovDataSize = this.getLovDataByteSize();
+		int outputChannel = recordSet.getChannelConfigNumber();
 
 		if (dataBuffer[offset] == 0x0C) {
 			byte[] convertBuffer = new byte[deviceDataBufferSize];
 			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 			for (int i = 0; i < recordDataSize; i++) {
-				System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+				if (outputChannel == 1)
+					System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+				else if (outputChannel == 2) {
+					System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, 9); //copy until input voltage
+					System.arraycopy(dataBuffer, 57+offset + i * lovDataSize, convertBuffer, 9, 2); //copy operation mode
+					convertBuffer[11] = convertBuffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
+					System.arraycopy(dataBuffer, 59+offset + i * lovDataSize, convertBuffer, 13, 24);
+				}
+				else if (outputChannel == 3) {
+					System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, 9); //copy until input voltage
+					System.arraycopy(dataBuffer, 83+offset + i * lovDataSize, convertBuffer, 9, 2); //copy operation mode
+					convertBuffer[11] = convertBuffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
+					System.arraycopy(dataBuffer, 85+offset + i * lovDataSize, convertBuffer, 13, 24);
+				}
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 				recordSet.addPoints(convertDataBytes(points, convertBuffer));
 			}
