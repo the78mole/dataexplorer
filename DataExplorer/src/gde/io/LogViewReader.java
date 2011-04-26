@@ -86,6 +86,8 @@ public class LogViewReader {
 		deviceMap.put("graupner ultramat 12 plus pocket", "Ultramat12"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("graupner ultramat 16", "Ultramat16"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("graupner ultramat 16s", "Ultramat16S"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("graupner ultra trio plus 14", "UltraTrioPlus14"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("graupner ultra trio plus 16", "UltraTrioPlus16S"); //$NON-NLS-1$ //$NON-NLS-2$
 		// add more supported devices here, key in lower case
 	}
 
