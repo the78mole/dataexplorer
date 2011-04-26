@@ -37,6 +37,7 @@ import gde.ui.DataExplorer;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -335,8 +336,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			configData.put(eStation.CONFIG_BATTERY_TYPE, this.ACCU_TYPES[(dataBuffer[23] & 0xFF - 0x80) - 1]);
 			configData.put(eStation.CONFIG_PROCESSING_TIME, ""+((dataBuffer[69] & 0xFF - 0x80)*100 + (dataBuffer[70] & 0xFF - 0x80))); //$NON-NLS-1$
 		}
-		for (String key : configData.keySet()) {
-			log.log(Level.FINE, key + " = " + configData.get(key)); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) {
+			for (Entry<String, String> entry : configData.entrySet()) {
+				log.log(Level.FINE, entry.getKey() + " = " + entry.getValue()); //$NON-NLS-1$
+			}
 		}
 		return configData;
 	}
