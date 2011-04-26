@@ -22,7 +22,6 @@ import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.comm.DeviceSerialPortImpl;
 import gde.device.DeviceConfiguration;
-import gde.device.graupner.Ultramat.GraupnerDeviceType;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
@@ -365,7 +364,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 					+ "; delta to data contained delta = " + (buffer_check_sum - check_sum));
 			log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
 
-			if (check_sum == (buffer_check_sum - 384) || check_sum == (buffer_check_sum - 1152)) //tolerate Ultramat18 and UltraDuoPlus45 checksum delta
+			//tolerate UltraTrioPlus14, Ultramat18 and UltraDuoPlus45 checksum delta
+			//can not make sure that offset is the same after any firmware update the offset get logged, but will always return isOK=true
+			//if (check_sum == (buffer_check_sum - 576) || check_sum == (buffer_check_sum - 384) || check_sum == (buffer_check_sum - 1152)) 
 				isOK = true;
 		}
 		return isOK;

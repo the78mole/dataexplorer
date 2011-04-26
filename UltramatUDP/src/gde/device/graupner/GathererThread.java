@@ -169,9 +169,9 @@ public class GathererThread extends Thread {
 						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
 							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
 							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
-							System.arraycopy(dataBuffer, 49, buffer, 10, 2); //copy operation mode
-							buffer[12] = buffer[13] = 48; //blank out cycle number, channel 2 does not support cycles
-							System.arraycopy(dataBuffer, 51, buffer, 14, 24);
+							System.arraycopy(dataBuffer, 49, buffer, 9, 2); //copy operation mode
+							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
+							System.arraycopy(dataBuffer, 51, buffer, 13, 24);
 							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
 							recordSet2 = (RecordSet) ch2[0];
 							this.recordSetKey2 = (String) ch2[1];
@@ -181,9 +181,9 @@ public class GathererThread extends Thread {
 						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
 							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
 							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
-							System.arraycopy(dataBuffer, 75, buffer, 10, 2); //copy operation mode
-							buffer[12] = buffer[13] = 48; //blank out cycle number, channel 2 does not support cycles
-							System.arraycopy(dataBuffer, 77, buffer, 14, 24);
+							System.arraycopy(dataBuffer, 75, buffer, 9, 2); //copy operation mode
+							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
+							System.arraycopy(dataBuffer, 77, buffer, 13, 24);
 							ch3 = processDataChannel(3, recordSet3, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
 							recordSet3 = (RecordSet) ch3[0];
 							this.recordSetKey2 = (String) ch3[1];
@@ -203,9 +203,9 @@ public class GathererThread extends Thread {
 						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
 							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
 							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
-							System.arraycopy(dataBuffer, 57, buffer, 10, 2); //copy operation mode
-							buffer[12] = buffer[13] = 48; //blank out cycle number, channel 2 does not support cycles
-							System.arraycopy(dataBuffer, 59, buffer, 14, 24);
+							System.arraycopy(dataBuffer, 57, buffer, 9, 2); //copy operation mode
+							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
+							System.arraycopy(dataBuffer, 59, buffer, 13, 24);
 							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
 							recordSet2 = (RecordSet) ch2[0];
 							this.recordSetKey2 = (String) ch2[1];
@@ -215,9 +215,9 @@ public class GathererThread extends Thread {
 						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
 							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
 							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
-							System.arraycopy(dataBuffer, 83, buffer, 10, 2); //copy operation mode
-							buffer[12] = buffer[13] = 48; //blank out cycle number, channel 2 does not support cycles
-							System.arraycopy(dataBuffer, 85, buffer, 14, 24);
+							System.arraycopy(dataBuffer, 83, buffer, 9, 2); //copy operation mode
+							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
+							System.arraycopy(dataBuffer, 85, buffer, 13, 24);
 							ch3 = processDataChannel(3, recordSet3, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
 							recordSet3 = (RecordSet) ch3[0];
 							this.recordSetKey2 = (String) ch3[1];
