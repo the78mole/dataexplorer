@@ -741,15 +741,13 @@ public class VarioToolTabItem extends CTabItem {
 								public void widgetSelected(SelectionEvent evt) {
 									VarioToolTabItem.log.log(java.util.logging.Level.FINEST, "setupSlider6.widgetSelected, event=" + evt); //$NON-NLS-1$
 									int tmpValue = VarioToolTabItem.this.setupSlider6.getSelection();
-									if (tmpValue % 1 == 0) {
-										if (tmpValue < 44)
-											VarioToolTabItem.this.setupValue6 = 44;
-										else if (tmpValue > 99)
-											VarioToolTabItem.this.setupValue6 = 99;
-										else
-											VarioToolTabItem.this.setupValue6 = tmpValue;
-										VarioToolTabItem.this.setupText6.setText(String.format("%.1f", VarioToolTabItem.this.setupValue6 / 10.0)); //$NON-NLS-1$
-									}
+									if (tmpValue < 44)
+										VarioToolTabItem.this.setupValue6 = 44;
+									else if (tmpValue > 99)
+										VarioToolTabItem.this.setupValue6 = 99;
+									else
+										VarioToolTabItem.this.setupValue6 = tmpValue;
+									VarioToolTabItem.this.setupText6.setText(String.format("%.1f", VarioToolTabItem.this.setupValue6 / 10.0)); //$NON-NLS-1$
 								}
 							});
 						}
@@ -810,15 +808,13 @@ public class VarioToolTabItem extends CTabItem {
 								public void widgetSelected(SelectionEvent evt) {
 									VarioToolTabItem.log.log(java.util.logging.Level.FINEST, "setupSlider7.widgetSelected, event=" + evt); //$NON-NLS-1$
 									int tmpValue = VarioToolTabItem.this.setupSlider7.getSelection();
-									if (tmpValue % 1 == 0) {
-										if (tmpValue < 0)
-											VarioToolTabItem.this.setupValue7 = 0;
-										else if (tmpValue > 20)
-											VarioToolTabItem.this.setupValue7 = 20;
-										else
-											VarioToolTabItem.this.setupValue7 = tmpValue;
-										VarioToolTabItem.this.setupText7.setText(String.format("%.1f", VarioToolTabItem.this.setupValue7 / -10.0)); //$NON-NLS-1$
-									}
+									if (tmpValue < 0)
+										VarioToolTabItem.this.setupValue7 = 0;
+									else if (tmpValue > 20)
+										VarioToolTabItem.this.setupValue7 = 20;
+									else
+										VarioToolTabItem.this.setupValue7 = tmpValue;
+									VarioToolTabItem.this.setupText7.setText(String.format("%.1f", VarioToolTabItem.this.setupValue7 / -10.0)); //$NON-NLS-1$
 								}
 							});
 						}
@@ -1449,7 +1445,7 @@ public class VarioToolTabItem extends CTabItem {
 								this.setupButton13a.setLayoutData(setupButton13aLData);
 								this.setupButton13a.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.setupButton13a.setText(Messages.getString(MessageIds.GDE_MSGT1861));
-								this.setupButton13a.setSelection((this.setupValue13 % 2) == 1);
+								this.setupButton13a.setSelection((Math.abs(this.setupValue13) % 2) == 1);
 								this.setupButton13a.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -2263,8 +2259,8 @@ public class VarioToolTabItem extends CTabItem {
 				this.setupButton12.setSelection(this.setupValue12 == 0);
 
 				this.setupValue13 = buffer[13]; // integral vario config
-				this.setupButton13a.setSelection((this.setupValue13 % 2) == 1);
-				this.setupButton13b.setSelection((this.setupValue13 % 2) == 0);
+				this.setupButton13a.setSelection((Math.abs(this.setupValue13) % 2) == 1);
+				this.setupButton13b.setSelection((Math.abs(this.setupValue13) % 2) == 0);
 				this.setupButton13c.setSelection(this.setupValue13 > 2);
 				this.setupSlider13.setEnabled(this.setupValue13 > 2);
 				this.setupSlider13.setSelection((this.setupValue13 < 4) ? 20 : (this.setupValue13 > 7) ? 100 : 50);
@@ -2348,7 +2344,7 @@ public class VarioToolTabItem extends CTabItem {
 				data_out.write(buffer);
 				data_out.close();
 			}
-			catch (Exception e) {
+			catch (Throwable e) {
 				VarioToolTabItem.log.log(Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
 			}
 		}
