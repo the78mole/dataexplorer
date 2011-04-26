@@ -158,9 +158,6 @@ public class GPSHelper {
 					phi_A_rad = phi_B_rad;
 					lambda_A = lambda_B;
 
-					if (deltaTrip < 0) 
-						lastTripLength = lastTripLength + deltaTrip;
-					else
 					lastTripLength = lastTripLength + deltaTrip;
 					
 					if (indexMovement == 0 && recordDistance.get(i) > 1500) 

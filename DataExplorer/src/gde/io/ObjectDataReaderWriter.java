@@ -328,7 +328,7 @@ public class ObjectDataReaderWriter {
 			outZip.flush();
 			outZip.close();
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}

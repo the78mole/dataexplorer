@@ -450,7 +450,7 @@ public class MathUtils {
 			}
 			else if (tmpDeltaScale <= 0.00025) {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 50000);
-				results[2] = new Integer(1);
+				results[2] = Integer.valueOf(1);
 			}
 			else if (tmpDeltaScale <= 0.0025) {
 				results = evaluateNumTicksAuto(tmpMinValue, tmpMaxValue, maxNumberTicks, 50000);

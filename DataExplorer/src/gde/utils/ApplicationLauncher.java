@@ -138,7 +138,7 @@ public class ApplicationLauncher {
 			}
 			fqExecPath = executable;
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			DataExplorer.getInstance().openMessageDialogAsync(e.getMessage());
 		}

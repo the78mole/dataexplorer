@@ -87,46 +87,49 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 */
 	public SerialPort open() throws ApplicationConfigurationException, SerialPortException {
 		try {
-			String path;
-			if (this.application.isObjectoriented()) {
-				path = this.application.getObjectFilePath();
-			}
-			else {
-				String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-				path = this.application.getActiveDevice() != null ? this.settings.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX : this.settings.getDataFilePath();
-				if (!FileUtils.checkDirectoryAndCreate(path)) {
-					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
+			if (this.application != null) {
+				String path;
+				if (this.application.isObjectoriented()) {
+					path = this.application.getObjectFilePath();
 				}
-			}
-			FileDialog openFileDialog = this.application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV, GDE.FILE_ENDING_STAR_TXT, GDE.FILE_ENDING_STAR_LOG }, path, null, SWT.SINGLE);
-			if (openFileDialog.getFileName().length() > 4) {
-				String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				else {
+					String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+					path = this.application.getActiveDevice() != null ? this.settings.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX : this.settings.getDataFilePath();
+					if (!FileUtils.checkDirectoryAndCreate(path)) {
+						this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
+					}
+				}
+				FileDialog openFileDialog = this.application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV, GDE.FILE_ENDING_STAR_TXT,
+						GDE.FILE_ENDING_STAR_LOG }, path, null, SWT.SINGLE);
+				if (openFileDialog.getFileName().length() > 4) {
+					String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 
-				if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
-					fileType = GDE.FILE_ENDING_STAR_OSD;
-					//TODO add implementation to use *.osd files as simulation data input
+					if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
+						fileType = GDE.FILE_ENDING_STAR_OSD;
+						//TODO add implementation to use *.osd files as simulation data input
+					}
+					else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
+						fileType = GDE.FILE_ENDING_STAR_LOV;
+						data_in = new DataInputStream(new FileInputStream(new File(openFilePath)));
+						LogViewReader.readHeader(data_in);
+					}
+					else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
+						fileType = GDE.FILE_ENDING_STAR_TXT;
+						txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
+						txt_in.read();
+					}
+					else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+						fileType = GDE.FILE_ENDING_STAR_LOG;
+						txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
+					}
+					else
+						this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0008) + openFilePath);
 				}
-				else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
-					fileType = GDE.FILE_ENDING_STAR_LOV;
-					data_in = new DataInputStream(new FileInputStream(new File(openFilePath)));
-					LogViewReader.readHeader(data_in);
-				}
-				else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
-					fileType = GDE.FILE_ENDING_STAR_TXT;
-					txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
-					txt_in.read();
-				}
-				else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
-					fileType = GDE.FILE_ENDING_STAR_LOG;
-					txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
-				}
-				else
-					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0008) + openFilePath);
+				this.isConnected = data_in != null || txt_in != null;
+				this.application.setPortConnected(this.isConnected);
 			}
-			this.isConnected = data_in != null || txt_in != null;
-			if (this.application != null) this.application.setPortConnected(this.isConnected);
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return null;

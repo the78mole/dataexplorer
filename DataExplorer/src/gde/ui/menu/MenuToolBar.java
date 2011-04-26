@@ -1079,7 +1079,7 @@ public class MenuToolBar {
 													try {
 														MenuToolBar.this.application.openHelpDialog(FileUtils.getJarFileNameOfDevice(MenuToolBar.this.application.getActiveDevice().getDeviceConfiguration()), "HelpInfo.html");//$NON-NLS-1$
 													}
-													catch (Exception e) {
+													catch (Throwable e) {
 														//ignore
 													} 	
 												}
