@@ -196,7 +196,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 	 * @throws Exception
 	 */
 	public byte[] readSingleTelegramm() throws Exception {
-		byte[] tmp1ReadBuffer = new byte[1], tmp2ReadBuffer = new byte[1], readBuffer = new byte[1];
+		byte[] tmp1ReadBuffer = new byte[1], tmp2ReadBuffer, readBuffer = new byte[1];
 		int length = 0;
 		
 		try {
@@ -213,7 +213,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 				readBuffer = readRetry(tmp1ReadBuffer);
 			}
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			readBuffer = readRetry(tmp1ReadBuffer);
 		}
 		

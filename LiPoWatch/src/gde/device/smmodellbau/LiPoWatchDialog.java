@@ -168,22 +168,6 @@ public class LiPoWatchDialog extends DeviceDialog {
 	final Settings								settings;																																																							// application configuration settings
 
 	/**
-	* Auto-generated main method to display this 
-	* gde.device.DeviceDialog inside a new Shell.
-	*/
-	public static void main(String[] args) {
-		try {
-			Display display = Display.getDefault();
-			Shell shell = new Shell(display);
-			LiPoWatchDialog inst = new LiPoWatchDialog(shell, null);
-			inst.open();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * default constructor initialize all variables required
 	 * @param parent Shell
 	 * @param useDevice device specific class implementation
