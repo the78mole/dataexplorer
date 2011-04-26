@@ -258,7 +258,7 @@ public class SetupReaderWriter {
 				data_out.write(buffer);
 				data_out.close();
 			}
-			catch (Exception e) {
+			catch (Throwable e) {
 				log.log(Level.WARNING, "Error writing setupfile = " + fileDialog.getFileName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); //$NON-NLS-1$
 			}
 		}
