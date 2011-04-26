@@ -549,7 +549,7 @@ public class AkkuMasterC4SerialPort extends DeviceCommPort {
 	 * @return String[] containing described values
 	 * @throws Throwable 
 	 */
-	public synchronized HashMap<String, String> getVersion() throws Exception {
+	public synchronized HashMap<String, String> getVersion() throws Throwable {
 		HashMap<String, String> result = new HashMap<String, String>(4);
 		try {
 			if (!this.isConnected()) {
@@ -592,7 +592,7 @@ public class AkkuMasterC4SerialPort extends DeviceCommPort {
 				result.put(AkkuMasterC4SerialPort.VERSION_TYPE_FRONT, Messages.getString(MessageIds.GDE_MSGT1172)); 
 
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
