@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.comm.DeviceSerialPortImpl;
 import gde.device.DeviceConfiguration;
+import gde.device.graupner.Ultramat.GraupnerDeviceType;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
@@ -63,14 +64,14 @@ public class UltramatSerialPort extends DeviceCommPort {
 	static byte[]				READ_GRAPHICS_DATA						= new byte[] { DeviceSerialPortImpl.FF, '8', '9', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 1001
 	static byte[]				WRITE_GRAPHICS_DATA						= new byte[] { DeviceSerialPortImpl.FF, '0', '9' };																																	//0000 1001
 
-	static int					SIZE_MEMORY_SETUP							= 28;
-	static int					SIZE_MEMORY_STEP_CHARGE_SETUP	= 20;
-	static int					SIZE_MEMORY_TRACE							= 6;
-	static int					SIZE_MEMORY_CYCLE							= 121;
-	static int					SIZE_CHANNEL_1_SETUP					= 16;
-	static int					SIZE_CHANNEL_2_SETUP					= 4;
-	static int					SIZE_TIRE_HEATER_SETUP				= 8;
-	static int					SIZE_MOTOR_RUN_SETUP					= 17;
+	final static int					SIZE_MEMORY_SETUP							= 28;
+	final static int					SIZE_MEMORY_STEP_CHARGE_SETUP	= 20;
+	final static int					SIZE_MEMORY_TRACE							= 6;
+	final static int					SIZE_MEMORY_CYCLE							= 121;
+	static int								SIZE_CHANNEL_1_SETUP					= 16;
+	final static int					SIZE_CHANNEL_2_SETUP					= 4;
+	final static int					SIZE_TIRE_HEATER_SETUP				= 8;
+	final static int					SIZE_MOTOR_RUN_SETUP					= 17;
 
 	boolean							isInSync											= false;
 
@@ -86,7 +87,6 @@ public class UltramatSerialPort extends DeviceCommPort {
 			UltramatSerialPort.SIZE_CHANNEL_1_SETUP = 19; // additional supply input 2 voltage, current
 			break;
 
-		case UltraDuoPlus50:
 		case UltraDuoPlus60:
 		default:
 			UltramatSerialPort.SIZE_CHANNEL_1_SETUP = 16;
