@@ -92,9 +92,9 @@ public class UniLogDataGatherer extends Thread {
 			if (this.dialog != null) {
 				this.dialog.updateConfigurationValues(readBuffer);
 				this.dialog.updateActualConfigTabItemAnalogModi(this.channelNumber);
+				this.dialog.resetDataSetsLabel();
 			}
 
-			this.dialog.resetDataSetsLabel();
 			this.serialPort.setTransmitFinished(false);
 			HashMap<String, Object> data = this.serialPort.getData(this.dialog);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "back from gathering data"); //$NON-NLS-1$

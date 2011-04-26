@@ -185,7 +185,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 				readBuffer = readRetry(readBuffer);
 			}
 		}
-		catch (Exception e) {
+		catch (Throwable e) {
 			readBuffer = readRetry(readBuffer);
 		}
 		

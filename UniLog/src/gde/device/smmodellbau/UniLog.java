@@ -147,7 +147,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1376), Messages.getString(MessageIds.GDE_MSGT1375));
+		if (this.application != null && this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1376), Messages.getString(MessageIds.GDE_MSGT1375));
 	}
 
 	/**
@@ -485,7 +485,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8) + ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
 			}
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
-			recordSet.setTimeStep_ms(timeStamps.lastElement()/(timeStamps.size()-1)/10.0); //UniLog has constant time step, even if the XML says -1
+			recordSet.setTimeStep_ms(timeStamps.lastElement()/(double)(timeStamps.size()-1)/10.0); //UniLog has constant time step, even if the XML says -1
 		}
 		
 		for (int i = 0; i < recordDataSize; i++) {
