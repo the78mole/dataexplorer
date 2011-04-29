@@ -161,7 +161,7 @@ public class DataTableWindow extends CTabItem {
 		this.dataTable.setItemCount (count);
 	}
 	
-	public void cleanTable() {
+	public synchronized void cleanTable() {
 		if (this.dataTable != null && !this.dataTable.isDisposed())
 			this.dataTable.removeAll();
 	}

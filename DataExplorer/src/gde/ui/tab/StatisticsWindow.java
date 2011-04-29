@@ -408,7 +408,7 @@ public class StatisticsWindow extends CTabItem {
 					row = new TableItem(this.dataTable, SWT.NONE);
 					row.setText(itemsText.split(DELIMITER));
 				}
-				if (!activeRecordSet.equals(oldRecordSet)) {
+				if (oldRecordSet != null && !activeRecordSet.getName().equals(oldRecordSet.getName())) {
 					this.descriptionGroup.redraw();
 				}
 				this.oldRecordSet = activeRecordSet;

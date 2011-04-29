@@ -146,13 +146,13 @@ public class SelectorComposite extends Composite {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 						TableItem item = (TableItem) evt.item;
 						String recordName = item.getText();
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$
 						SelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, recordName);
 						SelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, evt.item);
 						if (item.getChecked() != (Boolean) item.getData(DataExplorer.OLD_STATE)) {
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "selection state changed = " + recordName); //$NON-NLS-1$
 							Record activeRecord;
 							switch (SelectorComposite.this.windowType) {
 							case GraphicsWindow.TYPE_COMPARE:

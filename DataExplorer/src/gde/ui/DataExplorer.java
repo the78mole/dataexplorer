@@ -773,7 +773,7 @@ public class DataExplorer extends Composite {
 	 * updates the data table with current record set data
 	 * @param requestingRecordSetName
 	 */
-	public void updateDataTable(String requestingRecordSetName, boolean forceClean) {
+	public synchronized void updateDataTable(String requestingRecordSetName, boolean forceClean) {
 		final Channel activeChannel = this.channels != null ? this.channels.getActiveChannel() : null;
 		final RecordSet activeRecordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 

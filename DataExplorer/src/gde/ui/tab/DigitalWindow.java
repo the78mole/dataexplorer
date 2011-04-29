@@ -115,7 +115,7 @@ public class DigitalWindow extends CTabItem {
 	/**
 	 * method to update the window with its children
 	 */
-	public void updateChilds() {
+	public synchronized void updateChilds() {
 		RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) { // channel does not have a record set yet
 			String[] activeRecordKeys = recordSet.getDisplayableAndVisibleRecordNames();
@@ -132,7 +132,7 @@ public class DigitalWindow extends CTabItem {
 	/**
 	 * method to update digital window by adding removing digital displays
 	 */
-	public void update(boolean forceUpdate) {
+	public synchronized void update(boolean forceUpdate) {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null && this.digitalMainComposite.isVisible()) {
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.STRING_BLANK);

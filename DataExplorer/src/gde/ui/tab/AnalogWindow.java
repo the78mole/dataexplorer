@@ -118,7 +118,7 @@ public class AnalogWindow extends CTabItem {
 	/**
 	 * method to update the window with its children
 	 */
-	public void updateChilds() {
+	public synchronized void updateChilds() {
 		RecordSet recordSet = this.channels.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) { // channel does not have a record set yet
 			String[] activeRecordKeys = recordSet.getDisplayableAndVisibleRecordNames();

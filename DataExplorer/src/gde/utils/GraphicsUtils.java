@@ -103,6 +103,7 @@ public class GraphicsUtils {
 			dist = dist * -1;
 		}
 		
+		gc.setLineWidth(1);
 		if (numberTicks>1) {
 			double deltaMainTickValue = deltaScaleValue / numberTicks; //deltaScale / numberTicks;
 			if (log.isLoggable(Level.FINE))

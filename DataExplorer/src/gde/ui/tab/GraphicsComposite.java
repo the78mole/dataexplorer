@@ -1389,7 +1389,7 @@ public class GraphicsComposite extends Composite {
 		}
 	}
 
-	public void updateCaptions() {
+	public synchronized void updateCaptions() {
 		GraphicsComposite.this.recordSetComment.redraw();
 		GraphicsComposite.this.graphicsHeader.redraw();
 	}

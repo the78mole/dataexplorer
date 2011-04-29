@@ -151,13 +151,12 @@ public class CurveUtils {
 		int gap = 10;
 
 		// prepare axis position
-		gc.setLineWidth(1);
+		gc.setLineWidth(2);
 		gc.setLineStyle(SWT.LINE_SOLID);
 		boolean isPositionLeft = record.isPositionLeft();
 		int positionNumber = isCompareSet ? 0 : record.getParent().getAxisPosition(recordName, isPositionLeft);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordName + " positionNumber = " + positionNumber); //$NON-NLS-1$
 		gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
-		gc.setLineWidth(2);
 		if (isPositionLeft) {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0+1, xPos, y0-height-1); //xPos = x0
