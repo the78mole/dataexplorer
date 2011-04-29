@@ -96,6 +96,11 @@ public class RecordSet extends HashMap<String, Record> {
 
 	// measurement
 	String												recordKeyMeasurement;
+	
+	//current drop, shadow point vector to mark data points capable to be smoothed
+	boolean												isSmoothAtCurrentDrop						= false;
+	Vector<Integer>								currentDropShadow								= new Vector<Integer>(0,1);
+	public static final String		SMOOTH_AT_CURRENT_DROP					= "RecordSet_smoothAtCurrentDrop";						//$NON-NLS-1$
 
 	public static final String		DESCRIPTION_TEXT_LEAD					= Messages.getString(MessageIds.GDE_MSGT0129);
 
@@ -2019,5 +2024,20 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void applyTemplate(boolean updateVisibilityStatus) {
 		this.parent.applyTemplate(this.name, true);
+	}
+	
+	/**
+	 * query boolean value to enable curve smoothing due to current drop 
+	 */
+	public boolean isSmoothAtCurrentDrop() {
+		return this.isSmoothAtCurrentDrop;
+	}
+	
+	/**
+	 * set boolean value to enable curve smoothing due to current drop 
+	 * @param enable
+	 */
+	public void setSmoothAtCurrentDrop(boolean enable) {
+		this.isSmoothAtCurrentDrop = enable;
 	}
 }

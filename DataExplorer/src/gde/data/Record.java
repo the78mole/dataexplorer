@@ -160,6 +160,7 @@ public class Record extends Vector<Integer> {
 	double							displayScaleFactorValue;
 	double							minDisplayValue;									// min value in device units, correspond to draw area
 	double							maxDisplayValue;									// max value in device units, correspond to draw area
+	boolean             isCurrentRecord = false;
 
 	// measurement
 	boolean							isMeasurementMode				= false;
@@ -220,6 +221,8 @@ public class Record extends Vector<Integer> {
 		this.initializeProperties(this, newProperties);
 		this.df = new DecimalFormat("0.0"); //$NON-NLS-1$
 		
+		this.isCurrentRecord = this.unit.equalsIgnoreCase("A") && this.symbol.toUpperCase().contains("I");
+		
 		// special keys for compare set record are handled with put method
 		//this.channelConfigKey;
 		//this.keyName;
@@ -259,6 +262,8 @@ public class Record extends Vector<Integer> {
 		this.isStartEndDefined = record.isStartEndDefined;
 		this.maxScaleValue = record.maxScaleValue;
 		this.minScaleValue = record.minScaleValue;
+		this.isCurrentRecord = record.isCurrentRecord;
+
 		// handle special keys for compare set record
 		this.channelConfigKey = record.channelConfigKey;
 		this.keyName = record.keyName;
@@ -308,6 +313,7 @@ public class Record extends Vector<Integer> {
 		this.initializeProperties(record, record.properties);
 		this.maxValue = 0;
 		this.minValue = 0;
+		this.isCurrentRecord = record.isCurrentRecord;
 		this.clear();
 		this.trimToSize();
 		
@@ -455,7 +461,7 @@ public class Record extends Vector<Integer> {
 	 * add a data point to the record data, checks for minimum and maximum to define display range
 	 * @param point
 	 */
-	public boolean add(Integer point, double useTimeStep_ms) {
+	public synchronized boolean add(Integer point, double useTimeStep_ms) {
 		if (this.timeStep_ms != null) this.timeStep_ms.add(useTimeStep_ms);
 		return this.add(point);
 	}
@@ -466,36 +472,38 @@ public class Record extends Vector<Integer> {
 	 */
 	@Override
 	public synchronized boolean add(Integer point) {
-		synchronized (this) {
-			final String $METHOD_NAME = "add"; //$NON-NLS-1$
-			if (super.size() == 0) {
-				this.minValue = this.maxValue = point;
-			}
-			else {
-				if (point > this.maxValue)			this.maxValue = point;
-				else if (point < this.minValue) this.minValue = point;
-			}
-			if(log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
-			if(log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
-			return super.add(point);
+		final String $METHOD_NAME = "add"; //$NON-NLS-1$
+		if (super.size() == 0) {
+			this.minValue = this.maxValue = point;
 		}
+		else {
+			if (point > this.maxValue)			this.maxValue = point;
+			else if (point < this.minValue) this.minValue = point;
+		}
+		if(log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
+		if(log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		//add shadow data points to detect current drops to nearly zero
+		if (this.isCurrentRecord ) {
+			if (this.size() > 10 && point < 50 && (point << 1) < this.maxValue) this.parent.currentDropShadow.add(1);
+			else																this.parent.currentDropShadow.add(0);
+		}
+		return super.add(point);
 	}
 	
 	@Override
 	public synchronized Integer set(int index, Integer point) {
-		synchronized (this) {
-			final String $METHOD_NAME = "set"; //$NON-NLS-1$
-			if (super.size() == 0) {
-				this.minValue = this.maxValue = point;
-			}
-			else {
-				if (point > this.maxValue)			this.maxValue = point;
-				else if (point < this.minValue) this.minValue = point;
-			}
-			if(log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " setting point = " + point); //$NON-NLS-1$
-			if(log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
-			return super.set(index, point);
-		}		
+		final String $METHOD_NAME = "set"; //$NON-NLS-1$
+		if (super.size() == 0) {
+			this.minValue = this.maxValue = point;
+		}
+		else {
+			if (point > this.maxValue)			this.maxValue = point;
+			else if (point < this.minValue) this.minValue = point;
+		}
+		if(log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " setting point = " + point); //$NON-NLS-1$
+		if(log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		return super.set(index, point);
 	}
 
 	public int getOrdinal() {
@@ -902,25 +910,27 @@ public class Record extends Vector<Integer> {
 	 */
 	@Override
 	public synchronized Integer get(int index) {
-		synchronized (this) {
-			int size = elementCount;
-			if (this.parent.isZoomMode) {
-				index = index + this.zoomOffset;
-				index = index > (size - 1) ? (size - 1) : index;
-				index = index < 0 ? 0 : index;
-			}
-			else if (this.parent.isScopeMode) {
-				index = index + this.parent.scopeModeOffset;
-				index = index > (size - 1) ? (size - 1) : index;
-				index = index < 0 ? 0 : index;
-			}
-			else {
-				index = index > (size - 1) ? (size - 1) : index;
-				index = index < 0 ? 0 : index;
-			}
-			//log.log(Level.INFO, "index=" + index);
-			return size != 0 ? super.get(index) : 0;
+		int size = elementCount;
+		if (this.parent.isZoomMode) {
+			index = index + this.zoomOffset;
+			index = index > (size - 1) ? (size - 1) : index;
+			index = index < 0 ? 0 : index;
 		}
+		else if (this.parent.isScopeMode) {
+			index = index + this.parent.scopeModeOffset;
+			index = index > (size - 1) ? (size - 1) : index;
+			index = index < 0 ? 0 : index;
+		}
+		else {
+			index = index > (size - 1) ? (size - 1) : index;
+			index = index < 0 ? 0 : index;
+		}
+		//log.log(Level.INFO, "index=" + index);
+		return size != 0 ? 
+			this.parent.isSmoothAtCurrentDrop && index > 10 && size > index + 8 
+				&& (this.parent.currentDropShadow.get(index - 2) == 1 || this.parent.currentDropShadow.get(index - 1) == 1 || this.parent.currentDropShadow.get(index) == 1	|| this.parent.currentDropShadow.get(index + 1) == 1) ?
+					(super.get(index - 8) + super.get(index + 8)) / 2 :
+						super.get(index) : 0;
 	}
 
 	/**

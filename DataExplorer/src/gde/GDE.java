@@ -80,7 +80,7 @@ public class GDE {
 	public static final String		NAME_SHORT											= "GDE";																																																											//$NON-NLS-1$
 	public static final String		NAME_LONG												= "DataExplorer";																																																						//$NON-NLS-1$
 	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V12";																																																										//$NON-NLS-1$
-	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION	= "_V05";																																																										//$NON-NLS-1$
+	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION	= "_V06";																																																										//$NON-NLS-1$
 
 	public static final boolean		IS_WINDOWS											= System.getProperty("os.name").toLowerCase().startsWith("windows");																													//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean		IS_LINUX												= System.getProperty("os.name").toLowerCase().startsWith("linux");																														//$NON-NLS-1$ //$NON-NLS-2$

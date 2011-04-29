@@ -170,12 +170,12 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.setActiveChannelNumber(channelNumber);
 				this.application.getMenuToolBar().updateChannelToolItems();
 				if (recordSetKey == null || recordSetKey.length() < 1)
-					this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getFirstRecordSetName()); // set record set to the first
+					this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getLastActiveRecordSetName()); 
 				else
 					this.getActiveChannel().setActiveRecordSet(recordSetKey);
 				
-				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET && this.getActiveChannel().getFileName() != null) {
-					this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
+				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET) {
+						this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 				}
 				GDE.display.asyncExec(new Runnable() {
 					public void run() {

@@ -61,7 +61,7 @@ public class CurveSelectorContextMenu {
 	Menu													lineWidthMenu, lineTypeMenu, axisEndValuesMenu, axisNumberFormatMenu, axisPositionMenu, timeGridMenu, horizontalGridMenu, measurementMenu;
 	MenuItem											recordName, lineVisible, lineColor, copyCurveCompare, cleanCurveCompare;
 	MenuItem											lineWidth, lineWidthMenuItem1, lineWidthMenuItem2, lineWidthMenuItem3;
-	MenuItem											lineType, lineTypeMenuItem1, lineTypeMenuItem2, lineTypeMenuItem3;
+	MenuItem											lineType, lineTypeMenuItem1, lineTypeMenuItem2, lineTypeMenuItem3, smoothAtCurrentDropItem;
 	MenuItem											axisEndValues, axisEndAuto, axisEndRound, axisStarts0, axisEndManual;
 	MenuItem											axisNumberFormat, axisNumberFormatAuto, axisNumberFormat0, axisNumberFormat1, axisNumberFormat2, axisNumberFormat3;
 	MenuItem											axisPosition, axisPositionLeft, axisPositionRight;
@@ -82,6 +82,7 @@ public class CurveSelectorContextMenu {
 	TableItem 										selectedItem;
 	Record												actualRecord = null;
 	boolean 											isRecordVisible = false;
+	boolean 											isSmoothAtCurrentDrop = false;
 	String 												recordNameKey = null;
 	String 												recordNameMeasurement = GDE.STRING_BLANK;
 	boolean 											isWindowTypeCompare = false;
@@ -119,6 +120,8 @@ public class CurveSelectorContextMenu {
 										CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.GDE_MSGT0085));
 										CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.actualRecord.isVisible();
 										CurveSelectorContextMenu.this.lineVisible.setSelection(CurveSelectorContextMenu.this.isRecordVisible);
+										CurveSelectorContextMenu.this.isSmoothAtCurrentDrop = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothAtCurrentDrop();
+										CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setSelection(CurveSelectorContextMenu.this.isSmoothAtCurrentDrop);
 										// check measurement selections
 										//deltaMeasure.setSelection(recordSet.isDeltaMeasurementMode(recordNameKey));
 										//disable all menu items which makes only sense if record is visible
@@ -185,15 +188,13 @@ public class CurveSelectorContextMenu {
 			this.lineVisible.setText(Messages.getString(MessageIds.GDE_MSGT0085));
 			this.lineVisible.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.log(Level.FINEST, "lineVisibler Action performed! " + e); //$NON-NLS-1$
-					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						boolean checked = CurveSelectorContextMenu.this.lineVisible.getSelection();
-						CurveSelectorContextMenu.this.actualRecord.setVisible(checked);
-						CurveSelectorContextMenu.this.selectedItem.setChecked(checked);
-						CurveSelectorContextMenu.this.recordSet.syncScaleOfSyncableRecords();
-						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-					}
+					log.log(Level.FINEST, "lineVisible selected evt=" + e); //$NON-NLS-1$
+					boolean checked = CurveSelectorContextMenu.this.lineVisible.getSelection();
+					CurveSelectorContextMenu.this.actualRecord.setVisible(checked);
+					//CurveSelectorContextMenu.this.selectedItem.setChecked(checked);
+					CurveSelectorContextMenu.this.recordSet.syncScaleOfSyncableRecords();
+					CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+					CurveSelectorContextMenu.this.application.updateGraphicsWindow();		
 				}
 			});
 
@@ -390,6 +391,18 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
+				}
+			});
+
+			this.smoothAtCurrentDropItem = new MenuItem(popupmenu, SWT.CHECK);
+			this.smoothAtCurrentDropItem.setText(Messages.getString(MessageIds.GDE_MSGT0335));
+			this.smoothAtCurrentDropItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					log.log(Level.FINEST, "smoothAtCurrentDropItem selected evt=" + e); //$NON-NLS-1$
+					boolean checked = CurveSelectorContextMenu.this.smoothAtCurrentDropItem.getSelection();
+					CurveSelectorContextMenu.this.recordSet.setSmoothAtCurrentDrop(checked);
+					CurveSelectorContextMenu.this.recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+					CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 				}
 			});
 			

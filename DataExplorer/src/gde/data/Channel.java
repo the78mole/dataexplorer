@@ -56,6 +56,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	final ChannelTypes						type;								// ChannelTypes.TYPE_OUTLET or ChannelTypes.TYPE_CONFIG
 	GraphicsTemplate							template;						// graphics template holds view configuration
 	RecordSet											activeRecordSet;
+	RecordSet											lastActiveRecordSet;
 	String												objectKey	= GDE.STRING_EMPTY;
 	String 												fileName;
 	String												fileDescription		= StringHelper.getDate();
@@ -206,6 +207,24 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	/**
+	 * query the last displayed record set name, in case of ChannelTypes.TYPE_CONFIG the last used entry is returned
+	 */ 
+	public String getLastActiveRecordSetName() {
+		if (this.type == ChannelTypes.TYPE_CONFIG && this.keySet() != null)
+			return this.keySet().toArray(new String[1])[0];
+		
+		return this.lastActiveRecordSet == null ? this.getFirstRecordSetName() : this.lastActiveRecordSet.name;
+	}
+
+	/**
+	 * set the last used record set
+	 * @param lastRecordSet
+	 */
+	public void setLastActiveRecordSet(RecordSet lastRecordSet) {
+		this.lastActiveRecordSet = lastRecordSet;
+	}
+
+	/**
 	 * query the first record set name, in case of ChannelTypes.TYPE_CONFIG the first entry of keySet might returned
 	 */ 
 	public String getFirstRecordSetName() {
@@ -277,6 +296,9 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(i + Record.IS_START_END_DEFINED, Boolean.valueOf(record.isStartEndDefined()).toString());
 				this.template.setProperty(i + Record.DEFINED_MAX_VALUE, Double.valueOf(record.getMaxScaleValue()).toString());
 				this.template.setProperty(i + Record.DEFINED_MIN_VALUE, Double.valueOf(record.getMinScaleValue()).toString());
+				//smooth current droprecordS
+				this.template.setProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, Boolean.toString(recordSet.isSmoothAtCurrentDrop()));
+				recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
 				// time grid
 				color = recordSet.getColorTimeGrid();
 				rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
@@ -323,6 +345,8 @@ public class Channel extends HashMap<String, RecordSet> {
 					//record.setStartEndDefined(new Boolean(this.template.getProperty(recordName + Record.IS_START_END_DEFINED, "false")).booleanValue(), new Double(this.template.getProperty(recordName + Record.DEFINED_MIN_VALUE, "0"))
 					//		.doubleValue(), new Double(this.template.getProperty(recordName + Record.DEFINED_MAX_VALUE, "0")).doubleValue());
 					record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
+					//smooth current drop
+					recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
 					// time grid
 					color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
@@ -376,6 +400,8 @@ public class Channel extends HashMap<String, RecordSet> {
 					record.setStartEndDefined(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), new Double(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")) //$NON-NLS-1$ //$NON-NLS-2$
 							.doubleValue(), new Double(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "0")).doubleValue()); //$NON-NLS-1$
 					record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
+					//smooth current drop
+					recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
 					// time grid
 					color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
@@ -447,13 +473,14 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * switch the record set according selection and set applications active channel
 	 * @param recordSetName p.e. "1) Laden"
 	 */
-	public void switchRecordSet(String recordSetName) {
+	public synchronized void switchRecordSet(String recordSetName) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("switching to record set threadId = %06d", Thread.currentThread().getId())); //$NON-NLS-1$
 		int percentage = this.application.getProgressPercentage();
 		if (percentage > 99 || percentage == 0)
 			this.application.setProgress(0, null);
 		final Channel activeChannel = this;
 		final String recordSetKey = recordSetName;
+		this.lastActiveRecordSet = this.get(recordSetKey);
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			updateForSwitchRecordSet(activeChannel, recordSetKey);
 		}
