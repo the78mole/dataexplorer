@@ -167,6 +167,7 @@
 <entry key="14_lineStyle">1</entry>
 <entry key="14_lineWidth">1</entry>
 <entry key="14_numberFormat">-1</entry>
+<entry key="RecordSet_smoothAtCurrentDrop">true</entry>
 <entry key="RecordSet_horizontalGridColor">192,192,192</entry>
 <entry key="RecordSet_horizontalGridLineStyle">2</entry>
 <entry key="RecordSet_horizontalGridRecordOrdinal">9</entry>
