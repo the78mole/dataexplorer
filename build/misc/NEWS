@@ -8,7 +8,8 @@ GNU DataExplorer - News - comes with version 2.81
 6) add Graupmer Ultramat Trio Plus 16S
 7) add Graupmer Ultramat 18
 8) add Graupmer UltraDuoPlus 45
-9) eStations fix displaying empty balance curve 
+9) eStations fix do not display empty balance curve 
+10)enable smooth curves at current drop in context menu
 
 
 
