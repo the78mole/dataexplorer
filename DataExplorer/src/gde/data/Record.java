@@ -485,7 +485,7 @@ public class Record extends Vector<Integer> {
 		
 		//add shadow data points to detect current drops to nearly zero
 		if (this.isCurrentRecord ) {
-			if (this.size() > 10 && point < 50 && (point << 1) < this.maxValue) this.parent.currentDropShadow.add(1);
+			if (this.size() > 10 && point < 50 && (point << 2) < this.maxValue) this.parent.currentDropShadow.add(1);
 			else																this.parent.currentDropShadow.add(0);
 		}
 		return super.add(point);
