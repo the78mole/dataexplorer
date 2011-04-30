@@ -126,7 +126,9 @@ public class MenuToolBar {
 	ToolBar												googleEarthToolBar;
 	ToolItem											googleEarthToolItem, googleEarthConfigToolItem;
 	
-	final DataExplorer	application;
+	String 												activeObjectKey;
+	
+	final DataExplorer						application;
 	final Channels								channels;
 	final Settings								settings;
 	final String									language;
@@ -139,6 +141,7 @@ public class MenuToolBar {
 		this.settings = Settings.getInstance();
 		this.language = this.settings.getLocale().getLanguage();
 		this.fileHandler = new FileHandler();
+		this.activeObjectKey = this.settings.getActiveObject();
 	}
 
 	public void init() {
@@ -413,6 +416,7 @@ public class MenuToolBar {
 									MenuToolBar.this.isObjectoriented = true;
 									
 									MenuToolBar.this.application.setObjectDescriptionTabVisible(true);
+									MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getText();
 								}
 								else { // device oriented
 									MenuToolBar.this.editObject.setEnabled(false);
@@ -420,11 +424,12 @@ public class MenuToolBar {
 									checkChannelForObjectKeyMissmatch(selectionIndex, GDE.STRING_EMPTY);
 									MenuToolBar.this.isObjectoriented = false;
 									MenuToolBar.this.application.setObjectDescriptionTabVisible(false);
+									MenuToolBar.this.activeObjectKey = GDE.STRING_EMPTY;
 								}
 								MenuToolBar.this.settings.setObjectList(MenuToolBar.this.objectSelectCombo.getItems(), selectionIndex);
 								//MenuToolBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuToolBar.this.application.getActiveDevice());
 								MenuToolBar.this.application.updateObjectDescriptionWindow();
-								MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.getActiveObjectKey(), MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
+								MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.activeObjectKey, MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 							}
 						});
 						this.objectSelectCombo.addKeyListener(new KeyAdapter() {
@@ -496,7 +501,8 @@ public class MenuToolBar {
 										MenuToolBar.this.application.setObjectDescriptionTabVisible(MenuToolBar.this.isObjectoriented);
 										MenuToolBar.this.application.updateObjectDescriptionWindow();
 									}
-									MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.getActiveObjectKey(), MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
+									MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getText();
+									MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.activeObjectKey, MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 								}
 							}
 						});		
@@ -1556,7 +1562,7 @@ public class MenuToolBar {
 	 * @return the activeObjectKey
 	 */
 	public String getActiveObjectKey() {
-		return this.objectSelectCombo.getText();
+		return this.activeObjectKey;
 	}
 	
 	/**
