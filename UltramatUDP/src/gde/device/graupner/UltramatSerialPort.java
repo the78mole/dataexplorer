@@ -133,6 +133,10 @@ public class UltramatSerialPort extends DeviceCommPort {
 				}
 				if (this.isInSync) break;
 
+				this.addXferError();
+				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
+						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
 				answer = new byte[data.length];
 				answer = this.read(answer, 3000);
 			}
@@ -298,6 +302,10 @@ public class UltramatSerialPort extends DeviceCommPort {
 				}
 				if (this.isInSync) break;
 
+				this.addXferError();
+				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
+						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
 				answer = new byte[expectedDataSize];
 				answer = this.read(answer, 3000);
 			}
