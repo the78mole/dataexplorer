@@ -51,6 +51,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.CellVoltageValues;
+import gde.utils.CellVoltageValues.CellVoltageTypes;
 
 /**
  * Dialog class to adjust the voltage levels of the bar graph
@@ -180,7 +181,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							CellVoltageValuesDialog.this.buttonLiIo.setSelection(false);
 							CellVoltageValuesDialog.this.buttonLiFe.setSelection(false);
 							
-							CellVoltageValuesDialog.this.voltageLimits = CellVoltageValues.getLiPoVoltageLimits();
+							CellVoltageValuesDialog.this.voltageLimits = CellVoltageValues.getVoltageLimits(CellVoltageTypes.LiPo);
 							CellVoltageValuesDialog.this.individualGroup.redraw();
 						}
 					});
@@ -204,7 +205,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							CellVoltageValuesDialog.this.buttonLiPo.setSelection(false);
 							CellVoltageValuesDialog.this.buttonLiFe.setSelection(false);
 							
-							CellVoltageValuesDialog.this.voltageLimits = CellVoltageValues.getLiIoVoltageLimits();
+							CellVoltageValuesDialog.this.voltageLimits = CellVoltageValues.getVoltageLimits(CellVoltageTypes.LiIo);
 							CellVoltageValuesDialog.this.individualGroup.redraw();
 						}
 					});
@@ -229,7 +230,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							CellVoltageValuesDialog.this.buttonLiIo.setSelection(false);
 							CellVoltageValuesDialog.this.buttonLiPo.setSelection(false);
 
-							CellVoltageValuesDialog.this.voltageLimits = CellVoltageValues.getLiFeVoltageLimits();
+							CellVoltageValuesDialog.this.voltageLimits = CellVoltageValues.getVoltageLimits(CellVoltageTypes.LiFe);
 							CellVoltageValuesDialog.this.individualGroup.redraw();
 						}
 					});
@@ -243,7 +244,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					buttonLiFeLData.grabExcessHorizontalSpace = true;
 					this.buttonNiMh.setLayoutData(buttonLiFeLData);
 					this.buttonNiMh.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
-					this.buttonNiMh.setText(Messages.getString(MessageIds.GDE_MSGT0377)); //TODO
+					this.buttonNiMh.setText(Messages.getString(MessageIds.GDE_MSGT0377));
 					this.buttonNiMh.setSelection(false);
 					this.buttonNiMh.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -254,7 +255,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							CellVoltageValuesDialog.this.buttonLiIo.setSelection(false);
 							CellVoltageValuesDialog.this.buttonLiPo.setSelection(false);
 
-							CellVoltageValuesDialog.this.voltageLimits = CellVoltageValues.getNiMhVoltageLimits();
+							CellVoltageValuesDialog.this.voltageLimits = CellVoltageValues.getVoltageLimits(CellVoltageTypes.NiMh);
 							CellVoltageValuesDialog.this.individualGroup.redraw();
 						}
 					});
@@ -286,7 +287,6 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				this.individualGroup.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "individualGroup.helpRequested, event=" + evt); //$NON-NLS-1$
-						//TODO add your code for individualGroup.helpRequested
 					}
 				});
 				this.individualGroup.addPaintListener(new PaintListener() {

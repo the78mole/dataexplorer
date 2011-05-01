@@ -240,9 +240,6 @@ public class GraphicsComposite extends Composite {
 							if (tmpDescription.contains(",") ) {
 								tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(","));
 							}
-							else if (tmpDescription.contains(".")) {
-								tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("."));
-							}
 							else if (tmpDescription.contains(":")) {
 								tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(":"));
 							}

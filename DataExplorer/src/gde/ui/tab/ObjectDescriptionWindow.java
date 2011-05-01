@@ -18,9 +18,23 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
-import java.io.File;
-import java.util.Vector;
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.ObjectData;
 import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.ObjectImageContextMenu;
+import gde.ui.menu.TabAreaContextMenu;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -59,6 +73,7 @@ import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Menu;
@@ -66,18 +81,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.ObjectData;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.ObjectImageContextMenu;
-import gde.ui.menu.TabAreaContextMenu;
 
 /**
  * @author Winfried Brügmann
@@ -459,8 +462,17 @@ public class ObjectDescriptionWindow extends CTabItem {
 								&& (Boolean) ObjectDescriptionWindow.this.imagePopupMenu.getData("OBJECT_IMAGE_CHANGED")) {
 							String imagePath = (String) ObjectDescriptionWindow.this.imagePopupMenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_PATH);
 							if (imagePath != null) {
-								ObjectDescriptionWindow.this.image = SWTResourceManager.getImage(ObjectDescriptionWindow.this.image.getImageData(),
+								if (ObjectDescriptionWindow.this.image != null)
+									ObjectDescriptionWindow.this.image = SWTResourceManager.getImage(ObjectDescriptionWindow.this.image.getImageData(),
 										ObjectDescriptionWindow.this.object.getKey(), ObjectDescriptionWindow.this.object.getImageWidth(), ObjectDescriptionWindow.this.object.getImageHeight(), true);
+								else
+									try {
+										ObjectDescriptionWindow.this.image = SWTResourceManager.getImage(new Image(Display.getDefault(), new FileInputStream(imagePath)).getImageData(),
+												ObjectDescriptionWindow.this.object.getKey(), ObjectDescriptionWindow.this.object.getImageWidth(), ObjectDescriptionWindow.this.object.getImageHeight(), true);
+									}
+									catch (FileNotFoundException e) {
+										log.log(Level.WARNING, e.getMessage(), e);
+									}
 							}
 							else {
 								ObjectDescriptionWindow.this.image = null;

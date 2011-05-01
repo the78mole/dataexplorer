@@ -65,10 +65,10 @@ public class CellVoltageDisplay extends Composite {
 	Composite						fillRight;
 	Composite						fillLeft;
 	Composite						cellComposite;
-	Label upperVoltage, middleVoltage, lowerVoltage;
+	Label 							upperVoltage, middleVoltage, lowerVoltage;
 	
 	final CellVoltageWindow				parent;
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final String									displayHeaderText;
 
 	final Color										backgroundColor;

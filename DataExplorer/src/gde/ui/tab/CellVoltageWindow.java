@@ -18,11 +18,26 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DesktopPropertyTypes;
+import gde.device.IDevice;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.dialog.CellVoltageValuesDialog;
+import gde.ui.menu.TabAreaContextMenu;
+import gde.utils.CellVoltageValues;
+import gde.utils.CellVoltageValues.CellVoltageTypes;
+
 import java.text.DecimalFormat;
 import java.util.Vector;
-
-import gde.GDE;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -47,21 +62,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Menu;
-
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.DesktopPropertyTypes;
-import gde.device.IDevice;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.dialog.CellVoltageValuesDialog;
-import gde.ui.menu.TabAreaContextMenu;
-import gde.utils.CellVoltageValues;
 
 /**
  * Display window parent of cellVoltage displays
@@ -223,7 +223,7 @@ public class CellVoltageWindow extends CTabItem {
 						CellVoltageWindow.this.liFeButton.setSelection(false);
 						CellVoltageWindow.this.niMhButton.setSelection(false);
 						CellVoltageWindow.this.individualButton.setSelection(false);
-						CellVoltageValues.setVoltageLimits(CellVoltageValues.getLiPoVoltageLimits());
+						CellVoltageValues.setVoltageLimits(CellVoltageValues.getVoltageLimits(CellVoltageTypes.LiPo));
 						Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
 						RecordSet recordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 						if (recordSet != null) recordSet.setVoltageLimits();
@@ -250,7 +250,7 @@ public class CellVoltageWindow extends CTabItem {
 						CellVoltageWindow.this.liFeButton.setSelection(false);
 						CellVoltageWindow.this.niMhButton.setSelection(false);
 						CellVoltageWindow.this.individualButton.setSelection(false);
-						CellVoltageValues.setVoltageLimits(CellVoltageValues.getLiIoVoltageLimits());
+						CellVoltageValues.setVoltageLimits(CellVoltageValues.getVoltageLimits(CellVoltageTypes.LiIo));
 						Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
 						RecordSet recordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 						if (recordSet != null) recordSet.setVoltageLimits();
@@ -277,7 +277,7 @@ public class CellVoltageWindow extends CTabItem {
 						CellVoltageWindow.this.liIoButton.setSelection(false);
 						CellVoltageWindow.this.niMhButton.setSelection(false);
 						CellVoltageWindow.this.individualButton.setSelection(false);
-						CellVoltageValues.setVoltageLimits(CellVoltageValues.getLiFeVoltageLimits());
+						CellVoltageValues.setVoltageLimits(CellVoltageValues.getVoltageLimits(CellVoltageTypes.LiFe));
 						Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
 						RecordSet recordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 						if (recordSet != null) recordSet.setVoltageLimits();
@@ -304,7 +304,7 @@ public class CellVoltageWindow extends CTabItem {
 						CellVoltageWindow.this.liIoButton.setSelection(false);
 						CellVoltageWindow.this.niMhButton.setSelection(true);
 						CellVoltageWindow.this.individualButton.setSelection(false);
-						CellVoltageValues.setVoltageLimits(CellVoltageValues.getNiMhVoltageLimits());
+						CellVoltageValues.setVoltageLimits(CellVoltageValues.getVoltageLimits(CellVoltageTypes.NiMh));
 						Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
 						RecordSet recordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 						if (recordSet != null) recordSet.setVoltageLimits();
@@ -439,6 +439,8 @@ public class CellVoltageWindow extends CTabItem {
 						}
 					}
 					this.displays.removeAllElements();
+					CellVoltageValues.setVoltageLimits(recordSet.getVoltageLimits());
+					this.voltageLimitsSelection.redraw();
 					// add new
 					for (int i = 0; this.voltageVector != null && i < this.voltageVector.size(); ++i) {
 						CellVoltageDisplay display = new CellVoltageDisplay(this.application, this.coverComposite, this.voltageVector.get(i).getVoltage(), this.voltageVector.get(i).getName(), this.voltageVector.get(i).getUnit(), this);

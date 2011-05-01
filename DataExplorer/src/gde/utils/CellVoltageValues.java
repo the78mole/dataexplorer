@@ -22,12 +22,14 @@ import java.util.logging.Logger;
 
 
 /**
- * Class to maintain the voltage levels of Lithium battries used for cell voltage bar graph, ...
+ * Class to maintain the voltage levels of Lithium batteries used for cell voltage bar graph, ...
  * @author Winfried Brügmann
  */
 public class CellVoltageValues {
 	final static String					$CLASS_NAME						= CellVoltageValues.class.getName();
 	final static Logger					log										= Logger.getLogger(CellVoltageValues.$CLASS_NAME);
+	
+	public enum CellVoltageTypes { LiPo, LiIo, LiFe, NiMh, Custom }
 	
 	public final static String[] upperLimitVoltage		= new String[] { "4.600", "4.500", "4.400", "4.300", "4.200", "4.100", "4.000", "3.900", "3.800", "3.700", "3.600", "1.600", "1.500", "1.400", "1.300"};
 	public final static String[] upperLimitColorRed 	= new String[] { "4.615", "4.515", "4.415", "4.315", "4.215", "4.115", "4.015", "3.915", "3.815", "3.715", "3.615", "1.600", "1.550", "1.500", "1.450", "1.400"};
@@ -43,36 +45,32 @@ public class CellVoltageValues {
 
 	// all initial values fit to LiPo akku type LiPo 3.7 V, LiIo 3.6 V LiFe 3.3 V
 	static int[]	voltageLimits				= new int[] {4200, 4215, 4150, 4000, 2600, 2300};
-
-	public static int[] getLiPoVoltageLimits() {
-		//{upperLimitVoltage=0,  upperLimitColorRed=1, lowerLimitColorGreen=2, beginSpreadVoltage=3, lowerLimitColorRed=4, lowerLimitVoltage=5}; 
-		CellVoltageValues.setVoltageLimits(liPoLimits);
-		return voltageLimits;
-	}
-
-	public static int[] getLiIoVoltageLimits() {
-		//{upperLimitVoltage=0,  upperLimitColorRed=1, lowerLimitColorGreen=2, beginSpreadVoltage=3, lowerLimitColorRed=4, lowerLimitVoltage=5}; 
-		CellVoltageValues.setVoltageLimits(liIoLimits);
-		return voltageLimits;
-	}
-
-	public static int[] getLiFeVoltageLimits() {
-		//{upperLimitVoltage=0,  upperLimitColorRed=1, lowerLimitColorGreen=2, beginSpreadVoltage=3, lowerLimitColorRed=4, lowerLimitVoltage=5}; 
-		CellVoltageValues.setVoltageLimits(liFeLimits);
-		return voltageLimits;
-	}
-
-	public static int[] getNiMhVoltageLimits() {
-		//{upperLimitVoltage=0,  upperLimitColorRed=1, lowerLimitColorGreen=2, beginSpreadVoltage=3, lowerLimitColorRed=4, lowerLimitVoltage=5}; 
-		CellVoltageValues.setVoltageLimits(niMhLimits);
-		return voltageLimits;
+	
+	public static int[] getVoltageLimits(CellVoltageTypes cellVoltageType) {
+		switch (cellVoltageType) {
+		case LiPo:
+			return CellVoltageValues.setVoltageLimits(liPoLimits);
+			
+		case LiIo:
+			return CellVoltageValues.setVoltageLimits(liIoLimits);
+			
+		case LiFe:
+			return CellVoltageValues.setVoltageLimits(liFeLimits);
+			
+		case NiMh:
+			return CellVoltageValues.setVoltageLimits(niMhLimits);
+			
+		default:
+		case Custom:
+			return voltageLimits;			
+		}
 	}
 
 	/**
 	 * @return the voltage limits as int array
 	 */
 	public static int[] getVoltageLimits() {
-		return voltageLimits;
+		return voltageLimits.clone();
 	}
 
 	/**
@@ -97,11 +95,13 @@ public class CellVoltageValues {
 	 * set the voltage limits for the bar graph
 	 * @param newVoltageLimits the voltage limits to set
 	 */
-	public static void setVoltageLimits(int[] newVoltageLimits) {
+	public static int[] setVoltageLimits(int[] newVoltageLimits) {
 		if (voltageLimits.length <= newVoltageLimits.length)
 			System.arraycopy(newVoltageLimits, 0, voltageLimits, 0, voltageLimits.length);
 		else if (voltageLimits.length > newVoltageLimits.length)
 			System.arraycopy(newVoltageLimits, 0, voltageLimits, 0, newVoltageLimits.length);			
+		
+		return voltageLimits;
 	}
 
 	/**
