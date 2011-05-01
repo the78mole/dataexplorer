@@ -71,6 +71,9 @@ Die Konfiguration von Stufenladungen wird zur Zeit nicht angeboten und ist einer
 </P>
 <H2><FONT FACE="Arial"><FONT SIZE=4><I>Datenaufzeichnung</I></FONT></FONT></H2>
 <P>Die Aufnahme von Datenkurven wird einfach durch Dr&uuml;cken der "Start Aufnahme" Taste gestartet.
+Dies sollte bei vorbereitetem Ladeger&auml;t geschehen, also Ladeprozess gewählt oder konfiguriert, Akku angeschlossen.
+Erst nach dem Starten der Datenaufnahme vom DataExplorer am Ger&auml;t den Ladeprozess starten.
+Nur so ist gew&auml;hrleistet, dass der komplette Ladevorgang aufgenommen wird.
 Die Umschaltung der Lade- bzw. Entlade-Kurven erfolgt automatisch, da die vom Ger&auml;t gelieferten Daten diese Information enthalten.
 Die Anzeige springt automatisch auf den Datenkanal, der als letztes Daten liefert.
 Im Bild ist ein Ladevorgang eines zusammengeschlossenen LiPo Akku mit 8 Zellen zu sehen.
@@ -80,7 +83,27 @@ was den Balancerausg&auml;ngen des Ladeger&auml;tes entspricht.
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_6.png" NAME="Bild6 Datenaufnahme LiPo LINK" ALT="Bild6 Datenaufnahme LiPo LINK">
 </P>
 <P>
-Ist das Ger&auml;t &uuml;ber einen gewissen Zeitraum inaktiv, wird der serielle Port geschlossen. 
+Ist das Ger&auml;t &uuml;ber einen gewissen Zeitraum inaktiv, stellt also keinen laufenden Prozess am Ger&auml;t fest, wird der serielle Port geschlossen. 
+</P>
+<H3><FONT FACE="Arial"><FONT SIZE=4><I>Automatische Objektwahl</I></FONT></FONT></H3>
+<P>Ladegr&auml;te, die Batteriespeicher verwalten k&ouml;nnen, bieten die M&ouml;glichkeit der automaischen Objektanwahl.
+</BR>Als Voraussetzung dazu muss einmal der Konfigurationsdialog benutzt worden sein.
+Hierbei wird eine Konfigurationsdatei als Datencache f&uuml;r das Ger&auml;t mit dem Ger&auml;tenamen zur Identifizierung angelegt.
+Starten man die Datenaufnahme, wird als erstes der Ger&auml;tename ausgelesen, danach dann die normale Datenaufnahme gestartet.
+Liefert das Ger&auml;t dann die ersten Daten, steht darin die Speichernummer. 
+Mit der Speichernummer kann nun aus der Ger&auml;tecachedatei der Batteriespeichername ausgelesen werden.
+Der Batteriespeichername wird dazu verwendet einen passenden Objektnamen zu finden. 
+Wird eine gute &Uuml;bereinstimmung gefunden, wird bei angelegen des ersten Datensatzes das Objekt angew&auml;lt.
+</P>
+<P>Wie wird der Objektname gefunden, wenn er nicht vollst&auml;ndig mit dem Batteriespeichernamen &uuml;bereinstimmt ?
+</BR>Der Batteriespeichername wird an Leerzeichen, Bindestrichen und Unterstrichen zerlegt. 
+Die einzelnen Namensfragmente werden dann dazu verwendet, &Uuml;bereinstimmungen zu finden. 
+Der Objektname, der die meisten &Uuml;bereinstimmungen aufweist, wird ausgew&auml;hlt.
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_7.png" NAME="Bild7 Batteriespeicher - Objektmatch" ALT="Bild7 Batteriespeicher - Objektmatch">
+</P>
+<P><B>Hinweis : </B>M&ouml;chte man diese Eigenschaft f&uuml;r sich ausnutzen, sollte man die Batteriespeichernamen und Objektnamen entsprechend benennen.
+Beide Namen k&ouml;nnen auch nachtr&auml;glich umbenannt werden, wenn erforderlich.
 </P>
 </BODY>
 </HTML>

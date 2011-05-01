@@ -31,6 +31,7 @@ import gde.exception.DataInconsitsentException;
 import gde.messages.Messages;
 
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -165,80 +166,8 @@ public class UltraDuoPlus60 extends Ultramat {
 		int minVotage = Integer.MAX_VALUE;
 
 		if (dataBuffer.length == Math.abs(this.getDataBlockSize()) / 2) {
-			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 8=SpannungZelle1 9=SpannungZelle2...
-			points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
-			points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
-			points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
-			points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
-			points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-			points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
-			String sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[37], (char) dataBuffer[38]);
-			if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[5] = -1 * points[5];
-			points[6] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
-			points[7] = 0;
-
-			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7
-			for (int i = 0, j = 0; i < points.length - 8; ++i, j += 4) {
-				points[i + 8] = Integer
-						.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
-				if (points[i + 8] > 0) {
-					maxVotage = points[i + 8] > maxVotage ? points[i + 8] : maxVotage;
-					minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
-				}
-			}
-			//calculate balance on the fly
-			points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-		}
-		else if (dataBuffer.length == Math.abs(this.getDataBlockSize())) {
-			if (this.isLinkedMode(dataBuffer)) {
-				// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
-				points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
-				points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[85], (char) dataBuffer[86], (char) dataBuffer[87], (char) dataBuffer[88]), 16);
-				points[0] = points[1] + points[2];
-				points[4] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
-				points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[89], (char) dataBuffer[90], (char) dataBuffer[91], (char) dataBuffer[92]), 16);
-				points[3] = points[4] + points[5];
-				points[7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
-				points[8] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[93], (char) dataBuffer[94], (char) dataBuffer[95], (char) dataBuffer[96]), 16);
-				points[6] = points[7] + points[8];
-				points[10] = Double.valueOf(points[1] * points[4] / 1000.0).intValue(); // power U*I [W]
-				points[11] = Double.valueOf(points[2] * points[5] / 1000.0).intValue(); // power U*I [W]
-				points[9] = points[10] + points[11];
-				points[13] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-				points[14] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-				points[12] = points[13] + points[14];
-				points[15] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
-				String sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[37], (char) dataBuffer[38]);
-				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[15] = -1 * points[15];
-				points[16] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[97], (char) dataBuffer[98], (char) dataBuffer[99], (char) dataBuffer[100]), 16);
-				sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[37], (char) dataBuffer[38]);
-				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[16] = -1 * points[16];
-				points[17] = (Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16) 
-						+ Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[75], (char) dataBuffer[76], (char) dataBuffer[77], (char) dataBuffer[78]), 16)) >>> 1;
-				points[18] = 0;
-
-				// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7 
-				for (int i = 0, j = 0; i < 7; ++i, j += 4) {
-					points[i + 19] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]),	16);
-					if (points[i + 19] > 0) {
-						maxVotage = points[i + 19] > maxVotage ? points[i + 19] : maxVotage;
-						minVotage = points[i + 19] < minVotage ? points[i + 19] : minVotage;
-					}
-				}
-				// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
-				for (int i = 0, j = 0; i < 7; ++i, j += 4) {
-					points[i + 26] = Integer.parseInt(
-							String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[105 + j], (char) dataBuffer[106 + j], (char) dataBuffer[107 + j], (char) dataBuffer[108 + j]), 16);
-					if (points[i + 26] > 0) {
-						maxVotage = points[i + 26] > maxVotage ? points[i + 26] : maxVotage;
-						minVotage = points[i + 26] < minVotage ? points[i + 26] : minVotage;
-					}
-				}
-				//calculate balance on the fly
-				points[18] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-			}
-			else {
-				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
+			try {
+				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 8=SpannungZelle1 9=SpannungZelle2...
 				points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
 				points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
 				points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
@@ -250,13 +179,100 @@ public class UltraDuoPlus60 extends Ultramat {
 				points[6] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
 				points[7] = 0;
 
-				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7 
+				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7
 				for (int i = 0, j = 0; i < points.length - 8; ++i, j += 4) {
-					points[i + 8] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
+					points[i + 8] = Integer
+							.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
 					if (points[i + 8] > 0) {
 						maxVotage = points[i + 8] > maxVotage ? points[i + 8] : maxVotage;
 						minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
 					}
+				}
+			}
+			catch (NumberFormatException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
+			//calculate balance on the fly
+			points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+		}
+		else if (dataBuffer.length == Math.abs(this.getDataBlockSize())) {
+			if (this.isLinkedMode(dataBuffer)) {
+				try {
+					// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
+					points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
+					points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[85], (char) dataBuffer[86], (char) dataBuffer[87], (char) dataBuffer[88]), 16);
+					points[0] = points[1] + points[2];
+					points[4] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
+					points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[89], (char) dataBuffer[90], (char) dataBuffer[91], (char) dataBuffer[92]), 16);
+					points[3] = points[4] + points[5];
+					points[7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
+					points[8] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[93], (char) dataBuffer[94], (char) dataBuffer[95], (char) dataBuffer[96]), 16);
+					points[6] = points[7] + points[8];
+					points[10] = Double.valueOf(points[1] * points[4] / 1000.0).intValue(); // power U*I [W]
+					points[11] = Double.valueOf(points[2] * points[5] / 1000.0).intValue(); // power U*I [W]
+					points[9] = points[10] + points[11];
+					points[13] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
+					points[14] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
+					points[12] = points[13] + points[14];
+					points[15] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
+					String sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[37], (char) dataBuffer[38]);
+					if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[15] = -1 * points[15];
+					points[16] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[97], (char) dataBuffer[98], (char) dataBuffer[99], (char) dataBuffer[100]), 16);
+					sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[37], (char) dataBuffer[38]);
+					if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[16] = -1 * points[16];
+					points[17] = (Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16) 
+							+ Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[75], (char) dataBuffer[76], (char) dataBuffer[77], (char) dataBuffer[78]), 16)) >>> 1;
+					points[18] = 0;
+
+					// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7 
+					for (int i = 0, j = 0; i < 7; ++i, j += 4) {
+						points[i + 19] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]),	16);
+						if (points[i + 19] > 0) {
+							maxVotage = points[i + 19] > maxVotage ? points[i + 19] : maxVotage;
+							minVotage = points[i + 19] < minVotage ? points[i + 19] : minVotage;
+						}
+					}
+					// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
+					for (int i = 0, j = 0; i < 7; ++i, j += 4) {
+						points[i + 26] = Integer.parseInt(
+								String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[105 + j], (char) dataBuffer[106 + j], (char) dataBuffer[107 + j], (char) dataBuffer[108 + j]), 16);
+						if (points[i + 26] > 0) {
+							maxVotage = points[i + 26] > maxVotage ? points[i + 26] : maxVotage;
+							minVotage = points[i + 26] < minVotage ? points[i + 26] : minVotage;
+						}
+					}
+				}
+				catch (NumberFormatException e) {
+					log.log(Level.WARNING, e.getMessage(), e);
+				}
+				//calculate balance on the fly
+				points[18] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+			}
+			else {
+				try {
+					// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
+					points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
+					points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
+					points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
+					points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
+					points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
+					points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
+					String sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[37], (char) dataBuffer[38]);
+					if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[5] = -1 * points[5];
+					points[6] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
+					points[7] = 0;
+					// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7 
+					for (int i = 0, j = 0; i < points.length - 8; ++i, j += 4) {
+						points[i + 8] = Integer.parseInt(
+								String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]), 16);
+						if (points[i + 8] > 0) {
+							maxVotage = points[i + 8] > maxVotage ? points[i + 8] : maxVotage;
+							minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
+						}
+					}
+				}
+				catch (Exception e) {
+					log.log(Level.WARNING, e.getMessage(), e);
 				}
 				//calculate balance on the fly
 				points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;

@@ -29,6 +29,7 @@ import gde.exception.DataInconsitsentException;
 import gde.messages.Messages;
 
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -130,23 +131,28 @@ public class Ultramat16S extends Ultramat {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
 
-		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 7=SpannungZelle1 8=SpannungZelle2....
-		points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
-		points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[15], (char) dataBuffer[16], (char) dataBuffer[17], (char) dataBuffer[18]), 16);
-		points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[19], (char) dataBuffer[20], (char) dataBuffer[21], (char) dataBuffer[22]), 16);
-		points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
-		points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-		points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[3], (char) dataBuffer[4], (char) dataBuffer[5], (char) dataBuffer[6]), 16);
-		points[6] = 0;
+		try {
+			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 7=SpannungZelle1 8=SpannungZelle2....
+			points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
+			points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[15], (char) dataBuffer[16], (char) dataBuffer[17], (char) dataBuffer[18]), 16);
+			points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[19], (char) dataBuffer[20], (char) dataBuffer[21], (char) dataBuffer[22]), 16);
+			points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
+			points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
+			points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[3], (char) dataBuffer[4], (char) dataBuffer[5], (char) dataBuffer[6]), 16);
+			points[6] = 0;
 
-		// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6 
-		for (int i = 0, j = 0; i < 6; ++i, j += 4) {
-			points[i + 7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[23 + j], (char) dataBuffer[24 + j], (char) dataBuffer[25 + j], (char) dataBuffer[26 + j]),
-					16);
-			if (points[i + 7] > 0) {
-				maxVotage = points[i + 7] > maxVotage ? points[i + 7] : maxVotage;
-				minVotage = points[i + 7] < minVotage ? points[i + 7] : minVotage;
+			// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6 
+			for (int i = 0, j = 0; i < 6; ++i, j += 4) {
+				points[i + 7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[23 + j], (char) dataBuffer[24 + j], (char) dataBuffer[25 + j], (char) dataBuffer[26 + j]),
+						16);
+				if (points[i + 7] > 0) {
+					maxVotage = points[i + 7] > maxVotage ? points[i + 7] : maxVotage;
+					minVotage = points[i + 7] < minVotage ? points[i + 7] : minVotage;
+				}
 			}
+		}
+		catch (NumberFormatException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
 		}
 		//calculate balance on the fly
 		points[6] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;

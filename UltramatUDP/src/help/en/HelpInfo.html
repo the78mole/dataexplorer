@@ -72,6 +72,9 @@ The configuration of step charge parameters are actually not possible and is par
 </P>
 <H2><FONT FACE="Arial"><FONT SIZE=4><I>Data gathering</I></FONT></FONT></H2>
 <P>To start data capturing simply push the "start gathering" button.
+Do this while the charger is prepared, charge process configured, battery connected.
+Right after starting the gathering process at the DataExplorer start the charge process at device.
+Only this sequence guarantees that the complete charging process gets captured.
 Switching between charge, discharge and other curve types is enabled automatically by values received from the device.
 While a new curve gets created the graphical visualization switches to this data set at the certain outlet data channel.
 The picture below showing a graph of a linked charged LiPo battery with 8 cells.
@@ -82,6 +85,27 @@ This relates to the balancer outlets where the batteries are connected.
 </P>
 <P>
 If the device is inactive for a certain time frame the serial communication port gets closed.
+</P>
+<H3><FONT FACE="Arial"><FONT SIZE=4><I>Automatic Object Selection</I></FONT></FONT></H3>
+<P>Charging devices which are capable to manage battery memories forwards this possibility to automatic object key selection.
+</BR>As pre-requisite the configuration dialog must be used to configure the battery memories.
+During the configuration activity a configuration file gets created and is used as data cache.
+The configured device name is part of the file identifier.
+While the data gathering gets started the device identifier name will be read. Afterwards the normal gathering will begin.
+Receiving the first data from the device, the process memory number is known.
+With the battery memory number the memory name can be looked up.
+The battery name is now used to find a best match from object key list.
+If a good match can be found the object key gets selected while creating the first data set.
+</P>
+<P>How to match the object name while there is no complete containment ?
+</BR>The battery memory name gets split at blank, hyphen and under bar.
+The name fragments are now used to find partially matches.
+The object name which has the most containment hits get selected.
+</P>
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Image_7.png" NAME="Image7 Battery memory - object match" ALT="Image7 Battery memory - object match">
+</P>
+<P><B>Hint : </B>To have good matching results, name battery memories as well as object key names accordingly.
+Both names battery memory name as well as object key name can be renamed if required
 </P>
 </BODY>
 </HTML>

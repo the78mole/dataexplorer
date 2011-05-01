@@ -1069,7 +1069,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 								log.log(java.util.logging.Level.FINEST, "backupButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								FileDialog fileDialog = UltraDuoPlusDialog.this.application.prepareFileSaveDialog(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2285), new String[] {
 										GDE.FILE_ENDING_STAR_XML, GDE.FILE_ENDING_STAR }, UltraDuoPlusDialog.this.settings.getDataFilePath(), StringHelper.getDateAndTime("yyyy-MM-dd-HH-mm-ss") + GDE.STRING_UNDER_BAR
-										+ UltraDuoPlusDialog.this.device.getName());
+										+ UltraDuoPlusDialog.this.device.getName() + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getIdentifierName());
 								String configFilePath = fileDialog.open();
 								if (configFilePath != null && fileDialog.getFileName().length() > 4) {
 									if (FileUtils.checkFileExist(configFilePath)) {

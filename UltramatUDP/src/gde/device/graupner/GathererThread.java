@@ -373,7 +373,9 @@ public class GathererThread extends Thread {
 			throws DataInconsitsentException {
 		final String $METHOD_NAME = "processOutlet"; //$NON-NLS-1$
 		Object[] result = new Object[4];
-		String processName = this.device.USAGE_MODE[this.device.getProcessingMode(dataBuffer)];
+		// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
+		int processNumber = this.device.getProcessingMode(dataBuffer);
+		String processName = this.device.USAGE_MODE[processNumber];
 
 		Channel channel = this.channels.get(number);
 		if (channel != null) {
@@ -384,18 +386,23 @@ public class GathererThread extends Thread {
 
 				// record set does not exist or is outdated, build a new name and create
 				StringBuilder extend = new StringBuilder();
-				if (this.device.getProcessingMode(dataBuffer) < 5) {
-					if (this.device.getProcessingType(dataBuffer).length() > 3 || this.device.getCycleNumber(number, dataBuffer) > 0) extend.append(GDE.STRING_BLANK_LEFT_BRACKET);
-					if (this.device.getProcessingType(dataBuffer).length() > 3) extend.append(this.device.getProcessingType(dataBuffer));
-					if (this.device.getCycleNumber(number, dataBuffer) > 0) {
-						if (this.device.getProcessingType(dataBuffer).equals(Messages.getString(MessageIds.GDE_MSGT2302)))
-							extend.append(GDE.STRING_COLON).append(this.device.getCycleNumber(number, dataBuffer));
-						else if (this.device.getProcessingType(dataBuffer).length() > 3) 
-							extend.append(GDE.STRING_MESSAGE_CONCAT);
-						
-						extend.append(Messages.getString(MessageIds.GDE_MSGT2302)).append(GDE.STRING_COLON).append(this.device.getCycleNumber(number, dataBuffer));
-					}
-					if (this.device.getProcessingType(dataBuffer).length() > 3 || this.device.getCycleNumber(number, dataBuffer) > 0) extend.append(GDE.STRING_RIGHT_BRACKET);
+				if (processNumber < 5) {// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
+					String processingType = this.device.getProcessingType(dataBuffer);
+					int cycleNumber = this.device.getCycleNumber(number, dataBuffer);
+					
+					if (processingType.length() > 3 || cycleNumber > 0) extend.append(GDE.STRING_BLANK_LEFT_BRACKET);				
+					if (processingType.length() > 3) extend.append(processingType);
+					
+					if (cycleNumber > 0) {
+						if (processingType.equals(Messages.getString(MessageIds.GDE_MSGT2302))) {
+							extend.append(GDE.STRING_COLON).append(cycleNumber);
+						}
+						else {
+							extend.append(GDE.STRING_MESSAGE_CONCAT);				
+							extend.append(Messages.getString(MessageIds.GDE_MSGT2302)).append(GDE.STRING_COLON).append(cycleNumber);
+						}
+					}			
+					if (processingType.length() > 3 || cycleNumber > 0) extend.append(GDE.STRING_RIGHT_BRACKET);
 				}
 				recordSetKey = channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName + extend.toString();
 				recordSetKey = recordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetKey : recordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
@@ -413,7 +420,7 @@ public class GathererThread extends Thread {
 					if (this.device.ultraDuoPlusSetup != null && this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)) != null) {
 						String batteryMemoryName = this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer) - 1).getName();
 						description = description + GDE.STRING_MESSAGE_CONCAT + batteryMemoryName;
-						this.device.matchBatteryMemory2ObjectKey(batteryMemoryName);
+						if (recordSetKey.startsWith("1)")) this.device.matchBatteryMemory2ObjectKey(batteryMemoryName); //$NON-NLS-1$
 					}
 				}
 				catch (Exception e) {
