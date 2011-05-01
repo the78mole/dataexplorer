@@ -87,7 +87,6 @@ public class ObjectData {
 	public ObjectData(String objectFilePath) {
 		this.fullQualifiedObjectFilePath = objectFilePath;
 		this.key = objectFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX).substring(objectFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1, objectFilePath.lastIndexOf(GDE.STRING_DOT));
-		this.key = this.key.contains(GDE.STRING_DOT) ? this.key.substring(0, this.key.indexOf(GDE.STRING_DOT)) : this.key;
 		this.type = Messages.getString(MessageIds.GDE_MSGT0279);
 		this.activationDate = Messages.getString(MessageIds.GDE_MSGT0279);
 		this.status = Messages.getString(MessageIds.GDE_MSGT0279);

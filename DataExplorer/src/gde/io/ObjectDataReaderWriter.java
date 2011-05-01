@@ -266,11 +266,7 @@ public class ObjectDataReaderWriter {
 			// check if target directory exist, it must be created and removed by creatingor removing object key
 			File targetFileDir = new File(this.filePath.substring(0, this.filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
 			if (targetFileDir.exists()) {
-				if (targetFile.exists()) {
-					if (!targetFile.delete())
-						log.log(Level.WARNING, "failed to delete " + this.filePath);
-				}
-				else {
+				if (!targetFile.exists()) {
 					if (!targetFile.createNewFile())
 						log.log(Level.WARNING, "failed to create " + this.filePath);
 				}
