@@ -160,7 +160,11 @@ public class Record extends Vector<Integer> {
 	double							displayScaleFactorValue;
 	double							minDisplayValue;									// min value in device units, correspond to draw area
 	double							maxDisplayValue;									// max value in device units, correspond to draw area
+
+	//current drop, make curve capable to be smoothed
 	boolean             isCurrentRecord = false;
+	int             		dropIndex 			= 0;
+	int             		dropRunout 			= 15;
 
 	// measurement
 	boolean							isMeasurementMode				= false;
@@ -485,8 +489,16 @@ public class Record extends Vector<Integer> {
 		
 		//add shadow data points to detect current drops to nearly zero
 		if (this.isCurrentRecord ) {
-			if (this.size() > 10 && point < 50 && (point << 2) < this.maxValue) this.parent.currentDropShadow.add(1);
-			else																this.parent.currentDropShadow.add(0);
+			int index = this.size();
+			if (this.size() > 5 && point < 50 && (point << 2) < this.maxValue) {
+				this.dropIndex = index;
+				this.parent.currentDropShadow.add(1);
+				this.parent.currentDropShadow.set(this.dropIndex-1, 1); // drop run in
+			}
+			else { //drop run out
+				if(this.dropIndex > 5 && index < (this.dropIndex + this.dropRunout))	this.parent.currentDropShadow.add(1);
+				else																																	this.parent.currentDropShadow.add(0);
+			}
 		}
 		return super.add(point);
 	}
@@ -926,11 +938,14 @@ public class Record extends Vector<Integer> {
 			index = index < 0 ? 0 : index;
 		}
 		//log.log(Level.INFO, "index=" + index);
-		return size != 0 ? 
-			this.parent.isSmoothAtCurrentDrop && index > 10 && size > index + 8 
-				&& (this.parent.currentDropShadow.get(index - 2) == 1 || this.parent.currentDropShadow.get(index - 1) == 1 || this.parent.currentDropShadow.get(index) == 1	|| this.parent.currentDropShadow.get(index + 1) == 1) ?
-					(super.get(index - 8) + super.get(index + 8)) / 2 :
-						super.get(index) : 0;
+		if (size != 0) {
+			if (!this.parent.isCompareSet && this.parent.isSmoothAtCurrentDrop && size > (index + this.dropRunout) && this.parent.currentDropShadow.get(index) == 1) {
+				int tmpValue = this.get(index - 1);
+				return tmpValue + ((super.get(index + this.dropRunout) - tmpValue) / 3);
+			}
+			return super.get(index);
+		}
+		return 0;
 	}
 
 	/**
