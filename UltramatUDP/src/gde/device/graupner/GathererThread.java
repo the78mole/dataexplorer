@@ -415,7 +415,7 @@ public class GathererThread extends Thread {
 				recordSet.setAllDisplayable();
 				String description = recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR 
 					+ "Firmware  : " + this.device.firmware //$NON-NLS-1$
-					+ (this.device.getBatteryMemoryNumber(number, dataBuffer) > 1 ? "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer) : GDE.STRING_EMPTY); //$NON-NLS-1$
+					+ (this.device.getBatteryMemoryNumber(number, dataBuffer) >= 1 ? "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer) : GDE.STRING_EMPTY); //$NON-NLS-1$
 				try {
 					if (this.device.ultraDuoPlusSetup != null && this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)) != null) {
 						String batteryMemoryName = this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer) - 1).getName();
