@@ -10,7 +10,8 @@ GNU DataExplorer - News - comes with version 2.81
 8) add Graupmer UltraDuoPlus 45
 9) eStations fix do not display empty balance curve 
 10)enable smooth curves at current drop in context menu
-
+11)fix make battery type record dependent
+12)enable battery memory to object key matching for devices with battery memory management
 
 
 
