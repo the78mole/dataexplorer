@@ -357,7 +357,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			if (this.serialPort != null && !this.serialPort.isConnected()) {
 				try {
 					this.serialPort.open();
-					byte[] answer = this.serialPort.getData();
+					byte[] answer = this.serialPort.getData(true);
 					if (this.device.isProcessing(1, answer) || this.device.isProcessing(2, answer)) {
 						this.application.openMessageDialogAsync(null, Messages.getString(MessageIds.GDE_MSGW2201));
 						return;

@@ -259,7 +259,7 @@ public class Ultramat16S extends Ultramat {
 	 */
 	@Override
 	public int getProductCode(byte[] dataBuffer) {
-		//1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, 6=Ultramat16S ?=Ultramat16
+		//0=Ultramat50, 1=Ultramat40, 2=UltramatTrio14, 3=Ultramat18 4=Ultramat45, 5=Ultramat60, 6=Ultramat16S ?=Ultramat12 ?=Ultramat16 ?=Ultramat16S
 		return GraupnerDeviceType.Ultramat16S.ordinal();
 	}
 

@@ -256,17 +256,6 @@ public class Ultramat18 extends Ultramat {
 	}
 
 	/**
-	 * query the product code 0=Ultramat50, 1=Ultramat40, 2=Ultramat14Trio, 3=Ultramat18, 4=ultramat45, 5=Ultramat60, 6=Ultramat80
-	 * @param dataBuffer 
-	 * @return v2.0
-	 */
-	@Override
-	public int getProductCode(byte[] dataBuffer) {
-		//1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, 6=Ultramat16S
-		return 3;
-	}
-
-	/**
 	 * check if one of the outlet channels are in processing mode
 	 * @param outletNum 1
 	 * @param dataBuffer

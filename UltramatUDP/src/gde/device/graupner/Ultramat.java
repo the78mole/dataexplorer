@@ -49,6 +49,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.eclipse.swt.SWT;
+
 /**
  * Graupner Ultramat base class
  * @author Winfried Brügmann
@@ -57,7 +59,8 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	final static Logger	log	= Logger.getLogger(Ultramat.class.getName());
 
 	public enum GraupnerDeviceType {
-		UltraDuoPlus50, Ultramat40, UltramatTrio14, Ultramat18, UltraDuoPlus45, UltraDuoPlus60, UltramatTrio16S, /*unknown*/Ultramat16S
+		//0=Ultramat50, 1=Ultramat40, 2=UltramatTrio14, 3=Ultramat18 4=Ultramat45, 5=Ultramat60, 6=UltramatTrioPlus16S ?=Ultramat12 ?=Ultramat16 ?=Ultramat16S
+		UltraDuoPlus50, Ultramat40, UltraTrioPlus14, Ultramat18, UltraDuoPlus45, UltraDuoPlus60, UltraTrioPlus16S, /*unknown*/Ultramat16S
 	};
 
 	protected String[]														USAGE_MODE;
@@ -272,39 +275,9 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 
 				// check if measurements isActive == false and set to isDisplayable == false
 				for (String measurementKey : recordNames) {
-					Record record = recordSet.get(measurementKey);
-
-					if (record.hasReasonableData()) {
-						++displayableCounter;
-					}
+					recordSet.get(measurementKey).setDisplayable(true);
+					++displayableCounter;
 				}
-
-				String recordKey = recordNames[3]; //3=Leistung
-				Record record = recordSet.get(recordKey);
-				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
-					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
-					try {
-						this.calculationThreads.get(recordKey).start();
-					}
-					catch (RuntimeException e) {
-						log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-					}
-				}
-				++displayableCounter;
-
-				recordKey = recordNames[4]; //4=Energie
-				record = recordSet.get(recordKey);
-				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
-					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
-					try {
-						this.calculationThreads.get(recordKey).start();
-					}
-					catch (RuntimeException e) {
-						log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-					}
-				}
-				++displayableCounter;
-
 				log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 				recordSet.setConfiguredDisplayable(displayableCounter);
 
@@ -352,9 +325,17 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 				try {
 					this.serialPort.open();
 					try {
-						byte[] dataBuffer = this.serialPort.getData();
+						byte[] dataBuffer = this.serialPort.getData(false);
 						this.firmware = this.getFirmwareVersion(dataBuffer);
-						//TODO check if device fits this.device.getProductCode(dataBuffer); else ask for switch ?? don't know if this is required
+						//check if device fits this.device.getProductCode(dataBuffer)
+						if (this.getDeviceTypeIdentifier().ordinal() != this.getProductCode(dataBuffer)) {
+							int answer = this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW2202, new String[] {GraupnerDeviceType.values()[this.getProductCode(dataBuffer)].toString()}));
+							if (answer == SWT.YES) {
+								this.application.getDeviceSelectionDialog().setupDevice(GraupnerDeviceType.values()[this.getProductCode(dataBuffer)].toString());
+								this.serialPort.close();
+								return;
+							}
+						}
 
 						//load cached memory configurations to enable memory name to object key match
 						switch (this.getDeviceTypeIdentifier()) {
@@ -480,7 +461,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 */
 	public int getProductCode(byte[] dataBuffer) {
 		//1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, ?=Ultramat16S
-		return Integer.parseInt(String.format("%c%c", (char) dataBuffer[3], (char) dataBuffer[4]));
+		return Integer.parseInt(String.format("%c%c", (char) dataBuffer[3], (char) dataBuffer[4]), 16);
 	}
 
 	/**

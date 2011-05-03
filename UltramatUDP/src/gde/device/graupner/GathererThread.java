@@ -112,7 +112,7 @@ public class GathererThread extends Thread {
 
 		while (!this.isCollectDataStopped) {
 			try {
-				dataBuffer = this.serialPort.getData(); // get data from device
+				dataBuffer = this.serialPort.getData(true); // get data from device
 
 				switch (this.device.getDeviceTypeIdentifier()) {
 
@@ -122,8 +122,8 @@ public class GathererThread extends Thread {
 					this.isProgrammExecuting2 = this.isProgrammExecuting3 = false;
 					break;
 
-				case UltramatTrio14:
-				case UltramatTrio16S:
+				case UltraTrioPlus14:
+				case UltraTrioPlus16S:
 					this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
 					this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
 					this.isProgrammExecuting3 = this.device.isProcessing(3, dataBuffer);
@@ -158,7 +158,7 @@ public class GathererThread extends Thread {
 						this.startCycleTime1 = (Long) ch1[3];
 						break;
 
-					case UltramatTrio14:
+					case UltraTrioPlus14:
 						if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
 							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
 							recordSet1 = (RecordSet) ch1[0];
@@ -192,7 +192,7 @@ public class GathererThread extends Thread {
 						}
 						break;
 						
-					case UltramatTrio16S:
+					case UltraTrioPlus16S:
 						if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
 							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
 							recordSet1 = (RecordSet) ch1[0];

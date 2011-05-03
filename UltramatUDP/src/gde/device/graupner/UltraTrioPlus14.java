@@ -270,7 +270,7 @@ public class UltraTrioPlus14 extends Ultramat {
 	 */
 	@Override
 	public GraupnerDeviceType getDeviceTypeIdentifier() {
-		return GraupnerDeviceType.UltramatTrio14;
+		return GraupnerDeviceType.UltraTrioPlus14;
 	}
 
 	/**

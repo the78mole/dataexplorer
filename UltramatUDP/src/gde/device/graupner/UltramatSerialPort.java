@@ -108,7 +108,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @return byte array containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public synchronized byte[] getData() throws Exception {
+	public synchronized byte[] getData(boolean checkBeginEndSignature) throws Exception {
 		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
 		byte[] data = new byte[Math.abs(this.device.getDataBlockSize())];
 		byte[] answer = new byte[] { 0x00 };
@@ -142,19 +142,19 @@ public class UltramatSerialPort extends DeviceCommPort {
 			}
 			log.logp(Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
 
-			if (!(data[0] == DeviceSerialPortImpl.FF && data[data.length - 1] == DeviceSerialPortImpl.CR)) {
+			if (checkBeginEndSignature  && !(data[0] == DeviceSerialPortImpl.FF && data[data.length - 1] == DeviceSerialPortImpl.CR)) {
 				this.addXferError();
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
-				data = getData();
+				data = getData(true);
 			}
 
 			if (!isChecksumOK(data)) {
 				this.addXferError();
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
-				data = getData();
+				data = getData(true);
 			}
 		}
 		catch (Exception e) {

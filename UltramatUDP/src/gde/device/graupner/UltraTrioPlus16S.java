@@ -238,7 +238,7 @@ public class UltraTrioPlus16S extends UltraTrioPlus14 {
 	 */
 	@Override
 	public GraupnerDeviceType getDeviceTypeIdentifier() {
-		return GraupnerDeviceType.UltramatTrio16S;
+		return GraupnerDeviceType.UltraTrioPlus16S;
 	}
 
 	/**
