@@ -240,7 +240,7 @@ public class OsdReaderWriter {
 					channels.setChannelNames(newChannelNames.toArray(new String[1]));
 				}
 				channels.setActiveChannelNumber(channel.getNumber());
-				channel.setObjectKey(objectKey);
+				OsdReaderWriter.application.selectObjectKey(objectKey);	//calls channel.setObjectKey(objectKey);
 				// "3 : Motor"
 				channelConfig = channelConfig.contains(GDE.STRING_COLON) ? channelConfig.split(GDE.STRING_COLON)[1].trim() : channelConfig.trim();
 				// "Motor 3"

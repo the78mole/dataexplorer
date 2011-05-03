@@ -660,10 +660,10 @@ public class Channel extends HashMap<String, RecordSet> {
 		return this.objectKey;
 	}
 
-	public void setObjectKey(String newObjectkey) {
-		this.objectKey = newObjectkey;
+	public void setObjectKey(String newObjectKey) {
+		this.objectKey = newObjectKey;
 		if (this.activeRecordSet != null) {
-			if (newObjectkey.equals(GDE.STRING_EMPTY))	this.activeRecordSet.setUnsaved(Channel.UNSAVED_REASON_REMOVE_OBJECT_KEY);
+			if (newObjectKey.equals(GDE.STRING_EMPTY))	this.activeRecordSet.setUnsaved(Channel.UNSAVED_REASON_REMOVE_OBJECT_KEY);
 			else 																				this.activeRecordSet.setUnsaved(Channel.UNSAVED_REASON_ADD_OBJECT_KEY);
 		}
 	}

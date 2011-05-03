@@ -177,14 +177,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET) {
 						this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 				}
-				GDE.display.asyncExec(new Runnable() {
-					public void run() {
-						if (!Channels.this.application.getObjectKey().equals(Channels.this.getActiveChannel().getObjectKey())) {
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "switch to channels object key \"" + Channels.this.getActiveChannel().getObjectKey() + "\""); //$NON-NLS-1$
-							Channels.this.application.getMenuToolBar().updateObjectSelector();
-						}
-					}
-				});
+				this.application.selectObjectKey(Channels.this.getActiveChannel().getObjectKey());
 			}
 			else {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$

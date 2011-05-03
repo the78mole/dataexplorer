@@ -779,10 +779,10 @@ public class DataExplorer extends Composite {
 
 		if (activeRecordSet != null && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
 				&& activeRecordSet.getName().equals(requestingRecordSetName)
-				&& activeRecordSet.getDevice().isTableTabRequested() ){
-//TODO check if still required				&& activeRecordSet.checkAllRecordsDisplayable()) {
+				&& activeRecordSet.getDevice().isTableTabRequested()
+				&& activeRecordSet.checkAllRecordsDisplayable()) {
 			if (forceClean) {
-				GDE.display.syncExec(new Runnable() {
+				GDE.display.asyncExec(new Runnable() {
 					public void run() {
 						DataExplorer.this.dataTableTabItem.setHeader();
 						DataExplorer.this.dataTableTabItem.cleanTable();
@@ -1393,22 +1393,23 @@ public class DataExplorer extends Composite {
 	 * @return the object keys, if there are no object key defined return an empty string array
 	 */
 	public void selectObjectKey(final String newObjectKey) {
-		
-		String[] objectKeys = this.settings.getObjectList();
-		for(int searchSelectionIndex = 0; searchSelectionIndex < objectKeys.length; ++searchSelectionIndex) {
-			if (newObjectKey.equals(objectKeys[searchSelectionIndex])) {
-				if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-					this.menuToolBar.selectObjectKey(searchSelectionIndex);
+		if (!this.getObjectKey().equals(newObjectKey)) {
+			String[] objectKeys = this.settings.getObjectList();
+			for (int searchSelectionIndex = 0; searchSelectionIndex < objectKeys.length; ++searchSelectionIndex) {
+				if (newObjectKey.equals(objectKeys[searchSelectionIndex])) {
+					if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+						this.menuToolBar.selectObjectKey(searchSelectionIndex);
+					}
+					else {
+						final int selectionIndex = searchSelectionIndex;
+						GDE.display.asyncExec(new Runnable() {
+							public void run() {
+								DataExplorer.this.menuToolBar.selectObjectKey(selectionIndex);
+							}
+						});
+					}
+					break;
 				}
-				else {
-					final int selectionIndex = searchSelectionIndex;
-					GDE.display.asyncExec(new Runnable() {
-						public void run() {
-							DataExplorer.this.menuToolBar.selectObjectKey(selectionIndex);
-						}
-					});
-				}
-				break;
 			}
 		}
 	}
