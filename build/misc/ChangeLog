@@ -15,8 +15,8 @@ enable smooth curves at current drop in context menu
 fix - problem while updating/switching object image
 fix - make battery type record dependent
 enable battery memory to object key matching for devices with battery memory management
-TODO create and update temporary file while data gathering
 detect and switch wrong Ultramat device 
+update data table time format to HH:mm:ss
 
 
 Version 2.80 - 15 Apr 2011
