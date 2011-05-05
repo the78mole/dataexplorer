@@ -289,7 +289,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
-	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
@@ -458,8 +458,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
-	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
-	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
@@ -518,15 +518,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
-		String[] dataTableRow = new String[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
+	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-			String[] recordNames = recordSet.getRecordNames();	
-			int numberRecords = recordNames.length;			
-
-			dataTableRow[0] = String.format("%.2f", (recordSet.getTime_ms(rowIndex) / 1000.0));
-			for (int j = 0; j < numberRecords; j++) {
+			String[] recordNames = recordSet.getRecordNames(); 
+			for (int j = 0; j < recordNames.length; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
