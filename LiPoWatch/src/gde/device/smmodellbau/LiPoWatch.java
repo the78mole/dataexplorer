@@ -162,7 +162,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
-	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
@@ -299,16 +299,12 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
-		String[] dataTableRow = new String[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
+	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames();	// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, .... 
-			int numberRecords = recordNames.length;			
+			String[] recordNames = recordSet.getRecordNames(); 
 			double offset = 0.0;
 			double factor = 1.0;
-
-			dataTableRow[0] = String.format("%.2f", (recordSet.getTime_ms(rowIndex) / 1000.0));
-			for (int j = 0; j < numberRecords; j++) {
+			for (int j = 0; j < recordNames.length; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				switch (j) {
 				case 3: //3=temperature analog outlet
