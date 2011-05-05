@@ -111,7 +111,7 @@ public class UltraDuoPlus60 extends Ultramat {
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
-	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
 	 * this method is more usable for real logger, where data can be stored and converted in one block
 	 * @param recordSet
 	 * @param dataBuffer
@@ -381,33 +381,6 @@ public class UltraDuoPlus60 extends Ultramat {
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
-	}
-
-	/**
-	 * function to prepare a data table row of record set while translating available measurement values
-	 * @return pointer to filled data table row with formated values
-	 */
-	@Override
-	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
-		String[] dataTableRow = new String[recordSet.size() + 1]; // this.device.getMeasurementNames(this.channelNumber).length
-		try {
-			String[] recordNames = recordSet.getRecordNames();
-			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
-			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
-			int numberRecords = recordNames.length;
-
-			dataTableRow[0] = String.format("%.3f", (recordSet.getTime_ms(rowIndex) / 1000.0)); //$NON-NLS-1$
-			for (int j = 0; j < numberRecords; j++) {
-				Record record = recordSet.get(recordNames[j]);
-				double reduction = record.getReduction();
-				double factor = record.getFactor(); // != 1 if a unit translation is required
-				dataTableRow[j + 1] = record.getDecimalFormat().format((((record.get(rowIndex) / 1000.0) - reduction) * factor));
-			}
-		}
-		catch (RuntimeException e) {
-			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-		}
-		return dataTableRow;
 	}
 	
 	/**

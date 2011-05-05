@@ -97,7 +97,7 @@ public class Ultramat16 extends Ultramat16S {
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
-	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
 	 * this method is more usable for real logger, where data can be stored and converted in one block
 	 * @param recordSet
 	 * @param dataBuffer

@@ -33,6 +33,7 @@ import gde.device.IDevice;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
@@ -152,7 +153,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
-	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
 	 * this method is more usable for real log, where data can be stored and converted in one block
 	 * @param recordSet
 	 * @param dataBuffer
@@ -187,17 +188,12 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
-		String[] dataTableRow = new String[recordSet.size() + 1]; // this.device.getMeasurementNames(this.channelNumber).length
+	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
 			String[] recordNames = recordSet.getRecordNames();
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
-			// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6
-			// 13=SpannungZelle7 14=SpannungZelle8 15=SpannungZelle9 16=SpannungZelle10 17=SpannungZelle11 18=SpannungZelle12
-			int numberRecords = recordNames.length;
-
-			dataTableRow[0] = String.format("%.3f", (recordSet.getTime_ms(rowIndex) / 1000.0)); //$NON-NLS-1$
-			for (int j = 0; j < numberRecords; j++) {
+			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BAtterietemperatur 6=VersorgungsSpg 7=Balance 
+			for (int j = 0; j < recordNames.length; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				dataTableRow[j + 1] = record.getDecimalFormat().format(((record.get(rowIndex) / 1000.0) * factor));
@@ -264,29 +260,61 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
+
 		// since there are live measurement points only the calculation will take place directly after switch all to displayable
 		if (recordSet.isRaw()) {
 			// calculate the values required
 			try {
+				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
-				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
 				String[] recordNames = recordSet.getRecordNames();
 				int displayableCounter = 0;
 
+				
 				// check if measurements isActive == false and set to isDisplayable == false
 				for (String measurementKey : recordNames) {
-					recordSet.get(measurementKey).setDisplayable(true);
-					++displayableCounter;
+					Record record = recordSet.get(measurementKey);
+					
+					if (record.isActive() && (record.getOrdinal() <= 5 || record.hasReasonableData())) {
+						++displayableCounter;
+					}
 				}
-				log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
-				recordSet.setConfiguredDisplayable(displayableCounter);
+				
+				String recordKey = recordNames[3]; //3=Leistung
+				Record record = recordSet.get(recordKey);
+				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
+					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+					try {
+						this.calculationThreads.get(recordKey).start();
+					}
+					catch (RuntimeException e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+					}
+				}
+				++displayableCounter;
+				
+				recordKey = recordNames[4]; //4=Energie
+				record = recordSet.get(recordKey);
+				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
+					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+					try {
+						this.calculationThreads.get(recordKey).start();
+					}
+					catch (RuntimeException e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+					}
+				}		
+				++displayableCounter;
+				
+				log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+				recordSet.setConfiguredDisplayable(displayableCounter);		
 
 				if (recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
 					this.application.updateGraphicsWindow();
 				}
 			}
 			catch (RuntimeException e) {
-				log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+				log.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 	}
