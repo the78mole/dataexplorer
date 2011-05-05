@@ -1188,15 +1188,16 @@ public class FileUtils {
 		List<File> result = new ArrayList<File>();
 		if (rootDirectory.isDirectory() && rootDirectory.canRead()) {
 			File[] filesAndDirs = rootDirectory.listFiles();
-			List<File> filesDirs = Arrays.asList(filesAndDirs);
-			for (File file : filesDirs) {
-				if (file.isFile()) {
-					result.add(file);
-				}
-				else { // isDirectory()
-					//recursive walk by calling itself
-					List<File> deeperList = getFileListingNoSort(file);
-					result.addAll(deeperList);
+			if (filesAndDirs != null) {
+				List<File> filesDirs = Arrays.asList(filesAndDirs);
+				for (File file : filesDirs) {
+					if (file.isFile()) {
+						result.add(file);
+					} else { // isDirectory()
+								//recursive walk by calling itself
+						List<File> deeperList = getFileListingNoSort(file);
+						result.addAll(deeperList);
+					}
 				}
 			}
 		}
