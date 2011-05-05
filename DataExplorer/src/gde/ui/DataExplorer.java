@@ -791,7 +791,8 @@ public class DataExplorer extends Composite {
 			}
 				GDE.display.asyncExec(new Runnable() {
 					public void run() {
-						DataExplorer.this.dataTableTabItem.setRowCount(activeRecordSet.getRecordDataSize(true));					
+						DataExplorer.this.dataTableTabItem.setRowCount(activeRecordSet.getRecordDataSize(true));	
+						DataExplorer.this.dataTableTabItem.updateTopIndex();
 					}
 				});
 		}
@@ -1104,6 +1105,7 @@ public class DataExplorer extends Composite {
 	public void setSerialRxOn() {
 		GDE.display.asyncExec(new Runnable() {
 			public void run() {
+				DataExplorer.this.statusBar.setSerialRxOff();
 				DataExplorer.this.statusBar.setSerialRxOn();
 			}
 		});
@@ -1112,6 +1114,7 @@ public class DataExplorer extends Composite {
 	public void setSerialRxOff() {
 		GDE.display.asyncExec(new Runnable() {
 			public void run() {
+				DataExplorer.this.statusBar.setSerialRxOn();
 				DataExplorer.this.statusBar.setSerialRxOff();
 			}
 		});
@@ -1636,21 +1639,24 @@ public class DataExplorer extends Composite {
 	 */
 	public void updateAllTabs(final boolean force) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-		this.updateGraphicsWindow();
-		this.updateStatisticsData(true);
-		if (force) {
-			this.updateDigitalWindow();
-			this.updateAnalogWindow();
-		}
-		else {
-			this.updateDigitalWindowChilds();
-			this.updateAnalogWindowChilds();
-		}
-		this.updateCellVoltageWindow();
-		this.updateFileCommentWindow();
-		if (this.getActiveRecordSet() != null) {
-			this.updateDataTable(this.getActiveRecordSet().getName(), force);
-		}
+			this.updateGraphicsWindow();
+			this.updateStatisticsData(true);
+			if (force) {
+				this.updateDigitalWindow();
+				this.updateAnalogWindow();
+			}
+			else {
+				this.updateDigitalWindowChilds();
+				this.updateAnalogWindowChilds();
+			}
+			this.updateCellVoltageWindow();
+			this.updateFileCommentWindow();
+			if (this.getActiveRecordSet() != null) {
+				this.updateDataTable(this.getActiveRecordSet().getName(), force);
+			}
+			else {
+				DataExplorer.this.updateDataTable(GDE.STRING_EMPTY, force);
+			}
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {

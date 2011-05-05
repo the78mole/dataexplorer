@@ -497,7 +497,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @return formatted values as string array including time
 	 */
 	public String[] getDataTableRow(int index) {
-		return this.device.prepareDataTableRow(this, index);
+		String[] dataTableRow = new String[this.size() + 1]; // add time column
+		dataTableRow[0] = this.getFormatedTime_sec(index);
+		return this.device.prepareDataTableRow(this, dataTableRow, index);
 	}
 
 	/**
@@ -521,6 +523,25 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public double getTime_ms(int index) {
 		return this.timeStep_ms.getTime_ms(index);
+	}
+
+	/**
+	 * @return the timeSteps_ms
+	 */
+	public String getFormatedTime_sec(int index) {
+		String fromatString = "HH:mm:ss:SSS";
+		if (this.getMaxTime_ms() <= 1000*60*60) 
+			fromatString = "mm:ss:SSS";
+		else if (this.getMaxTime_ms() <= 1000*60*60*60)
+			fromatString = "HH:mm:ss:SSS";
+		else if (this.getMaxTime_ms() > 1000*60*60*60)
+			fromatString = "dd HH:mm:ss:SSS";
+		else if (this.getMaxTime_ms() > 1000*60*60*60*24)
+			fromatString = "mm:dd HH:mm:ss:SSS";
+		else
+			fromatString = "yy:mm:dd HH:mm:ss:SSS";
+
+		return this.timeStep_ms.getFormattedTime(fromatString, index);
 	}
 
 	/**

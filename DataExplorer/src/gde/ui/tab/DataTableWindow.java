@@ -91,7 +91,6 @@ public class DataTableWindow extends CTabItem {
 					if (activeRecordSet != null) {
 						TableItem item = (TableItem) event.item;
 						int index = DataTableWindow.this.dataTable.indexOf(item);
-						item.setText("Item " + index);
 						item.setText(activeRecordSet.getDataTableRow(index));
 					}
 				}
@@ -113,7 +112,7 @@ public class DataTableWindow extends CTabItem {
 		int extentFactor = 9;
 		String time = Messages.getString(MessageIds.GDE_MSGT0234); //$NON-NLS-1$
 		this.timeColumn = new TableColumn(this.dataTable, SWT.CENTER);
-		this.timeColumn.setWidth(time.length() * extentFactor);
+		this.timeColumn.setWidth(time.length() * 7);
 		this.timeColumn.setText(time);
 
 		// set the new header line
@@ -155,12 +154,15 @@ public class DataTableWindow extends CTabItem {
 	}
 
 	/**
-	 * @param recordEntries
+	 * @param count of record entries
 	 */
 	public void setRowCount(int count) {
 		this.dataTable.setItemCount (count);
 	}
 	
+	/**
+	 * clean the table, not the header
+	 */
 	public synchronized void cleanTable() {
 		if (this.dataTable != null && !this.dataTable.isDisposed())
 			this.dataTable.removeAll();
@@ -178,5 +180,20 @@ public class DataTableWindow extends CTabItem {
 		imageGC.dispose();
 
 		return tabContentImage;
+	}
+	
+	/**
+	 * reset the top index of the data table if required while updating or adding rows
+	 */
+	public void updateTopIndex() {
+		int height = this.dataTable.getClientArea().height;
+		int visibleItemCount = height / this.dataTable.getItemHeight() - 1;
+		int topIndex = this.dataTable.getTopIndex();
+		int itemCount = this.dataTable.getItemCount();
+		if (itemCount > visibleItemCount) {
+			int newTopIndex = itemCount - visibleItemCount;
+			if (topIndex != newTopIndex)
+				this.dataTable.setTopIndex(newTopIndex);
+		}
 	}
 }

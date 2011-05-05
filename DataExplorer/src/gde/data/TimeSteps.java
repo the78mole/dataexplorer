@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.data;
 
+import java.text.SimpleDateFormat;
 import java.util.Vector;
 import gde.log.Level;
 import java.util.logging.Logger;
@@ -27,11 +28,12 @@ import java.util.logging.Logger;
  * @author Winfried Brügmann
  */
 public class TimeSteps extends Vector<Integer> {
-	final static String	$CLASS_NAME				= RecordSet.class.getName();
-	final static long		serialVersionUID	= 26031957;
-	final static Logger	log								= Logger.getLogger(RecordSet.class.getName());
+	final static String			$CLASS_NAME				= RecordSet.class.getName();
+	final static long				serialVersionUID	= 26031957;
+	final static Logger			log								= Logger.getLogger(RecordSet.class.getName());
 
-	final boolean				isConstant;							// true if the time step is constant and the consumed time is a number of measurement points * timeStep_ms
+	final boolean						isConstant;				// true if the time step is constant and the consumed time is a number of measurement points * timeStep_ms
+	final SimpleDateFormat	timeFormat				= new SimpleDateFormat("HH:mm:ss:SSS");
 	
 	/**
 	 * Constructs a new TimeSteps class, a give time step greater than 0 signals that the time step is constant between measurement points
@@ -40,6 +42,7 @@ public class TimeSteps extends Vector<Integer> {
 	 */
 	public TimeSteps(double newTimeStep_ms) {
 		super(1, 1);
+		this.timeFormat.getTimeZone().setRawOffset(0);
 		this.isConstant = newTimeStep_ms > 0;
 		if (this.isConstant) 
 			super.add((int) (newTimeStep_ms * 10));
@@ -121,6 +124,17 @@ public class TimeSteps extends Vector<Integer> {
 		synchronized (this) {
 			return this.isConstant ? (index == 0 ? 0.0 : this.get(0) / 10.0 * index) : (index < 0 ? this.firstElement() : index > elementCount - 1 ? this.lastElement() / 10.0 : this.get(index) / 10.0);
 		}
+	}
+
+	/**
+	 * query time at an index position and return as HH:mm:ss:SSS formated string
+	 * @param formatPattern yy:mm:dd HH:mm:ss:SSS
+	 * @param index
+	 * @return time fit to index
+	 */
+	public String getFormattedTime(String formatPattern, int index) {
+		this.timeFormat.applyPattern(formatPattern);			
+		return String.format("%25s", this.timeFormat.format(this.getTime_ms(index)));
 	}
 
 	/**

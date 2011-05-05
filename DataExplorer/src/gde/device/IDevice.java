@@ -761,8 +761,8 @@ public interface IDevice {
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
-	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
-	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param doUpdateProgressBar
@@ -772,8 +772,8 @@ public interface IDevice {
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
-	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
-	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
@@ -785,7 +785,7 @@ public interface IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex);
+	public String[] prepareDataTableRow(RecordSet recordSet, String[] tableRow, int rowIndex);
 	
 	/**
 	 * function to translate measured value from a device to values represented
