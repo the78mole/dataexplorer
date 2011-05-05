@@ -276,32 +276,33 @@ public class GathererThread extends Thread {
 						}
 						break;
 					}
-				}
-				else { // no program is executing, wait for 180 seconds max. for actions
-					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2200));
-					log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation"); //$NON-NLS-1$
 
-					if (recordSet1 != null && recordSet1.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
+					if (!this.isProgrammExecuting1 && recordSet1 != null && recordSet1.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(recordSet1.getName());
 						this.isProgrammExecuting1 = false;
 						recordSet1 = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
 						this.application.openMessageDialogAsync(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2204, new String[] { "1" })); //$NON-NLS-1$
 					}
-					if (recordSet2 != null && recordSet2.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
+					if (!this.isProgrammExecuting2 && recordSet2 != null && recordSet2.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(recordSet2.getName());
 						this.isProgrammExecuting2 = false;
 						recordSet2 = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
 						this.application.openMessageDialogAsync(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2204, new String[] { "2" })); //$NON-NLS-1$
 					}
-					if (recordSet3 != null && recordSet3.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
+					if (!this.isProgrammExecuting3 && recordSet3 != null && recordSet3.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(recordSet3.getName());
 						this.isProgrammExecuting3 = false;
 						recordSet3 = null;
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
 						this.application.openMessageDialogAsync(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2204, new String[] { "3" })); //$NON-NLS-1$
 					}
+				}
+				else { // no program is executing, wait for 180 seconds max. for actions
+					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2200));
+					log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation"); //$NON-NLS-1$
+					
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2203));
