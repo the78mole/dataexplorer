@@ -99,8 +99,8 @@ public class eStationBC6 extends eStation {
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
-	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
-	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize

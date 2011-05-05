@@ -135,7 +135,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
-	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
 	 * this method is more usable for real logger, where data can be stored and converted in one block
 	 * @param recordSet
 	 * @param dataBuffer
@@ -347,8 +347,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
-	 * do not forget to call makeInActiveDisplayable afterwords to calualte th emissing data
-	 * since this is a long term operation the progress bar should be updated to signal busyness to user 
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
@@ -422,16 +422,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	public String[] prepareDataTableRow(RecordSet recordSet, int rowIndex) {
-		String[] dataTableRow = new String[recordSet.size()+1]; // this.device.getMeasurementNames(this.channelNumber).length
+	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames();				
-			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
-			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
-			int numberRecords = recordNames.length;			
-			
-			dataTableRow[0] = String.format("%.3f", (recordSet.getTime_ms(rowIndex) / 1000.0));
-			for (int j = 0; j < numberRecords; j++) {
+			String[] recordNames = recordSet.getRecordNames(); 
+			for (int j = 0; j < recordNames.length; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
@@ -519,7 +513,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		if (recordSet.isRaw()) {
 			// calculate the values required
 			try {
-				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
+				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg. 6=Balance (BC6, P6, ..)
+				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
 				String[] recordNames = recordSet.getRecordNames();
 				int displayableCounter = 0;
 
@@ -528,14 +523,14 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				for (String measurementKey : recordNames) {
 					Record record = recordSet.get(measurementKey);
 					
-					if (record.isActive() && (record.getOrdinal() <= 5 || record.getRealMaxValue() != 0 || record.getRealMinValue() != record.getRealMaxValue())) {
+					if (record.isActive() && (record.getOrdinal() <= 6 || record.hasReasonableData())) {
 						++displayableCounter;
 					}
 				}
 				
 				String recordKey = recordNames[3]; //3=Leistung
 				Record record = recordSet.get(recordKey);
-				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
+				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
 					try {
 						this.calculationThreads.get(recordKey).start();
@@ -548,7 +543,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				
 				recordKey = recordNames[4]; //4=Energie
 				record = recordSet.get(recordKey);
-				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
+				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
 					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
 					try {
 						this.calculationThreads.get(recordKey).start();
