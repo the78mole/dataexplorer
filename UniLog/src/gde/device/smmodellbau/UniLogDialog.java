@@ -1028,7 +1028,6 @@ public class UniLogDialog extends DeviceDialog {
 									public void paintControl(PaintEvent evt) {
 										if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dataReadGroup.paintControl, event=" + evt); //$NON-NLS-1$
 										int index = UniLogDialog.this.application.getActiveChannelNumber() - 1;
-										System.out.println(index);
 										UniLogDialog.this.configurationNames = new String[UniLogDialog.this.device.getChannelCount()];
 										for (int i = 0; i < UniLogDialog.this.configurationNames.length; i++) {
 											UniLogDialog.this.configurationNames[i] = " " + UniLogDialog.this.device.getChannelName(i + 1); //$NON-NLS-1$
