@@ -29,7 +29,6 @@ import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.utils.TimeLine;
 import gde.utils.WaitTimer;
 
 import java.util.logging.Logger;
@@ -47,26 +46,19 @@ public class GathererThread extends Thread {
 	final DataExplorer				application;
 	final UltramatSerialPort	serialPort;
 	final Ultramat						device;
-	final UltraDuoPlusDialog	dialog;
 	final Channels						channels;
 
 	String										recordSetKey1								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 	String										recordSetKey2								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 	String										recordSetKey3								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
-	boolean										isGatheredRecordSetVisible	= true;
 	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;													// 180 * 1 sec
 	boolean										isCollectDataStopped				= false;
 
 	boolean										isProgrammExecuting1				= false;
 	boolean										isProgrammExecuting2				= false;
 	boolean										isProgrammExecuting3				= false;
+	boolean[]									isAlerted4Finish						= {false, false, false, false};
 	boolean										isCombinedMode							= false;
-	long											startCycleTime1							= 0;
-	long											startCycleTime2							= 0;
-	long											startCycleTime3							= 0;
-	long											measurementCount1						= 0;
-	long											measurementCount2						= 0;
-	long											measurementCount3						= 0;
 
 	/**
 	 * data gatherer thread definition 
@@ -78,7 +70,6 @@ public class GathererThread extends Thread {
 		super("dataGatherer"); //$NON-NLS-1$
 		this.application = DataExplorer.getInstance();
 		this.device = (Ultramat) this.application.getActiveDevice();
-		this.dialog = null;//(UltraDuoPlusDialog) this.device.getDialog();
 		this.serialPort = this.device.getCommunicationPort();
 		this.channels = Channels.getInstance();
 
@@ -99,12 +90,6 @@ public class GathererThread extends Thread {
 		this.isProgrammExecuting1 = false;
 		this.isProgrammExecuting2 = false;
 		this.isProgrammExecuting3 = false;
-		this.startCycleTime1 = 0;
-		this.startCycleTime2 = 0;
-		this.startCycleTime3 = 0;
-		this.measurementCount1 = 0;
-		this.measurementCount2 = 0;
-		this.measurementCount3 = 0;
 		Object[] ch1, ch2, ch3;
 
 		this.isCollectDataStopped = false;
@@ -151,20 +136,16 @@ public class GathererThread extends Thread {
 
 					case Ultramat16S:
 					case Ultramat18:
-						ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
+						ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1);
 						recordSet1 = (RecordSet) ch1[0];
 						this.recordSetKey1 = (String) ch1[1];
-						this.measurementCount1 = (Long) ch1[2];
-						this.startCycleTime1 = (Long) ch1[3];
 						break;
 
 					case UltraTrioPlus14:
 						if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
-							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
+							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1);
 							recordSet1 = (RecordSet) ch1[0];
 							this.recordSetKey1 = (String) ch1[1];
-							this.measurementCount1 = (Long) ch1[2];
-							this.startCycleTime1 = (Long) ch1[3];
 						}
 						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
 							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
@@ -172,11 +153,9 @@ public class GathererThread extends Thread {
 							System.arraycopy(dataBuffer, 49, buffer, 9, 2); //copy operation mode
 							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
 							System.arraycopy(dataBuffer, 51, buffer, 13, 24);
-							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
+							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2);
 							recordSet2 = (RecordSet) ch2[0];
 							this.recordSetKey2 = (String) ch2[1];
-							this.measurementCount2 = (Long) ch2[2];
-							this.startCycleTime2 = (Long) ch2[3];
 						}
 						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
 							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
@@ -184,21 +163,17 @@ public class GathererThread extends Thread {
 							System.arraycopy(dataBuffer, 75, buffer, 9, 2); //copy operation mode
 							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
 							System.arraycopy(dataBuffer, 77, buffer, 13, 24);
-							ch3 = processDataChannel(3, recordSet3, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
+							ch3 = processDataChannel(3, recordSet3, this.recordSetKey2, buffer, points3);
 							recordSet3 = (RecordSet) ch3[0];
-							this.recordSetKey2 = (String) ch3[1];
-							this.measurementCount2 = (Long) ch3[2];
-							this.startCycleTime2 = (Long) ch3[3];
+							this.recordSetKey3 = (String) ch3[1];
 						}
 						break;
 						
 					case UltraTrioPlus16S:
 						if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
-							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
+							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1);
 							recordSet1 = (RecordSet) ch1[0];
 							this.recordSetKey1 = (String) ch1[1];
-							this.measurementCount1 = (Long) ch1[2];
-							this.startCycleTime1 = (Long) ch1[3];
 						}
 						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
 							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
@@ -206,11 +181,9 @@ public class GathererThread extends Thread {
 							System.arraycopy(dataBuffer, 57, buffer, 9, 2); //copy operation mode
 							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
 							System.arraycopy(dataBuffer, 59, buffer, 13, 24);
-							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
+							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2);
 							recordSet2 = (RecordSet) ch2[0];
 							this.recordSetKey2 = (String) ch2[1];
-							this.measurementCount2 = (Long) ch2[2];
-							this.startCycleTime2 = (Long) ch2[3];
 						}
 						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
 							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
@@ -218,85 +191,67 @@ public class GathererThread extends Thread {
 							System.arraycopy(dataBuffer, 83, buffer, 9, 2); //copy operation mode
 							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
 							System.arraycopy(dataBuffer, 85, buffer, 13, 24);
-							ch3 = processDataChannel(3, recordSet3, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
+							ch3 = processDataChannel(3, recordSet3, this.recordSetKey2, buffer, points3);
 							recordSet3 = (RecordSet) ch3[0];
-							this.recordSetKey2 = (String) ch3[1];
-							this.measurementCount2 = (Long) ch3[2];
-							this.startCycleTime2 = (Long) ch3[3];
+							this.recordSetKey3 = (String) ch3[1];
 						}
 						break;
 
 					case UltraDuoPlus45:
 						if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
-							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
+							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1);
 							recordSet1 = (RecordSet) ch1[0];
 							this.recordSetKey1 = (String) ch1[1];
-							this.measurementCount1 = (Long) ch1[2];
-							this.startCycleTime1 = (Long) ch1[3];
 						}
 						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
 							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
 							System.arraycopy(dataBuffer, 97, buffer, 11, 8); //sync to same value positions, only point array length is different
 							buffer[19] = buffer[20] = 48; //blank out cycle number
 							System.arraycopy(dataBuffer, 105, buffer, 21, 41);
-							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
+							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2);
 							recordSet2 = (RecordSet) ch2[0];
 							this.recordSetKey2 = (String) ch2[1];
-							this.measurementCount2 = (Long) ch2[2];
-							this.startCycleTime2 = (Long) ch2[3];
 						}
 						break;
 
 					case UltraDuoPlus60:
 						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
 							this.isCombinedMode = true;
-							ch3 = processDataChannel(3, recordSet3, this.recordSetKey3, dataBuffer, points3, this.measurementCount3, this.startCycleTime3);
+							ch3 = processDataChannel(3, recordSet3, this.recordSetKey3, dataBuffer, points3);
 							recordSet3 = (RecordSet) ch3[0];
 							this.recordSetKey3 = (String) ch3[1];
-							this.measurementCount3 = (Long) ch3[2];
-							this.startCycleTime3 = (Long) ch3[3];
 						}
 						else {
 							if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
-								ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1, this.measurementCount1, this.startCycleTime1);
+								ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1);
 								recordSet1 = (RecordSet) ch1[0];
 								this.recordSetKey1 = (String) ch1[1];
-								this.measurementCount1 = (Long) ch1[2];
-								this.startCycleTime1 = (Long) ch1[3];
 							}
 							if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
 								byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
 								System.arraycopy(dataBuffer, buffer.length - 5, buffer, 0, buffer.length);
-								ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2, this.measurementCount2, this.startCycleTime2);
+								ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2);
 								recordSet2 = (RecordSet) ch2[0];
 								this.recordSetKey2 = (String) ch2[1];
-								this.measurementCount2 = (Long) ch2[2];
-								this.startCycleTime2 = (Long) ch2[3];
 							}
 						}
 						break;
 					}
-
+					
 					if (!this.isProgrammExecuting1 && recordSet1 != null && recordSet1.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(recordSet1.getName());
 						this.isProgrammExecuting1 = false;
 						recordSet1 = null;
-						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
-						this.application.openMessageDialogAsync(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2204, new String[] { "1" })); //$NON-NLS-1$
 					}
 					if (!this.isProgrammExecuting2 && recordSet2 != null && recordSet2.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(recordSet2.getName());
 						this.isProgrammExecuting2 = false;
 						recordSet2 = null;
-						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
-						this.application.openMessageDialogAsync(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2204, new String[] { "2" })); //$NON-NLS-1$
 					}
 					if (!this.isProgrammExecuting3 && recordSet3 != null && recordSet3.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(recordSet3.getName());
 						this.isProgrammExecuting3 = false;
 						recordSet3 = null;
-						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset retry counter 180 sec
-						this.application.openMessageDialogAsync(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2204, new String[] { "3" })); //$NON-NLS-1$
 					}
 				}
 				else { // no program is executing, wait for 180 seconds max. for actions
@@ -305,7 +260,7 @@ public class GathererThread extends Thread {
 					
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2203));
+						this.application.openMessageDialogAsync(null, Messages.getString(MessageIds.GDE_MSGI2203));
 						stopDataGatheringThread(false, null);
 					}
 				}
@@ -342,7 +297,7 @@ public class GathererThread extends Thread {
 					log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(this.dialog != null && this.dialog.getDialogShell() != null ? this.dialog.getDialogShell() : null, Messages.getString(MessageIds.GDE_MSGI2200));
+						this.application.openMessageDialogAsync(null, Messages.getString(MessageIds.GDE_MSGI2200));
 						stopDataGatheringThread(false, null);
 					}
 				}
@@ -364,16 +319,13 @@ public class GathererThread extends Thread {
 	 * @param recordSetKey
 	 * @param dataBuffer
 	 * @param points
-	 * @param measurementCount
-	 * @param startCycleTime
-	 * @param numCells
-	 * @return object array with updated values {recordSet, recordSetKey, measurementCount, startCycleTime, numCells}
+	 * @return object array with updated values {recordSet, recordSetKey}
 	 * @throws DataInconsitsentException
 	 */
-	private Object[] processDataChannel(int number, RecordSet recordSet, String recordSetKey, byte[] dataBuffer, int[] points, long measurementCount, long startCycleTime)
+	private Object[] processDataChannel(int number, RecordSet recordSet, String recordSetKey, byte[] dataBuffer, int[] points)
 			throws DataInconsitsentException {
 		final String $METHOD_NAME = "processOutlet"; //$NON-NLS-1$
-		Object[] result = new Object[4];
+		Object[] result = new Object[2];
 		// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
 		int processNumber = this.device.getProcessingMode(dataBuffer);
 		String processName = this.device.USAGE_MODE[processNumber];
@@ -414,6 +366,10 @@ public class GathererThread extends Thread {
 				recordSet = channel.get(recordSetKey);
 				this.device.setTemperatureUnit(number, recordSet, dataBuffer); //°C or °F
 				recordSet.setAllDisplayable();
+				channel.applyTemplate(recordSetKey, false);
+				// switch the active record set if the current record set is child of active channel
+				this.channels.switchChannel(channel.getNumber(), recordSetKey);
+				channel.switchRecordSet(recordSetKey);
 				String description = recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR 
 					+ "Firmware  : " + this.device.firmware //$NON-NLS-1$
 					+ (this.device.getBatteryMemoryNumber(number, dataBuffer) >= 1 ? "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer) : GDE.STRING_EMPTY); //$NON-NLS-1$
@@ -429,34 +385,27 @@ public class GathererThread extends Thread {
 					// ignore and do not append memory name
 				}
 				recordSet.setRecordSetDescription(description);
-				channel.applyTemplate(recordSetKey, false);
-				// switch the active record set if the current record set is child of active channel
-				this.channels.switchChannel(channel.getNumber(), recordSetKey);
-				channel.switchRecordSet(recordSetKey);
-				measurementCount = 0;
-				startCycleTime = 0;
+				
+				// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
+				if (processNumber >= 4 && !isAlerted4Finish[number]) {
+					this.application.openMessageDialogAsync(null, Messages.getString(MessageIds.GDE_MSGI2204, new Object[] { number }));
+					isAlerted4Finish[number] = true;
+				}
+				else {
+					isAlerted4Finish[number] = false;
+				}
 			}
 
-			// prepare the data for adding to record set
-			this.isGatheredRecordSetVisible = recordSetKey.equals(channel.getActiveRecordSet().getName());
-			long tmpCycleTime = System.nanoTime() / 1000000;
-			if (measurementCount++ == 0) {
-				startCycleTime = tmpCycleTime;
-			}
-
-			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
-			log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
+			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
 
 			GathererThread.this.application.updateAllTabs(false);
 
-			if (measurementCount < 3 || measurementCount % 10 == 0) {
+			if (recordSet.get(0).realSize() < 3 || recordSet.get(0).realSize() % 10 == 0) {
 				this.device.updateVisibilityStatus(recordSet, true);
 			}
 		}
 		result[0] = recordSet;
 		result[1] = recordSetKey;
-		result[2] = measurementCount;
-		result[3] = startCycleTime;
 		return result;
 	}
 
@@ -481,10 +430,9 @@ public class GathererThread extends Thread {
 	}
 
 	/**
-	 * close port, set isDisplayable according channel configuration and calculate slope
+	 * set isDisplayable according channel configuration and calculate slope
 	 */
 	void finalizeRecordSet(String recordSetKey) {
-		//if (doClosePort && this.isPortOpenedByLiveGatherer && this.serialPort.isConnected()) this.serialPort.close();
 
 		RecordSet tmpRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
 		if (tmpRecordSet != null) {
@@ -512,7 +460,7 @@ public class GathererThread extends Thread {
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 				this.application.updateStatisticsData();
 				this.application.updateDataTable(recordSetKey, true);
-				this.application.openMessageDialog(GathererThread.this.dialog.getDialogShell(), message);
+				this.application.openMessageDialog(null, message);
 			}
 			else {
 				final String useRecordSetKey = recordSetKey;
@@ -521,13 +469,13 @@ public class GathererThread extends Thread {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						GathererThread.this.application.updateStatisticsData();
 						GathererThread.this.application.updateDataTable(useRecordSetKey, true);
-						GathererThread.this.application.openMessageDialog(GathererThread.this.dialog.getDialogShell(), message);
+						GathererThread.this.application.openMessageDialog(null, message);
 					}
 				});
 			}
 		}
 		else
-			this.application.openMessageDialog(this.dialog.getDialogShell(), message);
+			this.application.openMessageDialog(null, message);
 	}
 
 	/**
