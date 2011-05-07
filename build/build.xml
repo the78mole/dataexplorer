@@ -191,6 +191,9 @@
 		<condition property="isWindows">
 			<os name="Windows 2003" />
 		</condition>
+		<condition property="isWindows">
+			<os name="Windows 7" />
+		</condition>
 		<antcall target="Windows" />
 		<condition property="isMAC">
 			<os name="Mac OS" />
