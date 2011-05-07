@@ -163,8 +163,12 @@ public class Record extends Vector<Integer> {
 
 	//current drop, make curve capable to be smoothed
 	boolean             isCurrentRecord = false;
-	int             		dropIndex 			= 0;
-	int             		dropRunout 			= 15;
+	int             		dropStartIndex 	= 0;
+	int             		dropEndIndex 		= 0;
+	int             		dropStartValue 	= 0;
+	int             		dropEndValue 		= 0;
+	int             		dropDeltaValue 	= 0;
+	int             		dropRunout 			= 5;
 
 	// measurement
 	boolean							isMeasurementMode				= false;
@@ -489,16 +493,25 @@ public class Record extends Vector<Integer> {
 		
 		//add shadow data points to detect current drops to nearly zero
 		if (this.isCurrentRecord ) {
-			int index = this.size();
-			if (this.size() > 5 && point < 50 && (point << 2) < this.maxValue) {
-				this.dropIndex = index;
-				this.parent.currentDropShadow.add(1);
-				this.parent.currentDropShadow.set(this.dropIndex-1, 1); // drop run in
+			int index = super.size();
+			if (index > 5) {
+				if (point < 50 && (point << 2) < this.maxValue) {
+					this.parent.currentDropShadow.add(1);
+					if (this.dropStartIndex == 0) {
+						this.dropStartIndex = index;
+						this.parent.currentDropShadow.set(this.dropStartIndex - 1, 1); // drop run in
+					}
+					this.dropEndIndex = index;
+					this.dropRunout = (index - this.dropStartIndex) * 3;
+				}
+				else { //drop run out
+					if (index < (this.dropEndIndex + this.dropRunout))	this.parent.currentDropShadow.add(1);
+					else 																								this.parent.currentDropShadow.add(0);
+					
+					this.dropStartIndex = 0;
+				}
 			}
-			else { //drop run out
-				if(this.dropIndex > 5 && index < (this.dropIndex + this.dropRunout))	this.parent.currentDropShadow.add(1);
-				else																																	this.parent.currentDropShadow.add(0);
-			}
+			else this.parent.currentDropShadow.add(0);
 		}
 		return super.add(point);
 	}
@@ -939,10 +952,21 @@ public class Record extends Vector<Integer> {
 		}
 		//log.log(Level.INFO, "index=" + index);
 		if (size != 0) {
-			if (!this.parent.isCompareSet && this.parent.isSmoothAtCurrentDrop && size > (index + this.dropRunout) && this.parent.currentDropShadow.get(index) == 1) {
-				int tmpValue = this.get(index - 1);
-				return tmpValue + ((super.get(index + this.dropRunout) - tmpValue) / 3);
+			if (!this.parent.isCompareSet && this.parent.isSmoothAtCurrentDrop && this.parent.currentDropShadow.get(index) == 1) {
+				if (this.dropStartIndex == 0) {
+					this.dropStartIndex = this.dropEndIndex = index;
+					this.dropStartValue = super.get(index);
+					while(this.parent.currentDropShadow.get(this.dropEndIndex) == 1){
+						this.dropEndValue = super.get(this.dropEndIndex);
+						if (this.dropEndIndex + 1 > size-1)
+							break;
+						++this.dropEndIndex;
+					}
+					this.dropDeltaValue = (this.dropStartValue - this.dropEndValue) / (this.dropEndIndex - this.dropStartIndex);
+				}
+				return this.dropStartValue + this.dropDeltaValue * (this.dropStartIndex - index);
 			}
+			this.dropStartIndex = 0;
 			return super.get(index);
 		}
 		return 0;
