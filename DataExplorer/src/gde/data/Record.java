@@ -167,8 +167,8 @@ public class Record extends Vector<Integer> {
 	int             		dropEndIndex 		= 0;
 	int             		dropStartValue 	= 0;
 	int             		dropEndValue 		= 0;
-	int             		dropDeltaValue 	= 0;
-	int             		dropRunout 			= 5;
+	double             	dropDeltaValue 	= 0;
+	boolean             dropIndexWritten 			= true;
 
 	// measurement
 	boolean							isMeasurementMode				= false;
@@ -492,26 +492,30 @@ public class Record extends Vector<Integer> {
 		if(log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		//add shadow data points to detect current drops to nearly zero
-		if (this.isCurrentRecord ) {
+		if (this.isCurrentRecord && super.size() > 5 ) {
 			int index = super.size();
-			if (index > 5) {
-				if (point < 50 && (point << 2) < this.maxValue) {
-					this.parent.currentDropShadow.add(1);
-					if (this.dropStartIndex == 0) {
-						this.dropStartIndex = index;
-						this.parent.currentDropShadow.set(this.dropStartIndex - 1, 1); // drop run in
-					}
-					this.dropEndIndex = index;
-					this.dropRunout = (index - this.dropStartIndex) * 3;
+			//check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
+			if (point < 50 && (point << 2) < this.maxValue && this.maxValue > 200) {
+				if (this.dropStartIndex == 0) {
+					this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
 				}
-				else { //drop run out
-					if (index < (this.dropEndIndex + this.dropRunout))	this.parent.currentDropShadow.add(1);
-					else 																								this.parent.currentDropShadow.add(0);
-					
+				else if (!this.dropIndexWritten) { // run into another drop while previous one is not handled
+					this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, this.dropEndIndex-2});
+					this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement					
+					this.dropIndexWritten = true;
+				}
+				this.dropEndIndex = index + ((index - this.dropStartIndex) * 3);
+			}
+			else { // normal data point
+				if (index > this.dropEndIndex && this.dropStartIndex != 0) {
+					this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, this.dropEndIndex});
 					this.dropStartIndex = 0;
+					this.dropIndexWritten = true;
+				}
+				else if (this.dropStartIndex != 0) {
+					this.dropIndexWritten = false;
 				}
 			}
-			else this.parent.currentDropShadow.add(0);
 		}
 		return super.add(point);
 	}
@@ -952,21 +956,16 @@ public class Record extends Vector<Integer> {
 		}
 		//log.log(Level.INFO, "index=" + index);
 		if (size != 0) {
-			if (!this.parent.isCompareSet && this.parent.isSmoothAtCurrentDrop && this.parent.currentDropShadow.get(index) == 1) {
-				if (this.dropStartIndex == 0) {
-					this.dropStartIndex = this.dropEndIndex = index;
-					this.dropStartValue = super.get(index);
-					while(this.parent.currentDropShadow.get(this.dropEndIndex) == 1){
-						this.dropEndValue = super.get(this.dropEndIndex);
-						if (this.dropEndIndex + 1 > size-1)
-							break;
-						++this.dropEndIndex;
+			if (!this.parent.isCompareSet && this.parent.isSmoothAtCurrentDrop) {
+				for (Integer[] dropArea :  this.parent.currentDropShadow) {
+					if (dropArea[0] <= index && dropArea[1] >= index) {
+						this.dropStartValue = super.get(dropArea[0]);
+						this.dropEndValue = super.get(dropArea[1]);
+						this.dropDeltaValue = (double)(this.dropEndValue - this.dropStartValue) / (dropArea[1] - dropArea[0]);
+						return (int) (this.dropStartValue + this.dropDeltaValue * (index - dropArea[0]));
 					}
-					this.dropDeltaValue = (this.dropStartValue - this.dropEndValue) / (this.dropEndIndex - this.dropStartIndex);
 				}
-				return this.dropStartValue + this.dropDeltaValue * (this.dropStartIndex - index);
 			}
-			this.dropStartIndex = 0;
 			return super.get(index);
 		}
 		return 0;
