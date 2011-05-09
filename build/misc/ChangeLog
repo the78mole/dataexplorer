@@ -17,6 +17,7 @@ fix - make battery type record dependent
 enable battery memory to object key matching for devices with battery memory management
 detect and switch wrong Ultramat device 
 update data table time format to HH:mm:ss
+update SWT to 3.7M7 (solving Mac OS update problem)
 
 
 Version 2.80 - 15 Apr 2011
