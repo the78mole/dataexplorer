@@ -180,7 +180,7 @@ public class GathererThread extends Thread {
 					}
 					
 					//switch off single cell voltage lines if no cell voltages is available
-					for (int i = posCells + this.numberBatteryCells; !isConfigUpdated && i < points.length; i++) {
+					for (int i = posCells + this.numberBatteryCells - 1; !isConfigUpdated && i < points.length; i++) {
 						Record tmpRecord = recordSet.get(recordKeys[i]);
 						tmpRecord.setActive(false);
 						tmpRecord.setDisplayable(false);

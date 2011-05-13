@@ -484,14 +484,16 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		String[] recordKeys = recordSet.getRecordNames();
 
+		//BC6 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg. 6=Balance
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
 		recordSet.setAllDisplayable();
 		for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
 			recordSet.get(recordKey).setActive(true);
 		}
-		for (int i=5; i<recordKeys.length; ++i) {
+		for (int i=6; i<recordKeys.length; ++i) {
 				Record record = recordSet.get(recordKeys[i]);
-				record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
-				log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData()));
+				record.setDisplayable(record.hasReasonableData());
+				log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + record.hasReasonableData());
 		}
 		
 		if (log.isLoggable(Level.FINE)) {
