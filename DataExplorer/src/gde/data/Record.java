@@ -500,11 +500,11 @@ public class Record extends Vector<Integer> {
 					this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
 				}
 				else if (!this.dropIndexWritten) { // run into another drop while previous one is not handled
-					this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, this.dropEndIndex-2});
+					this.parent.currentDropShadow.add(new Integer[]{this.dropStartIndex-2, index-2});
 					this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement					
 					this.dropIndexWritten = true;
 				}
-				this.dropEndIndex = index + ((index - this.dropStartIndex) * 3);
+				this.dropEndIndex = index + ((index - this.dropStartIndex) * 4);
 			}
 			else { // normal data point
 				if (index > this.dropEndIndex && this.dropStartIndex != 0) {
