@@ -33,6 +33,7 @@ import gde.device.IDevice;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
+import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -391,8 +392,11 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 					}
 					catch (SerialPortException e) {
 						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET_END);
-						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 						throw e;
+					}
+					catch (TimeOutException e) {
+						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET_END);
+						throw new SerialPortException(e.getMessage());
 					}
 					catch (Exception e) {
 						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET_END);
@@ -418,14 +422,15 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 				}
 				catch (SerialPortException e) {
 					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog != null ? this.dialog.getDialogShell() : null,
-							Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 					this.serialPort.close();
+					this.application.openMessageDialog(Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
+					this.application.getDeviceSelectionDialog().open();
 				}
 				catch (ApplicationConfigurationException e) {
-					this.application.openMessageDialog(this.dialog != null ? this.dialog.getDialogShell() : null, Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
-					this.application.getDeviceSelectionDialog().open();
+					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 					this.serialPort.close();
+					this.application.openMessageDialog(Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+					this.application.getDeviceSelectionDialog().open();
 				}
 				catch (Throwable e) {
 					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);

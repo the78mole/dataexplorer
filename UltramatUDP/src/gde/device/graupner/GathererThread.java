@@ -260,7 +260,7 @@ public class GathererThread extends Thread {
 					
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(null, Messages.getString(MessageIds.GDE_MSGI2203));
+						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2203));
 						stopDataGatheringThread(false, null);
 					}
 				}
@@ -297,7 +297,7 @@ public class GathererThread extends Thread {
 					log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
 						log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
-						this.application.openMessageDialogAsync(null, Messages.getString(MessageIds.GDE_MSGI2200));
+						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2200));
 						stopDataGatheringThread(false, null);
 					}
 				}
@@ -388,7 +388,7 @@ public class GathererThread extends Thread {
 				
 				// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
 				if (processNumber >= 4 && !isAlerted4Finish[number]) {
-					this.application.openMessageDialogAsync(null, Messages.getString(MessageIds.GDE_MSGI2204, new Object[] { number }));
+					this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2204, new Object[] { number }));
 					isAlerted4Finish[number] = true;
 				}
 				else {
@@ -460,7 +460,7 @@ public class GathererThread extends Thread {
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 				this.application.updateStatisticsData();
 				this.application.updateDataTable(recordSetKey, true);
-				this.application.openMessageDialog(null, message);
+				this.application.openMessageDialog(message);
 			}
 			else {
 				final String useRecordSetKey = recordSetKey;
@@ -469,13 +469,13 @@ public class GathererThread extends Thread {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						GathererThread.this.application.updateStatisticsData();
 						GathererThread.this.application.updateDataTable(useRecordSetKey, true);
-						GathererThread.this.application.openMessageDialog(null, message);
+						GathererThread.this.application.openMessageDialog(message);
 					}
 				});
 			}
 		}
 		else
-			this.application.openMessageDialog(null, message);
+			this.application.openMessageDialog(message);
 	}
 
 	/**
