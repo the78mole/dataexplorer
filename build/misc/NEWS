@@ -14,7 +14,8 @@ GNU DataExplorer - News - comes with version 2.81
 11)fix - make battery type record dependent
 12)enable battery memory to object key matching for devices with battery memory management
 13)update data table time format to HH:mm:ss
-14)update SWT to 3.7M7 (solving Mac OS update problem)
+14)update SWT to 3.7M7 (solving Mac OS 10.6.x update problem)
+15)update documantation
 
 
 
