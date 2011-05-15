@@ -934,13 +934,13 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.dischargeTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.dischargeTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2300));
 										{
-											this.dischargeCycleComposite = new Composite(this.chargeTypeTabFolder, SWT.BORDER);
+											this.dischargeCycleComposite = new Composite(this.chargeTypeTabFolder, SWT.NONE);
 											RowLayout scrolledComposite1Layout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
 											this.dischargeCycleComposite.setLayout(scrolledComposite1Layout);
 											this.dischargeTabItem.setControl(this.dischargeCycleComposite);
 											{
 												this.dischargeGroup = new Group(this.dischargeCycleComposite, SWT.NONE);
-												RowData dischargeGroupLData = new RowData(620, UltraDuoPlusDialog.this.dischargeSelectHeight);
+												RowData dischargeGroupLData = new RowData(630, UltraDuoPlusDialog.this.dischargeSelectHeight);
 												this.dischargeGroup.setLayoutData(dischargeGroupLData);
 												FillLayout memoryCompositeLayout = new FillLayout(SWT.VERTICAL);
 												this.dischargeGroup.setLayout(memoryCompositeLayout);
@@ -964,7 +964,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 											}
 											{
 												this.cycleGroup = new Group(this.dischargeCycleComposite, SWT.NONE);
-												RowData cycleGroupLData = new RowData(620, UltraDuoPlusDialog.this.cycleSelectHeight);
+												RowData cycleGroupLData = new RowData(630, UltraDuoPlusDialog.this.cycleSelectHeight);
 												this.cycleGroup.setLayoutData(cycleGroupLData);
 												FillLayout memoryCompositeLayout = new FillLayout(SWT.VERTICAL);
 												this.cycleGroup.setLayout(memoryCompositeLayout);
