@@ -18,6 +18,7 @@ enable battery memory to object key matching for devices with battery memory man
 detect and switch wrong Ultramat device 
 update data table time format to HH:mm:ss
 update SWT to 3.7M7 (solving Mac OS 10.6.x update problem)
+make UNIX USB2Serial driver visible
 update documentation 
 
 
