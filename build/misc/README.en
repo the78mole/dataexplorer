@@ -92,6 +92,7 @@ is received after executing launch.bat/lauchn.sh the Java version (java -version
 For Windows user: Depending of the used Windows version and patch level it might be required to install the latest 
 "Microsoft Visual C++ 2008 Redistributable Package" from www.microsoft.com/downloads (desktop icon, object link creation).
 For GNU/Linux user: RXTXcomm uses serial port locking mechanism, the application user must be part of uucp group.
+While facing problems with USB2Serial UART SiliconLabs cp210x refer to GNULinux_cp210x directory in download area.
 For Mac OS user: Same as for GNU/Linux user, but the /var/lock directory must be created, refer to RXTX_Post-Install_MacOS.txt
 
 Hint: It is planned to use the DataExplorer on different operating systems and share the data files, do not use special characters at all.

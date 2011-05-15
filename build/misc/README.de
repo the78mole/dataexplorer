@@ -90,7 +90,8 @@ Hinweis: Erscheint nach der Ausführung von DataExplorer.exe/DataExplorer folgend
 ist die installierte Java Version (java -version) zu alt und muss gegen eine aktuelle Version > 1.6 ausgetauscht werden.
 Für Windowsanwender: Je nach verwendeter Windows Version und Patchlevel kann es nötig sein das System mit dem 
 "Microsoft Visual C++ 2008 Redistributable Package" von www.microsoft.com/downloads nachzurüsten (Desktopicon, Objektlink).
-Füt GNU/Linux Anwender: RXTXcomm locked den seriellen Port über die Gruppe "uucp", welcher der Anwendungsnutzer angehören sollte
+Füt GNU/Linux Anwender: RXTXcomm locked den seriellen Port über die Gruppe "uucp", welcher der Anwendungsnutzer angehören sollte.
+Bei Problemen mit dem USB2Serial UART von SiliconLabs cp210x siehe das GNULinux_cp210x Verzeichnis im Downloadbereich.
 Für Mac OS Anwender: Hier gilt prinzipiell das Gleiche wie für GNU/Linux, nur dass das Verzeichnis /var/lock erst angelegt werden muss, siehe
 RXTX_Post-Install_MacOS.txt
 
