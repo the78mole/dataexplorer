@@ -1396,7 +1396,7 @@ public class DataExplorer extends Composite {
 	 * @return the object keys, if there are no object key defined return an empty string array
 	 */
 	public void selectObjectKey(final String newObjectKey) {
-		if (!this.getObjectKey().equals(newObjectKey)) {
+		if (this.settings != null && !this.getObjectKey().equals(newObjectKey)) {
 			String[] objectKeys = this.settings.getObjectList();
 			for (int searchSelectionIndex = 0; searchSelectionIndex < objectKeys.length; ++searchSelectionIndex) {
 				if (newObjectKey.equals(objectKeys[searchSelectionIndex])) {
