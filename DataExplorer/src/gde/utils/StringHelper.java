@@ -289,14 +289,21 @@ public class StringHelper {
 				try {
 					int portNumber = Integer.parseInt(tmpSerialPortList[i].substring(3));
 					String portDescription = DeviceSerialPortImpl.getWindowsPorts().get(portNumber)==null ? "" : DeviceSerialPortImpl.getWindowsPorts().get(portNumber);
-					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + " - " + portDescription;
+					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + portDescription;
 				}
 				catch (Exception e) {
 					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
 				}
 			}
-			else
-			serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
+			else if (GDE.IS_LINUX) {
+				String portName = OperatingSystemHelper.dereferenceLink("/dev/serial/by-id" , tmpSerialPortList[i].substring(tmpSerialPortList[i].lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+				if (portName.length() > 8)  // ./ttyUSB0
+					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + portName.substring(portName.indexOf("usb-")+4, portName.length()-11);
+				else 
+					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
+			}
+			else 
+				serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
 		}
 		return serialPortList;
 	}

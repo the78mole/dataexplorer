@@ -821,4 +821,35 @@ public class OperatingSystemHelper {
 		}
 		return isMember;
 	}
+	
+	/**
+	 * dereference symbolic link using grep command
+	 * @param grepChunk
+	 * @return
+	 */
+	public static String dereferenceLink(String directory, String grepChunk) {
+		String result = grepChunk;
+		try {
+			String[] command = {"/bin/sh", "-c", "ls -l " + directory + " | grep " + grepChunk};  //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.FINE, "executing: ls -l " + directory + " | grep " + grepChunk);//$NON-NLS-1$ //$NON-NLS-2$
+			Process process = new ProcessBuilder(command).start(); 
+			process.waitFor();
+			BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			String line;
+			while ((line = bisr.readLine()) != null) {
+				log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
+				if (line.contains("->"))
+					result = line.substring(0, line.lastIndexOf("->")-1); //$NON-NLS-1$
+			}
+			while ((line = besr.readLine()) != null) {
+				log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
+			}
+			besr.close();
+			bisr.close();
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+		}
+		return result;
+	}
 }
