@@ -1,0 +1,3 @@
+While using cp210x USB to serial driver and kernel messages saying cp210x_open - Unable to enable UART replace the cp210x module in kernel
+The attached module was compiled using the linux-source-2.6.38 (2.6.38-8.42).
+Refer to http://pharos.ece.utexas.edu/wiki/index.php/Fixing_the_cp210x_open_-_Unable_to_enable_UART_Error_-_04/17/2011 for manual update.
