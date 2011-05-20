@@ -161,9 +161,9 @@ public class GathererThread extends Thread {
 							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
 							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
 							System.arraycopy(dataBuffer, 75, buffer, 9, 2); //copy operation mode
-							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
+							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 3 does not support cycles
 							System.arraycopy(dataBuffer, 77, buffer, 13, 24);
-							ch3 = processDataChannel(3, recordSet3, this.recordSetKey2, buffer, points3);
+							ch3 = processDataChannel(3, recordSet3, this.recordSetKey3, buffer, points3);
 							recordSet3 = (RecordSet) ch3[0];
 							this.recordSetKey3 = (String) ch3[1];
 						}
@@ -191,7 +191,7 @@ public class GathererThread extends Thread {
 							System.arraycopy(dataBuffer, 83, buffer, 9, 2); //copy operation mode
 							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
 							System.arraycopy(dataBuffer, 85, buffer, 13, 24);
-							ch3 = processDataChannel(3, recordSet3, this.recordSetKey2, buffer, points3);
+							ch3 = processDataChannel(3, recordSet3, this.recordSetKey3, buffer, points3);
 							recordSet3 = (RecordSet) ch3[0];
 							this.recordSetKey3 = (String) ch3[1];
 						}
@@ -351,7 +351,7 @@ public class GathererThread extends Thread {
 							extend.append(GDE.STRING_COLON).append(cycleNumber);
 						}
 						else {
-							extend.append(GDE.STRING_MESSAGE_CONCAT);				
+							if (processingType.length() > 0 ) extend.append(GDE.STRING_MESSAGE_CONCAT);				
 							extend.append(Messages.getString(MessageIds.GDE_MSGT2302)).append(GDE.STRING_COLON).append(cycleNumber);
 						}
 					}			
