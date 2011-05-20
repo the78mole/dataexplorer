@@ -1,6 +1,12 @@
 Development history / change log, please read from bottom up
 
-Version 2.81 - xx 2011
+Version 2.82 - xy May 2011
+
+UniLog refine efficiency calculation, fix typo in device XML
+UltramatTrioPlus devices fix bug while data gathering output channel 3
+
+
+Version 2.81 - 15 May 2011
 
 update Graupner Ultra Duo Plus 60 to select object key in dependency of battery memory
 add Graupmer Ultramat 12

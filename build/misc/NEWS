@@ -1,22 +1,7 @@
-GNU DataExplorer - News - comes with version 2.81
+GNU DataExplorer - News - comes with version 2.82
 
-1) update Graupner Ultra Duo Plus 60 to select object key in dependency of battery memory
-2) add Graupmer Ultramat 12
-3) add Graupmer Ultramat 16
-4) add Graupmer Ultramat 16S
-5) add Graupmer Ultramat Trio Plus 14
-6) add Graupmer Ultramat Trio Plus 16S
-7) add Graupmer Ultramat 18
-8) add Graupmer UltraDuoPlus 45
-9) eStations fix do not display empty balance curve 
-10)enable smooth curves at current drop in context menu
-11)fix - problem while updating/switching object image
-11)fix - make battery type record dependent
-12)enable battery memory to object key matching for devices with battery memory management
-13)update data table time format to HH:mm:ss
-14)update SWT to 3.7M7 (solving Mac OS 10.6.x update problem)
-15)make UNIX USB2Serial driver visible
-16)update documantation
+1) UniLog refine efficiency calculation, fix typo in device XML
+2) UltramatTrioPlus devices fix bug while data gathering output channel 3
 
 
 
