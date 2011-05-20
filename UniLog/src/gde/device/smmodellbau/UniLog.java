@@ -796,11 +796,17 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			Record recordPower = recordSet.get(measurements[4]); // 4=power [w]
 			property = record.getProperty(UniLog.PROP_N_100_W);
 			int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
+			recordCurrent = recordSet.get(measurements[2]); // 2=current
 			for (int i = 0; i < recordRevolution.size(); i++) {
-				double motorPower = Math.pow(((recordRevolution.get(i) * rpmFactor / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
-				//if (recordRevolution.get(i)> 100) log.log(Level.INFO, "recordPower=" + recordPower.get(i) + " motorPower=" + motorPower);
-				double eta = (recordPower.get(i)) > motorPower ? (motorPower * 100.0) / recordPower.get(i) : 0.0;
-				record.add(Double.valueOf(eta * 1000).intValue());
+				if (i > 1 && recordRevolution.get(i)> 100000 && recordCurrent.get(i) > 3000) { //100 1/min && 3A
+					double motorPower = Math.pow(((recordRevolution.get(i) * rpmFactor / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
+					double eta = motorPower * 100.0 / recordPower.get(i);
+					eta = eta > 100 ? record.lastElement()/1000.0 : eta < 0 ? 0 : eta;
+					if (log.isLoggable(Level.FINER)) 
+						log.log(Level.FINER, String.format("current=%5.1f; recordRevolution=%5.0f; recordPower=%6.2f; motorPower=%6.2f eta=%5.1f", recordCurrent.get(i)/1000.0, recordRevolution.get(i)/1000.0, recordPower.get(i)/1000.0, motorPower/1000.0, eta));
+					record.add(Double.valueOf(eta * 1000).intValue());
+				}
+				else record.add(0);
 				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
 			}
 			if (recordRevolution.isDisplayable() && recordPower.isDisplayable()) {

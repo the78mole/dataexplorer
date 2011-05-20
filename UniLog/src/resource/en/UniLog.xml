@@ -90,7 +90,7 @@
 	            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Efficience</name>
+	            <name>Efficiency</name>
 	            <symbol>eta</symbol>
 	            <unit>%</unit>
 	            <statistics sigma="false" avg="false" max="true" min="true"/>
@@ -200,7 +200,7 @@
 	            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Efficience</name>
+	            <name>Efficiency</name>
 	            <symbol>eta</symbol>
 	            <unit>%</unit>
 	            <statistics sigma="false" avg="true" max="false" min="false"/>
@@ -312,7 +312,7 @@
 	            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Efficience</name>
+	            <name>Efficiency</name>
 	            <symbol>eta</symbol>
 	            <unit>%</unit>
 	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="false" min="false"/>
@@ -424,7 +424,7 @@
 	            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Efficience</name>
+	            <name>Efficiency</name>
 	            <symbol>eta</symbol>
 	            <unit>%</unit>
 	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="false" min="false"/>
