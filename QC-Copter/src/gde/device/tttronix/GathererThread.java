@@ -104,14 +104,6 @@ public class GathererThread extends Thread {
 							terminalText = new StringBuffer();
 							terminalText.append(Messages.getString(MessageIds.GDE_MSGI1903)).append(text);
 							this.dialog.setTerminalText(terminalText.toString());
-//							GDE.display.syncExec(new Runnable() {
-//								@Override
-//								public void run() {
-//									if (!GathererThread.this.dialog.isDisposed()) {
-//										GathererThread.this.dialog.dispose();
-//									}
-//								}
-//							});
 						}
 						else if (this.serialPort.containsFF(text.getBytes())) {
 							terminalText = new StringBuffer();
@@ -144,8 +136,6 @@ public class GathererThread extends Thread {
 						recordSet = this.channel.get(this.recordSetKey);
 						recordSet.setAllDisplayable();
 						this.device.updateVisibilityStatus(recordSet, false);
-						//recordSet.addTimeStep_ms(0.0);
-						this.channel.applyTemplate(this.recordSetKey, false);
 						// switch the active record set if the current record set is child of active channel
 						// for eStation its always the case since we have only one channel
 						if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {
