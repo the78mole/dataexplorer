@@ -140,13 +140,10 @@ public class GathererThread extends Thread {
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") [" + configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$
 						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
-						this.channel.applyTemplateBasics(this.recordSetKey);
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
 						recordSet = this.channel.get(this.recordSetKey);
-						recordSet.setAllDisplayable();
-						//recordSet.addTimeStep_ms(0.0);
-						this.channel.applyTemplate(this.recordSetKey, false);
+						this.channel.applyTemplateBasics(this.recordSetKey);
 						// switch the active record set if the current record set is child of active channel
 						// for eStation its always the case since we have only one channel
 						if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {
