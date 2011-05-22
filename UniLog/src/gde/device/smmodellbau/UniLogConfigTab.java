@@ -145,10 +145,11 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 	CLabel												calculationTypeLabel;
 	CCombo												slopeCalculationTypeCombo;
 	CCombo												regressionTime;
+	RecordSet											lastActiveRecordSet = null;
 
 	final UniLogDialog						dialog;
 	final UniLog									device;							// get device specific things, get serial port, ...
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final Channels								channels;
 
 	/**
@@ -174,7 +175,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			FillLayout thisLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.setLayout(thisLayout);
 			this.setSize(630, 340);
-			this.addMouseTrackListener(this.dialog.mouseTrackerEnterFadeOut);
 			{
 				this.setLayout(null);
 				{
