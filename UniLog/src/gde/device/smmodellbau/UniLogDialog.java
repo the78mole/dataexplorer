@@ -175,6 +175,7 @@ public class UniLogDialog extends DeviceDialog {
 	UniLogLiveGatherer						liveThread;
 	UniLogConfigTab								configTab1, configTab2, configTab3, configTab4;
 	TaskItem											taskBarItem;
+	RecordSet											lastActiveRecordSet 			= null;
 
 	String												statusText								= "";																																																							//$NON-NLS-1$
 
@@ -315,16 +316,25 @@ public class UniLogDialog extends DeviceDialog {
 						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
 						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 10, 10, 10, 15);
 					}
-
 					@Override
 					public void mouseHover(MouseEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
 					}
-
 					@Override
 					public void mouseExit(MouseEvent evt) {
 						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
 						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 10, 10, -10, 15);
+					}
+				});
+				this.dialogShell.addPaintListener(new PaintListener() {		
+					@Override
+					public void paintControl(PaintEvent paintevent) {
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
+						if (UniLogDialog.this.lastActiveRecordSet != null && !UniLogDialog.this.lastActiveRecordSet.getName().equals(UniLogDialog.this.application.getActiveRecordSet().getName())) {
+							int index = Channels.getInstance().getActiveChannelNumber();
+							UniLogDialog.this.deviceConfigTabFolder.setSelection(index < 1 || index > UniLogDialog.this.deviceConfigTabFolder.getChildren().length - 2 ? 1 : index);
+						}
+						UniLogDialog.this.lastActiveRecordSet = UniLogDialog.this.application.getActiveRecordSet();
 					}
 				});
 				{
