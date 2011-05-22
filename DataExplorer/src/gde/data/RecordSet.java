@@ -2040,14 +2040,6 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 	
 	/**
-	 * apply the graphics template to make records visible according its device default measurement view
-	 * @param updateVisibilityStatus
-	 */
-	public void applyTemplate(boolean updateVisibilityStatus) {
-		this.parent.applyTemplate(this.name, true);
-	}
-	
-	/**
 	 * query boolean value to enable curve smoothing due to current drop 
 	 */
 	public boolean isSmoothAtCurrentDrop() {
