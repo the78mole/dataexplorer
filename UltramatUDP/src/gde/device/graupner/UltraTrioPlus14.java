@@ -51,12 +51,9 @@ public class UltraTrioPlus14 extends Ultramat {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2200), Messages.getString(MessageIds.GDE_MSGT2201), Messages.getString(MessageIds.GDE_MSGT2202),
-				Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGT2204), Messages.getString(MessageIds.GDE_MSGT2205), Messages.getString(MessageIds.GDE_MSGT2206),
-				Messages.getString(MessageIds.GDE_MSGT2207), Messages.getString(MessageIds.GDE_MSGT2208), Messages.getString(MessageIds.GDE_MSGT2209) };
-		this.CHARGE_MODE = new String[0];
-		this.DISCHARGE_MODE = new String[0];
-		this.DELAY_MODE = new String[0];
-		this.CURRENT_MODE = new String[0];
+				Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGI2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2207),
+				Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), 
+				Messages.getString(MessageIds.GDE_MSGT2222), Messages.getString(MessageIds.GDE_MSGT2222)};
 
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 		this.dialog = null;
@@ -71,12 +68,9 @@ public class UltraTrioPlus14 extends Ultramat {
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2200), Messages.getString(MessageIds.GDE_MSGT2201), Messages.getString(MessageIds.GDE_MSGT2202),
-				Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGT2204), Messages.getString(MessageIds.GDE_MSGT2205), Messages.getString(MessageIds.GDE_MSGT2206),
-				Messages.getString(MessageIds.GDE_MSGT2207), Messages.getString(MessageIds.GDE_MSGT2208), Messages.getString(MessageIds.GDE_MSGT2209) };
-		this.CHARGE_MODE = new String[0];
-		this.DISCHARGE_MODE = new String[0];
-		this.DELAY_MODE = new String[0];
-		this.CURRENT_MODE = new String[0];
+				Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGI2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2207),
+				Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), 
+				Messages.getString(MessageIds.GDE_MSGT2222), Messages.getString(MessageIds.GDE_MSGT2222)};
 
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 		this.dialog = null;
@@ -297,8 +291,8 @@ public class UltraTrioPlus14 extends Ultramat {
 				if (log.isLoggable(java.util.logging.Level.FINE)) {
 					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode1);
 				}
-				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
-				return operationMode1 > 0 && operationMode1 < 4; 
+				//0=no processing 1=charge 2=discharge 3=pause 4=finished 5=error 6=balance 11=store charge 12=store discharge
+				return (operationMode1 > 0 && operationMode1 < 4) || operationMode1 == 6 || operationMode1 == 11 || operationMode1 == 12; 
 			}
 			catch (NumberFormatException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -311,8 +305,8 @@ public class UltraTrioPlus14 extends Ultramat {
 				if (log.isLoggable(java.util.logging.Level.FINE)) {
 					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode2);
 				}
-				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
-				return operationMode2 > 0 && operationMode2 < 4; 
+				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error 6=balance 11=store charge 12=store discharge
+				return (operationMode2 > 0 && operationMode2 < 4) || operationMode2 == 6 || operationMode2 == 11 || operationMode2 == 12; 
 			}
 			catch (NumberFormatException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -325,8 +319,8 @@ public class UltraTrioPlus14 extends Ultramat {
 				if (log.isLoggable(java.util.logging.Level.FINE)) {
 					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode3);
 				}
-				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
-				return operationMode3 > 0 && operationMode3 < 4; 
+				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error 6=balance 11=store charge 12=store discharge
+				return (operationMode3 > 0 && operationMode3 < 4) || operationMode3 == 6 || operationMode3 == 11 || operationMode3 == 12; 
 			}
 			catch (NumberFormatException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);

@@ -238,6 +238,7 @@ public class GathererThread extends Thread {
 						break;
 					}
 					
+					//finalize record sets for devices with > 1 outlet channel while one is still processing
 					if (!this.isProgrammExecuting1 && recordSet1 != null && recordSet1.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(recordSet1.getName());
 						this.isProgrammExecuting1 = false;
@@ -262,6 +263,42 @@ public class GathererThread extends Thread {
 						log.log(java.util.logging.Level.FINE, "device activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2203));
 						stopDataGatheringThread(false, null);
+					}
+					
+					int processNumber = this.device.getProcessingMode(dataBuffer);
+					//finalize record sets
+					if (recordSet1 != null && recordSet1.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
+						finalizeRecordSet(recordSet1.getName());
+						this.isProgrammExecuting1 = false;
+						recordSet1 = null;
+						//signal processing finished, auto balancing devices like UltraDuoPlus already signaled
+						//0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error (only UltraDuoPlus devices do auto balancing when processing has been finished)
+						//0=no processing 1=charge 2=discharge 3=pause 4=finished 		5=error 6=balance 11=store charge 12=store discharge
+						if (processNumber == 4) {
+							this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2204, new Object[] { 1 }));
+						}
+					}
+					if (recordSet2 != null && recordSet2.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
+						finalizeRecordSet(recordSet2.getName());
+						this.isProgrammExecuting2 = false;
+						recordSet2 = null;
+						//signal processing finished, auto balancing devices like UltraDuoPlus already signaled
+						//0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error (only UltraDuoPlus devices do auto balancing when processing has been finished)
+						//0=no processing 1=charge 2=discharge 3=pause 4=finished 		5=error 6=balance 11=store charge 12=store discharge
+						if (processNumber == 4) {
+							this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2204, new Object[] { 2 }));
+						}
+					}
+					if (recordSet3 != null && recordSet3.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
+						finalizeRecordSet(recordSet3.getName());
+						this.isProgrammExecuting3 = false;
+						recordSet3 = null;
+						//signal processing finished, auto balancing devices like UltraDuoPlus already signaled
+						//0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error (only UltraDuoPlus devices do auto balancing when processing has been finished)
+						//0=no processing 1=charge 2=discharge 3=pause 4=finished 		5=error 6=balance 11=store charge 12=store discharge
+						if (processNumber == 4) {
+							this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2204, new Object[] { 3 }));
+						}
 					}
 				}
 
@@ -337,7 +374,7 @@ public class GathererThread extends Thread {
 				this.application.setStatusMessage(""); //$NON-NLS-1$
 				setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset to 180 sec
 
-				// record set does not exist or is outdated, build a new name and create
+				// record set does not exist or is out dated, build a new name and create
 				StringBuilder extend = new StringBuilder();
 				if (processNumber < 5) {// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
 					String processingType = this.device.getProcessingType(dataBuffer);
@@ -366,7 +403,7 @@ public class GathererThread extends Thread {
 				recordSet = channel.get(recordSetKey);
 				this.device.setTemperatureUnit(number, recordSet, dataBuffer); //°C or °F
 				recordSet.setAllDisplayable();
-				channel.applyTemplate(recordSetKey, false);
+				//channel.applyTemplate(recordSetKey, false);
 				// switch the active record set if the current record set is child of active channel
 				this.channels.switchChannel(channel.getNumber(), recordSetKey);
 				channel.switchRecordSet(recordSetKey);
@@ -386,8 +423,9 @@ public class GathererThread extends Thread {
 				}
 				recordSet.setRecordSetDescription(description);
 				
-				// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
-				if (processNumber >= 4 && !isAlerted4Finish[number]) {
+				// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error (only UltraDuoPlus devices do auto balancing when processing has been finished)
+				// 0=no processing 1=charge 2=discharge 3=pause 4=finished 		 5=error 6=balance 11=store charge 12=store discharge
+				if (processNumber == 4 && !isAlerted4Finish[number]) {
 					this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2204, new Object[] { number }));
 					isAlerted4Finish[number] = true;
 				}
@@ -425,8 +463,8 @@ public class GathererThread extends Thread {
 
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
 			log.log(java.util.logging.Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
-			this.serialPort.close();
 		}
+		this.serialPort.close();
 	}
 
 	/**
