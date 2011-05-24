@@ -408,10 +408,10 @@ public class FileHandler {
 			String channelType = activeDevice.getChannelTypes(channelNumber).name();
 			String channelConfigName = activeDevice.getChannelName(channelNumber);
 			log.log(Level.FINE, "channelConfigName = " + channelConfigName + " (" + GDE.CHANNEL_CONFIG_TYPE + channelType + "; " + GDE.CHANNEL_CONFIG_NUMBER + channelNumber + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			Channel channel = this.channels.get(this.channels.getChannelNumber(channelConfigName));
+			Channel channel = this.channels.get(channelNumber);
 
 			if (channel != null && this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET && this.channels.size() > 1) {
-				if (this.channels.getActiveChannelNumber() != this.channels.getChannelNumber(channelConfigName)) {
+				if (this.channels.getActiveChannelNumber() != channelNumber) {
 					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI0006, new Object[] { channelConfigName }));
 					if (answer != SWT.OK) return;
 
