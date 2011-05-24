@@ -80,7 +80,9 @@ public class LogViewReader {
 		deviceMap.put("qc copter", "QC-Copter"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("sm gps logger", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("nmea 0183", "NMEA-Adapter"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("graupner ultra duo plus 40", "UltraDuoPlus40"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("graupner ultra duo plus 45", "UltraDuoPlus45"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("graupner ultra duo plus 50", "UltraDuoPlus50"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("graupner ultra duo plus 60", "UltraDuoPlus60"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("graupner ultramat 18", "Ultramat18"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("graupner ultramat 12 plus pocket", "Ultramat12"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -159,7 +161,7 @@ public class LogViewReader {
 				recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
 				//recordDataSize = new Long(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).longValue();
 				//recordSetDataPointer = new Long(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
-				channel = channels.get(channels.getChannelNumber(channelConfig));
+				channel = channels.get(channelNumber);
 				if (channel == null) { // channelConfiguration not found
 					String msg = Messages.getString(MessageIds.GDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.GDE_MSGI0019) + "\n" + Messages.getString(MessageIds.GDE_MSGI0020);
 					DataExplorer.getInstance().openMessageDialogAsync(msg);
@@ -224,7 +226,7 @@ public class LogViewReader {
 				log.log(Level.FINE, "recordSetDataSize = " + recordSetDataBytes);
 				recordSetDataPointer = position;
 				log.log(Level.FINE, String.format("recordSetDataPointer = %d (0x%X)", recordSetDataPointer, recordSetDataPointer));
-				channel = channels.get(channels.getChannelNumber(channelConfig));
+				channel = channels.get(channelNumber);
 				recordSet = channel.get(recordSetName);
 				recordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, recordSetDataBytes);
 				//channel.setActiveRecordSet(recordSet);
@@ -251,7 +253,7 @@ public class LogViewReader {
 					channel.setFileName(filePath);
 					channel.setFileDescription(header.get(GDE.FILE_COMMENT));
 					channel.setSaved(true);
-					channels.switchChannel(channels.getChannelNumber(firstRecordSet[0]), firstRecordSet[1]);
+					channels.switchChannel(channelNumber, firstRecordSet[1]);
 				}
 				
 				position += buffer.length;
