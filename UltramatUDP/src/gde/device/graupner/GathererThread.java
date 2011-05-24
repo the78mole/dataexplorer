@@ -114,12 +114,14 @@ public class GathererThread extends Thread {
 					this.isProgrammExecuting3 = this.device.isProcessing(3, dataBuffer);
 					break;
 
+				case UltraDuoPlus40:
 				case UltraDuoPlus45:
 					this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
 					this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
 					this.isProgrammExecuting3 = false;
 					break;
 
+				case UltraDuoPlus50:
 				case UltraDuoPlus60:
 					this.isProgrammExecuting3 = this.device.isLinkedMode(dataBuffer);
 					if (!this.isProgrammExecuting3 && !this.isCombinedMode) { // outlet channel 1+2 combined 
@@ -194,6 +196,23 @@ public class GathererThread extends Thread {
 							ch3 = processDataChannel(3, recordSet3, this.recordSetKey3, buffer, points3);
 							recordSet3 = (RecordSet) ch3[0];
 							this.recordSetKey3 = (String) ch3[1];
+						}
+						break;
+
+					case UltraDuoPlus40:
+						if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
+							ch1 = processDataChannel(1, recordSet1, this.recordSetKey1, dataBuffer, points1);
+							recordSet1 = (RecordSet) ch1[0];
+							this.recordSetKey1 = (String) ch1[1];
+						}
+						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+							System.arraycopy(dataBuffer, 91, buffer, 5, 8); //sync to same value positions, only point array length is different
+							buffer[13] = buffer[14] = 48; //blank out cycle number
+							System.arraycopy(dataBuffer, 99, buffer, 15, 41);
+							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2);
+							recordSet2 = (RecordSet) ch2[0];
+							this.recordSetKey2 = (String) ch2[1];
 						}
 						break;
 
@@ -411,7 +430,8 @@ public class GathererThread extends Thread {
 					+ "Firmware  : " + this.device.firmware //$NON-NLS-1$
 					+ (this.device.getBatteryMemoryNumber(number, dataBuffer) >= 1 ? "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer) : GDE.STRING_EMPTY); //$NON-NLS-1$
 				try {
-					if (this.device.ultraDuoPlusSetup != null && this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer)) != null) {
+					int batteryMemoryNumber = this.device.getBatteryMemoryNumber(number, dataBuffer);
+					if (batteryMemoryNumber > 0 && this.device.ultraDuoPlusSetup != null && this.device.ultraDuoPlusSetup.getMemory().get(batteryMemoryNumber) != null) {
 						String batteryMemoryName = this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer) - 1).getName();
 						description = description + GDE.STRING_MESSAGE_CONCAT + batteryMemoryName;
 						if (recordSetKey.startsWith("1)")) this.device.matchBatteryMemory2ObjectKey(batteryMemoryName); //$NON-NLS-1$
