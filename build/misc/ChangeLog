@@ -7,6 +7,7 @@ UltramatTrioPlus devices fix bug while data gathering output channel 3
 while data gathering and creating new record sets take over visualization properties from previous active record set
 add UltraDuoPlus40
 add UltraDuoPlus50
+fix QC-Copter problem adding new data set while data gathering
 
 
 Version 2.81 - 15 May 2011
