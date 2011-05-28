@@ -137,10 +137,8 @@ public class GathererThread extends Thread {
 						recordSet.setAllDisplayable();
 						this.device.updateVisibilityStatus(recordSet, false);
 						// switch the active record set if the current record set is child of active channel
-						// for eStation its always the case since we have only one channel
-						if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {
-							this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
-						}
+						this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
+					
 						measurementCount = 0;
 						startCycleTime = 0;
 					}
