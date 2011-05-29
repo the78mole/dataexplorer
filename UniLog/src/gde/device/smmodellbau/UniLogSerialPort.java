@@ -32,7 +32,6 @@ import gde.utils.WaitTimer;
 import gnu.io.NoSuchPortException;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -89,9 +88,9 @@ public class UniLogSerialPort extends DeviceCommPort {
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws Exception
 	 */
-	public HashMap<String, Object> getData(UniLogDialog dialog) throws Exception {
+	public Vector<Vector<byte[]>> getData(UniLogDialog dialog) throws Exception {
 		boolean isPortOpenedByMe = false;
-		HashMap<String, Object> dataCollection = new HashMap<String, Object>();
+		Vector<Vector<byte[]>> dataCollection = new Vector<Vector<byte[]>>();
 		int numberMeasurementsLess4 = 0;
 		
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
@@ -131,7 +130,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 					}
 					else {
 						//telegrams.size() > 4 min + max + 2 data points
-						if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone()); //$NON-NLS-1$
+						if (telegrams.size() > 4) dataCollection.add(telegrams);
 						else ++numberMeasurementsLess4;
 						numberRecordSet = ((readBuffer[5] & 0xF8) / 8 + 1);
 						telegrams = new Vector<byte[]>();
@@ -148,7 +147,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 						break;
 					}
 				}
-				if (telegrams.size() > 4) dataCollection.put(""+numberRecordSet, telegrams.clone()); //$NON-NLS-1$
+				if (telegrams.size() > 4) dataCollection.add(telegrams);
 				//read numberRecordSet might different from really readable, UniLog suppress invalid data sets internally !
 				numberMeasurementsLess4 = numberRecordSet - dataCollection.size();
 				dialog.updateDataGatherProgress(counter, numberRecordSet, this.reveiceErrors, numberMeasurementsLess4, memoryUsed);

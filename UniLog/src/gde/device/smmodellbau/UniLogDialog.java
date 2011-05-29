@@ -329,7 +329,8 @@ public class UniLogDialog extends DeviceDialog {
 				this.dialogShell.addPaintListener(new PaintListener() {		
 					public void paintControl(PaintEvent paintevent) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
-						if (UniLogDialog.this.lastActiveRecordSet != null && !UniLogDialog.this.lastActiveRecordSet.getName().equals(UniLogDialog.this.application.getActiveRecordSet().getName())) {
+						RecordSet activeRecordSet = UniLogDialog.this.application.getActiveRecordSet();
+						if (UniLogDialog.this.lastActiveRecordSet != null && activeRecordSet != null && !UniLogDialog.this.lastActiveRecordSet.getName().equals(activeRecordSet.getName())) {
 							int index = Channels.getInstance().getActiveChannelNumber();
 							UniLogDialog.this.deviceConfigTabFolder.setSelection(index < 1 || index > UniLogDialog.this.deviceConfigTabFolder.getChildren().length - 2 ? 1 : index);
 						}

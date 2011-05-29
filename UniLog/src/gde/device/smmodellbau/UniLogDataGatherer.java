@@ -18,13 +18,6 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Vector;
-import gde.log.Level;
-import java.util.logging.Logger;
-
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -32,10 +25,15 @@ import gde.device.smmodellbau.unilog.MessageIds;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.TimeOutException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
 import gde.utils.WaitTimer;
+
+import java.io.IOException;
+import java.util.Vector;
+import java.util.logging.Logger;
 
 /**
  * Thread implementation to gather data from UniLog device
@@ -71,8 +69,6 @@ public class UniLogDataGatherer extends Thread {
 	 * this gives not a real feeling since the record sets may have big differences in number of available telegrams
 	 */
 	@Override
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
-	// cast from Object to Vector<Integer>
 	public void run() {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "entry data gatherer : " + this.channelNumber + " : " + this.configKey); //$NON-NLS-1$ //$NON-NLS-2$
 		Channel channel = Channels.getInstance().get(this.channelNumber);
@@ -96,30 +92,22 @@ public class UniLogDataGatherer extends Thread {
 			}
 
 			this.serialPort.setTransmitFinished(false);
-			HashMap<String, Object> data = this.serialPort.getData(this.dialog);
+			Vector<Vector<byte[]>> dataCollection = this.serialPort.getData(this.dialog);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "back from gathering data"); //$NON-NLS-1$
 
-			// iterate over number of telegram sets in map
-			String[] keys = data.keySet().toArray(new String[0]);		
-			Arrays.sort(keys);
-			for (int i = 0; i < keys.length; i++) {
-				Vector<byte[]> telegrams = (Vector<byte[]>) data.get(keys[i]); //$NON-NLS-1$
-				// iterate over telegram entries to build the record set
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "number record set = " + keys[i]); //$NON-NLS-1$
-
+			// iterate over telegram entries to build the record set
+			for (Vector<byte[]> telegrams : dataCollection) {
 				recordSetKey = channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
-				
 				// check analog modus and update channel/configuration
 				this.device.updateMeasurementByAnalogModi(telegrams.get(3), this.channelNumber);
 				
-				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
+				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, channel.getNumber(), true, false));
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
 
 				recordSet = channel.get(recordSetKey); // record set where the data is added
 				this.device.updateInitialRecordSetComment(recordSet);
-				channel.applyTemplate(recordSetKey, true);
+				channel.applyTemplateBasics(recordSetKey);
 				
-
 				int[] points = new int[recordSet.realSize()];
 
 				for (int j = 2; j < telegrams.size(); j++) {
@@ -127,11 +115,13 @@ public class UniLogDataGatherer extends Thread {
 					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
 				}
 
-				if (i == 0 && channel.getActiveRecordSet() == null) {
+				if (channel.getActiveRecordSet() == null) {
 					Channels.getInstance().switchChannel(this.channelNumber, recordSetKey);
 					channel.switchRecordSet(recordSetKey);
 				}
-				finalizeRecordSet(channel, recordSetKey, recordSet);
+				this.device.makeInActiveDisplayable(recordSet);
+				this.application.updateStatisticsData();
+				this.application.updateDataTable(recordSetKey, false);
 			}
 			// make all record set names visible in selection combo
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
@@ -165,19 +155,6 @@ public class UniLogDataGatherer extends Thread {
 			if(isPortOpenedByMe) this.serialPort.close();
 		}
 	} // end of run()
-
-	/**
-	 * calculate missing data, check all cross dependencies and switch records to display able
-	 * @param channel
-	 * @param recordSetKey
-	 * @param recordSet
-	 */
-	private void finalizeRecordSet(Channel channel, String recordSetKey, RecordSet recordSet) {
-		this.device.makeInActiveDisplayable(recordSet);
-		channel.applyTemplate(recordSetKey, true);
-		this.application.updateStatisticsData();
-		this.application.updateDataTable(recordSetKey, false);
-	}
 
 	public void setThreadStop() {
 		try {
