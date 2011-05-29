@@ -311,8 +311,8 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_COLOR, rgb);
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, Integer.valueOf(recordSet.getHorizontalGridLineStyle()).toString());
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_TYPE, Integer.valueOf(recordSet.getHorizontalGridType()).toString());
-				if (recordSet.get(recordSet.getHorizontalGridRecordName(false)) != null) {
-					this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, Integer.valueOf(recordSet.get(recordSet.getHorizontalGridRecordName(false)).ordinal).toString());
+				if (recordSet.get(recordSet.getHorizontalGridRecordName()) != null) {
+					this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, Integer.valueOf(recordSet.get(recordSet.getHorizontalGridRecordName()).ordinal).toString());
 				}
 			}
 			this.template.store();
@@ -325,12 +325,13 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public void applyTemplateBasics(String recordSetKey) {
 		RecordSet recordSet = this.get(recordSetKey);
+		this.activeRecordSet = this.application.getActiveRecordSet();
 		if (recordSet != null) {
-			log.log(Level.FINE, "this.size() > 1 " + (this.size() > 1) + "; this.lastActiveRecordSet = " + this.getLastActiveRecordSetName());
+			log.log(Level.FINER, "this.size() > 1 " + (this.size() > 1) + "; this.lastActiveRecordSet = " + this.getLastActiveRecordSetName());
 			if (this.size() <= 1) { //apply values from template
 				if (this.template != null) this.template.load();
 				if (this.template != null && this.template.isAvailable()) {
-					log.log(Level.OFF, "name = " + this.template.getDefaultFileName());
+					log.log(Level.FINER, "name = " + this.template.getDefaultFileName());
 					for (int i = 0; i < recordSet.realSize(); ++i) {
 						Record record = recordSet.get(i);
 						record.setVisible(Boolean.valueOf(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
@@ -374,7 +375,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				for (int i = 0; i < recordSet.realSize(); ++i) {
 					Record record = recordSet.get(i);
 					Record lastActiveRecord = this.get(this.getLastActiveRecordSetName()).get(i);
-					if(log.isLoggable(Level.FINE)) log.log(Level.FINE, "lastActiveRecord = " + lastActiveRecord.name + " isVisible = " + lastActiveRecord.isVisible);
+					if(log.isLoggable(Level.FINER)) log.log(Level.FINER, "lastActiveRecord = " + lastActiveRecord.name + " isVisible=" + lastActiveRecord.isVisible + " isPositionLeft=" + lastActiveRecord.isPositionLeft + " isStartpointZero=" + lastActiveRecord.isStartpointZero);
 					record.setVisible(lastActiveRecord.isVisible);
 					record.setPositionLeft(lastActiveRecord.isPositionLeft);
 					record.setColor(lastActiveRecord.color);
@@ -382,7 +383,7 @@ public class Channel extends HashMap<String, RecordSet> {
 					record.setLineStyle(lastActiveRecord.lineStyle);
 					record.setRoundOut(lastActiveRecord.isRoundOut); //$NON-NLS-1$
 					record.setStartpointZero(lastActiveRecord.isStartpointZero); //$NON-NLS-1$
-					record.setStartEndDefined(lastActiveRecord.isStartEndDefined, lastActiveRecord.minScaleValue, lastActiveRecord.maxScaleValue);
+					record.setStartEndDefined(lastActiveRecord.isStartEndDefined, lastActiveRecord.getMinScaleValue(), lastActiveRecord.getMaxScaleValue());
 					record.setNumberFormat(lastActiveRecord.numberFormat); //$NON-NLS-1$
 					//smooth current drop
 					recordSet.setSmoothAtCurrentDrop(lastActiveRecord.parent.isSmoothAtCurrentDrop);
@@ -395,6 +396,7 @@ public class Channel extends HashMap<String, RecordSet> {
 					recordSet.setHorizontalGridLineStyle(lastActiveRecord.parent.horizontalGridLineStyle);
 					recordSet.setHorizontalGridType(lastActiveRecord.parent.horizontalGridType);
 					recordSet.setHorizontalGridRecordOrdinal(lastActiveRecord.parent.horizontalGridRecordOrdinal);
+					if(log.isLoggable(Level.FINER)) log.log(Level.FINER, "record = " + record.name + " isVisible=" + record.isVisible + " isPositionLeft=" + record.isPositionLeft + " isStartpointZero=" + record.isStartpointZero);
 				}
 			}
 
@@ -412,6 +414,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public void applyTemplate(String recordSetKey, boolean doUpdateVisibilityStatus) {
 		RecordSet recordSet = this.get(recordSetKey);
+		this.activeRecordSet = this.application.getActiveRecordSet();
 		if (recordSet != null) {
 			if (this.template != null) this.template.load();
 			if (this.template != null && this.template.isAvailable()) {

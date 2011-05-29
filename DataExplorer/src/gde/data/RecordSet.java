@@ -1494,13 +1494,13 @@ public class RecordSet extends HashMap<String, Record> {
 
 	/**
 	 * get the record name to decide for horizontal grid lines 
-	 * @param isSyncRecordIncluded while building the horizontal grid vector the scale of the syncRecord must be used
 	 * @return the horizontalGridRecord
 	 */
-	public String getHorizontalGridRecordName(boolean isSyncRecordIncluded) {
+	public String getHorizontalGridRecordName() {
 		String gridRecordName = this.horizontalGridRecordOrdinal == -1 || this.horizontalGridRecordOrdinal > this.getRecordNames().length-1
 		? GDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
-		if (this.get(gridRecordName) != null && !this.isOneOfSyncableRecord(this.get(this.horizontalGridRecordOrdinal)) && !(this.get(gridRecordName).isVisible && this.get(gridRecordName).isDisplayable)) {
+		boolean isOneOfSycableAndOneOfSynableVisible = this.isOneOfSyncableRecord(this.get(this.horizontalGridRecordOrdinal)) && this.isOneSyncableVisible(this.getSyncMasterRecordOrdinal(this.get(gridRecordName)));
+		if (this.get(gridRecordName) != null && !isOneOfSycableAndOneOfSynableVisible && !(this.get(gridRecordName).isVisible && this.get(gridRecordName).isDisplayable)) {
 			gridRecordName = this.getFirstRecordName();
 			log.log(Level.FINE, "gridRecordName = " + gridRecordName); //$NON-NLS-1$
 		}

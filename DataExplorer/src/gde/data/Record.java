@@ -162,12 +162,9 @@ public class Record extends Vector<Integer> {
 	double							maxDisplayValue;									// max value in device units, correspond to draw area
 
 	//current drop, make curve capable to be smoothed
-	boolean             isCurrentRecord = false;
-	int             		dropStartIndex 	= 0;
-	int             		dropEndIndex 		= 0;
-	int             		dropStartValue 	= 0;
-	int             		dropEndValue 		= 0;
-	double             	dropDeltaValue 	= 0;
+	boolean             isCurrentRecord 			= false;
+	int             		dropStartIndex 				= 0;
+	int             		dropEndIndex 					= 0;
 	boolean             dropIndexWritten 			= true;
 
 	// measurement
@@ -959,10 +956,10 @@ public class Record extends Vector<Integer> {
 			if (!this.parent.isCompareSet && this.parent.isSmoothAtCurrentDrop) {
 				for (Integer[] dropArea :  this.parent.currentDropShadow) {
 					if (dropArea[0] <= index && dropArea[1] >= index) {
-						this.dropStartValue = super.get(dropArea[0]);
-						this.dropEndValue = super.get(dropArea[1]);
-						this.dropDeltaValue = (double)(this.dropEndValue - this.dropStartValue) / (dropArea[1] - dropArea[0]);
-						return (int) (this.dropStartValue + this.dropDeltaValue * (index - dropArea[0]));
+						int dropStartValue = super.get(dropArea[0]);
+						int dropEndValue = super.get(dropArea[1]);
+						double dropDeltaValue = (double)(dropEndValue - dropStartValue) / (dropArea[1] - dropArea[0]);
+						return (int) (dropStartValue + dropDeltaValue * (index - dropArea[0]));
 					}
 				}
 			}
@@ -1420,15 +1417,20 @@ public class Record extends Vector<Integer> {
 			double tmpTimeValue = this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms();
 			int[] indexs = this.findBoundingIndexes(tmpTimeValue);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, tmpTimeValue + "; " + indexs[0] + "; " + indexs[1]); //$NON-NLS-1$ //$NON-NLS-2$
-			if (indexs[0] == indexs[1]) {
-				pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue)).intValue();
-			}
-			else {
-				int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
-				double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[1]) - this.parent.timeStep_ms.getTime_ms(indexs[0]);
-				double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deltyValueY = " + deltaValueY  + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue).intValue();
+			if (super.size() > 0) {
+				if (indexs[0] == indexs[1]) {
+					pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue)).intValue();
+				}
+				else {
+					int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
+					double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[1])
+							- this.parent.timeStep_ms.getTime_ms(indexs[0]);
+					double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deltyValueY = " + deltaValueY + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					pointPosY = Double.valueOf(
+							this.parent.drawAreaBounds.height - (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - this.minDisplayValue) * this.displayScaleFactorValue)
+							.intValue();
+				}
 			}
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, xPos + " -> timeValue = " + TimeLine.getFomatedTime(tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
 			
