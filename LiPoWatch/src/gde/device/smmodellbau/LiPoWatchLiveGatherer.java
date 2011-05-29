@@ -239,7 +239,6 @@ public class LiPoWatchLiveGatherer extends Thread {
 		RecordSet recordSet = this.channel.get(recordSetKey);
 		this.device.updateVisibilityStatus(recordSet, true);
 		this.device.makeInActiveDisplayable(recordSet);
-		this.channel.applyTemplate(recordSetKey, true);
 		this.application.updateStatisticsData();
 		this.application.updateDataTable(recordSetKey, false);
 	}

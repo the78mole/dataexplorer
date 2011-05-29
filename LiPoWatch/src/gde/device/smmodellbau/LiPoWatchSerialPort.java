@@ -30,7 +30,6 @@ import gde.utils.Checksum;
 import gde.utils.WaitTimer;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -87,9 +86,9 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 	 * @return map containing gathered data - this can individual specified per device
 	 * @throws Exception
 	 */
-	public HashMap<String, Object> getData(LiPoWatchDialog dialog) throws Exception {
+	public Vector<Vector<byte[]>> getData(LiPoWatchDialog dialog) throws Exception {
 		boolean isPortOpenedByMe = false;
-		HashMap<String, Object> dataCollection = new HashMap<String, Object>();
+		Vector<Vector<byte[]>> dataCollection = new Vector<Vector<byte[]>>();
 		int numberLess4measurements = 0;
 		
 		byte[] readBuffer;
@@ -137,7 +136,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 						else {
 							//telegrams.size() > 4 min + max + 2 data points
 							if (telegrams.size() > 4) {
-								dataCollection.put(""+numberRecordSet, telegrams); //$NON-NLS-1$
+								dataCollection.add(telegrams); //$NON-NLS-1$
 								if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
 							}
 							else 
@@ -166,7 +165,7 @@ public class LiPoWatchSerialPort extends DeviceCommPort {
 					}
 				}
 				if (telegrams.size() > 4) {
-					dataCollection.put("" + numberRecordSet, telegrams); //$NON-NLS-1$
+					dataCollection.add(telegrams);
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "dataCollection.put = " + numberRecordSet ); //$NON-NLS-1$					
 				}
 				else 

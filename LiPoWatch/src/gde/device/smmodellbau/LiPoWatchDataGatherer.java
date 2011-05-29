@@ -33,8 +33,6 @@ import gde.utils.CalculationThread;
 import gde.utils.WaitTimer;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -72,8 +70,6 @@ public class LiPoWatchDataGatherer extends Thread {
 	 * this gives not a real feeling since the record sets may have big differences in number of available telegrams
 	 */
 	@Override
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
-	// cast from Object to Vector<byte[]>
 	public void run() {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "entry data gatherer : " + this.channelNumber + " : " + this.configKey); //$NON-NLS-1$ //$NON-NLS-2$
 		Channel channel = Channels.getInstance().get(this.channelNumber);
@@ -98,17 +94,11 @@ public class LiPoWatchDataGatherer extends Thread {
 
 			this.dialog.resetDataSetsLabel();
 			this.serialPort.setTransmitFinished(false);
-			HashMap<String, Object> data = this.serialPort.getData(this.dialog);
+			Vector<Vector<byte[]>> dataCollection = this.serialPort.getData(this.dialog);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "back from gathering data"); //$NON-NLS-1$
 
-			// iterate over number of telegram sets in map
-			String[] keys = data.keySet().toArray(new String[0]);		
-			Arrays.sort(keys);
-			for (int i = 0; i < keys.length; i++) {
-				Vector<byte[]> telegrams = (Vector<byte[]>) data.get(keys[i]); //$NON-NLS-1$
-				// iterate over telegram entries to build the record set
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "number record set = " + keys[i]); //$NON-NLS-1$
-
+			// iterate over telegram entries to build the record set
+			for (Vector<byte[]> telegrams : dataCollection) {
 				recordSetKey = channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
 				
 				// check analog modus and update channel/configuration
@@ -119,6 +109,7 @@ public class LiPoWatchDataGatherer extends Thread {
 
 				recordSet = channel.get(recordSetKey); // record set where the data is added
 				this.device.updateInitialRecordSetComment(recordSet);
+				channel.applyTemplateBasics(recordSetKey);
 				
 				int[] points = new int[recordSet.realSize()];
 				byte[] dataBuffer;
@@ -141,11 +132,14 @@ public class LiPoWatchDataGatherer extends Thread {
 				}
 				recordSet.syncScaleOfSyncableRecords();
 
-				if (i == 0 && channel.getActiveRecordSet() == null) {
+				if (channel.getActiveRecordSet() == null) {
 					Channels.getInstance().switchChannel(this.channelNumber, recordSetKey);
 					channel.switchRecordSet(recordSetKey);
 				}
-				finalizeRecordSet(channel, recordSetKey, recordSet);
+				this.device.makeInActiveDisplayable(recordSet);
+				this.device.updateVisibilityStatus(recordSet, true);
+				this.application.updateStatisticsData();
+				this.application.updateDataTable(recordSetKey, false);
 			}
 			// make all record set names visible in selection combo
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
@@ -179,19 +173,6 @@ public class LiPoWatchDataGatherer extends Thread {
 			if(isPortOpenedByMe) this.serialPort.close();
 		}
 	} // end of run()
-
-	/**
-	 * calculate missing data, check all cross dependencies and switch records to display able
-	 * @param channel
-	 * @param recordSetKey
-	 * @param recordSet
-	 */
-	private void finalizeRecordSet(Channel channel, String recordSetKey, RecordSet recordSet) {
-		this.device.makeInActiveDisplayable(recordSet);
-		channel.applyTemplate(recordSetKey, true);
-		this.application.updateStatisticsData();
-		this.application.updateDataTable(recordSetKey, false);
-	}
 
 	public void setThreadStop() {
 		try {
