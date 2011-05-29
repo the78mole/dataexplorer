@@ -8,6 +8,7 @@ while data gathering and creating new record sets take over visualization proper
 add UltraDuoPlus40
 add UltraDuoPlus50
 fix QC-Copter problem adding new data set while data gathering
+update UniLog/LiPoWatch code to prevent mixing record sets sequence 
 
 
 Version 2.81 - 15 May 2011
