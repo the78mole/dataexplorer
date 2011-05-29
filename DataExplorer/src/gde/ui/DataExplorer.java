@@ -2623,7 +2623,7 @@ public class DataExplorer extends Composite {
 	 */
 	public RecordSet getActiveRecordSet() {
 		RecordSet activeRecordSet = null;
-		Channel activeChannnel = this.channels.getActiveChannel();
+		Channel activeChannnel = this.channels != null ? this.channels.getActiveChannel() : null;
 		if(activeChannnel != null)
 			activeRecordSet = activeChannnel.getActiveRecordSet();
 		
