@@ -332,7 +332,7 @@ public class TestSuperClass extends TestCase {
 
 		// check for activated horizontal grid
 		boolean isCurveGridEnabled = recordSet.getHorizontalGridType() > 0;
-		String curveGridRecordName = recordSet.getHorizontalGridRecordName(false);
+		String curveGridRecordName = recordSet.getHorizontalGridRecordName();
 		String[] recordNames = recordSet.getRecordNames().clone();
 		// sort the record set names to get the one which makes the grid lines drawn first
 		for (int i = 0; i < recordNames.length; i++) {
