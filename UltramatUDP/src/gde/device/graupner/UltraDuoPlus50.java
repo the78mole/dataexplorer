@@ -167,8 +167,9 @@ public class UltraDuoPlus50 extends Ultramat {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize());
 
-		if (this.isLinkedMode(dataBuffer)) {
+		if (deviceDataBufferSize == dataBuffer.length && this.isLinkedMode(dataBuffer)) {
 			try {
 				// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
 				points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[15], (char) dataBuffer[16], (char) dataBuffer[17], (char) dataBuffer[18]), 16);
