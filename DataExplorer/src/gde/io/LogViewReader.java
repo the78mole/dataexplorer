@@ -65,19 +65,21 @@ public class LogViewReader {
 	static {
 		deviceMap.put("htronic akkumaster c4", "AkkuMasterC4"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("picolario", "Picolario"); //$NON-NLS-1$ //$NON-NLS-2$
-		deviceMap.put("unilog", "UniLog"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station 902", "eStation902"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station bc6", "eStationBC6"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station bc610", "eStationBC610"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("e-station bc8", "eStationBC8"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("pichler p6", "PichlerP6"); //$NON-NLS-1$ //$NON-NLS-2$		
 		deviceMap.put("pichler p60", "PichlerP60"); //$NON-NLS-1$ //$NON-NLS-2$
-		deviceMap.put("lipowatch", "LiPoWatch"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech datavario", "DataVario"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech datavario duo", "DataVarioDuo"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech linkvario", "LinkaVario"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech linkvario duo", "LinkVario"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("qc copter", "QC-Copter"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("unilog", "UniLog"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("sm unilog", "UniLog"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("lipowatch", "LiPoWatch"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("sm lipowatch", "LiPoWatch"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("sm gps logger", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("nmea 0183", "NMEA-Adapter"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("graupner ultra duo plus 40", "UltraDuoPlus40"); //$NON-NLS-1$ //$NON-NLS-2$
