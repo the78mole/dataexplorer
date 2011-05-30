@@ -581,7 +581,7 @@ public class Settings extends Properties {
 	}
 
 	public Point[] getCoolBarSizes() {
-		return StringHelper.stringToPointArray(DataExplorer.getInstance().getMenuToolBar().getCoolBarSizes());
+		return StringHelper.stringToPointArray(this.getProperty(COOLBAR_SIZES, DataExplorer.getInstance().getMenuToolBar().getCoolBarSizes()).trim());
 	}
 
   public List<String> getFileHistory() {

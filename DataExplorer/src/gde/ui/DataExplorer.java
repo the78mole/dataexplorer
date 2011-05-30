@@ -306,7 +306,6 @@ public class DataExplorer extends Composite {
 					this.statusBar.create();
 				}
 			}
-			this.layout();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -357,7 +356,6 @@ public class DataExplorer extends Composite {
 			GDE.shell.setText(GDE.NAME_LONG);
 
 			GDE.seStartupProgress(100);
-			GDE.shell.layout();
 			GDE.shell.open();
 			if (GDE.splash != null) GDE.splash.dispose();
 			TaskBar taskBar = GDE.display.getSystemTaskBar();
@@ -723,6 +721,7 @@ public class DataExplorer extends Composite {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 		}
+		GDE.shell.layout();
 	}
 
 	/**
