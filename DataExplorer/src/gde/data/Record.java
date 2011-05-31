@@ -227,10 +227,6 @@ public class Record extends Vector<Integer> {
 		this.df = new DecimalFormat("0.0"); //$NON-NLS-1$
 		
 		this.isCurrentRecord = this.unit.equalsIgnoreCase("A") && this.symbol.toUpperCase().contains("I");
-		
-		// special keys for compare set record are handled with put method
-		//this.channelConfigKey;
-		//this.keyName;
 	}
 
 	/**
@@ -384,13 +380,9 @@ public class Record extends Vector<Integer> {
 	private void initializeProperties(Record recordRef, List<PropertyType> newProperties) {
 		this.properties = this.properties != null ? this.properties : new ArrayList<PropertyType>();	// offset, factor, reduction, ...
 		for (PropertyType property : newProperties) {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordRef.name + " - " + property.getName() + " = " + property.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%20s - %s = %s", recordRef.name, property.getName(), property.getValue()));
 			this.properties.add(property.clone());
 		}
-		// initialize factor, offset, reduction if not exist only
-		//if (!this.properties.contains(IDevice.FACTOR)) this.properties.add(this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, recordRef.getFactor())); 
-		//if (!this.properties.contains(IDevice.OFFSET)) this.properties.add(this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, recordRef.getOffset()));
-		//if (!this.properties.contains(IDevice.REDUCTION)) this.properties.add(this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, recordRef.getReduction()));
 	}
 
 	/**
@@ -1794,22 +1786,23 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setSerializedDeviceSpecificProperties(String serializedProperties) {
 		HashMap<String, String> recordDeviceProps = StringHelper.splitString(serializedProperties, DELIMITER, this.getDevice().getUsedPropertyKeys());
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder().append("update: "); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINE)) sb.append(this.name).append(GDE.STRING_MESSAGE_CONCAT);
 		
-		// each record loaded from a file gets new properties instead of using the default initialized in constructor
-		this.properties = new ArrayList<PropertyType>(); // offset, factor, reduction, ...
-		
+		// each record loaded from a file updates properties instead of using the default initialized in constructor
 		for (Entry<String, String> entry : recordDeviceProps.entrySet()) {
-			String prop = entry.getValue();
-			PropertyType tmpProperty = new ObjectFactory().createPropertyType();
-			tmpProperty.setName(entry.getKey());
-			String type = prop.split(GDE.STRING_EQUAL)[0].substring(1);
-			if (type != null && type.length() > 3) tmpProperty.setType(DataTypes.fromValue(type));
-			String value = prop.split(GDE.STRING_EQUAL)[1];
-			if (value != null && value.length() > 0) tmpProperty.setValue(value.trim());
-			this.properties.add(tmpProperty);
-			if (log.isLoggable(Level.FINE)) sb.append(entry.getKey()).append(" = ").append(value); //$NON-NLS-1$
+			for (PropertyType defaultProperty : this.properties) {
+				if(defaultProperty.getName().equalsIgnoreCase(entry.getKey())) {
+					String prop = entry.getValue();
+					String type = prop.split(GDE.STRING_EQUAL)[0].substring(1);
+					DataTypes dataType = type != null ? DataTypes.fromValue(type) : DataTypes.STRING;
+					String value = prop.split(GDE.STRING_EQUAL)[1];
+					if (value != null && value.length() > 0 && defaultProperty.getType().equals(dataType)) {
+						defaultProperty.setValue(value.trim());
+						if (log.isLoggable(Level.FINE)) sb.append(entry.getKey()).append(" = ").append(value); //$NON-NLS-1$
+					}
+				}
+			}
 		}
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sb.toString());
 	}
