@@ -10,6 +10,7 @@ add UltraDuoPlus50
 fix QC-Copter problem adding new data set while data gathering
 update UniLog/LiPoWatch code to prevent mixing record sets sequence 
 fix menu cool bar order problem
+correct UniLog mA/m calculation  
 
 
 Version 2.81 - 15 May 2011
