@@ -332,7 +332,9 @@ public class UniLogDialog extends DeviceDialog {
 						RecordSet activeRecordSet = UniLogDialog.this.application.getActiveRecordSet();
 						if (UniLogDialog.this.lastActiveRecordSet != null && activeRecordSet != null && !UniLogDialog.this.lastActiveRecordSet.getName().equals(activeRecordSet.getName())) {
 							int index = Channels.getInstance().getActiveChannelNumber();
-							UniLogDialog.this.deviceConfigTabFolder.setSelection(index < 1 || index > UniLogDialog.this.deviceConfigTabFolder.getChildren().length - 2 ? 1 : index);
+							index = index < 1 || index > UniLogDialog.this.deviceConfigTabFolder.getChildren().length - 2 ? 1 : index;
+							UniLogDialog.this.deviceConfigTabFolder.setSelection(index);
+							((UniLogConfigTab)UniLogDialog.this.deviceConfigTabFolder.getChildren()[index]).initialize();
 						}
 						UniLogDialog.this.lastActiveRecordSet = UniLogDialog.this.application.getActiveRecordSet();
 					}
