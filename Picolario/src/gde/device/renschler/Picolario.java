@@ -26,6 +26,7 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
 import gde.exception.DataInconsitsentException;
 import gde.log.Level;
@@ -42,7 +43,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 /**
- * Picolariolog device main implementaion class
+ * Picolariolog device main implementation class
  * @author Winfried Brügmann
  */
 public class Picolario extends DeviceConfiguration implements IDevice {
@@ -51,8 +52,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 	public final static String		DO_NO_ADAPTION		= "do_no_adaption"; //$NON-NLS-1$
 	public final static String		DO_OFFSET_HEIGHT	= "do_offset_height"; //$NON-NLS-1$
-	public final static String		DO_SUBTRACT_FIRST	= "do_subtract_first"; //$NON-NLS-1$
-	public final static String		DO_SUBTRACT_LAST	= "subtract_last"; //$NON-NLS-1$
+	public final static String		DO_SUBTRACT_FIRST	= MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value();
+	public final static String		DO_SUBTRACT_LAST	= MeasurementPropertyTypes.DO_SUBTRACT_LAST.value();
 
 	final DataExplorer	application;
 	final PicolarioDialog					dialog;
@@ -283,10 +284,10 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 				try {
 					if (subtractFirst) {
-						reduction = record.getFirst().intValue() / 1000.0;
+						reduction = record.getFirst() / 1000.0;
 					}
 					else if (subtractLast) {
-						reduction = record.getLast().intValue() / 1000.0;
+						reduction = record.getLast() / 1000.0;
 					}
 				}
 				catch (Throwable e) {
@@ -332,10 +333,10 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 
 			try {
 				if (subtractFirst) {
-					reduction = record.getFirst().intValue() / 1000.0;
+					reduction = record.getFirst() / 1000.0;
 				}
 				else if (subtractLast) {
-					reduction = record.getLast().intValue() / (double)1000;
+					reduction = record.getLast() / 1000.0;
 				}
 			}
 			catch (Throwable e) {
