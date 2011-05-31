@@ -125,7 +125,9 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	public final static String		NUMBER_MOTOR							= MeasurementPropertyTypes.NUMBER_MOTOR.value();
 	public final static String		REVOLUTION_FACTOR					= MeasurementPropertyTypes.REVOLUTION_FACTOR.value();
 	public final static String		RPM_FACTOR								= IDevice.FACTOR;
-	
+	public final static String		DO_SUBTRACT_FIRST					= MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value();
+	public final static String		DO_SUBTRACT_LAST					= MeasurementPropertyTypes.DO_SUBTRACT_LAST.value();
+
 	public final static String		FIRMEWARE_VERSION					= "Firmware"; //$NON-NLS-1$
 	public final static String		SERIAL_NUMBER							= "S/N"; //$NON-NLS-1$
 
@@ -552,8 +554,25 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
 					//newValues = value * rpmFactor / numberMotor;
 					break;
-				case 8: //efficiency
 				case 9: //height
+					property = record.getProperty(UniLog.DO_SUBTRACT_FIRST);
+					boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+					property = record.getProperty(UniLog.DO_SUBTRACT_LAST);
+					boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+
+					try {
+						if (subtractFirst) {
+							reduction = record.getFirst()/1000.0;
+						}
+						else if (subtractLast) {
+							reduction = record.getLast()/1000.0;
+						}
+					}
+					catch (Throwable e) {
+						log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage());
+					}
+					break;
+				case 8: //efficiency
 				case 10: //slope
 				case 11: //a1Value
 				case 12: //a2Value
@@ -579,25 +598,51 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
-		double newValues = value;
+		double newValue = value;
 		
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 		PropertyType property = null;
-		if (record.getOrdinal() == 2) {//2=current [A]
-			newValues = value + record.getOffset();
-		}
-		else if (record.getOrdinal() == 7) {//7=revolutionSpeed [1/min]
+		switch (record.getOrdinal()) {
+		case 2: //2=current [A]
+			newValue = value + record.getOffset();
+			break;
+			
+		case 7: //7=revolutionSpeed [1/min]
 			property = record.getProperty(UniLog.NUMBER_MOTOR);
 			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
-			newValues = value * record.getFactor() / numberMotor;
-		}
-		else if (record.getOrdinal() == 11 	//11=a1Value
-				|| record.getOrdinal() == 12		//12=a2Value
-				|| record.getOrdinal() == 13) {	//13=a3Value
-			newValues = record.getFactor() * value + record.getOffset();
+			newValue = value * record.getFactor() / numberMotor;
+			break;
+			
+		case 9: //9=height [m]
+			property = record.getProperty(UniLog.DO_SUBTRACT_FIRST);
+			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+			property = record.getProperty(UniLog.DO_SUBTRACT_LAST);
+			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+
+			try {
+				if (subtractFirst) {
+					newValue = value - record.getFirst()/1000.0;
+				}
+				else if (subtractLast) {
+					newValue = value - record.getLast()/1000.0;
+				}
+			}
+			catch (Throwable e) {
+				log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage());
+			}
+			break;
+			
+		case 11: //11=a1Value
+		case 12: //12=a2Value
+		case 13: //13=a3Value
+			newValue = record.getFactor() * value + record.getOffset();
+			break;
+
+		default:
+			break;
 		}
 		
-		return newValues;
+		return newValue;
 	}
 
 	/**
@@ -606,25 +651,50 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		double newValues = value;
+		double newValue = value;
 		
 		// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 		PropertyType property = null;
-		if (record.getOrdinal() == 2) {//2=current [A]
-			newValues = value - record.getOffset();
-		}
-		else if (record.getOrdinal() == 7) {//7=revolutionSpeed [1/min]
+		switch (record.getOrdinal()) {
+		case 2: //2=current [A]:
+			newValue = value - record.getOffset();
+			break;
+			
+		case 7: //7=revolutionSpeed [1/min]
 			property = record.getProperty(UniLog.NUMBER_MOTOR);
 			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
-			newValues = value * numberMotor / record.getFactor();
-		}
-		else if (record.getOrdinal() == 11 	//11=a1Value
-				|| record.getOrdinal() == 12		//12=a2Value
-				|| record.getOrdinal() == 13) {	//13=a3Value
-			newValues = value / record.getFactor() - record.getOffset();
-		}
+			newValue = value * numberMotor / record.getFactor();
+			break;
+			
+		case 9: //9=height [m]
+			property = record.getProperty(UniLog.DO_SUBTRACT_FIRST);
+			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+			property = record.getProperty(UniLog.DO_SUBTRACT_LAST);
+			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 
-		return newValues;
+			try {
+				if (subtractFirst) {
+					newValue = value + record.getFirst()/1000.0;
+				}
+				else if (subtractLast) {
+					newValue = value + record.getLast()/1000.0;
+				}
+			}
+			catch (Throwable e) {
+				log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage());
+			}
+			break;
+			
+		case 11: //11=a1Value
+		case 12: //12=a2Value
+		case 13: //13=a3Value
+			newValue = (value - record.getOffset()) / record.getFactor();
+			break;
+
+		default:
+			break;
+		}
+		return newValue;
 	}
 
 	/**

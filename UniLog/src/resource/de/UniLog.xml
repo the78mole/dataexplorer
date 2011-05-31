@@ -102,6 +102,7 @@
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Reduktion aller gemessenem Werte durch den ersten Messwert" type="Boolean" value="true" name="do_subtract_first"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Steigrate</name>
@@ -212,6 +213,7 @@
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Reduktion aller gemessenem Werte durch den ersten Messwert" type="Boolean" value="true" name="do_subtract_first"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Steigrate</name>
@@ -323,7 +325,8 @@
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
-	            <statistics ratioText="Kapazität/Motorhöhe" ratioRefOrdinal="4" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+	            <statistics ratioText="Kapazität/Motorhöhe" ratioRefOrdinal="3" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+                <property description="Reduktion aller gemessenem Werte durch den ersten Messwert" type="Boolean" value="true" name="do_subtract_first"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Steigrate</name>
@@ -436,6 +439,7 @@
 	            <unit>m</unit>
 	            <active>true</active>
 	            <statistics ratioText="Kapazität/Motorhöhe" ratioRefOrdinal="4" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+                <property description="Reduktion aller gemessenem Werte durch den ersten Messwert" type="Boolean" value="true" name="do_subtract_first"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Steigrate</name>
