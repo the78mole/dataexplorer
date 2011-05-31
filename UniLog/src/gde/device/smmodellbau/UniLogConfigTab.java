@@ -1234,7 +1234,6 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			
 			property = recordSet.get(recordKeys[8]).getProperty(UniLog.PROP_N_100_W);
 			this.prop100WValue = property != null ? new Integer(property.getValue().trim()) : 10000;
-			System.out.println(this.prop100WValue);
 			
 			this.isActiveHeight = recordSet.get(recordKeys[9]).isActive();
 
