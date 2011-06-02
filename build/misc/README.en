@@ -33,7 +33,9 @@ Actual the following devices are available as plug-in:
 											 - Ultramat Trio Plus 14 (Graupner) 3 outlet charger/discharger
 											 - Ultramat Trio Plus 16S (Graupner) 3 outlet charger/discharger
 											 - Ultramat 18 (Graupner) charger/discharger
+											 - Ultra Duo Plus 40 (Graupner) 2 outlet charger/discharger with battery memory
 											 - Ultra Duo Plus 45 (Graupner) 2 outlet charger/discharger with battery memory
+											 - Ultra Duo PLus 50 (Graupner) 2 equivalent outlet charger/discharger with battery memory
 											 - Ultra Duo PLus 60 (Graupner) 2 equivalent outlet charger/discharger with battery memory
 											 - Simulator test plug-in
 
@@ -87,17 +89,20 @@ At this place also application configuration and trace log files are located.
 The directory for the user data (log data files) the user takes responsibility, the location will be stored within the application configuration file
 (DataExplorer.properties) and queried just after starting the application.
 
-Hint: Is a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (osde/OSDE) bad major version at offset=6" 
+Hint: Is a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major version at offset=6" 
 is received after executing launch.bat/lauchn.sh the Java version (java -version) is to old to execute this program and must be renewed.
+
 For Windows user: Depending of the used Windows version and patch level it might be required to install the latest 
 "Microsoft Visual C++ 2008 Redistributable Package" from www.microsoft.com/downloads (desktop icon, object link creation).
+
 For GNU/Linux user: RXTXcomm uses serial port locking mechanism, the application user must be part of uucp group.
 While facing problems with USB2Serial UART SiliconLabs cp210x refer to GNULinux_cp210x directory in download area.
+
 For Mac OS user: Same as for GNU/Linux user, but the /var/lock directory must be created, refer to RXTX_Post-Install_MacOS.txt
 
 Hint: It is planned to use the DataExplorer on different operating systems and share the data files, do not use special characters at all.
-(conversion ISO-8859-1 to UTF-8 and vice versa). File links are different on the supported operatings systems. Object related data files don't get duplicated,
-they get referenced using file links. Before you move data files to a different operating system, remove the objcet related file links and re-create afterwards.
+(conversion ISO-8859-1 to UTF-8 and vice versa). File links are different on the supported operating systems. Object related data files don't get duplicated,
+they get referenced using file links. Before you move data files to a different operating system, remove the object related file links and re-create afterwards.
 Please use the preferences dialog with the miscellaneous tab with the related buttons.
 
 For questions or suggestions for improvement feel free to contact me using the e-mail address at the download page.

@@ -33,7 +33,9 @@ Zur Zeit sind folgende Geräte eingebunden:
 											 - Ultramat Trio Plus 14 (Graupner) Lade-/Entlade-gerät
 											 - Ultramat Trio Plus 16S (Graupner) Lade-/Entlade-gerät
 											 - Ultramat 18 (Graupner) Lade-/Entlade-gerät
+											 - Ultra Duo Plus 40 (Graupner) 2 Ausgänge Lade-/Entlade-gerät mit Batteriespeicher
 											 - Ultra Duo Plus 45 (Graupner) 2 Ausgänge Lade-/Entlade-gerät mit Batteriespeicher
+											 - Ultra Duo PLus 50 (Graupner) 2 gleichwertige Ausgänge Lade-/Entlade-gerät mit Batteriespeicher
 											 - Ultra Duo PLus 60 (Graupner) 2 gleichwertige Ausgänge Lade-/Entlade-gerät mit Batteriespeicher
 											 - Simulator Test Plug-in
 											 
@@ -86,12 +88,15 @@ Für das Verzeichnis der Nutzerdaten (Logdateien) ist der Anwender selbst verantw
 in den Anwendungkonfigurationsdatei (DataExplorer.properties) hinterlegt.
 
 Hinweis: Erscheint nach der Ausführung von DataExplorer.exe/DataExplorer folgende oder ähnliche Fehlermeldung 
-"The java class could not be loaded. java.lang.UnsupportedClassVersionError: (osde/OSDE) bad major Version at offset=6"
+"The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major Version at offset=6"
 ist die installierte Java Version (java -version) zu alt und muss gegen eine aktuelle Version > 1.6 ausgetauscht werden.
-Für Windowsanwender: Je nach verwendeter Windows Version und Patchlevel kann es nötig sein das System mit dem 
+
+Für Windows Anwender: Je nach verwendeter Windows Version und Patchlevel kann es nötig sein das System mit dem 
 "Microsoft Visual C++ 2008 Redistributable Package" von www.microsoft.com/downloads nachzurüsten (Desktopicon, Objektlink).
+
 Füt GNU/Linux Anwender: RXTXcomm locked den seriellen Port über die Gruppe "uucp", welcher der Anwendungsnutzer angehören sollte.
 Bei Problemen mit dem USB2Serial UART von SiliconLabs cp210x siehe das GNULinux_cp210x Verzeichnis im Downloadbereich.
+
 Für Mac OS Anwender: Hier gilt prinzipiell das Gleiche wie für GNU/Linux, nur dass das Verzeichnis /var/lock erst angelegt werden muss, siehe
 RXTX_Post-Install_MacOS.txt
 
