@@ -666,7 +666,15 @@
 		</copy>
 	</target>
 
-	<target name="signature" description="create and verify gpg signature and verify" depends="copy_docu">
+	<target name="copy_misc" description="copy misc files to build/target/install" depends="init" >
+		<copy todir="${build.target.dir}" overwrite="true">
+			<fileset dir="build/misc" >
+				<include name="GNULinux_cp210x/*" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="signature" description="create and verify gpg signature and verify" depends="copy_docu, copy_misc">
 		<for param="file">
 			<path>
 				<fileset dir="${basedir}/build/target/install" includes="*.sig" />
