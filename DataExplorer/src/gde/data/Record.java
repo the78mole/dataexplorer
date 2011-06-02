@@ -915,11 +915,11 @@ public class Record extends Vector<Integer> {
 	}
 	
 	public Integer getFirst() {
-		return super.get(0);
+		return super.size() > 0 ? super.get(0) : 0;
 	}
 	
 	public Integer getLast() {
-		return super.get(this.elementCount-1);
+		return super.size() > 0 ? super.get(super.size()-1) : 0;
 	}
 
 	/**
