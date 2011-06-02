@@ -356,7 +356,6 @@ public class DataExplorer extends Composite {
 			GDE.shell.setText(GDE.NAME_LONG);
 
 			GDE.seStartupProgress(100);
-			GDE.shell.open();
 			if (GDE.splash != null) GDE.splash.dispose();
 			TaskBar taskBar = GDE.display.getSystemTaskBar();
 			if (taskBar == null)
@@ -394,7 +393,8 @@ public class DataExplorer extends Composite {
 				}
 			});
 			
-			if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, DataExplorer.$CLASS_NAME, $METHOD_NAME, "total init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			GDE.shell.open();
+			log.logp(Level.TIME, DataExplorer.$CLASS_NAME, $METHOD_NAME, "total init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			while (!GDE.shell.isDisposed()) {
 				if (!GDE.display.readAndDispatch()) GDE.display.sleep();
 			}
@@ -446,7 +446,7 @@ public class DataExplorer extends Composite {
 	private void postInitGUI(final String inputFilePath) {
 		final String $METHOD_NAME = "postInitGUI"; //$NON-NLS-1$
 		try {
-			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init tabs"); //$NON-NLS-1$
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init tabs"); //$NON-NLS-1$
 			this.statisticsTabItem = new StatisticsWindow(this.displayTab, SWT.NONE);
 			this.statisticsTabItem.create();
 
@@ -459,10 +459,10 @@ public class DataExplorer extends Composite {
 
 			this.setObjectDescriptionTabVisible(this.menuToolBar.isObjectoriented());
 			
-			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init listener"); //$NON-NLS-1$
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init listener"); //$NON-NLS-1$
 			GDE.shell.addListener(SWT.Close, new Listener() {
 				public void handleEvent(Event evt) {
-					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, GDE.shell.getLocation().toString() + "event = " + evt); //$NON-NLS-1$
+					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, GDE.shell.getLocation().toString() + "event = " + evt); //$NON-NLS-1$
 
 					// checkk all data saved - prevent closing application
 					evt.doit = getDeviceSelectionDialog().checkDataSaved();
@@ -470,22 +470,22 @@ public class DataExplorer extends Composite {
 			});
 			GDE.shell.addControlListener(new ControlListener() {			
 				public void controlResized(ControlEvent controlevent) {
-					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
+					log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					DataExplorer.application.settings.setWindowMaximized(GDE.shell.getMaximized());
 					if (!DataExplorer.application.settings.isWindowMaximized()) {
 						DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
 					}
 				}		
 				public void controlMoved(ControlEvent controlevent) {
-					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
+					log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					if (!GDE.shell.getMaximized()) 
 						DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
 				}
 			});
 			this.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
-					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, "widgetDisposed", GDE.shell.getLocation().toString() + "event = " + evt); //$NON-NLS-1$ //$NON-NLS-2$
-					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, "widgetDisposed", GDE.shell.getSize().toString()); //$NON-NLS-1$
+					log.logp(Level.FINE, $CLASS_NAME, "widgetDisposed", GDE.shell.getLocation().toString() + "event = " + evt); //$NON-NLS-1$ //$NON-NLS-2$
+					log.logp(Level.FINE, $CLASS_NAME, "widgetDisposed", GDE.shell.getSize().toString()); //$NON-NLS-1$
 					//cleanup
 					// if help browser is open, dispose it
 					if (DataExplorer.this.helpDialog != null && !DataExplorer.this.helpDialog.isDisposed()) {
@@ -533,21 +533,21 @@ public class DataExplorer extends Composite {
 					// menuCoolBar.controlResized signals collBar item moved
 					if (DataExplorer.this.displayTab != null && getSize().y != 0) {
 						Point fillerSize = DataExplorer.this.filler.getSize();
-						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "filler.size = " + fillerSize); //$NON-NLS-1$
+						log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "filler.size = " + fillerSize); //$NON-NLS-1$
 						Point menuCoolBarSize = DataExplorer.this.menuCoolBar.getSize();
-						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "menuCoolBar.size = " + menuCoolBarSize); //$NON-NLS-1$
+						log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "menuCoolBar.size = " + menuCoolBarSize); //$NON-NLS-1$
 						Point shellSize = new Point(getClientArea().width, getClientArea().height);
-						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "shellClient.size = " + shellSize); //$NON-NLS-1$
+						log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "shellClient.size = " + shellSize); //$NON-NLS-1$
 						Point statusBarSize = DataExplorer.this.statusComposite.getSize();
-						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "statusBar.size = " + statusBarSize); //$NON-NLS-1$
+						log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "statusBar.size = " + statusBarSize); //$NON-NLS-1$
 						DataExplorer.this.displayTab.setBounds(0, menuCoolBarSize.y + fillerSize.y, shellSize.x, shellSize.y - menuCoolBarSize.y - statusBarSize.y - fillerSize.y);
-						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "displayTab.bounds = " + DataExplorer.this.displayTab.getBounds()); //$NON-NLS-1$
+						log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "displayTab.bounds = " + DataExplorer.this.displayTab.getBounds()); //$NON-NLS-1$
 					}
 				}
 			});
 			this.displayTab.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME,
+					log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME,
 							"displayTab.paintControl " + DataExplorer.this.displayTab.getItems()[DataExplorer.this.displayTab.getSelectionIndex()].getText() //$NON-NLS-1$
 									+ GDE.STRING_MESSAGE_CONCAT + DataExplorer.this.displayTab.getSelectionIndex() + GDE.STRING_MESSAGE_CONCAT + evt);
 					if (isRecordSetVisible(GraphicsWindow.TYPE_NORMAL)) {
@@ -577,7 +577,7 @@ public class DataExplorer extends Composite {
 			this.displayTab.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "addSelectionListener, event=" + evt); //$NON-NLS-1$
+					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "addSelectionListener, event=" + evt); //$NON-NLS-1$
 					CTabFolder tabFolder = (CTabFolder) evt.widget;
 					int tabSelectionIndex = tabFolder.getSelectionIndex();
 					if (tabSelectionIndex == 0) {
@@ -636,7 +636,7 @@ public class DataExplorer extends Composite {
 					if (DataExplorer.this.fileTransfer.isSupportedType(event.currentDataType)) {
 						String[] files = (String[]) event.data;
 						for (String filePath : files) {
-							if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "dropped file = " + filePath); //$NON-NLS-1$
+							log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "dropped file = " + filePath); //$NON-NLS-1$
 							if (filePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
 								DataExplorer.this.fileHandler.openOsdFile(filePath);
 							}
@@ -651,16 +651,16 @@ public class DataExplorer extends Composite {
 				}
 			});
 
-			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init help listener"); //$NON-NLS-1$
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "init help listener"); //$NON-NLS-1$
 			this.menuCoolBar.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$
+					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$
 					DataExplorer.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
 				}
 			});
 			this.menu.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$
+					log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "this.helpRequested, event=" + evt); //$NON-NLS-1$
 					DataExplorer.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_3.html"); //$NON-NLS-1$
 				}
 			});
@@ -709,8 +709,6 @@ public class DataExplorer extends Composite {
 				this.deviceSelectionDialog.setupDevice();
 			}
 
-			this.updateLogger();
-
 			if (inputFilePath.length() > 5) {
 				if (inputFilePath.endsWith(GDE.FILE_ENDING_OSD))
 					this.fileHandler.openOsdFile(inputFilePath);
@@ -721,7 +719,9 @@ public class DataExplorer extends Composite {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 		}
+		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "call GDE.shell.layout()");
 		GDE.shell.layout();
+		this.updateLogger();
 	}
 
 	/**
@@ -1517,7 +1517,7 @@ public class DataExplorer extends Composite {
 		FileDialog fileOpenDialog = new FileDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);
 		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
-		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileOpenDialog.setText(name);
 		fileOpenDialog.setFileName(fileName == null ? GDE.STRING_EMPTY : fileName);
 		if (extensions != null) {
@@ -1554,7 +1554,7 @@ public class DataExplorer extends Composite {
 		FileDialog fileOpenDialog = new FileDialog(parent, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);
 		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
-		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileOpenDialog.setText(name);
 		fileOpenDialog.setFileName(fileName == null ? GDE.STRING_EMPTY : fileName);
 		if (extensions != null) {
@@ -1570,7 +1570,7 @@ public class DataExplorer extends Composite {
 		FileDialog fileSaveDialog = new FileDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.SAVE);
 		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
-		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileSaveDialog.setText(name);
 		if (extensions != null) {
 			adaptFilter(fileSaveDialog, extensions);
@@ -1585,7 +1585,7 @@ public class DataExplorer extends Composite {
 		FileDialog fileSaveDialog = new FileDialog(parent, SWT.PRIMARY_MODAL | SWT.SAVE | SWT.ON_TOP);
 		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
-		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileSaveDialog.setText(name);
 		if (extensions != null) {
 			adaptFilter(fileSaveDialog, extensions);
@@ -1621,7 +1621,7 @@ public class DataExplorer extends Composite {
 		DirectoryDialog fileDirDialog = new DirectoryDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.NONE);
 		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
-		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
+		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileDirDialog.setText(name);
 		if (path != null) fileDirDialog.setFilterPath(path);
 		return fileDirDialog.open();
@@ -1847,11 +1847,11 @@ public class DataExplorer extends Composite {
 	public void setGraphicsMode(int graphicsMode, boolean enabled) {
 		final String $METHOD_NAME = "setGraphicsMode"; //$NON-NLS-1$
 		if (isRecordSetVisible(GraphicsWindow.TYPE_NORMAL)) {
-			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "graphicsWindow.getGraphicCanvas().isVisible() == true"); //$NON-NLS-1$
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "graphicsWindow.getGraphicCanvas().isVisible() == true"); //$NON-NLS-1$
 			setGraphicsWindowGraphicsMode(graphicsMode, enabled);
 		}
 		else if (isRecordSetVisible(GraphicsWindow.TYPE_COMPARE) && graphicsMode != GraphicsComposite.MODE_SCOPE) {
-			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "compareWindow.getGraphicCanvas().isVisible() == true"); //$NON-NLS-1$
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "compareWindow.getGraphicCanvas().isVisible() == true"); //$NON-NLS-1$
 			setCompareWindowGraphicsMode(graphicsMode, enabled);
 		}
 	}
@@ -2063,17 +2063,17 @@ public class DataExplorer extends Composite {
 				this.helpDialog = new HelpInfoDialog(GDE.shell, SWT.NONE);
 			}
 			if (GDE.IS_WINDOWS || GDE.IS_MAC) { //$NON-NLS-1$
-				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using syle SWT.NONE (windows IE)"); //$NON-NLS-1$
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using syle SWT.NONE (windows IE)"); //$NON-NLS-1$
 				//this.helpDialog.dispose();
 				this.helpDialog.open(deviceName, fileName, SWT.NONE);
 			}
 			else {
-				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using syle SWT.MOZILLA (xulrunner)"); //$NON-NLS-1$
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using syle SWT.MOZILLA (xulrunner)"); //$NON-NLS-1$
 				this.helpDialog.open(deviceName, fileName, SWT.MOZILLA);
 			}
 		}
 		catch (Error e) {
-			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using OS registered web browser"); //$NON-NLS-1$
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using OS registered web browser"); //$NON-NLS-1$
 			WebBrowser.openURL(deviceName, fileName);
 			application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0025));
 		}
