@@ -257,7 +257,7 @@
         </Channel>
         <Channel type="TYPE_OUTLET" name="Outlet 1+2">
             <Measurement>
-                <name>Voltage</name>
+                <name>Voltage 1+2</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
@@ -278,7 +278,7 @@
                 <property type="Integer" value="1" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Current</name>
+                <name>Current 1+2</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -299,7 +299,7 @@
                 <property type="Integer" value="4" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Capacity</name>
+                <name>Capacity 1+2</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
@@ -323,7 +323,7 @@
                 <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Power</name>
+                <name>Power 1+2</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
@@ -342,7 +342,7 @@
                 <property type="Integer" value="10" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Energy</name>
+                <name>Energy 1+2</name>
                 <symbol>E</symbol>
                 <unit>Wh</unit>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
