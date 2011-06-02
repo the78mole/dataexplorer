@@ -50,6 +50,7 @@
 	            <unit>µs</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <property type="Integer" value="1" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>Temperature</name>
