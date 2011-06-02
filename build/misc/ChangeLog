@@ -3,16 +3,18 @@ Development history / change log, please read from bottom up
 Version 2.82 - xy May 2011
 
 UltramatTrioPlus devices fix bug while data gathering output channel 3
-while data gathering and creating new record sets take over visualization properties from previous active record set
 add UltraDuoPlus40
 add UltraDuoPlus50
-fix QC-Copter problem adding new data set while data gathering
-fix menu cool bar order problem
+QC-Copter fix problem adding new data set while data gathering
+UniLog/LiPoWatch update code to prevent mixing record sets sequence 
 UniLog refine efficiency calculation, fix typo in device XML
-update UniLog/LiPoWatch code to prevent mixing record sets sequence 
-correct UniLog mA/m calculation  
-fix UniLog dialog parameter update problems
+ - correct UniLog mA/m calculation  
+ - fix UniLog dialog parameter update problems
+fix menu cool bar order problem
+while data gathering and creating new record sets take over visualization properties from previous active record set
 update device XMLs to reflect difference between Altitude and Height (english only)
+enable back level version usage parallel installation in respect of configuration XMLs update (future versions only)
+
 
 
 Version 2.81 - 15 May 2011
