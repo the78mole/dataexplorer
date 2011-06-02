@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V13.xsd">
     <Device>
         <name implementation="gde.device.nmea.NMEAAdapter">NMEA-Adapter</name>
         <manufacturer>diverse</manufacturer>
@@ -98,7 +98,7 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
 	        <Measurement>
-	            <name>Altitude (relative)</name>
+	            <name>Height</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
