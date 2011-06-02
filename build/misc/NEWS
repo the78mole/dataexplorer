@@ -1,8 +1,17 @@
 GNU DataExplorer - News - comes with version 2.82
 
-1) UniLog refine efficiency calculation, fix typo in device XML
-2) UltramatTrioPlus devices fix bug while data gathering output channel 3
-
+1) UltramatTrioPlus devices fix bug while data gathering output channel 3
+2) add UltraDuoPlus40
+3) add UltraDuoPlus50
+4) QC-Copter fix problem adding new data set while data gathering
+5) UniLog/LiPoWatch update code to prevent mixing record sets sequence 
+6) UniLog refine efficiency calculation, fix typo in device XML
+7) UniLog correct mA/m calculation  
+8) UniLog fix dialog parameter update problems
+9) fix menu cool bar order problem
+10)while data gathering and creating new record sets take over visualization properties from previous active record set
+11)update device XMLs to reflect difference between Altitude and Height (English only)
+12)enable back level version usage parallel installation in respect of configuration XMLs update (future versions only)
 
 
 

@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 2.82 - xy May 2011
+Version 2.82 - 03 Jun 2011
 
 UltramatTrioPlus devices fix bug while data gathering output channel 3
 add UltraDuoPlus40
@@ -12,7 +12,7 @@ UniLog refine efficiency calculation, fix typo in device XML
  - fix UniLog dialog parameter update problems
 fix menu cool bar order problem
 while data gathering and creating new record sets take over visualization properties from previous active record set
-update device XMLs to reflect difference between Altitude and Height (english only)
+update device XMLs to reflect difference between Altitude and Height (English only)
 enable back level version usage parallel installation in respect of configuration XMLs update (future versions only)
 
 
