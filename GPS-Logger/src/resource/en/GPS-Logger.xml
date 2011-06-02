@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V12.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V13.xsd">
     <Device>
         <name implementation="gde.device.smmodellbau.GPSLogger">GPS-Logger</name>
         <manufacturer>SM-Modellbau</manufacturer>
@@ -90,7 +90,7 @@
 	            <property type="String" value="255,0,128" name="google_earth_upper_limit_color"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Altitude (relative)</name>
+	            <name>Height</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
@@ -183,7 +183,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Altitude (relative)_UL</name>
+	            <name>Height_UL</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
@@ -267,7 +267,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Altitude (relative)_ML</name>
+	            <name>Height_ML</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
@@ -316,7 +316,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Altitude (relative) 2_ML</name>
+	            <name>Height 2_ML</name>
 	            <symbol>h</symbol>
 	            <unit>m</unit>
 	            <active>true</active>
