@@ -12,6 +12,7 @@ UniLog refine efficiency calculation, fix typo in device XML
 update UniLog/LiPoWatch code to prevent mixing record sets sequence 
 correct UniLog mA/m calculation  
 fix UniLog dialog parameter update problems
+update device XMLs to reflect difference between Altitude and Height (english only)
 
 
 Version 2.81 - 15 May 2011
