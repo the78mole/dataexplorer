@@ -76,7 +76,7 @@ public class Settings extends Properties {
 	final static Logger					log													= Logger.getLogger(Settings.class.getName());
 	final static String $CLASS_NAME = Settings.class.getName();
 	
-	private static Settings	instance											= null;	// singelton
+	private static Settings	instance												= null;	// singelton
 
 	// JAXB XML environment
 	Schema											schema;
@@ -94,8 +94,8 @@ public class Settings extends Properties {
 	static final String	PATH_RESOURCE								= "resource/";
 	static final String PATH_RESOURCE_TEMPLATE 			= "resource/template/";
 
-	final static String		HEADER_TEXT										= "# -- DataExplorer Settings File -- "; //$NON-NLS-1$
-	final static String		DEVICE_BLOCK									= "#[Actual-Device-Port-Settings]";																				// Picolario;Renschler;COM2 //$NON-NLS-1$
+	final static String		HEADER_TEXT										= "# -- DataExplorer Settings File -- "; 	//$NON-NLS-1$
+	final static String		DEVICE_BLOCK									= "#[Actual-Device-Port-Settings]";				// Picolario;Renschler;COM2 //$NON-NLS-1$
 	final static String		WINDOW_BLOCK									= "#[Window-Settings]"; //$NON-NLS-1$
 	final static String		WINDOW_MAXIMIZED							= "window_maximized"; //$NON-NLS-1$
 	final static String		WINDOW_LEFT										= "window_left"; //$NON-NLS-1$
@@ -297,7 +297,7 @@ public class Settings extends Properties {
 		}
 		
 		String templateDirectory = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + GRAPHICS_TEMPLATES_DIR_NAME;
-		if (!FileUtils.checkDirectoryAndCreate(templateDirectory, GRAPHICS_TEMPLATES_XSD_NAME)) { // there is no old XSD version
+		if (!FileUtils.checkDirectoryAndCreate(templateDirectory, GRAPHICS_TEMPLATES_XSD_NAME)) {
 			FileUtils.extract(this.getClass(), GRAPHICS_TEMPLATES_XSD_NAME, PATH_RESOURCE, templateDirectory, PERMISSION_555);
 			this.isGraphicsTemplateUpdated = true;
 		}
