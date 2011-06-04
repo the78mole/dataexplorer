@@ -620,6 +620,7 @@ public class Record extends Vector<Integer> {
 		newProperty.setName(propertyKey);
 		newProperty.setType(type);
 		newProperty.setValue(GDE.STRING_EMPTY + value);
+		this.properties.add(newProperty);
 		return newProperty;
 	}
 
@@ -643,7 +644,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
 		else
-			this.properties.add(this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue))); //$NON-NLS-1$
+			this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
 	public double getOffset() {
@@ -666,7 +667,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
 		else
-			this.properties.add(this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue))); //$NON-NLS-1$
+			this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
 	public double getReduction() {
@@ -691,7 +692,7 @@ public class Record extends Vector<Integer> {
 		if (property != null)
 			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
 		else
-			this.properties.add(this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue))); //$NON-NLS-1$
+			this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
 	public boolean isVisible() {
