@@ -15,6 +15,7 @@ fix menu cool bar order problem
 while data gathering and creating new record sets take over visualization properties from previous active record set
 update device XMLs to reflect difference between Altitude and Height (English only)
 enable back level version usage parallel installation in respect of configuration XMLs update (future versions only)
+fix error handling record properties, used by UniLog and Picolario
 
 
 

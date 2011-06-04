@@ -13,6 +13,8 @@ GNU DataExplorer - News - comes with version 2.82
 11)while data gathering and creating new record sets take over visualization properties from previous active record set
 12)update device XMLs to reflect difference between Altitude and Height (English only)
 13)enable back level version usage parallel installation in respect of configuration XMLs update (future versions only)
+14)fix error handling record properties, used by UniLog and Picolario
+
 
 
 
