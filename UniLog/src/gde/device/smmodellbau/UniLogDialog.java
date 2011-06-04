@@ -1757,7 +1757,7 @@ public class UniLogDialog extends DeviceDialog {
 	 * function to reset all the buttons, normally called after data gathering finished
 	 */
 	public void resetButtons() {
-		if (this.dialogShell != null) {
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
 			if (Thread.currentThread().getId() == this.application.getThreadId()) {		
 				this.setButtonStateLiveGatherer(true);
 				this.startLoggingButton.setEnabled(true);
