@@ -18,6 +18,21 @@
 ****************************************************************************************/
 package gde.device.renschler;
 
+import gde.GDE;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DataTypes;
+import gde.device.IDevice;
+import gde.device.MeasurementType;
+import gde.device.PropertyType;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.CalculationThread;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -33,21 +48,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-
-import gde.GDE;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.DataTypes;
-import gde.device.IDevice;
-import gde.device.MeasurementType;
-import gde.device.PropertyType;
-import gde.log.Level;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.CalculationThread;
 
 /**
  * Configuration tab for Picolario configration entries
@@ -428,9 +428,7 @@ public class PicolarioConfigTab extends Composite {
 		int channelConfigNumber = Channels.getInstance().getActiveChannel().getNumber();
 		RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) { // load all data from record set
-			String[] recordKeys = recordSet.getRecordNames();
-			
-			record = recordSet.get(recordKeys[1]); // 1 = height
+			record = recordSet.get(1); // 1 = height
 			this.heightDataUnit = record.getUnit();
 			log.log(Level.FINER, "heightDataUnit = " + this.heightDataUnit); //$NON-NLS-1$
 	
@@ -454,7 +452,7 @@ public class PicolarioConfigTab extends Composite {
 			this.heightOffsetValue = new Double(property != null ? property.getValue() : "0.0").doubleValue(); //$NON-NLS-1$
 			log.log(Level.FINER, "heightOffsetValue = " + this.heightOffsetValue); //$NON-NLS-1$
 	
-			record = recordSet.get(recordKeys[2]); // 2 = slope
+			record = recordSet.get(2); // 2 = climb
 			this.slopeDataUnit = record.getUnit();
 			log.log(Level.FINER, "slopeDataUnit = " + this.slopeDataUnit); //$NON-NLS-1$
 	
@@ -483,7 +481,7 @@ public class PicolarioConfigTab extends Composite {
 			log.log(Level.FINER, "doHeightAdaption = " + this.doHeightAdaption); //$NON-NLS-1$
 	
 			property = measurement.getProperty(Picolario.DO_SUBTRACT_FIRST);
-			this.doSubtractFirst = Boolean.valueOf(property != null ? property.getValue() : "false").booleanValue(); //$NON-NLS-1$
+			this.doSubtractFirst = Boolean.valueOf(property != null ? property.getValue() : "true").booleanValue(); //$NON-NLS-1$
 			log.log(Level.FINER, "doSubtractFirst = " + this.doSubtractFirst); //$NON-NLS-1$
 	
 			property = measurement.getProperty(Picolario.DO_SUBTRACT_LAST);
@@ -585,13 +583,37 @@ public class PicolarioConfigTab extends Composite {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				String measurementKey = activeRecordSet.getRecordNames()[1]; // height
-				Record activeRecord = activeRecordSet.get(measurementKey);
-				activeRecord.getProperty(Picolario.DO_NO_ADAPTION).setValue(""+PicolarioConfigTab.this.doNoAdation); //$NON-NLS-1$
-				activeRecord.getProperty(Picolario.DO_SUBTRACT_FIRST).setValue(""+PicolarioConfigTab.this.doSubtractFirst); //$NON-NLS-1$
-				activeRecord.getProperty(Picolario.DO_SUBTRACT_LAST).setValue(""+PicolarioConfigTab.this.doSubtractLast); //$NON-NLS-1$
-				activeRecord.getProperty(Picolario.DO_OFFSET_HEIGHT).setValue(""+PicolarioConfigTab.this.doOffsetHeight); //$NON-NLS-1$
-				activeRecord.getProperty(IDevice.OFFSET).setValue(""+PicolarioConfigTab.this.heightOffsetValue); //$NON-NLS-1$
+				Record activeRecord = activeRecordSet.get(1); // height
+				PropertyType property = activeRecord.getProperty(Picolario.DO_NO_ADAPTION);
+				if (property == null) {
+					activeRecord.createProperty(Picolario.DO_NO_ADAPTION, DataTypes.BOOLEAN, PicolarioConfigTab.this.doNoAdation);
+				}
+				else property.setValue(PicolarioConfigTab.this.doNoAdation);
+				
+				property = activeRecord.getProperty(Picolario.DO_SUBTRACT_FIRST);
+				if (property == null) {
+					activeRecord.createProperty(Picolario.DO_SUBTRACT_FIRST, DataTypes.BOOLEAN, PicolarioConfigTab.this.doSubtractFirst);
+				}
+				else property.setValue(PicolarioConfigTab.this.doSubtractFirst);
+				
+				property = activeRecord.getProperty(Picolario.DO_SUBTRACT_LAST);
+				if (property == null) {
+					activeRecord.createProperty(Picolario.DO_SUBTRACT_LAST, DataTypes.BOOLEAN, PicolarioConfigTab.this.doSubtractLast);
+				}
+				else property.setValue(PicolarioConfigTab.this.doSubtractLast);
+				
+				property = activeRecord.getProperty(Picolario.DO_OFFSET_HEIGHT);
+				if (property == null) {
+					activeRecord.createProperty(Picolario.DO_OFFSET_HEIGHT, DataTypes.BOOLEAN, PicolarioConfigTab.this.doOffsetHeight);
+				}
+				else property.setValue(PicolarioConfigTab.this.doOffsetHeight);
+				
+				property = activeRecord.getProperty(IDevice.OFFSET);
+				if (property == null) {
+					activeRecord.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, PicolarioConfigTab.this.heightOffsetValue);
+				}
+				else property.setValue(PicolarioConfigTab.this.heightOffsetValue);
+				
 				PicolarioConfigTab.this.application.updateGraphicsWindow();
 				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}
