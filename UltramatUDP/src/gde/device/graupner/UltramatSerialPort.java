@@ -71,9 +71,14 @@ public class UltramatSerialPort extends DeviceCommPort {
 	final static int		SIZE_CHANNEL_2_SETUP					= 4;
 	final static int		SIZE_TIRE_HEATER_SETUP				= 8;
 	final static int		SIZE_MOTOR_RUN_SETUP					= 17;
+	
+	final static int    xferErrorLimit								= 15;
 
 	boolean							isInSync											= false;
-	boolean							isMissmatchWarningWritten			= false;
+	boolean							isDataMissmatchWarningWritten	= false;
+	int									dataCheckSumOffset						= 0;
+	boolean							isCmdMissmatchWarningWritten	= false;
+	int									cmdCheckSumOffset							= 0;
 
 	/**
 	 * constructor of default implementation
@@ -136,7 +141,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 				this.addXferError();
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
+				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
 				answer = new byte[data.length];
 				answer = this.read(answer, 3000);
 			}
@@ -146,14 +151,14 @@ public class UltramatSerialPort extends DeviceCommPort {
 				this.addXferError();
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
+				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
 				data = getData(true);
 			}
 
 			if (checkBeginEndSignature && !isChecksumOK(data)) {
 				this.addXferError();
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
+				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
 				data = getData(true);
 			}
 		}
@@ -305,7 +310,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 				this.addXferError();
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
+				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
 				answer = new byte[expectedDataSize];
 				answer = this.read(answer, 3000);
 			}
@@ -313,7 +318,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 				this.addXferError();
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-				if (this.getXferErrors() > 10) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of 10");
+				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
 				readBuffer = readConfigData(type, expectedDataSize, index);
 			}
 			log.logp(Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "readBuffer = " + StringHelper.convert2CharString(readBuffer)); //$NON-NLS-1$
@@ -366,19 +371,18 @@ public class UltramatSerialPort extends DeviceCommPort {
 		int check_sum = Checksum.ADD(buffer, 1, length - 6);
 		int buffer_check_sum = Integer.parseInt(
 				String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length - 5], (char) buffer[length - 4], (char) buffer[length - 3], (char) buffer[length - 2]), 16);
-		if (check_sum == buffer_check_sum)
+		if (check_sum == buffer_check_sum || check_sum == (buffer_check_sum - this.dataCheckSumOffset))
 			isOK = true;
 		else {
-			if (!this.isMissmatchWarningWritten) {
+			//some devices has a constant checksum offset by firmware error, calculate this offset first time the mismatch occurs and tolerate the calculated offset afterwards
+			if (!this.isDataMissmatchWarningWritten) {
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "check sum missmatch detected, calculates check_sum = " + check_sum + "; delta to data contained delta = "
 						+ (buffer_check_sum - check_sum));
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
-				this.isMissmatchWarningWritten = true;
-			}
-				//tolerate UltraTrioPlus14, Ultramat18 and UltraDuoPlus45 checksum delta
-			//can not make sure that offset is the same after any firmware update the offset get logged, but will always return isOK=true
-			//if (check_sum == (buffer_check_sum - 576) || check_sum == (buffer_check_sum - 384) || check_sum == (buffer_check_sum - 1152)) 
+				this.isDataMissmatchWarningWritten = true;
+				this.dataCheckSumOffset = buffer_check_sum - check_sum;
 				isOK = true;
+			}
 		}
 		return isOK;
 	}
@@ -395,14 +399,18 @@ public class UltramatSerialPort extends DeviceCommPort {
 		int check_sum = Checksum.ADD(buffer, 1, length - 7);
 		int buffer_check_sum = Integer.parseInt(
 				String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length - 6], (char) buffer[length - 5], (char) buffer[length - 4], (char) buffer[length - 3]), 16);
-		if (check_sum == buffer_check_sum)
+		if (check_sum == buffer_check_sum || check_sum == (buffer_check_sum - this.cmdCheckSumOffset))
 			isOK = true;
 		else {
-			log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "check sum missmatch detected, calculates check_sum = " + check_sum
-					+ "; delta to data contained delta = " + (buffer_check_sum - check_sum));
-			log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
-
-			if (check_sum == (buffer_check_sum - 384) || check_sum == (buffer_check_sum - 1152)) isOK = true;
+			//some devices has a constant checksum offset by firmware error, calculate this offset first time the mismatch occurs and tolerate the calculated offset afterwards
+			if (!this.isDataMissmatchWarningWritten) {
+				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "check sum missmatch detected, calculates check_sum = " + check_sum + "; delta to data contained delta = "
+						+ (buffer_check_sum - check_sum));
+				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+				this.isDataMissmatchWarningWritten = true;
+				this.dataCheckSumOffset = buffer_check_sum - check_sum;
+				isOK = true;
+			}
 		}
 		return isOK;
 	}
