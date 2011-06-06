@@ -40,8 +40,8 @@ public class UltramatSerialPort extends DeviceCommPort {
 	final static String	$CLASS_NAME										= UltramatSerialPort.class.getName();
 	final static Logger	log														= Logger.getLogger(UltramatSerialPort.$CLASS_NAME);
 
-	final static byte[]	RESET_BEGIN										= new byte[] { DeviceSerialPortImpl.FF, 0x41, 0x37, 0x30, 0x30, 0x30, 0x30, 0x44, 0x38, DeviceSerialPortImpl.CR };	//1000 1111
-	final static byte[]	RESET_END											= new byte[] { DeviceSerialPortImpl.FF, 0x43, 0x30, 0x30, 0x30, 0x30, 0x30, 0x44, 0x33, DeviceSerialPortImpl.CR };	//1000 1111
+	final static byte[]	RESET_CONFIG									= new byte[] { DeviceSerialPortImpl.FF, 0x41, 0x37, 0x30, 0x30, 0x30, 0x30, 0x44, 0x38, DeviceSerialPortImpl.CR };	//1000 1111
+	final static byte[]	RESET													= new byte[] { DeviceSerialPortImpl.FF, 0x43, 0x30, 0x30, 0x30, 0x30, 0x30, 0x44, 0x33, DeviceSerialPortImpl.CR };	//1000 1111
 	final static byte[]	READ_MEMORY_NAME							= new byte[] { DeviceSerialPortImpl.FF, '8', '0', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0000
 	final static byte[]	WRITE_MEMORY_NAME							= new byte[] { DeviceSerialPortImpl.FF, '0', '0' };																																//0000 0000
 	final static byte[]	READ_MEMORY_SETUP							= new byte[] { DeviceSerialPortImpl.FF, '8', '1', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0001
@@ -142,6 +142,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
+				this.write(RESET);
 				answer = new byte[data.length];
 				answer = this.read(answer, 3000);
 			}
@@ -152,6 +153,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
+				this.write(RESET);
 				data = getData(true);
 			}
 
@@ -159,6 +161,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 				this.addXferError();
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
+				this.write(RESET);
 				data = getData(true);
 			}
 		}
@@ -311,6 +314,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
+				this.write(RESET);
 				answer = new byte[expectedDataSize];
 				answer = this.read(answer, 3000);
 			}
@@ -319,6 +323,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
+				this.write(RESET);
 				readBuffer = readConfigData(type, expectedDataSize, index);
 			}
 			log.logp(Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "readBuffer = " + StringHelper.convert2CharString(readBuffer)); //$NON-NLS-1$

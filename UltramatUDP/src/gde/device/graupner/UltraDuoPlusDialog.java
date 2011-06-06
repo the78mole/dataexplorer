@@ -204,7 +204,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				try {
 					long time = new Date().getTime();
 					serialPort.open();
-					serialPort.write(UltramatSerialPort.RESET_BEGIN);
+					serialPort.write(UltramatSerialPort.RESET_CONFIG);
 
 					deviceIdentifierName = serialPort.readDeviceUserName(); //read the device identifier name to read available cache file
 
@@ -244,7 +244,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				}
 				finally {
 					if (serialPort.isConnected()) {
-						serialPort.write(UltramatSerialPort.RESET_END);
+						serialPort.write(UltramatSerialPort.RESET);
 						serialPort.close();
 					}
 
@@ -357,12 +357,13 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			if (this.serialPort != null && !this.serialPort.isConnected()) {
 				try {
 					this.serialPort.open();
+					this.serialPort.write(UltramatSerialPort.RESET);
 					byte[] answer = this.serialPort.getData(true);
 					if (this.device.isProcessing(1, answer) || this.device.isProcessing(2, answer)) {
 						this.application.openMessageDialogAsync(null, Messages.getString(MessageIds.GDE_MSGW2201));
 						return;
 					}
-					this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
+					this.serialPort.write(UltramatSerialPort.RESET_CONFIG);
 					this.deviceIdentifierName = this.serialPort.readDeviceUserName();
 
 					this.jc = JAXBContext.newInstance("gde.device.graupner"); //$NON-NLS-1$
@@ -466,7 +467,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 								saveConfigUDP(UltraDuoPlusDialog.this.settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
 										+ UltraDuoPlusDialog.this.deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML);
 
-								UltraDuoPlusDialog.this.serialPort.write(UltramatSerialPort.RESET_END);
+								UltraDuoPlusDialog.this.serialPort.write(UltramatSerialPort.RESET);
 							}
 							catch (Throwable e) {
 								e.printStackTrace();
@@ -1155,7 +1156,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			this.application.resetShellIcon();
 			if (this.serialPort != null && this.serialPort.isConnected()) {
 				try {
-					this.serialPort.write(UltramatSerialPort.RESET_END);
+					this.serialPort.write(UltramatSerialPort.RESET);
 				}
 				catch (IOException e) {
 					// ignore

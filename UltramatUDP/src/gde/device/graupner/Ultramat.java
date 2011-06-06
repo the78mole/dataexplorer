@@ -353,6 +353,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 			if (!this.serialPort.isConnected()) {
 				try {
 					this.serialPort.open();
+					this.serialPort.write(UltramatSerialPort.RESET);
 					try {
 						byte[] dataBuffer = this.serialPort.getData(false);
 						this.firmware = this.getFirmwareVersion(dataBuffer);
@@ -371,9 +372,9 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 						case UltraDuoPlus45:
 						case UltraDuoPlus60:
 							if (!(this.isProcessing(1, dataBuffer) || this.isProcessing(2, dataBuffer))) {
-								this.serialPort.write(UltramatSerialPort.RESET_BEGIN);
+								this.serialPort.write(UltramatSerialPort.RESET_CONFIG);
 								String deviceIdentifierName = this.serialPort.readDeviceUserName();
-								this.serialPort.write(UltramatSerialPort.RESET_END);
+								this.serialPort.write(UltramatSerialPort.RESET);
 
 								this.jc = JAXBContext.newInstance("gde.device.graupner"); //$NON-NLS-1$
 								this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
@@ -387,19 +388,19 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 						}
 					}
 					catch (FileNotFoundException e) {
-						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET_END);
+						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET);
 						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 					}
 					catch (SerialPortException e) {
-						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET_END);
+						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET);
 						throw e;
 					}
 					catch (TimeOutException e) {
-						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET_END);
+						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET);
 						throw new SerialPortException(e.getMessage());
 					}
 					catch (Exception e) {
-						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET_END);
+						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET);
 						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 						throw e;
 					}
