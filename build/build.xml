@@ -670,6 +670,8 @@
 		<copy todir="${build.target.dir}" overwrite="true">
 			<fileset dir="build/misc" >
 				<include name="GNULinux_cp210x/*" />
+				<include name="udev_rules/*" />
+				<include name="HowToCreateDevicePlugin" />
 			</fileset>
 		</copy>
 	</target>
