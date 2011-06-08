@@ -47,7 +47,7 @@ Documentation how to proceed doing this is available at download area.
 								 
 How to detect the processor architecture :
 Windows on command prompt : "echo %PROCESSOR_ARCHITECTURE% -> x86 == 32 Bit; AMD64 == 64 Bit or Settings/All Programms -> Control Panel -> System -> System Type
-GNU/Linux 	Kommandozeile : "uname -a" -> i586 == 32 Bit; x84_64 == 64 Bit
+GNU/Linux 	Kommandozeile : "uname -a" -> i386/i686 == 32 Bit; x84_64 == 64 Bit
 MAC OS run always on a 64 Bit processor and supports the execution of 32 Bit as well as 64 Bit Java applications.	
 
 Installation of the binary distribution is an unpack of the containing DataExplorer directory with its sub directories and files to a place 

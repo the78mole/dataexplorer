@@ -47,7 +47,7 @@ Dokumentation hierzu ist im Downloadbereich verfügbar.
 
 Wie stelle ich die Prozessorarchitektur fest (Bitbreite):
 Windows über die Kommandozeile : "echo %PROCESSOR_ARCHITECTURE% -> x86 == 32 Bit; AMD64 == 64 Bit oder Programme -> Kontrolcenter -> System -> System Typ
-GNU/Linux 	Kommandozeile : "uname -a" -> i586 == 32 Bit; x84_64 == 64 Bit
+GNU/Linux 	Kommandozeile : "uname -a" -> i386/i686 == 32 Bit; x84_64 == 64 Bit
 MAC OS ist immer 64 Bit und unterstützt die Ausführung von 32 Bit sowie 64 Bit Javaprogrammen.	
 
 Eine Installation ist nicht nötig, das im Archiv enthaltene Verzeichnis "DataExplorer" mit den darunter liegenden Verzeichnissen und Dateien
