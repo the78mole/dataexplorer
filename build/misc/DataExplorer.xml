@@ -7,7 +7,7 @@
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
-  <downloadUrl>http://java.sun.com/javase/downloads/index.jsp</downloadUrl>
+  <downloadUrl>http://java.com/download</downloadUrl>
   <supportUrl>http://savannah.nongnu.org/projects/dataexplorer</supportUrl>
   <customProcName>false</customProcName>
   <stayAlive>true</stayAlive>

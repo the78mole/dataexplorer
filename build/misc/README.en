@@ -1,9 +1,10 @@
-﻿******** DataExplorer README ***********  24 Mar 2010 WB
+﻿******** DataExplorer README ***********  08 Jun 2011 WB
 
 The GNU DataExplorer is free software, please see http://www.gnu.org/philosophy/free-sw.html. It is also available at no
 cost, but without any warranty. Since the implementation is based on Java using the free available libraries RXTXcomm and SWT
 the execution of this program is possible under a number of popular operating systems like 32/64 Bit Windows and GNU/Linux 
-and Mac OS. To execute the only prerequisite is an installed Java runtime with version 1.6 or higher, like IcedTea.
+and MAC OS. To execute the only prerequisite is an installed Java runtime with version 1.6 or higher, like IcedTea or
+SUN/Oracles Java Runtime download http://java.com/download.
 
 The GNU DataExplorer gathers data from connected devices and display this data for a various of further analysis.
 Actual the following devices are available as plug-in: 
@@ -42,7 +43,12 @@ Actual the following devices are available as plug-in:
 More device are under construction. Help doing this is very welcome.		
 
 A device API (IDevice) is defined to enable a relative simple adaptation of a new device to work together with the base application.
-Documentation how to proceed doing this is under construction.									 
+Documentation how to proceed doing this is available at download area.	
+								 
+How to detect the processor architecture :
+Windows on command prompt : "echo %PROCESSOR_ARCHITECTURE% -> x86 == 32 Bit; AMD64 == 64 Bit or Settings/All Programms -> Control Panel -> System -> System Type
+GNU/Linux 	Kommandozeile : "uname -a" -> i586 == 32 Bit; x84_64 == 64 Bit
+MAC OS run always on a 64 Bit processor and supports the execution of 32 Bit as well as 64 Bit Java applications.	
 
 Installation of the binary distribution is an unpack of the containing DataExplorer directory with its sub directories to a place 
 where execution right exist.
