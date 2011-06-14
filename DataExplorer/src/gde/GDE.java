@@ -338,7 +338,7 @@ public class GDE {
 			sb.append("SWT.PLATFORM = ").append(SWT.getPlatform()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, sb.toString());
 
-			GDE.seStartupProgress(40);
+			GDE.seStartupProgress(80);
 			application.execute(inputFilePath);
 		}
 		catch (Throwable e) {
@@ -516,7 +516,7 @@ public class GDE {
 			}
 		});
 		splashShell.open();
-		bar.setSelection(15);
+		bar.setSelection(40);
 		GDE.splash = splashShell;
 		GDE.progBar = bar;
 	}

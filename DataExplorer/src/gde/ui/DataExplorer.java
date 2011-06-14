@@ -354,7 +354,6 @@ public class DataExplorer extends Composite {
 			GDE.shell.setImage(SWTResourceManager.getImage(GDE.IS_MAC ? "gde/resource/DataExplorer_MAC.png" : "gde/resource/DataExplorer.png")); //$NON-NLS-1$ //$NON-NLS-2$
 			GDE.shell.setText(GDE.NAME_LONG);
 
-			GDE.seStartupProgress(100);
 			if (GDE.splash != null) GDE.splash.dispose();
 			TaskBar taskBar = GDE.display.getSystemTaskBar();
 			if (taskBar == null)
