@@ -1,5 +1,10 @@
 Development history / change log, please read from bottom up
 
+Version 2.8x - xx Yyy 2011
+
+refine time line to support days, month and years as period
+update UltraDuoPlus dialog to read battery cycle data
+
 Version 2.82 - 03 Jun 2011
 
 UltramatTrioPlus devices fix bug while data gathering output channel 3
