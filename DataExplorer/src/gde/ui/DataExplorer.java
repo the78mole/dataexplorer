@@ -45,7 +45,6 @@ import gde.ui.tab.GraphicsComposite;
 import gde.ui.tab.GraphicsWindow;
 import gde.ui.tab.ObjectDescriptionWindow;
 import gde.ui.tab.StatisticsWindow;
-import gde.ui.tab.UtilGraphicsWindow;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
@@ -585,12 +584,22 @@ public class DataExplorer extends Composite {
 					int tabSelectionIndex = tabFolder.getSelectionIndex();
 					if (tabSelectionIndex == 0) {
 						DataExplorer.this.menuToolBar.enableScopePointsCombo(true);
+						DataExplorer.this.enableZoomMenuButtons(true);
+						DataExplorer.this.updateGraphicsWindow();
 					}
 					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) 
-							&& (DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE) || DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL))) {
+							&& DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
 						DataExplorer.this.menuToolBar.enableScopePointsCombo(false);
+						DataExplorer.this.enableZoomMenuButtons(true);
+						DataExplorer.this.updateGraphicsWindow();
 					}
-					//TODO disable zoom for window type util
+					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) 
+							&& DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
+						DataExplorer.this.menuToolBar.enableScopePointsCombo(false);
+						DataExplorer.this.enableZoomMenuButtons(false);
+						DataExplorer.this.updateGraphicsWindow();
+					}
+					
 				}
 			});
 			// drag filePath support
@@ -1453,6 +1462,15 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
+	 * enable / disable the zoom menu buttons
+	 * @param enabled
+	 */
+	public void enableZoomMenuButtons(boolean enabled) {
+		this.menuToolBar.enableZoomToolBar(enabled);
+		this.menuBar.enableZoomMenuButtons(enabled);
+	}
+
+	/**
 	 * enable / disable the device switch buttons
 	 * @param enabled
 	 */
@@ -1697,10 +1715,12 @@ public class DataExplorer extends Composite {
 				if (tabSelectionIndex == 0) { //graphics tab is alwasy the first one
 					this.graphicsTabItem.redrawGraphics();
 				}
-				else if (this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) {
+				else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) 
+						&& DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
 					this.compareTabItem.redrawGraphics();
 				}
-				else if (this.displayTab.getItem(tabSelectionIndex) instanceof UtilGraphicsWindow) {
+				else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) 
+						&& DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
 					this.utilGraphicsTabItem.redrawGraphics();
 				}
 			}
@@ -1713,10 +1733,12 @@ public class DataExplorer extends Composite {
 						if (tabSelectionIndex == 0) {
 							DataExplorer.this.graphicsTabItem.redrawGraphics();
 						}
-						else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) {
+						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) 
+								&& DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
 								DataExplorer.this.compareTabItem.redrawGraphics();
 						}
-						else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof UtilGraphicsWindow) {
+						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) 
+								&& DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
 							DataExplorer.this.utilGraphicsTabItem.redrawGraphics();
 						}
 					}
