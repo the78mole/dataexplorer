@@ -82,6 +82,7 @@ public class RecordSet extends HashMap<String, Record> {
 	
 	//for compare set x min/max and y max (time) might be different
 	boolean												isCompareSet									= false;
+	boolean												isUtilitySet									= false;
 	double												maxTime												= 0.0;							//compare set -> each record will have its own timeSteps_ms, 
 																																									//so the biggest record in view point of time will define the time scale
 	double												maxValue											= Integer.MIN_VALUE;
@@ -187,8 +188,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param newChannelName the channel name or configuration name
 	 * @param newName for the records like "1) Laden" 
 	 * @param newTimeStep_ms time in msec of device measures points
+	 * @param windowType GraphicsWindow.WINDOW_TYPE
 	 */
-	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms) {
+	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms, int windowType) {
 		super();
 		this.application = DataExplorer.getInstance();
 		this.channels = null;
@@ -198,7 +200,8 @@ public class RecordSet extends HashMap<String, Record> {
 		this.recordNames = new String[0];
 		//this.timeStep_ms = new TimeSteps(this.get(0), newTimeStep_ms);
 		this.isRaw = true;
-		this.isCompareSet = true;
+		this.isCompareSet = GraphicsWindow.TYPE_COMPARE == windowType;
+		this.isUtilitySet = GraphicsWindow.TYPE_UTIL == windowType;
 	}
 
 	/**
@@ -547,7 +550,7 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * @return the time information for index given
 	 */
-	public int getTime(int index) {
+	public long getTime(int index) {
 		return this.timeStep_ms.get(index);
 	}
 
@@ -869,7 +872,7 @@ public class RecordSet extends HashMap<String, Record> {
 		newRecord.parent = this;
 
 		// add key to recordNames[] in case of TYPE_COMPARE_SET, keep ordinal to enable translate value
-		if (this.isCompareSet) {
+		if (this.isCompareSet || this.isUtilitySet) {
 			this.addRecordName(key);
 			newRecord.name = key;
 			
@@ -898,7 +901,8 @@ public class RecordSet extends HashMap<String, Record> {
 			return this.get(this.recordNames[recordOrdinal]);
 		}
 		catch (Exception e) {
-			return this.get(0);
+			log.log(Level.SEVERE, e.getMessage(), e);
+			return super.size() > 0 ? this.get(0) : null;
 		}
 	}
 
@@ -1708,7 +1712,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public void syncScaleOfSyncableRecords() {
 		this.scaleSyncedRecords	= new HashMap<Integer,Vector<Record>>(1);
 		for (int i = 0; i < this.size() && !this.isCompareSet; i++) {
-			PropertyType syncProperty = this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+			PropertyType syncProperty = this.isUtilitySet ? this.get(i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) : this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 			Record tmpRecord = this.get(i);
 			if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
 				int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());

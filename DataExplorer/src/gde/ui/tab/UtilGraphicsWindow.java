@@ -46,11 +46,6 @@ import org.eclipse.swt.graphics.Rectangle;
 public class UtilGraphicsWindow extends CTabItem {
 	final static Logger						log											= Logger.getLogger(UtilGraphicsWindow.class.getName());
 
-	public static final int				TYPE_NORMAL							= 0;
-	public static final int				TYPE_COMPARE						= 1;
-	public static final int				TYPE_UTIL								= 2;
-	public static final String		WINDOW_TYPE							= "window_type"; //$NON-NLS-1$
-
 	final CTabFolder							tabFolder;
 	
 	SashForm											graphicSashForm;
@@ -63,7 +58,7 @@ public class UtilGraphicsWindow extends CTabItem {
 	// drawing canvas
 	GraphicsComposite							graphicsComposite;
 
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final Channels								channels;
 	final Settings								settings;
 	final String									tabName;

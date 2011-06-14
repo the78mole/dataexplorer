@@ -79,7 +79,7 @@ public class AnalogDisplay extends Composite {
 	double					minValue					= 0.0;
 	double					maxValue					= 1.0;
 
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final Channel									channel;
 	final RecordSet								recordSet;
 	final Record									record;

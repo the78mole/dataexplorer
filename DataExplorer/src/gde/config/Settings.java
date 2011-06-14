@@ -113,6 +113,9 @@ public class Settings extends Properties {
 	final static String		COMPARE_AREA_BACKGROUND				= "compare_area_background"; //$NON-NLS-1$
 	final static String		COMPARE_SURROUND_BACKGRD			= "compare_surround_backgrd"; //$NON-NLS-1$
 	final static String		COMPARE_BORDER_COLOR					= "compare_border_color"; //$NON-NLS-1$
+	final static String		UTILITY_AREA_BACKGROUND				= "utility_area_background"; //$NON-NLS-1$
+	final static String		UTILITY_SURROUND_BACKGRD			= "utility_surround_backgrd"; //$NON-NLS-1$
+	final static String		UTILITY_BORDER_COLOR					= "utility_border_color"; //$NON-NLS-1$
 	final static String		STATISTICS_INNER_BACKGROUND		= "statistics_inner_background"; //$NON-NLS-1$
 	final static String		STATISTICS_SURROUND_BACKGRD		= "statistics_surround_backgrd"; //$NON-NLS-1$
 	final static String		ANALOG_INNER_BACKGROUND				= "analog_inner_background"; //$NON-NLS-1$
@@ -465,6 +468,9 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", COMPARE_AREA_BACKGROUND, getCompareCurveAreaBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", COMPARE_SURROUND_BACKGRD, getCompareSurroundingBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", COMPARE_BORDER_COLOR, getCurveCompareBorderColorStr())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", UTILITY_AREA_BACKGROUND, getUtilityCurveAreaBackgroundStr())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", UTILITY_SURROUND_BACKGRD, getUtilitySurroundingBackgroundStr())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", UTILITY_BORDER_COLOR, getUtilityCurvesBorderColorStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", STATISTICS_INNER_BACKGROUND, getStatisticsInnerAreaBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", STATISTICS_SURROUND_BACKGRD, getStatisticsSurroundingAreaBackgroundStr())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", ANALOG_INNER_BACKGROUND, getAnalogInnerAreaBackgroundStr())); //$NON-NLS-1$
@@ -1346,14 +1352,14 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getGraphicsCurveAreaBackground() {
-		return getColor(COMPARE_AREA_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
+		return getColor(GRAPHICS_AREA_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
 
 	/**
 	 * @return the grid vertical color of the compare window as string of (r,g,b)
 	 */
 	public String getGraphicsCurveAreaBackgroundStr() {
-		return this.getProperty(COMPARE_AREA_BACKGROUND, "250,249,211").trim(); //$NON-NLS-1$
+		return this.getProperty(GRAPHICS_AREA_BACKGROUND, "250,249,211").trim(); //$NON-NLS-1$
 	}
 
 	/**
@@ -1377,6 +1383,29 @@ public class Settings extends Properties {
 	 */
 	public String getCompareCurveAreaBackgroundStr() {
 		return this.getProperty(COMPARE_AREA_BACKGROUND, "250,249,211").trim(); //$NON-NLS-1$
+	}
+
+	/**
+	 * set the background color of the compare graphics curve area
+	 * @param curveAreaBackground
+	 */
+	public void setUtilityCurveAreaBackground(Color curveAreaBackground) {
+		this.setProperty(UTILITY_AREA_BACKGROUND, curveAreaBackground.getRed()+GDE.STRING_COMMA + curveAreaBackground.getGreen()+GDE.STRING_COMMA + curveAreaBackground.getBlue());
+	}
+
+	/**
+	 * get the background color of the compare graphics curve area
+	 * @return requested color
+	 */
+	public Color getUtilityCurveAreaBackground() {
+		return getColor(UTILITY_AREA_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
+	}
+
+	/**
+	 * @return the grid vertical color of the compare window as string of (r,g,b)
+	 */
+	public String getUtilityCurveAreaBackgroundStr() {
+		return this.getProperty(UTILITY_AREA_BACKGROUND, "250,249,211").trim(); //$NON-NLS-1$
 	}
 
 	/**
@@ -1426,6 +1455,29 @@ public class Settings extends Properties {
 	}
 
 	/**
+	 * set the background color of the compare graphics curve surrounding area
+	 * @param surroundingBackground
+	 */
+	public void setUtilitySurroundingBackground(Color surroundingBackground) {
+		this.setProperty(UTILITY_SURROUND_BACKGRD, surroundingBackground.getRed()+GDE.STRING_COMMA + surroundingBackground.getGreen()+GDE.STRING_COMMA + surroundingBackground.getBlue());
+	}
+
+	/**
+	 * get the background color of the compare graphics curve surrounding area
+	 * @return requested color
+	 */
+	public Color getUtilitySurroundingBackground() {
+		return getColor(UTILITY_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
+	}
+
+	/**
+	 * @return the grid vertical color of the compare window as string of (r,g,b)
+	 */
+	public String getUtilitySurroundingBackgroundStr() {
+		return this.getProperty(UTILITY_SURROUND_BACKGRD, "250,249,230").trim(); //$NON-NLS-1$
+	}
+
+	/**
 	 * set the border color of the graphics curve area
 	 * @param borderColor
 	 */
@@ -1469,6 +1521,29 @@ public class Settings extends Properties {
 	 */
 	public String getCurveCompareBorderColorStr() {
 		return this.getProperty(COMPARE_BORDER_COLOR, "180,180,180").trim(); //$NON-NLS-1$
+	}
+
+	/**
+	 * set the border color of the graphics curve area
+	 * @param borderColor
+	 */
+	public void setUtilityCurvesBorderColor(Color borderColor) {
+		this.setProperty(UTILITY_BORDER_COLOR, borderColor.getRed()+GDE.STRING_COMMA + borderColor.getGreen()+GDE.STRING_COMMA + borderColor.getBlue());
+	}
+
+	/**
+	 * get the border color of the graphics curve area
+	 * @return requested color
+	 */
+	public Color getUtilityCurvesBorderColor() {
+		return getColor(UTILITY_BORDER_COLOR, "180,180,180"); //COLOR_GREY //$NON-NLS-1$
+	}
+
+	/**
+	 * @return the grid vertical color of the utility window as string of (r,g,b)
+	 */
+	public String getUtilityCurvesBorderColorStr() {
+		return this.getProperty(UTILITY_BORDER_COLOR, "180,180,180").trim(); //$NON-NLS-1$
 	}
 
 	/**

@@ -70,7 +70,7 @@ public class CurveSelectorContextMenu {
 	MenuItem											horizontalGridRecordName, horizontalGridColor, horizontalGrid, horizontalGridOff, horizontalGridEveryTick, horizontalGridEverySecond;
 
 	RecordSet											recordSet;
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final Settings								settings = Settings.getInstance();
 	AxisEndValuesDialog						axisEndValuesDialog;
 	
@@ -86,6 +86,7 @@ public class CurveSelectorContextMenu {
 	String 												recordNameKey = null;
 	String 												recordNameMeasurement = GDE.STRING_BLANK;
 	boolean 											isWindowTypeCompare = false;
+	boolean 											isWindowTypeUtility = false;
 	
 	public CurveSelectorContextMenu() {
 		super();
@@ -106,9 +107,8 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
 							log.log(Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
 							CurveSelectorContextMenu.this.isWindowTypeCompare = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE);
-							CurveSelectorContextMenu.this.recordSet = CurveSelectorContextMenu.this.isWindowTypeCompare 
-								? CurveSelectorContextMenu.this.application.getCompareSet()
-								: Channels.getInstance().getActiveChannel().getActiveRecordSet();
+							CurveSelectorContextMenu.this.isWindowTypeUtility = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsWindow.TYPE_UTIL);
+							CurveSelectorContextMenu.this.recordSet = CurveSelectorContextMenu.this.application.getRecordSetOfVisibleTab();
 
 							if (CurveSelectorContextMenu.this.recordSet != null) {
 								setAllEnabled(true);
@@ -157,6 +157,14 @@ public class CurveSelectorContextMenu {
 									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
 									CurveSelectorContextMenu.this.axisPosition.setEnabled(false);
 									CurveSelectorContextMenu.this.axisEndValues.setEnabled(false);
+								}
+
+								// utility window
+								if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
+									CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setEnabled(false);
+									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
+									CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
+									CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
 								}
 
 								// disable clear, if nothing to clear

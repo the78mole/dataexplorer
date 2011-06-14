@@ -389,7 +389,7 @@ public class Record extends Vector<Integer> {
 	 * Method to initialize color and scale position defaults
 	 * @param recordOrdinal
 	 */
-	void setColorDefaultsAndPosition(int recordOrdinal) {
+	public void setColorDefaultsAndPosition(int recordOrdinal) {
 		// set color defaults
 		switch (recordOrdinal) {
 		case 0: // erste Kurve

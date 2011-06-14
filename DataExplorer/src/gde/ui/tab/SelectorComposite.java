@@ -159,6 +159,10 @@ public class SelectorComposite extends Composite {
 								activeRecord = SelectorComposite.this.application.getCompareSet().getRecord(recordName);
 								break;
 
+							case GraphicsWindow.TYPE_UTIL:
+								activeRecord = SelectorComposite.this.application.getUtilitySet().getRecord(recordName);
+								break;
+
 							default:
 								activeRecord = SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet().getRecord(recordName);
 								break;
@@ -199,7 +203,8 @@ public class SelectorComposite extends Composite {
 	public synchronized void doUpdateCurveSelectorTable() {
 		int itemWidth = this.initialSelectorHeaderWidth;
 		RecordSet activeRecordSet = this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getActiveRecordSet() : null;
-		RecordSet recordSet = this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet : this.application.getCompareSet();
+		RecordSet recordSet = this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet 
+				: this.windowType == GraphicsWindow.TYPE_COMPARE ? this.application.getCompareSet() : this.application.getUtilitySet();
 		if (recordSet != null && recordSet.size() > 0) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSet.getName());
 				this.curveSelectorTable.removeAll();

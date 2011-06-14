@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  * TimeSteps class handles all the time steps of a record set or a record of part of compare set
  * @author Winfried Brügmann
  */
-public class TimeSteps extends Vector<Integer> {
+public class TimeSteps extends Vector<Long> {
 	final static String			$CLASS_NAME				= RecordSet.class.getName();
 	final static long				serialVersionUID	= 26031957;
 	final static Logger			log								= Logger.getLogger(RecordSet.class.getName());
@@ -45,7 +45,7 @@ public class TimeSteps extends Vector<Integer> {
 		this.timeFormat.getTimeZone().setRawOffset(0);
 		this.isConstant = newTimeStep_ms > 0;
 		if (this.isConstant) 
-			super.add((int) (newTimeStep_ms * 10));
+			super.add((long) (newTimeStep_ms * 10));
 	}
 	
 	/**
@@ -63,7 +63,7 @@ public class TimeSteps extends Vector<Integer> {
   	//super(toBeClonedTimeSteps);
   	if (!(this.isConstant = toBeClonedTimeSteps.isConstant)) {
 			if (isFromBegin) {
-				int cutOffVal = toBeClonedTimeSteps.get(index);
+				long cutOffVal = toBeClonedTimeSteps.get(index);
 				for (int i = index; i < toBeClonedTimeSteps.elementCount; i++) {
 					super.add(toBeClonedTimeSteps.get(i) - cutOffVal);
 				}
@@ -144,7 +144,7 @@ public class TimeSteps extends Vector<Integer> {
 	 */
 	public synchronized boolean add(double value) {
 		synchronized (this) {
-			return this.isConstant ? true : super.add((int) (value * 10));
+			return this.isConstant ? true : super.add((long) (value * 10));
 		}
 	}
 	

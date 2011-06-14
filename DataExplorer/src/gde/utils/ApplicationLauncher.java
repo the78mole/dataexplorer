@@ -169,7 +169,7 @@ public class ApplicationLauncher {
 					}
 				}
 				sb.deleteCharAt(sb.length()-1).append(GDE.STRING_SINGLE_QUOAT);
-				log.log(Level.OFF, sb.toString());
+				log.log(Level.FINE, sb.toString());
 				
 				new ProcessBuilder(arguments.toArray(new String[1])).start();
 			}

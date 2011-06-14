@@ -18,20 +18,20 @@
 ****************************************************************************************/
 package gde.utils;
 
+import gde.data.RecordSet;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.SWTResourceManager;
+
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-
-import gde.data.RecordSet;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.SWTResourceManager;
 
 /**
  * Utility class to draw time line with tick marks and numbers
@@ -40,12 +40,18 @@ import gde.ui.SWTResourceManager;
 public class TimeLine {
 	final static Logger			log									= Logger.getLogger(TimeLine.class.getName());
 
-	public final static int	TIME_LINE_MSEC			= 0;
-	public final static int	TIME_LINE_SEC				= 1;
-	public final static int	TIME_LINE_SEC_MIN		= 2;
-	public final static int	TIME_LINE_MIN				= 3;
-	public final static int	TIME_LINE_MIN_HRS		= 4;
-	public final static int	TIME_LINE_HRS				= 5;
+	public final static int	TIME_LINE_MSEC				= 0;
+	public final static int	TIME_LINE_SEC					= 1;
+	public final static int	TIME_LINE_SEC_MIN			= 2;
+	public final static int	TIME_LINE_MIN					= 4;
+	public final static int	TIME_LINE_MIN_HRS			= 6;
+	public final static int	TIME_LINE_HRS					= 8;
+	public final static int	TIME_LINE_HRS_DAYS		= 12;
+	public final static int	TIME_LINE_DAYS				= 14;
+	public final static int	TIME_LINE_DAYS_MONTH	= 16;
+	public final static int	TIME_LINE_MONTH				= 18;
+	public final static int	TIME_LINE_MONTH_YEARS	= 20;
+	public final static int	TIME_LINE_YEARS				= 22;
 
 	String									timeLineText				= Messages.getString(MessageIds.GDE_MSGT0267);
 	boolean									isTimeLinePrepared	= false;
@@ -65,15 +71,48 @@ public class TimeLine {
 		long totalTime_sec = Double.valueOf(totalDisplayTime_ms / 1000.0).longValue();
 		long totalTime_min = TimeUnit.MINUTES.convert(totalTime_sec, TimeUnit.SECONDS);
 		long totalTime_std = TimeUnit.HOURS.convert(totalTime_sec, TimeUnit.SECONDS);
+		long totalTime_days = TimeUnit.DAYS.convert(totalTime_sec, TimeUnit.SECONDS);
+		long totalTime_month = TimeUnit.DAYS.convert(totalTime_sec, TimeUnit.SECONDS)/30;
+		long totalTime_year = TimeUnit.DAYS.convert(totalTime_sec, TimeUnit.SECONDS)/365;
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "totalTime_std = " + totalTime_std + "; totalTime_min = " + totalTime_min + "; totalTime_sec = " + totalTime_sec + "; totalTime_ms = " + totalTime_msec + " - " + Integer.MAX_VALUE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		int maxTimeNumberFormated; // the biggest number in the scale to be displayed
 
-		if (totalTime_std > 5) {
+		if (totalTime_year > 5) {
+			maxTimeNumberFormated = (int) totalTime_year;
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0392);
+			format = TimeLine.TIME_LINE_YEARS;
+		}
+		else if (totalTime_month >= 12) {
+			maxTimeNumberFormated = (int) totalTime_month;
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0393);
+			format = TimeLine.TIME_LINE_MONTH_YEARS;
+		}
+		else if (totalTime_month > 3) {
+			maxTimeNumberFormated = (int) totalTime_month;
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0394);
+			format = TimeLine.TIME_LINE_MONTH;
+		}
+		else if (totalTime_days > 30) {
+			maxTimeNumberFormated = (int) totalTime_days;
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0395);
+			format = TimeLine.TIME_LINE_DAYS_MONTH;
+		}
+		else if (totalTime_days > 7) {
+			maxTimeNumberFormated = (int) totalTime_days;
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0396);
+			format = TimeLine.TIME_LINE_DAYS;
+		}
+		else if (totalTime_std >= 24) {
+			maxTimeNumberFormated = (int) totalTime_std;
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0397);
+			format = TimeLine.TIME_LINE_HRS_DAYS;
+		}
+		else if (totalTime_std > 5) {
 			maxTimeNumberFormated = (int) totalTime_std;
 			timeLineText = Messages.getString(MessageIds.GDE_MSGT0265);
 			format = TimeLine.TIME_LINE_HRS;
 		}
-		else if (totalTime_min > 60) {
+		else if (totalTime_min >= 60) {
 			maxTimeNumberFormated = (int) totalTime_min;
 			timeLineText = Messages.getString(MessageIds.GDE_MSGT0266);
 			format = TimeLine.TIME_LINE_MIN_HRS;
@@ -83,7 +122,7 @@ public class TimeLine {
 			timeLineText = Messages.getString(MessageIds.GDE_MSGT0267);
 			format = TimeLine.TIME_LINE_MIN;
 		}
-		else if (totalTime_sec > 60) {
+		else if (totalTime_sec >= 60) {
 			maxTimeNumberFormated = (int) totalTime_sec;
 			timeLineText = Messages.getString(MessageIds.GDE_MSGT0268);
 			format = TimeLine.TIME_LINE_SEC_MIN;
@@ -99,13 +138,19 @@ public class TimeLine {
 			factor = 1000; // 2900 -> 2,9 sec
 			format = TimeLine.TIME_LINE_SEC;
 		}
-		else {
+		else if (totalTime_msec > 0) {
 			maxTimeNumberFormated = (int) totalTime_msec;
 			timeLineText = Messages.getString(MessageIds.GDE_MSGT0271);
 			factor = 1;
 			format = TimeLine.TIME_LINE_MSEC;
 		}
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, timeLineText + "  " + maxTimeNumberFormated); //$NON-NLS-1$
+		else {
+			maxTimeNumberFormated = (int) totalTime_msec;
+			timeLineText = Messages.getString(MessageIds.GDE_MSGT0264);
+			factor = 1;
+			format = TimeLine.TIME_LINE_MSEC;
+		}
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, timeLineText + "  " + maxTimeNumberFormated); //$NON-NLS-1$
 
 		this.isTimeLinePrepared = true;
 
@@ -127,7 +172,7 @@ public class TimeLine {
 	 * @param deltaTime_ms the difference in ms between start and end time
 	 * @param color
 	 */
-	public void drawTimeLine(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int timeFormat, int deltaTime_ms, Color color) {
+	public void drawTimeLine(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, int scaleFactor, int timeFormat, long deltaTime_ms, Color color) {
 		if (this.isTimeLinePrepared == false) {
 			log.log(Level.WARNING, "isTimeLinePrepared == false -> getScaleMaxTimeNumber(RecordSet recordSet) needs to be called first"); //$NON-NLS-1$
 			return;
@@ -167,7 +212,7 @@ public class TimeLine {
 	 * @param miniticks number of mini ticks drawn between the main ticks
 	 * @param gap distance between ticks and the number scale
 	 */
-	private void drawTickMarks(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, double scaleFactor, int timeFormat, int deltaTime_ms, int ticklength, int miniticks, int gap) {
+	private void drawTickMarks(RecordSet recordSet, GC gc, int x0, int y0, int width, int startTimeValue, int endTimeValue, double scaleFactor, int timeFormat, long deltaTime_ms, int ticklength, int miniticks, int gap) {
 		double numberTicks, timeDelta;
 		//int offset = (startTimeValue != 0) ? 10 - startTimeValue % 10 : 0;
 		int timeDeltaValue = endTimeValue - startTimeValue;
@@ -185,14 +230,26 @@ public class TimeLine {
 				timeDelta = (deltaTime_ms/60000.0);
 				break;
 			case TimeLine.TIME_LINE_HRS:
+			case TimeLine.TIME_LINE_HRS_DAYS:
 				timeDelta = (deltaTime_ms/3600000.0);
+				break;
+			case TimeLine.TIME_LINE_DAYS:
+			case TimeLine.TIME_LINE_DAYS_MONTH:
+				timeDelta = (deltaTime_ms/3600000.0/24);
+				break;
+			case TimeLine.TIME_LINE_MONTH:
+			case TimeLine.TIME_LINE_MONTH_YEARS:
+				timeDelta = (deltaTime_ms/3600000.0/24/30);
+				break;
+			case TimeLine.TIME_LINE_YEARS:
+				timeDelta = (deltaTime_ms/3600000.0/24/30/365);
 				break;
 			case TimeLine.TIME_LINE_MSEC:
 			default:
 				timeDelta =(deltaTime_ms * 1.0);
 				break;
 			}
-			
+			log.log(Level.FINE, "width/timeDeltaValue = " + width/timeDeltaValue);
 			switch (timeFormat * (int)scaleFactor) { // TIME_LINE_MSEC, TIME_LINE_SEC, TIME_LINE_SEC_MIN, ..
 			case TimeLine.TIME_LINE_MSEC * 1:
 				if (timeDeltaValue <= width*2) {
@@ -203,9 +260,8 @@ public class TimeLine {
 					numberTicks = timeDelta / 200.0; // every 2'th units one tick
 					scaleFactor = 0.5;
 				}
-//				numberTicks = timeDelta / 100; // every 1'th units one tick
-//				scaleFactor = 1;
 				break;
+				
 			case TimeLine.TIME_LINE_SEC * 100:
 				if (timeDeltaValue <= width*10) {
 					numberTicks = timeDelta / 1000.0; // every 1'th units one tick
@@ -216,6 +272,7 @@ public class TimeLine {
 					scaleFactor = 200;
 				}
 				break;
+				
 			case TimeLine.TIME_LINE_SEC * 1000:
 				if (timeDeltaValue <= width*10) {
 					numberTicks = timeDelta / 0.5; // every 1'th units one tick
@@ -226,10 +283,13 @@ public class TimeLine {
 					scaleFactor = 100;
 				}
 				break;
+
 			default:
 			case TimeLine.TIME_LINE_SEC * 10:
 			case TimeLine.TIME_LINE_MIN * 10:
 			case TimeLine.TIME_LINE_HRS * 10:
+			case TimeLine.TIME_LINE_DAYS * 10:
+			case TimeLine.TIME_LINE_MONTH * 10:
 				if (timeDeltaValue > 0 && timeDeltaValue <= width/100) {
 					numberTicks = timeDelta * 2.0; // every 0.5'th units one tick
 					scaleFactor = scaleFactor * 20.0;
@@ -250,6 +310,7 @@ public class TimeLine {
 					numberTicks = timeDelta / 10.0; // every 10th units one tick
 				}
 				break;
+				
 			case TimeLine.TIME_LINE_SEC_MIN * 10:
 			case TimeLine.TIME_LINE_MIN_HRS * 10:
 				if (timeDeltaValue >= 0 && timeDeltaValue <= 30) {
@@ -269,6 +330,83 @@ public class TimeLine {
 					scaleFactor = scaleFactor / 2.0;
 				}
 				break;
+				
+			case TimeLine.TIME_LINE_HRS_DAYS * 10:
+				if (timeDeltaValue >= 0 && timeDeltaValue <= 30) {
+					numberTicks = timeDelta / 2.5; // every 2.5 th units one tick
+					scaleFactor = scaleFactor * 4.0;
+				}
+				else if (timeDeltaValue > width/25 && timeDeltaValue <= width/7) {
+					numberTicks = timeDelta / 5.0; // every 5 th units one tick
+					scaleFactor = scaleFactor * 2.0;
+				}
+				else if (timeDeltaValue >= width/7 && timeDeltaValue <= width/1.5) {
+					numberTicks = timeDelta / 10.0; // every 10 th units one tick
+					scaleFactor = scaleFactor * 1.0;
+				}
+				else {
+					numberTicks = timeDelta / 20.0; // every 20 th units one tick
+					scaleFactor = scaleFactor / 2.0;
+				}
+				break;
+				
+			case TimeLine.TIME_LINE_DAYS_MONTH * 10:
+				if (width/timeDeltaValue >= 20) {
+					numberTicks = timeDelta / 2.0; // every 2.5 th units one tick
+					scaleFactor = scaleFactor * 5.0;
+				}
+				else if (width/timeDeltaValue >= 7) {
+					numberTicks = timeDelta / 5.0; // every 5 th units one tick
+					scaleFactor = scaleFactor * 2.0;
+				}
+				else if (width/timeDeltaValue >= 3) {
+					numberTicks = timeDelta / 10.0; // every 10 th units one tick
+					scaleFactor = scaleFactor * 1.0;
+				}
+				else {
+					numberTicks = timeDelta / 30.0; // every 20 th units one tick
+					scaleFactor = scaleFactor / 3.0;
+				}
+				break;
+				
+			case TimeLine.TIME_LINE_MONTH_YEARS * 10:
+				if (timeDeltaValue >= width/6) {
+					numberTicks = timeDelta / 4.0; // every 2'th units one tick
+					scaleFactor = scaleFactor * 2.5;
+				}
+				else if (timeDeltaValue >= width/15) {
+					numberTicks = timeDelta / 2.0; // every 2'th units one tick
+					scaleFactor = scaleFactor * 5.0;
+				}
+				else if (timeDeltaValue > width/60) {
+					numberTicks = timeDelta; // 1 ticks every unit
+					scaleFactor = scaleFactor * 10.0;
+				}
+				else {
+					numberTicks = timeDelta * 2 ; // 2 ticks every units
+					scaleFactor = scaleFactor * 20.0;
+				}
+				break;
+				
+			case TimeLine.TIME_LINE_YEARS * 10:
+				if (timeDeltaValue >= width/6) {
+					numberTicks = timeDelta * 3.75; // every 2'th units one tick
+					scaleFactor = scaleFactor * 1.25;
+				}
+				else if (timeDeltaValue >= width/15) {
+					numberTicks = timeDelta * 7.5; // every 3'th units one tick
+					scaleFactor = scaleFactor * 2.5;
+				}
+				else if (timeDeltaValue > width/60) {
+					numberTicks = timeDelta * 15; // every 2'th units one tick
+					scaleFactor = scaleFactor * 5.0;
+				}
+				else {
+					numberTicks = timeDelta * 30 ; // 1 ticks every unit
+					scaleFactor = scaleFactor * 10.0;
+				}
+				break;
+
 			}
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "timeFormat = " + timeFormat + " numberTicks = " + numberTicks + " startTimeValue = " + startTimeValue + " endTimeValue = " + endTimeValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
@@ -304,9 +442,11 @@ public class TimeLine {
 				double timeValue = i * 100.0 / scaleFactor;
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "timeValue = " + timeValue); //$NON-NLS-1$
 				// prepare to make every minute or hour to bold
-				boolean isMod60 = (timeValue % 60) == 0;
 				String numberStr;
-				if (timeFormat != TimeLine.TIME_LINE_MSEC) { // msec
+				switch (timeFormat) {
+				case TimeLine.TIME_LINE_SEC_MIN: // 60 sec/min
+				case TimeLine.TIME_LINE_MIN_HRS: // 60 min/hrs  
+					boolean isMod60 = (timeValue % 60) == 0;
 					double timeValue60 = isMod60 ? timeValue / 60 : timeValue % 60; // minute, hour
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "timeValue = " + timeValue + ", timeValue60 = " + timeValue60); //$NON-NLS-1$ //$NON-NLS-2$
 					numberStr = (timeValue60 % 1 == 0 || isMod60) ? String.format("%.0f", timeValue60) : String.format("%.1f", timeValue60); //$NON-NLS-1$ //$NON-NLS-2$
@@ -320,9 +460,63 @@ public class TimeLine {
 					else {
 						GraphicsUtils.drawTextCentered(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 					}
-				}
-				else
+					break;
+					
+				case TimeLine.TIME_LINE_MONTH_YEARS: // 12 month/year
+					boolean isMod12 = (timeValue % 12) == 0;
+					double timeValue12 = isMod12 ? timeValue / 12 : timeValue % 12; // minute, hour
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "timeValue = " + timeValue + ", timeValue12 = " + timeValue12); //$NON-NLS-1$ //$NON-NLS-2$
+					numberStr = (timeValue12 % 1 == 0 || isMod12) ? String.format("%.0f", timeValue12) : String.format("%.1f", timeValue12); //$NON-NLS-1$ //$NON-NLS-2$
+					if (isMod12 && timeValue > 0.0) {
+						gc.setFont(SWTResourceManager.getFont(gc, SWT.BOLD));
+						if (i != 0 && recordSet.getTimeGridType() == RecordSet.TIME_GRID_MOD60) 
+							timeGrid.add(intXTickPosition);
+						GraphicsUtils.drawTextCentered(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+						gc.setFont(SWTResourceManager.getFont(gc, SWT.NORMAL));
+					}
+					else {
+						GraphicsUtils.drawTextCentered(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+					}
+					break;
+
+				case TimeLine.TIME_LINE_DAYS_MONTH: // 30 days/month
+					boolean isMod30 = (timeValue % 30) == 0;
+					double timeValue30 = isMod30 ? timeValue / 30 : timeValue % 30; // day, hour
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "timeValue = " + timeValue + ", timeValue30 = " + timeValue30); //$NON-NLS-1$ //$NON-NLS-2$
+					numberStr = (timeValue30 % 1 == 0 || isMod30) ? String.format("%.0f", timeValue30) : String.format("%.1f", timeValue30); //$NON-NLS-1$ //$NON-NLS-2$
+					if (isMod30 && timeValue > 0.0) {
+						gc.setFont(SWTResourceManager.getFont(gc, SWT.BOLD));
+						if (i != 0 && recordSet.getTimeGridType() == RecordSet.TIME_GRID_MOD60) 
+							timeGrid.add(intXTickPosition);
+						GraphicsUtils.drawTextCentered(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+						gc.setFont(SWTResourceManager.getFont(gc, SWT.NORMAL));
+					}
+					else {
+						GraphicsUtils.drawTextCentered(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+					}
+					break;
+					
+				case TimeLine.TIME_LINE_HRS_DAYS: // 24 hrs/day
+					boolean isMod24 = (timeValue % 24) == 0;
+					double timeValue24 = isMod24 ? timeValue / 24 : timeValue % 24; // 24 hours/day
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "timeValue = " + timeValue + ", timeValue24 = " + timeValue24); //$NON-NLS-1$ //$NON-NLS-2$
+					numberStr = (timeValue24 % 1 == 0 || isMod24) ? String.format("%.0f", timeValue24) : String.format("%.1f", timeValue24); //$NON-NLS-1$ //$NON-NLS-2$
+					if (isMod24 && timeValue > 0.0) {
+						gc.setFont(SWTResourceManager.getFont(gc, SWT.BOLD));
+						if (i != 0 && recordSet.getTimeGridType() == RecordSet.TIME_GRID_MOD60) 
+							timeGrid.add(intXTickPosition);
+						GraphicsUtils.drawTextCentered(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+						gc.setFont(SWTResourceManager.getFont(gc, SWT.NORMAL));
+					}
+					else {
+						GraphicsUtils.drawTextCentered(numberStr, intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
+					}
+					break;
+					
+				default:
 					GraphicsUtils.drawTextCentered(("" + timeValue), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$
+					break;
+				}
 			}
 			recordSet.setTimeGrid(timeGrid);
 		}
@@ -336,10 +530,25 @@ public class TimeLine {
 		long time_sec = Double.valueOf(time_ms / 1000.0).longValue();
 		long time_min = TimeUnit.MINUTES.convert(time_sec, TimeUnit.SECONDS);
 		long time_std = TimeUnit.HOURS.convert(time_sec, TimeUnit.SECONDS);
+		long time_days = TimeUnit.DAYS.convert(time_sec, TimeUnit.SECONDS);
+		long time_month = TimeUnit.DAYS.convert(time_sec, TimeUnit.SECONDS)/30;
+		long time_year = TimeUnit.DAYS.convert(time_sec, TimeUnit.SECONDS)/365;
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "time_std = " + time_std + "; time_min = " + time_min + "; time_sec = " + time_sec + "; time_ms = " + time_ms); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		int result;
 
 		switch (timeFormat) {
+		case TIME_LINE_YEARS:
+			result = Long.valueOf(time_year).intValue();
+			break;
+		case TIME_LINE_MONTH_YEARS:
+		case TIME_LINE_MONTH:
+			result = Long.valueOf(time_month).intValue();
+			break;
+		case TIME_LINE_DAYS_MONTH:
+		case TIME_LINE_DAYS:
+			result = Long.valueOf(time_days).intValue();
+			break;
+		case TIME_LINE_HRS_DAYS:
 		case TIME_LINE_HRS:
 			result = Long.valueOf(time_std).intValue();
 			break;

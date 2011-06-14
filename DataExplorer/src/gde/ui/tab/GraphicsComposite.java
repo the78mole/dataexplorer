@@ -82,7 +82,7 @@ public class GraphicsComposite extends Composite {
 	public final static int				MODE_CUT_RIGHT					= 7;
 	public final static int				MODE_SCOPE							= 8;
 
-	final	DataExplorer	application 						= DataExplorer.getInstance();
+	final	DataExplorer						application 						= DataExplorer.getInstance();
 	final Settings								settings								= Settings.getInstance();
 	final Channels								channels								= Channels.getInstance();
 	final TimeLine								timeLine								= new TimeLine();
@@ -161,15 +161,24 @@ public class GraphicsComposite extends Composite {
 		this.windowType = useWindowType;
 		
 		//get the background colors
-		if (this.windowType == GraphicsWindow.TYPE_NORMAL) {			
-			this.curveAreaBackground = this.settings.getGraphicsCurveAreaBackground();
-			this.surroundingBackground = this.settings.getGraphicsSurroundingBackground();
-			this.curveAreaBorderColor = this.settings.getGraphicsCurvesBorderColor();
-		}
-		else {
+		switch (this.windowType) {
+		case GraphicsWindow.TYPE_COMPARE:
 			this.curveAreaBackground = this.settings.getCompareCurveAreaBackground();
 			this.surroundingBackground = this.settings.getCompareSurroundingBackground();
 			this.curveAreaBorderColor = this.settings.getCurveCompareBorderColor();
+			break;
+
+		case GraphicsWindow.TYPE_UTIL:
+			this.curveAreaBackground = this.settings.getUtilityCurveAreaBackground();
+			this.surroundingBackground = this.settings.getUtilitySurroundingBackground();
+			this.curveAreaBorderColor = this.settings.getUtilityCurvesBorderColor();
+			break;
+			
+		default:
+			this.curveAreaBackground = this.settings.getGraphicsCurveAreaBackground();
+			this.surroundingBackground = this.settings.getGraphicsSurroundingBackground();
+			this.curveAreaBorderColor = this.settings.getGraphicsCurvesBorderColor();
+			break;
 		}
 			
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
@@ -232,26 +241,37 @@ public class GraphicsComposite extends Composite {
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
 					//System.out.println("width = " + GraphicsComposite.this.getSize().x);
-					Channel activeChannel = GraphicsComposite.this.channels.getActiveChannel();
-					if (activeChannel != null) {
-						RecordSet recordSet = activeChannel.getActiveRecordSet();
-						if (recordSet != null) {
-							String tmpDescription = activeChannel.getFileDescription();
-							if (tmpDescription.contains(",") ) {
-								tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(","));
-							}
-							else if (tmpDescription.contains(":")) {
-								tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(":"));
-							}
-							else if (tmpDescription.contains(";")) {
-								tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(";"));
-							}
-							else if (tmpDescription.contains("\n")) {
-								tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\n"));
-							}
-							String tmpHeader = tmpDescription + GDE.STRING_MESSAGE_CONCAT + recordSet.getName();
+					if (GraphicsComposite.this.windowType == GraphicsWindow.TYPE_UTIL) {
+						RecordSet utilitySet = GraphicsComposite.this.application.getUtilitySet();
+						if (utilitySet != null) {
+						String tmpHeader = utilitySet.getRecordSetDescription();
 							if (GraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(GraphicsComposite.this.graphicsHeaderText)) {
 								GraphicsComposite.this.graphicsHeader.setText(GraphicsComposite.this.graphicsHeaderText = tmpHeader);
+							}
+						}
+					}
+					else {
+						Channel activeChannel = GraphicsComposite.this.channels.getActiveChannel();
+						if (activeChannel != null) {
+							RecordSet recordSet = activeChannel.getActiveRecordSet();
+							if (recordSet != null) {
+								String tmpDescription = activeChannel.getFileDescription();
+								if (tmpDescription.contains(",") ) {
+									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(","));
+								}
+								else if (tmpDescription.contains(":")) {
+									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(":"));
+								}
+								else if (tmpDescription.contains(";")) {
+									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(";"));
+								}
+								else if (tmpDescription.contains("\n")) {
+									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\n"));
+								}
+								String tmpHeader = tmpDescription + GDE.STRING_MESSAGE_CONCAT + recordSet.getName();
+								if (GraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(GraphicsComposite.this.graphicsHeaderText)) {
+									GraphicsComposite.this.graphicsHeader.setText(GraphicsComposite.this.graphicsHeaderText = tmpHeader);
+								}
 							}
 						}
 					}
@@ -380,17 +400,23 @@ public class GraphicsComposite extends Composite {
 
 		RecordSet recordSet = null;
 		switch (this.windowType) {
-			case GraphicsWindow.TYPE_COMPARE:
-				if (this.application.getCompareSet() != null && this.application.getCompareSet().size() > 0) {
-					recordSet = this.application.getCompareSet();
-				}
-				break;
-	
-			default: // TYPE_NORMAL
-				if (this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getActiveRecordSet() != null) {
-					recordSet = this.channels.getActiveChannel().getActiveRecordSet();
-				}
-				break;
+		case GraphicsWindow.TYPE_COMPARE:
+			if (this.application.getCompareSet() != null && this.application.getCompareSet().size() > 0) {
+				recordSet = this.application.getCompareSet();
+			}
+			break;
+
+		case GraphicsWindow.TYPE_UTIL:
+			if (this.application.getUtilitySet() != null && this.application.getUtilitySet().size() > 0) {
+				recordSet = this.application.getUtilitySet();
+			}
+			break;
+
+		default: // TYPE_NORMAL
+			if (this.channels.getActiveChannel() != null && this.channels.getActiveChannel().getActiveRecordSet() != null) {
+				recordSet = this.channels.getActiveChannel().getActiveRecordSet();
+			}
+			break;
 		}
 		if (recordSet != null && recordSet.realSize() > 0) {
 			drawCurves(recordSet, this.canvasBounds, this.canvasImageGC);
@@ -503,8 +529,8 @@ public class GraphicsComposite extends Composite {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "average time step record 0 = " + recordSet.getAverageTimeStep_ms());
 		startTimeFormated = TimeLine.convertTimeInFormatNumber(recordSet.getStartTime(), timeFormat);
 		endTimeFormated = startTimeFormated + maxTimeFormated;
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + (int)totalDisplayDeltaTime_ms + " endTime = " + endTimeFormated);
-		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (int)totalDisplayDeltaTime_ms, DataExplorer.COLOR_BLACK);
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "startTime = " + startTimeFormated + " detaTime_ms = " + (long)totalDisplayDeltaTime_ms + " endTime = " + endTimeFormated);
+		this.timeLine.drawTimeLine(recordSet, gc, x0, y0+1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (long)totalDisplayDeltaTime_ms, DataExplorer.COLOR_BLACK);
 
 		// draw draw area bounding 
 		gc.setForeground(this.curveAreaBorderColor);
@@ -1327,7 +1353,8 @@ public class GraphicsComposite extends Composite {
 	void updateCutModeButtons() {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.application.getCompareSet();
+			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() 
+					: (this.windowType == GraphicsWindow.TYPE_COMPARE) ? this.application.getCompareSet() : this.application.getUtilitySet();
 			if (this.canvasImage != null && recordSet != null) {
 				// 
 				if (recordSet.isCutLeftEdgeEnabled()) {
@@ -1438,35 +1465,48 @@ public class GraphicsComposite extends Composite {
 	 * @return the graphic window content as image - only if compare window is visible return the compare window graphics
 	 */
 	public Image getGraphicsPrintImage() {	
-		boolean isCompareSet = this.windowType == GraphicsWindow.TYPE_COMPARE;
-		RecordSet compareRecordSet = DataExplorer.getInstance().getCompareSet();
-		String[] compareSetNames = compareRecordSet.getRecordNames();
-		int graphicsHeight = isCompareSet ? 30+this.canvasBounds.height+10+compareSetNames.length*20 : 30+this.canvasBounds.height+40;
-		Image graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
+		Image graphicsImage = null;
+		int graphicsHeight = 30+this.canvasBounds.height+40;
 		// decide if normal graphics window or compare window should be copied
 		if (this.windowType == GraphicsWindow.TYPE_COMPARE) {
-				GC graphicsGC = new GC(graphicsImage);
-				graphicsGC.setBackground(this.surroundingBackground);
-				graphicsGC.setForeground(this.graphicsHeader.getForeground());
-				graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
-				graphicsGC.setFont(this.graphicsHeader.getFont());
-				GraphicsUtils.drawTextCentered(Messages.getString(MessageIds.GDE_MSGT0144), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
-				graphicsGC.setFont(this.recordSetComment.getFont());
-				for (int i=0,yPos=30+this.canvasBounds.height+5; i<compareSetNames.length; ++i, yPos+=20) {
-					Record compareRecord = compareRecordSet.get(compareSetNames[i]);
-					if (compareRecord != null) {
-						graphicsGC.setForeground(compareRecord.getColor());
-						String recordName = "--- " + compareRecord.getName(); //$NON-NLS-1$
-						GraphicsUtils.drawText(recordName, 20, yPos, graphicsGC, SWT.HORIZONTAL);
-						graphicsGC.setForeground(this.recordSetComment.getForeground());
-						String description = compareRecord.getDescription();
-						description = description.contains("\n") ? description.substring(0, description.indexOf("\n")) : description; //$NON-NLS-1$ //$NON-NLS-2$
-						Point pt = graphicsGC.textExtent(recordName); // string dimensions
-						GraphicsUtils.drawText(description, pt.x+30, yPos, graphicsGC, SWT.HORIZONTAL);
-					}
+			RecordSet compareRecordSet = DataExplorer.getInstance().getCompareSet();
+			String[] compareSetNames = compareRecordSet.getRecordNames();
+			graphicsHeight = 30+this.canvasBounds.height+10+compareSetNames.length*20;
+			graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
+			GC graphicsGC = new GC(graphicsImage);
+			graphicsGC.setBackground(this.surroundingBackground);
+			graphicsGC.setForeground(this.graphicsHeader.getForeground());
+			graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
+			graphicsGC.setFont(this.graphicsHeader.getFont());
+			GraphicsUtils.drawTextCentered(Messages.getString(MessageIds.GDE_MSGT0144), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
+			graphicsGC.setFont(this.recordSetComment.getFont());
+			for (int i=0,yPos=30+this.canvasBounds.height+5; i<compareSetNames.length; ++i, yPos+=20) {
+				Record compareRecord = compareRecordSet.get(compareSetNames[i]);
+				if (compareRecord != null) {
+					graphicsGC.setForeground(compareRecord.getColor());
+					String recordName = "--- " + compareRecord.getName(); //$NON-NLS-1$
+					GraphicsUtils.drawText(recordName, 20, yPos, graphicsGC, SWT.HORIZONTAL);
+					graphicsGC.setForeground(this.recordSetComment.getForeground());
+					String description = compareRecord.getDescription();
+					description = description.contains("\n") ? description.substring(0, description.indexOf("\n")) : description; //$NON-NLS-1$ //$NON-NLS-2$
+					Point pt = graphicsGC.textExtent(recordName); // string dimensions
+					GraphicsUtils.drawText(description, pt.x+30, yPos, graphicsGC, SWT.HORIZONTAL);
 				}
-				graphicsGC.drawImage(this.canvasImage, 0, 30);
-				graphicsGC.dispose();
+			}
+			graphicsGC.drawImage(this.canvasImage, 0, 30);
+			graphicsGC.dispose();
+		}
+		else	if (this.windowType == GraphicsWindow.TYPE_UTIL) {
+			graphicsHeight = 30+this.canvasBounds.height;
+			graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
+			GC graphicsGC = new GC(graphicsImage);
+			graphicsGC.setBackground(this.surroundingBackground);
+			graphicsGC.setForeground(this.graphicsHeader.getForeground());
+			graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
+			graphicsGC.setFont(this.graphicsHeader.getFont());
+			GraphicsUtils.drawTextCentered(this.graphicsHeader.getText(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
+			graphicsGC.drawImage(this.canvasImage, 0, 30);
+			graphicsGC.dispose();
 		}
 		else {
 			Channel activeChannel = this.channels.getActiveChannel();
@@ -1480,7 +1520,7 @@ public class GraphicsComposite extends Composite {
 					this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
 					drawCurves(activeRecordSet, this.canvasBounds, this.canvasImageGC);
-
+					graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
 					GC graphicsGC = new GC(graphicsImage);
 					graphicsGC.setForeground(this.graphicsHeader.getForeground());
 					graphicsGC.setBackground(this.surroundingBackground);

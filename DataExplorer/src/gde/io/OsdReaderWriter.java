@@ -472,7 +472,7 @@ public class OsdReaderWriter {
 							int l = 0;
 							if (!recordSet.isTimeStepConstant()) {
 								for (int j = 0; j < recordSet.getRecordDataSize(true); ++j, l += GDE.SIZE_BYTES_INTEGER) {
-										int timeStamp = recordSet.getTime(j);
+										long timeStamp = recordSet.getTime(j);
 										//log.log(Level.FINER, ""+point);
 										bytes[0] = (byte) ((timeStamp >>> 24) & 0xFF);
 										bytes[1] = (byte) ((timeStamp >>> 16) & 0xFF);

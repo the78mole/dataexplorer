@@ -237,19 +237,7 @@ public class CurveUtils {
 
 		try {
 			// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-			if (!record.getParent().isCompareSet()) {
-				for (int j = 0; j <= displayableSize && displayableSize > 1; j += xScaleFactor) {
-					// get the point to be drawn
-					newPoint = record.getDisplayPoint(j, x0, y0);
-					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newPoint.toString());
-					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
-					oldPoint = newPoint; // remember the last draw point for next drawLine operation
-				}
-				//draw the last point with possible interpolated values if it does not match a measurement point at time value
-				newPoint = record.getDisplayEndPoint(width);
-				gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
-			}
-			else { // compare set might contain records with different size
+			if (record.getParent().isCompareSet()) {// compare set might contain records with different size
 				//drawLimit = drawLimit / xScale;
 				int drawLimit = record.findBestIndex(record.getCompareSetDrawLimit_ms()) - record.findBestIndex(record.getZoomTimeOffset());
 				int j = 0;
@@ -267,6 +255,18 @@ public class CurveUtils {
 					newPoint = record.getDisplayEndPoint(width);
 					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 				}
+			}
+			else { 
+				for (int j = 0; j <= displayableSize && displayableSize > 1; j += xScaleFactor) {
+					// get the point to be drawn
+					newPoint = record.getDisplayPoint(j, x0, y0);
+					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newPoint.toString());
+					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+					oldPoint = newPoint; // remember the last draw point for next drawLine operation
+				}
+				//draw the last point with possible interpolated values if it does not match a measurement point at time value
+				newPoint = record.getDisplayEndPoint(width);
+				gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 			}
 		}
 		catch (RuntimeException e) {

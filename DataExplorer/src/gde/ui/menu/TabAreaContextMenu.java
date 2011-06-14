@@ -43,10 +43,10 @@ import gde.ui.tab.GraphicsWindow;
 public class TabAreaContextMenu {
 	final static Logger						log	= Logger.getLogger(TabAreaContextMenu.class.getName());
 	
-	public final static int				TYPE_GRAPHICS = GraphicsWindow.TYPE_NORMAL;
-	public final static int				TYPE_COMPARE = GraphicsWindow.TYPE_COMPARE;
-	public final static int				TYPE_SIMPLE = 2;
-	public final static int				TYPE_TABLE = 3;
+	public final static int	TYPE_GRAPHICS	= GraphicsWindow.TYPE_NORMAL;
+	public final static int	TYPE_COMPARE	= GraphicsWindow.TYPE_COMPARE;
+	public final static int	TYPE_UTILITY	= GraphicsWindow.TYPE_UTIL;
+	public final static int	TYPE_SIMPLE		= 3;														//only referenced in not specified else clause
 	
 	final DataExplorer	application;
 
@@ -125,13 +125,13 @@ public class TabAreaContextMenu {
 					TabAreaContextMenu.this.application.copyTabContentAsImage();
 				}
 			});
-			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE) {
+			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE || type == TYPE_UTILITY) {
 				this.copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027));
 				this.copyPrintImageItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "copyPrintImageItem action performed! " + e); //$NON-NLS-1$
-						TabAreaContextMenu.this.application.copyTabContentAsImage();
+						TabAreaContextMenu.this.application.copyGraphicsPrintImage();
 					}
 				});
 			}
@@ -159,7 +159,7 @@ public class TabAreaContextMenu {
 					}
 				}
 			});
-			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE) {
+			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE || type == TYPE_UTILITY) {
 				this.borderColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.borderColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0464));
 				this.borderColorItem.addListener(SWT.Selection, new Listener() {
