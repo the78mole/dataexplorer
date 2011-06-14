@@ -21,7 +21,6 @@ package gde.device.wstech;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.ui.tab.GraphicsWindow;
 
 import java.util.logging.Logger;
 
@@ -38,13 +37,8 @@ import org.eclipse.swt.widgets.MenuItem;
 public class ContextMenu {
 	final static Logger						log						= Logger.getLogger(ContextMenu.class.getName());
 
-	public final static int				TYPE_GRAPHICS	= GraphicsWindow.TYPE_NORMAL;
-	public final static int				TYPE_COMPARE	= GraphicsWindow.TYPE_COMPARE;
-	public final static int				TYPE_SIMPLE		= 2;
-	public final static int				TYPE_TABLE		= 3;
-
-	final DataExplorer	application;
-	final VarioToolTabItem varioToolTabItem;
+	final DataExplorer						application;
+	final VarioToolTabItem 				varioToolTabItem;
 
 	MenuItem											headerItem;
 	MenuItem											setupLoadItem;
