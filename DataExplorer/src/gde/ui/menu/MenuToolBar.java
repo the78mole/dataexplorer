@@ -1604,6 +1604,14 @@ public class MenuToolBar {
 		this.isScopePointsCombo = enabled;
 		this.scopePointsCombo.setEnabled(enabled);
 	}
+
+	/**
+	 * enable or disable the complete zoom tool bar
+	 * @param enabled true will enable the zoom tool bar
+	 */
+	public void enableZoomToolBar(boolean enabled) {
+		this.zoomToolBar.setEnabled(enabled);
+	}
 	
 	/**
 	 * switch enable the Google Earth tool item, if enabled KML export with Google Earth launch could be executed

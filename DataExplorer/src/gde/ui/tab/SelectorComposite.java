@@ -18,6 +18,17 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
+import gde.GDE;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.menu.CurveSelectorContextMenu;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -25,8 +36,6 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -40,17 +49,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import gde.GDE;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.menu.CurveSelectorContextMenu;
-
 /**
  * This class defines a composite with a header (Curve Selector, ..) and a table with checkable table items
  * The table has a popup menu to manipulate properties of the items behind the table items
@@ -59,7 +57,7 @@ import gde.ui.menu.CurveSelectorContextMenu;
 public class SelectorComposite extends Composite {
   final static Logger           log                                 = Logger.getLogger(SelectorComposite.class.getName());
 
-  final DataExplorer  	application = DataExplorer.getInstance();
+  final DataExplorer  						application = DataExplorer.getInstance();
   final Channels                	channels    = Channels.getInstance();
   final SashForm									parent;
   final int												windowType;
@@ -103,11 +101,6 @@ public class SelectorComposite extends Composite {
 		this.setLayout(curveSelectorLayout);
 		GridData curveSelectorLData = new GridData();
 		this.setLayoutData(curveSelectorLData);
-		this.addPaintListener(new PaintListener() {		
-			public void paintControl(PaintEvent arg0) {
-				doUpdateCurveSelectorTable();
-			}
-		});
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
 				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "curveSelector.helpRequested " + evt); //$NON-NLS-1$
@@ -202,9 +195,21 @@ public class SelectorComposite extends Composite {
 	 */
 	public synchronized void doUpdateCurveSelectorTable() {
 		int itemWidth = this.initialSelectorHeaderWidth;
-		RecordSet activeRecordSet = this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getActiveRecordSet() : null;
-		RecordSet recordSet = this.windowType == GraphicsWindow.TYPE_NORMAL ? activeRecordSet 
-				: this.windowType == GraphicsWindow.TYPE_COMPARE ? this.application.getCompareSet() : this.application.getUtilitySet();
+		RecordSet recordSet = null;
+		switch (this.windowType) {
+		case GraphicsWindow.TYPE_COMPARE:
+			recordSet = this.application.getCompareSet();
+			break;
+
+		case GraphicsWindow.TYPE_UTIL:
+			recordSet = this.application.getUtilitySet();
+			break;
+
+		case GraphicsWindow.TYPE_NORMAL:
+		default:
+			recordSet = this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getActiveRecordSet() : null;
+			break;
+		}
 		if (recordSet != null && recordSet.size() > 0) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSet.getName());
 				this.curveSelectorTable.removeAll();

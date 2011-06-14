@@ -917,6 +917,15 @@ public class MenuBar {
 	}
 	
 	/**
+	 * set the state of zoom  menu buttons
+	 * @param enabled
+	 */
+	public void enableZoomMenuButtons(boolean enabled) {
+		this.activateZoomGraphicMenuItem.setEnabled(enabled);
+		this.resetZoomGraphicMenuItem.setEnabled(enabled);
+	}
+	
+	/**
 	 * @return the file menu for update purpose
 	 */
 	public Menu getExportMenu() {

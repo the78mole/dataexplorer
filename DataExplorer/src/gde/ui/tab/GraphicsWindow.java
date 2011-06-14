@@ -97,6 +97,7 @@ public class GraphicsWindow extends CTabItem {
 		} // graphics composite
 
 		// graphicSashForm
+		this.graphicSashForm.setWeights(new int[] {117, GDE.shell.getClientArea().width - 117});
 	}
 
 	/**

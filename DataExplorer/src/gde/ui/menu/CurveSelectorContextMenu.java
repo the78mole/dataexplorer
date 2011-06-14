@@ -160,11 +160,10 @@ public class CurveSelectorContextMenu {
 								}
 
 								// utility window
-								if (CurveSelectorContextMenu.this.isWindowTypeCompare) {
+								if (CurveSelectorContextMenu.this.isWindowTypeUtility) {
 									CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setEnabled(false);
 									CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
-									CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
-									CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
+									CurveSelectorContextMenu.this.measurement.setEnabled(false);
 								}
 
 								// disable clear, if nothing to clear
