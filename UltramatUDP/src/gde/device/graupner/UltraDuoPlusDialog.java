@@ -19,10 +19,16 @@
 package gde.device.graupner;
 
 import gde.GDE;
+import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
 import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.DataTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.DeviceDialog;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.PropertyType;
 import gde.device.graupner.UltraDuoPlusSychronizer.SYNC_TYPE;
 import gde.device.graupner.UltraDuoPlusType.ChannelData1;
 import gde.device.graupner.UltraDuoPlusType.ChannelData2;
@@ -37,6 +43,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.ParameterConfigControl;
 import gde.ui.SWTResourceManager;
+import gde.ui.tab.GraphicsWindow;
 import gde.utils.FileUtils;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
@@ -45,9 +52,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.Vector;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -96,6 +108,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -121,14 +134,16 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	Button										helpButton;
 	Button										copyButton;
 	CTabFolder								mainTabFolder, chargeTypeTabFolder;
-	CTabItem									setupTabItem, memorySetupTabItem, chargeTabItem, dischargeTabItem;
+	CTabItem									setupTabItem, memorySetupTabItem, chargeTabItem, dischargeTabItem, memoryCycleDataTabItem;
 	ScrolledComposite					scrolledchargeComposite;
 	Composite									boundsComposite, deviceComposite, dischargeCycleComposite;
 	Group											chargeGroup, dischargeGroup, cycleGroup;
 
 	Composite									memoryBoundsComposite, memorySelectComposite;
-	CLabel										memorySelectLabel;
-	CCombo										memoryCombo;
+	Composite									memoryDataComposite, memoryDataSelectComposite;
+	CLabel										memorySelectLabel, memoryDataSelectLabel;
+	CCombo										memoryCombo, memoryDataCombo;
+	ProgressBar 							cycleDataProgressBar, graphicsDataProgressBar;
 
 	final Ultramat						device;																																																																												// get device specific things, get serial port, ...
 	final UltramatSerialPort	serialPort;																																																																										// open/close port execute getData()....
@@ -170,6 +185,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	ParameterConfigControl[]	memoryParameters					= new ParameterConfigControl[UltramatSerialPort.SIZE_MEMORY_SETUP];
 	int												lastMemorySelectionIndex	= -1;
 	int												lastCellSelectionIndex		= -1;
+	int												memorySelectionIndexData	= 1;
 	int												parameterSelectHeight			= 30;
 	int												chargeSelectHeight				= 11 * this.parameterSelectHeight;
 	int												dischargeSelectHeight			= 5 * this.parameterSelectHeight;
@@ -988,6 +1004,331 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 								}
 							}
 						}
+						{
+							this.memoryCycleDataTabItem = new CTabItem(this.mainTabFolder, SWT.NONE);
+							this.memoryCycleDataTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.memoryCycleDataTabItem.setText("Speicher Zyklus Daten");
+							{
+								this.memoryDataComposite = new Composite(this.mainTabFolder, SWT.NONE);
+								this.memoryCycleDataTabItem.setControl(this.memoryDataComposite);
+								this.memoryDataComposite.setLayout(new FormLayout());
+								{
+									this.memoryDataSelectComposite = new Composite(this.memoryDataComposite, SWT.NONE);
+									FormData memorySelectLData = new FormData();
+									memorySelectLData.height = 50;
+									memorySelectLData.left = new FormAttachment(0, 1000, 0);
+									memorySelectLData.right = new FormAttachment(1000, 1000, 0);
+									memorySelectLData.top = new FormAttachment(0, 1000, 0);
+									this.memoryDataSelectComposite.setLayoutData(memorySelectLData);
+									RowLayout composite2Layout = new RowLayout(SWT.HORIZONTAL);
+									this.memoryDataSelectComposite.setLayout(composite2Layout);
+									this.memoryDataSelectComposite.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+									{
+										Composite filler  = new Composite(this.memoryDataSelectComposite, SWT.NONE);
+										filler.setLayoutData(new RowData(500, 10));
+										filler.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+									}
+									{
+										this.memoryDataSelectLabel = new CLabel(this.memoryDataSelectComposite, SWT.RIGHT);
+										RowData memoryCycleDataSelectLabelLData = new RowData();
+										memoryCycleDataSelectLabelLData.width = 220;
+										memoryCycleDataSelectLabelLData.height = 20;
+										this.memoryDataSelectLabel.setLayoutData(memoryCycleDataSelectLabelLData);
+										this.memoryDataSelectLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+										this.memoryDataSelectLabel.setText("Batteriespeicher " + Messages.getString(MessageIds.GDE_MSGT2251));
+										this.memoryDataSelectLabel.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+									}
+									{
+										//this.memoryNames will be updated by memoryCombo selection handler
+										this.memoryDataCombo = new CCombo(this.memoryDataSelectComposite, SWT.BORDER);
+										this.memoryDataCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+										this.memoryDataCombo.setItems(this.memoryNames);
+										this.memoryDataCombo.setVisibleItemCount(20);
+										this.memoryDataCombo.setTextLimit(5 + 16);
+										RowData memoryComboCycleDataLData = new RowData();
+										memoryComboCycleDataLData.width = 165;
+										memoryComboCycleDataLData.height = GDE.IS_WINDOWS ? 16 : 18;
+										this.memoryDataCombo.setLayoutData(memoryComboCycleDataLData);
+										this.memoryDataCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2252));
+										this.memoryDataCombo.select(0);
+										this.memoryDataCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+										this.memoryDataCombo.setEditable(true);
+										this.memoryDataCombo.addSelectionListener(new SelectionAdapter() {
+											@Override
+											public void widgetSelected(SelectionEvent evt) {
+												log.log(java.util.logging.Level.FINEST, "memoryComboData.widgetSelected, event=" + evt); //$NON-NLS-1$
+												UltraDuoPlusDialog.this.memorySelectionIndexData = UltraDuoPlusDialog.this.memoryDataCombo.getSelectionIndex()+1;
+											}
+										});
+									}
+								}
+								{
+									Button cycleDataButton = new Button(this.memoryDataComposite, SWT.Selection);
+									FormData cycleDataButtonLData = new FormData();
+									cycleDataButtonLData.height = 30;
+									cycleDataButtonLData.left = new FormAttachment(0, 1000, 150);
+									cycleDataButtonLData.right = new FormAttachment(1000, 1000, -150);
+									cycleDataButtonLData.top = new FormAttachment(0, 1000, 80);
+									cycleDataButton.setLayoutData(cycleDataButtonLData);
+									cycleDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									cycleDataButton.setText("display memory cycle data");
+									cycleDataButton.setToolTipText("read memory cycle data and display it in a new graphics tab");
+									cycleDataButton.addSelectionListener(new SelectionAdapter() {
+										@Override
+										public void widgetSelected(SelectionEvent evt) {
+											log.log(java.util.logging.Level.FINEST, "cycleDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											try {
+												cycleDataProgressBar.setSelection(0);
+												GraphicsWindow cycleGraph = (GraphicsWindow) UltraDuoPlusDialog.this.device.getUtilityDeviceTabItem();
+												RecordSet utilitySet = UltraDuoPlusDialog.this.application.getUtilitySet();
+												utilitySet.clear();
+												for (int i=0; i<Ultramat.cycleDataRecordNames.length; ++i) {
+													Record tmpRecord = new Record(UltraDuoPlusDialog.this.device, i, Ultramat.cycleDataRecordNames[i], "", Ultramat.cycleDataUnitNames[i], true, null, new ArrayList<PropertyType>(), 11);
+													tmpRecord.setFactor(Ultramat.cycleDataFactors[i]);
+													if (Ultramat.cycleDataSyncRefOrdinal[i] >= 0) {
+														tmpRecord.createProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER, Ultramat.cycleDataSyncRefOrdinal[i]);
+													}
+													tmpRecord.setColorDefaultsAndPosition(i);
+													utilitySet.put(Ultramat.cycleDataRecordNames[i], tmpRecord);
+													tmpRecord.setColor(SWTResourceManager.getColor(Ultramat.cycleDataColors[i][0], Ultramat.cycleDataColors[i][1], Ultramat.cycleDataColors[i][2]));
+													if (i >= 4) 
+														tmpRecord.setPositionLeft(false);
+													if ((i+1)%2 == 0)
+														tmpRecord.setVisible(false);
+												}
+												utilitySet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
+												utilitySet.setHorizontalGridRecordOrdinal(4);
+												utilitySet.setTimeGridType(RecordSet.TIME_GRID_MAIN);
+												utilitySet.setTimeStep_ms(-1.0); //different time steps
+												utilitySet.syncScaleOfSyncableRecords();
+												
+												UltraDuoPlusDialog.this.application.getTabFolder().setSelection(cycleGraph);
+												cycleDataProgressBar.setSelection(50);
+												
+												TreeMap<Long, int[]> sortCyclesData = new TreeMap<Long, int[]>();
+												if (Boolean.parseBoolean(System.getProperty("GDE_IS_SIMULATION"))) {
+													//test data - change dates in timeSteps block below to vary
+													long[] timeSteps = {
+															new GregorianCalendar(2011, 06, 01, 03, 38, 0).getTimeInMillis(), 
+															new GregorianCalendar(2011, 06, 02, 03, 38, 0).getTimeInMillis(), 
+															new GregorianCalendar(2011, 06, 03, 11, 04, 0).getTimeInMillis(),
+															new GregorianCalendar(2011, 06, 04,  9, 45, 0).getTimeInMillis(),
+															new GregorianCalendar(2011, 06, 04, 16, 04, 0).getTimeInMillis(),
+															new GregorianCalendar(2011, 06, 12, 18, 52, 0).getTimeInMillis(),
+													};
+													int[][] pointss = { 
+															{16834,     0, 1000,  0, 1300,  0},
+															{16834, 16264, 1281, 33, 1036,  0},
+															{16857,     0,  371,  0, 1425,  0},
+															{16766,     0, 2783,  0,  949,  0},
+															{16790,    34, 2783, 15, 1382, 29},
+															{16768, 		0, 2000,  0, 1140,  0},
+													};
+													//                             2;        0;     	 4;        3;        1;        5
+													//2011-04-17, 03:38:00;     1281;    16834;     1036;       33;    16264;        0
+													//2011-04-24, 11:04:00;      371;    16857;     1425;        0;        0;        0
+													//2011-05-07, 09:45:00;     2783;    16766;      949;        0;        0;        0
+													//2011-06-04, 16:04:00;     2783;    16790;     1382;       15;       34;       29
+													//2011-06-12, 18:52:00;     2000;    16768;     1140;        0;        0;        0
+													for (int i = 0; i < timeSteps.length; i++) {
+														sortCyclesData.put(timeSteps[i], pointss[i].clone());
+													}
+												}
+												else {
+													Vector<byte[]> cyclesData = UltraDuoPlusDialog.this.serialPort.readMemoryCycleData(UltraDuoPlusDialog.this.memorySelectionIndexData);
+													for (byte[] cycleData : cyclesData) {
+														long timeStamp = 0;
+														int[] points = new int[6];
+														try {
+															int hour = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[0], cycleData[1], cycleData[2], cycleData[3]), 16);
+															int minute = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[4], cycleData[5], cycleData[6], cycleData[7]), 16);
+															int year = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[8], cycleData[9], cycleData[10], cycleData[11]), 16);
+															int month = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[12], cycleData[13], cycleData[14], cycleData[15]), 16);
+															int day = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[16], cycleData[17], cycleData[18], cycleData[19]), 16);
+															if (year != 0 && month != 0 && day != 0 && minute != 0 && hour != 0) {
+																GregorianCalendar calendar = new GregorianCalendar(2000 + year, month - 1, day, hour, minute, 0);
+																long justNow = new Date().getTime();
+																timeStamp = calendar.getTimeInMillis() < justNow ? calendar.getTimeInMillis() : 0;
+															}
+														}
+														catch (NumberFormatException e) {
+															log.log(Level.WARNING, e.getMessage(), e);
+														}
+														try {
+															points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[20], (char) cycleData[21], (char) cycleData[22], (char) cycleData[23]), 16);
+															points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[24], (char) cycleData[25], (char) cycleData[26], (char) cycleData[27]), 16);
+															points[4] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[28], (char) cycleData[29], (char) cycleData[30], (char) cycleData[31]), 16);
+															points[3] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[32], (char) cycleData[33], (char) cycleData[34], (char) cycleData[35]), 16);
+															points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[36], (char) cycleData[37], (char) cycleData[38], (char) cycleData[39]), 16);
+															points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[40], (char) cycleData[41], (char) cycleData[42], (char) cycleData[43]), 16);
+														}
+														catch (Exception e) {
+															log.log(Level.WARNING, e.getMessage(), e);
+														}
+
+														if (timeStamp > 0) {
+															sortCyclesData.put(timeStamp, points.clone());
+															
+															if (log.isLoggable(Level.FINEST)) {
+																StringBuilder sb = new StringBuilder();
+																for (int i = 0; i < points.length; i++) {
+																	sb.append("; ").append(String.format("%8d", points[i]));
+																}
+																log.log(Level.FINEST, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp) + sb.toString());
+															}
+														}
+													}
+												}
+
+												log.log(Level.FINE, GDE.LINE_SEPARATOR);
+												long lastTimeStamp = 0;
+												for (Entry<Long, int[]> entry : sortCyclesData.entrySet()) {
+													utilitySet.addPoints(entry.getValue(), (lastTimeStamp == 0 ? 0 : entry.getKey() - lastTimeStamp));
+													
+													StringBuilder sb = new StringBuilder();
+													for (int i = 0; i < entry.getValue().length; i++) {
+														sb.append("; ").append(String.format("%8d", entry.getValue()[i]));
+													}
+													log.log(Level.FINE, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", entry.getKey()) + String.format("%12d %s", (lastTimeStamp == 0 ? 0 : entry.getKey() - lastTimeStamp), sb.toString()));
+													
+													lastTimeStamp = lastTimeStamp == 0 ? entry.getKey() : lastTimeStamp;
+												}
+												Long[] dates = sortCyclesData.keySet().toArray(new Long[0]);
+												if (dates != null && dates.length > 0) {
+												utilitySet.setRecordSetDescription(UltraDuoPlusDialog.this.memoryDataCombo.getText() + GDE.STRING_BLANK_COLON_BLANK 
+														+ StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", dates[0]) + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", dates[dates.length-1]));
+												}
+												else {
+													utilitySet.setRecordSetDescription(UltraDuoPlusDialog.this.memoryDataCombo.getText());
+												}
+												cycleGraph.enableGraphicsHeader(true);
+												application.getTabFolder().notifyListeners(SWT.Selection, new Event());
+												cycleDataProgressBar.setSelection(100);
+											}
+											catch (Exception e) {
+												log.log(Level.WARNING, e.getMessage(), e);
+											}
+										}
+									});
+								}
+								{
+									cycleDataProgressBar = new ProgressBar(this.memoryDataComposite, SWT.NONE);
+									FormData cycleDataProgressBarLData = new FormData();
+									cycleDataProgressBarLData.height = 15;
+									cycleDataProgressBarLData.left = new FormAttachment(0, 1000, 150);
+									cycleDataProgressBarLData.right = new FormAttachment(1000, 1000, -150);
+									cycleDataProgressBarLData.top = new FormAttachment(0, 1000, 120);
+									cycleDataProgressBar.setLayoutData(cycleDataProgressBarLData);
+									cycleDataProgressBar.setMinimum(0);
+									cycleDataProgressBar.setMinimum(100);
+								}
+								{
+									Button graphicsDataButton = new Button(this.memoryDataComposite, SWT.Selection);
+									FormData graphicsDataButtonLData = new FormData();
+									graphicsDataButtonLData.height = 30;
+									graphicsDataButtonLData.left = new FormAttachment(0, 1000, 150);
+									graphicsDataButtonLData.right = new FormAttachment(1000, 1000, -150);
+									graphicsDataButtonLData.top = new FormAttachment(0, 1000, 180);
+									graphicsDataButton.setLayoutData(graphicsDataButtonLData);
+									graphicsDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									graphicsDataButton.setText("read memories last graphics data");
+									graphicsDataButton.setToolTipText("read memory graphics data and display it in at standard graphics tab");
+									graphicsDataButton.addSelectionListener(new SelectionAdapter() {
+										@Override
+										public void widgetSelected(SelectionEvent evt) {
+											log.log(java.util.logging.Level.FINEST, "graphicsDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+//											Channel channel = this.channels.get(number);
+//											if (channel != null) {
+//												// check if a record set matching for re-use is available and prepare a new if required
+//												if (recordSet == null || !recordSetKey.contains(processName)) {
+//													this.application.setStatusMessage(""); //$NON-NLS-1$
+//													setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // reset to 180 sec
+//
+//													// record set does not exist or is out dated, build a new name and create
+//													StringBuilder extend = new StringBuilder();
+//													if (processNumber < 5) {// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
+//														String processingType = this.device.getProcessingType(dataBuffer);
+//														int cycleNumber = this.device.getCycleNumber(number, dataBuffer);
+//														
+//														if (processingType.length() > 3 || cycleNumber > 0) extend.append(GDE.STRING_BLANK_LEFT_BRACKET);				
+//														if (processingType.length() > 3) extend.append(processingType);
+//														
+//														if (cycleNumber > 0) {
+//															if (processingType.equals(Messages.getString(MessageIds.GDE_MSGT2302))) {
+//																extend.append(GDE.STRING_COLON).append(cycleNumber);
+//															}
+//															else {
+//																if (processingType.length() > 0 ) extend.append(GDE.STRING_MESSAGE_CONCAT);				
+//																extend.append(Messages.getString(MessageIds.GDE_MSGT2302)).append(GDE.STRING_COLON).append(cycleNumber);
+//															}
+//														}			
+//														if (processingType.length() > 3 || cycleNumber > 0) extend.append(GDE.STRING_RIGHT_BRACKET);
+//													}
+//													recordSetKey = channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName + extend.toString();
+//													recordSetKey = recordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetKey : recordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
+//
+//													channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
+//													channel.applyTemplateBasics(recordSetKey);
+//													log.logp(java.util.logging.Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, recordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
+//													recordSet = channel.get(recordSetKey);
+//													this.device.setTemperatureUnit(number, recordSet, dataBuffer); //°C or °F
+//													recordSet.setAllDisplayable();
+//													//channel.applyTemplate(recordSetKey, false);
+//													// switch the active record set if the current record set is child of active channel
+//													this.channels.switchChannel(channel.getNumber(), recordSetKey);
+//													channel.switchRecordSet(recordSetKey);
+//													String description = recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR 
+//														+ "Firmware  : " + this.device.firmware //$NON-NLS-1$
+//														+ (this.device.getBatteryMemoryNumber(number, dataBuffer) >= 1 ? "; Memory #" + this.device.getBatteryMemoryNumber(number, dataBuffer) : GDE.STRING_EMPTY); //$NON-NLS-1$
+//													try {
+//														int batteryMemoryNumber = this.device.getBatteryMemoryNumber(number, dataBuffer);
+//														if (batteryMemoryNumber > 0 && this.device.ultraDuoPlusSetup != null && this.device.ultraDuoPlusSetup.getMemory().get(batteryMemoryNumber) != null) {
+//															String batteryMemoryName = this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer) - 1).getName();
+//															description = description + GDE.STRING_MESSAGE_CONCAT + batteryMemoryName;
+//															if (recordSetKey.startsWith("1)")) this.device.matchBatteryMemory2ObjectKey(batteryMemoryName); //$NON-NLS-1$
+//														}
+//													}
+//													catch (Exception e) {
+//														e.printStackTrace();
+//														// ignore and do not append memory name
+//													}
+//													recordSet.setRecordSetDescription(description);
+//													
+//													// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error (only UltraDuoPlus devices do auto balancing when processing has been finished)
+//													// 0=no processing 1=charge 2=discharge 3=pause 4=finished 		 5=error 6=balance 11=store charge 12=store discharge
+//													if (processNumber == 4 && !isAlerted4Finish[number]) {
+//														this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2204, new Object[] { number }));
+//														isAlerted4Finish[number] = true;
+//													}
+//													else {
+//														isAlerted4Finish[number] = false;
+//													}
+//												}
+//
+//												recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
+//
+//												GathererThread.this.application.updateAllTabs(false);
+//
+//												if (recordSet.get(0).realSize() < 3 || recordSet.get(0).realSize() % 10 == 0) {
+//													this.device.updateVisibilityStatus(recordSet, true);
+//												}
+//											
+										}
+									});
+								}
+								{
+									graphicsDataProgressBar = new ProgressBar(this.memoryDataComposite, SWT.NONE);
+									FormData graphicsDataProgressBarLData = new FormData();
+									graphicsDataProgressBarLData.height = 15;
+									graphicsDataProgressBarLData.left = new FormAttachment(0, 1000, 150);
+									graphicsDataProgressBarLData.right = new FormAttachment(1000, 1000, -150);
+									graphicsDataProgressBarLData.top = new FormAttachment(0, 1000, 220);
+									graphicsDataProgressBar.setLayoutData(graphicsDataProgressBarLData);
+									graphicsDataProgressBar.setMinimum(0);
+									graphicsDataProgressBar.setMinimum(100);
+								}
+							}
+						}
 						this.mainTabFolder.setSelection(1);
 					}
 					{
@@ -1152,17 +1493,19 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		finally {
-			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-			this.application.resetShellIcon();
-			if (this.serialPort != null && this.serialPort.isConnected()) {
-				try {
-					this.serialPort.write(UltramatSerialPort.RESET);
-				}
-				catch (IOException e) {
-					// ignore
-				}
-				finally {
-					this.serialPort.close();
+			if (!GDE.shell.isDisposed()) {
+				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+				this.application.resetShellIcon();
+				if (this.serialPort != null && this.serialPort.isConnected()) {
+					try {
+						this.serialPort.write(UltramatSerialPort.RESET);
+					}
+					catch (IOException e) {
+						// ignore
+					}
+					finally {
+						this.serialPort.close();
+					}
 				}
 			}
 		}

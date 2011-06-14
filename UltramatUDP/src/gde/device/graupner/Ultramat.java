@@ -88,6 +88,12 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	protected final UltramatSerialPort						serialPort;
 	protected final Channels											channels;
 	protected UltraDuoPlusDialog									dialog;
+	
+	public static final String[]									cycleDataRecordNames						= { "Voltage charge", "Voltage discharge", "Capacity charge", "Capacity discharge",  "Resitance charge", "Resitance discharge" };
+	public static final String[]									cycleDataUnitNames							= { "V", "V", "mAh", "mAh", "m\u2126", "m\u2126" };
+	public static final double[]									cycleDataFactors								= { 1.0, 1.0, 1000.0, 1000.0, 100.0, 100.0 };
+	public static final int[]											cycleDataSyncRefOrdinal					= { -1, 0, -1, 2, -1, 4 };
+	public static final int[][]										cycleDataColors									= { {0,0,255},{12,12,255}, {128,0,0},{128,12,12},  {255,0,0},{255,12,12}};
 
 	/**
 	 * constructor using properties file

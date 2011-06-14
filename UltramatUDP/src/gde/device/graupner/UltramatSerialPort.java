@@ -30,6 +30,7 @@ import gde.utils.Checksum;
 import gde.utils.StringHelper;
 
 import java.io.IOException;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 /**
@@ -430,5 +431,24 @@ public class UltramatSerialPort extends DeviceCommPort {
 		String check_sum = String.format("%04X", Checksum.ADD(buffer, 1, buffer.length - 6)); //$NON-NLS-1$
 		log.logp(Level.FINER, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "Check_sum char[]= " + check_sum); //$NON-NLS-1$
 		return check_sum.getBytes();
+	}
+	
+	/**
+	 * query memory cycle data, time stamp, capacity, voltage, resistance for charge and discharge
+	 * @param memoryNumber
+	 * @return
+	 * @throws TimeOutException 
+	 * @throws IOException 
+	 * @throws SerialPortException 
+	 */
+	public Vector<byte[]> readMemoryCycleData(int memoryNumber) throws SerialPortException, IOException, TimeOutException {
+		Vector<byte[]> result = new Vector<byte[]>();
+		String memoryCycleData = readMemoryCycle(memoryNumber);
+		for (int i = 0; i < 11; i++) {
+			int startIndex = i*(11*4);
+			int endIndex = (i+1)*(11*4);
+			result.add(memoryCycleData.substring(startIndex, endIndex).getBytes());
+		}
+		return result;
 	}
 }
