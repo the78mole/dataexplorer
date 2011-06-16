@@ -76,7 +76,7 @@ public class GDE {
 
 
 	// ****** begin global constants section *******
-	public static final String		VERSION													= "Version 2.82";																																																						//$NON-NLS-1$
+	public static final String		VERSION													= "Version 2.83";																																																						//$NON-NLS-1$
 	public static final String		NAME_SHORT											= "GDE";																																																											//$NON-NLS-1$
 	public static final String		NAME_LONG												= "DataExplorer";																																																						//$NON-NLS-1$
 	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V13";																																																										//$NON-NLS-1$
@@ -496,16 +496,18 @@ public class GDE {
 		bar.setSize(165, 15);
 		splashShell.pack();
 		
-		GDE.startSplash = SplashScreen.getSplashScreen();
-		if (GDE.startSplash != null) {
-			java.awt.Rectangle splashRect = GDE.startSplash.getBounds();
-			splashShell.setLocation(splashRect.x, splashRect.y);
-		}
-		else {
+		//with java 1.6 update 26 this part needs to be comment out since the file dialog will not open anymore ???
+		//decide to make all versions equal and disable -splash: option while launching java
+//		GDE.startSplash = SplashScreen.getSplashScreen();
+//		if (GDE.startSplash != null) {
+//			java.awt.Rectangle splashRect = GDE.startSplash.getBounds();
+//			splashShell.setLocation(splashRect.x, splashRect.y);
+//		}
+//		else {
 			Rectangle primaryMonitorBounds = GDE.display.getBounds();
-			Point splashRect = new Point(primaryMonitorBounds.width / 2 - 165, primaryMonitorBounds.height / 2 - 103);
+			Point splashRect = new Point(primaryMonitorBounds.width / 2 - 185, primaryMonitorBounds.height / 2 - 103);
 			splashShell.setLocation(splashRect.x, splashRect.y);
-		}
+//		}
 		
 		splashShell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent arg0) {
