@@ -25,7 +25,6 @@
     <initialHeapSize>32</initialHeapSize>
     <maxHeapSize>256</maxHeapSize>
     <opt>-Dfile.encoding=UTF-8</opt>
-    <opt>-splash:DataExplorerSplash.png</opt>
   </jre>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>

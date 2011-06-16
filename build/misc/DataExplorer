@@ -1,6 +1,7 @@
 #!/bin/bash
 # ***** script to launch DataExplorer ** 27 Apr 2009 WB *****
 
-echo java -Dfile.encoding=UTF-8 -splash:./DataExplorerSplash.png -jar -Xms32m -Xmx256m ./DataExplorer.jar
-java -Dfile.encoding=UTF-8 -splash:./DataExplorerSplash.png -jar -Xms32m -Xmx256m ./DataExplorer.jar
+echo java -Dfile.encoding=UTF-8 -jar -Xms32m -Xmx256m ./DataExplorer.jar
+echo argument $1
+java -Dfile.encoding=UTF-8 -jar -Xms32m -Xmx256m ./DataExplorer.jar $1
 
