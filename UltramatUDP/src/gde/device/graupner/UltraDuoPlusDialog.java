@@ -119,7 +119,7 @@ import org.eclipse.swt.widgets.Text;
 public class UltraDuoPlusDialog extends DeviceDialog {
 	final static Logger				log												= Logger.getLogger(UltraDuoPlusDialog.class.getName());
 	static final String				DEVICE_JAR_NAME						= "UltramatUDP";																																																											//$NON-NLS-1$
-	static final String				STRING_FORMAT_02D					= "%02d";
+	static final String				STRING_FORMAT_02D					= "%02d"; //$NON-NLS-1$
 	static final String				STRING_FORMAT_02d_s				= "%02d - %s";																																																												//$NON-NLS-1$
 	static final String				STRING_16_BLANK						= "                ";																																																								//$NON-NLS-1$
 	static final String				ULTRA_DUO_PLUS_XSD				= "UltraDuoPlus_V02.xsd";																																																						//$NON-NLS-1$
@@ -215,7 +215,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			String deviceIdentifierName = GDE.STRING_EMPTY;
 			log.log(Level.TIME, "XSD init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
-			serialPort = new UltramatSerialPort(new DeviceConfiguration(basePath + "/Devices/UltraDuoPlus60.xml")); //$NON-NLS-1$
+			serialPort = new UltramatSerialPort(new DeviceConfiguration(basePath + "/Devices/UltraDuoPlus60.xml"));
 			if (!serialPort.isConnected()) {
 				try {
 					long time = new Date().getTime();
@@ -327,7 +327,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			break;
 		}
 		this.memoryNames = new String[UltraDuoPlusDialog.numberMemories];
-		this.memoryNames[1] = " initial ";
+		this.memoryNames[1] = " initial "; //$NON-NLS-1$
 
 		this.memoryParameterChangeListener = new Listener() {
 			public void handleEvent(Event evt) {
@@ -538,7 +538,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 								log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
 								File oldConfigDataFile = new File(UltraDuoPlusDialog.this.settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
 										+ UltraDuoPlusDialog.this.deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML);
-								if (oldConfigDataFile.exists()) if(!oldConfigDataFile.delete()) log.log(Level.WARNING, "could not delete " + oldConfigDataFile.getName());
+								if (oldConfigDataFile.exists()) if(!oldConfigDataFile.delete()) log.log(Level.WARNING, "could not delete " + oldConfigDataFile.getName()); //$NON-NLS-1$
 								UltraDuoPlusDialog.this.deviceIdentifierName = (UltraDuoPlusDialog.this.userNameText.getText() + UltraDuoPlusDialog.STRING_16_BLANK).substring(0, 16);
 								UltraDuoPlusDialog.this.ultraDuoPlusSetup.setIdentifierName(UltraDuoPlusDialog.this.deviceIdentifierName);
 								UltraDuoPlusDialog.this.ultraDuoPlusSetup.setChanged(true);
@@ -619,13 +619,13 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												Messages.getString(MessageIds.GDE_MSGT2244) + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT2245), 175, UltraDuoPlusDialog.powerOnDisplayType, 50, 150);
 										//channelParameters[7] = new ParameterConfigControl(baseDeviceSetupComposite, channelValues1, 7, "PC setup", 175, "DISABLE | ENABLE", 175, diableEnableType, 50, 150);
 										this.channelParameters[8] = new ParameterConfigControl(this.baseDeviceSetupGroup, this.channelValues1, 8, GDE.STRING_EMPTY,
-												Messages.getString(MessageIds.GDE_MSGT2296) + "(1)", 175, "120 ~ 150 (12.0 ~ 15.0V)", 175, true, 50, 150, 120, 150, -100); //$NON-NLS-1$ 
+												Messages.getString(MessageIds.GDE_MSGT2296) + "(1)", 175, "120 ~ 150 (12.0 ~ 15.0V)", 175, true, 50, 150, 120, 150, -100); //$NON-NLS-1$ //$NON-NLS-2$ 
 										this.channelParameters[9] = new ParameterConfigControl(this.baseDeviceSetupGroup, this.channelValues1, 9, GDE.STRING_EMPTY,
-												Messages.getString(MessageIds.GDE_MSGT2297) + "(1)", 175, "50 ~ 400 (5 ~ 40A)", 175, true, 50, 150, 50, 400, -50); //$NON-NLS-1$ 
+												Messages.getString(MessageIds.GDE_MSGT2297) + "(1)", 175, "50 ~ 400 (5 ~ 40A)", 175, true, 50, 150, 50, 400, -50); //$NON-NLS-1$ //$NON-NLS-2$ 
 										this.channelParameters[10] = new ParameterConfigControl(this.baseDeviceSetupGroup, this.channelValues1, 10, GDE.STRING_EMPTY,
-												Messages.getString(MessageIds.GDE_MSGT2296) + "(2)", 175, "120 ~ 150 (12.0 ~ 15.0V)", 175, true, 50, 150, 120, 150, -100); //$NON-NLS-1$ 
+												Messages.getString(MessageIds.GDE_MSGT2296) + "(2)", 175, "120 ~ 150 (12.0 ~ 15.0V)", 175, true, 50, 150, 120, 150, -100); //$NON-NLS-1$ //$NON-NLS-2$ 
 										this.channelParameters[11] = new ParameterConfigControl(this.baseDeviceSetupGroup, this.channelValues1, 11, GDE.STRING_EMPTY,
-												Messages.getString(MessageIds.GDE_MSGT2297) + "(2)", 175, "50 ~ 400 (5 ~ 40A)", 175, true, 50, 150, 50, 400, -50); //$NON-NLS-1$ 
+												Messages.getString(MessageIds.GDE_MSGT2297) + "(2)", 175, "50 ~ 400 (5 ~ 40A)", 175, true, 50, 150, 50, 400, -50); //$NON-NLS-1$ //$NON-NLS-2$ 
 										this.channelParameters[12] = new ParameterConfigControl(this.baseDeviceSetupGroup, this.channelValues1, 12, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2315), 175,
 												"1 - 99%", 175, false, 50, 150, 1, 99, -1); //$NON-NLS-1$ 
 										this.channelParameters[18] = new ParameterConfigControl(this.baseDeviceSetupGroup, this.channelValues1, 18, Messages.getString(MessageIds.GDE_MSGT2303), 175,
@@ -1007,7 +1007,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						{
 							this.memoryCycleDataTabItem = new CTabItem(this.mainTabFolder, SWT.NONE);
 							this.memoryCycleDataTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.memoryCycleDataTabItem.setText("Speicher Zyklus Daten");
+							this.memoryCycleDataTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2320));
 							{
 								this.memoryDataComposite = new Composite(this.mainTabFolder, SWT.NONE);
 								this.memoryCycleDataTabItem.setControl(this.memoryDataComposite);
@@ -1035,7 +1035,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										memoryCycleDataSelectLabelLData.height = 20;
 										this.memoryDataSelectLabel.setLayoutData(memoryCycleDataSelectLabelLData);
 										this.memoryDataSelectLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.memoryDataSelectLabel.setText("Batteriespeicher " + Messages.getString(MessageIds.GDE_MSGT2251));
+										this.memoryDataSelectLabel.setText(Messages.getString(MessageIds.GDE_MSGT2321) + Messages.getString(MessageIds.GDE_MSGT2251)); 
 										this.memoryDataSelectLabel.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
 									}
 									{
@@ -1071,8 +1071,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									cycleDataButtonLData.top = new FormAttachment(0, 1000, 80);
 									cycleDataButton.setLayoutData(cycleDataButtonLData);
 									cycleDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									cycleDataButton.setText("display memory cycle data");
-									cycleDataButton.setToolTipText("read memory cycle data and display it in a new graphics tab");
+									cycleDataButton.setText(Messages.getString(MessageIds.GDE_MSGT2322));
+									cycleDataButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2316));
 									cycleDataButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -1105,98 +1105,161 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												UltraDuoPlusDialog.this.application.getTabFolder().setSelection(cycleGraph);
 												cycleDataProgressBar.setSelection(50);
 												
+												long justNowPlus2Hours = new Date().getTime() + 7200000L;
+												long justNowMinus2Year = new Date().getTime() - 63072000000L;
+												boolean isDateChanged = false;
+												Vector<byte[]> cyclesData = new Vector<byte[]>();
 												TreeMap<Long, int[]> sortCyclesData = new TreeMap<Long, int[]>();
-												if (Boolean.parseBoolean(System.getProperty("GDE_IS_SIMULATION"))) {
+												if (Boolean.parseBoolean(System.getProperty("GDE_IS_SIMULATION"))) { //$NON-NLS-1$
 													//test data - change dates in timeSteps block below to vary
-													long[] timeSteps = {
-															new GregorianCalendar(2011, 06, 01, 03, 38, 0).getTimeInMillis(), 
-															new GregorianCalendar(2011, 06, 02, 03, 38, 0).getTimeInMillis(), 
-															new GregorianCalendar(2011, 06, 03, 11, 04, 0).getTimeInMillis(),
-															new GregorianCalendar(2011, 06, 04,  9, 45, 0).getTimeInMillis(),
-															new GregorianCalendar(2011, 06, 04, 16, 04, 0).getTimeInMillis(),
-															new GregorianCalendar(2011, 06, 12, 18, 52, 0).getTimeInMillis(),
-													};
-													int[][] pointss = { 
-															{16834,     0, 1000,  0, 1300,  0},
-															{16834, 16264, 1281, 33, 1036,  0},
-															{16857,     0,  371,  0, 1425,  0},
-															{16766,     0, 2783,  0,  949,  0},
-															{16790,    34, 2783, 15, 1382, 29},
-															{16768, 		0, 2000,  0, 1140,  0},
-													};
-													//                             2;        0;     	 4;        3;        1;        5
-													//2011-04-17, 03:38:00;     1281;    16834;     1036;       33;    16264;        0
-													//2011-04-24, 11:04:00;      371;    16857;     1425;        0;        0;        0
-													//2011-05-07, 09:45:00;     2783;    16766;      949;        0;        0;        0
-													//2011-06-04, 16:04:00;     2783;    16790;     1382;       15;       34;       29
-													//2011-06-12, 18:52:00;     2000;    16768;     1140;        0;        0;        0
-													for (int i = 0; i < timeSteps.length; i++) {
-														sortCyclesData.put(timeSteps[i], pointss[i].clone());
+													//original data
+													//String memoryCycleData = "00030026000B00040011050141C2040C00213F880000000B0004000B00040018017341D905910000000000000009002D000B0005000709BF417E03B50000000000000008002B000C00050009084341DC04B4000B0000000000000032000F00050012001A41F0000000000000000000090015000C0005001D0A2E4194044E00000000000000100004000B000600040ADF41960566000F0022001D00120034000B0006000C07D0418004740000000000000003000E000E0006000D094241E206A30000000000000000000000000000000000000000000000000000000000210088000000000000000000000000000000000000";
+													//updated data
+													String memoryCycleData = "00030026000B00040011050141C2040C00213F880000000B0004000B00040018017341D905910000000000000009002D000B0005000709BF417E03B500000000000000130013000B0005000A084341DC04B4000B0000000000000032000000050012001A41F0000000000000000000130028000B0005001E0A2E4194044E00000000000000100004000B000600040ADF41960566000F0022001D00120034000B0006000C07D041800474000000000000000D0022000B00060010094241E206A30000000000000000000000000000000000000000000000000000000000210088000000000000000000000000000000000000";
+													for (int i = 0; i < 11; i++) {
+														int startIndex = i*(11*4);
+														int endIndex = (i+1)*(11*4);
+														cyclesData.add(memoryCycleData.substring(startIndex, endIndex).getBytes());
 													}
+
+//													long[] timeSteps = {
+//															new GregorianCalendar(2011, 06, 01, 03, 38, 0).getTimeInMillis(), 
+//															new GregorianCalendar(2011, 06, 02, 03, 38, 0).getTimeInMillis(), 
+//															new GregorianCalendar(2011, 06, 03, 11, 04, 0).getTimeInMillis(),
+//															new GregorianCalendar(2011, 06, 04,  9, 45, 0).getTimeInMillis(),
+//															new GregorianCalendar(2011, 06, 04, 16, 04, 0).getTimeInMillis(),
+//															new GregorianCalendar(2011, 06, 12, 18, 52, 0).getTimeInMillis(),
+//													};
+//													int[][] pointss = { 
+//															{16834,     0, 1000,  0, 1300,  0},
+//															{16834, 16264, 1281, 33, 1036,  0},
+//															{16857,     0,  371,  0, 1425,  0},
+//															{16766,     0, 2783,  0,  949,  0},
+//															{16790,    34, 2783, 15, 1382, 29},
+//															{16768, 		0, 2000,  0, 1140,  0},
+//													};
+//													//                             2;        0;     	 4;        3;        1;        5
+//													//2011-04-17, 03:38:00;     1281;    16834;     1036;       33;    16264;        0
+//													//2011-04-24, 11:04:00;      371;    16857;     1425;        0;        0;        0
+//													//2011-05-07, 09:45:00;     2783;    16766;      949;        0;        0;        0
+//													//2011-06-04, 16:04:00;     2783;    16790;     1382;       15;       34;       29
+//													//2011-06-12, 18:52:00;     2000;    16768;     1140;        0;        0;        0
+//													for (int i = 0; i < timeSteps.length; i++) {
+//														sortCyclesData.put(timeSteps[i], pointss[i].clone());
+//													}
 												}
 												else {
-													Vector<byte[]> cyclesData = UltraDuoPlusDialog.this.serialPort.readMemoryCycleData(UltraDuoPlusDialog.this.memorySelectionIndexData);
+													cyclesData = UltraDuoPlusDialog.this.serialPort.readMemoryCycleData(UltraDuoPlusDialog.this.memorySelectionIndexData);
+												}
+												
+												if (log.isLoggable(Level.OFF)) {
+													StringBuilder sb = new StringBuilder();
 													for (byte[] cycleData : cyclesData) {
-														long timeStamp = 0;
-														int[] points = new int[6];
-														try {
-															int hour = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[0], cycleData[1], cycleData[2], cycleData[3]), 16);
-															int minute = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[4], cycleData[5], cycleData[6], cycleData[7]), 16);
-															int year = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[8], cycleData[9], cycleData[10], cycleData[11]), 16);
-															int month = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[12], cycleData[13], cycleData[14], cycleData[15]), 16);
-															int day = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[16], cycleData[17], cycleData[18], cycleData[19]), 16);
-															if (year != 0 && month != 0 && day != 0 && minute != 0 && hour != 0) {
-																GregorianCalendar calendar = new GregorianCalendar(2000 + year, month - 1, day, hour, minute, 0);
-																long justNow = new Date().getTime();
-																timeStamp = calendar.getTimeInMillis() < justNow ? calendar.getTimeInMillis() : 0;
-															}
-														}
-														catch (NumberFormatException e) {
-															log.log(Level.WARNING, e.getMessage(), e);
-														}
-														try {
-															points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[20], (char) cycleData[21], (char) cycleData[22], (char) cycleData[23]), 16);
-															points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[24], (char) cycleData[25], (char) cycleData[26], (char) cycleData[27]), 16);
-															points[4] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[28], (char) cycleData[29], (char) cycleData[30], (char) cycleData[31]), 16);
-															points[3] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[32], (char) cycleData[33], (char) cycleData[34], (char) cycleData[35]), 16);
-															points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[36], (char) cycleData[37], (char) cycleData[38], (char) cycleData[39]), 16);
-															points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[40], (char) cycleData[41], (char) cycleData[42], (char) cycleData[43]), 16);
-														}
-														catch (Exception e) {
-															log.log(Level.WARNING, e.getMessage(), e);
-														}
+														sb.append(new String(cycleData));
+													}
+													log.log(Level.OFF, sb.toString());
+												}
+												
+												for (byte[] cycleData : cyclesData) {
+													long timeStamp = 0;
+													int[] points = new int[6];
+													int hour = 0;
+													int minute = 0;
+													int year = 0;
+													int month = 0;
+													int day = 0;
+													try {
+														hour = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[0], cycleData[1], cycleData[2], cycleData[3]), 16);
+														minute = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[4], cycleData[5], cycleData[6], cycleData[7]), 16);
+														year = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[8], cycleData[9], cycleData[10], cycleData[11]), 16);
+														month = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[12], cycleData[13], cycleData[14], cycleData[15]), 16);
+														day = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[16], cycleData[17], cycleData[18], cycleData[19]), 16);
+														timeStamp = new GregorianCalendar(2000 + year, month - 1, day, hour, minute, 0).getTimeInMillis();
+													}
+													catch (NumberFormatException e) {
+														log.log(Level.WARNING, e.getMessage(), e);
+													}
 
-														if (timeStamp > 0) {
-															sortCyclesData.put(timeStamp, points.clone());
-															
-															if (log.isLoggable(Level.FINEST)) {
-																StringBuilder sb = new StringBuilder();
-																for (int i = 0; i < points.length; i++) {
-																	sb.append("; ").append(String.format("%8d", points[i]));
+													try {
+														points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[20], (char) cycleData[21], (char) cycleData[22], (char) cycleData[23]), 16);
+														points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[24], (char) cycleData[25], (char) cycleData[26], (char) cycleData[27]), 16);
+														points[4] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[28], (char) cycleData[29], (char) cycleData[30], (char) cycleData[31]), 16);
+														points[3] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[32], (char) cycleData[33], (char) cycleData[34], (char) cycleData[35]), 16);
+														points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[36], (char) cycleData[37], (char) cycleData[38], (char) cycleData[39]), 16);
+														points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[40], (char) cycleData[41], (char) cycleData[42], (char) cycleData[43]), 16);
+													}
+													catch (Exception e) {
+														log.log(Level.WARNING, e.getMessage(), e);
+													}
+													
+													if (log.isLoggable(Level.OFF)) {
+														StringBuilder sb = new StringBuilder();
+														for (int i = 0; i < points.length; i++) {
+															sb.append("; ").append(String.format("%8d", points[i])); //$NON-NLS-1$ //$NON-NLS-2$
+														}
+														log.log(Level.OFF, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp) + sb.toString()); //$NON-NLS-1$
+													}
+													//if time stamp is not between just now - 1 year and just now + 2 hrs  and contains data ask if the date should be corrected
+													long dataSum = 0;
+													for (int point : points) {
+														dataSum += point;
+													}
+													if (dataSum > 0 && (timeStamp < justNowMinus2Year || timeStamp > justNowPlus2Hours)) {
+														log.log(Level.FINER, "time stamp out of range ! " + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp)); //$NON-NLS-1$ //$NON-NLS-2$
+														int[] newTimeStamp = new ChangeDateDialog(dialogShell, SWT.NONE, new int[] {hour, minute, 2000+year, month, day, points[2], points[3]}).open();
+														if(newTimeStamp.length > 0) { //change requested
+															System.out.println("date change requested !"); //$NON-NLS-1$
+															isDateChanged = true;
+															newTimeStamp[0] = newTimeStamp[0] < 0 ? 0 : newTimeStamp[0] > 24 ? 24 : newTimeStamp[0]; //hour
+															newTimeStamp[1] = newTimeStamp[1] < 0 ? 0 : newTimeStamp[1] > 60 ? 60 : newTimeStamp[1]; //minute
+															newTimeStamp[2] = newTimeStamp[2] <= 2000 ? 0 : newTimeStamp[2] - 2000; //year
+															newTimeStamp[3] = newTimeStamp[3] < 1 ? 1 : newTimeStamp[3] > 12 ? 12 : newTimeStamp[3]; //month
+															newTimeStamp[4] = newTimeStamp[4] < 1 ? 1 : newTimeStamp[4] > 30 ? 30 : newTimeStamp[4]; //day
+															for (int i = 0,k = 0; i < newTimeStamp.length; i++, k+=4) {
+																byte[] bytes = String.format("%04X", newTimeStamp[i]).getBytes(); //$NON-NLS-1$
+																for (int j = 0; j < bytes.length; j++) {
+																	 cycleData[j+k] = bytes[j]; 
 																}
-																log.log(Level.FINEST, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp) + sb.toString());
 															}
+															hour = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[0], cycleData[1], cycleData[2], cycleData[3]), 16);
+															minute = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[4], cycleData[5], cycleData[6], cycleData[7]), 16);
+															year = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[8], cycleData[9], cycleData[10], cycleData[11]), 16);
+															month = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[12], cycleData[13], cycleData[14], cycleData[15]), 16);
+															day = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[16], cycleData[17], cycleData[18], cycleData[19]), 16);
+															timeStamp = new GregorianCalendar(2000 + year, month - 1, day, hour, minute, 0).getTimeInMillis();																
 														}
 													}
+
+													if (dataSum > 0 && timeStamp > justNowMinus2Year && timeStamp < justNowPlus2Hours) {
+														sortCyclesData.put(timeStamp, points.clone());
+													}
+												}
+												
+												//check if time stamp was changed, if yes write back changed data to device
+												if (isDateChanged) {
+													application.openMessageDialogAsync(dialogShell, "writing corrected data to device is disabled due to malfunction !");
+													//TODO serialPort.writeMemoryCycleData(UltraDuoPlusDialog.this.memorySelectionIndexData, cyclesData);
+													isDateChanged = false;
 												}
 
-												log.log(Level.FINE, GDE.LINE_SEPARATOR);
+												log.log(Level.OFF, "used entries between " +  StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", justNowMinus2Year) + GDE.STRING_MESSAGE_CONCAT +  StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", justNowPlus2Hours) + GDE.LINE_SEPARATOR); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 												long lastTimeStamp = 0;
 												for (Entry<Long, int[]> entry : sortCyclesData.entrySet()) {
 													utilitySet.addPoints(entry.getValue(), (lastTimeStamp == 0 ? 0 : entry.getKey() - lastTimeStamp));
 													
-													StringBuilder sb = new StringBuilder();
-													for (int i = 0; i < entry.getValue().length; i++) {
-														sb.append("; ").append(String.format("%8d", entry.getValue()[i]));
+													if (log.isLoggable(Level.OFF)) {
+														StringBuilder sb = new StringBuilder();
+														for (int i = 0; i < entry.getValue().length; i++) {
+															sb.append("; ").append(String.format("%8d", entry.getValue()[i])); //$NON-NLS-1$ //$NON-NLS-2$
+														}
+														log.log(Level.OFF, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", entry.getKey()) + String.format("; %12d%s", (lastTimeStamp == 0 ? 0 : entry.getKey() - lastTimeStamp), sb.toString())); //$NON-NLS-1$ //$NON-NLS-2$
 													}
-													log.log(Level.FINE, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", entry.getKey()) + String.format("%12d %s", (lastTimeStamp == 0 ? 0 : entry.getKey() - lastTimeStamp), sb.toString()));
-													
 													lastTimeStamp = lastTimeStamp == 0 ? entry.getKey() : lastTimeStamp;
 												}
 												Long[] dates = sortCyclesData.keySet().toArray(new Long[0]);
 												if (dates != null && dates.length > 0) {
 												utilitySet.setRecordSetDescription(UltraDuoPlusDialog.this.memoryDataCombo.getText() + GDE.STRING_BLANK_COLON_BLANK 
-														+ StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", dates[0]) + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", dates[dates.length-1]));
+														+ StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", dates[0]) + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", dates[dates.length-1])); //$NON-NLS-1$ //$NON-NLS-2$
 												}
 												else {
 													utilitySet.setRecordSetDescription(UltraDuoPlusDialog.this.memoryDataCombo.getText());
@@ -1231,8 +1294,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									graphicsDataButtonLData.top = new FormAttachment(0, 1000, 180);
 									graphicsDataButton.setLayoutData(graphicsDataButtonLData);
 									graphicsDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									graphicsDataButton.setText("read memories last graphics data");
-									graphicsDataButton.setToolTipText("read memory graphics data and display it in at standard graphics tab");
+									graphicsDataButton.setText(Messages.getString(MessageIds.GDE_MSGT2318));
+									graphicsDataButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2319));
 									graphicsDataButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -1410,7 +1473,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "backupButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								FileDialog fileDialog = UltraDuoPlusDialog.this.application.prepareFileSaveDialog(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2285), new String[] {
-										GDE.FILE_ENDING_STAR_XML, GDE.FILE_ENDING_STAR }, UltraDuoPlusDialog.this.settings.getDataFilePath(), StringHelper.getDateAndTime("yyyy-MM-dd-HH-mm-ss") + GDE.STRING_UNDER_BAR
+										GDE.FILE_ENDING_STAR_XML, GDE.FILE_ENDING_STAR }, UltraDuoPlusDialog.this.settings.getDataFilePath(), StringHelper.getDateAndTime("yyyy-MM-dd-HH-mm-ss") + GDE.STRING_UNDER_BAR //$NON-NLS-1$
 										+ UltraDuoPlusDialog.this.device.getName() + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getIdentifierName());
 								String configFilePath = fileDialog.open();
 								if (configFilePath != null && fileDialog.getFileName().length() > 4) {
@@ -1445,7 +1508,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					}
 					{
 						this.helpButton = new Button(this.boundsComposite, SWT.PUSH | SWT.CENTER);
-						this.helpButton.setImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
+						this.helpButton.setImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif"));
 						FormData LoadButtonLData = new FormData();
 						LoadButtonLData.width = 118;
 						LoadButtonLData.height = GDE.IS_MAC ? 33 : 30;
@@ -1645,7 +1708,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			if (log.isLoggable(java.util.logging.Level.FINE)) {
 				StringBuffer sb = new StringBuffer();
 				for (int i = 0; i < UltramatSerialPort.SIZE_MEMORY_SETUP; i++) {
-					sb.append(String.format("%04d", this.memoryValues[i])).append(GDE.STRING_LEFT_BRACKET).append(i).append(GDE.STRING_RIGHT_BRACKET_COMMA);
+					sb.append(String.format("%04d", this.memoryValues[i])).append(GDE.STRING_LEFT_BRACKET).append(i).append(GDE.STRING_RIGHT_BRACKET_COMMA); //$NON-NLS-1$
 				}
 				log.log(java.util.logging.Level.FINE, sb.toString());
 			}
@@ -1850,7 +1913,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		if (log.isLoggable(java.util.logging.Level.FINER)) {
 			StringBuffer sb = new StringBuffer();
 			for (int i = 0; i < UltramatSerialPort.SIZE_MEMORY_SETUP; i++) {
-				sb.append(String.format("%04d", this.memoryValues[i])).append(GDE.STRING_LEFT_BRACKET).append(i).append(GDE.STRING_RIGHT_BRACKET_COMMA);
+				sb.append(String.format("%04d", this.memoryValues[i])).append(GDE.STRING_LEFT_BRACKET).append(i).append(GDE.STRING_RIGHT_BRACKET_COMMA); //$NON-NLS-1$
 			}
 			log.log(java.util.logging.Level.FINER, sb.toString());
 		}
