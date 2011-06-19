@@ -731,7 +731,7 @@ public class DataExplorer extends Composite {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 		}
-		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "call GDE.shell.layout()");
+		log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "call GDE.shell.layout()"); //$NON-NLS-1$
 		GDE.shell.layout();
 		this.updateLogger();
 	}

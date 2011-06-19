@@ -124,7 +124,7 @@ public class DataTableWindow extends CTabItem {
 				for (int i = 0; i < recordNames.length; i++) {
 					Record record = activeRecordSet.get(recordNames[i]);
 					StringBuilder sb = new StringBuilder();
-					sb.append(record.getName()).append(GDE.STRING_BLANK).append(GDE.STRING_LEFT_BRACKET).append(record.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
+					sb.append(record.getName()).append(GDE.STRING_BLANK_LEFT_BRACKET).append(record.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 					column.setWidth(sb.length() * extentFactor);
 					column.setText(sb.toString());
