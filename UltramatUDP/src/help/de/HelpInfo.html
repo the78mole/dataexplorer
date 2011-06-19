@@ -106,12 +106,12 @@ Der Objektname, der die meisten &Uuml;bereinstimmungen aufweist, wird ausgew&aum
 <P><B>Hinweis : </B>M&ouml;chte man diese Eigenschaft f&uuml;r sich ausnutzen, sollte man die Batteriespeichernamen und Objektnamen entsprechend benennen.
 Beide Namen k&ouml;nnen auch nachtr&auml;glich umbenannt werden, wenn erforderlich.
 </P>
-<H3><FONT FACE="Arial"><FONT SIZE=4><I>Akkuzyclusdaten</I></FONT></FONT></H3>
+<H3><FONT FACE="Arial"><FONT SIZE=4><I>Akkuzyklusdaten Historie</I></FONT></FONT></H3>
 <P>&Uuml;ber den Akkudaten-Tabulator können die Akkuzyklusdaten abgerufen werden. 
 Diese Daten werden dann in einem neuen Tabulator in der Hauptansicht dargestellt.
 </P>
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_8.png" NAME="Bild8 Akkuzyklusdaten" ALT="Bild8 Akkuzyklusdaten"></P>
-<P><B>Hinweis : </B>Es werden nur Daten angezeigt, die innerhalb der letzten 2 Jahre f&uuml;r den ausgew&auml;hlten Akku aufgenimmen wurden.
+<P><B>Hinweis : </B>Es werden nur Daten angezeigt, die innerhalb der letzten 2 Jahre f&uuml;r den ausgew&auml;hlten Akku aufgenommen wurden.
 </P>
 <P>Durch Misskonfiguration oder Firmwareupdate kann es vorkommen, dass die Ger&auml;teinterne Zeitbasis verloren geht. 
 Dadurch kann es zu Fehleintr&auml;gen bez&uuml;glich des Datums bzw. der Zeit kommt.
@@ -119,59 +119,10 @@ Wird eine solche Zeitstempelabweichung festgestellt wird ein kleiner Dialog ange
 </P>
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_9.png" NAME="Bild9 Korrekturdialog" ALT="Bild9 Korrekturdialog"></P>
 <P>Wie kann man die zur &Auml;nderung vorgeschlagenen Zeitstempel mit Lade-/Entlade-Vorg&auml;ngen korrelieren? 
-Durch Ver&auml;ndern des Logginglevels f&uuml;r die UltraDuoPlusDialog Klasse können alle aus dem Ger&auml;t gelesenen Daten angezeigt werden. 
+Beim Einlesen &uuml;berspringt man erst einmal alle &Auml;nderungsvorschl&auml;ge und schaut sich die Tabelle mit den gelesenen Eintr&auml;gen an.
 </P>
-<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_10.png" NAME="Bild10 Tracelogkonfiguration" ALT="Bild10 Tracelogkonfiguration"></P>
-<P>Ruft man nach dieser Einstellung nochmal die Daten ab werden vergleichbare Eintr&auml;ge in die trace.log.1 Datei geschrieben.
-(Das Verzeichnis, in der sich trace.log befindet ist Betriebssystemabh&auml;ngig und ist in der Haupthilfe unter Verwendete Verzeichnisse beschrieben).
-Hierbei sollte immer Nein f&uuml;r keine &Auml;nderung im Korrekturdialog ausgew&aum;lt werden.
-</BR>
-2011-06-17 10:22:27.781 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2011-04-17, 03:38:00;    16834;    16264;     1281;       33;     1036;        0
-</BR>
-2011-06-17 10:22:27.781 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2011-04-24, 11:04:00;    16857;        0;      371;        0;     1425;        0
-</BR>
-2011-06-17 10:22:27.781 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2011-05-07, 09:45:00;    16766;        0;     2495;        0;      949;        0
-</BR>
-2011-06-17 10:22:27.781 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2012-05-09, 08:43:00;    16860;        0;     2115;       11;     1204;        0
-</BR>
-2011-06-17 10:22:30.125 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2015-05-18, 00:50:00;    16880;        0;       26;        0;        0;        0
-</BR>
-2011-06-17 10:22:30.671 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2012-05-29, 09:21:00;    16788;        0;     2606;        0;     1102;        0
-</BR>
-2011-06-17 10:22:31.140 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2011-06-04, 16:04:00;    16790;       34;     2783;       15;     1382;       29
-</BR>
-2011-06-17 10:22:31.140 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2011-06-12, 18:52:00;    16768;        0;     2000;        0;     1140;        0
-</BR>
-2011-06-17 10:22:31.140 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2014-06-13, 03:14:00;    16866;        0;     2370;        0;     1699;        0
-</BR>
-2011-06-17 10:22:31.609 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 1999-11-30, 00:00:00;        0;        0;        0;        0;        0;        0
-</BR>
-2011-06-17 10:22:31.609 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 1999-12-01, 11:16:00;        0;        0;        0;        0;        0;        0
-</BR>
-2011-06-17 10:22:31.609 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - used entries between 2009-06-17, 10:22:27 - 2011-06-17, 12:22:27
-</BR></BR>
-2011-06-17 10:22:31.609 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2011-04-17, 03:38:00;            0;    16834;    16264;     1281;       33;     1036;        0
-</BR>
-2011-06-17 10:22:31.609 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2011-04-24, 11:04:00;    631560000;    16857;        0;      371;        0;     1425;        0
-</BR>
-2011-06-17 10:22:31.609 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2011-05-07, 09:45:00;   1750020000;    16766;        0;     2495;        0;      949;        0
-</BR>
-2011-06-17 10:22:31.609 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2011-06-04, 16:04:00;   4191960000;    16790;       34;     2783;       15;     1382;       29
-</BR>
-2011-06-17 10:22:31.609 000010 FINE    gde.device.graupner.UltraDuoPlusDialog.widgetSelected() - 2011-06-12, 18:52:00;   4893240000;    16768;        0;     2000;        0;     1140;        0
-</BR></BR>
-Nun kann man anhand von aufgezeichneten DataExplorer Dateien, am besten &uuml;ber den Statistiktabulator, herausfinden, welcher Eintrag auf welchen Zeitstempel zu berichtigen ist.
-Am besten nimmt amn eine leere Textdatei und stellt sich die Daten zusammen, in etwa so:
-<BR>
-2011-05-10, 19:19:37	2115 <--- 2012-05-09, 08:43:00;    16860;        0;     2115;       11;     1204;        0
-<BR>
-1999-01-01, 00:00:00	0000 <--- 2015-05-18, 00:50:00;    16880;        0;       26;        0;        0;        0
-<BR>
-2011-05-30, 19:40:23	2606 <--- 2012-05-29, 09:21:00;    16788;        0;     2606;        0;     1102;        0
-<BR>
-2011-06-16, 13:34:00	2370 <--- 2014-06-13, 03:14:00;    16866;        0;     2370;        0;     1699;        0
-<BR>
-In der zweiten Zeile wir bewusst ein Eintrag mit '1999-01-01, 00:00:00' &uuml;berschrieben, dadurch wird dieser dann von Ger&auml;t vor den anderen wiederverwendet.
+<P ALIGN=CENTER><IMG SRC="HelpInfo_Bild_10.png" NAME="Bild10 Dialog Akkuhistorie" ALT="Bild10 Dialog Akkuhistorie"></P>
+<P>Nun kann man sich die Daten in aller Ruhe ansehen und mittels der gesicherten DataExplorer Dateien von den in Frage kommenden Einträge bei einem weiterem Abrufen der Historiendaten die Korrekturen vornehmen.
 </P>
 </BODY>
 </HTML>
