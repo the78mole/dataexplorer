@@ -1169,12 +1169,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													cyclesData = UltraDuoPlusDialog.this.serialPort.readMemoryCycleData(UltraDuoPlusDialog.this.memorySelectionIndexData);
 												}
 
-												if (log.isLoggable(java.util.logging.Level.OFF)) {
+												if (log.isLoggable(java.util.logging.Level.FINE)) {
 													StringBuilder sb = new StringBuilder();
 													for (byte[] cycleData : cyclesData) {
 														sb.append(new String(cycleData));
 													}
-													log.log(java.util.logging.Level.OFF, sb.toString());
+													log.log(java.util.logging.Level.FINE, sb.toString());
 												}
 												UltraDuoPlusDialog.this.dataTable.removeAll();
 
@@ -1210,12 +1210,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 														log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 													}
 
-													if (log.isLoggable(java.util.logging.Level.OFF)) {
+													if (log.isLoggable(java.util.logging.Level.FINE)) {
 														StringBuilder sb = new StringBuilder();
 														for (int point : points) {
 															sb.append("; ").append(String.format("%8d", point)); //$NON-NLS-1$ //$NON-NLS-2$
 														}
-														log.log(java.util.logging.Level.OFF, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp) + sb.toString()); //$NON-NLS-1$
+														log.log(java.util.logging.Level.FINE, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp) + sb.toString()); //$NON-NLS-1$
 													}
 
 													//display values
@@ -1272,17 +1272,17 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													isDateChanged = false;
 												}
 
-												log.log(Level.OFF, "used entries between " + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", justNowMinus2Year) + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", justNowPlus2Hours) + GDE.LINE_SEPARATOR); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+												log.log(Level.FINE, "used entries between " + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", justNowMinus2Year) + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", justNowPlus2Hours) + GDE.LINE_SEPARATOR); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 												long lastTimeStamp = 0;
 												for (Entry<Long, int[]> entry : sortCyclesData.entrySet()) {
 													utilitySet.addPoints(entry.getValue(), (lastTimeStamp == 0 ? 0 : entry.getKey() - lastTimeStamp));
 
-													if (log.isLoggable(java.util.logging.Level.OFF)) {
+													if (log.isLoggable(java.util.logging.Level.FINE)) {
 														StringBuilder sb = new StringBuilder();
 														for (int i = 0; i < entry.getValue().length; i++) {
 															sb.append("; ").append(String.format("%8d", entry.getValue()[i])); //$NON-NLS-1$ //$NON-NLS-2$
 														}
-														log.log(Level.OFF, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", entry.getKey()) + String.format("; %12d%s", (lastTimeStamp == 0 ? 0 : entry.getKey() - lastTimeStamp), sb.toString())); //$NON-NLS-1$ //$NON-NLS-2$
+														log.log(Level.FINE, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", entry.getKey()) + String.format("; %12d%s", (lastTimeStamp == 0 ? 0 : entry.getKey() - lastTimeStamp), sb.toString())); //$NON-NLS-1$ //$NON-NLS-2$
 													}
 													lastTimeStamp = lastTimeStamp == 0 ? entry.getKey() : lastTimeStamp;
 												}
