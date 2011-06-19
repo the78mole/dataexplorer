@@ -4,9 +4,11 @@ Version 2.8x - xx Yyy 2011
 
 refine time line to support days, month and years as period
 update UltraDuoPlus dialog to read battery cycle data
-circumvent java 1.6 update 26 problem with splash and file dialog
+update UltraDuoPlus dialog to read battery graphics
 enable data correction of red battery cycle data
+circumvent java 1.6 update 26 problem with splash and file dialog
 update UltraDuoPlus documentation
+
 
 
 Version 2.82 - 03 Jun 2011
