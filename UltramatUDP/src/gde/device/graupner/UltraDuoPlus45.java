@@ -449,6 +449,6 @@ public class UltraDuoPlus45 extends Ultramat {
 	 */
 	@Override
 	public CTabItem getUtilityDeviceTabItem() {
-		return this.application.getUtilGraphicsWindow("Battery Data");
+		return this.application.getUtilGraphicsWindow(Messages.getString(MessageIds.GDE_MSGT2340));
 	}
 }
