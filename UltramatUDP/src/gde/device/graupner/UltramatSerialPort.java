@@ -24,7 +24,6 @@ import gde.comm.DeviceSerialPortImpl;
 import gde.device.DeviceConfiguration;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
-import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
 import gde.utils.StringHelper;
@@ -72,8 +71,8 @@ public class UltramatSerialPort extends DeviceCommPort {
 	final static int		SIZE_CHANNEL_2_SETUP					= 4;
 	final static int		SIZE_TIRE_HEATER_SETUP				= 8;
 	final static int		SIZE_MOTOR_RUN_SETUP					= 17;
-	
-	final static int    xferErrorLimit								= 15;
+
+	final static int		xferErrorLimit								= 15;
 
 	boolean							isInSync											= false;
 	boolean							isDataMissmatchWarningWritten	= false;
@@ -133,42 +132,42 @@ public class UltramatSerialPort extends DeviceCommPort {
 						answer = this.read(answer, 1000);
 						System.arraycopy(answer, 0, data, data.length - i, i);
 						this.isInSync = true;
-						log.logp(Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+						log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
 						break; //sync
 					}
 				}
 				if (this.isInSync) break;
 
 				this.addXferError();
-				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
+				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
-				this.write(RESET);
+				if (this.getXferErrors() > UltramatSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + UltramatSerialPort.xferErrorLimit); //$NON-NLS-1$
+				this.write(UltramatSerialPort.RESET);
 				answer = new byte[data.length];
 				answer = this.read(answer, 3000);
 			}
-			log.logp(Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
+			log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
 
-			if (checkBeginEndSignature  && !(data[0] == DeviceSerialPortImpl.FF && data[data.length - 1] == DeviceSerialPortImpl.CR)) {
+			if (checkBeginEndSignature && !(data[0] == DeviceSerialPortImpl.FF && data[data.length - 1] == DeviceSerialPortImpl.CR)) {
 				this.addXferError();
-				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
+				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
-				this.write(RESET);
+				if (this.getXferErrors() > UltramatSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + UltramatSerialPort.xferErrorLimit); //$NON-NLS-1$
+				this.write(UltramatSerialPort.RESET);
 				data = getData(true);
 			}
 
 			if (checkBeginEndSignature && !isChecksumOK(data)) {
 				this.addXferError();
-				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
-				this.write(RESET);
+				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
+				if (this.getXferErrors() > UltramatSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + UltramatSerialPort.xferErrorLimit); //$NON-NLS-1$
+				this.write(UltramatSerialPort.RESET);
 				data = getData(true);
 			}
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
-				log.logp(Level.SEVERE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(java.util.logging.Level.SEVERE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 			throw e;
 		}
@@ -283,7 +282,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 */
 	public synchronized byte[] readConfigData(byte[] type, int expectedDataSize, int index) throws IOException, TimeOutException, SerialPortException {
 		final String $METHOD_NAME = "readConfigData"; //$NON-NLS-1$
-		log.logp(Level.FINEST, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
+		log.logp(java.util.logging.Level.FINEST, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 		byte[] readBuffer = new byte[expectedDataSize];
 
 		if (this.isConnected()) {
@@ -292,7 +291,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 			System.arraycopy(num, 0, writeBuffer, 3, 2);
 			byte[] checkSum = getChecksum(writeBuffer);
 			System.arraycopy(checkSum, 0, writeBuffer, 5, 4);
-			log.logp(Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "write = " + StringHelper.convert2CharString(writeBuffer)); //$NON-NLS-1$
+			log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "write = " + StringHelper.convert2CharString(writeBuffer)); //$NON-NLS-1$
 
 			this.write(writeBuffer);
 			byte[] answer = this.read(readBuffer, 3000);
@@ -305,31 +304,96 @@ public class UltramatSerialPort extends DeviceCommPort {
 						answer = this.read(answer, 1000);
 						System.arraycopy(answer, 0, readBuffer, readBuffer.length - i, i);
 						this.isInSync = true;
-						log.logp(Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+						log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
 						break; //sync
 					}
 				}
 				if (this.isInSync) break;
 
 				this.addXferError();
-				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
+				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
-				this.write(RESET);
+				if (this.getXferErrors() > UltramatSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + UltramatSerialPort.xferErrorLimit); //$NON-NLS-1$
+				this.write(UltramatSerialPort.RESET);
 				answer = new byte[expectedDataSize];
 				answer = this.read(answer, 3000);
 			}
 			if (!(readBuffer[0] == DeviceSerialPortImpl.FF && readBuffer[readBuffer.length - 1] == DeviceSerialPortImpl.ACK && isCommandChecksumOK(readBuffer))) {
 				this.addXferError();
-				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
+				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-				if (this.getXferErrors() > xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + xferErrorLimit);
-				this.write(RESET);
+				if (this.getXferErrors() > UltramatSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + UltramatSerialPort.xferErrorLimit); //$NON-NLS-1$
+				this.write(UltramatSerialPort.RESET);
 				readBuffer = readConfigData(type, expectedDataSize, index);
 			}
-			log.logp(Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "readBuffer = " + StringHelper.convert2CharString(readBuffer)); //$NON-NLS-1$
+			log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "readBuffer = " + StringHelper.convert2CharString(readBuffer)); //$NON-NLS-1$
 		}
 		return readBuffer;
+	}
+
+	/**
+	 * read last available graphics data for the given  channel number
+	 * @param graphicsRecordSetData pointer to the graphis data organized in a array[3][]
+	 * @param channelNumber 1 | 2 supported by device only
+	 * @throws IOException
+	 * @throws TimeOutException
+	 * @throws SerialPortException 
+	 */
+	public synchronized void readGraphicsData(byte[][] graphicsRecordSetData, int channelNumber, UltraDuoPlusDialog dialog) throws IOException, TimeOutException, SerialPortException {
+		final String $METHOD_NAME = "readConfigData"; //$NON-NLS-1$
+		log.logp(java.util.logging.Level.FINEST, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
+		Vector<Byte> graphicsData = new Vector<Byte>();
+		int redPoints = 0;
+		int numBytes = 1;
+		dialog.setGraphicsDataReadProgress(redPoints);
+
+		if (this.isConnected()) {
+			for (int i = 0; i < 3; i++) {//voltage=0, current=1, temperature=2 
+				byte[] writeBuffer = UltramatSerialPort.READ_GRAPHICS_DATA;
+				byte[] num = String.format("%d%X", i, channelNumber).getBytes(); //$NON-NLS-1$
+				System.arraycopy(num, 0, writeBuffer, 3, 2);
+				byte[] checkSum = getChecksum(writeBuffer);
+				System.arraycopy(checkSum, 0, writeBuffer, 5, 4);
+				log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "write = " + StringHelper.convert2CharString(writeBuffer)); //$NON-NLS-1$
+				this.write(writeBuffer);
+
+				byte[] readBuffer = new byte[9];
+				byte[] answer = this.read(readBuffer, 3000);
+				int numOfPoints = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, answer[1], answer[2], answer[3], answer[4]), 16);
+				int timeStep_sec = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, answer[5], answer[6], answer[7], answer[8]), 16);
+				numBytes = numOfPoints * 3 * 4 + 3 * 9 + 5;
+				for (byte b : answer) {
+					graphicsData.add(b);
+				}
+				redPoints += 9;
+				dialog.setGraphicsDataReadProgress(redPoints * 100 / numBytes);
+				log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, String.format("numOfPoints = %d; timeStep_sec = %d", numOfPoints, timeStep_sec)); //$NON-NLS-1$ 
+				readBuffer = new byte[numOfPoints]; // 4 byte per point + chksum + 0xD0
+				for (int j = 0; j < 4; j++) {
+					answer = this.read(readBuffer, 5000);
+					for (byte b : answer) {
+						graphicsData.add(b);
+					}
+					redPoints += numOfPoints;
+					dialog.setGraphicsDataReadProgress(redPoints * 100 / numBytes);
+				}
+				readBuffer = new byte[1]; // checksum + 0x0D
+				while (readBuffer[0] != DeviceSerialPortImpl.ACK) {
+					answer = this.read(readBuffer, 1000);
+					graphicsData.add(answer[0]);
+					redPoints += 1;
+					dialog.setGraphicsDataReadProgress(redPoints * 100 / numBytes);
+				}
+				readBuffer = new byte[graphicsData.size()];
+				for (int j = 0; j < readBuffer.length; j++) {
+					readBuffer[j] = graphicsData.elementAt(j);
+				}
+				log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "readBuffer = " + StringHelper.convert2CharString(readBuffer)); //$NON-NLS-1$
+				graphicsRecordSetData[i] = readBuffer.clone();
+				graphicsData.clear();
+			}
+			dialog.setGraphicsDataReadProgress(redPoints * 100 / numBytes);
+		}
 	}
 
 	/**
@@ -342,7 +406,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 */
 	public synchronized void writeConfigData(byte[] type, byte[] configData, int index) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "writeConfigData"; //$NON-NLS-1$
-		log.logp(Level.FINEST, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
+		log.logp(java.util.logging.Level.FINEST, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 		byte[] writeBuffer = new byte[configData.length + 10]; //0x0C, type, index, data..., checksum, 0x0D
 
 		if (this.isConnected()) {
@@ -353,13 +417,13 @@ public class UltramatSerialPort extends DeviceCommPort {
 			System.arraycopy(configData, 0, writeBuffer, 5, configData.length);
 			byte[] checkSum = getChecksum(writeBuffer);
 			System.arraycopy(checkSum, 0, writeBuffer, writeBuffer.length - 5, 4);
-			log.logp(Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "answer = " + StringHelper.convert2CharString(writeBuffer)); //$NON-NLS-1$
+			log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "answer = " + StringHelper.convert2CharString(writeBuffer)); //$NON-NLS-1$
 
 			this.write(writeBuffer);
 			byte[] answer = this.read(new byte[1], 3000);
-			log.logp(Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "answer = " + StringHelper.convert2CharString(answer)); //$NON-NLS-1$
+			log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "answer = " + StringHelper.convert2CharString(answer)); //$NON-NLS-1$
 			if ((answer[0] == DeviceSerialPortImpl.NAK)) {
-				log.log(Level.WARNING, "Writing UltraDuoPlus configuration type (" + new String(type) + ") data failed!"); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(java.util.logging.Level.WARNING, "Writing UltraDuoPlus configuration type (" + new String(type) + ") data failed!"); //$NON-NLS-1$ //$NON-NLS-2$
 				throw new IOException("Writing UltraDuoPlus configuration type (" + new String(type) + ") data failed!"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
@@ -382,9 +446,10 @@ public class UltramatSerialPort extends DeviceCommPort {
 		else {
 			//some devices has a constant checksum offset by firmware error, calculate this offset first time the mismatch occurs and tolerate the calculated offset afterwards
 			if (!this.isDataMissmatchWarningWritten) {
-				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "check sum missmatch detected, calculates check_sum = " + check_sum + "; delta to data contained delta = "
-						+ (buffer_check_sum - check_sum));
-				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
+						"check sum missmatch detected, calculates check_sum = " + check_sum + "; delta to data contained delta = " //$NON-NLS-1$ //$NON-NLS-2$
+								+ (buffer_check_sum - check_sum));
+				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
 				this.isDataMissmatchWarningWritten = true;
 				this.dataCheckSumOffset = buffer_check_sum - check_sum;
 				isOK = true;
@@ -410,9 +475,10 @@ public class UltramatSerialPort extends DeviceCommPort {
 		else {
 			//some devices has a constant checksum offset by firmware error, calculate this offset first time the mismatch occurs and tolerate the calculated offset afterwards
 			if (!this.isDataMissmatchWarningWritten) {
-				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "check sum missmatch detected, calculates check_sum = " + check_sum + "; delta to data contained delta = "
-						+ (buffer_check_sum - check_sum));
-				log.logp(Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
+						"check sum missmatch detected, calculates check_sum = " + check_sum + "; delta to data contained delta = " //$NON-NLS-1$ //$NON-NLS-2$
+								+ (buffer_check_sum - check_sum));
+				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
 				this.isDataMissmatchWarningWritten = true;
 				this.dataCheckSumOffset = buffer_check_sum - check_sum;
 				isOK = true;
@@ -429,10 +495,10 @@ public class UltramatSerialPort extends DeviceCommPort {
 	private synchronized byte[] getChecksum(byte[] buffer) {
 		final String $METHOD_NAME = "getChecksum"; //$NON-NLS-1$
 		String check_sum = String.format("%04X", Checksum.ADD(buffer, 1, buffer.length - 6)); //$NON-NLS-1$
-		log.logp(Level.FINER, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "Check_sum char[]= " + check_sum); //$NON-NLS-1$
+		log.logp(java.util.logging.Level.FINER, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "Check_sum char[]= " + check_sum); //$NON-NLS-1$
 		return check_sum.getBytes();
 	}
-	
+
 	/**
 	 * query memory cycle data, time stamp, capacity, voltage, resistance for charge and discharge
 	 * @param memoryNumber
@@ -445,13 +511,13 @@ public class UltramatSerialPort extends DeviceCommPort {
 		Vector<byte[]> result = new Vector<byte[]>();
 		String memoryCycleData = readMemoryCycle(memoryNumber);
 		for (int i = 0; i < 11; i++) {
-			int startIndex = i*(11*4);
-			int endIndex = (i+1)*(11*4);
+			int startIndex = i * (11 * 4);
+			int endIndex = (i + 1) * (11 * 4);
 			result.add(memoryCycleData.substring(startIndex, endIndex).getBytes());
 		}
 		return result;
 	}
-	
+
 	/**
 	 * query memory cycle data, time stamp, capacity, voltage, resistance for charge and discharge
 	 * @param memoryNumber

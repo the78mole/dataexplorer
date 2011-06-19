@@ -89,8 +89,9 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	protected final Channels											channels;
 	protected UltraDuoPlusDialog									dialog;
 	
-	public static final String[]									cycleDataRecordNames						= { "Voltage charge", "Voltage discharge", "Capacity charge", "Capacity discharge",  "Resitance charge", "Resitance discharge" };
-	public static final String[]									cycleDataUnitNames							= { "V", "V", "mAh", "mAh", "m\u2126", "m\u2126" };
+	public static final String[]									cycleDataRecordNames						= Messages.getString(gde.messages.MessageIds.GDE_MSGT0398).split(GDE.STRING_COMMA);
+	public static final String[]									cycleDataUnitNames							= { "V", "V", "mAh", "mAh", "m\u2126", "m\u2126" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+	public static final String[]									cycleDataTableNames							= Messages.getString(gde.messages.MessageIds.GDE_MSGT0399).split(GDE.STRING_COMMA);
 	public static final double[]									cycleDataFactors								= { 1.0, 1.0, 1000.0, 1000.0, 100.0, 100.0 };
 	public static final int[]											cycleDataSyncRefOrdinal					= { -1, 0, -1, 2, -1, 4 };
 	public static final int[][]										cycleDataColors									= { {0,0,255},{12,12,255}, {128,0,0},{128,12,12},  {255,0,0},{255,12,12}};
@@ -491,7 +492,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @return v2.0
 	 */
 	public String getFirmwareVersion(byte[] dataBuffer) {
-		return String.format("v%.2f", (Integer.parseInt(String.format("%c%c", (char) dataBuffer[1], (char) dataBuffer[2]), 16) / 100.0));
+		return String.format("v%.2f", (Integer.parseInt(String.format("%c%c", (char) dataBuffer[1], (char) dataBuffer[2]), 16) / 100.0)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -501,7 +502,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 */
 	public int getProductCode(byte[] dataBuffer) {
 		//1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, ?=Ultramat16S
-		return Integer.parseInt(String.format("%c%c", (char) dataBuffer[3], (char) dataBuffer[4]), 16);
+		return Integer.parseInt(String.format("%c%c", (char) dataBuffer[3], (char) dataBuffer[4]), 16); //$NON-NLS-1$
 	}
 
 	/**
@@ -540,7 +541,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 				tmpResult = new Object[] { tmpObjectKey, 100 };
 				break;
 			}
-			String[] batteryNameParts = batteryMemoryName.split(" |-|_");
+			String[] batteryNameParts = batteryMemoryName.split(" |-|_"); //$NON-NLS-1$
 			int hitCount = 0;
 			for (String namePart : batteryNameParts) {
 				if (namePart.length() > 1 && tmpObjectKey.contains(namePart)) ++hitCount;
@@ -548,7 +549,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 			if (hitCount > 0) {
 				if (tmpResult == null || hitCount > (Integer) tmpResult[1]) {
 					tmpResult = new Object[] { tmpObjectKey, hitCount };
-					log.log(java.util.logging.Level.FINE, "result updated = " + tmpObjectKey + " hitCount = " + hitCount);
+					log.log(java.util.logging.Level.FINE, "result updated = " + tmpObjectKey + " hitCount = " + hitCount); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
