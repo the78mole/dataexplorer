@@ -876,9 +876,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									this.memoryParameters[3] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 3, UltraDuoPlusDialog.STRING_FORMAT_02D,
 											Messages.getString(MessageIds.GDE_MSGT2260), 100, GDE.STRING_EMPTY, 5, false, 30, 70, 0, 99);
 									this.memoryParameters[4] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 4, UltraDuoPlusDialog.STRING_FORMAT_02D,
-											Messages.getString(MessageIds.GDE_MSGT2261), 60, GDE.STRING_EMPTY, 5, false, 30, 80, 1, 12);
+											Messages.getString(MessageIds.GDE_MSGT2261), 60, GDE.STRING_EMPTY, 5, false, 20, 80, 1, 12);
 									this.memoryParameters[5] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 5, UltraDuoPlusDialog.STRING_FORMAT_02D,
-											Messages.getString(MessageIds.GDE_MSGT2262), 55, GDE.STRING_EMPTY, 5, false, 30, 80, 1, 31);
+											Messages.getString(MessageIds.GDE_MSGT2262), 55, GDE.STRING_EMPTY, 5, false, 20, 80, 1, 31);
 									//new ParameterHeaderControl(this.memorySelectComposite, Messages.getString(MessageIds.GDE_MSGT2247), 175, Messages.getString(MessageIds.GDE_MSGT2248), 50,	Messages.getString(MessageIds.GDE_MSGT2249), 180, 20);
 								}
 								{
