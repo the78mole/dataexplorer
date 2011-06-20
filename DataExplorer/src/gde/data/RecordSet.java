@@ -1503,7 +1503,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public String getHorizontalGridRecordName() {
 		String gridRecordName = this.horizontalGridRecordOrdinal == -1 || this.horizontalGridRecordOrdinal > this.getRecordNames().length-1
 		? GDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
-		boolean isOneOfSycableAndOneOfSynableVisible = this.isOneOfSyncableRecord(this.get(this.horizontalGridRecordOrdinal)) && this.isOneSyncableVisible(this.getSyncMasterRecordOrdinal(this.get(gridRecordName)));
+		boolean isOneOfSycableAndOneOfSynableVisible = this.horizontalGridRecordOrdinal >= 0 && this.isOneOfSyncableRecord(this.get(this.horizontalGridRecordOrdinal)) && this.isOneSyncableVisible(this.getSyncMasterRecordOrdinal(this.get(gridRecordName)));
 		if (this.get(gridRecordName) != null && !isOneOfSycableAndOneOfSynableVisible && !(this.get(gridRecordName).isVisible && this.get(gridRecordName).isDisplayable)) {
 			gridRecordName = this.getFirstRecordName();
 			log.log(Level.FINE, "gridRecordName = " + gridRecordName); //$NON-NLS-1$
