@@ -1,19 +1,14 @@
-GNU DataExplorer - News - comes with version 2.82
+GNU DataExplorer - News - comes with version 2.83
 
-1) UltramatTrioPlus devices fix bug while data gathering output channel 3
-2) Ultramat16/16S/18 correct sycnc_ref_ordinal typo in English config XML 
-3) add UltraDuoPlus40
-4) add UltraDuoPlus50
-5) QC-Copter fix problem adding new data set while data gathering
-6) UniLog/LiPoWatch update code to prevent mixing record sets sequence 
-7) UniLog refine efficiency calculation, fix typo in device XML
-8) UniLog correct mA/m calculation  
-9) UniLog fix dialog parameter update problems
-10)fix menu cool bar order problem
-11)while data gathering and creating new record sets take over visualization properties from previous active record set
-12)update device XMLs to reflect difference between Altitude and Height (English only)
-13)enable back level version usage parallel installation in respect of configuration XMLs update (future versions only)
-14)fix error handling record properties, used by UniLog and Picolario
+Version 2.83 - 20 Jun 2011
+
+1) refine time line to support days, month and years as period
+2) update UltraDuoPlus dialog to read battery cycle data
+3) update UltraDuoPlus dialog to read battery graphics
+4) enable data correction of red battery cycle data
+5) circumvent java 1.6 update 26 problem with splash and file dialog
+6) correct copying graphics content to clipboard
+7) update documentation
 
 
 
