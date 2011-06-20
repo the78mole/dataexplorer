@@ -1211,17 +1211,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 														log.log(java.util.logging.Level.FINE, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp) + sb.toString()); //$NON-NLS-1$
 													}
 
-													//display values
-													TableItem item = new TableItem(UltraDuoPlusDialog.this.dataTable, SWT.CENTER);
-													item.setText(new String[] { StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm", timeStamp), //$NON-NLS-1$
-															String.format("%.2f", points[0] / 1000.0), //$NON-NLS-1$
-															String.format("%.2f", points[1] / 1000.0), //$NON-NLS-1$
-															String.format("%.2f", points[2] / 1.0), //$NON-NLS-1$
-															String.format("%.2f", points[3] / 1.0), //$NON-NLS-1$
-															String.format("%.2f", points[4] / 10.0), //$NON-NLS-1$
-															String.format("%.2f", points[5] / 10.0), //$NON-NLS-1$
-													});
-
 													//if time stamp is not between just now - 1 year and just now + 2 hrs  and contains data ask if the date should be corrected
 													long dataSum = 0;
 													for (int point : points) {
@@ -1253,6 +1242,17 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 														}
 													}
 
+													//display values
+													TableItem item = new TableItem(UltraDuoPlusDialog.this.dataTable, SWT.CENTER);
+													item.setText(new String[] { StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm", timeStamp), //$NON-NLS-1$
+															String.format("%.2f", points[0] / 1000.0), //$NON-NLS-1$
+															String.format("%.2f", points[1] / 1000.0), //$NON-NLS-1$
+															String.format("%.2f", points[2] / 1.0), //$NON-NLS-1$
+															String.format("%.2f", points[3] / 1.0), //$NON-NLS-1$
+															String.format("%.2f", points[4] / 10.0), //$NON-NLS-1$
+															String.format("%.2f", points[5] / 10.0), //$NON-NLS-1$
+													});
+													//add selected entries to the sorted map, this is what gets displayed in the utility record
 													if (dataSum > 0 && timeStamp > justNowMinus2Year && timeStamp < justNowPlus2Hours) {
 														sortCyclesData.put(timeStamp, points.clone());
 													}
