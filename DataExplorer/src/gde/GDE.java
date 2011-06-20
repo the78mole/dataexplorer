@@ -338,7 +338,7 @@ public class GDE {
 			sb.append("SWT.PLATFORM = ").append(SWT.getPlatform()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, sb.toString());
 
-			GDE.seStartupProgress(80);
+			GDE.seStartupProgress(95);
 			application.execute(inputFilePath);
 		}
 		catch (Throwable e) {
@@ -493,7 +493,8 @@ public class GDE {
 		progressData.right = new FormAttachment(100, -5);
 		progressData.bottom = new FormAttachment(100, -5);
 		bar.setLayoutData(progressData);
-		bar.setSize(165, 15);
+		bar.setSelection(40);
+		bar.setSize(355, 15);
 		splashShell.pack();
 		
 		//with java 1.6 update 26 this part needs to be comment out since the file dialog will not open anymore ???
@@ -518,7 +519,6 @@ public class GDE {
 			}
 		});
 		splashShell.open();
-		bar.setSelection(40);
 		GDE.splash = splashShell;
 		GDE.progBar = bar;
 	}
