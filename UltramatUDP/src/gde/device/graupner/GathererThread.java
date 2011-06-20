@@ -481,10 +481,12 @@ public class GathererThread extends Thread {
 
 		this.isCollectDataStopped = true;
 
-		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
-			log.log(java.util.logging.Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (this.serialPort != null) {
+			if (this.serialPort.getXferErrors() > 0) {
+				log.log(java.util.logging.Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			this.serialPort.close();
 		}
-		this.serialPort.close();
 	}
 
 	/**
