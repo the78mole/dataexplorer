@@ -473,7 +473,7 @@
 
 	</target>
 
-	<!-- zip for Windows, tar for GNULinux/Mac OS -->
+	<!-- zip for Windows/MAC OS, tar for GNULinux -->
 	<target name="binary_package" depends="copy-files">
 
 		<echo message="zip Windows 32 bit files" />
