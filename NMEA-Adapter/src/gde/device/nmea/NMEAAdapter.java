@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2010,2011 Winfried Bruegmann
+    Copyright (c) 2011 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.nmea;
 
@@ -63,8 +63,6 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	final static Logger		log								= Logger.getLogger(NMEAAdapter.class.getName());
-
-	final static String		SM_GPS_LOGGER_INI	= "SM GPS-Logger.ini";													//$NON-NLS-1$
 
 	final DataExplorer		application;
 	final Channels				channels;
