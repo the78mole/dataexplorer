@@ -142,4 +142,8 @@ WStechVario/src/help/de/HelpInfo_Bild_1.png HelpInfo_Bild_2.png HelpInfo_Bild_3.
 HelpInfo_Bild_4.png
 WStechVario/src/help/en/HelpInfo_Image_1.png HelpInfo_Image_2.png HelpInfo_Image_3.png
 HelpInfo_Image_4.png
-
+UltramatUDP/src/help/de/HelpInfo_Bild_1.png   HelpInfo_Bild_2_NiMh.png  HelpInfo_Bild_4_LiPo.png  HelpInfo_Bild_6.png  HelpInfo_Bild_8.png
+HelpInfo_Bild_10.png  HelpInfo_Bild_3_NiMh.png  HelpInfo_Bild_5_LiPo.png  HelpInfo_Bild_7.png  HelpInfo_Bild_9.png
+UltramatUDP/src/help/en/HelpInfo_Image_1.png   HelpInfo_Image_2_NiMh.png  HelpInfo_Image_4_LiPo.png  HelpInfo_Image_6.png  HelpInfo_Image_8.png
+HelpInfo_Image_10.png  HelpInfo_Image_3_NiMh.png  HelpInfo_Image_5_LiPo.png  HelpInfo_Image_7.png  HelpInfo_Image_9.png
+UltramatUDP/src/resource/UltraDuoPlus.jpg  UltraDuoPlus45.jpg  UltraTrioPlus14.jpg  UltraTrioPlus16S.jpg  Ultramat12.jpg  Ultramat16S.jpg  Ultramat18.jpg
