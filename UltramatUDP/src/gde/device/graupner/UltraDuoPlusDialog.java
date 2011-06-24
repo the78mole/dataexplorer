@@ -466,19 +466,21 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 								try {
 									//set the date to sync with PC time
 									String[] date = StringHelper.getDateAndTime("yy:MM:dd:hh:mm").split(GDE.STRING_COLON); //$NON-NLS-1$
-									if (UltraDuoPlusDialog.this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45) {
-										UltraDuoPlusDialog.this.channelValues1[10] = Integer.parseInt(date[0]);
-										UltraDuoPlusDialog.this.channelValues1[11] = Integer.parseInt(date[1]);
-										UltraDuoPlusDialog.this.channelValues1[12] = Integer.parseInt(date[2]);
-										UltraDuoPlusDialog.this.channelValues1[13] = Integer.parseInt(date[3]);
-										UltraDuoPlusDialog.this.channelValues1[14] = Integer.parseInt(date[4]);
-									}
-									else {
-										UltraDuoPlusDialog.this.channelValues1[13] = Integer.parseInt(date[0]);
+									switch (UltraDuoPlusDialog.this.device.getDeviceTypeIdentifier()) {
+									case UltraDuoPlus45:
+										UltraDuoPlusDialog.this.channelValues1[13] = Integer.parseInt(date[2]);
 										UltraDuoPlusDialog.this.channelValues1[14] = Integer.parseInt(date[1]);
-										UltraDuoPlusDialog.this.channelValues1[15] = Integer.parseInt(date[2]);
+										UltraDuoPlusDialog.this.channelValues1[15] = Integer.parseInt(date[0]);
 										UltraDuoPlusDialog.this.channelValues1[16] = Integer.parseInt(date[3]);
 										UltraDuoPlusDialog.this.channelValues1[17] = Integer.parseInt(date[4]);
+										break;
+									case UltraDuoPlus60:
+										UltraDuoPlusDialog.this.channelValues1[10] = Integer.parseInt(date[2]);
+										UltraDuoPlusDialog.this.channelValues1[11] = Integer.parseInt(date[1]);
+										UltraDuoPlusDialog.this.channelValues1[12] = Integer.parseInt(date[0]);
+										UltraDuoPlusDialog.this.channelValues1[13] = Integer.parseInt(date[3]);
+										UltraDuoPlusDialog.this.channelValues1[14] = Integer.parseInt(date[4]);
+										break;
 									}
 									ChannelData1 value = new ChannelData1();
 									value.setValue(StringHelper.integer2Hex4ByteString(UltraDuoPlusDialog.this.channelValues1));
@@ -2116,7 +2118,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		}
 
 		//channel base setup
-		if (this.ultraDuoPlusSetup.getChannelData1().getValue().equals(tmpUltraDuoPlusSetup.getChannelData1().getValue())) {
+		if (!this.ultraDuoPlusSetup.getChannelData1().getValue().equals(tmpUltraDuoPlusSetup.getChannelData1().getValue())) {
 			this.ultraDuoPlusSetup.getChannelData1().setValue(tmpUltraDuoPlusSetup.getChannelData1().getValue());
 			this.ultraDuoPlusSetup.getChannelData1().setChanged(true);
 			this.device.convert2IntArray(this.channelValues1, this.ultraDuoPlusSetup.channelData1.getValue());
@@ -2126,7 +2128,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				}
 			}
 		}
-		if (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 && this.ultraDuoPlusSetup.getChannelData2().getValue().equals(tmpUltraDuoPlusSetup.getChannelData2().getValue())) {
+		if (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 && !this.ultraDuoPlusSetup.getChannelData2().getValue().equals(tmpUltraDuoPlusSetup.getChannelData2().getValue())) {
 			this.ultraDuoPlusSetup.getChannelData2().setValue(tmpUltraDuoPlusSetup.getChannelData2().getValue());
 			this.ultraDuoPlusSetup.getChannelData2().setChanged(true);
 			this.device.convert2IntArray(this.channelValues2, this.ultraDuoPlusSetup.channelData2.getValue());
