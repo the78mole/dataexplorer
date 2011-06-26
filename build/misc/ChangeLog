@@ -1,5 +1,10 @@
 Development history / change log, please read from bottom up
 
+Version 2.84 - xx Jun 2011
+
+fix error in UltraDuoPlus dialog restore of backup functionality
+fix error in UltraDuoPlus dialog while sync time stamp PC-Device
+
 Version 2.83 - 20 Jun 2011
 
 refine time line to support days, month and years as period
