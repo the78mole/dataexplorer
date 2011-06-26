@@ -24,6 +24,7 @@ import gde.comm.DeviceSerialPortImpl;
 import gde.device.DeviceConfiguration;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
+import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
 import gde.utils.StringHelper;
@@ -529,10 +530,10 @@ public class UltramatSerialPort extends DeviceCommPort {
 	public synchronized void writeMemoryCycleData(int memoryNumber, Vector<byte[]> cyclesData) throws SerialPortException, IOException, TimeOutException {
 		StringBuilder sb = new StringBuilder();
 		for (byte[] bytes : cyclesData) {
-			System.out.print(new String(bytes));
 			sb.append(new String(bytes));
 		}
-		System.out.println();
+		log.log(Level.FINER, sb.toString());
+		
 		//clear config data
 		//sb = new StringBuilder().append("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
 		//05 FlugAkku 3200 A original data

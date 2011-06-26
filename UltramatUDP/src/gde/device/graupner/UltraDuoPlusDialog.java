@@ -1125,9 +1125,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												if (Boolean.parseBoolean(System.getProperty("GDE_IS_SIMULATION"))) { //$NON-NLS-1$
 													//test data - change dates in timeSteps block below to vary
 													//original data
-													//String memoryCycleData = "00030026000B00040011050141C2040C00213F880000000B0004000B00040018017341D905910000000000000009002D000B0005000709BF417E03B50000000000000008002B000C00050009084341DC04B4000B0000000000000032000F00050012001A41F0000000000000000000090015000C0005001D0A2E4194044E00000000000000100004000B000600040ADF41960566000F0022001D00120034000B0006000C07D0418004740000000000000003000E000E0006000D094241E206A30000000000000000000000000000000000000000000000000000000000210088000000000000000000000000000000000000";
+													String memoryCycleData = "00030026000B00040011050141C2040C00213F880000000B0004000B00040018017341D905910000000000000009002D000B0005000709BF417E03B50000000000000008002B000C00050009084341DC04B4000B0000000000000032000F00050012001A41F0000000000000000000090015000C0005001D0A2E4194044E00000000000000100004000B000600040ADF41960566000F0022001D00120034000B0006000C07D0418004740000000000000003000E000E0006000D094241E206A30000000000000000000000000000000000000000000000000000000000210088000000000000000000000000000000000000";
 													//updated data
-													String memoryCycleData = "00030026000B00040011050141C2040C00213F880000000B0004000B00040018017341D905910000000000000009002D000B0005000709BF417E03B500000000000000130013000B0005000A084341DC04B4000B0000000000000032000000050012001A41F0000000000000000000130028000B0005001E0A2E4194044E00000000000000100004000B000600040ADF41960566000F0022001D00120034000B0006000C07D041800474000000000000000D0022000B00060010094241E206A30000000000000000000000000000000000000000000000000000000000210088000000000000000000000000000000000000";
+													//String memoryCycleData = "00030026000B00040011050141C2040C00213F880000000B0004000B00040018017341D905910000000000000009002D000B0005000709BF417E03B500000000000000130013000B0005000A084341DC04B4000B0000000000000032000000050012001A41F0000000000000000000130028000B0005001E0A2E4194044E00000000000000100004000B000600040ADF41960566000F0022001D00120034000B0006000C07D041800474000000000000000D0022000B00060010094241E206A30000000000000000000000000000000000000000000000000000000000210088000000000000000000000000000000000000";
 													for (int i = 0; i < 11; i++) {
 														int startIndex = i * (11 * 4);
 														int endIndex = (i + 1) * (11 * 4);
@@ -1184,9 +1184,9 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													try {
 														hour = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[0], cycleData[1], cycleData[2], cycleData[3]), 16);
 														minute = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[4], cycleData[5], cycleData[6], cycleData[7]), 16);
-														year = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[8], cycleData[9], cycleData[10], cycleData[11]), 16);
+														day = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[8], cycleData[9], cycleData[10], cycleData[11]), 16);
 														month = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[12], cycleData[13], cycleData[14], cycleData[15]), 16);
-														day = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[16], cycleData[17], cycleData[18], cycleData[19]), 16);
+														year = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[16], cycleData[17], cycleData[18], cycleData[19]), 16);
 														timeStamp = new GregorianCalendar(2000 + year, month - 1, day, hour, minute, 0).getTimeInMillis();
 													}
 													catch (NumberFormatException e) {
@@ -1222,7 +1222,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 														log.log(java.util.logging.Level.FINER, "time stamp out of range ! " + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp)); //$NON-NLS-1$ //$NON-NLS-2$
 														int[] newTimeStamp = new ChangeDateDialog(UltraDuoPlusDialog.this.dialogShell, SWT.NONE, new int[] { hour, minute, 2000 + year, month, day, points[2], points[3] }).open();
 														if (newTimeStamp.length > 0) { //change requested
-															System.out.println("date change requested !"); //$NON-NLS-1$
+															log.log(Level.FINE, "date change requested !"); //$NON-NLS-1$
 															isDateChanged = true;
 															newTimeStamp[0] = newTimeStamp[0] < 0 ? 0 : newTimeStamp[0] > 24 ? 24 : newTimeStamp[0]; //hour
 															newTimeStamp[1] = newTimeStamp[1] < 0 ? 0 : newTimeStamp[1] > 60 ? 60 : newTimeStamp[1]; //minute
@@ -1263,7 +1263,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												//check if time stamp was changed, if yes write back changed data to device
 												if (isDateChanged) {
 													UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2333));
-													//TODO serialPort.writeMemoryCycleData(UltraDuoPlusDialog.this.memorySelectionIndexData, cyclesData);
+													//serialPort.writeMemoryCycleData(UltraDuoPlusDialog.this.memorySelectionIndexData, cyclesData);
 													isDateChanged = false;
 												}
 
@@ -1401,13 +1401,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 												int[] points = new int[UltraDuoPlusDialog.this.device.getMeasurementNames(UltraDuoPlusDialog.this.channelSelectionIndex).length];
 												final byte[][] graphicsData = new byte[3][];
-												try {
-													UltraDuoPlusDialog.this.serialPort.readGraphicsData(graphicsData, UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this);
-												}
-												catch (Exception e) {
-													log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-													UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2336));
-												}
+												UltraDuoPlusDialog.this.serialPort.readGraphicsData(graphicsData, UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this);
 
 												//create a new record set at the selected output channel
 												String processName = Messages.getString(MessageIds.GDE_MSGT2337);
@@ -1444,10 +1438,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													}
 													recordSet.setRecordSetDescription(description);
 
-													int numOfPoints = Integer.parseInt(
-															String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, graphicsData[0][1], (char) graphicsData[0][2], (char) graphicsData[0][3], (char) graphicsData[0][4]), 16) - 10;
-													int timeStep_sec = Integer.parseInt(
-															String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, graphicsData[0][5], (char) graphicsData[0][6], (char) graphicsData[0][7], (char) graphicsData[0][8]), 16);
+													int numOfPoints = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, graphicsData[0][1], (char) graphicsData[0][2], (char) graphicsData[0][3], (char) graphicsData[0][4]), 16) - 10;
+													int timeStep_sec = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, graphicsData[0][5], (char) graphicsData[0][6], (char) graphicsData[0][7], (char) graphicsData[0][8]), 16);
 													recordSet.setNewTimeStep_ms(timeStep_sec * 1000.0);
 													for (int i = 0, j = 9; i < numOfPoints; i++, j += 4) {
 														// 0=Spannung 1=Strom 5=BatteryTemperature
@@ -1467,6 +1459,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 											catch (DataInconsitsentException e) {
 												log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 												UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2338));
+											}
+											catch (Exception e) {
+												log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+												UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2336));												
 											}
 											finally {
 												UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
