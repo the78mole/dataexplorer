@@ -168,6 +168,7 @@ public class GDE {
 	public static final String		FILE_ENDING_STAR_INI						= "*.ini";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_TXT						= "*.txt";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_LOG						= "*.log";																																																										//$NON-NLS-1$
+	public static final String		FILE_ENDING_STAR_BIN						= "*.bin";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_STAR						= "*.*";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_JAR							= ".jar";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_LOV							= ".lov";																																																										//$NON-NLS-1$
@@ -190,6 +191,7 @@ public class GDE {
 	public static final String		FILE_ENDING_DOT_KML							= ".kml";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_EXE							= ".exe";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_INI							= ".ini";																																																										//$NON-NLS-1$
+	public static final String		FILE_ENDING_DOT_BIN							= ".bin";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_LOV									= "lov";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_OSD									= "osd";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_CSV									= "csv";																																																											//$NON-NLS-1$
@@ -205,6 +207,7 @@ public class GDE {
 	public static final String		FILE_ENDING_HEX									= "hex";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_EXE									= "exe";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_INI									= "ini";																																																											//$NON-NLS-1$
+	public static final String		FILE_ENDING_BIN									= "bin";																																																											//$NON-NLS-1$
 
 	public final static String		LINE_SEPARATOR									= System.getProperty("line.separator");																																											// is OS dependent //$NON-NLS-1$
 

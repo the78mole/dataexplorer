@@ -62,7 +62,7 @@ import java.util.logging.Logger;
 public class OsdReaderWriter {
 	final static Logger									log												= Logger.getLogger(OsdReaderWriter.class.getName());
 
-	final static DataExplorer	application								= DataExplorer.getInstance();
+	final static DataExplorer						application								= DataExplorer.getInstance();
 	final static Channels 							channels 									= Channels.getInstance();
 
 

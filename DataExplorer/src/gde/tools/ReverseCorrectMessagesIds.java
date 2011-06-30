@@ -62,6 +62,9 @@ public class ReverseCorrectMessagesIds {
 	+ "# range 1800 to 1899 WStechVario device  \n"
 	+ "# range 1900 to 1999 QC-Copter device  \n"
 	+ "# range 2000 to 2999 GPS-Logger device  \n"
+	+ "# range 2100 to 2199 NMEA-Adapter device  \n"  
+	+ "# range 2200 to 2399 Ultramat/UltraDuoPlus devices  \n" 
+	+ "# range 2400 to 2499 HoTTAdapter  \n"  
 	// add new supported device here
 	+ " \n";
 
