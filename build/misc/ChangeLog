@@ -3,7 +3,8 @@ Development history / change log, please read from bottom up
 Version 2.84 - xx Jun 2011
 
 fix error in UltraDuoPlus dialog restore of backup functionality
-fix error in UltraDuoPlus dialog while sync time stamp PC-Device
+fix error in UltraDuoPlus dialog while sync date PC-Device
+implement HoTTAdapter
 
 Version 2.83 - 20 Jun 2011
 
