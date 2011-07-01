@@ -1,18 +1,25 @@
-################################
-# RXTX Post-Installation Steps
-# execute using sudo 
-################################
+#!/bin/sh
+######################################
+# execute RXTX Post-Installation Steps to fix permissions
+######################################
 
-mkdir /var/lock
-chgrp uucp /var/lock
-chmod 775 /var/lock
+curruser=`sudo id -p | grep 'login' | sed 's/login.//'`
 
-# Mac OS 10.5.x 
-dscl . -read /groups/_uucp users | grep <username>
-dscl . -append /groups/_uucp GroupMembership <username>
+if [ ! -d /var/lock ]
+then
+sudo mkdir /var/lock
+fi
 
-# Mac OS X 10.6.x (Snow Leopard)
-niutil -readprop / /groups/uucp users | grep <username>
-niutil -mergeprop / /groups/uucp users <username>
+sudo chgrp uucp /var/lock
+sudo chmod 775 /var/lock
 
-chmod g+w /var/spool/uucp/
+# for Mac OS lower than 10.5 use niutil instead 
+
+#if [ ! `sudo niutil -readprop / /groups/uucp users | grep $curruser > /dev/null` ]
+if [ ! `sudo dscl . -read / /groups/_uucp users | grep $curruser > /dev/null` ]
+then
+#  sudo niutil -mergeprop / /groups/uucp users $curruser
+  sudo dscl . -append /groups/_uucp GroupMembership $curruser
+fi 
+
+sudo chmod g+w /var/spool/uucp/
