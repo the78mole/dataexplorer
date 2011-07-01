@@ -127,7 +127,7 @@ public class SettingsDialog extends Dialog {
 	Button															cleanObjectReferecesButton;
 	Button															removeMimeAssocButton;
 	Group																miscDiagGroup;
-	Button															resourceConsumptionButton;
+	Button															resourceConsumptionButton, cleanSettingsButton;
 	Button															assocMimeTypeButton;
 	Button															removeLauncherButton;
 	Button															createLauncherButton;
@@ -811,7 +811,7 @@ public class SettingsDialog extends Dialog {
 							RowLayout miscDiagGroupLayout = new RowLayout(SWT.HORIZONTAL);
 							miscDiagGroupLayout.center = true;
 							miscDiagGroupLayout.marginTop = 30;
-							miscDiagGroupLayout.marginWidth = 90;
+							miscDiagGroupLayout.marginWidth = 40;
 							miscDiagGroupLayout.spacing = 40;
 							this.miscDiagGroup.setLayout(miscDiagGroupLayout);
 							this.miscDiagGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -822,7 +822,7 @@ public class SettingsDialog extends Dialog {
 								this.resourceConsumptionButton.setText(Messages.getString(MessageIds.GDE_MSGT0210));
 								this.resourceConsumptionButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0211));
 								RowData resourceConsumptionButtonLData = new RowData();
-								resourceConsumptionButtonLData.width = 300;
+								resourceConsumptionButtonLData.width = 180;
 								resourceConsumptionButtonLData.height = 30;
 								this.resourceConsumptionButton.setLayoutData(resourceConsumptionButtonLData);
 								this.resourceConsumptionButton.addSelectionListener(new SelectionAdapter() {
@@ -830,6 +830,25 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "resourceConsumptionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SWTResourceManager.listResourceStatus();
+									}
+								});
+							}
+							{
+								this.cleanSettingsButton = new Button(this.miscDiagGroup, SWT.PUSH | SWT.CENTER);
+								this.cleanSettingsButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.cleanSettingsButton.setText(Messages.getString(MessageIds.GDE_MSGT0378));
+								this.cleanSettingsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0379));
+								RowData resourceConsumptionButtonLData = new RowData();
+								resourceConsumptionButtonLData.width = 180;
+								resourceConsumptionButtonLData.height = 30;
+								this.cleanSettingsButton.setLayoutData(resourceConsumptionButtonLData);
+								this.cleanSettingsButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "cleanSettingsButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										if (SWT.YES == SettingsDialog.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0544))) {
+											System.setProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN, GDE.STRING_TRUE);
+										}
 									}
 								});
 							}

@@ -1020,7 +1020,8 @@ public class FileUtils {
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			basePath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
 				+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
-				+ GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY); // + "/devices";  																																																				//$NON-NLS-1$ //$NON-NLS-2$
+				+ GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY) 
+				+ GDE.FILE_SEPARATOR_UNIX;  																																																				//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else { // started outside java -jar *.jar
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
@@ -1291,20 +1292,17 @@ public class FileUtils {
 	 */
 	public static void cleanupPost() {
 		String jarBasePath = FileUtils.getJarBasePath();
-		String jarFilePath = jarBasePath + "/DataExplorer.jar"; //$NON-NLS-1$
+		String jarFilePath = jarBasePath + "DataExplorer.jar"; //$NON-NLS-1$
 
-		String command = System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java -classpath " + jarFilePath + " gde.utils.FileUtils"; //$NON-NLS-1$
-		log.log(Level.TIME, "executing: " + command); //$NON-NLS-1$
+		String command = System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java -classpath " + jarFilePath
+			+ " -D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN))
+			+ " gde.utils.FileUtils"; //$NON-NLS-1$
+		log.log(Level.OFF, "executing: " + command); //$NON-NLS-1$
 		try {
-//			StringBuilder sb = new StringBuilder();
-//			for (String element : new String[] {"cmd", "/C", "\"" + System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java\"", "-classpath", jarFilePath, "gde.utils.FileUtils"}) {
-//				sb.append(element).append(" ");
-//			}
-//			System.out.println(sb.toString());
 			if (GDE.IS_WINDOWS)
-				Runtime.getRuntime().exec(new String[] {"cmd", "/C", "\"" + System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java\"", "-classpath", jarFilePath, "gde.utils.FileUtils"}); //$NON-NLS-1$ //$NON-NLS-2$
+				Runtime.getRuntime().exec(new String[] {"cmd", "/C", System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils"}); //$NON-NLS-1$ //$NON-NLS-2$
 			else
-				Runtime.getRuntime().exec(new String[] {"java", "-classpath", jarFilePath, "gde.utils.FileUtils", "&"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				Runtime.getRuntime().exec(new String[] {"java", "-classpath", jarFilePath, " -D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils", "&"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, "failed executing: " + command); //$NON-NLS-1$
@@ -1314,8 +1312,19 @@ public class FileUtils {
 	 * main method to execute post execution cleanup, called by cleanupPost()
 	 */
 	public static void main(String[] args) {
+		if (Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN))) {
+			if (GDE.IS_WINDOWS) { //$NON-NLS-1$
+				FileUtils.cleanFiles(System.getenv("APPDATA") + GDE.FILE_SEPARATOR, new String[] {GDE.NAME_LONG});
+			}
+			else if (GDE.IS_LINUX) { //$NON-NLS-1$ //$NON-NLS-2$
+				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX, new String[] {GDE.STRING_DOT+GDE.NAME_LONG});
+			}
+			else if (GDE.IS_MAC) { //$NON-NLS-1$ //$NON-NLS-2$
+				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX , new String[] {GDE.NAME_LONG});
+			}
+		}
 		if (GDE.IS_WINDOWS) 
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "WinHelper*.dll", "swtlib-"+GDE.BIT_MODE, GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "rxtxSerial.dll", "GDE", "WinHelper*.dll", "swtlib-"+GDE.BIT_MODE, GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		else if (GDE.IS_LINUX)
 			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "*register.sh", "swtlib-"+GDE.BIT_MODE, GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		else if (GDE.IS_MAC)
