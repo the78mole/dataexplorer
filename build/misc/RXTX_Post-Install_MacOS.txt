@@ -8,11 +8,11 @@ chgrp uucp /var/lock
 chmod 775 /var/lock
 
 # Mac OS 10.5.x 
-niutil -readprop / /groups/uucp users | grep <OSDEuser>
-niutil -mergeprop / /groups/uucp users <OSDEuser>
+dscl . -read /groups/_uucp users | grep <user>
+dscl . -append /groups/_uucp GroupMembership <user>
 
 # Mac OS X 10.6.x (Snow Leopard)
-dscl . -read /groups/_uucp users | grep <OSDEuser>
-dscl . -append /groups/_uucp GroupMembership <OSDEuser>
+niutil -readprop / /groups/uucp users | grep <user>
+niutil -mergeprop / /groups/uucp users <user>
 
 chmod g+w /var/spool/uucp/
