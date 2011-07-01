@@ -1294,7 +1294,7 @@ public class FileUtils {
 		String jarBasePath = FileUtils.getJarBasePath();
 		String jarFilePath = jarBasePath + "DataExplorer.jar"; //$NON-NLS-1$
 
-		String command = System.getProperty("sun.boot.library.path")+ GDE.FILE_SEPARATOR + "java -classpath " + jarFilePath
+		String command = GDE.IS_WINDOWS ? System.getProperty("sun.boot.library.path")+GDE.FILE_SEPARATOR : GDE.STRING_EMPTY + "java -classpath " + jarFilePath
 			+ " -D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN))
 			+ " gde.utils.FileUtils"; //$NON-NLS-1$
 		log.log(Level.OFF, "executing: " + command); //$NON-NLS-1$
@@ -1313,20 +1313,22 @@ public class FileUtils {
 	 */
 	public static void main(String[] args) {
 		if (Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN))) {
-			OperatingSystemHelper.removeDesktopLink();
-			OperatingSystemHelper.deregisterApplication();
 			if (GDE.IS_WINDOWS) {
+				OperatingSystemHelper.removeDesktopLink();
+				OperatingSystemHelper.deregisterApplication();
 				FileUtils.cleanFiles(System.getenv("APPDATA") + GDE.FILE_SEPARATOR, new String[] {GDE.NAME_LONG});
 			}
 			else if (GDE.IS_LINUX) {
+				OperatingSystemHelper.removeDesktopLink();
+				OperatingSystemHelper.deregisterApplication();
 				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX, new String[] {GDE.STRING_DOT+GDE.NAME_LONG});
 			}
 			else if (GDE.IS_MAC) {
-				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX , new String[] {GDE.NAME_LONG});
+				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application\\ Support" + GDE.FILE_SEPARATOR_UNIX , new String[] {GDE.NAME_LONG});
 			}
 		}
 		if (GDE.IS_WINDOWS) 
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "rxtxSerial.dll", "GDE", "WinHelper*.dll", "swtlib-"+GDE.BIT_MODE, GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "rxtxSerial.dll", "GDE", "WinHelper*.dll", "Register*.exe", "swtlib-"+GDE.BIT_MODE, GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		else if (GDE.IS_LINUX)
 			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "swt*3448.dll", "GDE", "*register.sh", "swtlib-"+GDE.BIT_MODE, GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		else if (GDE.IS_MAC)
