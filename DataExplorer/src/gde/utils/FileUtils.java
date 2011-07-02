@@ -1302,7 +1302,7 @@ public class FileUtils {
 			if (GDE.IS_WINDOWS)
 				Runtime.getRuntime().exec(new String[] {"cmd", "/C", System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils"}); //$NON-NLS-1$ //$NON-NLS-2$
 			else
-				Runtime.getRuntime().exec(new String[] {"java", "-classpath", jarFilePath, " -D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils", "&"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				Runtime.getRuntime().exec(new String[] {"java", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils", "&"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, "failed executing: " + command); //$NON-NLS-1$
