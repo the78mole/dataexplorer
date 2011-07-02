@@ -457,7 +457,12 @@ public class OperatingSystemHelper {
 
 			if (GDE.IS_WINDOWS) {
 				// warn user for UAC or fail due to required admin rights accessing registry
-				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0029));
+				try {
+					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0029));
+				}
+				catch (Exception e) {
+					//enable suppress this warning while cleaning settings
+				}
 				String regExe = "Register" + GDE.BIT_MODE + ".exe"; //$NON-NLS-1$ //$NON-NLS-2$
 				log.log(Level.INFO, "register exe = " + regExe); //$NON-NLS-1$
 

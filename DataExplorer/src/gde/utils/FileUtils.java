@@ -1294,13 +1294,13 @@ public class FileUtils {
 		String jarBasePath = FileUtils.getJarBasePath();
 		String jarFilePath = jarBasePath + "DataExplorer.jar"; //$NON-NLS-1$
 
-		String command = GDE.IS_WINDOWS ? System.getProperty("sun.boot.library.path")+GDE.FILE_SEPARATOR : GDE.STRING_EMPTY + "java -classpath " + jarFilePath
+		String command = (GDE.IS_WINDOWS ? System.getProperty("sun.boot.library.path")+GDE.FILE_SEPARATOR : GDE.STRING_EMPTY) + "java -classpath " + jarFilePath
 			+ " -D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN))
 			+ " gde.utils.FileUtils"; //$NON-NLS-1$
 		log.log(Level.OFF, "executing: " + command); //$NON-NLS-1$
 		try {
 			if (GDE.IS_WINDOWS)
-				Runtime.getRuntime().exec(new String[] {"cmd", "/C", System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils"}); //$NON-NLS-1$ //$NON-NLS-2$
+				Runtime.getRuntime().exec(new String[] {"cmd", "/C", "\"" + System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java\"", "-classpath", "\""+ jarFilePath +"\"", "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils"}); //$NON-NLS-1$ //$NON-NLS-2$
 			else
 				Runtime.getRuntime().exec(new String[] {"java", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils", "&"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
@@ -1315,8 +1315,8 @@ public class FileUtils {
 		if (Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN))) {
 			if (GDE.IS_WINDOWS) {
 				OperatingSystemHelper.removeDesktopLink();
-				OperatingSystemHelper.deregisterApplication();
 				FileUtils.cleanFiles(System.getenv("APPDATA") + GDE.FILE_SEPARATOR, new String[] {GDE.NAME_LONG});
+				OperatingSystemHelper.deregisterApplication();
 			}
 			else if (GDE.IS_LINUX) {
 				OperatingSystemHelper.removeDesktopLink();
