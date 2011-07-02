@@ -304,6 +304,7 @@ public class FileUtils {
 	 * delete a file list, if exist
 	 */
 	public static void cleanFiles(String fileBasePath, String[] fileNames) {
+		fileBasePath = fileBasePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		Vector<String> fileNamesWildCard = new Vector<String>();
 		for (String fileName : fileNames) {
 			if (fileName.length() >= 2 && !fileName.contains(GDE.STRING_STAR)) { // "a.csv" "GDE", "OSDE"
@@ -1299,8 +1300,17 @@ public class FileUtils {
 			+ " gde.utils.FileUtils"; //$NON-NLS-1$
 		log.log(Level.OFF, "executing: " + command); //$NON-NLS-1$
 		try {
-			if (GDE.IS_WINDOWS)
-				Runtime.getRuntime().exec(new String[] {"cmd", "/C", "\"" + System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java\"", "-classpath", "\""+ jarFilePath +"\"", "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils"}); //$NON-NLS-1$ //$NON-NLS-2$
+			if (GDE.IS_WINDOWS) {
+				String[] commandArray = new String[] {"cmd", "/C", "\""+ System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java\"", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils"};//$NON-NLS-1$ //$NON-NLS-2$
+				//if (log.isLoggable(Level.OFF)) {
+				//	StringBuilder sb = new StringBuilder();
+				//	for (int i = 0; i < commandArray.length; i++) {
+				//		sb.append(commandArray[i]).append(GDE.STRING_BLANK);
+				//	}
+				//	log.log(Level.OFF, sb.toString());
+				//}
+				Runtime.getRuntime().exec(commandArray); 
+			}
 			else
 				Runtime.getRuntime().exec(new String[] {"java", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils", "&"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
