@@ -1295,10 +1295,6 @@ public class FileUtils {
 		String jarBasePath = FileUtils.getJarBasePath();
 		String jarFilePath = jarBasePath + "DataExplorer.jar"; //$NON-NLS-1$
 
-		String command = (GDE.IS_WINDOWS ? System.getProperty("sun.boot.library.path")+GDE.FILE_SEPARATOR : GDE.STRING_EMPTY) + "java -classpath " + jarFilePath
-			+ " -D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN))
-			+ " gde.utils.FileUtils"; //$NON-NLS-1$
-		log.log(Level.OFF, "executing: " + command); //$NON-NLS-1$
 		try {
 			if (GDE.IS_WINDOWS) {
 				String[] commandArray = new String[] {"cmd", "/C", "\""+ System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java\"", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils"};//$NON-NLS-1$ //$NON-NLS-2$
@@ -1315,7 +1311,7 @@ public class FileUtils {
 				Runtime.getRuntime().exec(new String[] {"java", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils", "&"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		catch (Exception e) {
-			log.log(Level.SEVERE, "failed executing: " + command); //$NON-NLS-1$
+			log.log(Level.SEVERE, "failed executing cleanup settings "); //$NON-NLS-1$
 		}
 	}
 	/**
