@@ -1324,7 +1324,7 @@ public class FileUtils {
 				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX, new String[] {GDE.STRING_DOT+GDE.NAME_LONG});
 			}
 			else if (GDE.IS_MAC) {
-				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application\\ Support" + GDE.FILE_SEPARATOR_UNIX , new String[] {GDE.NAME_LONG});
+				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX , new String[] {GDE.NAME_LONG});
 			}
 		}
 		if (GDE.IS_WINDOWS) 
