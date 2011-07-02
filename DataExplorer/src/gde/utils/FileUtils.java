@@ -1297,7 +1297,7 @@ public class FileUtils {
 
 		try {
 			if (GDE.IS_WINDOWS) {
-				String[] commandArray = new String[] {"cmd", "/C", "\""+ System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java\"", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils"};//$NON-NLS-1$ //$NON-NLS-2$
+				String[] commandArray = new String[] {"\""+ System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java\"", "-classpath", jarFilePath, "-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils"};//$NON-NLS-1$ //$NON-NLS-2$
 				//if (log.isLoggable(Level.OFF)) {
 				//	StringBuilder sb = new StringBuilder();
 				//	for (int i = 0; i < commandArray.length; i++) {
