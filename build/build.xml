@@ -171,6 +171,7 @@
 		<ant antfile="build.xml" target="clean" dir="GPS-Logger" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="NMEA-Adapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="UltramatUDP" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="HoTTAdapter" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -272,6 +273,7 @@
 		<ant antfile="build.xml" target="package" dir="GPS-Logger" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="NMEA-Adapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="UltramatUDP" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="HoTTAdapter" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -290,6 +292,7 @@
 			<include name="GPS-Logger/build/*.jar" />
 			<include name="NMEA-Adapter/build/*.jar" />
 			<include name="UltramatUDP/build/*.jar" />
+			<include name="HoTTAdapter/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
@@ -448,11 +451,11 @@
 		</copy>
 		<copy todir="${output.mac32.app}" flatten="yes">
 			<fileset file="build/misc/README.*" />
-			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
+			<fileset file="build/misc/RXTX_Post-Install_MacOS.sh" />
 		</copy>
 		<copy todir="${output.mac64.app}" flatten="yes">
 			<fileset file="build/misc/README.*" />
-			<fileset file="build/misc/RXTX_Post-Install_MacOS.txt" />
+			<fileset file="build/misc/RXTX_Post-Install_MacOS.sh" />
 		</copy>
 
 	</target>
@@ -513,10 +516,12 @@
 			<zipfileset dir="${output.mac32}" casesensitive="true" filemode="755">
 				<include name="**/DataExplorerMac32" />
 				<include name="**/DevicePropertiesEditorMac32" />
+				<include name="**/RXTX_Post-Install_MacOS.sh" />
 			</zipfileset>
 			<zipfileset dir="${output.mac32}" casesensitive="true">
 				<exclude name="**/DataExplorerMac32" />
 				<exclude name="**/DevicePropertiesEditorMac32" />
+				<exclude name="**/RXTX_Post-Install_MacOS.sh" />
 			</zipfileset>
 		</zip>
 
@@ -525,10 +530,12 @@
 			<zipfileset dir="${output.mac64}" casesensitive="true" filemode="755">
 				<include name="**/DataExplorerMac64" />
 				<include name="**/DevicePropertiesEditorMac64" />
+				<include name="**/RXTX_Post-Install_MacOS.sh" />
 			</zipfileset>
 			<zipfileset dir="${output.mac64}" casesensitive="true">
 				<exclude name="**/DataExplorerMac64" />
 				<exclude name="**/DevicePropertiesEditorMac64" />
+				<exclude name="**/RXTX_Post-Install_MacOS.sh" />
 			</zipfileset>
 		</zip>
 	</target>
