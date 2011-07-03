@@ -1,14 +1,11 @@
-GNU DataExplorer - News - comes with version 2.83
+GNU DataExplorer - News - comes with version 2.84
 
-Version 2.83 - 20 Jun 2011
+Version 2.84 - 04 Jul 2011
 
-1) refine time line to support days, month and years as period
-2) update UltraDuoPlus dialog to read battery cycle data
-3) update UltraDuoPlus dialog to read battery graphics
-4) enable data correction of red battery cycle data
-5) circumvent java 1.6 update 26 problem with splash and file dialog
-6) correct copying graphics content to clipboard
-7) update documentation
+1) fix error in UltraDuoPlus dialog restore of backup functionality
+2) fix error in UltraDuoPlus dialog while sync date PC-Device
+3) enable deletion of application settings
+4) documentation update
 
 
 
