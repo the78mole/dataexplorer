@@ -84,8 +84,6 @@
 
 <DIV ID="Content" DIR="LTR">
 <H1>The Preferences Dialog</H1>
-<H2>General Tab</H2>
-
 <P>The settings dialog is used to configure:
 <UL>
 	<LI>the language to be used
@@ -99,7 +97,7 @@
 	<LI>decimal separator and list separator characters. This might
 	be different then the character used from system locale to work together with the spread sheet programs.
 	This adjustment is used for import/export of CSV files, but has no influence while importing <A HREF="HelpInfo_C.html">CSV2SerialAdapter Data Format</A> files.
-<P ALIGN=CENTER><IMG SRC="images/Settingsdialog_1.png" NAME="graphics 1" ALIGN=CENTER >
+<P ALIGN=CENTER><IMG SRC="images/SettingsDialog_1.png" NAME="SettingsDialog_1" ALIGN=CENTER >
 </P>
 	<LI>using black-list or white-list configuration it is possible to configure according personal problematic ports.
 	This configuration is also valid for the device selection dialog, where device individual ports are selected.
@@ -117,17 +115,21 @@
 	single available port will be found automatically. Activating this check box will start the port update scan.
 </UL>
 </P>
-<H2>Miscellaneous Tab</H2>
 <P>
-Pushing the buttons will create a desktop launcher icon or remove it from desktop.
+The "Maintenance" tabulator contains some buttons to refresh or remove some application related items.
+Pushing the buttons will "Create Desktop Launcher" or "Remove Desktop Launcher" will create or remove such icons.
 The other two buttons enable the DataExplorer MIME type registration to associate the file endings *.osd and *.lov or remove this registration.
 </P>
-<P align=center><IMG SRC="images/Settingsdialog_3.png" NAME="graphics 3" ALIGN=CENTER></P>
-<P>The button "Create Link Files" will scan all OSD files under the configured folder and create all missing object directories as well as the associating link files.
+<P align=center><IMG SRC="images/SettingsDialog_2.png" NAME="SettingsDialog_2" ALIGN=CENTER></P>
+<P>The button "Create Link Files" will scan all data files under the configured folder and create all missing object directories as well as the associating link files.
 The button "Clean Link File" will delete object related link files but not the object description files nor the object related directories.
 This function helps to move data files to different system/platform or for backup purpose. 
+</BR>
+Using the button "Resource Consumption" will print the operating system handle usage status to the trace.log files.
+</BR>
+Pushing the button "Clean Settings" the DataExplorer gets configures to remove all application configuration entries from the system while exiting.
+This includes Starter-Icon and other system entries and enable clean application removal or re-starting the application initial configuration.
 </P>
-<H2>Analysis Tab</H2>
 <P>
 Using the analyze tab only adjustments for problem analysis can
 be found. After a program failure function a trace log entry should
@@ -168,7 +170,7 @@ Otherwise the amount of log statements is very high.
 	limited to 512 Mbyte.
 </UL>
 </P>
-<P ALIGN=CENTER><img src="images/Settingsdialog_2.png" name="graphics 2" ALIGN=CENTER >
+<P ALIGN=CENTER><img src="images/Settingsdialog_3.png" name="Settingsdialog_3" ALIGN=CENTER >
 </P>
 <P>The class based log level allows to set a logging level for selected class(es) which reduce the amount of trace statements and helps analyzing class centric.
 A context menu enables the log level selection.

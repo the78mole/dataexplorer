@@ -84,27 +84,31 @@
 <H1><A NAME="settings"></A>Der Einstellungsdialog</H1>
 <P>Der Einstellungsdialog dient zum Einstellen:
 <UL>
-	<LI>des Datenpfades, das Verzeichnis unter dem die
+	<LI>Des Datenpfades, das Verzeichnis unter dem die
 	ger&auml;tespezifischen Logdatendateien abgelegt werden sollen, hier
 	sucht das Programm entsprechend dem eingestellten Ger&auml;t die
-	Datendateien, sowie die Objektdatendateilinks.</LI>
+	Datendateien, sowie die Objektdatendateilinks.
+	</LI>
 	<LI>der Dateisicherungsdialog kann als Anfangsdateiname das
-	aktuelle Datum und/oder einen Objektschl&uuml;ssel vorschlagen. Das erleichtert die Auffindbarkeit von Dateien.</LI>
+	aktuelle Datum und/oder einen Objektschl&uuml;ssel vorschlagen. Das erleichtert die Auffindbarkeit von Dateien.
+	</LI>
 	<LI>Verhalten der Ger&auml;tedialoge: Ein programmmodales
 	Verhalten ist manchmal unpraktisch, wenn man parallel zu einer
-	Datensammelaktion Einstellungen vornehmen m&ouml;chte.</LI>
-	<LI>des Dezimalseparator- und Listenseparator-Zeichens, anders als
+	Datensammelaktion Einstellungen vornehmen m&ouml;chte.
+	</LI>
+	<LI>Des Dezimalseparator- und Listenseparator-Zeichens, anders als
 	durch die Systemlokalen vorgegeben kann man hier Einstellungen
 	vornehmen um mit eventuell verwendeten Tabellenkalkulationsprogrammen
 	eine Zusammenarbeiten herzustellen. Diese Einstellung wirkt sich auch
-	auf den Export, bzw. Import von CSV Dateien, nicht aber die durch den <A HREF="HelpInfo_C.html">CSV2SerialAdapter Datenformat</A> ausgewerteten, aus.</LI>
-<P align=center><IMG SRC="images/Settingsdialog_1.png" NAME="graphics 1" ALIGN=CENTER></P>
-	<LI>mit Black-List- bzw. White-List- Einstellungen kann man sein pers&ouml;nliches System, in Bezug auf problematisch Ports, konfigurieren.
+	auf den Export, bzw. Import von CSV Dateien, nicht aber die durch den <A HREF="HelpInfo_C.html">CSV2SerialAdapter Datenformat</A> ausgewerteten, aus.
+	</LI>
+<P align=center><IMG SRC="images/SettingsDialog_1.png" NAME="SettingsDialog_1" ALIGN=CENTER></P>
+	<LI>Mit Black-List- bzw. White-List- Einstellungen kann man sein pers&ouml;nliches System, in Bezug auf problematisch Ports, konfigurieren.
 	Diese Einstellungen gelten dann auch für den Ger&auml;teauswahldialog.
 	Die Ausschlussliste ignoriert darin angegebene Ports, w&auml;hrend die Exklusivliste die aufgelisteten Ports ausschlie&szlig;lich anspricht.
 	Hier kann es aber, bei wechselnden Ports durch "Plug And Play" dazu kommen, dass die konfigurierten Ports nicht mehr in der Auswahl erscheinen, da sie vom System automatisch umkonfiguriert wurden.
 	</LI>
-	<LI>wird ein globaler serieller Port ausgew&auml;hlt sucht der Dialog automatisch nach
+	<LI>Wird ein globaler serieller Port ausgew&auml;hlt sucht der Dialog automatisch nach
 	verf&uuml;gbaren seriellen Anschl&uuml;ssen und blendet das Ergebnis
 	m&ouml;glicherweise etwas zeitverz&ouml;gert ein. Diese
 	Zeitverz&ouml;gerung kann man auf langsamen Windows basierten Systemen
@@ -115,26 +119,33 @@
 	Systemen spielt das, zeitlich gesehen, keinen Rolle. Diese Einstellung
 	wirkt sich auch auf den Ger&auml;teauswahldialog aus, der seinerseits
 	auch nach verf&uuml;gbaren serielle Ports sucht.
-	</BR><B>Hinweis: </B>Bei Windows werden Bluetooth-Ports ausgeblendet, es kommt hier mit dem verwendeten RXTXcomm Paket zu Funktionseinschr&auml;nkungen!</LI>
+	</BR><B>Hinweis: </B>Bei Windows werden Bluetooth-Ports ausgeblendet, es kommt hier mit dem verwendeten RXTXcomm Paket zu Funktionseinschr&auml;nkungen!
+	</LI>
 	<LI>wenn es systemweit nur einen seriellen Anschluss (Port) gibt,
 	kann man hier die globale Einstellung vornehmen, meist sucht sich das
 	Programm aber selbst den seriellen Port zur Ger&auml;tekommunikation.
 	Der Dialog sucht beim &Ouml;ffnen nach seriellen Anschl&uuml;ssen und
 	blendet das Ergebnis m&ouml;glicherweise etwas zeitverz&ouml;gert ein.
 	Diese Einstellung wirkt sich auch auf den Ger&auml;teauswahldialog aus,
-	der dann die Portauswahl sperrt.</LI>
+	der dann die Portauswahl sperrt.
+	</LI>
 </UL>
 </P>
-</P>
-<P>Über den Tabulator für Verschiedenes kann man das Desktop-Starter-Icon erneut erstellen, bzw. entfernen.
+<P>Über den Tabulator "Wartung" kann man das Desktop-Starter-Icon erneut erstellen, bzw. entfernen.
 Ebenso kann hier die DataExplorer MIME Typ Assoziation zu den Dateiendungen *.osd und *.lov registriert, bzw. entfernt werden.
-Leider ist das f&uuml;r MAC OS zur Zeit nicht unterst&uuml;tzt.
+F&uuml;r MAC OS wird das nicht unterst&uuml;tzt, bzw. ist es unnötig.
 </P>
-<P align=center><IMG SRC="images/Settingsdialog_3.png" NAME="graphics 3" ALIGN=CENTER></P>
-<P>Die Taste "Erstelle Linkdateien" erzeugt von allen OSD Dateien die dazugehörigen, fehlenden Objektverzeichnisse.
-Die Taste "L&ouml;sche Linkdateien" löscht alle Linkdateien in den Objektverzeichnissen.
+<P align=center><IMG SRC="images/SettingsDialog_2.png" NAME="SettingsDialog_2" ALIGN=CENTER></P>
+<P>Die Taste "Erstelle Linkdateien" erzeugt von allen OSD Dateien die dazugehörigen, fehlenden Objektverzeichnisse und Linkdateien zu den jeweiligen Datendateien.
+Die Taste "L&ouml;sche Linkdateien" löscht alle Linkdateien in den Objektverzeichnissen aber nicht die Verzeichnisse und Objektbeschreibungen.
 Nicht verändert werden dabei die Dateien, die die Objektbeschreibung enthält. 
-Beide Funktionen sind sehr praktisch, wenn man Anwendungsdateien auf eine andere Ausf&uuml;hrungsplattform umziehen oder sichern möchte.</P>
+Beide Funktionen sind sehr praktisch, wenn man Anwendungsdatendateien auf eine andere Ausf&uuml;hrungsplattform umziehen oder sichern möchte.
+</BR>
+%Uuml;ber die Taste "Resourcenverbrauch" wird in die aktuelle trace.log Datei die Anzahl von Betriebssystemhandles für die einzelnen verwendeten Programmobjekte geschrieben.
+</BR>
+Durch drücken der Taste "L&ouml;sche Konfiguration" wird der DataExplorer so konfiguriert, dass er beim Beenden s&auml;mtliche Konfigurationsdateien, falls vorhanden Betriebssystemeintr&auml;ge 
+und Starter-Icon entfernt. Danach kann die Anwendung spurenfrei entfernt oder durch Neustart initial konfiguriert werden.
+</P>
 <P>Über den Analyse Tabulator erreicht man Einstellmöglichkeiten für
 eine Fehleranalyse. Nach einem Programmabsturz sollte in einer trace.log
 Datei eine m&ouml;gliche Erkl&auml;rung zu finden sein. Achtung, alle
@@ -175,7 +186,7 @@ Ohne besonderen Grund sollte man auch hier nicht unbedingt &uuml;ber den Level F
 	Speicherverbrauch der Java Virtual Machine auf 512 Megabyte begrenzt
 	ist.
 </UL>
-<P align=center><IMG SRC="images/Settingsdialog_2.png" NAME="graphics 2" ALIGN=CENTER>
+<P align=center><IMG SRC="images/SettingsDialog_3.png" NAME="SettingsDialog_3" ALIGN=CENTER>
 </P>
 <P>Der klassenbasierte Loglevel erlaubt den logging Level auf ausgew&auml;hlte Klassen zu reduzieren. 
 Hierdurch wir die Ausgabe &uuml;bersichtlicher und erlaubt die Analyse weiter einzuschr&auml;nken.
