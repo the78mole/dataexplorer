@@ -675,6 +675,7 @@
 				<include name="GNULinux_cp210x/*" />
 				<include name="udev_rules/*" />
 				<include name="HowToCreateDevicePlugin" />
+				<include name="README.*" />
 			</fileset>
 		</copy>
 	</target>
