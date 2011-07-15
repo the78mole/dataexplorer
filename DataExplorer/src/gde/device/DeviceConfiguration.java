@@ -425,7 +425,7 @@ public class DeviceConfiguration {
 	}
 
 	public Integer getBaudeRate() {
-		return this.serialPort.getBaudeRate();
+		return this.serialPort != null ? this.serialPort.getBaudeRate() : 9800;
 	}
 	
 	public void setBaudeRate(Integer value) {
@@ -435,7 +435,7 @@ public class DeviceConfiguration {
 	}
 
 	public DataBitsTypes getDataBits() {
-		return this.serialPort.getDataBits();
+		return this.serialPort != null ? this.serialPort.getDataBits() : DataBitsTypes.DATABITS_8;
 	}
 
 	public void setDataBits(DataBitsTypes value) {
@@ -445,7 +445,7 @@ public class DeviceConfiguration {
 	}
 
 	public StopBitsTypes getStopBits() {
-		return this.serialPort.getStopBits();
+		return this.serialPort != null ? this.serialPort.getStopBits() : StopBitsTypes.STOPBITS_1;
 	}
 
 	public void setStopBits(StopBitsTypes enumOrdinal) {
@@ -455,11 +455,11 @@ public class DeviceConfiguration {
 	}
 
 	public int getFlowCtrlMode() {
-		return this.serialPort.getFlowControlMode();
+		return this.serialPort != null ? this.serialPort.getFlowControlMode() : 0;
 	}
 
 	public int getFlowCtrlModeOrdinal() {
-		return this.serialPort.getFlowControlModeOrdinal();
+		return this.serialPort != null ? this.serialPort.getFlowControlModeOrdinal() : 0;
 	}
 
 	public String getFlowCtrlModeString() {
@@ -473,7 +473,7 @@ public class DeviceConfiguration {
 	}
 
 	public ParityTypes getParity() {
-		return this.serialPort.getParity();
+		return this.serialPort != null ? this.serialPort.getParity() : ParityTypes.PARITY_NONE;
 	}
 
 	/**
