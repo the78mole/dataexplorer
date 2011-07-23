@@ -34,7 +34,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 /**
- * eStation serial port implementation
+ * Ultramat devices serial port implementation
  * @author Winfried Brügmann
  */
 public class UltramatSerialPort extends DeviceCommPort {
