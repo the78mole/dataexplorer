@@ -428,21 +428,20 @@ public class StringHelper {
 	}
 
 	/**
-	 * prints a byte in 8 digits binary display
+	 * return a byte in 8 digits binary representation
 	 * @param inByte
 	 * @param newLine true appends a new line at the end, false will append a blank
 	 */
-	public static void printBinary(byte inByte, boolean newLine) {
+	public static String printBinary(byte inByte, boolean newLine) {
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 8; i++) {
-			log.log(Level.INFO, ""+((0x80 & inByte) >> 7));
+			sb.append(((0x80 & inByte) >> 7));
 			inByte = (byte)(inByte << 1); 
 		}
 		if (newLine) {
-			log.log(Level.INFO, GDE.LINE_SEPARATOR);
+			sb.append(GDE.LINE_SEPARATOR);
 		}
-		else {
-			log.log(Level.INFO, GDE.STRING_BLANK);
-		}
+		return sb.toString();
 	}
 
 	/**
@@ -471,6 +470,19 @@ public class StringHelper {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < bytes.length; i++) {
 			sb.append(String.format("%02X", bytes[i])); //$NON-NLS-1$
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * convert a byte array into a decimal string representation
+	 * @param bytes
+	 * @return string with converted characters
+	 */
+	public static String byte2FourDigitsIntegerString(byte[] bytes) {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < bytes.length; i++) {
+			sb.append(String.format("%4d", (bytes[i]&0xFF))); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}

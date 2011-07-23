@@ -20,6 +20,7 @@ package gde.utils;
 
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
+import gde.config.Settings;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -92,26 +93,29 @@ public class WindowsHelper {
 			log.log(Level.WARNING, Messages.getString(MessageIds.GDE_MSGW0035, new Object[] {enumPorts[0].split(GDE.STRING_SEMICOLON)[1]}));
 			return;
 		}
+		boolean isSkipBlootoothDevices = Settings.getInstance().isSkipBluetoothDevices();
 		
 		TreeMap<Integer, String> winPorts = DeviceSerialPortImpl.getWindowsPorts();
 		winPorts.clear();
 		for (String portString : enumPorts) {
-			if (portString != null && portString.length() > 1 && !portString.toLowerCase().contains("bluetooth")) { //$NON-NLS-1$
-					try {
-						int portNumber = Integer.parseInt(portString.substring(portString.indexOf(WINDOWS_SERIAL_PORT_COM)+3, portString.lastIndexOf(')')));
-						String[] tmpDesc = portString.split(GDE.STRING_SEMICOLON);
-						String portDescription = tmpDesc[1].substring(0, tmpDesc[1].indexOf(WINDOWS_SERIAL_PORT_COM)-2);
-						String manufacturer = tmpDesc[0].split(GDE.STRING_BLANK)[0];
-						if (manufacturer.length() > 1 && !manufacturer.startsWith("(")) { //$NON-NLS-1$
-							if (!portDescription.contains(manufacturer)) {
-								portDescription = manufacturer + GDE.STRING_BLANK + portDescription;
+			if (portString != null && portString.length() > 1) { //$NON-NLS-1$
+					if (!(isSkipBlootoothDevices && portString.toLowerCase().contains("bluetooth"))) {
+						try {
+							int portNumber = Integer.parseInt(portString.substring(portString.indexOf(WINDOWS_SERIAL_PORT_COM) + 3, portString.lastIndexOf(')')));
+							String[] tmpDesc = portString.split(GDE.STRING_SEMICOLON);
+							String portDescription = tmpDesc[1].substring(0, tmpDesc[1].indexOf(WINDOWS_SERIAL_PORT_COM) - 2);
+							String manufacturer = tmpDesc[0].split(GDE.STRING_BLANK)[0];
+							if (manufacturer.length() > 1 && !manufacturer.startsWith("(")) { //$NON-NLS-1$
+								if (!portDescription.contains(manufacturer)) {
+									portDescription = manufacturer + GDE.STRING_BLANK + portDescription;
+								}
 							}
+							log.log(Level.FINE, WINDOWS_SERIAL_PORT_COM + portNumber + GDE.STRING_MESSAGE_CONCAT + portDescription);
+							winPorts.put(portNumber, portDescription);
 						}
-						log.log(Level.FINE, WINDOWS_SERIAL_PORT_COM + portNumber + GDE.STRING_MESSAGE_CONCAT +portDescription);
-						winPorts.put(portNumber, portDescription);
-					}
-					catch (Throwable e) {
-						log.log(Level.FINER, portString);
+						catch (Throwable e) {
+							log.log(Level.FINER, portString);
+						}
 					}
 			}
 		}
