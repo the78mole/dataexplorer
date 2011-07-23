@@ -1,5 +1,10 @@
 Development history / change log, please read from bottom up
 
+Version 2.90 - xx yy 2011
+update SWT to 3.7 final stable release
+make bluetooth serial ports recognition configurable
+
+
 Version 2.84 - 04 Jul 2011
 
 fix error in UltraDuoPlus dialog restore of backup functionality
