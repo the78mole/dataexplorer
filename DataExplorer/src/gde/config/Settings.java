@@ -153,6 +153,7 @@ public class Settings extends Properties {
 	public static final String		APLHA_BLENDING_ENABLED				= "aplha_blending_enabled"; //$NON-NLS-1$
 	public final static String		IS_GLOBAL_PORT								= "is_global_port"; //$NON-NLS-1$
 	public final static String		GLOBAL_PORT_NAME							= "global_port_name"; //$NON-NLS-1$
+	public final static String		SKIP_BLUETOOTH_DEVICES				= "skip_bluetooth_devices"; //$NON-NLS-1$
 	public final static String		DO_PORT_AVAILABLE_TEST				= "do_port_available_test"; //$NON-NLS-1$
 	public final static String		IS_PORT_BLACKLIST							= "is_port_black_list"; //$NON-NLS-1$
 	public final static String		PORT_BLACKLIST								= "port_black_list"; //$NON-NLS-1$
@@ -497,6 +498,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", APLHA_BLENDING_ENABLED, isDeviceDialogAlphaEnabled())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", IS_GLOBAL_PORT, isGlobalSerialPort())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", GLOBAL_PORT_NAME, getSerialPort())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", SKIP_BLUETOOTH_DEVICES, isSkipBluetoothDevices())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", DO_PORT_AVAILABLE_TEST, doPortAvailabilityCheck())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", IS_PORT_BLACKLIST, isSerialPortBlackListEnabled())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", PORT_BLACKLIST, getSerialPortBlackList())); //$NON-NLS-1$
@@ -914,6 +916,21 @@ public class Settings extends Properties {
 	public String getSerialPort() {
 		String port = getProperty(GLOBAL_PORT_NAME, EMPTY).trim();
 		return port == null ? EMPTY : port;
+	}
+
+	/**
+	 * set property if during port scan disable detection of bluetooth devices
+	 */
+	public void setSkipBluetoothDevices(boolean enabled) {
+		setProperty(SKIP_BLUETOOTH_DEVICES, GDE.STRING_EMPTY+enabled);
+	}
+
+
+	/**
+	 * get property if during port scan disable detection of bluetooth devices
+	 */
+	public boolean isSkipBluetoothDevices() {
+		return Boolean.valueOf(getProperty(SKIP_BLUETOOTH_DEVICES, "true")); //$NON-NLS-1$
 	}
 
 	/**

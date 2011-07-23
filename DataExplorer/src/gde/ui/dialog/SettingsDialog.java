@@ -110,7 +110,7 @@ public class SettingsDialog extends Dialog {
 	CLabel															localLabel;
 	CCombo															localCombo;
 	Group																groupLocale;
-	Button															doPortAvailabilityCheck;
+	Button															skipBluetoothDevices, doPortAvailabilityCheck;
 	Button															enableBlackListButton, enableWhiteListButton;
 	Text																serialPortBlackList, serialPortWhiteList;
 	Button															suggestObjectKey;
@@ -559,6 +559,23 @@ public class SettingsDialog extends Dialog {
 									public void keyReleased(KeyEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "serialPortWhiteList.keyReleased, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSerialPortWhiteList(SettingsDialog.this.serialPortWhiteList.getText());
+									}
+								});
+							}
+							{
+								this.skipBluetoothDevices = new Button(this.serialPortGroup, SWT.CHECK | SWT.LEFT);
+								this.skipBluetoothDevices.setBounds(260, GDE.IS_MAC_COCOA ? 53 : 63, 243, 22);
+								this.skipBluetoothDevices.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.skipBluetoothDevices.setText(Messages.getString(MessageIds.GDE_MSGT0434));
+								this.skipBluetoothDevices.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0435));
+								this.skipBluetoothDevices.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINE, "skipBluetoothDevices.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setSkipBluetoothDevices(SettingsDialog.this.skipBluetoothDevices.getSelection());
+										if (SettingsDialog.this.skipBluetoothDevices.getSelection()) {
+											SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGI0036));
+										}
 									}
 								});
 							}
@@ -1307,6 +1324,7 @@ public class SettingsDialog extends Dialog {
 		SettingsDialog.this.decimalSeparator.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getDecimalSeparator());
 		SettingsDialog.this.listSeparator.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getListSeparator());
 
+		SettingsDialog.this.skipBluetoothDevices.setSelection(SettingsDialog.this.settings.isSkipBluetoothDevices());
 		SettingsDialog.this.doPortAvailabilityCheck.setSelection(SettingsDialog.this.settings.doPortAvailabilityCheck());
 		if (SettingsDialog.this.settings.isGlobalSerialPort()) {
 			updateAvailablePorts();

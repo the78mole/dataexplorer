@@ -474,7 +474,7 @@ public class FileHandler {
 		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
 			try {
 				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.STRING_LEFT_BRACKET)+1, activeRecordSet.getName().lastIndexOf(GDE.STRING_RIGHT_BRACKET));
-				if (!fileName.contains(GDE.STRING_EMPTY + Integer.parseInt(flightNumber))) {
+				if (fileName != null && !fileName.contains(GDE.STRING_EMPTY + Integer.parseInt(flightNumber))) {
 					fileName = fileName + GDE.STRING_UNDER_BAR + flightNumber;
 				}
 			}
