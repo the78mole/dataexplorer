@@ -153,7 +153,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 			this.setLayout(new FormLayout());
 			this.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					System.out.println("GPSLoggerSetupConfiguration2.helpRequested, event=" + evt); //$NON-NLS-1$
+					log.log(Level.FINEST, "GPSLoggerSetupConfiguration2.helpRequested, event=" + evt); //$NON-NLS-1$
 					GPSLoggerSetupConfiguration2.this.application.openHelpDialog(Messages.getString(MessageIds.GDE_MSGT2010), "HelpInfo.html#configuration");  //$NON-NLS-1$
 				}
 			});
