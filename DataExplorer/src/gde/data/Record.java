@@ -21,7 +21,6 @@ package gde.data;
 import gde.GDE;
 import gde.device.DataTypes;
 import gde.device.IDevice;
-import gde.device.MeasurementPropertyTypes;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.StatisticsType;
@@ -1447,12 +1446,14 @@ public class Record extends Vector<Integer> {
 	 */
 	public String getVerticalDisplayPointAsFormattedScaleValue(int yPos, Rectangle drawAreaBounds) {
 		String displayPointValue;
-		PropertyType syncProperty = this.parent.isCompareSet ? null : this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-		if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
-			Record syncRecord = this.parent.get(this.ordinal);
-				displayPointValue = syncRecord.df.format(new Double(syncRecord.minDisplayValue +  ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
-		}	
-		else if(this.parent.isZoomMode)
+		//scales are all synchronized in viewpoint of end values (min/max)
+		//PropertyType syncProperty = this.parent.isCompareSet ? null : this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+		//if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+		//	Record syncRecord = this.parent.get(this.ordinal);
+		//		displayPointValue = syncRecord.df.format(new Double(syncRecord.minDisplayValue +  ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
+		//}	
+		//else 
+		if(this.parent.isZoomMode)
 			displayPointValue = this.df.format(new Double(this.minZoomScaleValue +  ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
 		else
 			displayPointValue = this.df.format(new Double(this.minScaleValue +  ((this.maxScaleValue - this.minScaleValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
