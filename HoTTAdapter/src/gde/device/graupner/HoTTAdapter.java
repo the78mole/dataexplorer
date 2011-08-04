@@ -285,7 +285,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				}
 			}
 			//calculate balance on the fly
-			points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
+			points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
 			points[12] = HoTTbinReader.parse2Short(dataBuffer, 31) * 1000;
 			points[13] = HoTTbinReader.parse2Short(dataBuffer, 33) * 1000;
 			points[14] = HoTTbinReader.parse2Short(dataBuffer, 35) * 1000;
@@ -299,7 +299,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			break;
 
 		case HoTTAdapter.SENSOR_TYPE_ELECTRIC:
-			//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Revolution, 21=Height, 22=Climb 1, 23=Climb 3, 24=Voltage 1, 25=Voltage 2, 26=Temperature 1, 27=Temperature 2			
+			//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
 			points[0] = (dataBuffer[15] & 0xFF) * 1000;
 			points[1] = HoTTbinReader.parse2Short(dataBuffer, 40) * 1000;
 			points[2] = HoTTbinReader.parse2Short(dataBuffer, 38) * 1000;
@@ -314,15 +314,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				}
 			}
 			//calculate balance on the fly
-			points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
-			points[20] = HoTTbinReader.parse2Short(dataBuffer, 33) * 1000;
-			points[21] = HoTTbinReader.parse2Short(dataBuffer, 36) * 1000;
-			points[22] = HoTTbinReader.parse2Short(dataBuffer, 44) * 1000;
-			points[23] = (dataBuffer[46] & 0xFF) * 1000;
-			points[24] = HoTTbinReader.parse2Short(dataBuffer, 30) * 1000;
-			points[26] = HoTTbinReader.parse2Short(dataBuffer, 32) * 1000;
-			points[26] = (dataBuffer[34] & 0xFF) * 1000;
-			points[27] = (dataBuffer[35] & 0xFF) * 1000;
+			points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
+			points[20] = HoTTbinReader.parse2Short(dataBuffer, 36) * 1000;
+			points[21] = HoTTbinReader.parse2Short(dataBuffer, 44) * 1000;
+			points[22] = (dataBuffer[46] & 0xFF) * 1000;
+			points[23] = HoTTbinReader.parse2Short(dataBuffer, 30) * 1000;
+			points[24] = HoTTbinReader.parse2Short(dataBuffer, 32) * 1000;
+			points[25] = (dataBuffer[34] & 0xFF) * 1000;
+			points[26] = (dataBuffer[35] & 0xFF) * 1000;
 			break;
 		}
 		return points;

@@ -101,7 +101,7 @@ public class HoTTbinReader {
 		RecordSet 
 			recordSetReceiver = null, 	//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 			recordSetGeneral = null, 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel 17=OilLevel, 18=Voltage 1, 19=Voltage 2, 20=Temperature 1, 21=Temperature 2
-			recordSetElectric = null, 	//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Revolution, 21=Height, 22=Climb 1, 23=Climb 3, 24=Voltage 1, 25=Voltage 2, 26=Temperature 1, 27=Temperature 2 
+			recordSetElectric = null, 	//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 			recordSetVario = null, 			//0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			recordSetGPS = null; 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		int[] 
@@ -362,7 +362,7 @@ public class HoTTbinReader {
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC:
 						//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetElectric == null) {
-							channel = channels.get(4);
+							channel = channels.get(5);
 							recordSetName = (channel.size() + 1) + recordSetNameExtend; //$NON-NLS-1$
 							recordSetElectric = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 							channel.put(recordSetName, recordSetElectric);
@@ -394,33 +394,43 @@ public class HoTTbinReader {
 						}
 						
 						if (buf1 != null && buf2 != null && buf3 != null && buf4 != null) {
+//							printByteContent("buf1", buf1);
+//							printByteContent("buf2", buf2);
+//							printByteContent("buf3", buf3);
+//							printByteContent("buf4", buf4);
 							if (timeOffsetElectric_ms == 0) timeOffsetElectric_ms = timeStep_ms;
 							int maxVotage = Integer.MIN_VALUE;
 							int minVotage = Integer.MAX_VALUE;
-							//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Revolution, 21=Height, 22=Climb 1, 23=Climb 3, 24=Voltage 1, 25=Voltage 2, 26=Temperature 1, 27=Temperature 2 							
+							//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 							pointsElectric[0] = (buf1[0] & 0xFF) * 1000;
 							pointsElectric[1] = parse2Short(buf3, 7) * 1000;
 							pointsElectric[2] = parse2Short(buf3, 5) * 1000;
 							pointsElectric[3] = parse2Short(buf3[9], buf4[0]) * 1000;
 							pointsElectric[4] = Double.valueOf(pointsElectric[1] / 1000.0 * pointsElectric[2]).intValue(); // power U*I [W];
 							pointsElectric[5] = 0; //5=Balance
-							for (int j = 0; j < 14; j++) {
+							for (int j = 0; j < 7; j++) {
 								pointsElectric[j + 6] = (buf1[3+j] & 0xFF) * 1000;
 								if (pointsElectric[j + 6] > 0) {
 									maxVotage = pointsElectric[j + 6] > maxVotage ? pointsElectric[j + 6] : maxVotage;
 									minVotage = pointsElectric[j + 6] < minVotage ? pointsElectric[j + 6] : minVotage;
 								}
 							}
+							for (int j = 0; j < 7; j++) {
+								pointsElectric[j + 13] = (buf2[j] & 0xFF) * 1000;
+								if (pointsElectric[j + 13] > 0) {
+									maxVotage = pointsElectric[j + 13] > maxVotage ? pointsElectric[j + 13] : maxVotage;
+									minVotage = pointsElectric[j + 13] < minVotage ? pointsElectric[j + 13] : minVotage;
+								}
+							}
 							//calculate balance on the fly
 							pointsElectric[5] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-							pointsElectric[20] = parse2Short(buf2, 8) * 1000;
-							pointsElectric[21] = parse2Short(buf3, 0) * 1000;
-							pointsElectric[22] = parse2Short(buf3, 2) * 1000;
-							pointsElectric[23] = (buf3[4] & 0xFF) * 1000;
-							pointsElectric[24] = parse2Short(buf1[9], buf2[0]) * 1000;
-							pointsElectric[25] = parse2Short(buf2[1], buf2[2]) * 1000;
-							pointsElectric[26] = (buf2[3] & 0xFF) * 1000;
-							pointsElectric[27] = (buf2[4] & 0xFF) * 1000;
+							pointsElectric[20] = parse2Short(buf3, 3) * 1000;
+							pointsElectric[21] = parse2Short(buf4, 1) * 1000;
+							pointsElectric[22] = (buf4[3] & 0xFF) * 1000;
+							pointsElectric[23] = parse2Short(buf1[9], buf2[0]) * 1000;
+							pointsElectric[24] = parse2Short(buf2[1], buf2[2]) * 1000;
+							pointsElectric[25] = (buf2[3] & 0xFF) * 1000;
+							pointsElectric[26] = (buf2[4] & 0xFF) * 1000;
 	
 							recordSetElectric.addPoints(pointsElectric, timeStep_ms-timeOffsetElectric_ms);
 							buf1 = buf2 = buf3 = buf4 = null;
@@ -470,6 +480,17 @@ public class HoTTbinReader {
 			data_in = null;
 			file_input = null;
 		}
+	}
+
+	/**
+	 * @param buf[]
+	 */
+	public static void printByteContent(String name, byte[] buf4) {
+		StringBuilder s = new StringBuilder().append(name).append(": ");
+		for (int j = 0; j < buf4.length; j++) {
+			s.append(String.format("%4d", buf4[j] & 0xff));
+		}
+		log.log(Level.OFF, s.toString());
 	}
 	
 	/**
