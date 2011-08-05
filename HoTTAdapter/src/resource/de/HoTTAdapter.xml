@@ -222,7 +222,7 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Richtung</name>
+                <name>Kurswinkel</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
@@ -403,21 +403,13 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Spannung S1</name>
-                <symbol>U1</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-            </Measurement>
-            <Measurement>
                 <name>Spannung S2</name>
                 <symbol>U2</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="17" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperatur 1</name>
@@ -434,7 +426,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
-                <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Elektro">

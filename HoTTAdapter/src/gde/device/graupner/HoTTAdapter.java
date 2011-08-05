@@ -270,7 +270,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			break;
 
 		case HoTTAdapter.SENSOR_TYPE_GENERAL:
-			//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel 17=OilLevel, 18=Voltage 1, 19=Voltage 2, 20=Temperature 1, 21=Temperature 2							
+			//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
 			points[0] = (dataBuffer[15] & 0xFF) * 1000;
 			points[1] = HoTTbinReader.parse2Short(dataBuffer, 40) * 1000;
 			points[2] = HoTTbinReader.parse2Short(dataBuffer, 38) * 1000;
@@ -291,11 +291,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			points[14] = HoTTbinReader.parse2Short(dataBuffer, 35) * 1000;
 			points[15] = (dataBuffer[37] & 0xFF) * 1000;
 			points[16] = HoTTbinReader.parse2Short(dataBuffer, 29) * 1000;
-			points[17] = 0;
-			points[18] = HoTTbinReader.parse2Short(dataBuffer, 22) * 1000;
-			points[19] = HoTTbinReader.parse2Short(dataBuffer, 24) * 1000;
-			points[20] = (dataBuffer[26] & 0xFF) * 1000;
-			points[21] = (dataBuffer[27] & 0xFF) * 1000;
+			points[17] = HoTTbinReader.parse2Short(dataBuffer, 22) * 1000;
+			points[18] = HoTTbinReader.parse2Short(dataBuffer, 24) * 1000;
+			points[19] = (dataBuffer[26] & 0xFF) * 1000;
+			points[20] = (dataBuffer[27] & 0xFF) * 1000;
 			break;
 
 		case HoTTAdapter.SENSOR_TYPE_ELECTRIC:
@@ -518,8 +517,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 		if (recordSet.getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude 3=Height
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-			Record recordLongitude = recordSet.get(1);
-			Record recordLatitude = recordSet.get(2);
+			Record recordLatitude = recordSet.get(1);
+			Record recordLongitude = recordSet.get(2);
 			Record recordAlitude = recordSet.get(3);
 			if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData() && recordAlitude.hasReasonableData()) {
 				int recordSize = recordLatitude.realSize();
@@ -536,7 +535,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				}
 				startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
 
-				GPSHelper.calculateTripLength(this, recordSet, 2, 1, 3, startAltitude, 7, 9);
+				GPSHelper.calculateTripLength(this, recordSet, 1, 2, 3, startAltitude, 7, 9);
 				this.application.updateStatisticsData(true);
 				this.updateVisibilityStatus(recordSet, true);
 			}

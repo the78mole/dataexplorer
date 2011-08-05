@@ -100,13 +100,13 @@ public class HoTTbinReader {
 		Channel channel = null;
 		RecordSet 
 			recordSetReceiver = null, 	//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
-			recordSetGeneral = null, 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel 17=OilLevel, 18=Voltage 1, 19=Voltage 2, 20=Temperature 1, 21=Temperature 2
+			recordSetGeneral = null, 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 			recordSetElectric = null, 	//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 			recordSetVario = null, 			//0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			recordSetGPS = null; 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		int[] 
 		    pointsReceiver = new int[8],
-		    pointsGeneral = new int[22],
+		    pointsGeneral = new int[21],
 		    pointsElectric = new int[27],
 		    pointsVario = new int[7],
 		    pointsGPS = new int[12];
@@ -322,7 +322,7 @@ public class HoTTbinReader {
 							if (timeOffsetGeneral_ms == 0) timeOffsetGeneral_ms = timeStep_ms;
 							int maxVotage = Integer.MIN_VALUE;
 							int minVotage = Integer.MAX_VALUE;
-							//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel 17=OilLevel, 18=Voltage 1, 19=Voltage 2, 20=Temperature 1, 21=Temperature 2							
+							//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
 							pointsGeneral[0] = (buf1[0] & 0xFF) * 1000;
 							pointsGeneral[1] = parse2Short(buf3, 7) * 1000;
 							pointsGeneral[2] = parse2Short(buf3, 5) * 1000;
@@ -343,11 +343,10 @@ public class HoTTbinReader {
 							pointsGeneral[14] = parse2Short(buf3, 2) * 1000;				
 							pointsGeneral[15] = (buf3[4] & 0xFF) * 1000;						
 							pointsGeneral[16] = parse2Short(buf2, 6) * 1000;			
-							pointsGeneral[17] = 0; //TODO Oil level ?????
-							pointsGeneral[18] = parse2Short(buf1[9], buf2[0]) * 1000;
-							pointsGeneral[19] = parse2Short(buf2[1], buf2[2]) * 1000;
-							pointsGeneral[20] = (buf2[3] & 0xFF) * 1000;					
-							pointsGeneral[21] = (buf2[4] & 0xFF) * 1000;					
+							pointsGeneral[17] = parse2Short(buf1[9], buf2[0]) * 1000;
+							pointsGeneral[18] = parse2Short(buf2[1], buf2[2]) * 1000;
+							pointsGeneral[19] = (buf2[3] & 0xFF) * 1000;					
+							pointsGeneral[20] = (buf2[4] & 0xFF) * 1000;					
 	
 							recordSetGeneral.addPoints(pointsGeneral, timeStep_ms-timeOffsetGeneral_ms);
 							buf1 = buf2 = buf3 = buf4 = null;
@@ -427,10 +426,10 @@ public class HoTTbinReader {
 							pointsElectric[20] = parse2Short(buf3, 3) * 1000;
 							pointsElectric[21] = parse2Short(buf4, 1) * 1000;
 							pointsElectric[22] = (buf4[3] & 0xFF) * 1000;
-							pointsElectric[23] = parse2Short(buf1[9], buf2[0]) * 1000;
-							pointsElectric[24] = parse2Short(buf2[1], buf2[2]) * 1000;
-							pointsElectric[25] = (buf2[3] & 0xFF) * 1000;
-							pointsElectric[26] = (buf2[4] & 0xFF) * 1000;
+							pointsElectric[23] = parse2Short(buf2, 7) * 1000;
+							pointsElectric[24] = parse2Short(buf2[9], buf3[0]) * 1000;
+							pointsElectric[25] = (buf3[1] & 0xFF) * 1000;
+							pointsElectric[26] = (buf3[2] & 0xFF) * 1000;
 	
 							recordSetElectric.addPoints(pointsElectric, timeStep_ms-timeOffsetElectric_ms);
 							buf1 = buf2 = buf3 = buf4 = null;
