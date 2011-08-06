@@ -396,11 +396,12 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Ölstand</name>
-                <symbol></symbol>
-                <unit>ml</unit>
+                <name>Spannung S1</name>
+                <symbol>U2</symbol>
+                <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Spannung S2</name>
