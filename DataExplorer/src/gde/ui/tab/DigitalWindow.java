@@ -86,6 +86,14 @@ public class DigitalWindow extends CTabItem {
 		this.surroundingBackground = Settings.getInstance().getDigitalSurroundingAreaBackground();
 		
 		this.displays = new HashMap<String, DigitalDisplay>(3);
+		
+		this.displayTab.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent evt) {
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "digitalMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
+				DigitalWindow.this.contextMenu.createMenu(DigitalWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
+				update(false);
+			}
+		});
 	}
 
 	public void create() {
@@ -99,13 +107,6 @@ public class DigitalWindow extends CTabItem {
 				public void helpRequested(HelpEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "digitalMainComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_7.html"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			});
-			this.digitalMainComposite.addPaintListener(new PaintListener() {
-				public void paintControl(PaintEvent evt) {
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "digitalMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
-					DigitalWindow.this.contextMenu.createMenu(DigitalWindow.this.popupmenu, TabAreaContextMenu.TYPE_SIMPLE);
-					update(false);
 				}
 			});
 			this.digitalMainComposite.layout();
@@ -143,7 +144,7 @@ public class DigitalWindow extends CTabItem {
 		
 				// if recordSet name signature changed new displays need to be created
 				boolean isUpdateRequired = forceUpdate || this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName())
-				|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
+						|| this.oldChannel == null  || !this.oldChannel.getName().equals(activeChannel.getName())
 						|| (recordsToDisplay.length != this.oldRecordsToDisplay.length);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isUpdateRequired = " + isUpdateRequired); //$NON-NLS-1$
 				if (isUpdateRequired) {
