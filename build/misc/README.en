@@ -13,6 +13,7 @@ Actual the following devices are available as plug-in:
 											 - UniLog (SM-Modellbau) multi measurement device
 											 - LiPoWatch (SM-Modellbau) motor driver LiPo saver
 											 - GPS-Logger (SM-Modellbau) GPS, multi measurement device
+											 - HoTTAdapter (Graupner) Receiver-, Vario-, GPS-, General-, Electric-Sensor-Module
 											 - eStation BC6 (Bantam) charger/discharger 
 											 - eStation BC6102 (Bantam) charger/discharger 
 											 - eStation BC8 (Bantam) charger/discharger 
@@ -104,7 +105,7 @@ For Windows user: Depending of the used Windows version and patch level it might
 For GNU/Linux user: RXTXcomm uses serial port locking mechanism, the application user must be part of uucp group.
 While facing problems with USB2Serial UART SiliconLabs cp210x refer to GNULinux_cp210x directory in download area.
 
-For Mac OS user: Same as for GNU/Linux user, but the /var/lock directory must be created, refer to RXTX_Post-Install_MacOS.txt
+For Mac OS user: Same as for GNU/Linux user, but the /var/lock directory must be created, refer to application content RXTX_Post-Install_MacOS.sh
 
 Hint: It is planned to use the DataExplorer on different operating systems and share the data files, do not use special characters at all.
 (conversion ISO-8859-1 to UTF-8 and vice versa). File links are different on the supported operating systems. Object related data files don't get duplicated,

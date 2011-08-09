@@ -13,6 +13,7 @@ Zur Zeit sind folgende Geräte eingebunden:
 											 - UniLog (SM-Modellbau) Mulitmessgerät
 											 - LiPoWatch (SM-Modellbau) Motorsteller LiPo-Saver
 											 - GPS-Logger (SM-Modellbau) GPS, Multimessgerät
+											 - HoTTAdapter (Graupner) Empfänger-, Vario-, GPS-, Universal-, Elektro-Sensormodul
 											 - eStation BC6 (Bantam) Lade-/Entlade-gerät
 											 - eStation BC610 (Bantam) Lade-/Entlade-gerät
 											 - eStation BC8 (Bantam) Lade-/Entlade-gerät
@@ -52,7 +53,7 @@ MAC OS ist immer 64 Bit und unterstützt die Ausführung von 32 Bit sowie 64 Bit J
 
 Eine Installation ist nicht nötig, das im Archiv enthaltene Verzeichnis "DataExplorer" mit den darunter liegenden Verzeichnissen und Dateien
 einfach an einen Ort entpacken, wo Ausführungsrechte vorliegen. 
-Für Windowsbenutzer wäre das z.B. %ProgramFiles% für GNU/Linux-Benutzer "/opt" oder "/usr". Mac OS entpacken/verschieben unter /Applications (Programme)
+Für Windowsbenutzer wäre das z.B. %ProgramFiles% für GNU/Linux-Benutzer "/opt" oder "/usr". Mac OS entpacken/verschieben unter /Programme
 
 Achtung: Bitte keine Umlaute im Installationspfad benutzen, Java arbeitet standardmäßig mit UTF-8, da kann es Probleme mit der Konvertierung in der Laufzeitumgebung geben!
 
@@ -104,7 +105,7 @@ Füt GNU/Linux Anwender: RXTXcomm locked den seriellen Port über die Gruppe "uucp
 Bei Problemen mit dem USB2Serial UART von SiliconLabs cp210x siehe das GNULinux_cp210x Verzeichnis im Downloadbereich.
 
 Für Mac OS Anwender: Hier gilt prinzipiell das Gleiche wie für GNU/Linux, nur dass das Verzeichnis /var/lock erst angelegt werden muss, siehe
-RXTX_Post-Install_MacOS.txt
+Anwendungsordner Inhalt RXTX_Post-Install_MacOS.sh
 
 Hinweis: Soll der DataExplorer gleichzeitig auf mehreren Betriebssystemen verwendet werden, oder werden die Daten auf zentraler Stelle abgelegt,
 sind Umlaute in den Dateinamen und Objektnamen zu vermeiden. (Umwandlung ISO-8859-1 nach UTF-8 und umgekehrt). Dateilinks unterscheiden sich von den 
