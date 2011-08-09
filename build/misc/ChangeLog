@@ -6,6 +6,7 @@ make bluetooth serial ports recognition configurable
 update device properties XSD to version 14
 add HoTTAdapter implementation
 fix measurement function for synchronized measurement data
+fix update problem of digital display tabulator while changing curve selection
 
 
 Version 2.84 - 04 Jul 2011
