@@ -111,7 +111,7 @@ public class UniLogDialog extends DeviceDialog {
 	Group													autoStartGroup;
 	Text													gearFactorCombo;
 	CLabel												gearLabel;
-	CCombo												numbeProbCombo;
+	CCombo												numberProbCombo;
 	CCombo												motorPoleCombo;
 	Button												numberPropButton;
 	Group													motorPropGroup;
@@ -579,11 +579,11 @@ public class UniLogDialog extends DeviceDialog {
 											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "numberPolsButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 											if (UniLogDialog.this.numberPolsButton.getSelection()) {
-												UniLogDialog.this.numbeProbCombo.setEnabled(false);
+												UniLogDialog.this.numberProbCombo.setEnabled(false);
 												UniLogDialog.this.motorPoleCombo.setEnabled(true);
 											}
 											else {
-												UniLogDialog.this.numbeProbCombo.setEnabled(true);
+												UniLogDialog.this.numberProbCombo.setEnabled(true);
 												UniLogDialog.this.motorPoleCombo.setEnabled(false);
 												UniLogDialog.this.numberPropButton.setSelection(false);
 											}
@@ -655,11 +655,11 @@ public class UniLogDialog extends DeviceDialog {
 											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "numberPropButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 											if (UniLogDialog.this.numberPropButton.getSelection()) {
-												UniLogDialog.this.numbeProbCombo.setEnabled(true);
+												UniLogDialog.this.numberProbCombo.setEnabled(true);
 												UniLogDialog.this.motorPoleCombo.setEnabled(false);
 											}
 											else {
-												UniLogDialog.this.numbeProbCombo.setEnabled(false);
+												UniLogDialog.this.numberProbCombo.setEnabled(false);
 												UniLogDialog.this.motorPoleCombo.setEnabled(true);
 												UniLogDialog.this.numberPolsButton.setSelection(false);
 											}
@@ -667,14 +667,14 @@ public class UniLogDialog extends DeviceDialog {
 									});
 								}
 								{
-									this.numbeProbCombo = new CCombo(this.motorPropGroup, SWT.BORDER);
-									this.numbeProbCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.numbeProbCombo.setBounds(198, GDE.IS_MAC_COCOA ? 53 : 68, 63, GDE.IS_LINUX ? 22 : 20);
-									this.numbeProbCombo.setItems(new String[] { " 1", " 2", " 3", " 4" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-									this.numbeProbCombo.select(1);
-									this.numbeProbCombo.setEditable(false);
-									this.numbeProbCombo.setBackground(DataExplorer.COLOR_WHITE);
-									this.numbeProbCombo.addSelectionListener(new SelectionAdapter() {
+									this.numberProbCombo = new CCombo(this.motorPropGroup, SWT.BORDER);
+									this.numberProbCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.numberProbCombo.setBounds(198, GDE.IS_MAC_COCOA ? 53 : 68, 63, GDE.IS_LINUX ? 22 : 20);
+									this.numberProbCombo.setItems(new String[] { " 1", " 2", " 3", " 4" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+									this.numberProbCombo.select(1);
+									this.numberProbCombo.setEditable(false);
+									this.numberProbCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.numberProbCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "numbeProbCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
@@ -1521,13 +1521,13 @@ public class UniLogDialog extends DeviceDialog {
 					//motorPoleCombo.setItems(new String[] {"2", "4", "6", "8", "10", "12", "14", "16"});
 					UniLogDialog.this.motorPoleCombo.select(UniLogDialog.this.countMotorPole / 2 - 1);
 					//numbeProbCombo.setItems(new String[] {"1", "2", "3", "4"});
-					UniLogDialog.this.numbeProbCombo.select(UniLogDialog.this.countPropBlade - 1);
+					UniLogDialog.this.numberProbCombo.select(UniLogDialog.this.countPropBlade - 1);
 					if (UniLogDialog.this.isMotorPole) {
-						UniLogDialog.this.numbeProbCombo.setEnabled(false);
+						UniLogDialog.this.numberProbCombo.setEnabled(false);
 						UniLogDialog.this.motorPoleCombo.setEnabled(true);
 					}
 					else {
-						UniLogDialog.this.numbeProbCombo.setEnabled(true);
+						UniLogDialog.this.numberProbCombo.setEnabled(true);
 						UniLogDialog.this.motorPoleCombo.setEnabled(false);
 					}
 					UniLogDialog.this.currentTriggerButton.setSelection(UniLogDialog.this.isAutoStartCurrent);
@@ -1585,7 +1585,7 @@ public class UniLogDialog extends DeviceDialog {
 		if (this.numberPolsButton.getSelection()) // isMotorPole
 			updateBuffer[4] = (byte) ((this.motorPoleCombo.getSelectionIndex() + 1) | 0x80);
 		else
-			updateBuffer[4] = (byte) ((this.numbeProbCombo.getSelectionIndex() + 1));
+			updateBuffer[4] = (byte) ((this.numberProbCombo.getSelectionIndex() + 1));
 		checkSum = checkSum + (0xFF & updateBuffer[4]);
 
 		if (this.currentTriggerButton.getSelection()) // isCurrentTriggerAutoStart
