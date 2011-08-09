@@ -79,7 +79,7 @@
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="4" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="4" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>VoltageRx</name>
@@ -87,7 +87,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>TemperatureRx</name>
@@ -95,7 +95,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Vario">
@@ -111,17 +111,19 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="500.0" name="reduction"/>
+                <statistics countTriggerText="Calculated within climb trigger range" sumTriggerText="Sum motor height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="500.0" name="reduction"/>
             </Measurement>
             <Measurement>
                 <name>Climb 1</name>
                 <symbol>vh</symbol>
                 <unit>m/sec</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <statistics sumTriggerTimeText="~ Motor runtime" countTriggerText="Number counted climb flights" countByTrigger="true" sigma="false" avg="false" max="true" min="false">
+                    <trigger comment="Trigger: climb ratio &gt; 1.5 m/sec &gt; 10 sec" minTimeSec="10" isGreater="true" level="1500"/>
+                </statistics>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="30000.0" name="reduction"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Climb 3</name>
@@ -129,9 +131,8 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
-                <property type="Integer" value="2" name="scale_sync_ref_ordinal"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="30000.0" name="reduction"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Climb 10</name>
@@ -139,9 +140,8 @@
                 <unit>m/10sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
-                <property type="Integer" value="2" name="scale_sync_ref_ordinal"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="30000.0" name="reduction"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>VoltageRx</name>
@@ -149,7 +149,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>TemperatureRx</name>
@@ -157,7 +157,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="GPS">
@@ -187,17 +187,19 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="500.0" name="reduction"/>
+                <statistics countTriggerText="Calculated within climb trigger range" sumTriggerText="Summe Motor height" sumByTriggerRefOrdinal="4" sigma="false" avg="false" max="true" min="true"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="500.0" name="reduction"/>
             </Measurement>
             <Measurement>
                 <name>Climb 1</name>
                 <symbol>vh</symbol>
                 <unit>m/sec</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <statistics sumTriggerTimeText="~ Motor runtime" countTriggerText="Number counted climb flights" countByTrigger="true" sigma="false" avg="false" max="true" min="false">
+                    <trigger comment="Trigger: climb ratio &gt; 1.5 m/sec &gt; 10 sec" minTimeSec="10" isGreater="true" level="1500"/>
+                </statistics>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="30000.0" name="reduction"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Climb 3</name>
@@ -205,7 +207,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="120.0" name="reduction"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="120.0" name="reduction"/>
             </Measurement>
             <Measurement>
                 <name>Velocity</name>
@@ -227,7 +229,7 @@
                 <unit>°</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="2.0" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="2.0" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>TripLength</name>
@@ -242,7 +244,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>TemperatureRx</name>
@@ -250,7 +252,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30.0" name="reduction"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Universal">
@@ -266,25 +268,25 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Current</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics sumTriggerTimeText="Motorlaufzeit:" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
-                    <trigger comment="Current &gt; 3 A über &gt; 5 Sekunden" minTimeSec="5" isGreater="true" level="3000"/>
+                <statistics sumTriggerTimeText="Motor runtime:" countTriggerText="Number climb flights" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
+                    <trigger comment="Current &gt; 3 A over &gt; 3 Seconds" minTimeSec="3" isGreater="true" level="3000"/>
                 </statistics>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Capacity</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Power</name>
@@ -292,7 +294,7 @@
                 <unit>W</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Balance</name>
@@ -300,7 +302,7 @@
                 <unit>mV</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="2.0" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="2.0" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 1</name>
@@ -308,7 +310,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 2</name>
@@ -317,7 +319,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 3</name>
@@ -326,7 +328,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 4</name>
@@ -335,7 +337,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 5</name>
@@ -344,7 +346,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 6</name>
@@ -353,7 +355,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Revolution</name>
@@ -361,15 +363,15 @@
                 <unit>1/min</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Height</name>
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="500.0" name="reduction"/>
+                <statistics ratioText="Capacity/motor-height" ratioRefOrdinal="3" sumTriggerText="Motor height" sumByTriggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="500.0" name="reduction"/>
             </Measurement>
             <Measurement>
                 <name>Climb 1</name>
@@ -377,8 +379,8 @@
                 <unit>m/sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="30000.0" name="reduction"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Climb 3</name>
@@ -386,7 +388,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="120.0" name="reduction"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="120.0" name="reduction"/>
             </Measurement>
             <Measurement>
                 <name>FuelLevel</name>
@@ -401,7 +403,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Voltage S2</name>
@@ -409,8 +411,8 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="17" name="scale_sync_ref_ordinal"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="17" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature 1</name>
@@ -418,7 +420,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
             </Measurement>
             <Measurement>
                 <name>Temperature 2</name>
@@ -426,8 +428,8 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
-                <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Elektro">
@@ -443,41 +445,41 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Current</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics sumTriggerTimeText="Motorlaufzeit:" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
-                    <trigger comment="Current &gt; 3 A über &gt; 5 Sekunden" minTimeSec="5" isGreater="true" level="3000"/>
+                <statistics sumTriggerTimeText="Motor runtime:" countTriggerText="Number climb flights" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
+                    <trigger comment="Current &gt; 3 A over &gt; 3 Seconds" minTimeSec="3" isGreater="true" level="3000"/>
                 </statistics>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Capacity</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <statistics triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Power</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Balance</name>
                 <symbol></symbol>
                 <unit>mV</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="2.0" name="factor"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="2.0" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 1</name>
@@ -485,7 +487,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 2</name>
@@ -494,7 +496,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 3</name>
@@ -503,7 +505,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 4</name>
@@ -512,7 +514,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 5</name>
@@ -521,7 +523,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 6</name>
@@ -530,7 +532,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 7</name>
@@ -539,7 +541,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 8</name>
@@ -548,7 +550,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 9</name>
@@ -557,7 +559,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 10</name>
@@ -566,7 +568,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 11</name>
@@ -575,7 +577,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 12</name>
@@ -584,7 +586,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 13</name>
@@ -593,7 +595,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 14</name>
@@ -602,15 +604,15 @@
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.02" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.02" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Height</name>
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="500.0" name="reduction"/>
+                <statistics ratioText="Capacity/motor-height" ratioRefOrdinal="3" sumTriggerText="Motor height" sumByTriggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="500.0" name="reduction"/>
             </Measurement>
             <Measurement>
                 <name>Climb 1</name>
@@ -618,8 +620,8 @@
                 <unit>m/sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="30000.0" name="reduction"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="30000.0" name="reduction"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Climb 3</name>
@@ -627,7 +629,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="120.0" name="reduction"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="120.0" name="reduction"/>
             </Measurement>
             <Measurement>
                 <name>Voltage S1</name>
@@ -635,7 +637,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>Voltage S2</name>
@@ -643,8 +645,8 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="23" name="scale_sync_ref_ordinal"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature 1</name>
@@ -652,7 +654,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
             </Measurement>
             <Measurement>
                 <name>Temperature 2</name>
@@ -660,8 +662,8 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Reduktion zu einem gemessenem Wert vor dem Anwenden von Offset und/oder Faktor" type="Double" value="20.0" name="reduction"/>
-                <property description="Skalasynchronisations Messwertreferenz ala Zahl" type="Integer" value="25" name="scale_sync_ref_ordinal"/>
+                <property description="Reduction of a measured value subtracted before applying offset or factor" type="Double" value="20.0" name="reduction"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="25" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
     </Channels>

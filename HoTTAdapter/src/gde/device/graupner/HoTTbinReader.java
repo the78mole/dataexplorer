@@ -24,6 +24,7 @@ import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.IDevice;
 import gde.exception.NotSupportedFileFormatException;
+import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -146,12 +147,12 @@ public class HoTTbinReader {
 						}
 						//recordSetReceiver initialized and ready to add data
 						//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
-						if (buf[33] == 0 && parse2Short(buf, 40) != 0) {
+						if (buf[33] == 0 && DataParser.parse2Short(buf, 40) != 0) {
 							if (timeOffsetReceiver_ms == 0) timeOffsetReceiver_ms = timeStep_ms;
 							pointsReceiver[0] = (buf[34] & 0xFF) * 1000;
 							pointsReceiver[1] = (buf[38] & 0xFF) * 1000;
 							pointsReceiver[2] = (buf[34] & 0xFF) * 1000;
-							pointsReceiver[3] = parse2Short(buf, 40) * 1000;
+							pointsReceiver[3] = DataParser.parse2Short(buf, 40) * 1000;
 							//pointsReceiver[3] = (pointsReceiver[3] > 2000 ? 2000 : pointsReceiver[3]) * 1000;
 							pointsReceiver[4] = (buf[3] & 0xFF) * 1000;
 							pointsReceiver[5] = (buf[4] & 0xFF) * 1000;
@@ -184,7 +185,7 @@ public class HoTTbinReader {
 						}
 						//recordSetVario initialized and ready to add data
 						//fill data block 0 receiver voltage an temperature
-						if (buf[33] == 0 && parse2Short(buf, 0) != 0) {		
+						if (buf[33] == 0 && DataParser.parse2Short(buf, 0) != 0) {		
 							buf0 = new byte[2];
 							System.arraycopy(buf, 35, buf0, 0, buf0.length);
 						}
@@ -202,12 +203,12 @@ public class HoTTbinReader {
 							if (timeOffsetVario_ms == 0) timeOffsetVario_ms = timeStep_ms;
 							//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 							pointsVario[0] = (buf1[0] & 0xFF) * 1000;
-							pointsVario[1] = parse2Short(buf1, 3) * 1000;
-							//pointsVario[0]max = parse2Short(buf1, 5) * 1000;
-							//pointsVario[0]min = parse2Short(buf1, 7) * 1000;
-							pointsVario[2] = parse2Short(buf1[9], buf2[0]) * 1000;
-							pointsVario[3] = parse2Short(buf1[1], buf2[2]) * 1000;
-							pointsVario[4] = parse2Short(buf1[3], buf2[4]) * 1000;
+							pointsVario[1] = DataParser.parse2Short(buf1, 3) * 1000;
+							//pointsVario[0]max = DataParser.parse2Short(buf1, 5) * 1000;
+							//pointsVario[0]min = DataParser.parse2Short(buf1, 7) * 1000;
+							pointsVario[2] = DataParser.parse2Short(buf1[9], buf2[0]) * 1000;
+							pointsVario[3] = DataParser.parse2Short(buf1[1], buf2[2]) * 1000;
+							pointsVario[4] = DataParser.parse2Short(buf1[3], buf2[4]) * 1000;
 							pointsVario[5] = (buf0[0] & 0xFF) * 1000;
 							pointsVario[6] = (buf0[1] & 0xFF) * 1000;
 	
@@ -238,7 +239,7 @@ public class HoTTbinReader {
 						}
 						//recordSetGPS initialized and ready to add data
 						//fill data block 0 receiver voltage an temperature
-						if (buf0 == null && buf[33] == 0 && parse2Short(buf, 0) != 0) {		
+						if (buf0 == null && buf[33] == 0 && DataParser.parse2Short(buf, 0) != 0) {		
 							buf0 = new byte[2];
 							System.arraycopy(buf, 35, buf0, 0, buf0.length);
 						}
@@ -260,15 +261,15 @@ public class HoTTbinReader {
 							if (timeOffsetGPS_ms == 0) timeOffsetGPS_ms = timeStep_ms;
 							//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 							pointsGPS[0] = (buf1[0] & 0xFF) * 1000;										
-							pointsGPS[1] = parse2Short(buf1, 7) * 10000 + parse2Short(buf1[9], buf2[0]);			
+							pointsGPS[1] = DataParser.parse2Short(buf1, 7) * 10000 + DataParser.parse2Short(buf1[9], buf2[0]);			
 							pointsGPS[1] = buf1[6] == 1 ? -1 * pointsGPS[1] : pointsGPS[1];
-							pointsGPS[2] = parse2Short(buf2, 2) * 10000 + parse2Short(buf2, 4);
+							pointsGPS[2] = DataParser.parse2Short(buf2, 2) * 10000 + DataParser.parse2Short(buf2, 4);
 							pointsGPS[2] = buf2[1] == 1 ? -1 * pointsGPS[2] : pointsGPS[2];
-							pointsGPS[3] = parse2Short(buf2, 8) * 1000;
-							pointsGPS[4] = parse2Short(buf3, 0) * 1000;
+							pointsGPS[3] = DataParser.parse2Short(buf2, 8) * 1000;
+							pointsGPS[4] = DataParser.parse2Short(buf3, 0) * 1000;
 							pointsGPS[5] = (buf3[2] & 0xFF) * 1000;
-							pointsGPS[6] = parse2Short(buf1, 4) * 1000;
-							pointsGPS[7] = parse2Short(buf2, 6) * 1000;
+							pointsGPS[6] = DataParser.parse2Short(buf1, 4) * 1000;
+							pointsGPS[7] = DataParser.parse2Short(buf2, 6) * 1000;
 							pointsGPS[8] = (buf1[3] & 0xFF) * 1000;
 							pointsGPS[9] = 0; 
 							pointsGPS[10] = (buf0[0] & 0xFF) * 1000;
@@ -324,9 +325,9 @@ public class HoTTbinReader {
 							int minVotage = Integer.MAX_VALUE;
 							//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
 							pointsGeneral[0] = (buf1[0] & 0xFF) * 1000;
-							pointsGeneral[1] = parse2Short(buf3, 7) * 1000;
-							pointsGeneral[2] = parse2Short(buf3, 5) * 1000;
-							pointsGeneral[3] = parse2Short(buf3[9], buf4[0]) * 1000;
+							pointsGeneral[1] = DataParser.parse2Short(buf3, 7) * 1000;
+							pointsGeneral[2] = DataParser.parse2Short(buf3, 5) * 1000;
+							pointsGeneral[3] = DataParser.parse2Short(buf3[9], buf4[0]) * 1000;
 							pointsGeneral[4] = Double.valueOf(pointsGeneral[1] / 1000.0 * pointsGeneral[2]).intValue(); // power U*I [W];
 							pointsGeneral[5] = 0; //5=Balance
 							for (int j = 0; j < 6; j++) {
@@ -338,13 +339,13 @@ public class HoTTbinReader {
 							}
 							//calculate balance on the fly
 							pointsGeneral[5] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-							pointsGeneral[12] = parse2Short(buf2, 8) * 1000;				
-							pointsGeneral[13] = parse2Short(buf3, 0) * 1000;				
-							pointsGeneral[14] = parse2Short(buf3, 2) * 1000;				
+							pointsGeneral[12] = DataParser.parse2Short(buf2, 8) * 1000;				
+							pointsGeneral[13] = DataParser.parse2Short(buf3, 0) * 1000;				
+							pointsGeneral[14] = DataParser.parse2Short(buf3, 2) * 1000;				
 							pointsGeneral[15] = (buf3[4] & 0xFF) * 1000;						
-							pointsGeneral[16] = parse2Short(buf2, 6) * 1000;			
-							pointsGeneral[17] = parse2Short(buf1[9], buf2[0]) * 1000;
-							pointsGeneral[18] = parse2Short(buf2[1], buf2[2]) * 1000;
+							pointsGeneral[16] = DataParser.parse2Short(buf2, 6) * 1000;			
+							pointsGeneral[17] = DataParser.parse2Short(buf1[9], buf2[0]) * 1000;
+							pointsGeneral[18] = DataParser.parse2Short(buf2[1], buf2[2]) * 1000;
 							pointsGeneral[19] = (buf2[3] & 0xFF) * 1000;					
 							pointsGeneral[20] = (buf2[4] & 0xFF) * 1000;					
 	
@@ -402,9 +403,9 @@ public class HoTTbinReader {
 							int minVotage = Integer.MAX_VALUE;
 							//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 							pointsElectric[0] = (buf1[0] & 0xFF) * 1000;
-							pointsElectric[1] = parse2Short(buf3, 7) * 1000;
-							pointsElectric[2] = parse2Short(buf3, 5) * 1000;
-							pointsElectric[3] = parse2Short(buf3[9], buf4[0]) * 1000;
+							pointsElectric[1] = DataParser.parse2Short(buf3, 7) * 1000;
+							pointsElectric[2] = DataParser.parse2Short(buf3, 5) * 1000;
+							pointsElectric[3] = DataParser.parse2Short(buf3[9], buf4[0]) * 1000;
 							pointsElectric[4] = Double.valueOf(pointsElectric[1] / 1000.0 * pointsElectric[2]).intValue(); // power U*I [W];
 							pointsElectric[5] = 0; //5=Balance
 							for (int j = 0; j < 7; j++) {
@@ -423,11 +424,11 @@ public class HoTTbinReader {
 							}
 							//calculate balance on the fly
 							pointsElectric[5] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-							pointsElectric[20] = parse2Short(buf3, 3) * 1000;
-							pointsElectric[21] = parse2Short(buf4, 1) * 1000;
+							pointsElectric[20] = DataParser.parse2Short(buf3, 3) * 1000;
+							pointsElectric[21] = DataParser.parse2Short(buf4, 1) * 1000;
 							pointsElectric[22] = (buf4[3] & 0xFF) * 1000;
-							pointsElectric[23] = parse2Short(buf2, 7) * 1000;
-							pointsElectric[24] = parse2Short(buf2[9], buf3[0]) * 1000;
+							pointsElectric[23] = DataParser.parse2Short(buf2, 7) * 1000;
+							pointsElectric[24] = DataParser.parse2Short(buf2[9], buf3[0]) * 1000;
 							pointsElectric[25] = (buf3[1] & 0xFF) * 1000;
 							pointsElectric[26] = (buf3[2] & 0xFF) * 1000;
 	
@@ -491,31 +492,4 @@ public class HoTTbinReader {
 		}
 		log.log(Level.OFF, s.toString());
 	}
-	
-	/**
-	 * parse 4 byte of a data buffer to integer value, length might be 1, 2, 3, 4, 8 bytes
-	 * @param buffer
-	 */
-	static int parse2Int(byte[] buffer, int start) {
-		return (((buffer[start+3] & 0xff) << 24) | ((buffer[start+2] & 0xff) << 16) | ((buffer[start+1] & 0xff) << 8) | (buffer[start] & 0xff));
-	}
-	
-	/**
-	 * parse 2 byte of a data buffer to integer value, buffer byte sequence low byte high byte
-	 * @param buffer
-	 * @param start position of low byte 
-	 */
-	static int parse2Short(byte[] buffer, int start) {
-		return (((buffer[start+1] & 0xff) << 8) | (buffer[start] & 0xff));
-	}
-	
-	/**
-	 * parse high and low byte to integer value
-	 * @param low byte
-	 * @param high byte
-	 */
-	static int parse2Short(byte low, byte high) {
-		return (((high & 0xff) << 8) | (low & 0xff));
-	}
-
 }

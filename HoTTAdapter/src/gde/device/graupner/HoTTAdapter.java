@@ -30,6 +30,7 @@ import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
+import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.io.LogViewReader;
 import gde.io.NMEAParser;
@@ -228,7 +229,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			points[1] = (dataBuffer[9] & 0xFF) * 1000;
 			points[2] = (dataBuffer[5] & 0xFF) * 1000;
 			;
-			points[3] = HoTTbinReader.parse2Short(dataBuffer, 11) * 1000;
+			points[3] = DataParser.parse2Short(dataBuffer, 11) * 1000;
 			points[4] = (dataBuffer[13] & 0xFF) * 1000;
 			points[5] = (dataBuffer[9] & 0xFF) * 1000;
 			points[6] = (dataBuffer[6] & 0xFF) * 1000;
@@ -238,12 +239,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		case HoTTAdapter.SENSOR_TYPE_VARIO:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			points[0] = (dataBuffer[15] & 0xFF) * 1000;
-			points[1] = HoTTbinReader.parse2Short(dataBuffer, 16) * 1000;
+			points[1] = DataParser.parse2Short(dataBuffer, 16) * 1000;
 			//pointsVario[0]max = parse2Short(buf1, 5) * 1000; 			// VD.MaxAlt:=SmallInt(buf[1].data_3_1[5] or (buf[1].data_3_1[6] SHL 8))-500;
 			//pointsVario[0]min = parse2Short(buf1, 7) * 1000; 			// VD.MinAlt:=SmallInt(buf[1].data_3_1[7] or (buf[1].data_3_1[8] SHL 8))-500;
-			points[2] = HoTTbinReader.parse2Short(dataBuffer[22], dataBuffer[0]) * 1000;
-			points[3] = HoTTbinReader.parse2Short(dataBuffer[24], dataBuffer[2]) * 1000;
-			points[4] = HoTTbinReader.parse2Short(dataBuffer[26], dataBuffer[4]) * 1000;
+			points[2] = DataParser.parse2Short(dataBuffer[22], dataBuffer[0]) * 1000;
+			points[3] = DataParser.parse2Short(dataBuffer[24], dataBuffer[2]) * 1000;
+			points[4] = DataParser.parse2Short(dataBuffer[26], dataBuffer[4]) * 1000;
 			points[5] = (dataBuffer[8] & 0xFF) * 1000;
 			points[6] = (dataBuffer[5] & 0xFF) * 1000;
 			break;
@@ -251,15 +252,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		case HoTTAdapter.SENSOR_TYPE_GPS:
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 			points[0] = (dataBuffer[15] & 0xFF) * 1000;
-			points[1] = HoTTbinReader.parse2Short(dataBuffer, 20) * 10000 + HoTTbinReader.parse2Short(dataBuffer, 22);
+			points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
 			points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
-			points[2] = HoTTbinReader.parse2Short(dataBuffer, 25) * 10000 + HoTTbinReader.parse2Short(dataBuffer, 27);
+			points[2] = DataParser.parse2Short(dataBuffer, 25) * 10000 + DataParser.parse2Short(dataBuffer, 27);
 			points[2] = dataBuffer[24] == 1 ? -1 * points[2] : points[2];
-			points[3] = HoTTbinReader.parse2Short(dataBuffer, 31) * 1000;
-			points[4] = HoTTbinReader.parse2Short(dataBuffer, 33) * 1000;
+			points[3] = DataParser.parse2Short(dataBuffer, 31) * 1000;
+			points[4] = DataParser.parse2Short(dataBuffer, 33) * 1000;
 			points[5] = (dataBuffer[35] & 0xFF) * 1000;
-			points[6] = HoTTbinReader.parse2Short(dataBuffer, 17) * 1000;
-			points[7] = HoTTbinReader.parse2Short(dataBuffer, 29) * 1000;
+			points[6] = DataParser.parse2Short(dataBuffer, 17) * 1000;
+			points[7] = DataParser.parse2Short(dataBuffer, 29) * 1000;
 			points[8] = (dataBuffer[16] & 0xFF) * 1000;
 			points[9] = 0;
 			points[10] = (dataBuffer[8] & 0xFF) * 1000;
@@ -269,9 +270,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		case HoTTAdapter.SENSOR_TYPE_GENERAL:
 			//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
 			points[0] = (dataBuffer[15] & 0xFF) * 1000;
-			points[1] = HoTTbinReader.parse2Short(dataBuffer, 40) * 1000;
-			points[2] = HoTTbinReader.parse2Short(dataBuffer, 38) * 1000;
-			points[3] = HoTTbinReader.parse2Short(dataBuffer, 42) * 1000;
+			points[1] = DataParser.parse2Short(dataBuffer, 40) * 1000;
+			points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
+			points[3] = DataParser.parse2Short(dataBuffer, 42) * 1000;
 			points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
 			points[5] = 0; //5=Balance
 			for (int j = 0; j < 6; j++) {
@@ -283,13 +284,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			}
 			//calculate balance on the fly
 			points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
-			points[12] = HoTTbinReader.parse2Short(dataBuffer, 31) * 1000;
-			points[13] = HoTTbinReader.parse2Short(dataBuffer, 33) * 1000;
-			points[14] = HoTTbinReader.parse2Short(dataBuffer, 35) * 1000;
+			points[12] = DataParser.parse2Short(dataBuffer, 31) * 1000;
+			points[13] = DataParser.parse2Short(dataBuffer, 33) * 1000;
+			points[14] = DataParser.parse2Short(dataBuffer, 35) * 1000;
 			points[15] = (dataBuffer[37] & 0xFF) * 1000;
-			points[16] = HoTTbinReader.parse2Short(dataBuffer, 29) * 1000;
-			points[17] = HoTTbinReader.parse2Short(dataBuffer, 22) * 1000;
-			points[18] = HoTTbinReader.parse2Short(dataBuffer, 24) * 1000;
+			points[16] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+			points[17] = DataParser.parse2Short(dataBuffer, 22) * 1000;
+			points[18] = DataParser.parse2Short(dataBuffer, 24) * 1000;
 			points[19] = (dataBuffer[26] & 0xFF) * 1000;
 			points[20] = (dataBuffer[27] & 0xFF) * 1000;
 			break;
@@ -297,9 +298,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		case HoTTAdapter.SENSOR_TYPE_ELECTRIC:
 			//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
 			points[0] = (dataBuffer[15] & 0xFF) * 1000;
-			points[1] = HoTTbinReader.parse2Short(dataBuffer, 40) * 1000;
-			points[2] = HoTTbinReader.parse2Short(dataBuffer, 38) * 1000;
-			points[3] = HoTTbinReader.parse2Short(dataBuffer, 42) * 1000;
+			points[1] = DataParser.parse2Short(dataBuffer, 40) * 1000;
+			points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
+			points[3] = DataParser.parse2Short(dataBuffer, 42) * 1000;
 			points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
 			points[5] = 0; //5=Balance
 			for (int j = 0; j < 14; j++) {
@@ -311,11 +312,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			}
 			//calculate balance on the fly
 			points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
-			points[20] = HoTTbinReader.parse2Short(dataBuffer, 36) * 1000;
-			points[21] = HoTTbinReader.parse2Short(dataBuffer, 44) * 1000;
+			points[20] = DataParser.parse2Short(dataBuffer, 36) * 1000;
+			points[21] = DataParser.parse2Short(dataBuffer, 44) * 1000;
 			points[22] = (dataBuffer[46] & 0xFF) * 1000;
-			points[23] = HoTTbinReader.parse2Short(dataBuffer, 30) * 1000;
-			points[24] = HoTTbinReader.parse2Short(dataBuffer, 32) * 1000;
+			points[23] = DataParser.parse2Short(dataBuffer, 30) * 1000;
+			points[24] = DataParser.parse2Short(dataBuffer, 32) * 1000;
 			points[25] = (dataBuffer[34] & 0xFF) * 1000;
 			points[26] = (dataBuffer[35] & 0xFF) * 1000;
 			break;
