@@ -23,6 +23,7 @@ import gde.data.Channel;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.graupner.HoTTbinReader;
 import gde.exception.NotSupportedException;
 import gde.io.CSVReaderWriter;
 import gde.io.CSVSerialDataReaderWriter;
@@ -522,7 +523,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 	}
 
 	/**
-	 * test reading NMEA files %TEMP%\Write_1_OSD and writes OSD files to %TEMP%\Write_2_OSD
+	 * test reading CSV files in configured base directory (DataExplorer.properties and writes OSD files to %TEMP%\Write_1_OSD
 	 * all files must identical except time stamp
 	 */
 	public final void testCSVAdapterWriterOsd() {
@@ -564,6 +565,76 @@ public class TestFileReaderWriter extends TestSuperClass {
 						String tmpDir2 = this.tmpDir + "Write_2_OSD" + GDE.FILE_SEPARATOR;
 						new File(tmpDir2).mkdirs();
 						String absolutFilePath = tmpDir2 + file.getName();
+						System.out.println("writing as   : " + absolutFilePath);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						failures.put(file.getAbsolutePath(), e);
+					}
+				}
+			}
+
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
+	/**
+	 * test reading CSV files in configured base directory (DataExplorer.properties and writes OSD files to %TEMP%\Write_1_OSD
+	 * all files must identical except time stamp
+	 */
+	public final void testHoTTAdapterWriterOsd() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		try {
+			String binDir = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "HoTTAdapter" + GDE.FILE_SEPARATOR;
+			List<File> files = FileUtils.getFileListing(new File(binDir));
+
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".bin")) {
+					System.out.println("working with : " + file);
+					try {
+						//System.out.println("file.getPath() = " + file.getPath());
+						String deviceName = file.getPath().substring(0, file.getPath().lastIndexOf(GDE.FILE_SEPARATOR));
+						deviceName = deviceName.substring(1+deviceName.lastIndexOf(GDE.FILE_SEPARATOR));
+						//System.out.println("deviceName = " + deviceName);
+						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+						if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
+
+						IDevice device = this.getInstanceOfDevice(deviceConfig);
+						this.application.setActiveDeviceWoutUI(device);
+
+						setupDataChannels(device);
+
+						this.channels.setActiveChannelNumber(1);
+						Channel activeChannel = this.channels.getActiveChannel();
+						activeChannel.setFileName(file.getAbsolutePath());
+						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from NMEA file");
+						activeChannel.setSaved(true);
+
+						HoTTbinReader.read(file.getAbsolutePath());
+						RecordSet recordSet = activeChannel.getActiveRecordSet();
+
+						if (recordSet != null) {
+							activeChannel.setActiveRecordSet(recordSet);
+							activeChannel.applyTemplate(recordSet.getName(), true);
+							//device.makeInActiveDisplayable(recordSet);
+							drawCurves(recordSet, 1024, 768);
+						}
+
+						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
+						new File(tmpDir1).mkdirs();
+						String absolutFilePath = tmpDir1 + file.getName();
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 					}
