@@ -455,7 +455,7 @@ public class HoTTbinReader {
 			}
 			log.log(Level.WARNING, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 
-			if (channel != null) {
+			if (application.getMenuToolBar() != null && channel != null) {
 				RecordSet actualRecordSet = channel.get(recordSetName);
 				device.updateVisibilityStatus(actualRecordSet, true);
 				String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
