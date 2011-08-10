@@ -158,4 +158,31 @@ public class DataParser {
 	public int[] getValues() {
 		return values;
 	}
+
+	/**
+	 * parse 4 byte of a data buffer to integer value
+	 * @param buffer
+	 * @param startIndex index of low byte
+	 */
+	public static int parse2Int(byte[] buffer, int startIndex) {
+		return (((buffer[startIndex+3] & 0xff) << 24) | ((buffer[startIndex+2] & 0xff) << 16) | ((buffer[startIndex+1] & 0xff) << 8) | (buffer[startIndex] & 0xff));
+	}
+	
+	/**
+	 * parse 2 byte of a data buffer to integer value, buffer byte sequence low byte high byte
+	 * @param buffer
+	 * @param startIndex index of low byte 
+	 */
+	public static short parse2Short(byte[] buffer, int startIndex) {
+		return (short) (((buffer[startIndex+1] & 0xff) << 8) | (buffer[startIndex] & 0xff));
+	}
+	
+	/**
+	 * parse high and low byte to integer value
+	 * @param low byte
+	 * @param high byte
+	 */
+	public static short parse2Short(byte low, byte high) {
+		return (short) (((high & 0xFF) << 8) | (low & 0xFF));
+	}
 }
