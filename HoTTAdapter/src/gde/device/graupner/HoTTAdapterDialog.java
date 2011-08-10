@@ -264,10 +264,10 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.timeZoneOffsetUTCLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.timeZoneOffsetUTCLabel.setText(Messages.getString(MessageIds.GDE_MSGT2411));
 						FormData timeZoneOffsetUTCLabelLData = new FormData();
-						timeZoneOffsetUTCLabelLData.width = 120;
+						timeZoneOffsetUTCLabelLData.width = 100;
 						timeZoneOffsetUTCLabelLData.height = 20;
 						timeZoneOffsetUTCLabelLData.bottom = new FormAttachment(1000, 1000, -50);
-						timeZoneOffsetUTCLabelLData.right = new FormAttachment(1000, 1000, -90);
+						timeZoneOffsetUTCLabelLData.right = new FormAttachment(1000, 1000, -100);
 						this.timeZoneOffsetUTCLabel.setLayoutData(timeZoneOffsetUTCLabelLData);
 					}
 					{
@@ -275,7 +275,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.timeZoneOffsetUTCCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.timeZoneOffsetUTCCombo.setItems(this.deltaUTC);
 						FormData timeZoneOffsetUTCComboLData = new FormData();
-						timeZoneOffsetUTCComboLData.width = 40;
+						timeZoneOffsetUTCComboLData.width = 55;
 						timeZoneOffsetUTCComboLData.height = 17;
 						timeZoneOffsetUTCComboLData.bottom = new FormAttachment(1000, 1000, -50);
 						timeZoneOffsetUTCComboLData.right = new FormAttachment(1000, 1000, -40);
