@@ -22,6 +22,7 @@ import gde.comm.DeviceCommPort;
 import gde.device.DeviceConfiguration;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
+import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
@@ -85,12 +86,14 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			this.read(answer, 3000);
 			readDataBlock(data);
 
-			log.logp(java.util.logging.Level.OFF, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(data));
-			log.logp(java.util.logging.Level.OFF, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data));
-
+			if (log.isLoggable(Level.FINE)) {
+				log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(data));
+				log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data));
+			}
+			
 			if (checkBeginEndSignature && !(data[2] == HoTTAdapterSerialPort.DATA_BEGIN && data[data.length - 2] == HoTTAdapterSerialPort.DATA_END)) {
 				this.addXferError();
-				log.logp(java.util.logging.Level.WARNING, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME,
+				log.logp(Level.WARNING, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors());
 				if (this.getXferErrors() > HoTTAdapterSerialPort.xferErrorLimit)
 					throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + HoTTAdapterSerialPort.xferErrorLimit);
@@ -99,7 +102,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
-				log.logp(java.util.logging.Level.SEVERE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.SEVERE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 			throw e;
 		}

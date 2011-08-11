@@ -119,7 +119,7 @@ public class HoTTbinReader {
 		byte[] buf = new byte[dataBlockSize];
 		byte[] buf0 = new byte[42], buf1 = null, buf2 = null, buf3 = null, buf4 = null;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		if (application.getStatusBar() != null) application.setProgress(0, sThreadId);
+		if (HoTTbinReader.application.getStatusBar() != null) HoTTbinReader.application.setProgress(0, sThreadId);
 		
 		try {
 			//read all the data blocks from the file and parse
@@ -133,11 +133,11 @@ public class HoTTbinReader {
 					case HoTTAdapter.SENSOR_TYPE_RECEIVER: //receiver data only
 						//check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetReceiver == null) {
-							channel = channels.get(1);
+							channel = HoTTbinReader.channels.get(1);
 							recordSetName = (channel.size() + 1) + recordSetNameExtend; //$NON-NLS-1$
 							recordSetReceiver = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 							channel.put(recordSetName, recordSetReceiver);
-							if (application.getMenuToolBar() != null) {
+							if (HoTTbinReader.application.getMenuToolBar() != null) {
 								channel.applyTemplate(recordSetName, true);
 							}
 							if (lastLoadedSensorType[0] == null || lastLoadedSensorType[1] == null) {
@@ -171,11 +171,11 @@ public class HoTTbinReader {
 					case HoTTAdapter.SENSOR_TYPE_VARIO:
 						//check if recordSetVario initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetVario == null) {
-							channel = channels.get(2);
+							channel = HoTTbinReader.channels.get(2);
 							recordSetName = (channel.size() + 1) + recordSetNameExtend; //$NON-NLS-1$
 							recordSetVario = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 							channel.put(recordSetName, recordSetVario);
-							if (application.getMenuToolBar() != null) {
+							if (HoTTbinReader.application.getMenuToolBar() != null) {
 								channel.applyTemplate(recordSetName, true);
 							}
 							if (lastLoadedSensorType[0] == null || lastLoadedSensorType[1] == null) {
@@ -225,11 +225,11 @@ public class HoTTbinReader {
 					case HoTTAdapter.SENSOR_TYPE_GPS:
 						//check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate ans signals
 						if (recordSetGPS == null) {
-							channel = channels.get(3);
+							channel = HoTTbinReader.channels.get(3);
 							recordSetName = (channel.size() + 1) + recordSetNameExtend; //$NON-NLS-1$
 							recordSetGPS = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 							channel.put(recordSetName, recordSetGPS);
-							if (application.getMenuToolBar() != null) {
+							if (HoTTbinReader.application.getMenuToolBar() != null) {
 								channel.applyTemplate(recordSetName, true);
 							}
 							if (lastLoadedSensorType[0] == null || lastLoadedSensorType[1] == null) {
@@ -288,11 +288,11 @@ public class HoTTbinReader {
 					case HoTTAdapter.SENSOR_TYPE_GENERAL:
 						//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetGeneral == null) {
-							channel = channels.get(4);
+							channel = HoTTbinReader.channels.get(4);
 							recordSetName = (channel.size() + 1) + recordSetNameExtend; //$NON-NLS-1$
 							recordSetGeneral = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 							channel.put(recordSetName, recordSetGeneral);
-							if (application.getMenuToolBar() != null) {
+							if (HoTTbinReader.application.getMenuToolBar() != null) {
 								channel.applyTemplate(recordSetName, true);
 							}
 							if (lastLoadedSensorType[0] == null || lastLoadedSensorType[1] == null) {
@@ -362,11 +362,11 @@ public class HoTTbinReader {
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC:
 						//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetElectric == null) {
-							channel = channels.get(5);
+							channel = HoTTbinReader.channels.get(5);
 							recordSetName = (channel.size() + 1) + recordSetNameExtend; //$NON-NLS-1$
 							recordSetElectric = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 							channel.put(recordSetName, recordSetElectric);
-							if (application.getMenuToolBar() != null) {
+							if (HoTTbinReader.application.getMenuToolBar() != null) {
 								channel.applyTemplate(recordSetName, true);
 							}
 							if (lastLoadedSensorType[0] == null || lastLoadedSensorType[1] == null) {
@@ -446,7 +446,7 @@ public class HoTTbinReader {
 					// add default time step from device of 10 msec
 					timeStep_ms = timeStep_ms += 10;
 
-					if (application.getStatusBar() != null && i % 100 == 0) application.setProgress((int)(i * 100 / numberDatablocks), sThreadId);
+					if (HoTTbinReader.application.getStatusBar() != null && i % 100 == 0) HoTTbinReader.application.setProgress((int)(i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //skip empty block, but add time step
 					++countPackageLoss;
@@ -455,12 +455,12 @@ public class HoTTbinReader {
 			}
 			log.log(Level.WARNING, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 
-			if (application.getMenuToolBar() != null && channel != null) {
+			if (HoTTbinReader.application.getMenuToolBar() != null && channel != null) {
 				RecordSet actualRecordSet = channel.get(recordSetName);
 				device.updateVisibilityStatus(actualRecordSet, true);
 				String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
 				actualRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
-				channels.switchChannel(channel.getName());
+				HoTTbinReader.channels.switchChannel(channel.getName());
 				channel.switchRecordSet(recordSetName);
 				log.log(Level.FINE, "switch to channel " + channel.getName() + GDE.STRING_MESSAGE_CONCAT + recordSetName); //$NON-NLS-1$
 			}
@@ -473,7 +473,7 @@ public class HoTTbinReader {
 
 			log.log(Level.FINE, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
-			if (application.getStatusBar() != null) application.setProgress(100, sThreadId);
+			if (HoTTbinReader.application.getStatusBar() != null) HoTTbinReader.application.setProgress(100, sThreadId);
 		}
 		finally {
 			data_in.close ();
