@@ -138,7 +138,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						HoTTAdapterDialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						HoTTAdapterDialog.this.application.openHelpDialog("NMEA-Adapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						HoTTAdapterDialog.this.application.openHelpDialog("HoTTAdapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				// enable fade in/out alpha blending (do not fade-in on top)
@@ -333,7 +333,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								HoTTAdapterDialog.log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								HoTTAdapterDialog.this.application.openHelpDialog("NMEA-Adapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+								HoTTAdapterDialog.this.application.openHelpDialog("HoTTAdapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 							}
 						});
 					}
