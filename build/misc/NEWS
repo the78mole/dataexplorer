@@ -1,11 +1,15 @@
 GNU DataExplorer - News - comes with version 2.84
 
-Version 2.84 - 04 Jul 2011
+Version 2.90 - 12 Aug 2011
 
-1) fix error in UltraDuoPlus dialog restore of backup functionality
-2) fix error in UltraDuoPlus dialog while sync date PC-Device
-3) enable deletion of application settings
-4) documentation update
+1) update SWT to 3.7 final stable release
+2) make bluetooth serial ports recognition configurable
+3) update device properties XSD to version 14
+4) add HoTTAdapter implementation
+5) fix measurement function for synchronized measurement data
+6) fix update problem of digital display tabulator while changing curve selection
+7) documentation update
+
 
 
 

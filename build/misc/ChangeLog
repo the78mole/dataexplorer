@@ -1,13 +1,13 @@
 Development history / change log, please read from bottom up
 
-Version 2.90 - xx yy 2011
+Version 2.90 - 12 Aug 2011
 update SWT to 3.7 final stable release
 make bluetooth serial ports recognition configurable
 update device properties XSD to version 14
 add HoTTAdapter implementation
 fix measurement function for synchronized measurement data
 fix update problem of digital display tabulator while changing curve selection
-
+documentation update
 
 Version 2.84 - 04 Jul 2011
 
