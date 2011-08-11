@@ -47,7 +47,7 @@ This will specify that a later make install will install the compiled files into
 If you want them to be installed someplace else, such as $PREFIX/DataExplorer, then specify that when 
 you run configure:
 
-./configure --prefix $PREFIX
+./configure --prefix=$PREFIX
 
 If you have installed DataExplorer before, make sure you have removed menu entries.
 
