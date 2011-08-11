@@ -125,14 +125,12 @@ public class HoTTAdapterDialogTabItem extends CTabItem {
 				}
 			}
 			this.scolledComposite.addControlListener(new ControlListener() {
-				@Override
 				public void controlResized(ControlEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "scolledComposite.controlResized, event=" + evt);
 					int height = 35 + HoTTAdapterDialogTabItem.this.device.getChannelMeasuremts(HoTTAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
 					HoTTAdapterDialogTabItem.this.mainTabComposite.setSize(HoTTAdapterDialogTabItem.this.scolledComposite.getClientArea().width, height);
 				}
 
-				@Override
 				public void controlMoved(ControlEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "scolledComposite.controlMoved, event=" + evt);
 					int height = 35 + HoTTAdapterDialogTabItem.this.device.getChannelMeasuremts(HoTTAdapterDialogTabItem.this.parent.getSelectionIndex() + 1).size() * 28 / 2;
