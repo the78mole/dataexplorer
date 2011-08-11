@@ -57,7 +57,7 @@ For Windows user a proper place is %ProgramFiles% for GNU/Linux user "/opt" or "
 
 Attention: Do not use special characters in path, Java using UTF-8 as default, conversion problems could occur!
 
-For the first execution use a command window (Windows), shell (GNU/Linux) and change into the just created DataExplorer
+For the first execution use a command window (Windows), shell (GNU/Linux), Terminal (Mac OS) and change into the just created DataExplorer
 directory and execute running Windows, DataExplorer.exe, running GNU/Linux, DataExplorer. For Mac OS the start
 script is located /Applications/DataExplorer.app/Contents/MacOS/DataExplorerMac32, if the icons seams not accessible.
 This dynamically written files containing the application configuration and/or device configuration data are public domain. 
@@ -73,7 +73,7 @@ DataExplorer.desktop (GNU/Linux)
 DataExplorerMac32 (Mac OS)
 DevicePropertiesEditorMac32 (Mac OS)
 DataExplorer.icns (Mac OS)
-RXTX_Post-Install_MacOS.txt (Mac OS)
+RXTX_Post-Install_MacOS.sh (Mac OS)
 
 Main program files are:
 ../DataExplorer.jar

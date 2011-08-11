@@ -57,7 +57,7 @@ Für Windowsbenutzer wäre das z.B. %ProgramFiles% für GNU/Linux-Benutzer "/opt" o
 
 Achtung: Bitte keine Umlaute im Installationspfad benutzen, Java arbeitet standardmäßig mit UTF-8, da kann es Probleme mit der Konvertierung in der Laufzeitumgebung geben!
 
-Für den ersten Start des Programms über ein Kommando-Fenster(Windows), Shell(GNU/Linux) in das DataExplorer Verzeichnis 
+Für den ersten Start des Programms über ein Kommando-Fenster(Windows), Shell(GNU/Linux) , Terminal (Mac OS) in das DataExplorer Verzeichnis 
 wechseln und unter Windows, DataExplorer.exe oder Unix, DataExplorer, ausführen. Mac OS Benutzer finden das Startskript 
 unter /Applicatons/DataExplorer.app(Contents/MacOS/DataExplorerMac32, falls der Icon nicht funktioniert.
 
@@ -70,7 +70,7 @@ DataExplorer.desktop (GNU/Linux)
 DevicePropertiesEditor.desktop (GNU/Linux)
 DataExplorerMac32/64 (Mac OS)
 DevicePropertiesEditorMac32/64 (Mac OS)
-RXTX_Post-Install_MacOS.txt (Mac OS)
+RXTX_Post-Install_MacOS.sh (Mac OS)
 
 Andere Programmresourcen sind:
 ../DataExplorer.jar
