@@ -172,6 +172,7 @@
 		<ant antfile="build.xml" target="clean" dir="NMEA-Adapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="UltramatUDP" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="HoTTAdapter" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="UniLog2" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -274,6 +275,7 @@
 		<ant antfile="build.xml" target="package" dir="NMEA-Adapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="UltramatUDP" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="HoTTAdapter" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="UniLog2" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -293,6 +295,7 @@
 			<include name="NMEA-Adapter/build/*.jar" />
 			<include name="UltramatUDP/build/*.jar" />
 			<include name="HoTTAdapter/build/*.jar" />
+			<include name="UniLog2/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>

@@ -1,5 +1,11 @@
 Development history / change log, please read from bottom up
 
+Version 2.91 - xx Aug 2011
+add HoTTAdapter implementation for 115200 Baud transmitter
+HoTTAdapter live data gatherer detecting sensor type automatically
+add UniLog2 device implementation
+
+
 Version 2.90 - 12 Aug 2011
 update SWT to 3.7 final stable release
 make bluetooth serial ports recognition configurable
