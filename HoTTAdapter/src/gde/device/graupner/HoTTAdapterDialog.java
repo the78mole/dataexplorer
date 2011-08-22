@@ -188,6 +188,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 									HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(false);
 									HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(true);
 									HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(false);
+									HoTTAdapterDialog.this.inputFileButton.setEnabled(false);
 								}
 								catch (Exception e) {
 									HoTTAdapterDialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
@@ -195,6 +196,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 									HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
 									HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
 									HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(true);
+									HoTTAdapterDialog.this.inputFileButton.setEnabled(true);
 								}
 							}
 						});
@@ -218,6 +220,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
 								HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
 								HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(true);
+								HoTTAdapterDialog.this.inputFileButton.setEnabled(true);
 							}
 						});
 					}
@@ -411,16 +414,27 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	 * reset the button states
 	 */
 	public void resetButtons() {
-		HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
-		HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
-		HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(true);
+		this.dialogShell.getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
+				HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
+				HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(true);
+				HoTTAdapterDialog.this.inputFileButton.setEnabled(true);
+			}
+		});
 	}
 	
 	/**
 	 * switch to the tab when sensor is detected
 	 * @param index
 	 */
-	public void selectTab(int index) {
-		this.tabFolder.setSelection(index);
+	public void selectTab(final int index) {
+		this.dialogShell.getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				HoTTAdapterDialog.this.tabFolder.setSelection(index);
+			}
+		});
 	}
 }
