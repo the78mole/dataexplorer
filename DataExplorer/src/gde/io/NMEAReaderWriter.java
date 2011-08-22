@@ -141,7 +141,9 @@ public class NMEAReaderWriter {
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$		
 				Vector<String> lines = new Vector<String>();
 				//skip SM GPS-Logger setup sentence
-				while ((line = reader.readLine()) == null || line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name())
+				while ((line = reader.readLine()) == null || line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) 
+						|| line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name())
+						|| line.startsWith(device.getDataBlockLeader() + NMEA.UL2SETUP.name())
 						|| !line.startsWith(device.getDataBlockLeader())) {
 					if (line != null && (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name()))) {
 						Vector<String> setupLine = new Vector<String>();

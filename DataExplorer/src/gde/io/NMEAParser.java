@@ -73,7 +73,9 @@ public class NMEAParser {
 		//NMEA sentences
 		GPRMC, GPGSA, GPGGA, GPVTG, GPGSV, GPRMB, GPGLL, GPZDA, 
 		//additional SM-Modellbau GPS-Logger NMEA sentences
-		GPSSETUP, SETUP, SMGPS, MLINK, UNILOG, KOMMENTAR, COMMENT
+		GPSSETUP, SETUP, SMGPS, MLINK, UNILOG, KOMMENTAR, COMMENT,
+		//additional SM-Modellbau UniLog2 sentences
+		UL2SETUP, UL2
 	}
 
 	/**
@@ -202,6 +204,13 @@ public class NMEAParser {
 //								log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, "line number " + this.lineNumber + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 //							}
 					break;
+				case UL2SETUP: // UniLog2 setup
+					this.deviceSerialNumber = String.format("%d", Integer.parseInt(strValues[1].trim(), 16)); //$NON-NLS-1$
+					this.firmwareVersion = String.format("%.2f", Integer.parseInt(strValues[2].trim(), 16)/100.0); //$NON-NLS-1$
+					break;
+				case UL2:
+					if (this.values.length >=25) parseUNILOG2(strValues);
+					break;
 				}
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
@@ -237,7 +246,7 @@ public class NMEAParser {
 				String subSentence = sentence.substring(1, sentence.indexOf(GDE.STRING_STAR));
 				isOK = tmpCheckSum == Checksum.XOR(subSentence.toCharArray());
 				if (!isOK) 
-					log.logp(Level.WARNING, $CLASS_NAME, "parse()", String.format("line number %d : checkSum 0x%s missmatch 0x%X in %s!", this.lineNumber, hexCheckSum, Checksum.XOR(subSentence.getBytes()), subSentence)); //$NON-NLS-1$ //$NON-NLS-2$
+					log.logp(Level.WARNING, $CLASS_NAME, "parse()", String.format("line number %d : checkSum 0x%s missmatch 0x%02X in %s!", this.lineNumber, hexCheckSum, Checksum.XOR(subSentence.getBytes()), subSentence)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		catch (Exception e) {
@@ -856,6 +865,95 @@ public class NMEAParser {
 		//this.values[21] = a1UniLog;
 		//this.values[22] = a2UniLog;
 		//this.values[23] = a3UniLog;
+	}
+
+	/**
+	 * parse SM UNILOG sentence
+	 * $UL2,2011-07-03,16:01:31.30,0.00, 12.37,1.89,-1.5,0.0,23.4,1868.5,4.96,3.6,2.7,18.0,,4.6,4.095,4.085,4.086,0.000,0.000,0.000,949.94,24.8,0.0,0.0*0D
+	 * 1: date
+	 * 2: time stamp absolute with dot hundreds
+	 * 3: time stamp relative with dot hundreds
+	 * 4: voltage [V]
+	 * 5: current [A]
+	 * 6: height (relative) [m]
+	 * 7: climb [m/sec]
+	 * 8: power [W]
+	 * 9: revolution [1/min]
+	 * 10: voltageRx [V]
+	 * 11: capacity [mAh]
+	 * 12: energy [Wmin]
+	 * 13: value A1
+	 * 14: value A2
+	 * 15: value A3
+	 * 16: cell voltage 1 [V]
+	 * 17: cell voltage 2 [V]
+	 * 18: cell voltage 3 [V]
+	 * 19: cell voltage 4 [V]
+	 * 20: cell voltage 5 [V]
+	 * 21: cell voltage 6 [V]
+	 * 22: air pressure [hPa]
+	 * 23: temperature intern [°C]
+	 * 24: servo impuls in [us]
+	 * 25: servo impuls out [us]
+	 * @param strValues
+	 */
+	void parseUNILOG2(String[] strValues) {
+		int maxVotage = Integer.MIN_VALUE;
+		int minVotage = Integer.MAX_VALUE;
+
+		if (this.date == null) {
+			String[] strValueDate = strValues[1].trim().split(GDE.STRING_DASH);
+			this.year = Integer.parseInt(strValueDate[0]);
+			this.month = Integer.parseInt(strValueDate[1]);
+			this.day = Integer.parseInt(strValueDate[2]);
+		}
+		String[] strValueTime = strValues[2].trim().split(GDE.STRING_COLON);
+		int hour = Integer.parseInt(strValueTime[0]) + this.timeOffsetUTC;
+		int minute = Integer.parseInt(strValueTime[1]);
+		int second = 0;
+		if (strValueTime[2].contains(GDE.STRING_DOT)) {
+			second = Integer.parseInt(strValueTime[2].substring(0, strValueTime[2].indexOf(GDE.STRING_DOT)));
+		}
+		else {
+			second = Integer.parseInt(strValueTime[2]);
+		}
+		GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+		long timeStamp = calendar.getTimeInMillis() + (strValueTime[2].contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime[2].substring(strValueTime[2].indexOf(GDE.STRING_DOT) + 1)) : 0);
+
+		if (this.lastTimeStamp < timeStamp) {
+			this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
+			this.lastTimeStamp = timeStamp;
+			this.date = calendar.getTime();
+			log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SS").format(timeStamp)); //$NON-NLS-1$);
+			//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
+			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+			//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
+			//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+			//              000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
+			int[] in2out = {100, 100, 100, 100, 	1, 		2, 15,  16,   4,  13,   0,   3,   5,  18,  19,  20,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
+			for (int i = 4; i < strValues.length; i++) {
+				try {
+					String tmpValue = strValues[i].trim();
+					this.values[in2out[i]] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
+							? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
+							: Double.parseDouble(tmpValue) * 1000.0);
+					if (i >= 16 && i <= 21 && this.values[in2out[i]] > 0) {
+						maxVotage = this.values[in2out[i]] > maxVotage ? this.values[in2out[i]] : maxVotage;
+						minVotage = this.values[in2out[i]] < minVotage ? this.values[in2out[i]] : minVotage;
+					}
+				}
+				catch (Exception e) {
+					// ignore and leave value unchanged
+				}
+			}
+			this.values[6] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
+
+			StringBuilder s = new StringBuilder();
+			for (int value : this.values) {
+				s.append(value).append("; ");
+			}
+			log.log(Level.FINE, s.toString());
+		}
 	}
 
 	/**
