@@ -328,7 +328,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.activeRecordSet = this.application.getActiveRecordSet();
 		if (recordSet != null) {
 			log.log(Level.FINER, "this.size() > 1 " + (this.size() > 1) + "; this.lastActiveRecordSet = " + this.getLastActiveRecordSetName());
-			if (this.size() <= 1) { //apply values from template
+			if (this.size() <= 1 && this.get(this.getLastActiveRecordSetName()).getChannelConfigNumber() == this.get(recordSetKey).getChannelConfigNumber()) { //apply values from template
 				if (this.template != null) this.template.load();
 				if (this.template != null && this.template.isAvailable()) {
 					log.log(Level.FINER, "name = " + this.template.getDefaultFileName());
@@ -395,7 +395,7 @@ public class Channel extends HashMap<String, RecordSet> {
 					recordSet.setHorizontalGridColor(lastActiveRecord.parent.horizontalGridColor);
 					recordSet.setHorizontalGridLineStyle(lastActiveRecord.parent.horizontalGridLineStyle);
 					recordSet.setHorizontalGridType(lastActiveRecord.parent.horizontalGridType);
-					recordSet.setHorizontalGridRecordOrdinal(lastActiveRecord.parent.horizontalGridRecordOrdinal);
+					recordSet.setHorizontalGridRecordOrdinal(lastActiveRecord.parent.horizontalGridRecordOrdinal >= 0 ? lastActiveRecord.parent.horizontalGridRecordOrdinal : 0);
 					if(log.isLoggable(Level.FINER)) log.log(Level.FINER, "record = " + record.name + " isVisible=" + record.isVisible + " isPositionLeft=" + record.isPositionLeft + " isStartpointZero=" + record.isStartpointZero);
 				}
 			}

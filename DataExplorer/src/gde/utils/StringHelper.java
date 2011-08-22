@@ -24,8 +24,11 @@ import gde.device.DataTypes;
 import gde.log.Level;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -550,6 +553,30 @@ public class StringHelper {
 			tmpVec.add(element.toString());
 		}
 		return tmpVec.toArray(new String[0]);
+	}
+	
+	/**
+	 * convert string list to a string, list elements separated by separator character
+	 * @param list
+	 * @param separator
+	 * @return
+	 */
+	public static String listToString(List<String> list, char separator) {
+		Iterator<String> iter = list.iterator();
+		StringBuffer measurements = new StringBuffer(iter.next());
+		while (iter.hasNext())
+			measurements.append(separator).append(iter.next());
+		return measurements.toString();
+	}
+
+	/**
+	 * convert a separator character separated string to a string list
+	 * @param string
+	 * @param separator
+	 * @return
+	 */
+	public static List<String> stringToList(String string, char separator) {
+		return Arrays.asList(string.split(""+separator));
 	}
 
 }
