@@ -65,6 +65,7 @@ public class ReverseCorrectMessagesIds {
 	+ "# range 2100 to 2199 NMEA-Adapter device  \n"  
 	+ "# range 2200 to 2399 Ultramat/UltraDuoPlus devices  \n" 
 	+ "# range 2400 to 2499 HoTTAdapter  \n"  
+	+ "# range 2500 to 2599 UniLog2  \n"
 	// add new supported device here
 	+ " \n";
 
