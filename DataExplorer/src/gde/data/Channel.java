@@ -210,9 +210,9 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * query the last displayed record set name, in case of ChannelTypes.TYPE_CONFIG the last used entry is returned
 	 */ 
 	public String getLastActiveRecordSetName() {
-		if (this.type == ChannelTypes.TYPE_CONFIG && this.keySet() != null)
-			return this.keySet().toArray(new String[1])[0];
-		
+//		if (this.type == ChannelTypes.TYPE_CONFIG && this.keySet() != null)
+//			return this.keySet().toArray(new String[1])[0];
+//		
 		return this.lastActiveRecordSet == null ? this.getFirstRecordSetName() : this.lastActiveRecordSet.name;
 	}
 
@@ -327,8 +327,8 @@ public class Channel extends HashMap<String, RecordSet> {
 		RecordSet recordSet = this.get(recordSetKey);
 		this.activeRecordSet = this.application.getActiveRecordSet();
 		if (recordSet != null) {
-			log.log(Level.FINER, "this.size() > 1 " + (this.size() > 1) + "; this.lastActiveRecordSet = " + this.getLastActiveRecordSetName());
-			if (this.size() <= 1 && this.get(this.getLastActiveRecordSetName()).getChannelConfigNumber() == this.get(recordSetKey).getChannelConfigNumber()) { //apply values from template
+			log.log(Level.OFF, "this.size() > 1 " + (this.size() > 1) + "; this.lastActiveRecordSet = " + this.getLastActiveRecordSetName() +  " - " + this.get(this.getLastActiveRecordSetName()).getChannelConfigNumber() + "!=" +  this.get(recordSetKey).getChannelConfigNumber());
+			if (this.size() <= 1 || (this.type == ChannelTypes.TYPE_CONFIG && this.get(this.getLastActiveRecordSetName()).getChannelConfigNumber() != this.get(recordSetKey).getChannelConfigNumber())) { //apply values from template
 				if (this.template != null) this.template.load();
 				if (this.template != null && this.template.isAvailable()) {
 					log.log(Level.FINER, "name = " + this.template.getDefaultFileName());
@@ -372,9 +372,10 @@ public class Channel extends HashMap<String, RecordSet> {
 				}
 			}
 			else { //take over values from last active record set
+				RecordSet _lastActiveRecordSet = this.get(this.getLastActiveRecordSetName());
 				for (int i = 0; i < recordSet.realSize(); ++i) {
 					Record record = recordSet.get(i);
-					Record lastActiveRecord = this.get(this.getLastActiveRecordSetName()).get(i);
+					Record lastActiveRecord = _lastActiveRecordSet.get(i);
 					if(log.isLoggable(Level.FINER)) log.log(Level.FINER, "lastActiveRecord = " + lastActiveRecord.name + " isVisible=" + lastActiveRecord.isVisible + " isPositionLeft=" + lastActiveRecord.isPositionLeft + " isStartpointZero=" + lastActiveRecord.isStartpointZero);
 					record.setVisible(lastActiveRecord.isVisible);
 					record.setPositionLeft(lastActiveRecord.isPositionLeft);

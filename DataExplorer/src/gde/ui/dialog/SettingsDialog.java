@@ -573,8 +573,8 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINE, "skipBluetoothDevices.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSkipBluetoothDevices(SettingsDialog.this.skipBluetoothDevices.getSelection());
-										if (SettingsDialog.this.skipBluetoothDevices.getSelection()) {
-											SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGI0036));
+										if (!SettingsDialog.this.skipBluetoothDevices.getSelection()) {
+											SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGI0049));
 										}
 									}
 								});
