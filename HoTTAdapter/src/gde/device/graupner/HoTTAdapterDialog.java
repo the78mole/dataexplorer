@@ -26,8 +26,6 @@ import gde.device.graupner.hott.MessageIds;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -54,7 +52,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author Winfried Brügmann
  */
 public class HoTTAdapterDialog extends DeviceDialog {
-	final static Logger					log									= Logger.getLogger(HoTTAdapterDialog.class.getName());
+	final static Logger					log										= Logger.getLogger(HoTTAdapterDialog.class.getName());
 
 	CTabFolder									tabFolder;
 	CTabItem										serialComTabItem;
@@ -63,19 +61,18 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	CLabel											protocolTypesLabel, protocolTypesUnitLabel;
 	CCombo											protocolTypesCombo;
 	Button											inputFileButton;
-	Button 											startLifeDataCapturing, stopLifeDataCapturing;
+	Button											startLifeDataCapturing, stopLifeDataCapturing;
 
-	final HoTTAdapter						device;																																		// get device specific things, get serial port, ...
-	final Settings							settings;																																	// application configuration settings
-	final HoTTAdapterSerialPort	serialPort;																																// open/close port execute getData()....
+	final HoTTAdapter						device;																																			// get device specific things, get serial port, ...
+	final Settings							settings;																																		// application configuration settings
+	final HoTTAdapterSerialPort	serialPort;																																	// open/close port execute getData()....
 
 	HoTTAdapterLiveGatherer			lifeGatherer;
-	boolean											isVisibilityChanged	= false;
+	boolean											isVisibilityChanged		= false;
 
-	int													measurementsCount		= 0;
-	boolean											isProtocolTypeLegacy = true;
-	final List<CTabItem>				configurations			= new ArrayList<CTabItem>();
-	final String[]							protocolTypes				= { "19200", "115200" };
+	int													measurementsCount			= 0;
+	boolean											isProtocolTypeLegacy	= true;
+	final String[]							protocolTypes					= { "19200", "115200" };
 
 	/**
 	 * default constructor initialize all variables required
@@ -101,7 +98,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-			HoTTAdapterDialog.log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -122,12 +119,13 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent evt) {
-						HoTTAdapterDialog.log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (HoTTAdapterDialog.this.device.isChangePropery()) {
 							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { HoTTAdapterDialog.this.device.getPropertiesFileName() });
 							if (HoTTAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
-								HoTTAdapterDialog.log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
+								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								HoTTAdapterDialog.this.device.storeDeviceProperties();
 								setClosePossible(true);
 							}
@@ -136,54 +134,56 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
+					@Override
 					public void helpRequested(HelpEvent evt) {
-						HoTTAdapterDialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						HoTTAdapterDialog.this.application.openHelpDialog("HoTTAdapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
 				// enable fade in/out alpha blending (do not fade-in on top)
-//				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
-//					@Override
-//					public void mouseEnter(MouseEvent evt) {
-//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
-//						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, 20, 25);
-//					}
-//
-//					@Override
-//					public void mouseHover(MouseEvent evt) {
-//						log.log(java.util.logging.Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
-//					}
-//
-//					@Override
-//					public void mouseExit(MouseEvent evt) {
-//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
-//						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 25);
-//					}
-//				});
+				//				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+				//					@Override
+				//					public void mouseEnter(MouseEvent evt) {
+				//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
+				//						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, 20, 25);
+				//					}
+				//
+				//					@Override
+				//					public void mouseHover(MouseEvent evt) {
+				//						log.log(java.util.logging.Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
+				//					}
+				//
+				//					@Override
+				//					public void mouseExit(MouseEvent evt) {
+				//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
+				//						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 25);
+				//					}
+				//				});
 				{
 					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
 
 					{
 						for (int i = 0; i < this.device.getChannelCount(); i++) {
-							this.configurations.add(new HoTTAdapterDialogTabItem(this.tabFolder, this, (i + 1), this.device));
+							new HoTTAdapterDialogTabItem(this.tabFolder, this, (i + 1), this.device);
 						}
 					}
 					{
-						startLifeDataCapturing = new Button(this.dialogShell, SWT.None);
+						this.startLifeDataCapturing = new Button(this.dialogShell, SWT.None);
 						FormData startCapturingButtonLData = new FormData();
 						startCapturingButtonLData.height = GDE.IS_MAC ? 33 : 30;
 						startCapturingButtonLData.left = new FormAttachment(0, 1000, 210);
 						startCapturingButtonLData.width = 200;
 						startCapturingButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -43 : -45);
-						startLifeDataCapturing.setLayoutData(startCapturingButtonLData);
-						startLifeDataCapturing.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						startLifeDataCapturing.setText(Messages.getString(MessageIds.GDE_MSGT2413));
-						startLifeDataCapturing.addSelectionListener(new SelectionAdapter() {
+						this.startLifeDataCapturing.setLayoutData(startCapturingButtonLData);
+						this.startLifeDataCapturing.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.startLifeDataCapturing.setText(Messages.getString(MessageIds.GDE_MSGT2413));
+						this.startLifeDataCapturing.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								HoTTAdapterDialog.log.log(java.util.logging.Level.FINEST, "startLifeDataCapturing.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.log(java.util.logging.Level.FINEST, "startLifeDataCapturing.widgetSelected, event=" + evt); //$NON-NLS-1$
 								try {
-									HoTTAdapterDialog.this.lifeGatherer = new HoTTAdapterLiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this);
+									HoTTAdapterDialog.this.lifeGatherer = new HoTTAdapterLiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort,
+											HoTTAdapterDialog.this);
 									HoTTAdapterDialog.this.lifeGatherer.start();
 									HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(false);
 									HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(true);
@@ -191,7 +191,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 									HoTTAdapterDialog.this.inputFileButton.setEnabled(false);
 								}
 								catch (Exception e) {
-									HoTTAdapterDialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+									log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 									HoTTAdapterDialog.this.serialPort.close();
 									HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
 									HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
@@ -202,25 +202,21 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						});
 					}
 					{
-						stopLifeDataCapturing = new Button(this.dialogShell, SWT.None);
+						this.stopLifeDataCapturing = new Button(this.dialogShell, SWT.None);
 						FormData stopCapturingButtonLData = new FormData();
 						stopCapturingButtonLData.height = GDE.IS_MAC ? 33 : 30;
 						stopCapturingButtonLData.left = new FormAttachment(0, 1000, 210);
 						stopCapturingButtonLData.width = 200;
 						stopCapturingButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
-						stopLifeDataCapturing.setLayoutData(stopCapturingButtonLData);
-						stopLifeDataCapturing.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						stopLifeDataCapturing.setText(Messages.getString(MessageIds.GDE_MSGT2414));
+						this.stopLifeDataCapturing.setLayoutData(stopCapturingButtonLData);
+						this.stopLifeDataCapturing.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.stopLifeDataCapturing.setText(Messages.getString(MessageIds.GDE_MSGT2414));
 						this.stopLifeDataCapturing.setEnabled(false);
-						stopLifeDataCapturing.addSelectionListener(new SelectionAdapter() {
+						this.stopLifeDataCapturing.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								HoTTAdapterDialog.log.log(java.util.logging.Level.FINEST, "stopLifeDataCapturing.widgetSelected, event=" + evt); //$NON-NLS-1$
-								HoTTAdapterDialog.this.lifeGatherer.stopTimerThread();
-								HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
-								HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
-								HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(true);
-								HoTTAdapterDialog.this.inputFileButton.setEnabled(true);
+								log.log(java.util.logging.Level.FINEST, "stopLifeDataCapturing.widgetSelected, event=" + evt); //$NON-NLS-1$
+								HoTTAdapterDialog.this.serialPort.isInterruptedByUser = true;
 							}
 						});
 					}
@@ -238,11 +234,11 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.inputFileButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								HoTTAdapterDialog.log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								if (HoTTAdapterDialog.this.isVisibilityChanged) {
 									String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { HoTTAdapterDialog.this.device.getPropertiesFileName() });
 									if (HoTTAdapterDialog.this.application.openYesNoMessageDialog(HoTTAdapterDialog.this.getDialogShell(), msg) == SWT.YES) {
-										HoTTAdapterDialog.log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
+										log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 										HoTTAdapterDialog.this.device.storeDeviceProperties();
 									}
 								}
@@ -254,6 +250,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.protocolTypesLabel = new CLabel(this.dialogShell, SWT.RIGHT);
 						this.protocolTypesLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.protocolTypesLabel.setText(Messages.getString(MessageIds.GDE_MSGT2411));
+						this.protocolTypesLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2415));
 						FormData timeZoneOffsetUTCLabelLData = new FormData();
 						timeZoneOffsetUTCLabelLData.width = 100;
 						timeZoneOffsetUTCLabelLData.height = 20;
@@ -272,10 +269,11 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						timeZoneOffsetUTCComboLData.right = new FormAttachment(1000, 1000, -45);
 						this.protocolTypesCombo.setLayoutData(timeZoneOffsetUTCComboLData);
 						this.protocolTypesCombo.select(this.isProtocolTypeLegacy ? 0 : 1);
+						this.protocolTypesCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2415));
 						this.protocolTypesCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								HoTTAdapterDialog.log.log(java.util.logging.Level.FINEST, "timeZoneOffsetUTCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.log(java.util.logging.Level.FINEST, "timeZoneOffsetUTCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								HoTTAdapterDialog.this.device.setBaudeRate(Integer.parseInt(HoTTAdapterDialog.this.protocolTypesCombo.getText().trim()));
 								HoTTAdapterDialog.this.isProtocolTypeLegacy = HoTTAdapterDialog.this.protocolTypesCombo.getSelectionIndex() == 0;
 								HoTTAdapterDialog.this.serialPort.setProtocolTypeLegacy(HoTTAdapterDialog.this.isProtocolTypeLegacy);
@@ -287,6 +285,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.protocolTypesUnitLabel = new CLabel(this.dialogShell, SWT.RIGHT);
 						this.protocolTypesUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.protocolTypesUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2412));
+						this.protocolTypesUnitLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2415));
 						FormData timeZoneOffsetUTCUnitLData = new FormData();
 						timeZoneOffsetUTCUnitLData.width = 40;
 						timeZoneOffsetUTCUnitLData.height = 20;
@@ -308,7 +307,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.saveButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								HoTTAdapterDialog.log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								HoTTAdapterDialog.this.device.storeDeviceProperties();
 								HoTTAdapterDialog.this.saveButton.setEnabled(false);
 							}
@@ -327,7 +326,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.helpButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								HoTTAdapterDialog.log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								HoTTAdapterDialog.this.application.openHelpDialog("HoTTAdapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 							}
 						});
@@ -345,7 +344,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								HoTTAdapterDialog.log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								HoTTAdapterDialog.this.dialogShell.dispose();
 							}
 						});
@@ -360,7 +359,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.tabFolder.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							HoTTAdapterDialog.log.log(java.util.logging.Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(java.util.logging.Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
 							int channelNumber = HoTTAdapterDialog.this.tabFolder.getSelectionIndex() + 1;
 							//disable moving curves between configurations
 							if (channelNumber > 0 && channelNumber <= HoTTAdapterDialog.this.device.getChannelCount()) { // enable other tabs for future use
@@ -391,7 +390,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 			}
 		}
 		catch (Exception e) {
-			HoTTAdapterDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
@@ -409,7 +408,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	public Integer getTabFolderSelectionIndex() {
 		return this.tabFolder.getSelectionIndex();
 	}
-	
+
 	/**
 	 * reset the button states
 	 */
@@ -424,7 +423,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 			}
 		});
 	}
-	
+
 	/**
 	 * switch to the tab when sensor is detected
 	 * @param index

@@ -131,6 +131,7 @@ public class HoTTbinReader {
 					//create and fill sensor specific data record sets 
 					switch ((byte)(buf[7] & 0xFF)) {
 					case HoTTAdapter.SENSOR_TYPE_RECEIVER: //receiver data only
+					case HoTTAdapter.SENSOR_TYPE_RECEIVER_L: //receiver data only
 						//check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetReceiver == null) {
 							channel = HoTTbinReader.channels.get(1);
@@ -169,6 +170,7 @@ public class HoTTbinReader {
 						break;
 
 					case HoTTAdapter.SENSOR_TYPE_VARIO:
+					case HoTTAdapter.SENSOR_TYPE_VARIO_L:
 						//check if recordSetVario initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetVario == null) {
 							channel = HoTTbinReader.channels.get(2);
@@ -223,6 +225,7 @@ public class HoTTbinReader {
 					break;
 					
 					case HoTTAdapter.SENSOR_TYPE_GPS:
+					case HoTTAdapter.SENSOR_TYPE_GPS_L:
 						//check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate ans signals
 						if (recordSetGPS == null) {
 							channel = HoTTbinReader.channels.get(3);
@@ -286,6 +289,7 @@ public class HoTTbinReader {
 					break;
 					
 					case HoTTAdapter.SENSOR_TYPE_GENERAL:
+					case HoTTAdapter.SENSOR_TYPE_GENERAL_L:
 						//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetGeneral == null) {
 							channel = HoTTbinReader.channels.get(4);
@@ -360,6 +364,7 @@ public class HoTTbinReader {
 					break;
 					
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC:
+					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_L:
 						//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetElectric == null) {
 							channel = HoTTbinReader.channels.get(5);
@@ -490,6 +495,6 @@ public class HoTTbinReader {
 		for (int j = 0; j < buf4.length; j++) {
 			s.append(String.format("%4d", buf4[j] & 0xff));
 		}
-		log.log(Level.OFF, s.toString());
+		log.log(Level.FINE, s.toString());
 	}
 }

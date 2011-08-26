@@ -36,8 +36,6 @@ import gde.utils.WaitTimer;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Logger;
 
 /**
@@ -55,14 +53,14 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	Channel												channel;
 	Integer												channelNumber;
 	int														timeStep_ms									= 1000;
-	Timer													timer;
-	TimerTask											timerTask;
+//	Timer													timer;
+//	TimerTask											timerTask;
 	boolean												isTimerTaskActive						= true;
 	boolean												isPortOpenedByLiveGatherer	= false;
 	boolean												isSwitchedRecordSet					= false;
 	boolean												isGatheredRecordSetVisible	= true;
 	byte													sensorType									= (byte) 0x80;
-	int														queryGapTime_ms							= 20;
+	int														queryGapTime_ms							= 30;
 
 	// offsets and factors are constant over thread live time
 	final HashMap<String, Double>	calcValues									= new HashMap<String, Double>();
@@ -161,9 +159,6 @@ public class HoTTAdapterLiveGatherer extends Thread {
 
 		// prepare timed data gatherer thread
 		this.serialPort.isInterruptedByUser = false;
-		int delay = 0;
-		int period = this.timeStep_ms;
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		this.channel = this.application.getActiveChannel();
 		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
@@ -171,113 +166,99 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		if (log.isLoggable(Level.FINE))
 			log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 		final RecordSet recordSet = this.channel.get(recordSetKey);
-		this.channel.applyTemplateBasics(recordSetKey);
+		//this.channel.applyTemplateBasics(recordSetKey);
 		//this.device.updateInitialRecordSetComment(recordSet);
-		recordSet.setTimeStep_ms(this.timeStep_ms);
+		//recordSet.setTimeStep_ms(this.timeStep_ms);
 		final int[] points = new int[recordSet.size()];
 		final HoTTAdapter usedDevice = this.device;
 
-		if (!this.serialPort.isInterruptedByUser) {
-			this.timer = new Timer();
-			this.timerTask = new TimerTask() {
-			long	measurementCount	= 0;
+		long	measurementCount	= 0;
+		final long startTime = System.nanoTime()/1000000;
+		long lastTimeStamp = startTime, delayTime = 0;
+		while (!this.serialPort.isInterruptedByUser) {
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
+				try {
+					if (HoTTAdapterLiveGatherer.this.isTimerTaskActive) {
+						// prepare the data for adding to record set
+						if (log.isLoggable(Level.FINE))
+							log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
 
-				@Override
-				public void run() {
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "====> entry"); //$NON-NLS-1$
-					try {
-						if (HoTTAdapterLiveGatherer.this.isTimerTaskActive) {
-							// prepare the data for adding to record set
-							if (log.isLoggable(Level.FINE))
-								log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
+						// build the point array according curves from record set
+						if (HoTTAdapterLiveGatherer.this.serialPort.isProtocolTypeLegacy) {
+							HoTTAdapterLiveGatherer.this.serialPort.getData(true);
+							WaitTimer.delay(queryGapTime_ms);
+//							HoTTAdapterLiveGatherer.this.serialPort.getData(true);
+//							WaitTimer.delay(queryGapTime_ms);
+							recordSet.addPoints(usedDevice.convertDataBytes(points, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime()/1000000 - startTime);
+						}
+						else {
+							HoTTAdapterLiveGatherer.this.serialPort.getData();
+							WaitTimer.delay(queryGapTime_ms);
+//							HoTTAdapterLiveGatherer.this.serialPort.getData();
+//							WaitTimer.delay(queryGapTime_ms);
+							recordSet.addPoints(usedDevice.convertDataBytes(points, HoTTAdapterLiveGatherer.this.serialPort.getData()), System.nanoTime()/1000000 - startTime);
+						}
 
-							// build the point array according curves from record set
-							if (HoTTAdapterLiveGatherer.this.serialPort.isProtocolTypeLegacy) {
-								recordSet.addPoints(usedDevice.convertDataBytes(points, HoTTAdapterLiveGatherer.this.serialPort.getData(true)));
-							}
-							else {
-								recordSet.addPoints(usedDevice.convertDataBytes(points, HoTTAdapterLiveGatherer.this.serialPort.getData()));
-							}
+						// switch the active record set if the current record set is child of active channel
+						if (!HoTTAdapterLiveGatherer.this.isSwitchedRecordSet && HoTTAdapterLiveGatherer.this.channel.getName().equals(HoTTAdapterLiveGatherer.this.channels.getActiveChannel().getName())) {
+							HoTTAdapterLiveGatherer.this.channel.applyTemplateBasics(recordSetKey);
+							HoTTAdapterLiveGatherer.this.application.getMenuToolBar().addRecordSetName(recordSetKey);
+							HoTTAdapterLiveGatherer.this.channels.getActiveChannel().switchRecordSet(recordSetKey);
+							HoTTAdapterLiveGatherer.this.isSwitchedRecordSet = true;
+						}
 
-							// switch the active record set if the current record set is child of active channel
-							if (!HoTTAdapterLiveGatherer.this.isSwitchedRecordSet && HoTTAdapterLiveGatherer.this.channel.getName().equals(HoTTAdapterLiveGatherer.this.channels.getActiveChannel().getName())) {
-								HoTTAdapterLiveGatherer.this.channel.applyTemplateBasics(recordSetKey);
-								HoTTAdapterLiveGatherer.this.application.getMenuToolBar().addRecordSetName(recordSetKey);
-								HoTTAdapterLiveGatherer.this.channels.getActiveChannel().switchRecordSet(recordSetKey);
-								HoTTAdapterLiveGatherer.this.isSwitchedRecordSet = true;
-							}
-
-							if (++this.measurementCount % 5 == 0) {
-								HoTTAdapterLiveGatherer.this.device.updateVisibilityStatus(recordSet, true);
-							}
-							if (recordSet.isChildOfActiveChannel() && recordSet.equals(HoTTAdapterLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
-								HoTTAdapterLiveGatherer.this.application.updateAllTabs(false);
-							}
+						if (++measurementCount % 5 == 0) {
+							HoTTAdapterLiveGatherer.this.device.updateVisibilityStatus(recordSet, true);
+						}
+						if (recordSet.isChildOfActiveChannel() && recordSet.equals(HoTTAdapterLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
+							HoTTAdapterLiveGatherer.this.application.updateAllTabs(false);
 						}
 					}
-					catch (DataInconsitsentException e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
-						String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
-						cleanup(recordSetKey, message);
-					}
-					catch (TimeOutException e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
-						String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
-						//TODO + System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1301); //$NON-NLS-1$ 
-						cleanup(recordSetKey, message);
-					}
-					catch (IOException e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
-						String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
-						//TODO + System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1301); //$NON-NLS-1$ 
-						cleanup(recordSetKey, message);
-					}
-					catch (Throwable e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
-						String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$ 
-						cleanup(recordSetKey, message);
-					}
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
 				}
-			};
+				catch (DataInconsitsentException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
+					cleanup(recordSetKey, message);
+				}
+				catch (TimeOutException e) {
+					log.log(Level.WARNING, e.getMessage());
+					application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })); 
+				}
+				catch (IOException e) {
+					log.log(Level.WARNING, e.getMessage());
+					application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })); 
+				}
+				catch (Throwable e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					application.openMessageDialogAsync(e.getClass().getSimpleName() + " - " + e.getMessage()); //$NON-NLS-1$
+					finalizeRecordSet(recordSetKey);
+				}
+				WaitTimer.delay(100); //make sure we have such a pause while receiving data even we have 
+				
+				long deltatime = System.nanoTime()/1000000 - lastTimeStamp;
+				delayTime = timeStep_ms - deltatime;
 
-			// start the prepared timer thread within the live data gatherer thread
-			this.timer.scheduleAtFixedRate(this.timerTask, delay, period);
-			this.isTimerTaskActive = true;
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "======> delay time = " + delayTime); //$NON-NLS-1$
+				if (delayTime > 0) WaitTimer.delay(delayTime);
+				lastTimeStamp = System.nanoTime()/1000000;
+			}
+			finalizeRecordSet(recordSetKey);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "exit"); //$NON-NLS-1$
 		}
-		else {
-			cleanup(recordSetKey, null);
-		}
-	}
 
 	/**
 	 * close port, set isDisplayable according channel configuration and calculate slope
 	 * @param recordSetKey
 	 */
 	public void finalizeRecordSet(String recordSetKey) {
-		if (this.isPortOpenedByLiveGatherer) this.serialPort.close();
-
+		this.serialPort.isInterruptedByUser = true;
+		this.serialPort.close();
 		RecordSet recordSet = this.channel.get(recordSetKey);
 		this.device.updateVisibilityStatus(recordSet, false);
 		this.device.makeInActiveDisplayable(recordSet);
 		this.application.updateStatisticsData();
 		this.application.updateDataTable(recordSetKey, false);
-	}
-
-	/**
-	 * stop the timer task thread, this tops data capturing
-	 * waits for all running timers tasks are ended before return 
-	 */
-	public void stopTimerThread() {
-		if (this.timerTask != null) this.timerTask.cancel();
-		if (this.timer != null) {
-			this.timer.cancel();
-			this.timer.purge();
-		}
-		this.isTimerTaskActive = false;
-		WaitTimer.delay(this.timeStep_ms + 200);
-		if (this.isPortOpenedByLiveGatherer) this.serialPort.close();
+		this.device.getDialog().resetButtons();
 	}
 
 	/**
@@ -286,15 +267,15 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	 * @param message
 	 */
 	void cleanup(final String recordSetKey, String message) {
-		this.stopTimerThread();
-		boolean isErrorState = this.isTimerTaskActive;
+		this.serialPort.isInterruptedByUser = true;
+		this.serialPort.close();
 		this.channel.get(recordSetKey).clear();
 		this.channel.remove(recordSetKey);
 		this.application.getMenuToolBar().updateRecordSetSelectCombo();
 		this.application.updateStatisticsData();
 		this.application.updateDataTable(recordSetKey, true);
 		this.device.getDialog().resetButtons();
-		if (message != null && message.length() > 5 && isErrorState) {
+		if (message != null && message.length() > 5) {
 			this.application.openMessageDialog(this.dialog.getDialogShell(), message);
 		}
 	}

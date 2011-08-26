@@ -130,11 +130,11 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	 */
 	private synchronized byte[] readDataBlock(byte[] data) throws IOException, TimeOutException {
 		this.write(this.SENSOR_TYPE);
-		this.read(HoTTAdapterSerialPort.ANSWER, 1000);
+		this.read(HoTTAdapterSerialPort.ANSWER, 3000);
 		data[0] = this.SENSOR_TYPE[0];
 		data[1] = HoTTAdapterSerialPort.ANSWER[0];
 		if (HoTTAdapterSerialPort.ANSWER[0] == this.SENSOR_TYPE[0]) {
-			this.read(this.ANSWER_DATA, 1000);
+			this.read(this.ANSWER_DATA, 3000);
 		}
 		System.arraycopy(this.ANSWER_DATA, 0, data, 2, this.ANSWER_DATA.length);
 		//		byte[] b = new byte[1];
@@ -167,7 +167,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			++QUERY_SENSOR_DATA_DBM[1];
 			--QUERY_SENSOR_DATA_DBM[2];
 			this.write(QUERY_SENSOR_DATA_DBM);
-			this.read(answerDBM, 1000);
+			this.read(answerDBM, 3000);
 
 			if (log.isLoggable(Level.FINE)) {
 				log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(answerDBM));
@@ -181,7 +181,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		//query receiver to add voltageRx and temperatureRx
 		else {
 			this.write(QUERY_SENSOR_DATA_RECEIVER);
-			this.read(answerRx, 1000);
+			this.read(answerRx, 3000);
 
 			if (log.isLoggable(Level.FINE)) {
 				log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(answerDBM));
@@ -191,7 +191,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		WaitTimer.delay(20);
 
 		this.write(QUERY_SENSOR_TYPE);
-		this.read(answer, 1000);
+		this.read(answer, 3000);
 		data[0] = QUERY_SENSOR_TYPE[6];
 		System.arraycopy(answer, 0, data, 1, answer.length);
 
