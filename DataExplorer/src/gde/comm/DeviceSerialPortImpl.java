@@ -339,13 +339,13 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 */
 	public synchronized void write(byte[] writeBuffer) throws IOException {
 		final String $METHOD_NAME = "write"; //$NON-NLS-1$
-		int num = 0;
-		if ((num = this.inputStream.available()) != 0) {
-			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "clean inputStream left bytes -> " + this.inputStream.read(new byte[num])); //$NON-NLS-1$
-		}
 
 		try {
 			if (this.application != null) this.application.setSerialTxOn();
+			int num = 0;
+			if ((num = this.inputStream.available()) != 0) {
+				log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "clean inputStream left bytes -> " + this.inputStream.read(new byte[num])); //$NON-NLS-1$
+			}
 
 			this.outputStream.write(writeBuffer);
 			if (GDE.IS_LINUX && GDE.IS_ARCH_DATA_MODEL_64) {
@@ -362,10 +362,12 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 
-			if (this.application != null) this.application.setSerialTxOff();
 		}
 		catch (IOException e) {
 			throw e;
+		}
+		finally {
+			if (this.application != null) this.application.setSerialTxOff();
 		}
 	}
 
@@ -413,9 +415,9 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		int timeOutCounter = timeout_msec / (sleepTime + 18); //18 ms read blocking time
 
 		try {
+			if (this.application != null) this.application.setSerialRxOn();
 			wait4Bytes(bytes, timeout_msec - (timeout_msec / 5));
 
-			if (this.application != null) this.application.setSerialRxOn();
 
 			while (bytes != readBytes && timeOutCounter-- > 0) {
 				if (this.inputStream.available() > 0) {
@@ -441,12 +443,13 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				}
 				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
-
-			if (this.application != null) this.application.setSerialRxOff();
 		}
 		catch (IOException e) {
 			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			throw e;
+		}
+		finally {
+			if (this.application != null) this.application.setSerialRxOff();
 		}
 		return readBuffer;
 	}
@@ -469,10 +472,10 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		int timeOutCounter = timeout_msec / sleepTime;
 
 		try {
+			if (this.application != null) this.application.setSerialRxOn();
 			long startTime_ms = new Date().getTime();
 			wait4Bytes(timeout_msec);
 
-			if (this.application != null) this.application.setSerialRxOn();
 			while (bytes != readBytes && timeOutCounter-- > 0) {
 				readBytes += this.inputStream.read(readBuffer, readBytes, bytes - readBytes);
 				if (bytes != readBytes) {
@@ -498,8 +501,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				}
 				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
-
-			if (this.application != null) this.application.setSerialRxOff();
 		}
 		catch (IOException e) {
 			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -507,6 +508,9 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		}
 		catch (InterruptedException e) {
 			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+		}
+		finally {
+			if (this.application != null) this.application.setSerialRxOff();
 		}
 		return readBuffer;
 	}
@@ -586,9 +590,9 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		}
 
 		try {
-			expectedBytes = waitForStableReceiveBuffer(expectedBytes, timeout_msec, stableIndex);
-
 			if (this.application != null) this.application.setSerialRxOn();
+
+			expectedBytes = waitForStableReceiveBuffer(expectedBytes, timeout_msec, stableIndex);
 
 			while (readBytes < expectedBytes && timeOutCounter-- > 0) {
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, expectedBytes - readBytes);
@@ -620,7 +624,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 
-			if (this.application != null) this.application.setSerialRxOff();
 		}
 		catch (IOException e) {
 			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -628,6 +631,9 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		}
 		catch (InterruptedException e) {
 			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+		}
+		finally {
+			if (this.application != null) this.application.setSerialRxOff();
 		}
 		return readBuffer;
 	}
