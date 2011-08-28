@@ -142,7 +142,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 				this.addXferError();
 				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
-				if (this.getXferErrors() > UltramatSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + UltramatSerialPort.xferErrorLimit); //$NON-NLS-1$
+				if (this.getXferErrors() > UltramatSerialPort.xferErrorLimit) throw new SerialPortException("Number of transfer error exceed the acceptable limit of " + UltramatSerialPort.xferErrorLimit); //$NON-NLS-1$
 				this.write(UltramatSerialPort.RESET);
 				answer = new byte[data.length];
 				answer = this.read(answer, 3000);
