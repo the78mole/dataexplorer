@@ -364,6 +364,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 
 		}
 		catch (IOException e) {
+			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			throw e;
 		}
 		finally {

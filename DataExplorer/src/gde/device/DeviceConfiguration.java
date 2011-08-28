@@ -2050,6 +2050,7 @@ public class DeviceConfiguration {
 			this.isChangePropery = true;
 			this.deviceProps.getChannels().setLastUseOrdinal(channelNumber - 1);
 		}
+		this.storeDeviceProperties();
 	}
 
 	/**
