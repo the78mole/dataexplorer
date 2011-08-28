@@ -209,7 +209,9 @@ public class NMEAParser {
 					this.firmwareVersion = String.format("%.2f", Integer.parseInt(strValues[2].trim(), 16)/100.0); //$NON-NLS-1$
 					break;
 				case UL2:
-					if (this.values.length >=25) parseUNILOG2(strValues);
+					if (this.values.length >=25)
+						if (this.device.getName().equals("UniLog2")) parseUNILOG2(strValues);
+						else if (this.device.getName().equals("GPS-Logger")) parseUL2(strValues);
 					break;
 				}
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
@@ -869,6 +871,143 @@ public class NMEAParser {
 
 	/**
 	 * parse SM UNILOG sentence
+	 * $UNILOG,11.31 V,0.00 A,0.0 W,0 rpm,0.00 VRx,0.9 m,---- °C (A1),1303 mAh (A2),13.9 °C (int)*30
+	 * 1: Spannung
+	 * 2: Strom
+	 * 3: Leistung
+	 * 4: Drehzahl
+	 * 5: Rx Spannung
+	 * 6: Höhe
+	 * 7: Wert A1
+	 * 8: Wert A2
+	 * 9: Wert A3
+	 * 
+	 * $UL2,2011-07-03,16:01:31.30,0.00, 12.37,1.89,-1.5,0.0,23.4,1868.5,4.96,3.6,2.7,18.0,,4.6,4.095,4.085,4.086,0.000,0.000,0.000,949.94,24.8,0.0,0.0*0D
+	 * 1: date
+	 * 2: time stamp absolute with dot hundreds
+	 * 3: time stamp relative with dot hundreds
+	 * 4: voltage [V]
+	 * 5: current [A]
+	 * 6: height (relative) [m]
+	 * 7: climb [m/sec]
+	 * 8: power [W]
+	 * 9: revolution [1/min]
+	 * 10: voltageRx [V]
+	 * 11: capacity [mAh]
+	 * 12: energy [Wmin]
+	 * 13: value A1
+	 * 14: value A2
+	 * 15: value A3
+	 * 16: cell voltage 1 [V]
+	 * 17: cell voltage 2 [V]
+	 * 18: cell voltage 3 [V]
+	 * 19: cell voltage 4 [V]
+	 * 20: cell voltage 5 [V]
+	 * 21: cell voltage 6 [V]
+	 * 22: air pressure [hPa]
+	 * 23: temperature intern [°C]
+	 * 24: servo impuls in [us]
+	 * 25: servo impuls out [us]
+	 * @param strValues
+	 */
+	void parseUL2(String[] strValues) {
+		for (int i = 4; i < 2+4; i++) {
+			//this.values[15] = 4: voltage [V]
+			//this.values[16] = 5: current [A]
+			try {
+				String tmpValue = strValues[i].trim();
+				this.values[i + 15 - 4] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
+						? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
+						: Double.parseDouble(tmpValue) * 1000.0);
+			}
+			catch (Exception e) {
+				// ignore and leave value unchanged
+			}
+		}
+		try { //this.values[20] = 6: height (relative) [m]
+			String tmpValue = strValues[6].trim();
+			this.values[20] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
+					? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
+					: Double.parseDouble(tmpValue) * 1000.0);
+		}
+		catch (Exception e) {
+			// ignore and leave value unchanged
+		}
+		try {	//this.values[17] = 8: power [W]
+
+			String tmpValue = strValues[8].trim();
+			this.values[17] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
+					? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
+					: Double.parseDouble(tmpValue) * 1000.0);
+		}
+		catch (Exception e) {
+			// ignore and leave value unchanged
+		}
+		for (int i = 9; i < 2+9; i++) {
+			//this.values[18] = 9: revolution [1/min]
+			//this.values[19] = 10: voltageRx [V]
+			try {
+				String tmpValue = strValues[i].trim();
+				this.values[i + 18 - 9] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
+						? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
+						: Double.parseDouble(tmpValue) * 1000.0);
+			}
+			catch (Exception e) {
+				// ignore and leave value unchanged
+			}
+		}
+		for (int i = 13; i < 3+13; i++) {
+			//this.values[21] = 13: value A1
+			//this.values[22] = 14: value A2
+			//this.values[23] = 15: value A3
+			try {
+				String tmpValue = strValues[i].trim();
+				this.values[i + 21 - 13] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
+						? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
+						: Double.parseDouble(tmpValue) * 1000.0);
+			}
+			catch (Exception e) {
+				// ignore and leave value unchanged
+			}
+		}
+
+			StringBuilder s = new StringBuilder();
+			for (int value : this.values) {
+				s.append(value).append("; ");
+			}
+			log.log(Level.FINE, s.toString());
+
+		//GPS 
+		//this.values[0]  = latitude;
+		//this.values[1]  = longitude;
+		//this.values[2]  = altitudeAbs;
+		//this.values[3]  = numSatelites;
+		//this.values[4]  = PDOP (dilution of precision) 
+		//this.values[5]  = HDOP (horizontal dilution of precision) 
+		//this.values[6]  = VDOP (vertical dilution of precision)
+		//this.values[7]  = velocity;
+		//SMGPS
+		//this.values[8]  = altitudeRel;
+		//this.values[9]  = climb;
+		//this.values[10] = voltageRx;
+		//this.values[11] = distanceTotal;
+		//this.values[12] = distanceStart;
+		//this.values[13] = directionStart;
+		//this.values[14] = glideRatio;
+		//Unilog
+		//this.values[15] = voltageUniLog;
+		//this.values[16] = currentUniLog;
+		//this.values[17] = powerUniLog;
+		//this.values[18] = revolutionUniLog;
+		//this.values[19] = voltageRxUniLog;
+		//this.values[20] = heightUniLog;
+		//this.values[21] = a1UniLog;
+		//this.values[22] = a2UniLog;
+		//this.values[23] = a3UniLog;
+	}
+
+	/**
+	 * parse SM UNILOG2 sentence used for UniLog2 only
 	 * $UL2,2011-07-03,16:01:31.30,0.00, 12.37,1.89,-1.5,0.0,23.4,1868.5,4.96,3.6,2.7,18.0,,4.6,4.095,4.085,4.086,0.000,0.000,0.000,949.94,24.8,0.0,0.0*0D
 	 * 1: date
 	 * 2: time stamp absolute with dot hundreds
