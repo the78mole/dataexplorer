@@ -432,7 +432,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 		this.dialogShell.getDisplay().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				HoTTAdapterDialog.this.tabFolder.setSelection(index);
+				HoTTAdapterDialog.this.tabFolder.setSelection(index-1);
 			}
 		});
 	}

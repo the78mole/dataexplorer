@@ -200,6 +200,15 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data));
 		}
 		
+		if (answer[0] != 0x00) {
+			this.addXferError();
+			log.logp(Level.WARNING, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME,
+					"=====> transmission error occurred, number of errors = " + this.getXferErrors());
+			if (this.getXferErrors() > HoTTAdapterSerialPort.xferErrorLimit)
+				throw new SerialPortException("Number of transfer error exceed the acceptable limit of " + HoTTAdapterSerialPort.xferErrorLimit);
+			data = getData();
+		}
+	
 		//sensor type is receiver need to query DBM data in addition
 		if (QUERY_SENSOR_TYPE[6] == QUERY_SENSOR_DATA_RECEIVER[6]) {
 			for (int i = 0; i < 75; i++) {
