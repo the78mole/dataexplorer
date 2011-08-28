@@ -4,6 +4,7 @@ Version 2.91 - xx Aug 2011
 add HoTTAdapter implementation for 115200 Baud transmitter
 HoTTAdapter live data gatherer detecting sensor type automatically
 add UniLog2 device implementation
+adapt GPS-Logger to accept UL2 sentences
 
 
 Version 2.90 - 12 Aug 2011
