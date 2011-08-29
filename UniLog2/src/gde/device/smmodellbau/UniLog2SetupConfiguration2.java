@@ -86,7 +86,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 	final int												sliderMinimum						= 0;
 	final int												sliderMaximum						= 26;
 	final int												sliderIncrement					= 1;
-	final String[]									sliderValues						= { "  0", "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15", "  - -" };
+	final String[]									sliderValues						= { "  0", "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15", " - -" };
 
 	final String[]									currentValues						= { "    1", "    5", "   10", "   15", "   20", "   30", "   40", "   50", "   60", "   70", "   80", "   90", "  100", "  150", "  200",
 			"  250", "  300", "  350", "  400"									};
@@ -225,7 +225,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					RowData currentCComboLData = new RowData();
 					currentCComboLData.width = this.comboWidth;
-					currentCComboLData.height = 14;
+					currentCComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.currentCombo = new CCombo(this.unilogTelemtryAlarmsGroup, SWT.BORDER);
 					this.currentCombo.setLayoutData(currentCComboLData);
 					this.currentCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -302,7 +302,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					RowData voltageStartCComboLData = new RowData();
 					voltageStartCComboLData.width = this.comboWidth;
-					voltageStartCComboLData.height = 14;
+					voltageStartCComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.voltageStartCombo = new CCombo(this.unilogTelemtryAlarmsGroup, SWT.BORDER);
 					this.voltageStartCombo.setLayoutData(voltageStartCComboLData);
 					this.voltageStartCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -380,7 +380,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					RowData voltageCComboLData = new RowData();
 					voltageCComboLData.width = this.comboWidth;
-					voltageCComboLData.height = 14;
+					voltageCComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.voltageCombo = new CCombo(this.unilogTelemtryAlarmsGroup, SWT.BORDER);
 					this.voltageCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageCombo.setLayoutData(voltageCComboLData);
@@ -460,7 +460,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.capacityCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData capacityComboLData = new RowData();
 					capacityComboLData.width = this.comboWidth;
-					capacityComboLData.height = 14;
+					capacityComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.capacityCombo.setLayoutData(capacityComboLData);
 					this.capacityCombo.setItems(this.capacityValues);
 					this.capacityCombo.setText(String.format(Locale.ENGLISH, "%5d", this.configuration.capacityAlarm)); //$NON-NLS-1$
@@ -534,7 +534,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					RowData heightCComboLData = new RowData();
 					heightCComboLData.width = this.comboWidth;
-					heightCComboLData.height = 14;
+					heightCComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.heightCombo = new CCombo(this.unilogTelemtryAlarmsGroup, SWT.BORDER);
 					this.heightCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.heightCombo.setLayoutData(heightCComboLData);
@@ -612,7 +612,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					RowData voltageRxCComboLData = new RowData();
 					voltageRxCComboLData.width = this.comboWidth;
-					voltageRxCComboLData.height = 14;
+					voltageRxCComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.voltageRxCombo = new CCombo(this.unilogTelemtryAlarmsGroup, SWT.BORDER);
 					this.voltageRxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageRxCombo.setLayoutData(voltageRxCComboLData);
@@ -690,7 +690,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					RowData cellVoltageCComboLData = new RowData();
 					cellVoltageCComboLData.width = this.comboWidth;
-					cellVoltageCComboLData.height = 14;
+					cellVoltageCComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.cellVoltageCombo = new CCombo(this.unilogTelemtryAlarmsGroup, SWT.BORDER);
 					this.cellVoltageCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.cellVoltageCombo.setLayoutData(cellVoltageCComboLData);
@@ -998,7 +998,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.a1Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData a1ComboLData = new RowData();
 					a1ComboLData.width = 40;
-					a1ComboLData.height = 14;
+					a1ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a1Combo.setLayoutData(a1ComboLData);
 					this.a1Combo.setItems(this.sliderValues);
 					this.a1Combo.addSelectionListener(new SelectionAdapter() {
@@ -1022,7 +1022,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.a2Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData a2ComboLData = new RowData();
 					a2ComboLData.width = 40;
-					a2ComboLData.height = 14;
+					a2ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a2Combo.setLayoutData(a2ComboLData);
 					this.a2Combo.setItems(this.sliderValues);
 					this.a2Combo.addSelectionListener(new SelectionAdapter() {
@@ -1046,7 +1046,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.a3Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData a3ComboLData = new RowData();
 					a3ComboLData.width = 40;
-					a3ComboLData.height = 14;
+					a3ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a3Combo.setLayoutData(a3ComboLData);
 					this.a3Combo.setItems(this.sliderValues);
 					this.a3Combo.addSelectionListener(new SelectionAdapter() {
@@ -1070,7 +1070,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c1Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c1ComboLData = new RowData();
 					c1ComboLData.width = 40;
-					c1ComboLData.height = 14;
+					c1ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c1Combo.setLayoutData(c1ComboLData);
 					this.c1Combo.setItems(this.sliderValues);
 					this.c1Combo.addSelectionListener(new SelectionAdapter() {
@@ -1094,7 +1094,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c2Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c2ComboLData = new RowData();
 					c2ComboLData.width = 40;
-					c2ComboLData.height = 14;
+					c2ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c2Combo.setLayoutData(c2ComboLData);
 					this.c2Combo.setItems(this.sliderValues);
 					this.c2Combo.addSelectionListener(new SelectionAdapter() {
@@ -1118,7 +1118,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c3Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c3ComboLData = new RowData();
 					c3ComboLData.width = 40;
-					c3ComboLData.height = 14;
+					c3ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c3Combo.setLayoutData(c3ComboLData);
 					this.c3Combo.setItems(this.sliderValues);
 					this.c3Combo.addSelectionListener(new SelectionAdapter() {
@@ -1142,7 +1142,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c4Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c4ComboLData = new RowData();
 					c4ComboLData.width = 40;
-					c4ComboLData.height = 14;
+					c4ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c4Combo.setLayoutData(c4ComboLData);
 					this.c4Combo.setItems(this.sliderValues);
 					this.c4Combo.addSelectionListener(new SelectionAdapter() {
@@ -1166,7 +1166,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c5Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c5ComboLData = new RowData();
 					c5ComboLData.width = 40;
-					c5ComboLData.height = 14;
+					c5ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c5Combo.setLayoutData(c5ComboLData);
 					this.c5Combo.setItems(this.sliderValues);
 					this.c5Combo.addSelectionListener(new SelectionAdapter() {
@@ -1190,7 +1190,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c6Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c6ComboLData = new RowData();
 					c6ComboLData.width = 40;
-					c6ComboLData.height = 14;
+					c6ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c6Combo.setLayoutData(c6ComboLData);
 					this.c6Combo.setItems(this.sliderValues);
 					this.a1Combo.addSelectionListener(new SelectionAdapter() {

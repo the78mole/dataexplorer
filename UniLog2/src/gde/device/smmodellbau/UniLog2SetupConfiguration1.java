@@ -207,7 +207,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.currentTriggerCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
 					RowData currentTriggerComboLData = new RowData();
 					currentTriggerComboLData.width = 84;
-					currentTriggerComboLData.height = 14;
+					currentTriggerComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.currentTriggerCombo.setLayoutData(currentTriggerComboLData);
 					this.currentTriggerCombo.setItems(this.currentStartValues);
 					this.currentTriggerCombo.addSelectionListener(new SelectionAdapter() {
@@ -239,7 +239,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.rxTriggerCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
 					RowData rxTriggerComboLData = new RowData();
 					rxTriggerComboLData.width = 84;
-					rxTriggerComboLData.height = 14;
+					rxTriggerComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.rxTriggerCombo.setLayoutData(rxTriggerComboLData);
 					this.rxTriggerCombo.setItems(this.rxStartValues);
 					this.rxTriggerCombo.addSelectionListener(new SelectionAdapter() {
@@ -271,7 +271,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.timeTriggerCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
 					RowData timeTriggerComboLData = new RowData();
 					timeTriggerComboLData.width = 84;
-					timeTriggerComboLData.height = 14;
+					timeTriggerComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.timeTriggerCombo.setLayoutData(timeTriggerComboLData);
 					this.timeTriggerCombo.setItems(this.timeStartValues);
 					this.timeTriggerCombo.addSelectionListener(new SelectionAdapter() {
@@ -302,6 +302,10 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.autoStopCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
 					this.autoStopCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2519).split(GDE.STRING_COMMA));
+					RowData autoStopComboLData = new RowData();
+					autoStopComboLData.width = 84;
+					autoStopComboLData.height = GDE.IS_MAC ? 18 : 14;
+					this.autoStopCombo.setLayoutData(autoStopComboLData);
 					this.autoStopCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -335,7 +339,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.serialNumberText = new Text(this.commonAdjustmentsGroup, SWT.RIGHT | SWT.BORDER);
 					RowData serialNumberTextLData = new RowData();
 					serialNumberTextLData.width = 49;
-					serialNumberTextLData.height = 13;
+					serialNumberTextLData.height = GDE.IS_MAC ? 16 : 13;
 					this.serialNumberText.setLayoutData(serialNumberTextLData);
 				}
 				{
@@ -350,7 +354,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.firmwareText = new Text(this.commonAdjustmentsGroup, SWT.BORDER | SWT.RIGHT);
 					RowData firmwareTextLData = new RowData();
 					firmwareTextLData.width = 39;
-					firmwareTextLData.height = 13;
+					firmwareTextLData.height = GDE.IS_MAC ? 16 : 13;
 					this.firmwareText.setLayoutData(firmwareTextLData);
 				}
 				{
@@ -366,7 +370,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.dataRateCombo.setItems(this.dataRateValues);
 					RowData dataRateComboLData = new RowData();
 					dataRateComboLData.width = 84;
-					dataRateComboLData.height = 14;
+					dataRateComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.dataRateCombo.setLayoutData(dataRateComboLData);
 					this.dataRateCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -389,7 +393,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.currentSensorCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
 					RowData currentSensorComboLData = new RowData();
 					currentSensorComboLData.width = 84;
-					currentSensorComboLData.height = 14;
+					currentSensorComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.currentSensorCombo.setLayoutData(currentSensorComboLData);
 					this.currentSensorCombo.setItems(this.currentSensorTypes);
 					this.currentSensorCombo.addSelectionListener(new SelectionAdapter() {
@@ -414,7 +418,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.a1ModusCombo.setItems(this.analogModi);
 					RowData a1ModusComboLData = new RowData();
 					a1ModusComboLData.width = 105;
-					a1ModusComboLData.height = 14;
+					a1ModusComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a1ModusCombo.setLayoutData(a1ModusComboLData);
 					this.a1ModusCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -438,7 +442,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.a2ModusCombo.setItems(this.analogModi);
 					RowData a2ModusComboLData = new RowData();
 					a2ModusComboLData.width = 105;
-					a2ModusComboLData.height = 14;
+					a2ModusComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a2ModusCombo.setLayoutData(a2ModusComboLData);
 					this.a2ModusCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -462,7 +466,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.a3ModusCombo.setItems(this.analogModi);
 					RowData a3ModusComboLData = new RowData();
 					a3ModusComboLData.width = 105;
-					a3ModusComboLData.height = 14;
+					a3ModusComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a3ModusCombo.setLayoutData(a3ModusComboLData);
 					this.a3ModusCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -485,7 +489,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.propBladesCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
 					RowData propBladesComboLData = new RowData();
 					propBladesComboLData.width = 60;
-					propBladesComboLData.height = 14;
+					propBladesComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.propBladesCombo.setLayoutData(propBladesComboLData);
 					this.propBladesCombo.setItems(this.numberProbMotorPoles);
 					this.propBladesCombo.addSelectionListener(new SelectionAdapter() {
@@ -517,7 +521,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.gearFactorText = new Text(this.commonAdjustmentsGroup, SWT.CENTER | SWT.BORDER);
 					RowData gearFactorTextLData = new RowData();
 					gearFactorTextLData.width = 35;
-					gearFactorTextLData.height = 13;
+					gearFactorTextLData.height = GDE.IS_MAC ? 16 : 13;
 					this.gearFactorText.setLayoutData(gearFactorTextLData);
 				}
 				{
@@ -551,7 +555,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.varioTriggerLevelText = new Text(this.commonAdjustmentsGroup, SWT.CENTER | SWT.BORDER);
 					RowData varioTriggerLevelTextLData = new RowData();
 					varioTriggerLevelTextLData.width = 35;
-					varioTriggerLevelTextLData.height = 13;
+					varioTriggerLevelTextLData.height = GDE.IS_MAC ? 16 : 13;
 					this.varioTriggerLevelText.setLayoutData(varioTriggerLevelTextLData);
 				}
 				{
@@ -585,7 +589,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.varioToneCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER | SWT.CENTER);
 					RowData varioToneComboLData = new RowData();
 					varioToneComboLData.width = 84;
-					varioToneComboLData.height = 14;
+					varioToneComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.varioToneCombo.setLayoutData(varioToneComboLData);
 					this.varioToneCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2522).split(GDE.STRING_COMMA));
 					this.varioToneCombo.addSelectionListener(new SelectionAdapter() {
@@ -609,7 +613,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.limiterModusCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER | SWT.CENTER);
 					RowData limiterModusComboLData = new RowData();
 					limiterModusComboLData.width = 84;
-					limiterModusComboLData.height = 14;
+					limiterModusComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.limiterModusCombo.setLayoutData(limiterModusComboLData);
 					this.limiterModusCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2521).split(GDE.STRING_COMMA));
 					this.limiterModusCombo.addSelectionListener(new SelectionAdapter() {
@@ -632,8 +636,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.energyLimitText = new Text(this.commonAdjustmentsGroup, SWT.CENTER | SWT.BORDER);
 					RowData energyLimitTextLData = new RowData();
-					energyLimitTextLData.width = 35;
-					energyLimitTextLData.height = 13;
+					energyLimitTextLData.width = GDE.IS_MAC ? 39 : 35;
+					energyLimitTextLData.height = GDE.IS_MAC ? 16 : 13;
 					this.energyLimitText.setLayoutData(energyLimitTextLData);
 				}
 				{
@@ -650,7 +654,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "energyLimitSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration1.this.configuration.energyLimit = (short) UniLog2SetupConfiguration1.this.energyLimitSlider.getSelection();
-							UniLog2SetupConfiguration1.this.energyLimitText.setText(GDE.STRING_BLANK + UniLog2SetupConfiguration1.this.configuration.energyLimit);
+							UniLog2SetupConfiguration1.this.energyLimitText.setText(GDE.STRING_EMPTY + UniLog2SetupConfiguration1.this.configuration.energyLimit);
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -667,7 +671,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.minMaxRxCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
 					RowData minMaxRxComboLData = new RowData();
 					minMaxRxComboLData.width = 84;
-					minMaxRxComboLData.height = 14;
+					minMaxRxComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.minMaxRxCombo.setLayoutData(minMaxRxComboLData);
 					this.minMaxRxCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2519).split(GDE.STRING_COMMA));
 					this.minMaxRxCombo.addSelectionListener(new SelectionAdapter() {
