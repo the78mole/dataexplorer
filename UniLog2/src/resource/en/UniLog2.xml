@@ -36,7 +36,8 @@
     </DataBlock>
     <State>
         <property description="" type="Integer" value="01" name="flight record"/>
-eui3258r    <Channels lastUseOrdinal="1">
+    </State>
+	<Channels lastUseOrdinal="1">
 	    <Channel type="TYPE_CONFIG" name="General">
             <Measurement>
                 <name>VoltageRx</name>
@@ -270,7 +271,7 @@ eui3258r    <Channels lastUseOrdinal="1">
             <Measurement>
                 <name>Direction_ML</name>
                 <symbol>w</symbol>
-                <unit>°</unit>
+                <unit>Â°</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
