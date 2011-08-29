@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2010,2011 Winfried Bruegmann
+    Copyright (c) 2011 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
@@ -32,7 +32,6 @@ import gde.exception.DataInconsitsentException;
 import gde.io.LogViewReader;
 import gde.io.NMEAParser;
 import gde.io.NMEAReaderWriter;
-import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
@@ -53,12 +52,13 @@ import org.eclipse.swt.widgets.FileDialog;
  * @author Winfried Brügmann
  */
 public class UniLog2 extends DeviceConfiguration implements IDevice {
-	final static Logger		log								= Logger.getLogger(UniLog2.class.getName());
+	final static Logger	log										= Logger.getLogger(UniLog2.class.getName());
 
-	final static String		SM_GPS_LOGGER_INI	= "SM GPS-Logger.ini";													//$NON-NLS-1$
+	final static String	SM_UNILOG_2_INI				= "SM UniLog 2.ini";													//$NON-NLS-1$
+	final static String	SM_UNILOG_2_INI_PATH	= "SM UniLog 2 ";														//$NON-NLS-1$
 
-	final DataExplorer		application;
-	final Channels				channels;
+	final DataExplorer	application;
+	final Channels			channels;
 	final UniLog2Dialog	dialog;
 
 	/**
@@ -69,13 +69,13 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	public UniLog2(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.smmodellbau.gpslogger.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.smmodellbau.unilog2.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.dialog = new UniLog2Dialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2004), Messages.getString(MessageIds.GDE_MSGT2004));
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
 		}
 	}
 
@@ -86,13 +86,13 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	public UniLog2(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.smmodellbau.gpslogger.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.smmodellbau.unilog2.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		this.dialog = new UniLog2Dialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2004), Messages.getString(MessageIds.GDE_MSGT2004));
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
 		}
 	}
 
@@ -101,6 +101,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
+	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 		// ...
 		return lov2osdMap;
@@ -113,6 +114,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return converted configuration data
 	 */
+	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
 		return ""; //$NON-NLS-1$
@@ -121,6 +123,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	/**
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
+	@Override
 	public int getLovDataByteSize() {
 		return 0; // sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
@@ -136,6 +139,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
+	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
 		NMEAParser data = new NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), Math.abs(this.getDataBlockSize()), this,
@@ -156,18 +160,18 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 				//System.out.println((subLenght+8));
 				lineBuffer = new byte[subLenght];
 				System.arraycopy(dataBuffer, 4 + lastLength, lineBuffer, 0, subLenght);
-				String textInput = new String(lineBuffer,"ISO-8859-1");
+				String textInput = new String(lineBuffer, "ISO-8859-1"); //$NON-NLS-1$
 				//System.out.println(textInput);
 				StringTokenizer st = new StringTokenizer(textInput);
 				Vector<String> vec = new Vector<String>();
 				while (st.hasMoreTokens())
-					vec.add(st.nextToken("\r\n"));
+					vec.add(st.nextToken("\r\n")); //$NON-NLS-1$
 				//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
 				//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 				//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
 				//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 				data.parse(vec, vec.size());
-				lastLength += (subLenght+12);
+				lastLength += (subLenght + 12);
 
 				recordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms());
 
@@ -190,6 +194,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
+	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		//noop due to previous parsed CSV data
 		return points;
@@ -206,6 +211,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
+	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
@@ -254,9 +260,10 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
+	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames(); 
+			String[] recordNames = recordSet.getRecordNames();
 			for (int j = 0; j < recordNames.length; j++) {
 				Record record = recordSet.get(recordNames[j]);
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
@@ -272,7 +279,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 				else {
 					//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
 					double value = (record.get(rowIndex) / 1000000.0);
-					int grad = (int)value;
+					int grad = (int) value;
 					double minuten = (value - grad) * 100;
 					dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
 				}
@@ -289,6 +296,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double translateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -305,13 +313,14 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
 		double newValue = (value - offset) / factor + reduction;
-		
+
 		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
@@ -324,6 +333,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
+	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
@@ -359,7 +369,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 				++displayableCounter;
 			}
 		}
-		log.log(Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		log.log(java.util.logging.Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 	}
 
@@ -369,6 +379,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * for calculation which requires more effort or is time consuming it can call a background thread, 
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
+	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		this.application.updateStatisticsData();
 	}
@@ -386,6 +397,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
+	@Override
 	public String[] getUsedPropertyKeys() {
 		return new String[] { IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION };
 	}
@@ -395,25 +407,26 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
+	@Override
 	public void open_closeCommPort() {
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
 		if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
-		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2000), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
+		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2500), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
 				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
-		Thread reader = new Thread("reader"){
+		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
 			public void run() {
 				for (String tmpFileName : fd.getFileNames()) {
 					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-//					if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_NMEA)) {
-//						if (selectedImportFile.contains(GDE.STRING_DOT)) {
-//							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
-//						}
-//						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_NMEA;
-//					}
+					if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
+						if (selectedImportFile.contains(GDE.STRING_DOT)) {
+							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+						}
+						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_TXT;
+					}
 					log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 					if (fd.getFileName().length() > 4) {
@@ -424,7 +437,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 							NMEAReaderWriter.read(selectedImportFile, UniLog2.this, recordNameExtend, channelConfigNumber);
 						}
 						catch (Exception e) {
-							log.log(Level.WARNING, e.getMessage(), e);
+							log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 						}
 					}
 				}
@@ -434,6 +447,6 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	}
 
 	String getDefaultConfigurationFileName() {
-		return UniLog2.SM_GPS_LOGGER_INI;
+		return UniLog2.SM_UNILOG_2_INI;
 	}
 }

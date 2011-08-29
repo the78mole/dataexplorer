@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2010,2011 Winfried Bruegmann
+    Copyright (c) 2011 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
@@ -46,8 +46,7 @@ import org.eclipse.swt.widgets.Widget;
  * @author Winfried Brügmann
  */
 public class UniLog2VisualizationControl extends Composite {
-	private static final String	MLINK_EXTEND_ML			= "_ML";																														//$NON-NLS-1$
-	private static final String	UNILOG_EXTEND_UL		= "_UL";																														//$NON-NLS-1$
+	private static final String	MLINK_EXTEND_ML			= "_ML";																													//$NON-NLS-1$
 
 	final static Logger					log									= Logger.getLogger(UniLog2VisualizationControl.class.getName());
 
@@ -62,10 +61,10 @@ public class UniLog2VisualizationControl extends Composite {
 	boolean											isVisibilityChanged	= false;
 
 	final Widget								parent;
-	final IDevice								device;																																								// get device specific things, get serial port, ...
+	final IDevice								device;																																							// get device specific things, get serial port, ...
 	final DataExplorer					application;																																					// interaction with application instance
-	final Channels							channels;																																							// interaction with channels, source of all records
-	final UniLog2Dialog				dialog;
+	final Channels							channels;																																						// interaction with channels, source of all records
+	final UniLog2Dialog					dialog;
 	final int										channelConfigNumber;
 	final String								typeName;
 	final int										measurementCount;
@@ -94,7 +93,7 @@ public class UniLog2VisualizationControl extends Composite {
 
 	void create() {
 		{
-			if (this.typeName.equals(Messages.getString(MessageIds.GDE_MSGT2010))) {
+			if (this.typeName.equals(Messages.getString(MessageIds.GDE_MSGT2510))) {
 				this.tabItemLabel = new Label(this, SWT.CENTER);
 				GridData tabItemLabelLData = new GridData();
 				tabItemLabelLData.horizontalAlignment = GridData.CENTER;
@@ -112,13 +111,13 @@ public class UniLog2VisualizationControl extends Composite {
 			//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
 			//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) {
-				if (this.typeName.startsWith(Messages.getString(MessageIds.GDE_MSGT2012))) {
+				if (this.typeName.startsWith(Messages.getString(MessageIds.GDE_MSGT2512))) {
 					this.measurementTypes.add(new MeasurementControlConfigurable(this, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device,
 							1, GDE.STRING_BLANK + (i - this.measurementOffset), UniLog2VisualizationControl.MLINK_EXTEND_ML));
 				}
-				else if (this.typeName.startsWith(Messages.getString(MessageIds.GDE_MSGT2011)) && i >= this.measurementOffset + this.measurementCount - 3) {
+				else if (this.typeName.startsWith(Messages.getString(MessageIds.GDE_MSGT2511)) && i > 16 && i < 20) {
 					this.measurementTypes.add(new MeasurementControlConfigurable(this, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device,
-							1, "A" + (i - 20), UniLog2VisualizationControl.UNILOG_EXTEND_UL)); //$NON-NLS-1$
+							1, "A" + (i - 16), GDE.STRING_BLANK)); //$NON-NLS-1$
 				}
 				else {
 					this.measurementTypes.add(new MeasurementControl(this, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1));

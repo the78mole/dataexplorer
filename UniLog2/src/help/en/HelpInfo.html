@@ -22,31 +22,34 @@
 <HTML>
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-	<TITLE>DataExplorer - SM GPS-Logger Device dialog</TITLE>
+	<TITLE>DataExplorer - SM UniLog 2 device dialog</TITLE>
 	<META NAME="CHANGEDBY" CONTENT="Winfried Br&uuml;gmann">
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <DIV TYPE=HEADER>
-	<H2><A NAME="Introduction"></A><FONT FACE="Arial"><FONT SIZE=4><I>SM GPS-Logger Device Dialog</I></FONT></FONT></H2>
+	<H2><A NAME="Introduction"></A><FONT FACE="Arial"><FONT SIZE=4><I>SM UniLog 2 Device Dialog</I></FONT></FONT></H2>
 </DIV>
 <P>The below device dialog should be used to configure the visualization of measurements.
 Unchecked measurement will not be displayed. 
-This will lead to a more clear representation, curves which are hard to be interpreted in two dimensional way, may be blanked out.
-It is possible to import NMEA data files using the 'import data' button as well.
+</BR>
+There are two different data set configurations. This configurations are used for sttisiks calculations only.
+Only the Motor type configuration contains currrent level trigger to measure the motor runtime and calculate the reached height.
+For the climb flights used battery capacity is required to calculate a reference value of the needed capacity per height meter.
+</BR>
+It is possible to import log data files using the 'import data' button as well.
 </P>
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Image_1.png" NAME="HelpInfo_Image_1" ALT="HelpInfo_Image_1"></P>
+<P>Entering the revolution were the Propeller drives 100 Watts, enable to calculate the Efficency.
+Well, this calculation is not very accurate, but it helps for comparison.
+</P>
 <P><B>Hint: </B>The visualization configuration will be applied as well as it is closed in cases where the tool bar button is used to import the data.
 </P>
 <P>
-Is a UniLog as sensor device connected the three analog entry fields might be named freely. Same is valid for the symbol.
-The unit will be overtaken from the NMEA data.
-As initial presets 'velocity', 'capacity' and 'temperature' gets used. This has to be adapted if required.
-The scale of the graphics and the curve selector table will display updated names for the measurements. UniLog measurements has always a trailing '_UL'.
-If required an measurement offset as well as a factor can be configured using the device properties editor.
+If required for analog measurement sensors an measurement offset as well as a factor can be configured using the device properties editor.
 </P>
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Image_2.png" NAME="HelpInfo_Image_2" ALT="HelpInfo_Image_2"></P>
 <P>
-If Multiplex sensors are connected, the units are overtaken from the NMEA data as well. The names and symbols must be manually adapted.
+If Multiplex sensors are connected, the units are overtaken from the log data as well. The names and symbols must be manually adapted.
 The initial presets are only samples.
 Multiplex M-Link sensor measurements has always a trailing '_ML'.
 </P>
@@ -87,10 +90,6 @@ It is possible to configure a number of alarm thresholds and addresses to be use
 <P><B>Hint: </B>A preset directory path is configurable using the device properties editor on tab, Data Block - Optional Entries - data path.
 This configuration will position the file open dialog at the directory where the NMEA data files can directly be selected at the point where the SD-card is mounted.
 To load the setup file change into 'SM GPS-Logger setup' directory.
-</P>
-<P><B>Tip: </B>Since the GPS-Logger stores GPS data it is possible to load and display such data in Google Earth using KMZ files.
-This files can be exported using the file menu or directly launched to an installed Google Earth application.
-How to do so, refer to <A HREF="../../../help/en/HelpInfo_36.html">Toolbar -> Google Earth</A>.
 </P>
 </BODY>
 </HTML>
