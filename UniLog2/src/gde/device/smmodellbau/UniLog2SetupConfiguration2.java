@@ -167,7 +167,6 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 		try {
 			this.setLayout(new FormLayout());
 			this.addHelpListener(new HelpListener() {
-				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "GPSLoggerSetupConfiguration2.helpRequested, event=" + evt); //$NON-NLS-1$
 					UniLog2SetupConfiguration2.this.application.openHelpDialog(Messages.getString(MessageIds.GDE_MSGT2510), "HelpInfo.html#configuration"); //$NON-NLS-1$
@@ -244,7 +243,6 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						}
 					});
 					this.currentCombo.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "currentCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
@@ -322,7 +320,6 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						}
 					});
 					this.voltageStartCombo.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "voltageStartCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, verifyevent.text);
@@ -401,7 +398,6 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						}
 					});
 					this.voltageCombo.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "voltageCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, verifyevent.text);
@@ -479,7 +475,6 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						}
 					});
 					this.capacityCombo.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "capacityCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
@@ -557,7 +552,6 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						}
 					});
 					this.heightCombo.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "heightCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, verifyevent.text);
@@ -636,7 +630,6 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						}
 					});
 					this.voltageRxCombo.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "voltageRxCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, verifyevent.text);
@@ -715,7 +708,6 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						}
 					});
 					this.cellVoltageCombo.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "cellVoltageCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, verifyevent.text);
