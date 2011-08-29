@@ -119,7 +119,6 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addDisposeListener(new DisposeListener() {
-					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (HoTTAdapterDialog.this.device.isChangePropery()) {
@@ -134,7 +133,6 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
-					@Override
 					public void helpRequested(HelpEvent evt) {
 						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						HoTTAdapterDialog.this.application.openHelpDialog("HoTTAdapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -414,7 +412,6 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	 */
 	public void resetButtons() {
 		this.dialogShell.getDisplay().asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
 				HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
@@ -430,7 +427,6 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	 */
 	public void selectTab(final int index) {
 		this.dialogShell.getDisplay().asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				HoTTAdapterDialog.this.tabFolder.setSelection(index-1);
 			}
