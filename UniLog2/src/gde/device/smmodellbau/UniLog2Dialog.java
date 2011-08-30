@@ -493,12 +493,6 @@ public class UniLog2Dialog extends DeviceDialog {
 								}
 							}
 						});
-						propeller_n100W_Text.addPaintListener(new PaintListener() {
-							public void paintControl(PaintEvent arg0) {
-								if (!propeller_n100W_Text.getText().equals(GDE.STRING_EMPTY + UniLog2Dialog.this.propeller_n100W_Value))
-									propeller_n100W_Text.setText(GDE.STRING_EMPTY + UniLog2Dialog.this.propeller_n100W_Value);
-							}
-						});
 					}
 					{
 						CLabel efficencyUnit = new CLabel(filler, SWT.NONE);
