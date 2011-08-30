@@ -78,6 +78,7 @@ public class LogViewReader {
 		deviceMap.put("qc copter", "QC-Copter"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("unilog", "UniLog"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("sm unilog", "UniLog"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("sm unilog 2", "UniLog2"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("lipowatch", "LiPoWatch"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("sm lipowatch", "LiPoWatch"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("sm gps logger", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$

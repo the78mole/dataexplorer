@@ -145,7 +145,9 @@ public class NMEAReaderWriter {
 						|| line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name())
 						|| line.startsWith(device.getDataBlockLeader() + NMEA.UL2SETUP.name())
 						|| !line.startsWith(device.getDataBlockLeader())) {
-					if (line != null && (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name()))) {
+					if (line != null && (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) 
+							|| line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name())
+							|| line.startsWith(device.getDataBlockLeader() + NMEA.UL2SETUP.name()))) {
 						Vector<String> setupLine = new Vector<String>();
 						setupLine.add(line);
 						data.parse(setupLine, lineNumber);
