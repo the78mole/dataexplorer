@@ -62,14 +62,14 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 	Group														commonAdjustmentsGroup, logStartStopGroup;
 	CLabel													serialNumberLabel, firmwareLabel, dataRateLabel, currentSensorTypeLabel, propellerBladesLabel, motorPolsLabel, gearFactorLabel, varioTriggerLevelLabel,
 			varioToneLabel;
-	CLabel													limiterModusLabel, energyLimitLabel, currentTriggerUnitLabel, rxTriggerUnitLabel, timeTriggerUnitLabel, a1ModusLabel, a2ModusLabel, a3ModusLabel, minMaxRxLabel,
+	CLabel													limiterModusLabel, energyLimitLabel, autoStartCurrentUnitLabel, autoStartRxUnitLabel, autoStartTimeUnitLabel, a1ModusLabel, a2ModusLabel, a3ModusLabel, minMaxRxLabel,
 			autoStopLabel;
 	Text														serialNumberText, firmwareText, gearFactorText, varioTriggerLevelText, energyLimitText;
 	Slider													gearFactorSlider, varioTriggerLevelSlider, energyLimitSlider;
-	CCombo													dataRateCombo, currentSensorCombo, propBladesCombo, varioToneCombo, limiterModusCombo, minMaxRxCombo, autoStopCombo, currentTriggerCombo, rxTriggerCombo,
-			timeTriggerCombo;
+	CCombo													dataRateCombo, currentSensorCombo, propBladesCombo, varioToneCombo, limiterModusCombo, minMaxRxCombo, autoStopCombo, autoStartCurrentCombo, autoStartRxCombo,
+			autoStartTimeCombo;
 	CCombo													a1ModusCombo, a2ModusCombo, a3ModusCombo;
-	Button													startByCurrentButton, rxTriggerButton, timeTriggerButton;
+	Button													autoStartCurrentButton, autoStartRxButton, autoStartTimeButton;
 
 	final String[]									dataRateValues				= { " 50 Hz", " 20 Hz", " 10 Hz", "  5 Hz", "  2 Hz", "  1 Hz" };
 	final String[]									currentSensorTypes		= { "  20 A", " 40/80 A", " 150 A", " 400 A" };
@@ -169,13 +169,12 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 		this.energyLimitText.setText(GDE.STRING_BLANK + this.configuration.energyLimit);
 		this.minMaxRxCombo.select(this.configuration.minMaxRx);
 
-		// 4 AUTO_STROM=0x0001, AUTO_RX=0x0002, AUTO_TIME=0x0004
-		this.startByCurrentButton.setSelection((this.configuration.startModus & 0x0001) > 0);
-		this.rxTriggerButton.setSelection((this.configuration.startModus & 0x0002) > 0);
-		this.timeTriggerButton.setSelection((this.configuration.startModus & 0x0004) > 0);
-		this.currentTriggerCombo.select(this.configuration.startCurrent - 1);
-		this.rxTriggerCombo.select(this.configuration.startRx / 5 + 1);
-		this.timeTriggerCombo.select(this.configuration.startTime / 5 - 1);
+		this.autoStartCurrentButton.setSelection((this.configuration.startModus & 0x0001) > 0);
+		this.autoStartRxButton.setSelection((this.configuration.startModus & 0x0002) > 0);
+		this.autoStartTimeButton.setSelection((this.configuration.startModus & 0x0004) > 0);
+		this.autoStartCurrentCombo.select(this.configuration.startCurrent - 1);
+		this.autoStartRxCombo.select(this.configuration.startRx - 11);
+		this.autoStartTimeCombo.select(this.configuration.startTime / 5 - 1);
 		this.autoStopCombo.select(this.configuration.stopModus);
 	}
 
@@ -196,100 +195,139 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				this.logStartStopGroup.setLayoutData(logStartStopGroupLData);
 				this.logStartStopGroup.setText(Messages.getString(MessageIds.GDE_MSGT2526));
 				{
-					this.startByCurrentButton = new Button(this.logStartStopGroup, SWT.CHECK);
+					this.autoStartCurrentButton = new Button(this.logStartStopGroup, SWT.CHECK);
 					RowData startByCurrentButtonLData = new RowData();
 					startByCurrentButtonLData.width = 135;
 					startByCurrentButtonLData.height = 19;
-					this.startByCurrentButton.setLayoutData(startByCurrentButtonLData);
-					this.startByCurrentButton.setText(Messages.getString(MessageIds.GDE_MSGT2527));
+					this.autoStartCurrentButton.setLayoutData(startByCurrentButtonLData);
+					this.autoStartCurrentButton.setText(Messages.getString(MessageIds.GDE_MSGT2527));
+					this.autoStartCurrentButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "autoStartCurrentButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (UniLog2SetupConfiguration1.this.autoStartCurrentButton.getSelection()) {
+								UniLog2SetupConfiguration1.this.configuration.startModus = (short) (UniLog2SetupConfiguration1.this.configuration.startModus | UniLog2SetupReaderWriter.AUTO_START_CURRENT);
+							}
+							else {
+								UniLog2SetupConfiguration1.this.configuration.startModus = (short) (UniLog2SetupConfiguration1.this.configuration.startModus ^ UniLog2SetupReaderWriter.AUTO_START_CURRENT);
+							}
+							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
 				}
 				{
-					this.currentTriggerCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
+					this.autoStartCurrentCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
 					RowData currentTriggerComboLData = new RowData();
 					currentTriggerComboLData.width = 84;
 					currentTriggerComboLData.height = GDE.IS_MAC ? 18 : 14;
-					this.currentTriggerCombo.setLayoutData(currentTriggerComboLData);
-					this.currentTriggerCombo.setItems(this.currentStartValues);
-					this.currentTriggerCombo.addSelectionListener(new SelectionAdapter() {
+					this.autoStartCurrentCombo.setLayoutData(currentTriggerComboLData);
+					this.autoStartCurrentCombo.setItems(this.currentStartValues);
+					this.autoStartCurrentCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "currentTriggerCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							UniLog2SetupConfiguration1.this.configuration.startCurrent = (short) (UniLog2SetupConfiguration1.this.currentTriggerCombo.getSelectionIndex() + 1);
+							log.log(Level.FINEST, "autoStartCurrentCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration1.this.configuration.startCurrent = (short) (UniLog2SetupConfiguration1.this.autoStartCurrentCombo.getSelectionIndex() + 1);
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
 				}
 				{
-					this.currentTriggerUnitLabel = new CLabel(this.logStartStopGroup, SWT.NONE);
+					this.autoStartCurrentUnitLabel = new CLabel(this.logStartStopGroup, SWT.NONE);
 					RowData currentTriggerUnitLabelLData = new RowData();
 					currentTriggerUnitLabelLData.width = 49;
 					currentTriggerUnitLabelLData.height = 20;
-					this.currentTriggerUnitLabel.setLayoutData(currentTriggerUnitLabelLData);
-					this.currentTriggerUnitLabel.setText("[A]"); //$NON-NLS-1$
+					this.autoStartCurrentUnitLabel.setLayoutData(currentTriggerUnitLabelLData);
+					this.autoStartCurrentUnitLabel.setText("[A]"); //$NON-NLS-1$
 				}
 				{
-					this.rxTriggerButton = new Button(this.logStartStopGroup, SWT.CHECK | SWT.LEFT);
+					this.autoStartRxButton = new Button(this.logStartStopGroup, SWT.CHECK | SWT.LEFT);
 					RowData rxTriggerButtonLData = new RowData();
 					rxTriggerButtonLData.width = 135;
 					rxTriggerButtonLData.height = 16;
-					this.rxTriggerButton.setLayoutData(rxTriggerButtonLData);
-					this.rxTriggerButton.setText(Messages.getString(MessageIds.GDE_MSGT2528));
+					this.autoStartRxButton.setLayoutData(rxTriggerButtonLData);
+					this.autoStartRxButton.setText(Messages.getString(MessageIds.GDE_MSGT2528));
+					this.autoStartRxButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "autoStartRxButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (UniLog2SetupConfiguration1.this.autoStartRxButton.getSelection()) {
+								UniLog2SetupConfiguration1.this.configuration.startModus = (short) (UniLog2SetupConfiguration1.this.configuration.startModus | UniLog2SetupReaderWriter.AUTO_START_RX);
+							}
+							else {
+								UniLog2SetupConfiguration1.this.configuration.startModus = (short) (UniLog2SetupConfiguration1.this.configuration.startModus ^ UniLog2SetupReaderWriter.AUTO_START_RX);
+							}
+							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
 				}
 				{
-					this.rxTriggerCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
+					this.autoStartRxCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
 					RowData rxTriggerComboLData = new RowData();
 					rxTriggerComboLData.width = 84;
 					rxTriggerComboLData.height = GDE.IS_MAC ? 18 : 14;
-					this.rxTriggerCombo.setLayoutData(rxTriggerComboLData);
-					this.rxTriggerCombo.setItems(this.rxStartValues);
-					this.rxTriggerCombo.addSelectionListener(new SelectionAdapter() {
+					this.autoStartRxCombo.setLayoutData(rxTriggerComboLData);
+					this.autoStartRxCombo.setItems(this.rxStartValues);
+					this.autoStartRxCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "rxTriggerCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							UniLog2SetupConfiguration1.this.configuration.startRx = (short) ((UniLog2SetupConfiguration1.this.rxTriggerCombo.getSelectionIndex() - 1) * 5);
+							log.log(Level.FINEST, "autoStartRxCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration1.this.configuration.startRx = (short) (UniLog2SetupConfiguration1.this.autoStartRxCombo.getSelectionIndex() + 11);
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
 				}
 				{
-					this.rxTriggerUnitLabel = new CLabel(this.logStartStopGroup, SWT.NONE);
+					this.autoStartRxUnitLabel = new CLabel(this.logStartStopGroup, SWT.NONE);
 					RowData rxTriggerUnitLabelLData = new RowData();
 					rxTriggerUnitLabelLData.width = 49;
 					rxTriggerUnitLabelLData.height = 20;
-					this.rxTriggerUnitLabel.setLayoutData(rxTriggerUnitLabelLData);
-					this.rxTriggerUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2529));
+					this.autoStartRxUnitLabel.setLayoutData(rxTriggerUnitLabelLData);
+					this.autoStartRxUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2529));
 				}
 				{
-					this.timeTriggerButton = new Button(this.logStartStopGroup, SWT.CHECK | SWT.LEFT);
+					this.autoStartTimeButton = new Button(this.logStartStopGroup, SWT.CHECK | SWT.LEFT);
 					RowData timeTriggerButtonLData = new RowData();
 					timeTriggerButtonLData.width = 135;
 					timeTriggerButtonLData.height = 16;
-					this.timeTriggerButton.setLayoutData(timeTriggerButtonLData);
-					this.timeTriggerButton.setText(Messages.getString(MessageIds.GDE_MSGT2530));
-				}
-				{
-					this.timeTriggerCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
-					RowData timeTriggerComboLData = new RowData();
-					timeTriggerComboLData.width = 84;
-					timeTriggerComboLData.height = GDE.IS_MAC ? 18 : 14;
-					this.timeTriggerCombo.setLayoutData(timeTriggerComboLData);
-					this.timeTriggerCombo.setItems(this.timeStartValues);
-					this.timeTriggerCombo.addSelectionListener(new SelectionAdapter() {
+					this.autoStartTimeButton.setLayoutData(timeTriggerButtonLData);
+					this.autoStartTimeButton.setText(Messages.getString(MessageIds.GDE_MSGT2530));
+					this.autoStartTimeButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "timeTriggerCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							UniLog2SetupConfiguration1.this.configuration.startTime = (short) ((UniLog2SetupConfiguration1.this.timeTriggerCombo.getSelectionIndex() + 1) * 5);
+							log.log(Level.FINEST, "autoStartTimeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (UniLog2SetupConfiguration1.this.autoStartTimeButton.getSelection()) {
+								UniLog2SetupConfiguration1.this.configuration.startModus = (short) (UniLog2SetupConfiguration1.this.configuration.startModus | UniLog2SetupReaderWriter.AUTO_START_TIME);
+							}
+							else {
+								UniLog2SetupConfiguration1.this.configuration.startModus = (short) (UniLog2SetupConfiguration1.this.configuration.startModus ^ UniLog2SetupReaderWriter.AUTO_START_TIME);
+							}
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
 				}
 				{
-					this.timeTriggerUnitLabel = new CLabel(this.logStartStopGroup, SWT.NONE);
+					this.autoStartTimeCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
+					RowData timeTriggerComboLData = new RowData();
+					timeTriggerComboLData.width = 84;
+					timeTriggerComboLData.height = GDE.IS_MAC ? 18 : 14;
+					this.autoStartTimeCombo.setLayoutData(timeTriggerComboLData);
+					this.autoStartTimeCombo.setItems(this.timeStartValues);
+					this.autoStartTimeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "autoStartTimeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration1.this.configuration.startTime = (short) ((UniLog2SetupConfiguration1.this.autoStartTimeCombo.getSelectionIndex() + 1) * 5);
+							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.autoStartTimeUnitLabel = new CLabel(this.logStartStopGroup, SWT.NONE);
 					RowData timeTriggerUnitLabelLData = new RowData();
 					timeTriggerUnitLabelLData.width = 49;
 					timeTriggerUnitLabelLData.height = 20;
-					this.timeTriggerUnitLabel.setLayoutData(timeTriggerUnitLabelLData);
-					this.timeTriggerUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2531));
+					this.autoStartTimeUnitLabel.setLayoutData(timeTriggerUnitLabelLData);
+					this.autoStartTimeUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2531));
 				}
 				{
 					this.autoStopLabel = new CLabel(this.logStartStopGroup, SWT.NONE);
@@ -341,6 +379,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					serialNumberTextLData.width = 49;
 					serialNumberTextLData.height = GDE.IS_MAC ? 16 : 13;
 					this.serialNumberText.setLayoutData(serialNumberTextLData);
+					this.serialNumberText.setEditable(false);
 				}
 				{
 					this.firmwareLabel = new CLabel(this.commonAdjustmentsGroup, SWT.RIGHT);
@@ -356,6 +395,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					firmwareTextLData.width = 39;
 					firmwareTextLData.height = GDE.IS_MAC ? 16 : 13;
 					this.firmwareText.setLayoutData(firmwareTextLData);
+					this.firmwareText.setEditable(false);
 				}
 				{
 					this.dataRateLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);

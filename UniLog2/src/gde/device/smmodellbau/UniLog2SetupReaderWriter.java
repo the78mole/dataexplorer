@@ -53,6 +53,10 @@ public class UniLog2SetupReaderWriter {
 	final static int		TEL_ALARM_HEIGHT				= 0x0010;
 	final static int		TEL_ALARM_VOLTAGE_RX		= 0x0020;
 	final static int		TEL_ALARM_VOLTAGE_CELL	= 0x0040;
+	
+	final static int		AUTO_START_CURRENT			= 0x0001;
+	final static int		AUTO_START_RX						= 0x0002;
+	final static int		AUTO_START_TIME					= 0x0004;
 
 	//$UL2SETUP,192 Byte*
 	short								serialNumber						= 357;																												// 1
@@ -60,7 +64,7 @@ public class UniLog2SetupReaderWriter {
 	short								dataRate								= 2;																													// 3 0=50Hz, 1=20Hz, 2=10Hz, 3=5Hz, 4=4Hz, 5=1Hz
 	short								startModus							= 1;																													// 4 AUTO_STROM=0x0001, AUTO_RX=0x0002, AUTO_TIME=0x0004
 	short								startCurrent						= 3;																													// 5 1 - 50 A
-	short								startRx									= 15;																												// 6 value/10 msec
+	short								startRx									= 15;																													// 6 value/10 msec
 	short								startTime								= 5;																													// 7 5 - 90 sec
 	short								currentSensorType				= 1;																													// 8 0=20A, 1=40/80A, 2=150A, 3=400A
 	short								modusA1									= 0;																													// 9 0=Temperature, 1=MilliVolt, 2=SpeedSensor 250, 3=SpeedSensor 450, 4=Temperature PT1000

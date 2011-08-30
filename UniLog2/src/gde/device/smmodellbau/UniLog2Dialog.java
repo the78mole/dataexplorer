@@ -79,7 +79,7 @@ public class UniLog2Dialog extends DeviceDialog {
 
 	CTabItem										gpsLoggerTabItem, telemetryTabItem;
 
-	Text												propeller_n100W_Text;
+	//Text												propeller_n100W_Text;
 
 	final UniLog2								device;																																						// get device specific things, get serial port, ...
 	final Settings							settings;																																					// application configuration settings
@@ -158,15 +158,13 @@ public class UniLog2Dialog extends DeviceDialog {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
 						RecordSet activeRecordSet = UniLog2Dialog.this.application.getActiveRecordSet();
 						int index = Channels.getInstance().getActiveChannelNumber();
-						if (UniLog2Dialog.this.lastActiveRecordSet != null && activeRecordSet != null && !UniLog2Dialog.this.lastActiveRecordSet.getName().equals(activeRecordSet.getName())) {
-							index = index > UniLog2Dialog.this.tabFolder.getChildren().length - 1 ? 0 : index;
-							UniLog2Dialog.this.tabFolder.setSelection(index);
-							//TODO ((UniLog2Dialog)UniLog2Dialog.this.deviceConfigTabFolder.getChildren()[index]).initialize();
+						if (UniLog2Dialog.this.lastActiveRecordSet == null && activeRecordSet != null 
+								|| ( activeRecordSet != null && !UniLog2Dialog.this.lastActiveRecordSet.getName().equals(activeRecordSet.getName()))) {
+							UniLog2Dialog.this.tabFolder.setSelection(index - 1);
 						}
 						UniLog2Dialog.this.lastActiveRecordSet = UniLog2Dialog.this.application.getActiveRecordSet();
 						PropertyType property = UniLog2Dialog.this.device.getMeasruementProperty(index, 14, UniLog2Dialog.PROP_n100W);
 						if (property != null) UniLog2Dialog.this.propeller_n100W_Value = Integer.parseInt(property.getValue());
-						UniLog2Dialog.this.propeller_n100W_Text.setText(GDE.STRING_EMPTY + UniLog2Dialog.this.propeller_n100W_Value);
 					}
 				});
 				{
@@ -452,19 +450,19 @@ public class UniLog2Dialog extends DeviceDialog {
 						efficencyLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2506));
 					}
 					{
-						this.propeller_n100W_Text = new Text(filler, SWT.BORDER | SWT.CENTER);
+						final Text propeller_n100W_Text = new Text(filler, SWT.BORDER | SWT.CENTER);
 						RowData efficencyRowData = new RowData();
 						efficencyRowData.height = 14;
 						efficencyRowData.width = 80;
-						this.propeller_n100W_Text.setLayoutData(efficencyRowData);
-						this.propeller_n100W_Text.setText(GDE.STRING_EMPTY + UniLog2Dialog.this.propeller_n100W_Value);
-						this.propeller_n100W_Text.addKeyListener(new KeyAdapter() {
+						propeller_n100W_Text.setLayoutData(efficencyRowData);
+						propeller_n100W_Text.setText(GDE.STRING_EMPTY + UniLog2Dialog.this.propeller_n100W_Value);
+						propeller_n100W_Text.addKeyListener(new KeyAdapter() {
 							@Override
 							public void keyReleased(KeyEvent evt) {
 								log.log(Level.FINEST, "efficencyN100WText.keyReleaded, evt=" + evt); //$NON-NLS-1$
 								try {
 									if (evt.character == SWT.CR) {
-										UniLog2Dialog.this.propeller_n100W_Value = new Integer(UniLog2Dialog.this.propeller_n100W_Text.getText().trim());
+										UniLog2Dialog.this.propeller_n100W_Value = new Integer(propeller_n100W_Text.getText().trim());
 										if (UniLog2Dialog.this.channels.getActiveChannel() != null) {
 											RecordSet recordSet = UniLog2Dialog.this.channels.getActiveChannel().getActiveRecordSet();
 											if (recordSet != null) {
@@ -493,6 +491,12 @@ public class UniLog2Dialog extends DeviceDialog {
 									UniLog2Dialog.this.application.openMessageDialog(UniLog2Dialog.this.getDialogShell(),
 											Messages.getString(gde.messages.MessageIds.GDE_MSGE0030, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 								}
+							}
+						});
+						propeller_n100W_Text.addPaintListener(new PaintListener() {
+							public void paintControl(PaintEvent arg0) {
+								if (!propeller_n100W_Text.getText().equals(GDE.STRING_EMPTY + UniLog2Dialog.this.propeller_n100W_Value))
+									propeller_n100W_Text.setText(GDE.STRING_EMPTY + UniLog2Dialog.this.propeller_n100W_Value);
 							}
 						});
 					}

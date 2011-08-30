@@ -82,9 +82,10 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>CellBalance</name>
+                <name>Balance</name>
                 <symbol></symbol>
                 <unit>mV</unit>
+                <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
@@ -142,10 +143,11 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Efficency</name>
+                <name>Efficiency</name>
                 <symbol>eta</symbol>
                 <unit>%</unit>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="false"/>
                 <property type="Integer" value="3400" name="prop_n100W"/>
             </Measurement>
             <Measurement>
@@ -440,11 +442,11 @@
                 <statistics comment="Values referencing current tigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
             </Measurement>
             <Measurement>
-                <name>Efficency</name>
+                <name>Efficiency</name>
                 <symbol>eta</symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics comment="Values referencing current tigger" triggerRefOrdinal="2" sigma="true" avg="true" max="false" min="false"/>
+                <statistics comment="Values referencing current tigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
                 <property type="Integer" value="3600" name="prop_n100W"/>
             </Measurement>
             <Measurement>

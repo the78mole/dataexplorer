@@ -539,13 +539,12 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.heightCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.heightCombo.setLayoutData(heightCComboLData);
 					this.heightCombo.setItems(this.heightThresholds);
-					this.heightCombo.setText(String.format(Locale.ENGLISH, "%5.1f", this.configuration.heightAlarm / 10.0)); //$NON-NLS-1$
 					this.heightCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "heightCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.heightAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.heightCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)));
 							UniLog2SetupConfiguration2.this.configuration.heightAlarm = UniLog2SetupConfiguration2.this.configuration.heightAlarm < 10 ? 10
 									: UniLog2SetupConfiguration2.this.configuration.heightAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.heightAlarm;
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
@@ -617,13 +616,12 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.voltageRxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageRxCombo.setLayoutData(voltageRxCComboLData);
 					this.voltageRxCombo.setItems(this.voltageRxStartValues);
-					this.voltageRxCombo.setText(String.format(Locale.ENGLISH, "%5.1f", this.configuration.voltageRxAlarm / 10.0)); //$NON-NLS-1$
 					this.voltageRxCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "voltageRxCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.voltageRxCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
 							UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm = UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm < 10 ? 10
 									: UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm;
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
@@ -640,7 +638,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "voltageRxCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.voltageRxCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
 							UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm = UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm < 10 ? 10
 									: UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm;
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
@@ -701,7 +699,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "cellVoltageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.cellVoltageCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
 							UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm < 10 ? 10
 									: UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm;
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
@@ -718,7 +716,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "cellVoltageCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.cellVoltageCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
 							UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm < 10 ? 10
 									: UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm;
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
@@ -1193,7 +1191,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c6ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c6Combo.setLayoutData(c6ComboLData);
 					this.c6Combo.setItems(this.sliderValues);
-					this.a1Combo.addSelectionListener(new SelectionAdapter() {
+					this.c6Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "a1Combo.widgetSelected, event=" + evt); //$NON-NLS-1$

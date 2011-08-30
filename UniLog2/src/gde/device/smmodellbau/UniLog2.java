@@ -26,12 +26,15 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
+import gde.device.PropertyType;
 import gde.device.smmodellbau.unilog2.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.io.LogViewReader;
 import gde.io.NMEAParser;
 import gde.io.NMEAReaderWriter;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
@@ -55,7 +58,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	final static Logger	log										= Logger.getLogger(UniLog2.class.getName());
 
 	final static String	SM_UNILOG_2_INI				= "SM UniLog 2.ini";													//$NON-NLS-1$
-	final static String	SM_UNILOG_2_INI_PATH	= "SM UniLog 2 ";														//$NON-NLS-1$
+	final static String	SM_UNILOG_2_INI_PATH	= "SM UniLog 2 ";														  //$NON-NLS-1$
 
 	final DataExplorer	application;
 	final Channels			channels;
@@ -209,7 +212,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.getRecordNames().length];
+		int[] points = new int[recordSet.getNoneCalculationRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
@@ -240,9 +243,9 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 			}
 
 			if (recordSet.isTimeStepConstant())
-				recordSet.addPoints(points);
+				recordSet.addNoneCalculationRecordsPoints(points);
 			else
-				recordSet.addPoints(points, timeStamps.get(i) / 10.0);
+				recordSet.addNoneCalculationRecordsPoints(points, timeStamps.get(i) / 10.0);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
@@ -266,16 +269,24 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 				//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 				//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
 				//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-				if (j > 1) {
-					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+				if (j == 15) { //15=Height
+					PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
+					boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+					property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
+					boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+					try {
+						if (subtractFirst) {
+							reduction = record.getFirst() / 1000.0;
+						}
+						else if (subtractLast) {
+							reduction = record.getLast() / 1000.0;
+						}
+					}
+					catch (Throwable e) {
+						log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage());
+					}
 				}
-				else {
-					//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
-					double value = (record.get(rowIndex) / 1000000.0);
-					int grad = (int) value;
-					double minuten = (value - grad) * 100;
-					dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
-				}
+				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
 			}
 		}
 		catch (RuntimeException e) {
@@ -294,6 +305,28 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
+		//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
+		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+		//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
+		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+		if (record.getOrdinal() == 15) { //15=Height
+			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
+			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
+			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+			try {
+				if (subtractFirst) {
+					reduction = record.getFirst() / 1000.0;
+				}
+				else if (subtractLast) {
+					reduction = record.getLast() / 1000.0;
+				}
+			}
+			catch (Throwable e) {
+				log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage());
+			}
+		}
+
 		double newValue = (value - reduction) * factor + offset;
 
 		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -309,6 +342,28 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
+
+		//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
+		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+		//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
+		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+		if (record.getOrdinal() == 15) { //15=Height
+			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
+			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
+			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+			try {
+				if (subtractFirst) {
+					reduction = record.getFirst() / 1000.0;
+				}
+				else if (subtractLast) {
+					reduction = record.getLast() / 1000.0;
+				}
+			}
+			catch (Throwable e) {
+				log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage());
+			}
+		}
 
 		double newValue = (value - offset) / factor + reduction;
 
@@ -370,6 +425,39 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
+		//do not forget to make record displayable -> record.setDisplayable(true);
+		// calculate the values required
+		Record record;
+		String recordKey;
+		//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
+		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+		//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
+		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+		String[] measurements = recordSet.getRecordNames();
+		
+		recordKey = measurements[14]; // 14=efficiency
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "start data calculation for record = " + recordKey); //$NON-NLS-1$
+		record = recordSet.get(recordKey);
+		Record recordRevolution = recordSet.get(measurements[13]); // 13=revolution
+		Record recordPower = recordSet.get(measurements[4]); // 4=Power [w]
+		PropertyType property = record.getProperty(MeasurementPropertyTypes.PROP_N_100_W.value());
+		int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
+		property = recordRevolution.getProperty(MeasurementPropertyTypes.NUMBER_MOTOR.value());
+		double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+		Record recordCurrent = recordSet.get(measurements[2]); // 2=Current
+		for (int i = 0; i < recordRevolution.size(); i++) {
+			if (i > 1 && recordRevolution.get(i)> 100000 && recordCurrent.get(i) > 3000) { //100 1/min && 3A
+				double motorPower = Math.pow(((recordRevolution.get(i) / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
+				double eta = motorPower * 100.0 / recordPower.get(i);
+				eta = eta > 100 && i > 1 ? record.get(i-1)/1000.0 : eta < 0 ? 0 : eta;
+				if (log.isLoggable(Level.FINER)) 
+					log.log(Level.FINER, String.format("current=%5.1f; recordRevolution=%5.0f; recordPower=%6.2f; motorPower=%6.2f eta=%5.1f", recordCurrent.get(i)/1000.0, recordRevolution.get(i)/1000.0, recordPower.get(i)/1000.0, motorPower/1000.0, eta));
+				record.set(i, Double.valueOf(eta * 1000).intValue());
+				record.setDisplayable(true);
+			}
+			else record.set(i, 0);
+			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
+		}
 		this.application.updateStatisticsData();
 	}
 
