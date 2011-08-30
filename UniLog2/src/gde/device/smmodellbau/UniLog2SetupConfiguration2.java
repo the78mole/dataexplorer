@@ -991,6 +991,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					a1LabelLData.height = 19;
 					this.a1Label.setLayoutData(a1LabelLData);
 					this.a1Label.setText("A1"); //$NON-NLS-1$
+					this.a1Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.a1Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
@@ -999,6 +1000,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					a1ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a1Combo.setLayoutData(a1ComboLData);
 					this.a1Combo.setItems(this.sliderValues);
+					this.a1Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.a1Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1015,6 +1017,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					a2LabelLData.height = 19;
 					this.a2Label.setLayoutData(a2LabelLData);
 					this.a2Label.setText("A2"); //$NON-NLS-1$
+					this.a2Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.a2Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
@@ -1023,6 +1026,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					a2ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a2Combo.setLayoutData(a2ComboLData);
 					this.a2Combo.setItems(this.sliderValues);
+					this.a2Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.a2Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1039,6 +1043,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					a3LabelLData.height = 19;
 					this.a3Label.setLayoutData(a3LabelLData);
 					this.a3Label.setText("A3"); //$NON-NLS-1$
+					this.a3Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.a3Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
@@ -1047,6 +1052,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					a3ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a3Combo.setLayoutData(a3ComboLData);
 					this.a3Combo.setItems(this.sliderValues);
+					this.a3Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.a3Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1063,6 +1069,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c1LabelLData.height = 19;
 					this.c1Label.setLayoutData(c1LabelLData);
 					this.c1Label.setText(Messages.getString(MessageIds.GDE_MSGT2570));
+					this.c1Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.c1Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
@@ -1071,6 +1078,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c1ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c1Combo.setLayoutData(c1ComboLData);
 					this.c1Combo.setItems(this.sliderValues);
+					this.c1Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.c1Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1087,6 +1095,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c2LabelLData.height = 19;
 					this.c2Label.setLayoutData(c2LabelLData);
 					this.c2Label.setText(Messages.getString(MessageIds.GDE_MSGT2571));
+					this.c2Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.c2Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
@@ -1095,6 +1104,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c2ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c2Combo.setLayoutData(c2ComboLData);
 					this.c2Combo.setItems(this.sliderValues);
+					this.c2Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.c2Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1111,6 +1121,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c3LabelLData.height = 19;
 					this.c3Label.setLayoutData(c3LabelLData);
 					this.c3Label.setText(Messages.getString(MessageIds.GDE_MSGT2572));
+					this.c3Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.c3Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
@@ -1119,6 +1130,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c3ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c3Combo.setLayoutData(c3ComboLData);
 					this.c3Combo.setItems(this.sliderValues);
+					this.c3Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.c3Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1135,6 +1147,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c4LabelLData.height = 19;
 					this.c4Label.setLayoutData(c4LabelLData);
 					this.c4Label.setText(Messages.getString(MessageIds.GDE_MSGT2573));
+					this.c4Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.c4Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
@@ -1143,6 +1156,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c4ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c4Combo.setLayoutData(c4ComboLData);
 					this.c4Combo.setItems(this.sliderValues);
+					this.c4Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.c4Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1159,6 +1173,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c5LabelLData.height = 19;
 					this.c5Label.setLayoutData(c5LabelLData);
 					this.c5Label.setText(Messages.getString(MessageIds.GDE_MSGT2574));
+					this.c5Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.c5Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
@@ -1167,6 +1182,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c5ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c5Combo.setLayoutData(c5ComboLData);
 					this.c5Combo.setItems(this.sliderValues);
+					this.c5Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.c5Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1183,6 +1199,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c6LabelLData.height = 19;
 					this.c6Label.setLayoutData(c6LabelLData);
 					this.c6Label.setText(Messages.getString(MessageIds.GDE_MSGT2575));
+					this.c6Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.c6Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
@@ -1191,6 +1208,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					c6ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c6Combo.setLayoutData(c6ComboLData);
 					this.c6Combo.setItems(this.sliderValues);
+					this.c6Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.c6Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {

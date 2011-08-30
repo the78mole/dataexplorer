@@ -211,15 +211,6 @@ public class UniLog2Dialog extends DeviceDialog {
 					this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.tabFolder.setLayoutData(tabFolderLData);
 					this.tabFolder.setSelection(this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getNumber() - 1 : 0);
-					//					this.tabFolder.addListener(SWT.Selection, new Listener() {
-					//						public void handleEvent(Event event) {
-					//							if (UniLog2Dialog.this.tabFolder.getSelectionIndex() == 2) {
-					//								UniLog2Dialog.this.loggerSetup.loadSetup();
-					//								UniLog2Dialog.this.configuration1Composite.updateValues();
-					//								UniLog2Dialog.this.configuration2Composite.updateValues();
-					//							}
-					//						}
-					//					});
 					this.tabFolder.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -448,7 +439,7 @@ public class UniLog2Dialog extends DeviceDialog {
 						efficencyLabel.setLayoutData(efficencyRowData);
 						efficencyLabel.setText(Messages.getString(MessageIds.GDE_MSGT2505));
 						efficencyLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2506));
-					}
+						efficencyLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));					}
 					{
 						final Text propeller_n100W_Text = new Text(filler, SWT.BORDER | SWT.CENTER);
 						RowData efficencyRowData = new RowData();
@@ -456,6 +447,7 @@ public class UniLog2Dialog extends DeviceDialog {
 						efficencyRowData.width = 80;
 						propeller_n100W_Text.setLayoutData(efficencyRowData);
 						propeller_n100W_Text.setText(GDE.STRING_EMPTY + UniLog2Dialog.this.propeller_n100W_Value);
+						propeller_n100W_Text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						propeller_n100W_Text.addKeyListener(new KeyAdapter() {
 							@Override
 							public void keyReleased(KeyEvent evt) {
@@ -493,6 +485,12 @@ public class UniLog2Dialog extends DeviceDialog {
 								}
 							}
 						});
+						propeller_n100W_Text.addPaintListener(new PaintListener() {
+							public void paintControl(PaintEvent arg0) {
+								if (!propeller_n100W_Text.getText().equals(GDE.STRING_EMPTY + UniLog2Dialog.this.propeller_n100W_Value))
+									propeller_n100W_Text.setText(GDE.STRING_EMPTY + UniLog2Dialog.this.propeller_n100W_Value);
+							}
+						});
 					}
 					{
 						CLabel efficencyUnit = new CLabel(filler, SWT.NONE);
@@ -501,6 +499,7 @@ public class UniLog2Dialog extends DeviceDialog {
 						efficencyRowData.width = 50;
 						efficencyUnit.setLayoutData(efficencyRowData);
 						efficencyUnit.setText(Messages.getString(MessageIds.GDE_MSGT2507));
+						efficencyUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					}
 				}
 			}
