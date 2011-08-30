@@ -987,7 +987,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.a1Label = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
 					RowData a1LabelLData = new RowData();
-					a1LabelLData.width = 43;
+					a1LabelLData.width = GDE.IS_LINUX ? 40 : 43;
 					a1LabelLData.height = 19;
 					this.a1Label.setLayoutData(a1LabelLData);
 					this.a1Label.setText("A1"); //$NON-NLS-1$
@@ -996,7 +996,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.a1Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData a1ComboLData = new RowData();
-					a1ComboLData.width = 40;
+					a1ComboLData.width = GDE.IS_LINUX ? 45 : 40;
 					a1ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a1Combo.setLayoutData(a1ComboLData);
 					this.a1Combo.setItems(this.sliderValues);
@@ -1013,7 +1013,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.a2Label = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
 					RowData a2LabelLData = new RowData();
-					a2LabelLData.width = 43;
+					a2LabelLData.width = GDE.IS_LINUX ? 40 : 43;
 					a2LabelLData.height = 19;
 					this.a2Label.setLayoutData(a2LabelLData);
 					this.a2Label.setText("A2"); //$NON-NLS-1$
@@ -1022,7 +1022,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.a2Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData a2ComboLData = new RowData();
-					a2ComboLData.width = 40;
+					a2ComboLData.width = GDE.IS_LINUX ? 45 : 40;
 					a2ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a2Combo.setLayoutData(a2ComboLData);
 					this.a2Combo.setItems(this.sliderValues);
@@ -1039,7 +1039,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.a3Label = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
 					RowData a3LabelLData = new RowData();
-					a3LabelLData.width = 43;
+					a3LabelLData.width = GDE.IS_LINUX ? 40 : 43;
 					a3LabelLData.height = 19;
 					this.a3Label.setLayoutData(a3LabelLData);
 					this.a3Label.setText("A3"); //$NON-NLS-1$
@@ -1048,7 +1048,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.a3Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData a3ComboLData = new RowData();
-					a3ComboLData.width = 40;
+					a3ComboLData.width = GDE.IS_LINUX ? 45 : 40;
 					a3ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a3Combo.setLayoutData(a3ComboLData);
 					this.a3Combo.setItems(this.sliderValues);
@@ -1065,7 +1065,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c1Label = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
 					RowData c1LabelLData = new RowData();
-					c1LabelLData.width = 43;
+					c1LabelLData.width = GDE.IS_LINUX ? 40 : 43;
 					c1LabelLData.height = 19;
 					this.c1Label.setLayoutData(c1LabelLData);
 					this.c1Label.setText(Messages.getString(MessageIds.GDE_MSGT2570));
@@ -1074,7 +1074,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c1Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c1ComboLData = new RowData();
-					c1ComboLData.width = 40;
+					c1ComboLData.width = GDE.IS_LINUX ? 45 : 40;
 					c1ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c1Combo.setLayoutData(c1ComboLData);
 					this.c1Combo.setItems(this.sliderValues);
@@ -1091,7 +1091,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c2Label = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
 					RowData c2LabelLData = new RowData();
-					c2LabelLData.width = 43;
+					c2LabelLData.width = GDE.IS_LINUX ? 40 : 43;
 					c2LabelLData.height = 19;
 					this.c2Label.setLayoutData(c2LabelLData);
 					this.c2Label.setText(Messages.getString(MessageIds.GDE_MSGT2571));
@@ -1100,7 +1100,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c2Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c2ComboLData = new RowData();
-					c2ComboLData.width = 40;
+					c2ComboLData.width = GDE.IS_LINUX ? 45 : 40;
 					c2ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c2Combo.setLayoutData(c2ComboLData);
 					this.c2Combo.setItems(this.sliderValues);
@@ -1117,7 +1117,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c3Label = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
 					RowData c3LabelLData = new RowData();
-					c3LabelLData.width = 43;
+					c3LabelLData.width = GDE.IS_LINUX ? 40 : 43;
 					c3LabelLData.height = 19;
 					this.c3Label.setLayoutData(c3LabelLData);
 					this.c3Label.setText(Messages.getString(MessageIds.GDE_MSGT2572));
@@ -1126,7 +1126,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c3Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c3ComboLData = new RowData();
-					c3ComboLData.width = 40;
+					c3ComboLData.width = GDE.IS_LINUX ? 45 : 40;
 					c3ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c3Combo.setLayoutData(c3ComboLData);
 					this.c3Combo.setItems(this.sliderValues);
@@ -1143,7 +1143,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c4Label = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
 					RowData c4LabelLData = new RowData();
-					c4LabelLData.width = 43;
+					c4LabelLData.width = GDE.IS_LINUX ? 40 : 43;
 					c4LabelLData.height = 19;
 					this.c4Label.setLayoutData(c4LabelLData);
 					this.c4Label.setText(Messages.getString(MessageIds.GDE_MSGT2573));
@@ -1152,7 +1152,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c4Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c4ComboLData = new RowData();
-					c4ComboLData.width = 40;
+					c4ComboLData.width = GDE.IS_LINUX ? 45 : 40;
 					c4ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c4Combo.setLayoutData(c4ComboLData);
 					this.c4Combo.setItems(this.sliderValues);
@@ -1169,7 +1169,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c5Label = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
 					RowData c5LabelLData = new RowData();
-					c5LabelLData.width = 43;
+					c5LabelLData.width = GDE.IS_LINUX ? 40 : 43;
 					c5LabelLData.height = 19;
 					this.c5Label.setLayoutData(c5LabelLData);
 					this.c5Label.setText(Messages.getString(MessageIds.GDE_MSGT2574));
@@ -1178,7 +1178,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c5Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c5ComboLData = new RowData();
-					c5ComboLData.width = 40;
+					c5ComboLData.width = GDE.IS_LINUX ? 45 : 40;
 					c5ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c5Combo.setLayoutData(c5ComboLData);
 					this.c5Combo.setItems(this.sliderValues);
@@ -1195,7 +1195,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c6Label = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
 					RowData c6LabelLData = new RowData();
-					c6LabelLData.width = 43;
+					c6LabelLData.width = GDE.IS_LINUX ? 40 : 43;
 					c6LabelLData.height = 19;
 					this.c6Label.setLayoutData(c6LabelLData);
 					this.c6Label.setText(Messages.getString(MessageIds.GDE_MSGT2575));
@@ -1204,7 +1204,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				{
 					this.c6Combo = new CCombo(this.mLinkAddressesGroup, SWT.BORDER);
 					RowData c6ComboLData = new RowData();
-					c6ComboLData.width = 40;
+					c6ComboLData.width = GDE.IS_LINUX ? 45 : 40;
 					c6ComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.c6Combo.setLayoutData(c6ComboLData);
 					this.c6Combo.setItems(this.sliderValues);
