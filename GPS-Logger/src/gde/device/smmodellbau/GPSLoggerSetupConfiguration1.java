@@ -174,7 +174,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.serialNumberText = new Text(this.gpsLoggerGroup, SWT.RIGHT | SWT.BORDER);
 					RowData serialNumberTextLData = new RowData();
 					serialNumberTextLData.width = 83;
-					serialNumberTextLData.height = 16;
+					serialNumberTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.serialNumberText.setLayoutData(serialNumberTextLData);
 					this.serialNumberText.setEditable(false);
 					this.serialNumberText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -193,7 +193,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.firmwareText = new Text(this.gpsLoggerGroup, SWT.RIGHT | SWT.BORDER);
 					RowData firmwareTextLData = new RowData();
 					firmwareTextLData.width = 83;
-					firmwareTextLData.height = 16;
+					firmwareTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.firmwareText.setLayoutData(firmwareTextLData);
 					this.firmwareText.setEditable(false);
 					this.firmwareText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));

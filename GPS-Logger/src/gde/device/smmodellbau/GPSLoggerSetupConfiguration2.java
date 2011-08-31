@@ -183,7 +183,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText1LData = new RowData();
 					addressText1LData.width = textWidth;
-					addressText1LData.height = 13;
+					addressText1LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText1.setLayoutData(addressText1LData);
 					this.addressText1.setText(sliderValues[this.configuration.mLinkAddressVario]);
 				}
@@ -221,7 +221,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText2LData = new RowData();
 					addressText2LData.width = textWidth;
-					addressText2LData.height = 13;
+					addressText2LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText2.setLayoutData(addressText2LData);
 					this.addressText2.setText(sliderValues[this.configuration.mLinkAddressSpeed]);
 				}
@@ -259,7 +259,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText2max.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText2maxLData = new RowData();
 					addressText2maxLData.width = textWidth;
-					addressText2maxLData.height = 13;
+					addressText2maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText2max.setLayoutData(addressText2maxLData);
 					this.addressText2max.setText(sliderValues[this.configuration.mLinkAddressSpeedMax]);
 				}
@@ -297,7 +297,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText3LData = new RowData();
 					addressText3LData.width = textWidth;
-					addressText3LData.height = 13;
+					addressText3LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText3.setLayoutData(addressText3LData);
 					this.addressText3.setText(sliderValues[this.configuration.mLinkAddressHeight]);
 				}
@@ -335,7 +335,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText3max.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText3maxLData = new RowData();
 					addressText3maxLData.width = textWidth;
-					addressText3maxLData.height = 13;
+					addressText3maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText3max.setLayoutData(addressText3maxLData);
 					this.addressText3max.setText(sliderValues[this.configuration.mLinkAddressHeightMax]);
 				}
@@ -373,7 +373,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText4LData = new RowData();
 					addressText4LData.width = textWidth;
-					addressText4LData.height = 13;
+					addressText4LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText4.setLayoutData(addressText4LData);
 					this.addressText4.setText(sliderValues[this.configuration.mLinkAddressDistance]);
 				}
@@ -411,7 +411,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText5.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText5LData = new RowData();
 					addressText5LData.width = textWidth;
-					addressText5LData.height = 13;
+					addressText5LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText5.setLayoutData(addressText5LData);
 					this.addressText5.setText(sliderValues[this.configuration.mLinkAddressDirection]);
 				}
@@ -449,7 +449,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText6.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText6LData = new RowData();
 					addressText6LData.width = textWidth;
-					addressText6LData.height = 13;
+					addressText6LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText6.setLayoutData(addressText6LData);
 					this.addressText6.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
 				}
@@ -507,7 +507,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText1UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText1ULLData = new RowData();
 					addressText1ULLData.width = textWidth;
-					addressText1ULLData.height = 13;
+					addressText1ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText1UL.setLayoutData(addressText1ULLData);
 					this.addressText1UL.setText(sliderValues[this.configuration.mLinkAddressVoltageUL]);
 				}
@@ -545,7 +545,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText2UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText2ULLData = new RowData();
 					addressText2ULLData.width = textWidth;
-					addressText2ULLData.height = 13;
+					addressText2ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText2UL.setLayoutData(addressText2ULLData);
 					this.addressText2UL.setText(sliderValues[this.configuration.mLinkAddressCurrentUL]);
 				}
@@ -583,7 +583,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText3UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText3ULLData = new RowData();
 					addressText3ULLData.width = textWidth;
-					addressText3ULLData.height = 13;
+					addressText3ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText3UL.setLayoutData(addressText3ULLData);
 					this.addressText3UL.setText(sliderValues[this.configuration.mLinkAddressRevolutionUL]);
 				}
@@ -621,7 +621,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressText4UL.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText4ULLData = new RowData();
 					addressText4ULLData.width = textWidth;
-					addressText4ULLData.height = 13;
+					addressText4ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText4UL.setLayoutData(addressText4ULLData);
 					this.addressText4UL.setText(sliderValues[this.configuration.mLinkAddressCapacityUL]);
 				}
