@@ -79,7 +79,7 @@ public class GDE {
 	public static final String		VERSION													= "Version 2.91";																																																						//$NON-NLS-1$
 	public static final String		NAME_SHORT											= "GDE";																																																											//$NON-NLS-1$
 	public static final String		NAME_LONG												= "DataExplorer";																																																						//$NON-NLS-1$
-	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V14";																																																										//$NON-NLS-1$
+	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V15";																																																										//$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION	= "_V06";																																																										//$NON-NLS-1$
 	public final static String		CLEAN_SETTINGS_WHILE_SHUTDOWN 	= "CLEAN_SETTINGS_WHILE_SHUTDOWN";
 
