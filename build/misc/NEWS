@@ -6,6 +6,7 @@ Version 2.91 - 12 Sep 2011
 2) HoTTAdapter live data gatherer detecting sensor type automatically
 3) add UniLog2 device implementation
 4) adapt GPS-Logger to accept UL2 sentences
+5) new version of device properties schema to deliver updated GPS-Logger device configuration files
 7) documentation update
 
 
