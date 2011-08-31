@@ -766,7 +766,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.addressVoltageText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText1LData = new RowData();
 					addressText1LData.width = this.textWidth;
-					addressText1LData.height = 13;
+					addressText1LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressVoltageText.setLayoutData(addressText1LData);
 					this.addressVoltageText.setText(this.sliderValues[this.configuration.mLinkAddressVario]);
 				}
@@ -804,7 +804,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.addressCurrentText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText2LData = new RowData();
 					addressText2LData.width = this.textWidth;
-					addressText2LData.height = 13;
+					addressText2LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressCurrentText.setLayoutData(addressText2LData);
 					this.addressCurrentText.setText(this.sliderValues[this.configuration.mLinkAddressA1]);
 				}
@@ -842,7 +842,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.addressRevolutionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText2maxLData = new RowData();
 					addressText2maxLData.width = this.textWidth;
-					addressText2maxLData.height = 13;
+					addressText2maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressRevolutionText.setLayoutData(addressText2maxLData);
 				}
 				{
@@ -879,7 +879,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.addressCapacityText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText3LData = new RowData();
 					addressText3LData.width = this.textWidth;
-					addressText3LData.height = 13;
+					addressText3LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressCapacityText.setLayoutData(addressText3LData);
 					this.addressCapacityText.setText(this.sliderValues[this.configuration.mLinkAddressHeight]);
 				}
@@ -917,7 +917,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.addressVarioText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText3maxLData = new RowData();
 					addressText3maxLData.width = this.textWidth;
-					addressText3maxLData.height = 13;
+					addressText3maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressVarioText.setLayoutData(addressText3maxLData);
 				}
 				{
@@ -954,7 +954,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.addressHeightText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressText3maxLData = new RowData();
 					addressText3maxLData.width = this.textWidth;
-					addressText3maxLData.height = 13;
+					addressText3maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressHeightText.setLayoutData(addressText3maxLData);
 				}
 				{

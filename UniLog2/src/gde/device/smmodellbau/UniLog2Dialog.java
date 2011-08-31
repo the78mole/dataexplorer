@@ -379,6 +379,7 @@ public class UniLog2Dialog extends DeviceDialog {
 
 	/**
 	 * create a visualization control tab item
+	 * @param channelNumber
 	 */
 	private void createVisualizationTabItem(int channelNumber) {
 		this.visualizationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
@@ -395,8 +396,7 @@ public class UniLog2Dialog extends DeviceDialog {
 			layoutData.left = new FormAttachment(0, 1000, 0);
 			layoutData.right = new FormAttachment(458, 1000, 0);
 			layoutData.bottom = new FormAttachment(1000, 1000, 0);
-			new UniLog2VisualizationControl(this.visualizationMainComposite, layoutData, this, this.application.getActiveChannelNumber() == null ? 1 : this.application.getActiveChannelNumber(),
-					this.device, Messages.getString(MessageIds.GDE_MSGT2510), 0, 15);
+			new UniLog2VisualizationControl(this.visualizationMainComposite, layoutData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2510), 0, 15);
 
 			this.subTabFolder1 = new CTabFolder(this.visualizationMainComposite, SWT.NONE);
 			//this.subTabFolder1.setSimple(false);
@@ -443,7 +443,7 @@ public class UniLog2Dialog extends DeviceDialog {
 					{
 						final Text propeller_n100W_Text = new Text(filler, SWT.BORDER | SWT.CENTER);
 						RowData efficencyRowData = new RowData();
-						efficencyRowData.height = 14;
+						efficencyRowData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 						efficencyRowData.width = 80;
 						propeller_n100W_Text.setLayoutData(efficencyRowData);
 						propeller_n100W_Text.setText(GDE.STRING_EMPTY + UniLog2Dialog.this.propeller_n100W_Value);
