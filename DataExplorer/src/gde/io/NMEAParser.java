@@ -209,16 +209,41 @@ public class NMEAParser {
 					this.firmwareVersion = String.format("%.2f", Integer.parseInt(strValues[2].trim(), 16)/100.0); //$NON-NLS-1$
 					break;
 				case UL2:
-					if (this.values.length >=25)
-						if (this.device.getName().equals("UniLog2")) parseUNILOG2(strValues);
-						else if (this.device.getName().equals("GPS-Logger")) parseUL2(strValues);
+					if (this.values.length >=25){
+						if (this.device.getName().equals("UniLog2")) {
+							//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
+							//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+							//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
+							//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+							//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
+							int[] in2out = { -1,  -1,  -1,  -1, 	1, 		2, 15,  16,   4,  13,   0,   3,   5,  18,  19,  20,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
+							parseUNILOG2(strValues, in2out, true);
+						}
+						else if (this.device.getName().equals("GPS-Logger")) {
+							if (this.channelConfigNumber == 2) {
+								//UL2 4:voltage, 5:current, 6:height, 7:climb, 8:power, 9:revolution, 11:capacity, 12:energy, 13:valueA1, 14:valueA2, 15:valueA3, 
+								//UL2 16:cellvoltage1, 17:cellvoltage2, 18:cellvoltage3, 19:cellvoltage4, 20:cellvoltage5, 21:cellvoltage6, 23:temperature intern
+								//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+								//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+								//Unilog2 15=Voltage, 16=Current, 17=Capacity, 18=Power, 19=Energy, 20=CellBalance, 21=CellVoltage1, 21=CellVoltage2, 23=CellVoltage3, 
+								//Unilog2 24=CellVoltage4, 25=CellVoltage5, 26=CellVoltage6, 27=Revolution, 28=ValueA1, 29=ValueA2, 30=ValueA3, 31=InternTemperature
+								//M-LINK  32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+								//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
+								int[] in2out = { -1,  -1,  -1,  -1,  15,  16,  -1,  -1,  18,  27,  -1,  17,  19,  28,  29,  30,  21,  22,  23,  24,  25,  26,  -1,  31,  -1,  -1};
+								parseUNILOG2(strValues, in2out, false);								
+							}
+							else { // fall back to UniLog supported values
+								//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+								//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
+								//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+								//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
+								//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+								parseUL2(strValues); // UniLog values only
+							}
+						}
+					}
 					break;
 				}
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-				//GPS 		8=altitudeRel 9=climb 10=magneticVariation 11=tripLength 12=distance 13=azimuth
-				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-				//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-				//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 			}
 			catch (Exception e) {
 				if (e instanceof IllegalArgumentException && e.getMessage().contains("No enum")) { //$NON-NLS-1$
@@ -296,7 +321,9 @@ public class NMEAParser {
 				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
 				this.lastTimeStamp = timeStamp;
 				this.date = calendar.getTime();
-				log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
+				
+				if (log.isLoggable(Level.FINE)) 
+					log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
 
 				int latitude, longitude, velocity, magneticVariation;
 				try {
@@ -538,7 +565,9 @@ public class NMEAParser {
 					}
 					else 
 						signalNoiseRation = Integer.parseInt(strValues[7 + 4*i]);
-					log.log(Level.WARNING, "numSattelite = " + numSattelite + " elevation = " + elevationDegrees + " azimuth = " + azimuthDegrees + " signalNoiseRation = " + signalNoiseRation); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					
+					if (log.isLoggable(Level.FINE)) 
+						log.log(Level.FINE, "numSattelite = " + numSattelite + " elevation = " + elevationDegrees + " azimuth = " + azimuthDegrees + " signalNoiseRation = " + signalNoiseRation); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				}
 			}
 			catch (Exception e) {
@@ -711,7 +740,7 @@ public class NMEAParser {
 			this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
 			this.lastTimeStamp = timeStamp;
 			this.date = calendar.getTime();
-			log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
 		}
 	}
 
@@ -870,7 +899,7 @@ public class NMEAParser {
 	}
 
 	/**
-	 * parse SM UNILOG sentence
+	 * parse SM UniLog 2 sentence within GPS-Logger data, switch to channel/configuration UniLog2
 	 * $UNILOG,11.31 V,0.00 A,0.0 W,0 rpm,0.00 VRx,0.9 m,---- °C (A1),1303 mAh (A2),13.9 °C (int)*30
 	 * 1: Spannung
 	 * 2: Strom
@@ -971,11 +1000,13 @@ public class NMEAParser {
 			}
 		}
 
+		if (log.isLoggable(Level.FINE)) {
 			StringBuilder s = new StringBuilder();
 			for (int value : this.values) {
 				s.append(value).append("; ");
 			}
 			log.log(Level.FINE, s.toString());
+		}
 
 		//GPS 
 		//this.values[0]  = latitude;
@@ -1035,58 +1066,65 @@ public class NMEAParser {
 	 * 24: servo impuls in [us]
 	 * 25: servo impuls out [us]
 	 * @param strValues
+	 * @param inOutMapping
+	 * @param checkTime true will check if actual sentence has newer time tha the one worked with before
 	 */
-	void parseUNILOG2(String[] strValues) {
+	void parseUNILOG2(String[] strValues, int[] inOutMapping, boolean checkTime) {
+		if (checkTime) {
+			if (this.date == null) {
+				String[] strValueDate = strValues[1].trim().split(GDE.STRING_DASH);
+				this.year = Integer.parseInt(strValueDate[0]);
+				this.month = Integer.parseInt(strValueDate[1]);
+				this.day = Integer.parseInt(strValueDate[2]);
+			}
+			String[] strValueTime = strValues[2].trim().split(GDE.STRING_COLON);
+			int hour = Integer.parseInt(strValueTime[0]) + this.timeOffsetUTC;
+			int minute = Integer.parseInt(strValueTime[1]);
+			int second = 0;
+			if (strValueTime[2].contains(GDE.STRING_DOT)) {
+				second = Integer.parseInt(strValueTime[2].substring(0, strValueTime[2].indexOf(GDE.STRING_DOT)));
+			}
+			else {
+				second = Integer.parseInt(strValueTime[2]);
+			}
+			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+			long timeStamp = calendar.getTimeInMillis() + (strValueTime[2].contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime[2].substring(strValueTime[2].indexOf(GDE.STRING_DOT) + 1)) : 0);
+			if (this.lastTimeStamp < timeStamp) {
+				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
+				this.lastTimeStamp = timeStamp;
+				this.date = calendar.getTime();
+				log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SS").format(timeStamp)); //$NON-NLS-1$);
+			}
+			else {
+				return;
+			}
+		}
+		
+		//now start real sentence value parsing
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-
-		if (this.date == null) {
-			String[] strValueDate = strValues[1].trim().split(GDE.STRING_DASH);
-			this.year = Integer.parseInt(strValueDate[0]);
-			this.month = Integer.parseInt(strValueDate[1]);
-			this.day = Integer.parseInt(strValueDate[2]);
-		}
-		String[] strValueTime = strValues[2].trim().split(GDE.STRING_COLON);
-		int hour = Integer.parseInt(strValueTime[0]) + this.timeOffsetUTC;
-		int minute = Integer.parseInt(strValueTime[1]);
-		int second = 0;
-		if (strValueTime[2].contains(GDE.STRING_DOT)) {
-			second = Integer.parseInt(strValueTime[2].substring(0, strValueTime[2].indexOf(GDE.STRING_DOT)));
-		}
-		else {
-			second = Integer.parseInt(strValueTime[2]);
-		}
-		GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-		long timeStamp = calendar.getTimeInMillis() + (strValueTime[2].contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime[2].substring(strValueTime[2].indexOf(GDE.STRING_DOT) + 1)) : 0);
-
-		if (this.lastTimeStamp < timeStamp) {
-			this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
-			this.lastTimeStamp = timeStamp;
-			this.date = calendar.getTime();
-			log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SS").format(timeStamp)); //$NON-NLS-1$);
-			//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
-			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
-			//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
-			//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-			//              000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
-			int[] in2out = {100, 100, 100, 100, 	1, 		2, 15,  16,   4,  13,   0,   3,   5,  18,  19,  20,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
-			for (int i = 4; i < strValues.length; i++) {
-				try {
+		//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
+		//UniLog2      { -1,  -1,  -1,  -1, 	1, 		2, 15,  16,   4,  13,   0,   3,   5,  18,  19,  20,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
+		//GPS-Logger   { -1,  -1,  -1,  -1,  15,  16,  -1,  -1,  18,  27,  -1,  17,  19,  28,  29,  30,  21,  22,  23,  24,  25,  26,  -1,  31,  -1,  -1};
+		for (int i = 4; i < strValues.length; i++) {
+			try {
+				if (inOutMapping[i] >= 0) {
 					String tmpValue = strValues[i].trim();
-					this.values[in2out[i]] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
-							? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
-							: Double.parseDouble(tmpValue) * 1000.0);
-					if (i >= 16 && i <= 21 && this.values[in2out[i]] > 0) {
-						maxVotage = this.values[in2out[i]] > maxVotage ? this.values[in2out[i]] : maxVotage;
-						minVotage = this.values[in2out[i]] < minVotage ? this.values[in2out[i]] : minVotage;
+					this.values[inOutMapping[i]] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 ? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 : Double
+							.parseDouble(tmpValue) * 1000.0);
+					if (i >= 16 && i <= 21 && this.values[inOutMapping[i]] > 0) {
+						maxVotage = this.values[inOutMapping[i]] > maxVotage ? this.values[inOutMapping[i]] : maxVotage;
+						minVotage = this.values[inOutMapping[i]] < minVotage ? this.values[inOutMapping[i]] : minVotage;
 					}
 				}
-				catch (Exception e) {
-					// ignore and leave value unchanged
-				}
 			}
-			this.values[6] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
+			catch (Exception e) {
+				// ignore and leave value unchanged
+			}
+		}
+		this.values[6] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
 
+		if (log.isLoggable(Level.FINE)) {
 			StringBuilder s = new StringBuilder();
 			for (int value : this.values) {
 				s.append(value).append("; ");

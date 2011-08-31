@@ -89,9 +89,10 @@ public class NMEAReaderWriter {
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
 		String recordSetNameExtend = device.getRecordSetStemName();
 		long timeStamp = -1;
+		File inputFile = new File(filePath);
 		if (NMEAReaderWriter.application.getStatusBar() != null) NMEAReaderWriter.application.setProgress(0, sThreadId);
 
-		try {
+		try {			
 			if (channelConfigNumber == null)
 				activeChannel = NMEAReaderWriter.channels.getActiveChannel();
 			else
@@ -102,7 +103,7 @@ public class NMEAReaderWriter {
 				activeChannelConfigNumber = activeChannel.getNumber();
 
 				if (NMEAReaderWriter.application.getStatusBar() != null) {
-					NMEAReaderWriter.channels.switchChannel(activeChannel.getNumber(), GDE.STRING_EMPTY);
+					NMEAReaderWriter.channels.switchChannel(activeChannelConfigNumber, GDE.STRING_EMPTY);
 					NMEAReaderWriter.application.getMenuToolBar().updateChannelSelector();
 					activeChannel = NMEAReaderWriter.channels.getActiveChannel();
 				}
@@ -111,9 +112,8 @@ public class NMEAReaderWriter {
 				int dataBlockSize = Math.abs(device.getDataBlockSize()); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize < dataBlockSize) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new Object[] { filePath, measurementSize, dataBlockSize }));
-				NMEAParser data = new NMEAParser(device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize, device, activeChannel.getNumber(), device.getUTCdelta());
+				NMEAParser data = new NMEAParser(device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize, device, activeChannelConfigNumber, device.getUTCdelta());
 
-				File inputFile = new File(filePath);
 				long approximateLines = inputFile.length()/65; //average approximately 70 bytes per line
 				DataInputStream binReader = new DataInputStream(new FileInputStream(inputFile));
 				byte[] buffer = new byte[1024];
@@ -246,6 +246,7 @@ public class NMEAReaderWriter {
 				}
 				while ((line = reader.readLine()) != null);
 
+				NMEAReaderWriter.channels.switchChannel(activeChannelConfigNumber, recordSetName);
 				activeChannel.setActiveRecordSet(recordSetName);
 				activeChannel.get(recordSetName).setRecordSetDescription(activeChannel.get(recordSetName).getRecordSetDescription() + GDE.STRING_BLANK + data.getComment());
 				activeChannel.applyTemplate(recordSetName, true);
