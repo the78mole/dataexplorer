@@ -1,13 +1,11 @@
-GNU DataExplorer - News - comes with version 2.84
+GNU DataExplorer - News - comes with version 2.91
 
-Version 2.90 - 12 Aug 2011
+Version 2.91 - 12 Sep 2011
 
-1) update SWT to 3.7 final stable release
-2) make bluetooth serial ports recognition configurable
-3) update device properties XSD to version 14
-4) add HoTTAdapter implementation
-5) fix measurement function for synchronized measurement data
-6) fix update problem of digital display tabulator while changing curve selection
+1) add HoTTAdapter implementation for 115200 Baud transmitter
+2) HoTTAdapter live data gatherer detecting sensor type automatically
+3) add UniLog2 device implementation
+4) adapt GPS-Logger to accept UL2 sentences
 7) documentation update
 
 
