@@ -41,6 +41,8 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -419,10 +421,10 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				record.setDisplayable(measurement.isActive());
 				log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			if (includeReasonableDataCheck) {
-				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-				log.log(java.util.logging.Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ 
-			}
+//			if (includeReasonableDataCheck) {
+//				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
+//				log.log(java.util.logging.Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ 
+//			}
 
 			if (record.isActive() && record.isDisplayable()) {
 				log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
@@ -487,10 +489,19 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 					log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 					if (fd.getFileName().length() > 4) {
-						Integer channelConfigNumber = GPSLogger.this.application.getActiveChannelNumber();
-						channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
-						String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 						try {
+							Integer channelConfigNumber = 1; //channelCongig 1 : UniLog
+							String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								//check for GPS-Logger containing $UL2
+								DataInputStream binReader = new DataInputStream(new FileInputStream(selectedImportFile));
+								byte[] buffer = new byte[1024];
+								int numBytes = binReader.read(buffer);
+								if (numBytes > 0 && new String(buffer).contains("$UL2")) {
+									channelConfigNumber = 2;
+									GPSLogger.this.channels.switchChannel(channelConfigNumber, GDE.STRING_EMPTY); //channelCongig 2 : UniLog2
+								}
+								binReader.close();
+
 							NMEAReaderWriter.read(selectedImportFile, GPSLogger.this, recordNameExtend, channelConfigNumber);
 						}
 						catch (Exception e) {

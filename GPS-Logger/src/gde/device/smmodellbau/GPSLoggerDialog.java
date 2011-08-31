@@ -110,7 +110,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(650, 30 + 25 + 25 + this.measurementsCount * 29 + 50); //header + tab + label + this.measurementsCount * 23 + buttons
+				this.dialogShell.setSize(650, 30 + 25 + 25 + this.measurementsCount * 29 + 50 + 42); //header + tab + label + this.measurementsCount * 23 + buttons
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -138,63 +138,17 @@ public class GPSLoggerDialog extends DeviceDialog {
 					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
 					this.tabFolder.setSimple(false);
 					{
-						this.visualizationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
-						this.visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.visualizationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2009));
-
-						this.visualizationMainComposite = new Composite(this.tabFolder, SWT.NONE);
-						FormLayout visualizationMainCompositeLayout = new FormLayout();
-						this.visualizationMainComposite.setLayout(visualizationMainCompositeLayout);
-						this.visualizationTabItem.setControl(this.visualizationMainComposite);
-						{
-							FormData layoutData = new FormData();
-							layoutData.top = new FormAttachment(0, 1000, 0);
-							layoutData.left = new FormAttachment(0, 1000, 0);
-							layoutData.right = new FormAttachment(458, 1000, 0);
-							layoutData.bottom = new FormAttachment(1000, 1000, 0);
-							new GPSLoggerVisualizationControl(this.visualizationMainComposite, layoutData, this, this.application.getActiveChannelNumber() == null ? 1 : this.application.getActiveChannelNumber(),
-									this.device, Messages.getString(MessageIds.GDE_MSGT2010), 0, 15);
-
-							this.subTabFolder1 = new CTabFolder(this.visualizationMainComposite, SWT.NONE);
-							FormData subTabFolder1LData = new FormData();
-							subTabFolder1LData.top = new FormAttachment(0, 1000, 0);
-							subTabFolder1LData.left = new FormAttachment(460, 1000, 0);
-							subTabFolder1LData.right = new FormAttachment(1000, 1000, 0);
-							subTabFolder1LData.bottom = new FormAttachment(1000, 1000, 0);
-							this.subTabFolder1.setLayoutData(subTabFolder1LData);
-
-							{
-								this.uniLogTabItem = new CTabItem(this.subTabFolder1, SWT.NONE);
-								this.uniLogTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
-								this.uniLogTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2011));
-								this.uniLogVisualization = new Composite(this.subTabFolder1, SWT.NONE);
-								FormLayout compositeLayout = new FormLayout();
-								this.uniLogVisualization.setLayout(compositeLayout);
-								this.uniLogTabItem.setControl(this.uniLogVisualization);
-								FormData layoutUniLogData = new FormData();
-								layoutUniLogData.top = new FormAttachment(0, 1000, 0);
-								layoutUniLogData.left = new FormAttachment(0, 1000, 0);
-								layoutUniLogData.right = new FormAttachment(1000, 1000, 0);
-								layoutUniLogData.bottom = new FormAttachment(1000, 1000, 0);
-								new GPSLoggerVisualizationControl(this.uniLogVisualization, layoutUniLogData, this, 1, this.device, Messages.getString(MessageIds.GDE_MSGT2011), 15, 9);
-							}
-							{
-								this.mLinkTabItem = new CTabItem(this.subTabFolder1, SWT.NONE);
-								this.mLinkTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
-								this.mLinkTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2012));
-								this.mLinkVisualization = new Composite(this.subTabFolder1, SWT.NONE);
-								FormLayout compositeLayout = new FormLayout();
-								this.mLinkVisualization.setLayout(compositeLayout);
-								this.mLinkTabItem.setControl(this.mLinkVisualization);
-								FormData layoutMLinkData = new FormData();
-								layoutMLinkData.top = new FormAttachment(0, 1000, 0);
-								layoutMLinkData.left = new FormAttachment(0, 1000, 0);
-								layoutMLinkData.right = new FormAttachment(1000, 1000, 0);
-								layoutMLinkData.bottom = new FormAttachment(1000, 1000, 0);
-								new GPSLoggerVisualizationControl(this.mLinkVisualization, layoutMLinkData, this, 1, this.device, Messages.getString(MessageIds.GDE_MSGT2012), 24, 15);
-							}
-							this.subTabFolder1.setSelection(0);
-						}
+						//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+						//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+						//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
+						//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+						createVisualizationTabItem(1, 15, 9, 15);
+						//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+						//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+						//Unilog2 15=Voltage, 16=Current, 17=Capacity, 18=Power, 19=Energy, 20=CellBalance, 21=CellVoltage1, 21=CellVoltage2, 23=CellVoltage3, 
+						//Unilog2 24=CellVoltage4, 25=CellVoltage5, 26=CellVoltage6, 27=Revolution, 28=ValueA1, 29=ValueA2, 30=ValueA3, 31=InternTemperature
+						//M-LINK  32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+						createVisualizationTabItem(2, 15, 17, 15);
 					}
 					{
 						this.configurationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
@@ -234,7 +188,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 					this.tabFolder.setSelection(0);
 					this.tabFolder.addListener(SWT.Selection, new Listener() {
 						public void handleEvent(Event event) {
-							if (GPSLoggerDialog.this.tabFolder.getSelectionIndex() == 1) GPSLoggerDialog.this.loggerSetup.loadSetup();
+							if (GPSLoggerDialog.this.tabFolder.getSelectionIndex() == 2) GPSLoggerDialog.this.loggerSetup.loadSetup();
 							GPSLoggerDialog.this.configuration1Composite.updateValues();
 							GPSLoggerDialog.this.configuration2Composite.updateValues();
 						}
@@ -360,6 +314,69 @@ public class GPSLoggerDialog extends DeviceDialog {
 		}
 		catch (Exception e) {
 			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * create a visualization control tab item
+	 * @param channelNumber
+	 */
+	private void createVisualizationTabItem(int channelNumber, int numMeasurements, int numMeasurements_UL, int numMeasurements_ML) {
+		this.visualizationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
+		this.visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		this.visualizationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2009) + GDE.STRING_MESSAGE_CONCAT + this.device.getChannelName(channelNumber));
+
+		this.visualizationMainComposite = new Composite(this.tabFolder, SWT.NONE);
+		FormLayout visualizationMainCompositeLayout = new FormLayout();
+		this.visualizationMainComposite.setLayout(visualizationMainCompositeLayout);
+		this.visualizationTabItem.setControl(this.visualizationMainComposite);
+		{
+			FormData layoutData = new FormData();
+			layoutData.top = new FormAttachment(0, 1000, 0);
+			layoutData.left = new FormAttachment(0, 1000, 0);
+			layoutData.right = new FormAttachment(458, 1000, 0);
+			layoutData.bottom = new FormAttachment(1000, 1000, 0);
+			new GPSLoggerVisualizationControl(this.visualizationMainComposite, layoutData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2010), 0, numMeasurements);
+
+			this.subTabFolder1 = new CTabFolder(this.visualizationMainComposite, SWT.NONE);
+			FormData subTabFolder1LData = new FormData();
+			subTabFolder1LData.top = new FormAttachment(0, 1000, 0);
+			subTabFolder1LData.left = new FormAttachment(460, 1000, 0);
+			subTabFolder1LData.right = new FormAttachment(1000, 1000, 0);
+			subTabFolder1LData.bottom = new FormAttachment(1000, 1000, 0);
+			this.subTabFolder1.setLayoutData(subTabFolder1LData);
+
+			{
+				this.uniLogTabItem = new CTabItem(this.subTabFolder1, SWT.NONE);
+				this.uniLogTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+				this.uniLogTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2011));
+				this.uniLogVisualization = new Composite(this.subTabFolder1, SWT.NONE);
+				FormLayout compositeLayout = new FormLayout();
+				this.uniLogVisualization.setLayout(compositeLayout);
+				this.uniLogTabItem.setControl(this.uniLogVisualization);
+				FormData layoutUniLogData = new FormData();
+				layoutUniLogData.top = new FormAttachment(0, 1000, 0);
+				layoutUniLogData.left = new FormAttachment(0, 1000, 0);
+				layoutUniLogData.right = new FormAttachment(1000, 1000, 0);
+				layoutUniLogData.bottom = new FormAttachment(1000, 1000, 0);
+				new GPSLoggerVisualizationControl(this.uniLogVisualization, layoutUniLogData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2011), numMeasurements, numMeasurements_UL);
+			}
+			{
+				this.mLinkTabItem = new CTabItem(this.subTabFolder1, SWT.NONE);
+				this.mLinkTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+				this.mLinkTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2012));
+				this.mLinkVisualization = new Composite(this.subTabFolder1, SWT.NONE);
+				FormLayout compositeLayout = new FormLayout();
+				this.mLinkVisualization.setLayout(compositeLayout);
+				this.mLinkTabItem.setControl(this.mLinkVisualization);
+				FormData layoutMLinkData = new FormData();
+				layoutMLinkData.top = new FormAttachment(0, 1000, 0);
+				layoutMLinkData.left = new FormAttachment(0, 1000, 0);
+				layoutMLinkData.right = new FormAttachment(1000, 1000, 0);
+				layoutMLinkData.bottom = new FormAttachment(1000, 1000, 0);
+				new GPSLoggerVisualizationControl(this.mLinkVisualization, layoutMLinkData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2012), numMeasurements+numMeasurements_UL, numMeasurements_ML);
+			}
+			this.subTabFolder1.setSelection(0);
 		}
 	}
 
