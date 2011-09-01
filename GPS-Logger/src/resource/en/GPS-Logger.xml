@@ -53,7 +53,7 @@
 	        <Measurement>
 	            <name>Satellite</name>
 	            <symbol></symbol>
-	            <unit>Count</unit>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -79,7 +79,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Velocity</name>
+	            <name>Speed</name>
 	            <symbol>v</symbol>
 	            <unit>km/h</unit>
 	            <active>true</active>
@@ -107,7 +107,7 @@
 	        <Measurement>
 	            <name>VoltageRx</name>
 	            <symbol>Urx</symbol>
-	            <unit>V</unit>
+                <unit>VRx</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -178,7 +178,7 @@
 	        <Measurement>
 	            <name>VoltageRx_UL</name>
 	            <symbol>Urx</symbol>
-	            <unit>V</unit>
+                <unit>VRx</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -348,7 +348,7 @@
 	        <Measurement>
 	            <name>Satellite</name>
 	            <symbol></symbol>
-	            <unit>Count</unit>
+	            <unit></unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -374,7 +374,7 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Velocity</name>
+	            <name>Speed</name>
 	            <symbol>v</symbol>
 	            <unit>km/h</unit>
 	            <active>true</active>
@@ -402,7 +402,7 @@
 	        <Measurement>
 	            <name>VoltageRx</name>
 	            <symbol>Urx</symbol>
-	            <unit>V</unit>
+                <unit>VRx</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -434,84 +434,138 @@
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
-	        <Measurement>
-	            <name>Voltage_UL</name>
-	            <symbol>U</symbol>
-	            <unit>V</unit>
-	            <active>true</active>
-	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="false" avg="true" max="true" min="true"/>
-	        </Measurement>
-	        <Measurement>
-	            <name>Current_UL</name>
-	            <symbol>I</symbol>
-	            <unit>A</unit>
-	            <active>true</active>
-	            <statistics sumTriggerTimeText="Motor run time" countTriggerText="Number of climb flights" countByTrigger="true" sigma="false" avg="true" max="true" min="false">
-	                <trigger comment="Trigger: current &gt; 3 A + &gt; 5 sec." minTimeSec="5" isGreater="true" level="3000"/>
-	            </statistics>
-	            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
-	            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
-	        </Measurement>
-	        <Measurement>
-	            <name>Power_UL</name>
-	            <symbol>P</symbol>
-	            <unit>W</unit>
-	            <active>true</active>
-	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
-	        </Measurement>
-	        <Measurement>
-	            <name>Revolution_UL</name>
-	            <symbol>rpm</symbol>
-	            <unit>rpm</unit>
-	            <active>true</active>
-	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
-	            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
-	            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
-	            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
-	            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
-	        </Measurement>
-	        <Measurement>
-	            <name>VoltageRx_UL</name>
-	            <symbol>Urx</symbol>
-	            <unit>V</unit>
-	            <active>true</active>
-	            <statistics sigma="false" avg="true" max="true" min="true"/>
-	        </Measurement>
-	        <Measurement>
-	            <name>Height_UL</name>
-	            <symbol>h</symbol>
-	            <unit>m</unit>
-	            <active>true</active>
-	            <statistics sumTriggerText="Sum motor driven height" sumByTriggerRefOrdinal="16" triggerRefOrdinal="16" sigma="false" avg="false" max="true" min="true"/>
-	            <property description="Scalesynchronisatios reference as ordinal value" type="Integer" value="2" name="scale_sync_ref_ordinal"/>
-	        </Measurement>
-	        <Measurement>
-	            <name>Velocity_UL</name>
-	            <symbol>v</symbol>
-	            <unit>m</unit>
+            <Measurement>
+                <name>Voltage_UL</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
                 <active>true</active>
 	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="true"/>
-	            <property description="Offset to a measurement value" type="Double" value="0.0" name="offset"/>
-	            <property description="Factor to a measurement value" type="Double" value="1.0" name="factor"/>
-	        </Measurement>
-	        <Measurement>
-	            <name>Capacity_UL</name>
-	            <symbol>c</symbol>
-	            <unit>mAh</unit>
-	            <active>true</active>
-	            <statistics triggerRefOrdinal="16" sigma="false" avg="true" max="true" min="true"/>
-	            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
-	            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
-	        </Measurement>
-	        <Measurement>
-	            <name>Temperature_UL</name>
-	            <symbol>t</symbol>
-	            <unit>°C</unit>
-	            <active>true</active>
-	            <statistics sigma="false" avg="true" max="true" min="true"/>
-	            <property description="Offset zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
-	            <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
-	        </Measurement>
+            </Measurement>
+            <Measurement>
+                <name>Current_UL</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Capacity_UL</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Power_UL</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Energy_UL</name>
+                <symbol>E</symbol>
+                <unit>Wmin</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Balance_UL</name>
+                <symbol></symbol>
+                <unit>mV</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage 1_UL</name>
+                <symbol>U1</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage 2_UL</name>
+                <symbol>U1</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage 3_UL</name>
+                <symbol>U1</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage 4_UL</name>
+                <symbol>U1</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage 5_UL</name>
+                <symbol>U1</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>CellVoltage 6_UL</name>
+                <symbol>U1</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution_UL</name>
+                <symbol>n</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>A1-Value_UL</name>
+                <symbol>A1</symbol>
+                <unit>mV</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property type="Double" value="0.0" name="offset"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>A2-Value_UL</name>
+                <symbol>A2</symbol>
+                <unit>mV</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.0" name="offset"/>
+                <property type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>A3-Value_UL</name>
+                <symbol>A3</symbol>
+                <unit>mV</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property type="Double" value="0.0" name="offset"/>
+                <property type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>TempIntern_UL</name>
+                <symbol></symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property type="Double" value="0.0" name="offset"/>
+                <property type="Double" value="1.0" name="factor"/>
+            </Measurement>
 	        <Measurement>
 	            <name>VoltageRx_ML</name>
 	            <symbol>Urx</symbol>

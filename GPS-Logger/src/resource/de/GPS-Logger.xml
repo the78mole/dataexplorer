@@ -6,7 +6,7 @@
         <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
         <image>GPS-Logger.png</image>
-        <usage>true</usage>
+        <usage>false</usage>
     </Device>
     <TimeBase>
         <name>Time</name>
@@ -53,7 +53,7 @@
             <Measurement>
                 <name>Satelliten</name>
                 <symbol></symbol>
-                <unit>Stck</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
@@ -348,7 +348,7 @@
             <Measurement>
                 <name>Satelliten</name>
                 <symbol></symbol>
-                <unit>Stck</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
