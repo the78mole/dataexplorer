@@ -20,8 +20,11 @@ package gde.device.smmodellbau;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.Channels;
+import gde.data.RecordSet;
 import gde.device.DeviceDialog;
 import gde.device.smmodellbau.gpslogger.MessageIds;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
 
@@ -36,6 +39,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -70,6 +75,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 	final Settings								settings;																																					// application configuration settings
 	SetupReaderWriter							loggerSetup;
 
+	RecordSet											lastActiveRecordSet		= null;
 	boolean												isVisibilityChanged	= false;
 	int														measurementsCount		= 0;
 	final List<CTabItem>					configurations			= new ArrayList<CTabItem>();
@@ -132,6 +138,17 @@ public class GPSLoggerDialog extends DeviceDialog {
 					public void helpRequested(HelpEvent evt) {
 						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						GPSLoggerDialog.this.application.openHelpDialog(Messages.getString(MessageIds.GDE_MSGT2010), "HelpInfo.html");  //$NON-NLS-1$
+					}
+				});
+				this.dialogShell.addPaintListener(new PaintListener() {
+					public void paintControl(PaintEvent paintevent) {
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
+						RecordSet activeRecordSet = GPSLoggerDialog.this.application.getActiveRecordSet();
+						if (GPSLoggerDialog.this.lastActiveRecordSet == null && activeRecordSet != null 
+								|| ( activeRecordSet != null && !GPSLoggerDialog.this.lastActiveRecordSet.getName().equals(activeRecordSet.getName()))) {
+							GPSLoggerDialog.this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
+						}
+						GPSLoggerDialog.this.lastActiveRecordSet = GPSLoggerDialog.this.application.getActiveRecordSet();
 					}
 				});
 				{

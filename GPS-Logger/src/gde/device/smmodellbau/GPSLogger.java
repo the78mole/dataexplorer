@@ -421,10 +421,10 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				record.setDisplayable(measurement.isActive());
 				log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-//			if (includeReasonableDataCheck) {
-//				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-//				log.log(java.util.logging.Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ 
-//			}
+			if (includeReasonableDataCheck) {
+				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
+				log.log(java.util.logging.Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ 
+			}
 
 			if (record.isActive() && record.isDisplayable()) {
 				log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$

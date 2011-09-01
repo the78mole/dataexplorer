@@ -15,7 +15,7 @@
         <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="39" type="TEXT"/>
+        <format size="-47" type="TEXT"/>
         <checkSum type="XOR"/>
         <timeUnit>msec</timeUnit>
         <separator>comma</separator>
@@ -170,10 +170,6 @@
 	            <unit>rpm</unit>
 	            <active>true</active>
 	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
-	            <property description="(LogView compatibility)" type="Double" value="0.0" name="offset"/>
-	            <property description="(LogView compatibility)" type="Double" value="1.0" name="factor"/>
-	            <property description="Number motors ? (LogView compatibility)" type="Integer" value="1" name="number_motor"/>
-	            <property description="Revolution factor ? (LogView compatibility)" type="Double" value="1.0" name="revolution_factor"/>
 	        </Measurement>
 	        <Measurement>
 	            <name>VoltageRx_UL</name>
@@ -191,7 +187,7 @@
 	            <property description="Scalesynchronisatios reference as ordinal value" type="Integer" value="2" name="scale_sync_ref_ordinal"/>
 	        </Measurement>
 	        <Measurement>
-	            <name>Velocity_UL</name>
+	            <name>Speed_UL</name>
 	            <symbol>v</symbol>
 	            <unit>m</unit>
                 <active>true</active>
@@ -446,7 +442,11 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+	            <statistics sumTriggerTimeText="Motor run time" countTriggerText="Number of climb flights" countByTrigger="true" sigma="false" avg="true" max="true" min="false">
+	                <trigger comment="Trigger: current &gt; 3 A + &gt; 5 sec." minTimeSec="5" isGreater="true" level="3000"/>
+	            </statistics>
+	            <property description="With wrong purchaged sensor cable (Plug) it may occur to have the signal inverted which result in negative current values" type="Boolean" value="false" name="is_invert_current"/>
+	            <property description="With BEC usage or inaccurate adjusted sensor a current shift may occur" type="Double" value="0.0" name="offset"/>
             </Measurement>
             <Measurement>
                 <name>Capacity_UL</name>
@@ -460,14 +460,14 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
             </Measurement>
             <Measurement>
                 <name>Energy_UL</name>
                 <symbol>E</symbol>
                 <unit>Wmin</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
             </Measurement>
             <Measurement>
                 <name>Balance_UL</name>
@@ -489,7 +489,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scal synchronization reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 3_UL</name>
@@ -497,7 +497,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scal synchronization reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 4_UL</name>
@@ -505,7 +505,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scal synchronization reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 5_UL</name>
@@ -513,7 +513,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scal synchronization reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 6_UL</name>
@@ -521,14 +521,14 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scal synchronization reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Revolution_UL</name>
                 <symbol>n</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+	            <statistics comment="Values refer to current trigger range" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>A1-Value_UL</name>
