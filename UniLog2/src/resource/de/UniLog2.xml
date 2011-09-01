@@ -371,14 +371,14 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
+                <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Energie</name>
                 <symbol>E</symbol>
                 <unit>Wmin</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics comment="Werte bezogen auf Stromtriggerbereich" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Balance</name>

@@ -101,7 +101,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 3</name>
@@ -109,7 +109,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 4</name>
@@ -117,7 +117,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 5</name>
@@ -125,7 +125,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 6</name>
@@ -133,7 +133,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Revolution</name>
@@ -371,14 +371,14 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Values referencing current tigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="false"/>
+                <statistics comment="Values referencing current tigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Energy</name>
                 <symbol>E</symbol>
                 <unit>Wmin</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics comment="Values referencing current tigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Balance</name>
@@ -400,7 +400,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 3</name>
@@ -408,7 +408,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 4</name>
@@ -416,7 +416,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 5</name>
@@ -424,7 +424,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage 6</name>
@@ -432,7 +432,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Scal synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronization reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Revolution</name>
