@@ -111,7 +111,9 @@ public class NMEAReaderWriter {
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
 				int dataBlockSize = Math.abs(device.getDataBlockSize()); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
-				if (measurementSize < dataBlockSize) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new Object[] { filePath, measurementSize, dataBlockSize }));
+				if (measurementSize < dataBlockSize) {
+					dataBlockSize = measurementSize;
+				}
 				NMEAParser data = new NMEAParser(device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize, device, activeChannelConfigNumber, device.getUTCdelta());
 
 				long approximateLines = inputFile.length()/65; //average approximately 70 bytes per line
@@ -246,7 +248,6 @@ public class NMEAReaderWriter {
 				}
 				while ((line = reader.readLine()) != null);
 
-				NMEAReaderWriter.channels.switchChannel(activeChannelConfigNumber, recordSetName);
 				activeChannel.setActiveRecordSet(recordSetName);
 				activeChannel.get(recordSetName).setRecordSetDescription(activeChannel.get(recordSetName).getRecordSetDescription() + GDE.STRING_BLANK + data.getComment());
 				activeChannel.applyTemplate(recordSetName, true);

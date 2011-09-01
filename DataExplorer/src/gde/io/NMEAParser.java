@@ -217,7 +217,7 @@ public class NMEAParser {
 							//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 							//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
 							int[] in2out = { -1,  -1,  -1,  -1, 	1, 		2, 15,  16,   4,  13,   0,   3,   5,  18,  19,  20,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
-							parseUNILOG2(strValues, in2out, true);
+							parseUNILOG2(strValues, in2out, 6, true);
 						}
 						else if (this.device.getName().equals("GPS-Logger")) {
 							if (this.channelConfigNumber == 2) {
@@ -230,7 +230,7 @@ public class NMEAParser {
 								//M-LINK  32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
 								//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
 								int[] in2out = { -1,  -1,  -1,  -1,  15,  16,  -1,  -1,  18,  27,  -1,  17,  19,  28,  29,  30,  21,  22,  23,  24,  25,  26,  -1,  31,  -1,  -1};
-								parseUNILOG2(strValues, in2out, false);								
+								parseUNILOG2(strValues, in2out, 20, false);								
 							}
 							else { // fall back to UniLog supported values
 								//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
@@ -1067,9 +1067,10 @@ public class NMEAParser {
 	 * 25: servo impuls out [us]
 	 * @param strValues
 	 * @param inOutMapping
+	 * @param indexBalance
 	 * @param checkTime true will check if actual sentence has newer time tha the one worked with before
 	 */
-	void parseUNILOG2(String[] strValues, int[] inOutMapping, boolean checkTime) {
+	void parseUNILOG2(String[] strValues, int[] inOutMapping, int indexBalance, boolean checkTime) {
 		if (checkTime) {
 			if (this.date == null) {
 				String[] strValueDate = strValues[1].trim().split(GDE.STRING_DASH);
@@ -1122,7 +1123,7 @@ public class NMEAParser {
 				// ignore and leave value unchanged
 			}
 		}
-		this.values[6] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
+		this.values[indexBalance] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
 
 		if (log.isLoggable(Level.FINE)) {
 			StringBuilder s = new StringBuilder();
