@@ -55,7 +55,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	byte[]							ANSWER_DATA										= new byte[50];
 	byte[]							SENSOR_TYPE										= new byte[] { HoTTAdapter.SENSOR_TYPE_RECEIVER_L };
 	byte[] 							QUERY_SENSOR_TYPE;
-	final static int		xferErrorLimit								= 15;
+	final static int		xferErrorLimit								= 100;
 
 	boolean							isInSync											= false;
 	boolean							isDataMissmatchWarningWritten	= false;
@@ -200,7 +200,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data));
 		}
 		
-		if (answer[0] != 0x00) {
+		if (answer[0] != 0x00 || answer[4] != 0x00 || answer[5] != 0x04 || answer[6] != 0x01 || (answer[answer.length-3] < 0 && answer[answer.length-3] > 100)) {
 			this.addXferError();
 			log.logp(Level.WARNING, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME,
 					"=====> transmission error occurred, number of errors = " + this.getXferErrors());

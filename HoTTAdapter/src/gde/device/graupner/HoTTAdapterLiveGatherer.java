@@ -38,6 +38,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import org.eclipse.swt.SWT;
+
 /**
  * Thread implementation to gather data from HoTTAdapter device
  * @author Winfied Brügmann
@@ -222,7 +224,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				}
 				catch (TimeOutException e) {
 					log.log(Level.WARNING, e.getMessage());
-					application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })); 
+					application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGW0045, new Object[] { e.getClass().getSimpleName(), "xferErrors = "+serialPort.getXferErrors() }), SWT.COLOR_RED); 
 				}
 				catch (IOException e) {
 					log.log(Level.WARNING, e.getMessage());
