@@ -78,6 +78,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	final Settings												settings;
 	protected SerialPort									serialPort								= null;
 	protected int													xferErrors								= 0;
+	protected int													timeoutErrors							= 0;
 
 	boolean																isConnected								= false;
 	String																serialPortStr							= GDE.STRING_EMPTY;
@@ -238,7 +239,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 */
 	public SerialPort open() throws ApplicationConfigurationException, SerialPortException {
 		final String $METHOD_NAME = "open"; //$NON-NLS-1$
-		this.xferErrors = 0;
+		this.xferErrors = this.timeoutErrors = 0;
 		// Initialize serial port
 		try {
 			this.serialPortStr = this.deviceConfig.getPort();
@@ -766,7 +767,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	}
 
 	/**
-	 * @return number of transfer errors occur (checksum)
+	 * @return number of transfer errors
 	 */
 	public int getXferErrors() {
 		return this.xferErrors;
@@ -777,6 +778,20 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 */
 	public void addXferError() {
 		this.xferErrors++;
+	}
+
+	/**
+	 * add up timeout errors
+	 */
+	public void addTimeoutError() {
+		this.timeoutErrors++;
+	}
+
+	/**
+	 * @return number of timeout errors 
+	 */
+	public int getTimeoutErrors() {
+		return this.timeoutErrors;
 	}
 
 	/**

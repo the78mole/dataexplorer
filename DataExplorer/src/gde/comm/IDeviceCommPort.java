@@ -136,6 +136,16 @@ public interface IDeviceCommPort {
 	public void addXferError();
 
 	/**
+	 * @return number of transfer errors occur (checksum)
+	 */
+	public int getTimeoutErrors();
+
+	/**
+	 * add up transfer errors
+	 */
+	public void addTimeoutError();
+
+	/**
 	 * check if a configured serial port string matches actual available ports
 	 * @param newSerialPortStr
 	 * @return true if given port string matches one of the available once

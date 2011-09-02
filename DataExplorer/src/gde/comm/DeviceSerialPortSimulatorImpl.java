@@ -59,6 +59,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	DataInputStream			data_in;
 	BufferedReader			txt_in;
 	int									xferErrors					= 0;
+	int									timeoutErrors				= 0;
 	boolean							isConnected					= false;
 	String 							fileType 						= GDE.FILE_ENDING_STAR_LOV;
 
@@ -445,7 +446,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	}
 
 	/**
-	 * @return number of transfer errors occur (checksum)
+	 * @return number of transfer errors occur
 	 */
 	public int getXferErrors() {
 		return this.xferErrors;
@@ -456,6 +457,20 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 */
 	public void addXferError() {
 		this.xferErrors++;
+	}
+
+	/**
+	 * @return number of timeout errors occur
+	 */
+	public int getTimeoutErrors() {
+		return this.timeoutErrors;
+	}
+
+	/**
+	 * add up timeout errors
+	 */
+	public void addTimeoutError() {
+		this.timeoutErrors++;
 	}
 
 	/**

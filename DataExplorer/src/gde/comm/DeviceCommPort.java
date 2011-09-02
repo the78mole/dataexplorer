@@ -172,6 +172,20 @@ public class DeviceCommPort implements IDeviceCommPort {
 	}
 
 	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceCommPort#getXferErrors()
+	 */
+	public int getTimeoutErrors() {
+		return this.port.getTimeoutErrors();
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceCommPort#addXferError()
+	 */
+	public void addTimeoutError() {
+		this.port.addTimeoutError();
+	}
+
+	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#isMatchAvailablePorts(java.lang.String)
 	 */
 	public boolean isMatchAvailablePorts(String newSerialPortStr) {
