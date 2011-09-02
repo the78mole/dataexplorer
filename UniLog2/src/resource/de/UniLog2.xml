@@ -396,7 +396,7 @@
             </Measurement>
             <Measurement>
                 <name>ZellenSpannung 2</name>
-                <symbol>U1</symbol>
+                <symbol>U2</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -404,7 +404,7 @@
             </Measurement>
             <Measurement>
                 <name>ZellenSpannung 3</name>
-                <symbol>U1</symbol>
+                <symbol>U3</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -412,7 +412,7 @@
             </Measurement>
             <Measurement>
                 <name>ZellenSpannung 4</name>
-                <symbol>U1</symbol>
+                <symbol>U4</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -420,7 +420,7 @@
             </Measurement>
             <Measurement>
                 <name>ZellenSpannung 5</name>
-                <symbol>U1</symbol>
+                <symbol>U5</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -428,7 +428,7 @@
             </Measurement>
             <Measurement>
                 <name>ZellenSpannung 6</name>
-                <symbol>U1</symbol>
+                <symbol>U6</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
