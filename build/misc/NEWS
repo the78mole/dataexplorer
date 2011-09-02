@@ -1,6 +1,6 @@
 GNU DataExplorer - News - comes with version 2.91
 
-Version 2.91 - 12 Sep 2011
+Version 2.91 - 03 Sep 2011
 
 1) add HoTTAdapter implementation for 115200 Baud transmitter
 2) HoTTAdapter live data gatherer detecting sensor type automatically
