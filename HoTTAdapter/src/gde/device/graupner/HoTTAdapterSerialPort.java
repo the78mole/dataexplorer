@@ -109,7 +109,6 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
-				this.addTimeoutError();
 				log.logp(Level.SEVERE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 			throw e;

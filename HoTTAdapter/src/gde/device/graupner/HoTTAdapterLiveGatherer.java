@@ -223,6 +223,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				}
 				catch (TimeOutException e) {
 					log.log(Level.WARNING, e.getMessage());
+					serialPort.addTimeoutError();
 					application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGW0045, new Object[] { e.getClass().getSimpleName(), " = " + serialPort.getTimeoutErrors() + "; xferErrors = " + serialPort.getXferErrors() }), SWT.COLOR_RED); 
 				}
 				catch (IOException e) {
