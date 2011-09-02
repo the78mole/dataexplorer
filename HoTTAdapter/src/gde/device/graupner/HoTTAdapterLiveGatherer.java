@@ -87,6 +87,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				this.serialPort.open();
 				this.isPortOpenedByLiveGatherer = true;
 			}
+			this.serialPort.isInterruptedByUser = false;
 			long startTime = new Date().getTime();
 			//detect sensor type running a max of 3 times getting the sensor data
 			for (int i = 0; i < 4; i++) {
