@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
+import gde.device.graupner.hott.MessageIds;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
@@ -55,14 +56,13 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	Channel												channel;
 	Integer												channelNumber;
 	int														timeStep_ms									= 1000;
-//	Timer													timer;
-//	TimerTask											timerTask;
 	boolean												isTimerTaskActive						= true;
 	boolean												isPortOpenedByLiveGatherer	= false;
 	boolean												isSwitchedRecordSet					= false;
 	boolean												isGatheredRecordSetVisible	= true;
 	byte													sensorType									= (byte) 0x80;
 	int														queryGapTime_ms							= 30;
+	int														sensorDetectError						= 0;
 
 	// offsets and factors are constant over thread live time
 	final HashMap<String, Double>	calcValues									= new HashMap<String, Double>();
@@ -99,8 +99,9 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					break;
 				}
 				catch (Exception e) {
-					// ignore
-					e.printStackTrace();
+					log.log(Level.WARNING, e.getMessage(), e);
+					if (++sensorDetectError == 3)
+						this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW2400));
 				}
 			}
 			//no sensor type detected, seams only receiver is connected
@@ -136,7 +137,8 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { t.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + t.getMessage() }));
 			return;
 		}
-
+		this.application.setStatusMessage(GDE.STRING_EMPTY);
+		
 		//0=isVario, 1=isGPS, 2=isGeneral, 3=isElectric
 		if (HoTTAdapter.isSensorType[0] == true) {
 			this.dialog.selectTab(this.channelNumber = 2);
@@ -158,9 +160,6 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			this.dialog.selectTab(this.channelNumber = 1);
 			this.channels.switchChannel(this.channels.getChannelNames()[0]);
 		}
-
-		// prepare timed data gatherer thread
-		this.serialPort.isInterruptedByUser = false;
 
 		this.channel = this.application.getActiveChannel();
 		final String recordSetKey = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
@@ -224,7 +223,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				}
 				catch (TimeOutException e) {
 					log.log(Level.WARNING, e.getMessage());
-					application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGW0045, new Object[] { e.getClass().getSimpleName(), "xferErrors = "+serialPort.getXferErrors() }), SWT.COLOR_RED); 
+					application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGW0045, new Object[] { e.getClass().getSimpleName(), " = " + serialPort.getTimeoutErrors() + "; xferErrors = " + serialPort.getXferErrors() }), SWT.COLOR_RED); 
 				}
 				catch (IOException e) {
 					log.log(Level.WARNING, e.getMessage());

@@ -382,6 +382,12 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.dialogShell.setVisible(true);
 				this.dialogShell.setActive();
 			}
+			if (this.serialPort.isConnected()) { // check serial port state, if user has closed the dialog while gathering data
+				this.startLifeDataCapturing.setEnabled(false);
+				this.stopLifeDataCapturing.setEnabled(true);
+				this.protocolTypesCombo.setEnabled(false);
+				this.inputFileButton.setEnabled(false);
+			}
 			Display display = this.dialogShell.getDisplay();
 			while (!this.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();

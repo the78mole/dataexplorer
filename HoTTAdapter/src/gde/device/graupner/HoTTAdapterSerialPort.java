@@ -55,13 +55,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	byte[]							ANSWER_DATA										= new byte[50];
 	byte[]							SENSOR_TYPE										= new byte[] { HoTTAdapter.SENSOR_TYPE_RECEIVER_L };
 	byte[] 							QUERY_SENSOR_TYPE;
-	final static int		xferErrorLimit								= 100;
+	final static int		xferErrorLimit								= 1000;
 
-	boolean							isInSync											= false;
-	boolean							isDataMissmatchWarningWritten	= false;
-	int									dataCheckSumOffset						= 0;
-	boolean							isCmdMissmatchWarningWritten	= false;
-	int									cmdCheckSumOffset							= 0;
 	boolean							isInterruptedByUser						= false;
 	boolean							isProtocolTypeLegacy					= true;
 
@@ -114,6 +109,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
+				this.addTimeoutError();
 				log.logp(Level.SEVERE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 			}
 			throw e;
