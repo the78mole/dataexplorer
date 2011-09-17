@@ -22,7 +22,6 @@
         <separator>comma</separator>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredDataLocation>/Volumes</preferredDataLocation>
         <preferredFileExtention>*.nmea</preferredFileExtention>
     </DataBlock>
     <State>
