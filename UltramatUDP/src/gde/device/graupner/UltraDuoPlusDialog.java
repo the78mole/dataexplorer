@@ -55,6 +55,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -281,7 +282,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				ultraDuoPlusSetup.getChannelData1().synced = null;
 				ultraDuoPlusSetup.getChannelData2().synced = null;
 				Iterator<MemoryType> iterator = ultraDuoPlusSetup.getMemory().iterator();
-				for (int i = 1; iterator.hasNext(); ++i) {
+				while (iterator.hasNext()) {
 					MemoryType cellMemory = iterator.next();
 					cellMemory.synced = null;
 					cellMemory.getSetupData().synced = null;
@@ -290,11 +291,11 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					if (cellMemory.getCycleData() != null) cellMemory.getCycleData().synced = null;
 				}
 				Iterator<TireHeaterData> tireIterator = ultraDuoPlusSetup.getTireHeaterData().iterator();
-				for (int i = 1; tireIterator.hasNext(); ++i) {
+				while (tireIterator.hasNext()) {
 					tireIterator.next().synced = null;
 				}
 				Iterator<MotorRunData> motorIterator = ultraDuoPlusSetup.getMotorRunData().iterator();
-				for (int i = 1; motorIterator.hasNext(); ++i) {
+				while (motorIterator.hasNext()) {
 					motorIterator.next().synced = null;
 				}
 
@@ -1282,7 +1283,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													lastTimeStamp = lastTimeStamp == 0 ? entry.getKey() : lastTimeStamp;
 												}
 												Long[] dates = sortCyclesData.keySet().toArray(new Long[0]);
-												if (dates != null && dates.length > 0) {
+												Arrays.sort(dates);
+												if (dates != null && dates.length > 1) {
 													utilitySet.setRecordSetDescription(UltraDuoPlusDialog.this.memoryDataCombo.getText()
 															+ GDE.STRING_BLANK_COLON_BLANK
 															+ StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", dates[0]) + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", dates[dates.length - 1])); //$NON-NLS-1$ //$NON-NLS-2$
@@ -2027,7 +2029,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					this.ultraDuoPlusSetup.getChannelData2().synced = null;
 				}
 				Iterator<MemoryType> iterator = this.ultraDuoPlusSetup.getMemory().iterator();
-				for (int i = 1; iterator.hasNext(); ++i) {
+				while (iterator.hasNext()) {
 					MemoryType cellMemory = iterator.next();
 					cellMemory.synced = null;
 					cellMemory.changed = null;
@@ -2047,13 +2049,13 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					}
 				}
 				Iterator<TireHeaterData> tireIterator = this.ultraDuoPlusSetup.getTireHeaterData().iterator();
-				for (int i = 1; tireIterator.hasNext(); ++i) {
+				while (tireIterator.hasNext()) {
 					TireHeaterData tireHeater = tireIterator.next();
 					tireHeater.synced = null;
 					tireHeater.changed = null;
 				}
 				Iterator<MotorRunData> motorIterator = this.ultraDuoPlusSetup.getMotorRunData().iterator();
-				for (int i = 1; motorIterator.hasNext(); ++i) {
+				while (motorIterator.hasNext()) {
 					MotorRunData motorRunData = motorIterator.next();
 					motorRunData.synced = null;
 					motorRunData.changed = null;
@@ -2140,7 +2142,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		List<MemoryType> tmpCellMemories = tmpUltraDuoPlusSetup.getMemory();
 		Iterator<MemoryType> iterator = cellMemories.iterator();
 		Iterator<MemoryType> tmpIterator = tmpCellMemories.iterator();
-		for (int i = 1; iterator.hasNext(); ++i) {
+		while (iterator.hasNext()) {
 			MemoryType cellMemory = iterator.next();
 			MemoryType tmpCellMemory = tmpIterator.next();
 			//memory name
@@ -2202,7 +2204,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		List<TireHeaterData> tmpTireHeaters = tmpUltraDuoPlusSetup.getTireHeaterData();
 		Iterator<TireHeaterData> tireIterator = tireHeaters.iterator();
 		Iterator<TireHeaterData> tmpTireIterator = tmpTireHeaters.iterator();
-		for (int i = 1; iterator.hasNext(); ++i) {
+		while (iterator.hasNext()) {
 			TireHeaterData tireHeaterData = tireIterator.next();
 			TireHeaterData tmpTireHeaterData = tmpTireIterator.next();
 
@@ -2225,7 +2227,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		List<MotorRunData> tmpMotorRunDatas = tmpUltraDuoPlusSetup.getMotorRunData();
 		Iterator<MotorRunData> motorRunIterator = motorRunDatas.iterator();
 		Iterator<MotorRunData> tmpMotorRunIterator = tmpMotorRunDatas.iterator();
-		for (int i = 1; iterator.hasNext(); ++i) {
+		while (iterator.hasNext()) {
 			MotorRunData motorRunData = motorRunIterator.next();
 			MotorRunData tmpMotorRunData = tmpMotorRunIterator.next();
 
