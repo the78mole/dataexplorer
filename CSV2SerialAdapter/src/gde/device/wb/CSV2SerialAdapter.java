@@ -424,6 +424,9 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
 		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1700), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, searchDirectory, null, SWT.MULTI);
+		
+		this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+
 		for (String tmpFileName : fd.getFileNames()) {
 			String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
 			if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
