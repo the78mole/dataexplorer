@@ -65,7 +65,9 @@ import org.eclipse.swt.widgets.MenuItem;
 public class GPSLogger extends DeviceConfiguration implements IDevice {
 	final static Logger		log								= Logger.getLogger(GPSLogger.class.getName());
 
-	final static String		SM_GPS_LOGGER_INI	= "SM GPS-Logger.ini";													//$NON-NLS-1$
+	final static String		SM_GPS_LOGGER_INI				= "SM GPS-Logger.ini";													//$NON-NLS-1$
+	final static String		SM_GPS_LOGGER_INI_DIR		= "SM GPS-Logger setup";												//$NON-NLS-1$
+	final static String		SM_GPS_LOGGER_DIR_STUB	= "SM GPS-Logger";															//$NON-NLS-1$
 
 	final DataExplorer		application;
 	final Channels				channels;
@@ -475,6 +477,9 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		}
 		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2000), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
 				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
+
+		this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+
 		Thread reader = new Thread("reader"){
 			@Override
 			public void run() {
@@ -636,5 +641,13 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 
 	String getDefaultConfigurationFileName() {
 		return GPSLogger.SM_GPS_LOGGER_INI;
+	}
+	
+	String getConfigurationFileDirecotry() {
+		String searchPath = this.getDataBlockPreferredDataLocation();
+		if (searchPath.contains(GPSLogger.SM_GPS_LOGGER_DIR_STUB)) {
+			searchPath = searchPath.substring(0, searchPath.indexOf(GPSLogger.SM_GPS_LOGGER_DIR_STUB)) + GPSLogger.SM_GPS_LOGGER_INI_DIR;
+		}
+		return searchPath;
 	}
 }

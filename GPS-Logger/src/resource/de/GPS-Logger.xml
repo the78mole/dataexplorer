@@ -21,7 +21,6 @@
         <separator>comma</separator>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredDataLocation>g:\</preferredDataLocation>
         <preferredFileExtention>*.nmea</preferredFileExtention>
     </DataBlock>
     <State>
