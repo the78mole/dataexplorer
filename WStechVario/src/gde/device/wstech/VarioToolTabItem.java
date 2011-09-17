@@ -62,7 +62,7 @@ public class VarioToolTabItem extends CTabItem {
 
 	final CTabFolder							tabFolder;
 	final IDevice									device;
-	final DataExplorer	application							= DataExplorer.getInstance();
+	final DataExplorer						application							= DataExplorer.getInstance();
 	final boolean									isDataVarioTool;
 	final Menu										popupmenu;
 	final ContextMenu							contextMenu;
@@ -86,10 +86,8 @@ public class VarioToolTabItem extends CTabItem {
 	Button												setupButton13a, setupButton13b, setupButton14a, setupButton14b, setupButton14c, setupButton15a, setupButton15b, setupButton17, setupButton18;
 	Composite											setupComposite4c, setupComposite4b, setupComposite4a, setupComposite5, setupComposite8, setupComposite9, setupComposite10;
 	Composite											setupComposite13a, setupComposite13b, setupComposite14;
-	CLabel												channelLabel, frequencyLabel, setupLabel1a, setupLabel1b, setupLabel2a, setupLabel2b, setupLabel3a, setupLabel3b, setupLabel4, setupLabel6a, setupLabel6b,
-			setupLabel7a, setupLabel7b;
-	CLabel												setupLabel10, setupLabel11a, setupLabel11b, setupLabel12a, setupLabel12b, setupLabel13, setupLabel16a, setupLabel16b, setupLabel17a, setupLabel17b, setupLabel17c,
-			setupLabel18a, setupLabel18b;
+	CLabel												channelLabel, frequencyLabel, setupLabel1a, setupLabel1b, setupLabel2a, setupLabel2b, setupLabel3a, setupLabel3b, setupLabel4, setupLabel6a, setupLabel6b, setupLabel7a, setupLabel7b;
+	CLabel												setupLabel10, setupLabel11a, setupLabel11b, setupLabel12a, setupLabel12b, setupLabel13, setupLabel16a, setupLabel16b, setupLabel17a, setupLabel17b, setupLabel17c, setupLabel18a, setupLabel18b;
 	CLabel												setupLabel19a, setupLabel19b;
 
 	int														setupValue0							= 57;																																																																				// transmit channel

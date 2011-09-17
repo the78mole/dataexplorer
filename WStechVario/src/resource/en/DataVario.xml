@@ -20,7 +20,6 @@
 		<separator>semicolon</separator>
 		<leader>$</leader>
 		<trailer>0D0A</trailer>
-		<preferredDataLocation>G:</preferredDataLocation>
 		<preferredFileExtention>*.csv</preferredFileExtention>
 	</DataBlock>
 	<State>
