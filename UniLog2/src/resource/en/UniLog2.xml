@@ -31,7 +31,6 @@
         <separator>comma</separator>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredDataLocation>/Volumes</preferredDataLocation>
         <preferredFileExtention>*.txt</preferredFileExtention>
     </DataBlock>
     <State>
@@ -97,7 +96,7 @@
             </Measurement>
             <Measurement>
                 <name>CellVoltage 2</name>
-                <symbol>U1</symbol>
+                <symbol>U2</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -105,7 +104,7 @@
             </Measurement>
             <Measurement>
                 <name>CellVoltage 3</name>
-                <symbol>U1</symbol>
+                <symbol>U3</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -113,7 +112,7 @@
             </Measurement>
             <Measurement>
                 <name>CellVoltage 4</name>
-                <symbol>U1</symbol>
+                <symbol>U4</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -121,7 +120,7 @@
             </Measurement>
             <Measurement>
                 <name>CellVoltage 5</name>
-                <symbol>U1</symbol>
+                <symbol>U5</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
@@ -129,7 +128,7 @@
             </Measurement>
             <Measurement>
                 <name>CellVoltage 6</name>
-                <symbol>U1</symbol>
+                <symbol>U6</symbol>
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>

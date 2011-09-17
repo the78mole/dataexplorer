@@ -58,7 +58,8 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	final static Logger	log										= Logger.getLogger(UniLog2.class.getName());
 
 	final static String	SM_UNILOG_2_INI				= "SM UniLog 2.ini";													//$NON-NLS-1$
-	final static String	SM_UNILOG_2_INI_PATH	= "SM UniLog 2 ";														  //$NON-NLS-1$
+	final static String	SM_UNILOG_2_INI_PATH	= "SM UniLog 2 setup";												//$NON-NLS-1$
+	final static String	SM_UNILOG_2_DIR_STUB	= "SM UniLog 2";															//$NON-NLS-1$
 
 	final DataExplorer	application;
 	final Channels			channels;
@@ -491,6 +492,9 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		}
 		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2500), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
 				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
+		
+		this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
 			public void run() {
@@ -523,5 +527,13 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 
 	String getDefaultConfigurationFileName() {
 		return UniLog2.SM_UNILOG_2_INI;
+	}
+	
+	String getConfigurationFileDirecotry() {
+		String searchPath = this.getDataBlockPreferredDataLocation();
+		if (searchPath.contains(UniLog2.SM_UNILOG_2_DIR_STUB)) {
+			searchPath = searchPath.substring(0, searchPath.indexOf(UniLog2.SM_UNILOG_2_DIR_STUB)) + UniLog2.SM_UNILOG_2_INI_PATH;
+		}
+		return searchPath;
 	}
 }
