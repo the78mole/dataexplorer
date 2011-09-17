@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 2.91 - 03 Aug 2011
 GPS-Logger, UniLog 2, WStech varios, NMEAAdapte, CSV2SerialAdapter, HoTTAdapter - modify code to save last used data load path
 GPS-Logger, UniLog 2 - modify code to switch into setup directory
+UniLog 2 correct time calculation
 
 Version 2.91 - 03 Aug 2011
 add HoTTAdapter implementation for 115200 Baud transmitter
