@@ -1089,7 +1089,7 @@ public class NMEAParser {
 				second = Integer.parseInt(strValueTime[2]);
 			}
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-			long timeStamp = calendar.getTimeInMillis() + (strValueTime[2].contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime[2].substring(strValueTime[2].indexOf(GDE.STRING_DOT) + 1)) : 0);
+			long timeStamp = calendar.getTimeInMillis() + (strValueTime[2].contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime[2].substring(strValueTime[2].indexOf(GDE.STRING_DOT) + 1))*10 : 0);
 			if (this.lastTimeStamp < timeStamp) {
 				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
 				this.lastTimeStamp = timeStamp;
