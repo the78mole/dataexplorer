@@ -35,6 +35,7 @@ import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
 import gde.utils.LinearRegression;
 import gde.utils.QuasiLinearRegression;
+import gde.utils.StringHelper;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -59,6 +60,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	final PicolarioDialog					dialog;
 	final PicolarioSerialPort			serialPort;
 	final Channels								channels;
+	DataGathererThread						gatherThread;
 
 	/**
 	 * @param iniFile
@@ -74,7 +76,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
+		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1222), Messages.getString(MessageIds.GDE_MSGT1221));
 	}
 
 	/**
@@ -90,7 +92,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		this.serialPort = new PicolarioSerialPort(this, this.application);
 		this.dialog = new PicolarioDialog(this.application.getShell(), this);
 		this.channels = Channels.getInstance();
-		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_OPEN_CLOSE, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
+		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1222), Messages.getString(MessageIds.GDE_MSGT1221));
 	}
 	
 	/**
@@ -428,16 +430,32 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 		if (this.serialPort != null) {
 			if (!this.serialPort.isConnected()) {
 				try {
-					this.serialPort.open();
+					if (this.dialog != null) {
+						int availableRecords = this.dialog.numberAvailable.length() == 0 ? 0 : Integer.parseInt(this.dialog.numberAvailable);
+						if (this.dialog.numberAvailable.length() == 0) {
+							this.serialPort.open();
+							availableRecords = this.serialPort.readNumberAvailableRecordSets();
+							this.serialPort.close();
+							this.dialog.numberAvailable = Integer.valueOf(availableRecords).toString();
+						}
+						this.gatherThread = new DataGathererThread(this.application, this, this.serialPort, StringHelper.int2Array(availableRecords));
+						try {
+							this.gatherThread.start();
+							log.log(Level.FINE, "gatherThread.run() - executing"); //$NON-NLS-1$
+						}
+						catch (RuntimeException e) {
+							log.log(Level.WARNING, e.getMessage(), e);
+						}
+					}
 				}
 				catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0025, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0025, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
 					this.application.getDeviceSelectionDialog().open();
 				}
 			}
 			else {
-				this.serialPort.close();
+				this.gatherThread.setThreadStop(true);
 			}
 		}
 	}

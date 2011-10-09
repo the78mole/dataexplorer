@@ -48,6 +48,7 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
 
 /**
  * Dialog class for the Picolariolog device of Uwe Renschler
@@ -60,7 +61,7 @@ public class PicolarioDialog extends DeviceDialog {
 	Group											numberAvailableRecorsSetsGroup1;
 	Button										queryAvailableRecordSetButton;
 	CLabel										numberAvailableRecordSetsLabel;
-	String										numberAvailable		= "0"; //$NON-NLS-1$
+	String										numberAvailable		= GDE.STRING_EMPTY;
 
 	CTabFolder								configTabFolder;
 	CTabItem									configTabItem1, configTabItem2;
@@ -194,6 +195,7 @@ public class PicolarioDialog extends DeviceDialog {
 					this.numberAvailableRecordSetsLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.numberAvailableRecordSetsLabel.setBackground(DataExplorer.COLOR_WHITE);
 					this.numberAvailableRecordSetsLabel.setBounds(270, GDE.IS_MAC_COCOA ? 10 : 25, 30, 24);
+					this.numberAvailableRecordSetsLabel.setText(this.numberAvailable);
 				}
 			} // end group1
 
@@ -296,7 +298,7 @@ public class PicolarioDialog extends DeviceDialog {
 				{
 					this.recordSetSelectCombo = new CCombo(this.readDataGroup3, SWT.BORDER | SWT.RIGHT);
 					this.recordSetSelectCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.recordSetSelectCombo.setText("0"); //$NON-NLS-1$
+					this.recordSetSelectCombo.setItems(this.numberAvailable.length() >= 1 ? StringHelper.int2Array(Integer.parseInt(this.numberAvailable)) : new String[]{"0"}); //$NON-NLS-1$
 					this.recordSetSelectCombo.setBounds(260, GDE.IS_MAC_COCOA ? 32 : 47, 45, GDE.IS_LINUX ? 22 : 20);
 				}
 				{
@@ -406,11 +408,7 @@ public class PicolarioDialog extends DeviceDialog {
 	 * @param index
 	 */
 	public void setRecordSetSelection(int items, int index) {
-		String[] itemNames = new String[items];
-		for (int i = 0; i < items; i++) {
-			itemNames[i] = Integer.valueOf(i + 1).toString();
-		}
-		this.recordSetSelectCombo.setItems(itemNames);
+		this.recordSetSelectCombo.setItems(StringHelper.int2Array(items));
 		this.recordSetSelectCombo.select(index);
 		this.recordSetSelectCombo.setVisibleItemCount(items);
 	}
@@ -510,23 +508,39 @@ public class PicolarioDialog extends DeviceDialog {
 	 * reset the button states to default
 	 */
 	public void resetButtons() {
-		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			PicolarioDialog.this.setClosePossible(true);
-			PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(true);
-			PicolarioDialog.this.readSingle.setEnabled(true);
-			PicolarioDialog.this.readAllRecords.setEnabled(true);
-			PicolarioDialog.this.stopButton.setEnabled(false);
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
+			if (Thread.currentThread().getId() == this.application.getThreadId()) {
+				PicolarioDialog.this.setClosePossible(true);
+				PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(true);
+				PicolarioDialog.this.readSingle.setEnabled(true);
+				PicolarioDialog.this.readAllRecords.setEnabled(true);
+				PicolarioDialog.this.stopButton.setEnabled(false);
+			}
+			else {
+				GDE.display.asyncExec(new Runnable() {
+					public void run() {
+						PicolarioDialog.this.setClosePossible(true);
+						PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(true);
+						PicolarioDialog.this.readSingle.setEnabled(true);
+						PicolarioDialog.this.readAllRecords.setEnabled(true);
+						PicolarioDialog.this.stopButton.setEnabled(false);
+					}
+				});
+			}
 		}
-		else {
-			GDE.display.asyncExec(new Runnable() {
-				public void run() {
-					PicolarioDialog.this.setClosePossible(true);
-					PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(true);
-					PicolarioDialog.this.readSingle.setEnabled(true);
-					PicolarioDialog.this.readAllRecords.setEnabled(true);
-					PicolarioDialog.this.stopButton.setEnabled(false);
-				}
-			});
-		}
+	}
+
+	/**
+	 * @return the queryAvailableRecordSetButton
+	 */
+	public synchronized Button getQueryAvailableRecordSetButton() {
+		return queryAvailableRecordSetButton;
+	}
+
+	/**
+	 * @return the readAllRecords
+	 */
+	public synchronized Button getReadAllRecords() {
+		return readAllRecords;
 	}
 }
