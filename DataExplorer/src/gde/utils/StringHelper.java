@@ -579,4 +579,17 @@ public class StringHelper {
 		return Arrays.asList(string.split(""+separator));
 	}
 
+	/**
+	 * integer to string array ( 3 -> {"0", "1", "2"} )
+	 * @param items
+	 * @return
+	 */
+	public static String[] int2Array(int items) {
+		String[] itemNames = new String[items];
+		for (int i = 0; i < items; i++) {
+			itemNames[i] = Integer.valueOf(i + 1).toString();
+		}
+		return itemNames;
+	}
+
 }
