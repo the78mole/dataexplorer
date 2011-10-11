@@ -114,6 +114,7 @@ public class OsdReaderWriter {
 		switch (version) {
 		case 1:
 		case 2: // added OBJECT_KEY to header
+		case 3: // added startTimeStamp to recordSet
 			header.put(GDE.DATA_EXPLORER_FILE_VERSION, GDE.STRING_EMPTY+version);
 			boolean isHeaderComplete = false;
 			while (!isHeaderComplete && headerCounter-- > 0) {

@@ -250,6 +250,7 @@ public class NMEAReaderWriter {
 
 				activeChannel.setActiveRecordSet(recordSetName);
 				activeChannel.get(recordSetName).setRecordSetDescription(activeChannel.get(recordSetName).getRecordSetDescription() + GDE.STRING_BLANK + data.getComment());
+				activeChannel.get(recordSetName).setStartTimeStamp(data.getStartTimeStamp());
 				activeChannel.applyTemplate(recordSetName, true);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records

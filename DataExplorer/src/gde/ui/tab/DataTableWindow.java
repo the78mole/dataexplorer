@@ -30,6 +30,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -46,6 +47,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
+import gde.ui.menu.TabAreaContextMenu;
 
 /**
  * Table display class, displays the data in table form
@@ -54,12 +56,17 @@ import gde.ui.SWTResourceManager;
 public class DataTableWindow extends CTabItem {
 	final static Logger					  log	= Logger.getLogger(DataTableWindow.class.getName());
 
+	final public static String		TABLE_TIME_STAMP_ABSOLUTE = "table_time_stamp_absolute";
+
 	Table													dataTable;
 	TableColumn										timeColumn;
 
 	final DataExplorer						application;
 	final Channels								channels;
 	final CTabFolder							tabFolder;
+	final Menu										popupmenu;
+	final TabAreaContextMenu			contextMenu;
+	boolean												isAbsoluteDateTime = false;
 
 	public DataTableWindow(CTabFolder dataTab, int style, int position) {
 		super(dataTab, style, position);
@@ -69,6 +76,9 @@ public class DataTableWindow extends CTabItem {
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0233));
+		
+		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.contextMenu = new TabAreaContextMenu();
 	}
 
 	public void create() {
@@ -91,11 +101,13 @@ public class DataTableWindow extends CTabItem {
 					if (activeRecordSet != null) {
 						TableItem item = (TableItem) event.item;
 						int index = DataTableWindow.this.dataTable.indexOf(item);
-						item.setText(activeRecordSet.getDataTableRow(index));
+						item.setText(activeRecordSet.getDataTableRow(index, DataTableWindow.this.isAbsoluteDateTime));
 					}
 				}
 			}
 		});
+		this.contextMenu.createMenu(this.popupmenu, TabAreaContextMenu.TYPE_TABLE);
+		this.dataTable.setMenu(this.popupmenu);
 	}
 
 	/**
@@ -110,7 +122,7 @@ public class DataTableWindow extends CTabItem {
 		}
 
 		int extentFactor = 9;
-		String time = Messages.getString(MessageIds.GDE_MSGT0234); //$NON-NLS-1$
+		String time = isAbsoluteDateTime ? Messages.getString(MessageIds.GDE_MSGT0436) : Messages.getString(MessageIds.GDE_MSGT0234); 
 		this.timeColumn = new TableColumn(this.dataTable, SWT.CENTER);
 		this.timeColumn.setWidth(time.length() * 7);
 		this.timeColumn.setText(time);
@@ -195,5 +207,12 @@ public class DataTableWindow extends CTabItem {
 			if (topIndex != newTopIndex)
 				this.dataTable.setTopIndex(newTopIndex);
 		}
+	}
+
+	/**
+	 * @param isAbsoluteDateTime the isAbsoluteDateTime to set
+	 */
+	public synchronized void setAbsoluteDateTime(boolean isAbsoluteDateTime) {
+		this.isAbsoluteDateTime = isAbsoluteDateTime;
 	}
 }

@@ -63,7 +63,7 @@ public class GraphicsWindow extends CTabItem {
 	// drawing canvas
 	GraphicsComposite							graphicsComposite;
 
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final Channels								channels;
 	final Settings								settings;
 	final String									tabName;

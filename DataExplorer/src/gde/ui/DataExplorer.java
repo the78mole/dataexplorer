@@ -795,8 +795,8 @@ public class DataExplorer extends Composite {
 			if (forceClean) {
 				GDE.display.asyncExec(new Runnable() {
 					public void run() {
+						//DataExplorer.this.dataTableTabItem.setAbsoluteDateTime(false);
 						DataExplorer.this.dataTableTabItem.setHeader();
-						DataExplorer.this.dataTableTabItem.cleanTable();
 					}
 				});
 			}
@@ -2505,6 +2505,16 @@ public class DataExplorer extends Composite {
 				&& this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
 			this.settings.setUtilitySurroundingBackground(surroundingBackground);
 			this.utilGraphicsTabItem.setSurroundingBackground(surroundingBackground);
+		}
+	}
+	
+	public void setAbsoluteDateTime(boolean enable) {
+		this.dataTableTabItem.setAbsoluteDateTime(enable);
+		this.dataTableTabItem.setHeader();
+		Channel activeChannel = this.channels != null ? this.channels.getActiveChannel() : null;
+		RecordSet activeRecordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
+		if (activeRecordSet != null) {
+			this.dataTableTabItem.setRowCount(activeRecordSet.getRecordDataSize(true));
 		}
 	}
 	

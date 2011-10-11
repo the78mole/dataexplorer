@@ -19,6 +19,7 @@
 package gde.data;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Vector;
 import gde.log.Level;
 import java.util.logging.Logger;
@@ -33,7 +34,10 @@ public class TimeSteps extends Vector<Long> {
 	final static Logger			log								= Logger.getLogger(RecordSet.class.getName());
 
 	final boolean						isConstant;				// true if the time step is constant and the consumed time is a number of measurement points * timeStep_ms
-	final SimpleDateFormat	timeFormat				= new SimpleDateFormat("HH:mm:ss:SSS");
+	final SimpleDateFormat	timeFormat				= new SimpleDateFormat("HH:mm:ss.SSS");
+	final SimpleDateFormat	absoluteTimeFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	long  startTime = 0;
+
 	
 	/**
 	 * Constructs a new TimeSteps class, a give time step greater than 0 signals that the time step is constant between measurement points
@@ -46,6 +50,7 @@ public class TimeSteps extends Vector<Long> {
 		this.isConstant = newTimeStep_ms > 0;
 		if (this.isConstant) 
 			super.add((long) (newTimeStep_ms * 10));
+		this.startTime = new Date().getTime();
 	}
 	
 	/**
@@ -132,9 +137,9 @@ public class TimeSteps extends Vector<Long> {
 	 * @param index
 	 * @return time fit to index
 	 */
-	public String getFormattedTime(String formatPattern, int index) {
+	public String getFormattedTime(String formatPattern, int index, boolean isAbsolute) {
 		this.timeFormat.applyPattern(formatPattern);			
-		return String.format("%25s", this.timeFormat.format(this.getTime_ms(index)));
+		return String.format("%25s", isAbsolute ? this.getIndexDateTime(index) : this.timeFormat.format(this.getTime_ms(index)));
 	}
 
 	/**
@@ -243,5 +248,30 @@ public class TimeSteps extends Vector<Long> {
 		}
 		//log.log(Level.INFO, "index=" + index);
 		return index;
+	}
+	
+	/**
+	 * set absolute start and end time of this record set
+	 * @param startTimeStamp
+	 */
+	public void setStartTimeStamp(long startTimeStamp) {
+		this.startTime = startTimeStamp;
+	}
+
+	/**
+	 * return the start time stamp
+	 * @return
+	 */
+	public long getStartTimeStamp() {
+		return this.startTime;
+	}
+	
+	/**
+	 * query the formated absolute date time at index
+	 * @param index
+	 * @return
+	 */
+	public String getIndexDateTime(int index) {
+		return absoluteTimeFormat.format(this.startTime + getTime_ms(index));
 	}
 }

@@ -47,6 +47,7 @@ public class NMEAParser {
 	private static final String	STRING_SENTENCE_SPLITTER	= " |:";																				//$NON-NLS-1$
 
 	int													time_ms;
+	long												startTimeStamp						= 0;
 	long												lastTimeStamp							= 0;
 	int[]												values;
 	Date												date;
@@ -321,6 +322,7 @@ public class NMEAParser {
 				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
 				this.lastTimeStamp = timeStamp;
 				this.date = calendar.getTime();
+				if (this.startTimeStamp == 0) this.startTimeStamp = timeStamp;
 				
 				if (log.isLoggable(Level.FINE)) 
 					log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
@@ -668,6 +670,7 @@ public class NMEAParser {
 				this.lastTimeStamp = timeStamp;
 				this.date = calendar.getTime();
 				log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
+				if (this.startTimeStamp == 0) this.startTimeStamp = timeStamp;
 
 				int latitude, longitude;
 				try {
@@ -741,6 +744,7 @@ public class NMEAParser {
 			this.lastTimeStamp = timeStamp;
 			this.date = calendar.getTime();
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
+			if (this.startTimeStamp == 0) this.startTimeStamp = timeStamp;
 		}
 	}
 
@@ -1095,6 +1099,7 @@ public class NMEAParser {
 				this.lastTimeStamp = timeStamp;
 				this.date = calendar.getTime();
 				log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SS").format(timeStamp)); //$NON-NLS-1$);
+				if (this.startTimeStamp == 0) this.startTimeStamp = timeStamp;
 			}
 			else {
 				return;
@@ -1225,5 +1230,19 @@ public class NMEAParser {
 	 */
 	public String getComment() {
 		return this.comment != null ? this.comment : GDE.STRING_EMPTY;
+	}
+
+	/**
+	 * @return the startTimeStamp
+	 */
+	public synchronized long getStartTimeStamp() {
+		return startTimeStamp;
+	}
+
+	/**
+	 * @return the lastTimeStamp
+	 */
+	public synchronized long getLastTimeStamp() {
+		return lastTimeStamp;
 	}
 }

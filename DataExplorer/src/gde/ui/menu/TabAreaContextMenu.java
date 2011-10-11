@@ -47,8 +47,9 @@ public class TabAreaContextMenu {
 	public final static int	TYPE_COMPARE	= GraphicsWindow.TYPE_COMPARE;
 	public final static int	TYPE_UTILITY	= GraphicsWindow.TYPE_UTIL;
 	public final static int	TYPE_SIMPLE		= 3;														//only referenced in not specified else clause
+	public final static int	TYPE_TABLE		= 4;														
 	
-	final DataExplorer	application;
+	final DataExplorer						application;
 
 	MenuItem											curveSelectionItem;
 	MenuItem											displayGraphicsHeaderItem;
@@ -60,6 +61,7 @@ public class TabAreaContextMenu {
 	MenuItem											outherAreaColorItem;
 	MenuItem											innerAreaColorItem;
 	MenuItem											borderColorItem;
+	MenuItem											dateTimeItem;
 	boolean												isCreated = false;
 
 	public TabAreaContextMenu() {
@@ -117,14 +119,17 @@ public class TabAreaContextMenu {
 				this.separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);
 			}
 
-			this.copyTabItem = new MenuItem(popupMenu, SWT.PUSH);
-			this.copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026));
-			this.copyTabItem.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event e) {
-					TabAreaContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
-					TabAreaContextMenu.this.application.copyTabContentAsImage();
-				}
-			});
+			if (type != TYPE_TABLE) {
+				this.copyTabItem = new MenuItem(popupMenu, SWT.PUSH);
+				this.copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026));
+				this.copyTabItem.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						TabAreaContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
+						TabAreaContextMenu.this.application.copyTabContentAsImage();
+					}
+				});
+			}
+			
 			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE || type == TYPE_UTILITY) {
 				this.copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027));
@@ -135,30 +140,33 @@ public class TabAreaContextMenu {
 					}
 				});
 			}
-			this.separatorCopy = new MenuItem(popupMenu, SWT.SEPARATOR);
-
-			this.outherAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
-			this.outherAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0462));
-			this.outherAreaColorItem.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event e) {
-					TabAreaContextMenu.log.log(Level.FINEST, "outherAreaColorItem action performed! " + e); //$NON-NLS-1$
-					RGB rgb = TabAreaContextMenu.this.application.openColorDialog();
-					if (rgb != null) {
-						TabAreaContextMenu.this.application.setSurroundingBackground(TabAreaContextMenu.this.application.getTabSelectionIndex(), SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+			
+			if (type != TYPE_TABLE) {
+				this.separatorCopy = new MenuItem(popupMenu, SWT.SEPARATOR);
+				this.outherAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
+				this.outherAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0462));
+				this.outherAreaColorItem.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						TabAreaContextMenu.log.log(Level.FINEST, "outherAreaColorItem action performed! " + e); //$NON-NLS-1$
+						RGB rgb = TabAreaContextMenu.this.application.openColorDialog();
+						if (rgb != null) {
+							TabAreaContextMenu.this.application.setSurroundingBackground(TabAreaContextMenu.this.application.getTabSelectionIndex(), SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+						}
 					}
-				}
-			});
-			this.innerAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
-			this.innerAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0463));
-			this.innerAreaColorItem.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event e) {
-					TabAreaContextMenu.log.log(Level.FINEST, "innerAreaColorItem action performed! " + e); //$NON-NLS-1$
-					RGB rgb = TabAreaContextMenu.this.application.openColorDialog();
-					if (rgb != null) {
-						TabAreaContextMenu.this.application.setInnerAreaBackground(TabAreaContextMenu.this.application.getTabSelectionIndex(), SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+				});
+				this.innerAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
+				this.innerAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0463));
+				this.innerAreaColorItem.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						TabAreaContextMenu.log.log(Level.FINEST, "innerAreaColorItem action performed! " + e); //$NON-NLS-1$
+						RGB rgb = TabAreaContextMenu.this.application.openColorDialog();
+						if (rgb != null) {
+							TabAreaContextMenu.this.application.setInnerAreaBackground(TabAreaContextMenu.this.application.getTabSelectionIndex(), SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+						}
 					}
-				}
-			});
+				});
+			}
+			
 			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE || type == TYPE_UTILITY) {
 				this.borderColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.borderColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0464));
@@ -169,6 +177,17 @@ public class TabAreaContextMenu {
 						if (rgb != null) {
 							TabAreaContextMenu.this.application.setBorderColor(TabAreaContextMenu.this.application.getTabSelectionIndex(), SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 						}
+					}
+				});
+			}
+
+			if (type == TYPE_TABLE) {
+				this.dateTimeItem = new MenuItem(popupMenu, SWT.CHECK);
+				this.dateTimeItem.setText(Messages.getString(MessageIds.GDE_MSGT0436));
+				this.dateTimeItem.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event e) {
+						TabAreaContextMenu.log.log(Level.FINEST, "dateTimeItem action performed! " + e); //$NON-NLS-1$
+						TabAreaContextMenu.this.application.setAbsoluteDateTime(TabAreaContextMenu.this.dateTimeItem.getSelection());
 					}
 				});
 			}

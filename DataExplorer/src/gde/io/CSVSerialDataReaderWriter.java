@@ -83,6 +83,8 @@ public class CSVSerialDataReaderWriter {
 		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
 		Channel activeChannel = null;
+		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
+		boolean isOutdated = false;
 		int lineNumber = 0;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
 		String recordSetNameExtend = device.getRecordSetStemName();
@@ -169,20 +171,11 @@ public class CSVSerialDataReaderWriter {
 
 						recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), isRaw, true);
 						recordSetName = recordSet.getName(); // cut/correct length
-						String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
-						boolean isOutdated = false;
 						try {
 							isOutdated = Integer.parseInt(dateTime.split(GDE.STRING_DASH)[0]) <= 2000;
 						}
 						catch (Exception e) {
 							// ignore and state as not outdated
-						}
-						if (!isOutdated) {
-							recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
-							activeChannel.setFileDescription(dateTime.substring(0, 10) + activeChannel.getFileDescription().substring(10));
-						}
-						else {
-							recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
 						}
 
 						// make all records displayable while absolute data
@@ -205,6 +198,15 @@ public class CSVSerialDataReaderWriter {
 				activeChannel.setActiveRecordSet(recordSetName);
 				activeChannel.applyTemplate(recordSetName, true);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
+				if (!isOutdated) {
+					long startTimeStamp = (long) (new File(filePath).lastModified() - activeChannel.get(recordSetName).getMaxTime_ms());
+					activeChannel.get(recordSetName).setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp));
+					activeChannel.get(recordSetName).setStartTimeStamp(startTimeStamp);
+					activeChannel.setFileDescription(dateTime.substring(0, 10) + activeChannel.getFileDescription().substring(10));
+				}
+				else {
+					activeChannel.get(recordSetName).setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
+				}
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 

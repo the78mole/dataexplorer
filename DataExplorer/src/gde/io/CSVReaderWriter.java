@@ -399,7 +399,7 @@ public class CSVReaderWriter {
 			if (application.getStatusBar() != null) application.setProgress(progressCycle, sThreadId);
 			for (int i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
-				String[] row = recordSet.getDataTableRow(i);
+				String[] row = recordSet.getDataTableRow(i, true);
 
 				// add time entry
 				sb.append(row[0].replace('.', decimalSeparator)).append(separator).append(GDE.STRING_BLANK);

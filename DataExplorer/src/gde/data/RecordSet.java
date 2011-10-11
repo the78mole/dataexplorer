@@ -40,10 +40,13 @@ import gde.utils.StringHelper;
 import gde.utils.TimeLine;
 
 import java.text.DecimalFormat;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -108,6 +111,7 @@ public class RecordSet extends HashMap<String, Record> {
 	public static final int				MAX_NAME_LENGTH								= 40;
 
 	public static final String		TIME_STEP_MS									= "timeStep_ms";																//$NON-NLS-1$
+	public final static String		START_TIME_STAMP							= "startTimeStamp";														//$NON-NLS-1$
 	public static final String		TIME													= "time";																				//$NON-NLS-1$
 	public static final String		TIME_GRID_TYPE								= "RecordSet_timeGridType";											//$NON-NLS-1$
 	public static final String		TIME_GRID_COLOR								= "RecordSet_timeGridColor";										//$NON-NLS-1$
@@ -141,7 +145,7 @@ public class RecordSet extends HashMap<String, Record> {
 //	boolean												isSyncRecordSelected					= false;
 //	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
 	
-	private final String[]				propertyKeys									= new String[] { TIME_STEP_MS, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE,
+	private final String[]				propertyKeys									= new String[] { TIME_STEP_MS, START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE,
 			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, VOLTAGE_LIMITS	};
 
 	int														configuredDisplayable					= 0;																						// number of record which must be displayable before table calculation begins
@@ -499,9 +503,9 @@ public class RecordSet extends HashMap<String, Record> {
 	 * @param index of the data points
 	 * @return formatted values as string array including time
 	 */
-	public String[] getDataTableRow(int index) {
+	public String[] getDataTableRow(int index, boolean isAbsolute) {
 		String[] dataTableRow = new String[this.size() + 1]; // add time column
-		dataTableRow[0] = this.getFormatedTime_sec(index);
+		dataTableRow[0] = this.getFormatedTime_sec(index, isAbsolute);
 		return this.device.prepareDataTableRow(this, dataTableRow, index);
 	}
 
@@ -531,20 +535,22 @@ public class RecordSet extends HashMap<String, Record> {
 	/**
 	 * @return the timeSteps_ms
 	 */
-	public String getFormatedTime_sec(int index) {
-		String fromatString = "HH:mm:ss:SSS";
-		if (this.getMaxTime_ms() <= 1000*60*60) 
-			fromatString = "mm:ss:SSS";
-		else if (this.getMaxTime_ms() <= 1000*60*60*60)
-			fromatString = "HH:mm:ss:SSS";
-		else if (this.getMaxTime_ms() > 1000*60*60*60)
-			fromatString = "dd HH:mm:ss:SSS";
-		else if (this.getMaxTime_ms() > 1000*60*60*60*24)
-			fromatString = "mm:dd HH:mm:ss:SSS";
+	public String getFormatedTime_sec(int index, boolean isAbsolute) {
+		if (isAbsolute) {
+			return this.timeStep_ms.getFormattedTime("yyyy-mm-dd HH:mm:ss.SSS", index, isAbsolute);
+		}
+		String fromatString = "HH:mm:ss.SSS";
+		if (this.getMaxTime_ms() <= 1000 * 60 * 60)
+			fromatString = "mm:ss.SSS";
+		else if (this.getMaxTime_ms() <= 1000 * 60 * 60 * 60)
+			fromatString = "HH:mm:ss.SSS";
+		else if (this.getMaxTime_ms() > 1000 * 60 * 60 * 60)
+			fromatString = "dd HH:mm:ss.SSS";
+		else if (this.getMaxTime_ms() > 1000 * 60 * 60 * 60 * 24)
+			fromatString = "mm:dd HH:mm:ss.SSS";
 		else
-			fromatString = "yy:mm:dd HH:mm:ss:SSS";
-
-		return this.timeStep_ms.getFormattedTime(fromatString, index);
+			fromatString = "yyyy-mm-dd HH:mm:ss.SSS";
+		return this.timeStep_ms.getFormattedTime(fromatString, index, isAbsolute);
 	}
 
 	/**
@@ -1568,6 +1574,7 @@ public class RecordSet extends HashMap<String, Record> {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(TIME_STEP_MS).append(GDE.STRING_EQUAL).append(this.timeStep_ms.isConstant ? this.getAverageTimeStep_ms() : -1).append(Record.DELIMITER);
+		sb.append(START_TIME_STAMP).append(GDE.STRING_EQUAL).append(this.timeStep_ms.getStartTimeStamp()).append(Record.DELIMITER);
 
 		sb.append(TIME_GRID_TYPE).append(GDE.STRING_EQUAL).append(this.timeGridType).append(Record.DELIMITER);
 		sb.append(TIME_GRID_LINE_STYLE).append(GDE.STRING_EQUAL).append(this.timeGridLineStyle).append(Record.DELIMITER);
@@ -1601,6 +1608,33 @@ public class RecordSet extends HashMap<String, Record> {
 		try {
 			tmpValue = recordSetProps.get(TIME_STEP_MS);
 			if (tmpValue != null && tmpValue.length() > 0) this.timeStep_ms = new TimeSteps(Double.parseDouble(tmpValue.trim()));
+			tmpValue = recordSetProps.get(START_TIME_STAMP);
+			if (tmpValue != null && tmpValue.length() > 0) this.timeStep_ms.setStartTimeStamp(Long.parseLong(tmpValue));
+			else {
+				String recordSetDescription = new String(this.getRecordSetDescription());
+				Pattern datePattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+				Matcher dateMatcher = datePattern.matcher(recordSetDescription);
+				Pattern timePattern = Pattern.compile("\\d{2}:\\d{2}:\\d{2}");
+				Matcher timeMatcher = timePattern.matcher(recordSetDescription);
+				if (dateMatcher.find() && timeMatcher.find()) {
+					String date = dateMatcher.group();
+					String time = timeMatcher.group();
+					log.logp(Level.FINE, $CLASS_NAME, "setDeserializedProperties", date + " " + time);
+					
+					String[] strValueDate = date.split(GDE.STRING_DASH);
+					int year = Integer.parseInt(strValueDate[0]);
+					int month = Integer.parseInt(strValueDate[1]);
+					int day = Integer.parseInt(strValueDate[2]);
+
+					String[] strValueTime = time.split(GDE.STRING_COLON);
+					int hour = Integer.parseInt(strValueTime[0]);
+					int minute = Integer.parseInt(strValueTime[1]);
+					int second = Integer.parseInt(strValueTime[2]);
+					
+					GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
+					this.timeStep_ms.setStartTimeStamp(calendar.getTimeInMillis());
+				}
+			}
 			
 			tmpValue = recordSetProps.get(TIME_GRID_TYPE);
 			if (tmpValue != null && tmpValue.length() > 0) this.timeGridType = new Integer(tmpValue.trim()).intValue();
@@ -1640,9 +1674,6 @@ public class RecordSet extends HashMap<String, Record> {
 				this.horizontalGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(GDE.STRING_COMMA)[0]), new Integer(tmpValue.split(GDE.STRING_COMMA)[1]), new Integer(tmpValue
 						.split(GDE.STRING_COMMA)[2]));
 				
-//			tmpValue = recordSetProps.get(SYNC_RECORD_SELECTED);
-//			if (tmpValue != null && tmpValue.length() > 0) this.isSyncRecordSelected = Boolean.valueOf(tmpValue.trim());
-			
 			tmpValue = recordSetProps.get(VOLTAGE_LIMITS);
 			if (tmpValue != null && tmpValue.length() > 0) {
 				String[] strVoltageValues = tmpValue.trim().split(GDE.STRING_COMMA);
@@ -2056,5 +2087,17 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setSmoothAtCurrentDrop(boolean enable) {
 		this.isSmoothAtCurrentDrop = enable;
+	}
+	
+	/**
+	 * set absolute start and end time of this record set
+	 * @param startTimeStamp
+	 */
+	public void setStartTimeStamp(long startTimeStamp) {
+		if (this.timeStep_ms != null) {
+			this.timeStep_ms.setStartTimeStamp(startTimeStamp);
+		}
+		else 
+			log.log(Level.WARNING, "time step vector is null !");
 	}
 }
