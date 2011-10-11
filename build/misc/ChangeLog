@@ -1,7 +1,14 @@
 Development history / change log, please read from bottom up
 
 Version 2.93 - xx Oct 2011
-Picolario - read all record sets with single click
+Picolario - read all available record sets with single click
+Add absolute date/time in data table for long term measurements via context menu
+CSV2SerailAdapter consider absolute date and time from file modification stamp
+WStech DataVario/LinkVario consider absolute date and time from file modification stamp
+NMEA-Adapter consider absolute date and time from containing sentences
+SM GPS-Logger consider absolute date and time from containing NMEAD sentences
+SM UniLog 2 consider absolute date and time from containing sentence
+
 
 Version 2.92 - 03 Sep 2011
 GPS-Logger, UniLog 2, WStech varios, NMEAAdapte, CSV2SerialAdapter, HoTTAdapter - modify code to save last used data load path
