@@ -1536,8 +1536,10 @@ public class DataExplorer extends Composite {
 	public FileDialog openFileOpenDialog(String name, String[] extensions, String path, String fileName, int addStyle) {
 		final String $METHOD_NAME = "openFileOpenDialog"; //$NON-NLS-1$
 		FileDialog fileOpenDialog = new FileDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);
-		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
-		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		if (path != null) {
+			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		}
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileOpenDialog.setText(name);
 		fileOpenDialog.setFileName(fileName == null ? GDE.STRING_EMPTY : fileName);
@@ -1573,8 +1575,10 @@ public class DataExplorer extends Composite {
 	public FileDialog openFileOpenDialog(Shell parent, String name, String[] extensions, String path, String fileName, int addStyle) {
 		final String $METHOD_NAME = "openFileOpenDialog"; //$NON-NLS-1$
 		FileDialog fileOpenDialog = new FileDialog(parent, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);
-		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
-		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		if (path != null) {
+			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		}
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileOpenDialog.setText(name);
 		fileOpenDialog.setFileName(fileName == null ? GDE.STRING_EMPTY : fileName);
@@ -1589,8 +1593,10 @@ public class DataExplorer extends Composite {
 	public FileDialog prepareFileSaveDialog(String name, String[] extensions, String path, String fileName) {
 		final String $METHOD_NAME = "openFileSaveDialog"; //$NON-NLS-1$
 		FileDialog fileSaveDialog = new FileDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.SAVE);
-		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
-		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		if (path != null) {
+			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		}
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileSaveDialog.setText(name);
 		if (extensions != null) {
@@ -1604,8 +1610,10 @@ public class DataExplorer extends Composite {
 	public FileDialog prepareFileSaveDialog(Shell parent, String name, String[] extensions, String path, String fileName) {
 		final String $METHOD_NAME = "openFileSaveDialog"; //$NON-NLS-1$
 		FileDialog fileSaveDialog = new FileDialog(parent, SWT.PRIMARY_MODAL | SWT.SAVE | SWT.ON_TOP);
-		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
-		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		if (path != null) {
+			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		}
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileSaveDialog.setText(name);
 		if (extensions != null) {
@@ -1640,8 +1648,10 @@ public class DataExplorer extends Composite {
 	public String openDirFileDialog(String name, String path) {
 		final String $METHOD_NAME = "openDirFileDialog"; //$NON-NLS-1$
 		DirectoryDialog fileDirDialog = new DirectoryDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.NONE);
-		path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
-		path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		if (path != null) {
+			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		}
 		log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
 		fileDirDialog.setText(name);
 		if (path != null) fileDirDialog.setFilterPath(path);
