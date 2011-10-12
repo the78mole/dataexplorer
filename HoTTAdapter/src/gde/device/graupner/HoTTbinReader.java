@@ -463,8 +463,10 @@ public class HoTTbinReader {
 			if (HoTTbinReader.application.getMenuToolBar() != null && channel != null) {
 				RecordSet actualRecordSet = channel.get(recordSetName);
 				device.updateVisibilityStatus(actualRecordSet, true);
-				String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
+				long startTimeStamp = (long) (new File(filePath).lastModified() - actualRecordSet.getMaxTime_ms());
+				String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp); //$NON-NLS-1$
 				actualRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+				actualRecordSet.setStartTimeStamp(startTimeStamp);
 				HoTTbinReader.channels.switchChannel(channel.getName());
 				channel.switchRecordSet(recordSetName);
 				log.log(Level.FINE, "switch to channel " + channel.getName() + GDE.STRING_MESSAGE_CONCAT + recordSetName); //$NON-NLS-1$
