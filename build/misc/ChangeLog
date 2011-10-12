@@ -5,6 +5,7 @@ Picolario - read all available record sets with single click
 Add absolute date/time in data table for long term measurements via context menu
 CSV2SerailAdapter consider absolute date and time from file modification stamp
 WStech DataVario/LinkVario consider absolute date and time from file modification stamp
+HoTTAdapter consider absolute date and time from file modification stamp
 NMEA-Adapter consider absolute date and time from containing sentences
 SM GPS-Logger consider absolute date and time from containing NMEAD sentences
 SM UniLog 2 consider absolute date and time from containing sentence
