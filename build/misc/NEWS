@@ -1,13 +1,15 @@
-GNU DataExplorer - News - comes with version 2.91
+GNU DataExplorer - News - comes with version 2.93
 
-Version 2.91 - 03 Sep 2011
-
-1) add HoTTAdapter implementation for 115200 Baud transmitter
-2) HoTTAdapter live data gatherer detecting sensor type automatically
-3) add UniLog2 device implementation
-4) adapt GPS-Logger to accept UL2 sentences
-5) new version of device properties schema to deliver updated GPS-Logger device configuration files
-7) documentation update
+1) Picolario - read all available record sets with single click
+2) Add absolute date/time in data table for long term measurements via context menu
+3) CSV2SerailAdapter consider absolute date and time from file modification stamp
+4) WStech DataVario/LinkVario consider absolute date and time from file modification stamp
+5) HoTTAdapter consider absolute date and time from file modification stamp
+6) NMEA-Adapter consider absolute date and time from containing sentences
+7) SM GPS-Logger consider absolute date and time from containing NMEAD sentences
+8) SM UniLog 2 consider absolute date and time from containing sentence
+9) SM UniLog 2 fix sticky dialog
+10)SM UniLog 2 enable live data gathering
 
 
 
