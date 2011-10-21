@@ -328,7 +328,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.activeRecordSet = this.application.getActiveRecordSet();
 		if (recordSet != null) {
 			if (log.isLoggable(Level.FINE) && this.get(this.getLastActiveRecordSetName()) != null && this.get(recordSetKey) != null)
-				log.log(Level.OFF, "this.size() > 1 " + (this.size() > 1) + "; this.lastActiveRecordSet = " + this.getLastActiveRecordSetName() +  " - " + this.get(this.getLastActiveRecordSetName()).getChannelConfigNumber() + "!=" +  this.get(recordSetKey).getChannelConfigNumber());
+				log.log(Level.FINE, "this.size() > 1 " + (this.size() > 1) + "; this.lastActiveRecordSet = " + this.getLastActiveRecordSetName() +  " - " + this.get(this.getLastActiveRecordSetName()).getChannelConfigNumber() + "!=" +  this.get(recordSetKey).getChannelConfigNumber());
 			if (this.size() <= 1 || (this.get(this.getLastActiveRecordSetName()) != null && this.get(recordSetKey) != null && this.type == ChannelTypes.TYPE_CONFIG && this.get(this.getLastActiveRecordSetName()).getChannelConfigNumber() != this.get(recordSetKey).getChannelConfigNumber())) { //apply values from template
 				if (this.template != null) this.template.load();
 				if (this.template != null && this.template.isAvailable()) {
