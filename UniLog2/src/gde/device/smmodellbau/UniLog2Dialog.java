@@ -41,10 +41,14 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -65,31 +69,31 @@ import org.eclipse.swt.widgets.Text;
  * @author Winfried Brügmann
  */
 public class UniLog2Dialog extends DeviceDialog {
-	final static Logger					log										= Logger.getLogger(UniLog2Dialog.class.getName());
-	final static String					PROP_n100W						= MeasurementPropertyTypes.PROP_N_100_W.value();
+	final static Logger					log									= Logger.getLogger(UniLog2Dialog.class.getName());
+	final static String					PROP_n100W					= MeasurementPropertyTypes.PROP_N_100_W.value();
 
-	CTabFolder									tabFolder, subTabFolder1, subTabFolder2;
-	CTabItem										visualizationTabItem, configurationTabItem, uniLogTabItem, mLinkTabItem;
-	Composite										visualizationMainComposite, uniLogVisualization, mLinkVisualization;
+	CTabFolder									tabFolder;
+	CTabItem										configurationTabItem;
 	Composite										configurationMainComposite;
 	UniLog2SetupConfiguration1	configuration1Composite;
 	UniLog2SetupConfiguration2	configuration2Composite;
 
-	Button											saveVisualizationButton, inputFileButton, helpButton, saveSetupButton, closeButton;
+	Button											saveChangesButton, inputFileButton, helpButton, liveGathererButton, closeButton;
 
 	CTabItem										gpsLoggerTabItem, telemetryTabItem;
 
-	//Text												propeller_n100W_Text;
+	UniLog2LiveGatherer					liveThread;
 
-	final UniLog2								device;																																						// get device specific things, get serial port, ...
-	final Settings							settings;																																					// application configuration settings
+	final UniLog2								device;																																					// get device specific things, get serial port, ...
+	final Settings							settings;																																				// application configuration settings
 	final Channels							channels;
+	final UniLog2SerialPort			serialPort;																																			// open/close port execute getData()....
 
 	UniLog2SetupReaderWriter		loggerSetup;
 
-	RecordSet										lastActiveRecordSet		= null;
-	boolean											isVisibilityChanged		= false;
-	int													measurementsCount			= 0;
+	RecordSet										lastActiveRecordSet	= null;
+	boolean											isVisibilityChanged	= false;
+	int													measurementsCount		= 0;
 
 	/**
 	 * default constructor initialize all variables required
@@ -99,6 +103,7 @@ public class UniLog2Dialog extends DeviceDialog {
 	public UniLog2Dialog(Shell parent, UniLog2 useDevice) {
 		super(parent);
 		this.device = useDevice;
+		this.serialPort = useDevice.getCommunicationPort();
 		this.settings = Settings.getInstance();
 		this.channels = Channels.getInstance();
 		for (int i = 1; i <= this.device.getChannelCount(); i++) {
@@ -112,7 +117,7 @@ public class UniLog2Dialog extends DeviceDialog {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-			log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			UniLog2Dialog.log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -133,12 +138,13 @@ public class UniLog2Dialog extends DeviceDialog {
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent evt) {
-						log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (UniLog2Dialog.this.device.isChangePropery()) {
 							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { UniLog2Dialog.this.device.getPropertiesFileName() });
 							if (UniLog2Dialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
-								log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
+								UniLog2Dialog.log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								UniLog2Dialog.this.device.storeDeviceProperties();
 								setClosePossible(true);
 							}
@@ -147,18 +153,36 @@ public class UniLog2Dialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
+					@Override
 					public void helpRequested(HelpEvent evt) {
-						log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						UniLog2Dialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						UniLog2Dialog.this.application.openHelpDialog(Messages.getString(MessageIds.GDE_MSGT2510), "HelpInfo.html"); //$NON-NLS-1$
 					}
 				});
+				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+					@Override
+					public void mouseEnter(MouseEvent evt) {
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
+						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 10, 10, 10, 15);
+					}
+					@Override
+					public void mouseHover(MouseEvent evt) {
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
+					}
+					@Override
+					public void mouseExit(MouseEvent evt) {
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
+						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 10, 10, -10, 15);
+					}
+				});
 				this.dialogShell.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent paintevent) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
+						if (UniLog2Dialog.log.isLoggable(java.util.logging.Level.FINEST)) UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
 						RecordSet activeRecordSet = UniLog2Dialog.this.application.getActiveRecordSet();
 						int index = Channels.getInstance().getActiveChannelNumber();
-						if (UniLog2Dialog.this.lastActiveRecordSet == null && activeRecordSet != null 
-								|| ( activeRecordSet != null && !UniLog2Dialog.this.lastActiveRecordSet.getName().equals(activeRecordSet.getName()))) {
+						if (UniLog2Dialog.this.lastActiveRecordSet == null && activeRecordSet != null
+								|| (activeRecordSet != null && !UniLog2Dialog.this.lastActiveRecordSet.getName().equals(activeRecordSet.getName()))) {
 							UniLog2Dialog.this.tabFolder.setSelection(index - 1);
 						}
 						UniLog2Dialog.this.lastActiveRecordSet = UniLog2Dialog.this.application.getActiveRecordSet();
@@ -211,20 +235,25 @@ public class UniLog2Dialog extends DeviceDialog {
 					this.tabFolder.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (UniLog2Dialog.this.tabFolder.getSelectionIndex() == 2) {
+								UniLog2Dialog.this.saveChangesButton.setText(Messages.getString(MessageIds.GDE_MSGT2518));
+								UniLog2Dialog.this.saveChangesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2524));
 								UniLog2Dialog.this.loggerSetup.loadSetup();
 								UniLog2Dialog.this.configuration1Composite.updateValues();
 								UniLog2Dialog.this.configuration2Composite.updateValues();
 							}
 							else {
+								UniLog2Dialog.this.saveChangesButton.setText(Messages.getString(MessageIds.GDE_MSGT2516));
+								UniLog2Dialog.this.saveChangesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2523));
+
 								int channelNumber = UniLog2Dialog.this.tabFolder.getSelectionIndex();
 								if (channelNumber >= 0 && channelNumber <= UniLog2Dialog.this.device.getChannelCount()) { // enable other tabs for future use
 									channelNumber += 1;
 									String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText(); //$NON-NLS-1$
 									Channel activeChannel = UniLog2Dialog.this.channels.getActiveChannel();
 									if (activeChannel != null) {
-										log.log(Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+										UniLog2Dialog.log.log(java.util.logging.Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 										RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 										if (activeRecordSet != null && activeChannel.getNumber() != channelNumber) {
 											int answer = UniLog2Dialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.GDE_MSGI2501));
@@ -232,7 +261,7 @@ public class UniLog2Dialog extends DeviceDialog {
 												String recordSetKey = activeRecordSet.getName();
 												Channel tmpChannel = UniLog2Dialog.this.channels.get(channelNumber);
 												if (tmpChannel != null) {
-													log.log(Level.FINE,
+													UniLog2Dialog.log.log(java.util.logging.Level.FINE,
 															"move record set " + recordSetKey + " to channel/configuration " + channelNumber + GDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
 													tmpChannel.put(recordSetKey, activeRecordSet.clone(channelNumber));
 													activeChannel.remove(recordSetKey);
@@ -253,23 +282,28 @@ public class UniLog2Dialog extends DeviceDialog {
 					});
 				}
 				{
-					this.saveVisualizationButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+					this.saveChangesButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData saveButtonLData = new FormData();
 					saveButtonLData.width = 130;
 					saveButtonLData.height = GDE.IS_MAC ? 33 : 30;
 					saveButtonLData.left = new FormAttachment(0, 1000, 15);
 					saveButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
-					this.saveVisualizationButton.setLayoutData(saveButtonLData);
-					this.saveVisualizationButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.saveVisualizationButton.setText(Messages.getString(MessageIds.GDE_MSGT2516));
-					this.saveVisualizationButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2523));
-					this.saveVisualizationButton.setEnabled(false);
-					this.saveVisualizationButton.addSelectionListener(new SelectionAdapter() {
+					this.saveChangesButton.setLayoutData(saveButtonLData);
+					this.saveChangesButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.saveChangesButton.setText(Messages.getString(MessageIds.GDE_MSGT2516));
+					this.saveChangesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2523));
+					this.saveChangesButton.setEnabled(false);
+					this.saveChangesButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							UniLog2Dialog.this.device.storeDeviceProperties();
-							UniLog2Dialog.this.saveVisualizationButton.setEnabled(false);
+							UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (UniLog2Dialog.this.tabFolder.getSelectionIndex() == 2) {
+								UniLog2Dialog.this.loggerSetup.saveSetup();
+							}
+							else {
+								UniLog2Dialog.this.device.storeDeviceProperties();
+							}
+							UniLog2Dialog.this.saveChangesButton.setEnabled(false);
 						}
 					});
 				}
@@ -287,11 +321,11 @@ public class UniLog2Dialog extends DeviceDialog {
 					this.inputFileButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (UniLog2Dialog.this.isVisibilityChanged) {
 								String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { UniLog2Dialog.this.device.getPropertiesFileName() });
 								if (UniLog2Dialog.this.application.openYesNoMessageDialog(UniLog2Dialog.this.dialogShell, msg) == SWT.YES) {
-									log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
+									UniLog2Dialog.log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
 									UniLog2Dialog.this.device.storeDeviceProperties();
 								}
 							}
@@ -312,29 +346,58 @@ public class UniLog2Dialog extends DeviceDialog {
 					this.helpButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2Dialog.this.application.openHelpDialog(Messages.getString(MessageIds.GDE_MSGT2510), "HelpInfo.html"); //$NON-NLS-1$
 						}
 					});
 				}
 				{
-					this.saveSetupButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+					this.liveGathererButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData saveSetupButtonLData = new FormData();
 					saveSetupButtonLData.width = 130;
 					saveSetupButtonLData.height = GDE.IS_MAC ? 33 : 30;
 					saveSetupButtonLData.right = new FormAttachment(1000, 1000, -155);
 					saveSetupButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
-					this.saveSetupButton.setLayoutData(saveSetupButtonLData);
-					this.saveSetupButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.saveSetupButton.setText(Messages.getString(MessageIds.GDE_MSGT2518));
-					this.saveSetupButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2524));
-					this.saveSetupButton.setEnabled(false);
-					this.saveSetupButton.addSelectionListener(new SelectionAdapter() {
+					this.liveGathererButton.setLayoutData(saveSetupButtonLData);
+					this.liveGathererButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2576));
+					this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2578));
+					this.liveGathererButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "saveSetupButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							UniLog2Dialog.this.loggerSetup.saveSetup();
-							UniLog2Dialog.this.saveSetupButton.setEnabled(false);
+							if (UniLog2Dialog.log.isLoggable(java.util.logging.Level.FINE)) UniLog2Dialog.log.log(java.util.logging.Level.FINE, "liveGathererButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (UniLog2Dialog.this.liveThread == null) {
+								try {
+									UniLog2Dialog.this.liveThread = new UniLog2LiveGatherer(UniLog2Dialog.this.application, UniLog2Dialog.this.device, UniLog2Dialog.this.serialPort, UniLog2Dialog.this);
+									try {
+										UniLog2Dialog.this.liveThread.start();
+									}
+									catch (RuntimeException e) {
+										UniLog2Dialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+									}
+								}
+								catch (Exception e) {
+									if (UniLog2Dialog.this.liveThread != null && UniLog2Dialog.this.liveThread.isAlive()) {
+										UniLog2Dialog.this.liveThread.stopDataGathering();
+										UniLog2Dialog.this.liveThread.interrupt();
+									}
+									UniLog2Dialog.this.application.updateGraphicsWindow();
+									UniLog2Dialog.this.application.openMessageDialog(UniLog2Dialog.this.getDialogShell(),
+											Messages.getString(MessageIds.GDE_MSGW2500, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+									UniLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2576));
+									UniLog2Dialog.this.liveThread = null;
+								}
+								UniLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2577));
+							}
+							else {
+								if (UniLog2Dialog.this.liveThread != null && UniLog2Dialog.this.liveThread.isAlive()) {
+									UniLog2Dialog.this.liveThread.stopDataGathering();
+									UniLog2Dialog.this.liveThread.interrupt();
+								}
+								UniLog2Dialog.this.application.updateGraphicsWindow();
+								UniLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2576));
+								UniLog2Dialog.this.liveThread = null;
+							}
 						}
 					});
 				}
@@ -351,7 +414,7 @@ public class UniLog2Dialog extends DeviceDialog {
 					this.closeButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2Dialog.this.dispose();
 						}
 					});
@@ -370,7 +433,7 @@ public class UniLog2Dialog extends DeviceDialog {
 			}
 		}
 		catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
+			UniLog2Dialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
@@ -379,47 +442,47 @@ public class UniLog2Dialog extends DeviceDialog {
 	 * @param channelNumber
 	 */
 	private void createVisualizationTabItem(final int channelNumber) {
-		this.visualizationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
-		this.visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		this.visualizationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2509) + GDE.STRING_MESSAGE_CONCAT + this.device.getChannelName(channelNumber)); //);
+		CTabItem visualizationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
+		visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		visualizationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2509) + GDE.STRING_MESSAGE_CONCAT + this.device.getChannelName(channelNumber)); //);
 
-		this.visualizationMainComposite = new Composite(this.tabFolder, SWT.NONE);
+		Composite visualizationMainComposite = new Composite(this.tabFolder, SWT.NONE);
 		FormLayout visualizationMainCompositeLayout = new FormLayout();
-		this.visualizationMainComposite.setLayout(visualizationMainCompositeLayout);
-		this.visualizationTabItem.setControl(this.visualizationMainComposite);
+		visualizationMainComposite.setLayout(visualizationMainCompositeLayout);
+		visualizationTabItem.setControl(visualizationMainComposite);
 		{
 			FormData layoutData = new FormData();
 			layoutData.top = new FormAttachment(0, 1000, 0);
 			layoutData.left = new FormAttachment(0, 1000, 0);
 			layoutData.right = new FormAttachment(458, 1000, 0);
 			layoutData.bottom = new FormAttachment(1000, 1000, 0);
-			new UniLog2VisualizationControl(this.visualizationMainComposite, layoutData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2510), 0, 15);
+			new UniLog2VisualizationControl(visualizationMainComposite, layoutData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2510), 0, 15);
 
-			this.subTabFolder1 = new CTabFolder(this.visualizationMainComposite, SWT.NONE);
+			CTabFolder subTabFolder1 = new CTabFolder(visualizationMainComposite, SWT.NONE);
 			//this.subTabFolder1.setSimple(false);
 			FormData subTabFolder1LData = new FormData();
 			subTabFolder1LData.top = new FormAttachment(0, 1000, 0);
 			subTabFolder1LData.left = new FormAttachment(460, 1000, 0);
 			subTabFolder1LData.right = new FormAttachment(1000, 1000, 0);
 			subTabFolder1LData.bottom = new FormAttachment(1000, 1000, 0);
-			this.subTabFolder1.setLayoutData(subTabFolder1LData);
+			subTabFolder1.setLayoutData(subTabFolder1LData);
 
 			{
-				this.uniLogTabItem = new CTabItem(this.subTabFolder1, SWT.NONE);
-				this.uniLogTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
-				this.uniLogTabItem.setText("                                                                      ");//Messages.getString(MessageIds.GDE_MSGT2511)); //$NON-NLS-1$
-				this.uniLogVisualization = new Composite(this.subTabFolder1, SWT.NONE);
+				CTabItem uniLogTabItem = new CTabItem(subTabFolder1, SWT.NONE);
+				uniLogTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+				uniLogTabItem.setText("                                                                      ");//Messages.getString(MessageIds.GDE_MSGT2511)); //$NON-NLS-1$
+				Composite uniLogVisualization = new Composite(subTabFolder1, SWT.NONE);
 				FormLayout compositeLayout = new FormLayout();
-				this.uniLogVisualization.setLayout(compositeLayout);
-				this.uniLogTabItem.setControl(this.uniLogVisualization);
+				uniLogVisualization.setLayout(compositeLayout);
+				uniLogTabItem.setControl(uniLogVisualization);
 				FormData layoutUniLogData = new FormData();
 				layoutUniLogData.top = new FormAttachment(0, 1000, 0);
 				layoutUniLogData.left = new FormAttachment(0, 1000, 0);
 				layoutUniLogData.right = new FormAttachment(1000, 1000, 0);
 				layoutUniLogData.bottom = new FormAttachment(1000, 1000, -100);
-				new UniLog2VisualizationControl(this.uniLogVisualization, layoutUniLogData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2511), 15, 9);
+				new UniLog2VisualizationControl(uniLogVisualization, layoutUniLogData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2511), 15, 9);
 				{
-					Composite filler = new Composite(this.uniLogVisualization, SWT.NONE);
+					Composite filler = new Composite(uniLogVisualization, SWT.NONE);
 					FormData composite2LData = new FormData();
 					composite2LData.left = new FormAttachment(0, 1000, 0);
 					composite2LData.bottom = new FormAttachment(1000, 1000, 0);
@@ -436,22 +499,23 @@ public class UniLog2Dialog extends DeviceDialog {
 						efficencyLabel.setLayoutData(efficencyRowData);
 						efficencyLabel.setText(Messages.getString(MessageIds.GDE_MSGT2505));
 						efficencyLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2506));
-						efficencyLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));					}
+						efficencyLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					}
 					{
 						final Text propeller_n100W_Text = new Text(filler, SWT.BORDER | SWT.CENTER);
 						RowData efficencyRowData = new RowData();
 						efficencyRowData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 						efficencyRowData.width = 80;
 						propeller_n100W_Text.setLayoutData(efficencyRowData);
-						propeller_n100W_Text.setText("3600");
+						propeller_n100W_Text.setText("3600"); //$NON-NLS-1$
 						propeller_n100W_Text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						propeller_n100W_Text.addKeyListener(new KeyAdapter() {
 							@Override
 							public void keyReleased(KeyEvent evt) {
-								log.log(Level.FINEST, "efficencyN100WText.keyReleaded, evt=" + evt); //$NON-NLS-1$
+								UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "efficencyN100WText.keyReleaded, evt=" + evt); //$NON-NLS-1$
 								try {
 									if (evt.character == SWT.CR) {
-										 int propeller_n100W_Value = new Integer(propeller_n100W_Text.getText().trim());
+										int propeller_n100W_Value = new Integer(propeller_n100W_Text.getText().trim());
 										if (UniLog2Dialog.this.channels.getActiveChannel() != null) {
 											RecordSet recordSet = UniLog2Dialog.this.channels.getActiveChannel().getActiveRecordSet();
 											if (recordSet != null) {
@@ -470,10 +534,9 @@ public class UniLog2Dialog extends DeviceDialog {
 												UniLog2Dialog.this.application.updateDataTable(recordSet.getName(), true);
 												recordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 											}
-											UniLog2Dialog.this.device.setMeasurementPropertyValue(channelNumber, 14, MeasurementPropertyTypes.PROP_N_100_W.value(),
-													DataTypes.INTEGER, propeller_n100W_Value);
+											UniLog2Dialog.this.device.setMeasurementPropertyValue(channelNumber, 14, MeasurementPropertyTypes.PROP_N_100_W.value(), DataTypes.INTEGER, propeller_n100W_Value);
 										}
-										UniLog2Dialog.this.saveVisualizationButton.setEnabled(true);
+										UniLog2Dialog.this.saveChangesButton.setEnabled(true);
 									}
 								}
 								catch (Exception e) {
@@ -482,11 +545,14 @@ public class UniLog2Dialog extends DeviceDialog {
 								}
 							}
 						});
-						propeller_n100W_Text.addPaintListener(new PaintListener() {
-							public void paintControl(PaintEvent arg0) {
+						propeller_n100W_Text.addFocusListener(new FocusAdapter() {
+							@Override
+							public void focusGained(FocusEvent evt) {
 								PropertyType property = UniLog2Dialog.this.device.getMeasruementProperty(channelNumber, 14, UniLog2Dialog.PROP_n100W);
-								if (property != null) propeller_n100W_Text.setText(property.getValue());
-								else propeller_n100W_Text.setText("3600");
+								if (property != null)
+									propeller_n100W_Text.setText(property.getValue());
+								else
+									propeller_n100W_Text.setText("3600"); //$NON-NLS-1$
 							}
 						});
 					}
@@ -502,21 +568,21 @@ public class UniLog2Dialog extends DeviceDialog {
 				}
 			}
 			{
-				this.mLinkTabItem = new CTabItem(this.subTabFolder1, SWT.NONE);
-				this.mLinkTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
-				this.mLinkTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2512));
-				this.mLinkVisualization = new Composite(this.subTabFolder1, SWT.NONE);
+				CTabItem mLinkTabItem = new CTabItem(subTabFolder1, SWT.NONE);
+				mLinkTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+				mLinkTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2512));
+				Composite mLinkVisualization = new Composite(subTabFolder1, SWT.NONE);
 				FormLayout compositeLayout = new FormLayout();
-				this.mLinkVisualization.setLayout(compositeLayout);
-				this.mLinkTabItem.setControl(this.mLinkVisualization);
+				mLinkVisualization.setLayout(compositeLayout);
+				mLinkTabItem.setControl(mLinkVisualization);
 				FormData layoutMLinkData = new FormData();
 				layoutMLinkData.top = new FormAttachment(0, 1000, 0);
 				layoutMLinkData.left = new FormAttachment(0, 1000, 0);
 				layoutMLinkData.right = new FormAttachment(1000, 1000, 0);
 				layoutMLinkData.bottom = new FormAttachment(1000, 1000, 0);
-				new UniLog2VisualizationControl(this.mLinkVisualization, layoutMLinkData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2512), 24, 15);
+				new UniLog2VisualizationControl(mLinkVisualization, layoutMLinkData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2512), 24, 15);
 			}
-			this.subTabFolder1.setSelection(0);
+			subTabFolder1.setSelection(0);
 		}
 	}
 
@@ -525,7 +591,7 @@ public class UniLog2Dialog extends DeviceDialog {
 	 */
 	@Override
 	public void enableSaveButton(boolean enable) {
-		this.saveVisualizationButton.setEnabled(enable);
+		this.saveChangesButton.setEnabled(enable);
 		this.application.updateAllTabs(true);
 	}
 
@@ -533,7 +599,7 @@ public class UniLog2Dialog extends DeviceDialog {
 	 * set the save configuration button enabled 
 	 */
 	public void enableSaveConfigurationButton(boolean enable) {
-		this.saveSetupButton.setEnabled(enable);
+		this.saveChangesButton.setEnabled(enable);
 	}
 
 	/**
@@ -541,5 +607,12 @@ public class UniLog2Dialog extends DeviceDialog {
 	 */
 	public Integer getTabFolderSelectionIndex() {
 		return this.tabFolder.getSelectionIndex();
+	}
+
+	public void resetButtons() {
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
+			this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2576));
+			this.liveThread = null;
+		}
 	}
 }
