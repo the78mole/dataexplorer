@@ -24,6 +24,7 @@ package gde.device.smmodellbau.unilog2;
  */ 
 public class MessageIds { 
 
+	public final static String	GDE_MSGW2500 = "GDE_MSGW2500";
 	public final static String	GDE_MSGI2500 = "GDE_MSGI2500";
 	public final static String	GDE_MSGI2501 = "GDE_MSGI2501";
 	public final static String	GDE_MSGT2500 = "GDE_MSGT2500";
@@ -98,5 +99,8 @@ public class MessageIds {
 	public final static String	GDE_MSGT2573 = "GDE_MSGT2573";
 	public final static String	GDE_MSGT2574 = "GDE_MSGT2574";
 	public final static String	GDE_MSGT2575 = "GDE_MSGT2575";
+	public final static String	GDE_MSGT2576 = "GDE_MSGT2576";
+	public final static String	GDE_MSGT2577 = "GDE_MSGT2577";
+	public final static String	GDE_MSGT2578 = "GDE_MSGT2578";
 
  }

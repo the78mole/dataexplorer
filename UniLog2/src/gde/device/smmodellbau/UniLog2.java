@@ -38,6 +38,7 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
+import gde.utils.StringHelper;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -61,9 +62,10 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	final static String	SM_UNILOG_2_INI_PATH	= "SM UniLog 2 setup";												//$NON-NLS-1$
 	final static String	SM_UNILOG_2_DIR_STUB	= "SM UniLog 2";															//$NON-NLS-1$
 
-	final DataExplorer	application;
-	final Channels			channels;
-	final UniLog2Dialog	dialog;
+	final DataExplorer			application;
+	final Channels					channels;
+	final UniLog2Dialog			dialog;
+	final UniLog2SerialPort	serialPort;
 
 	/**
 	 * constructor using properties file
@@ -76,6 +78,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		Messages.setDeviceResourceBundle("gde.device.smmodellbau.unilog2.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
+		this.serialPort = this.application != null ? new UniLog2SerialPort(this, this.application) : new UniLog2SerialPort(this, null);
 		this.channels = Channels.getInstance();
 		this.dialog = new UniLog2Dialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
@@ -93,12 +96,22 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		Messages.setDeviceResourceBundle("gde.device.smmodellbau.unilog2.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
+		this.serialPort = this.application != null ? new UniLog2SerialPort(this, this.application) : new UniLog2SerialPort(this, null);
 		this.channels = Channels.getInstance();
 		this.dialog = new UniLog2Dialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
 		}
 	}
+
+	/**
+	 * @return the serialPort
+	 */
+	@Override
+	public UniLog2SerialPort getCommunicationPort() {
+		return this.serialPort;
+	}
+
 
 	/**
 	 * load the mapping exist between lov file configuration keys and GDE keys
@@ -192,10 +205,108 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
 	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
 	 * @param points pointer to integer array to be filled with converted data
-	 * @param dataBuffer byte arrax with the data to be converted
+	 * @param dataBuffer byte array with the data to be converted
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		//noop due to previous parsed CSV data
+		return points;
+	}
+
+	/**
+	 * convert the device live data string to data point values, no calculation will take place here, see translateValue reverseTranslateValue
+	 * @param points pointer to integer array to be filled with converted data
+	 * @param stringBuffer the data to be parsed
+	 */
+	public int[] convertLiveData(int[] points, String stringBuffer) {
+		String[] dataArray = StringHelper.splitString(stringBuffer, "<CR>", "\n");
+		for (int i=2; i < dataArray.length; i++) {
+			//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
+			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+			//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
+			try {
+				switch (i) {
+				case 2: // 0.00A    -3.4m
+					points[2] = (int) (Double.parseDouble(dataArray[i].split("A")[0].trim()) * 1000.0);
+					points[15] = (int) (Double.parseDouble(dataArray[i].split("A")[1].split("m")[0].trim()) * 1000.0);
+					break;
+				case 3: // 16.23V  +0.1m/s
+					points[1] = (int) (Double.parseDouble(dataArray[i].split("V")[0].trim()) * 1000.0);
+					points[16] = (int) (Double.parseDouble(dataArray[i].split("V")[1].split("m")[0].trim()) * 1000.0);
+					break;
+				case 4: // 0W      0rpm
+					points[4] = (int) (Double.parseDouble(dataArray[i].split("W")[0].trim()) * 1000.0);
+					points[13] = (int) (Double.parseDouble(dataArray[i].split("W")[1].split("r")[0].trim()) * 1000.0);
+					break;
+				case 5: // 0mAh 0.00VRx
+					points[3] = (int) (Double.parseDouble(dataArray[i].split("m")[0].trim()) * 1000.0);
+					points[0] = (int) (Double.parseDouble(dataArray[i].split("h")[1].split("V")[0].trim()) * 1000.0);
+					break;
+				case 6: // 0Wmin 
+					points[5] = (int) (Double.parseDouble(dataArray[i].split("W")[0].trim()) * 1000.0);
+					break;
+				case 7: // 0us ->    |0us
+					points[22] = (int) (Double.parseDouble(dataArray[i].split("us")[0].trim()) * 1000.0);
+					points[23] = (int) (Double.parseDouble(dataArray[i].split("us")[1].replace("|", "").substring(3).trim()) * 1000.0);
+					break;
+				case 10: // 4.04V1   4.05V2
+					points[7] = (int) (Double.parseDouble(dataArray[i].split("V1")[0].trim()) * 1000.0);
+					points[8] = (int) (Double.parseDouble(dataArray[i].split("V1")[1].split("V")[0].trim()) * 1000.0);
+					break;
+				case 11: // 4.05V3   4.08V4
+					points[9] = (int) (Double.parseDouble(dataArray[i].split("V3")[0].trim()) * 1000.0);
+					points[10] = (int) (Double.parseDouble(dataArray[i].split("V3")[1].split("V")[0].trim()) * 1000.0);
+					break;
+				case 12: // 0.00V5   0.00V6
+					points[11] = (int) (Double.parseDouble(dataArray[i].split("V5")[0].trim()) * 1000.0);
+					points[12] = (int) (Double.parseDouble(dataArray[i].split("V5")[1].split("V")[0].trim()) * 1000.0);
+					break;
+				case 13: // A1         0.6mV
+					if(dataArray[i].substring(2).contains("mV"))
+						points[17] = (int) (Double.parseDouble(dataArray[i].substring(2).split("mV")[0].trim()) * 1000.0);
+					else if(dataArray[i].substring(2).contains("`C"))
+						points[17] = (int) (Double.parseDouble(dataArray[i].substring(2).split("`C")[0].trim()) * 1000.0);
+					else if(dataArray[i].substring(2).contains("km/h"))
+						points[17] = (int) (Double.parseDouble(dataArray[i].substring(2).split("km/h")[0].trim()) * 1000.0);
+					break;
+				case 14: // A2         0.6mV
+					if(dataArray[i].substring(2).contains("mV"))
+						points[18] = (int) (Double.parseDouble(dataArray[i].substring(2).split("mV")[0].trim()) * 1000.0);
+					else if(dataArray[i].substring(2).contains("`C"))
+						points[18] = (int) (Double.parseDouble(dataArray[i].substring(2).split("`C")[0].trim()) * 1000.0);
+					else if(dataArray[i].substring(2).contains("km/h"))
+						points[18] = (int) (Double.parseDouble(dataArray[i].substring(2).split("km/h")[0].trim()) * 1000.0);
+					break;
+				case 15: // A3         0.6mV
+					if(dataArray[i].substring(2).contains("mV"))
+						points[19] = (int) (Double.parseDouble(dataArray[i].substring(2).split("mV")[0].trim()) * 1000.0);
+					else if(dataArray[i].substring(2).contains("`C"))
+						points[19] = (int) (Double.parseDouble(dataArray[i].substring(2).split("`C")[0].trim()) * 1000.0);
+					else if(dataArray[i].substring(2).contains("km/h"))
+						points[19] = (int) (Double.parseDouble(dataArray[i].substring(2).split("km/h")[0].trim()) * 1000.0);
+					break;
+				case 18: // Druck  970.74hPa
+					points[20] = (int) (Double.parseDouble(dataArray[i].substring(dataArray[i].lastIndexOf(" "), dataArray[i].length()-3).trim()) * 1000.0);
+					break;
+				case 19: // intern    32.1`C
+					points[21] = (int) (Double.parseDouble(dataArray[i].substring(dataArray[i].lastIndexOf(" "), dataArray[i].length()-2).trim()) * 1000.0);
+					break;
+				}
+			}
+			catch (RuntimeException e) {
+				//ignore;
+			}
+		}
+
+		int maxVotage = Integer.MIN_VALUE;
+		int minVotage = Integer.MAX_VALUE;
+		for (int i = 7; i <= 12; i++) {
+			if (points[i] > 0) {
+				maxVotage = points[i] > maxVotage ? points[i] : maxVotage;
+				minVotage = points[i] < minVotage ? points[i] : minVotage;
+			}
+		}
+		points[6] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
+		
 		return points;
 	}
 
