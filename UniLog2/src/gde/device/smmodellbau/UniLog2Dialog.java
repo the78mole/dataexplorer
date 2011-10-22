@@ -183,6 +183,8 @@ public class UniLog2Dialog extends DeviceDialog {
 							UniLog2Dialog.this.tabFolder.setSelection(index - 1);
 						}
 						UniLog2Dialog.this.lastActiveRecordSet = UniLog2Dialog.this.application.getActiveRecordSet();
+						if (UniLog2Dialog.this.serialPort != null && UniLog2Dialog.this.serialPort.isConnected()) 
+							UniLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2577));
 					}
 				});
 				{
