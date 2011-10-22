@@ -30,6 +30,7 @@ import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.TimeLine;
 import gde.utils.WaitTimer;
 
 import java.io.IOException;
@@ -41,6 +42,7 @@ import java.util.logging.Logger;
  * @author Winfied Brügmann
  */
 public class UniLog2LiveGatherer extends Thread {
+	final static String			$CLASS_NAME									= UniLog2LiveGatherer.class.getName();
 	final static Logger			log													= Logger.getLogger(UniLog2LiveGatherer.class.getName());
 
 	final DataExplorer			application;
@@ -77,6 +79,7 @@ public class UniLog2LiveGatherer extends Thread {
 
 	@Override
 	public void run() {
+		final String $METHOD_NAME = "run"; //$NON-NLS-1$
 		int measurementCount = 0;
 		try {
 			if (!this.serialPort.isConnected()) {
@@ -84,9 +87,6 @@ public class UniLog2LiveGatherer extends Thread {
 				this.isPortOpenedByLiveGatherer = true;
 				WaitTimer.delay(2000);
 			}
-			
-			// timer interval
-			this.timeStep_ms = 1000;
 		}
 		catch (SerialPortException e) {
 			this.application.openMessageDialogAsync(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
@@ -117,7 +117,6 @@ public class UniLog2LiveGatherer extends Thread {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 		final RecordSet recordSet = this.channel.get(recordSetKey);
 		this.channel.applyTemplateBasics(recordSetKey);
-		recordSet.setTimeStep_ms(this.timeStep_ms);
 		final int[] points = new int[recordSet.size()];
 		final UniLog2 usedDevice = this.device;
 
@@ -133,7 +132,8 @@ public class UniLog2LiveGatherer extends Thread {
 		}
 		this.isDataGatheringActive = true;
 		String[] liveAnswers = new String[3];
-		long timeStamp = 0;
+		long startCycleTime = 0;
+		long tmpCycleTime = 0;
 
 		while (this.isDataGatheringActive) {
 			try {
@@ -156,8 +156,10 @@ public class UniLog2LiveGatherer extends Thread {
 					}
 				}
 
-				recordSet.addPoints(usedDevice.convertLiveData(points, (new StringBuilder().append(liveAnswers[0]).append(liveAnswers[1]).append(liveAnswers[2])).toString()), timeStamp);
-				timeStamp = (System.nanoTime() / 1000000) - timeStamp;
+				tmpCycleTime = System.nanoTime()/1000000;
+				if (startCycleTime == 0) startCycleTime = tmpCycleTime;
+				recordSet.addPoints(usedDevice.convertLiveData(points, (new StringBuilder().append(liveAnswers[0]).append(liveAnswers[1]).append(liveAnswers[2])).toString()), (tmpCycleTime - startCycleTime));
+				log.logp(Level.TIME, $CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
 
 				// switch the active record set if the current record set is child of active channel
 				if (!UniLog2LiveGatherer.this.isSwitchedRecordSet && UniLog2LiveGatherer.this.channel.getName().equals(UniLog2LiveGatherer.this.channels.getActiveChannel().getName())) {
@@ -178,23 +180,27 @@ public class UniLog2LiveGatherer extends Thread {
 				log.log(Level.SEVERE, e.getMessage(), e);
 				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
 				cleanup(recordSetKey, message);
+				return;
 			}
 			catch (TimeOutException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
 				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW2500); //$NON-NLS-1$ 
 				cleanup(recordSetKey, message);
+				return;
 			}
 			catch (IOException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
 				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW2500); //$NON-NLS-1$ 
 				cleanup(recordSetKey, message);
+				return;
 			}
 			catch (Throwable e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
 				String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$ 
 				cleanup(recordSetKey, message);
+				return;
 			}
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
 		}
@@ -207,6 +213,7 @@ public class UniLog2LiveGatherer extends Thread {
 	 * @param message
 	 */
 	void cleanup(final String recordSetKey, String message) {
+		this.isDataGatheringActive = false;
 		if (this.serialPort.isConnected()) 
 			try {
 				this.serialPort.write(UniLog2SerialPort.COMMAND_STOP_LOGGING);
