@@ -121,6 +121,7 @@ public class UniLog2SetupReaderWriter {
 		log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {
+			this.device.setDataBlockPreferredDataLocation(fd.getFilterPath());
 			try {
 				FileInputStream file_input = new FileInputStream(new File(selectedSetupFile));
 				DataInputStream data_in = new DataInputStream(file_input);
