@@ -27,7 +27,6 @@ import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 import gnu.io.NoSuchPortException;
 
-import java.util.Vector;
 import java.util.logging.Logger;
 
 /**
@@ -75,36 +74,23 @@ public class UniLog2SerialPort extends DeviceCommPort {
 	 */
 	public synchronized String queryLiveData() throws Exception {
 		byte[] readBuffer = new byte[DATA_LENGTH_BYTES];
+		byte[] readBufferTmp = new byte[38];
+		
 		if (this.isConnected()) {
 			try {
 				this.write(COMMAND_START_LOGGING);
 				this.write(COMMAND_LIVE_VALUES);
-				byte[] buffer = new byte[1];
-				Vector<Byte> bytes = new Vector<Byte>();
-				while (true) {
-					this.read(buffer, 200);
-					if (bytes.size() > 100 && bytes.get(bytes.size()-2) == 0x0D && bytes.lastElement() == 0x0A && buffer[0] == 0x00) 
-						break;
-					bytes.add(buffer[0]);
-				}
-				DATA_LENGTH_BYTES = bytes.size();
-				log.log(Level.FINE, "datasize = " + DATA_LENGTH_BYTES);
-//				int tmpSize = waitForStableReceiveBuffer(DATA_LENGTH_BYTES, 1000, 150);
-//				if (tmpSize != DATA_LENGTH_BYTES) {
-//					log.log(Level.WARNING, "buffer size has changed to = " + tmpSize);
-//					DATA_LENGTH_BYTES = tmpSize;
-//					readBuffer = new byte[DATA_LENGTH_BYTES];
-//				}				
-//				readBuffer = this.read(readBuffer, 1000);
-
-				readBuffer = new byte[DATA_LENGTH_BYTES];
-				int index = 0;
-				for (Byte b : bytes) {
-					readBuffer[index++] = b;
-				}
+				this.read(readBufferTmp, 1000);
+				System.arraycopy(readBufferTmp, 0, readBuffer, 0, 38);
+				this.read(readBufferTmp, 1000);
+				System.arraycopy(readBufferTmp, 0, readBuffer, 38, 38);
+				this.read(readBufferTmp, 1000);
+				System.arraycopy(readBufferTmp, 0, readBuffer, 76, 38);
+				this.read(readBufferTmp, 1000);
+				System.arraycopy(readBufferTmp, 0, readBuffer, 114, 38);
 
 				//log.log(Level.FINE, StringHelper.byte2Hex2CharString(readBuffer));
-				log.log(Level.FINE, StringHelper.convert2CharString(readBuffer));
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.convert2CharString(readBuffer));
 			}
 			catch (Exception e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -196,8 +182,6 @@ public class UniLog2SerialPort extends DeviceCommPort {
 			this.read(buffer, 2000);
 			buffer = new byte[this.waitForStableReceiveBuffer(50, 1000, 50)];
 			this.read(buffer, 2000);
-			DATA_LENGTH_BYTES = 100 + buffer.length;
-			log.log(Level.FINE, "datasize = " + DATA_LENGTH_BYTES);
 			//log.log(Level.FINE, "###" + StringHelper.convert2CharString(buffer));
 		}
 		
@@ -208,28 +192,26 @@ public class UniLog2SerialPort extends DeviceCommPort {
 			this.read(buffer, 2000);
 			buffer = new byte[this.waitForStableReceiveBuffer(50, 1000, 50)];
 			this.read(buffer, 2000);
-			DATA_LENGTH_BYTES = 100 + buffer.length;
-			log.log(Level.FINE, "datasize = " + DATA_LENGTH_BYTES);
 			//log.log(Level.FINE, "***" + StringHelper.convert2CharString(buffer));
 		}
 		
 //		this.write(UniLog2SerialPort.COMMAND_START_LOGGING);
-//		byte[] answer1 = new byte[50];
-//		this.read(answer1, 2000);
-//		byte[] answer2 = new byte[50];
-//		this.read(answer2, 2000);
-//		byte[] buffer = new byte[1];
-//		byte[] lastbuffer = new byte[1];
-//		int bytecount = 0;
+//		byte[] buffer = new byte[40];
+//		this.read(buffer, 1000);
+//		this.read(buffer, 1000);
+//		this.read(buffer, 1000);
+//		buffer = new byte[1];
+//		Vector<Byte> bytes = new Vector<Byte>();
 //		while (true) {
-//			this.read(buffer, 200);
-//			++bytecount;
-//			if (lastbuffer[0] == 0x0A && buffer[0] == 0x00) break;
-//			lastbuffer[0] = buffer[0];
+//			this.read(buffer, 250);
+//			bytes.add(buffer[0]);
+//			if (bytes.size() > 10 && bytes.get(bytes.size()-3) == 0x0D && bytes.get(bytes.size()-2) == 0x0A && buffer[0] == 0x00) 
+//				break;
 //		}
-//		DATA_LENGTH_BYTES = 100 + bytecount;
+//		DATA_LENGTH_BYTES = 120 + bytes.size() - 4;
 //		log.log(Level.FINE, "datasize = " + DATA_LENGTH_BYTES);
-		
+			
+		DATA_LENGTH_BYTES = 152;
 		return isReady;
 	}
 

@@ -183,8 +183,6 @@ public class UniLog2Dialog extends DeviceDialog {
 							UniLog2Dialog.this.tabFolder.setSelection(index - 1);
 						}
 						UniLog2Dialog.this.lastActiveRecordSet = UniLog2Dialog.this.application.getActiveRecordSet();
-						if (UniLog2Dialog.this.serialPort != null && UniLog2Dialog.this.serialPort.isConnected()) 
-							UniLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2577));
 					}
 				});
 				{
@@ -359,7 +357,10 @@ public class UniLog2Dialog extends DeviceDialog {
 					saveSetupButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 					this.liveGathererButton.setLayoutData(saveSetupButtonLData);
 					this.liveGathererButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2576));
+					if (this.serialPort != null && this.serialPort.isConnected()) 
+						this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2577));
+					else
+						this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2576));
 					this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2578));
 					this.liveGathererButton.addSelectionListener(new SelectionAdapter() {
 						@Override
