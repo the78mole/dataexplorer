@@ -2,6 +2,8 @@ Development history / change log, please read from bottom up
 
 Version 2.94 - xx yyy 2011
 DevicePropertyEditor fix out of handles problem
+HottAdapter fix SWT error while live data gathering and closed dialog
+HottAdapter implement 19200 protocol V3 slave mode
 
 Version 2.93 - 23 Oct 2011
 Picolario - read all available record sets with single click
