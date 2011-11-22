@@ -859,6 +859,17 @@ public class DevicePropertiesEditor extends Composite {
 								//initial channel TabItem
 								new ChannelTypeTabItem(this.channelConfigInnerTabFolder, SWT.NONE, 0);
 							}
+							this.channelConfigInnerTabFolder.addSelectionListener(new SelectionAdapter() {
+								@Override
+								public void widgetSelected(SelectionEvent evt) {
+									log.log(java.util.logging.Level.OFF, "channelConfigInnerTabFolder selected, event=" + evt); //$NON-NLS-1$
+									for (CTabItem item : DevicePropertiesEditor.this.channelConfigInnerTabFolder.getItems()) {
+										((ChannelTypeTabItem)item).cleanMeasurementitems();
+									}
+									ChannelTypeTabItem tabItem = (ChannelTypeTabItem) evt.item;
+									tabItem.setupMeasurementItems();
+								}
+							});
 							this.channelConfigInnerTabFolder.setSelection(0);
 							this.channelConfigInnerTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
 								@Override

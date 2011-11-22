@@ -98,6 +98,16 @@ public class ChannelTypeTabItem extends CTabItem implements Cloneable {
 		this.channelConfigComposite.redraw();
 		this.setText(GDE.STRING_BLANK + ChannelTypeTabItem.this.channelConfigNumber + GDE.STRING_BLANK + this.channelType.getName());
 
+		if (this.channelConfigNumber == 1) setupMeasurementItems();
+
+		initialize();
+		this.channelConfigInnerTabFolder.setSelection(0);
+	}
+
+	/**
+	 * setup the measurement items for the actual channel tab item
+	 */
+	public void setupMeasurementItems() {
 		//MeasurementType begin
 		int measurementTypeCount = this.channelType.getMeasurement().size();
 		int actualTabItemCount = this.measurementsTabFolder.getItemCount();
@@ -128,19 +138,35 @@ public class ChannelTypeTabItem extends CTabItem implements Cloneable {
 		}
 		((MeasurementTypeTabItem) this.measurementsTabFolder.getSelection()).enableContextMenu(true);
 		//MeasurementType end
-
-		initialize();
-		this.channelConfigInnerTabFolder.setSelection(0);
 	}
 
-	public ChannelTypeTabItem(CTabFolder parent, int style, int index, ChannelType useChannelType) {
-		super(parent, style);
-		this.channelConfigInnerTabFolder = parent;
-		this.propsEditor = DevicePropertiesEditor.getInstance();
-		this.tabName = GDE.STRING_BLANK + (index + 1) + GDE.STRING_BLANK;
-		this.channelType = useChannelType;
-		initGUI();
+	/**
+	 * clean measurement items from not visible channel tab items 
+	 */
+	public void cleanMeasurementitems() {
+		int measurementTypeCount = this.measurementsTabFolder.getItemCount();
+		for (int i = measurementTypeCount; i > 1; i--) {
+			MeasurementTypeTabItem tmpMeasurementTypeTabItem = (MeasurementTypeTabItem) this.measurementsTabFolder.getItem(i-1);
+			if (tmpMeasurementTypeTabItem.measurementPropertiesTabFolder != null) { // dispose PropertyTypes
+				for (CTabItem tmpPropertyTypeTabItem : tmpMeasurementTypeTabItem.measurementPropertiesTabFolder.getItems()) {
+					((PropertyTypeTabItem) tmpPropertyTypeTabItem).dispose();
+				}
+				tmpMeasurementTypeTabItem.measurementPropertiesTabItem.dispose();
+			}
+			if (tmpMeasurementTypeTabItem.statisticsTypeTabItem != null) { // dispose StatisticsType
+				tmpMeasurementTypeTabItem.statisticsTypeTabItem.dispose();
+			}
+			tmpMeasurementTypeTabItem.dispose();
+		}
 	}
+//	public ChannelTypeTabItem(CTabFolder parent, int style, int index, ChannelType useChannelType) {
+//		super(parent, style);
+//		this.channelConfigInnerTabFolder = parent;
+//		this.propsEditor = DevicePropertiesEditor.getInstance();
+//		this.tabName = GDE.STRING_BLANK + (index + 1) + GDE.STRING_BLANK;
+//		this.channelType = useChannelType;
+//		initGUI();
+//	}
 
 	@Override
 	public synchronized ChannelTypeTabItem clone() {
