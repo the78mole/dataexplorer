@@ -406,6 +406,16 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		log.log(Level.WARNING, "write() not supported in simulation");
 	}
 
+	/**
+	 * cleanup the input stream if there are bytes available
+	 * @return number of bytes in receive buffer which get removed
+	 * @throws IOException
+	 */
+	public int cleanInputStream() throws IOException {
+		log.log(Level.WARNING, "cleanInputStream() not supported in simulation");
+		return 0;
+	}
+
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceSerialPort#wait4Bytes(int)
 	 */

@@ -88,6 +88,13 @@ public interface IDeviceCommPort {
 	public void write(byte[] writeBuffer) throws IOException;
 
 	/**
+	 * cleanup the input stream if there are bytes available
+	 * @return number of bytes in receive buffer which get removed
+	 * @throws IOException
+	 */
+	public int cleanInputStream() throws IOException;
+
+	/**
 	 * function check for available bytes on receive buffer
 	 * @return System.currentTimeMillis() if data available within time out, else an exception
 	 * @throws InterruptedException 

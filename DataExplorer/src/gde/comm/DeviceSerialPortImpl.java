@@ -343,10 +343,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 
 		try {
 			if (this.application != null) this.application.setSerialTxOn();
-			int num = 0;
-			if ((num = this.inputStream.available()) != 0) {
-				log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "clean inputStream left bytes -> " + this.inputStream.read(new byte[num])); //$NON-NLS-1$
-			}
+			cleanInputStream();
 
 			this.outputStream.write(writeBuffer);
 			if (GDE.IS_LINUX && GDE.IS_ARCH_DATA_MODEL_64) {
@@ -371,6 +368,20 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		finally {
 			if (this.application != null) this.application.setSerialTxOff();
 		}
+	}
+
+	/**
+	 * cleanup the input stream if there are bytes available
+	 * @return number of bytes in receive buffer which get removed
+	 * @throws IOException
+	 */
+	public int cleanInputStream() throws IOException {
+		final String $METHOD_NAME = "cleanInputStream"; //$NON-NLS-1$
+		int num = 0;
+		if ((num = this.inputStream.available()) != 0) {
+			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "clean inputStream left bytes -> " + this.inputStream.read(new byte[num])); //$NON-NLS-1$
+		}
+		return num;
 	}
 
 	/**

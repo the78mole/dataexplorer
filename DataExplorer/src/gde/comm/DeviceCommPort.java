@@ -130,6 +130,13 @@ public class DeviceCommPort implements IDeviceCommPort {
 	}
 
 	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceCommPort#write(byte[])
+	 */
+	public int cleanInputStream() throws IOException {
+		return this.port.cleanInputStream();
+	}
+
+	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#wait4Bytes(int)
 	 */
 	public long wait4Bytes(int timeout_msec) throws InterruptedException, TimeOutException, IOException {
