@@ -130,8 +130,8 @@ public class HoTTbinReader {
 				if (buf[33] >= 0 && buf[33] <= 4 && buf[3] != 0 && buf[4] != 0) { //skip empty block - package loss
 					//create and fill sensor specific data record sets 
 					switch ((byte)(buf[7] & 0xFF)) {
-					case HoTTAdapter.SENSOR_TYPE_RECEIVER: //receiver data only
-					case HoTTAdapter.SENSOR_TYPE_RECEIVER_L: //receiver data only
+					case HoTTAdapter.SENSOR_TYPE_RECEIVER_115200: //receiver data only
+					case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200: //receiver data only
 						//check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetReceiver == null) {
 							channel = HoTTbinReader.channels.get(1);
@@ -169,8 +169,8 @@ public class HoTTbinReader {
 						}
 						break;
 
-					case HoTTAdapter.SENSOR_TYPE_VARIO:
-					case HoTTAdapter.SENSOR_TYPE_VARIO_L:
+					case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
+					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 						//check if recordSetVario initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetVario == null) {
 							channel = HoTTbinReader.channels.get(2);
@@ -224,8 +224,8 @@ public class HoTTbinReader {
 						}
 					break;
 					
-					case HoTTAdapter.SENSOR_TYPE_GPS:
-					case HoTTAdapter.SENSOR_TYPE_GPS_L:
+					case HoTTAdapter.SENSOR_TYPE_GPS_115200:
+					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 						//check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate ans signals
 						if (recordSetGPS == null) {
 							channel = HoTTbinReader.channels.get(3);
@@ -288,8 +288,8 @@ public class HoTTbinReader {
 						}
 					break;
 					
-					case HoTTAdapter.SENSOR_TYPE_GENERAL:
-					case HoTTAdapter.SENSOR_TYPE_GENERAL_L:
+					case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
+					case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 						//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetGeneral == null) {
 							channel = HoTTbinReader.channels.get(4);
@@ -363,8 +363,8 @@ public class HoTTbinReader {
 						}
 					break;
 					
-					case HoTTAdapter.SENSOR_TYPE_ELECTRIC:
-					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_L:
+					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
+					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 						//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (recordSetElectric == null) {
 							channel = HoTTbinReader.channels.get(5);

@@ -71,8 +71,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	boolean											isVisibilityChanged		= false;
 
 	int													measurementsCount			= 0;
-	boolean											isProtocolTypeLegacy	= true;
-	final String[]							protocolTypes					= { "19200", "115200" };
+	int 												protocolTypeOrdinal				= 0;
 
 	/**
 	 * default constructor initialize all variables required
@@ -88,8 +87,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 			int actualMeasurementCount = this.device.getMeasurementNames(i).length;
 			this.measurementsCount = actualMeasurementCount > this.measurementsCount ? actualMeasurementCount : this.measurementsCount;
 		}
-		this.isProtocolTypeLegacy = this.device.getBaudeRate() == 19200;
-		this.serialPort.setProtocolTypeLegacy(this.isProtocolTypeLegacy);
+		this.protocolTypeOrdinal = this.device.getBaudeRate() == 115200 ? HoTTAdapter.Protocol.TYPE_115200.ordinal() : HoTTAdapter.Protocol.TYPE_19200_3.ordinal(); //TODO HoTTAdapter.Protocol.TYPE_19200_4
+		this.serialPort.setProtocolType(HoTTAdapter.Protocol.values()[this.protocolTypeOrdinal]);
 	}
 
 	@Override
@@ -259,22 +258,22 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					{
 						this.protocolTypesCombo = new CCombo(this.dialogShell, SWT.RIGHT | SWT.BORDER);
 						this.protocolTypesCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.protocolTypesCombo.setItems(this.protocolTypes);
+						this.protocolTypesCombo.setItems(HoTTAdapter.Protocol.valuesAsStingArray());
 						FormData timeZoneOffsetUTCComboLData = new FormData();
 						timeZoneOffsetUTCComboLData.width = 70;
 						timeZoneOffsetUTCComboLData.height = 17;
 						timeZoneOffsetUTCComboLData.bottom = new FormAttachment(1000, 1000, -50);
 						timeZoneOffsetUTCComboLData.right = new FormAttachment(1000, 1000, -45);
 						this.protocolTypesCombo.setLayoutData(timeZoneOffsetUTCComboLData);
-						this.protocolTypesCombo.select(this.isProtocolTypeLegacy ? 0 : 1);
+						this.protocolTypesCombo.select(this.protocolTypeOrdinal);
 						this.protocolTypesCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2415));
 						this.protocolTypesCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "timeZoneOffsetUTCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								HoTTAdapterDialog.this.device.setBaudeRate(Integer.parseInt(HoTTAdapterDialog.this.protocolTypesCombo.getText().trim()));
-								HoTTAdapterDialog.this.isProtocolTypeLegacy = HoTTAdapterDialog.this.protocolTypesCombo.getSelectionIndex() == 0;
-								HoTTAdapterDialog.this.serialPort.setProtocolTypeLegacy(HoTTAdapterDialog.this.isProtocolTypeLegacy);
+								HoTTAdapterDialog.this.protocolTypeOrdinal = HoTTAdapterDialog.this.protocolTypesCombo.getSelectionIndex();
+								HoTTAdapterDialog.this.serialPort.setProtocolType(HoTTAdapter.Protocol.values()[HoTTAdapterDialog.this.protocolTypeOrdinal]);
 								HoTTAdapterDialog.this.saveButton.setEnabled(true);
 							}
 						});
@@ -417,14 +416,16 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	 * reset the button states
 	 */
 	public void resetButtons() {
-		this.dialogShell.getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
-				HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
-				HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(true);
-				HoTTAdapterDialog.this.inputFileButton.setEnabled(true);
-			}
-		});
+		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
+			this.dialogShell.getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
+					HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
+					HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(true);
+					HoTTAdapterDialog.this.inputFileButton.setEnabled(true);
+				}
+			});
+		}
 	}
 
 	/**
@@ -432,10 +433,12 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	 * @param index
 	 */
 	public void selectTab(final int index) {
-		this.dialogShell.getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				HoTTAdapterDialog.this.tabFolder.setSelection(index-1);
-			}
-		});
+		if (HoTTAdapterDialog.this.tabFolder != null && !HoTTAdapterDialog.this.tabFolder.isDisposed()) {
+			this.dialogShell.getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					HoTTAdapterDialog.this.tabFolder.setSelection(index - 1);
+				}
+			});
+		}
 	}
 }
