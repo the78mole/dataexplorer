@@ -1,5 +1,8 @@
 Development history / change log, please read from bottom up
 
+Version 2.94 - xx yyy 2011
+DevicePropertyEditor fix out of handles problem
+
 Version 2.93 - 23 Oct 2011
 Picolario - read all available record sets with single click
 Add absolute date/time in data table for long term measurements via context menu
