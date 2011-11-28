@@ -60,7 +60,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static int		xferErrorLimit								= 1000;
 
 	boolean							isInterruptedByUser						= false;
-	HoTTAdapter.Protocol protocolType									= HoTTAdapter.Protocol.TYPE_19200_4;
+	HoTTAdapter.Protocol protocolType									= HoTTAdapter.Protocol.TYPE_19200_6;
 
 	/**
 	 * constructor of default implementation
@@ -305,7 +305,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				break;
 			}
 			break;
-		case TYPE_19200_4:
+		case TYPE_19200_6:
 			switch (sensorType) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				this.ANSWER_DATA = new byte[HoTTAdapter.IS_SLAVE_MODE ? 17 : 15];

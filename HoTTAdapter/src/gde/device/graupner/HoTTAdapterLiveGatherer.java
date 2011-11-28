@@ -195,7 +195,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						// build the point array according curves from record set
 						switch (HoTTAdapterLiveGatherer.this.serialPort.protocolType) {
 						case TYPE_19200_3:
-						case TYPE_19200_4:
+						case TYPE_19200_6:
 							HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 							WaitTimer.delay(queryGapTime_ms);
 //							HoTTAdapterLiveGatherer.this.serialPort.getData(true);
@@ -414,7 +414,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			}
 			break;
 			
-		case TYPE_19200_4:
+		case TYPE_19200_6:
 			if (HoTTAdapter.IS_SLAVE_MODE) {
 				log.log(Level.FINE, "------------ Receiver");
 				serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);

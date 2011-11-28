@@ -87,7 +87,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	//protocol definitions
 	public enum Protocol {
 		TYPE_19200_3("19200 V3"), 
-		TYPE_19200_4("19200 V6"),
+		TYPE_19200_6("19200 V6"),
 		TYPE_115200("115200");
 		
 		private final String	value;
@@ -364,7 +364,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			}
 			break;
 			
-		case TYPE_19200_4:
+		case TYPE_19200_6:
 			switch (dataBuffer[1]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
