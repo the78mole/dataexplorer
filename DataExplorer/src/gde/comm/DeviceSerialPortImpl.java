@@ -29,6 +29,7 @@ import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 import gde.utils.WindowsHelper;
 import gnu.io.CommPortIdentifier;
@@ -350,16 +351,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				this.outputStream.flush();
 			}
 
-			if (log.isLoggable(Level.FINE)) {
-				StringBuffer sb = new StringBuffer();
-				sb.append("Write data: "); //$NON-NLS-1$
-				for (byte element : writeBuffer) {
-					sb.append(String.format("%02X ", element)); //$NON-NLS-1$
-				}
-				sb.append(" to port ").append(this.serialPort.getName()).append(System.getProperty("line.separator")); //$NON-NLS-1$ //$NON-NLS-2$
-				log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
-			}
-
+			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Write : " + StringHelper.byte2Hex2CharString(writeBuffer, writeBuffer.length));
 		}
 		catch (IOException e) {
 			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -422,14 +414,15 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 */
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
-		int sleepTime = 2; // ms
+		int sleepTime = 10; // ms
 		int bytes = readBuffer.length;
 		int readBytes = 0;
 		int timeOutCounter = timeout_msec / (sleepTime + 18); //18 ms read blocking time
 
 		try {
 			if (this.application != null) this.application.setSerialRxOn();
-			wait4Bytes(bytes, timeout_msec - (timeout_msec / 5));
+			WaitTimer.delay(2);
+			//wait4Bytes(bytes, timeout_msec - (timeout_msec / 5));
 
 
 			while (bytes != readBytes && timeOutCounter-- > 0) {
@@ -441,20 +434,16 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				}
 
 				//this.dataAvailable = false;
-				if (timeOutCounter <= 0) {
+				if (timeOutCounter <= 0 && readBytes < bytes) {
 					TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { bytes, timeout_msec }));
 					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
 					throw e;
 				}
 			}
 
 			if (log.isLoggable(Level.FINE)) {
-				StringBuilder sb = new StringBuilder();
-				sb.append("Read  data: "); //$NON-NLS-1$
-				for (byte element : readBuffer) {
-					sb.append(String.format("%02X ", element)); //$NON-NLS-1$
-				}
-				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
+				log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
 			}
 		}
 		catch (IOException e) {
@@ -499,6 +488,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			if (timeOutCounter <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { bytes, timeout_msec }));
 				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
 				throw e;
 			}
 
@@ -506,14 +496,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "waitTime = " + ms); //$NON-NLS-1$
 			waitTimes.add(ms);
 
-			if (log.isLoggable(Level.FINE)) {
-				StringBuilder sb = new StringBuilder();
-				sb.append("Read  data: "); //$NON-NLS-1$
-				for (byte element : readBuffer) {
-					sb.append(String.format("%02X ", element)); //$NON-NLS-1$
-				}
-				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
-			}
+			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
 		}
 		catch (IOException e) {
 			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -618,6 +601,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			if (timeOutCounter <= 0) {
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { expectedBytes, timeout_msec }));
 				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
 				throw e;
 			}
 
@@ -628,14 +612,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				readBuffer = tmpBuffer;
 			}
 
-			if (log.isLoggable(Level.FINE)) {
-				StringBuilder sb = new StringBuilder();
-				sb.append("Read  data: "); //$NON-NLS-1$
-				for (byte element : readBuffer) {
-					sb.append(String.format("%02X ", element)); //$NON-NLS-1$
-				}
-				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
-			}
+			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
 
 		}
 		catch (IOException e) {

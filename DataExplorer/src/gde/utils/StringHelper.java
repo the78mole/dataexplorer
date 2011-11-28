@@ -467,12 +467,13 @@ public class StringHelper {
 	/**
 	 * convert a byte array into a 2 hex character string representation
 	 * @param bytes
+	 * @param size
 	 * @return string with converted characters
 	 */
-	public static String byte2Hex2CharString(byte[] bytes) {
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < bytes.length; i++) {
-			sb.append(String.format("%02X", bytes[i])); //$NON-NLS-1$
+	public static String byte2Hex2CharString(byte[] bytes, int size) {
+		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(size).append(GDE.STRING_RIGHT_BRACKET_COMMA);
+		for (int i = 0; i < size; i++) {
+			sb.append(String.format("%02X ", bytes[i])); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
@@ -483,7 +484,7 @@ public class StringHelper {
 	 * @return string with converted characters
 	 */
 	public static String byte2FourDigitsIntegerString(byte[] bytes) {
-		StringBuffer sb = new StringBuffer();
+		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(bytes.length).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 		for (int i = 0; i < bytes.length; i++) {
 			sb.append(String.format("%4d", (bytes[i]&0xFF))); //$NON-NLS-1$
 		}

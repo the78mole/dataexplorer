@@ -220,7 +220,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 									sb.delete(readBuffer.length*2, sb.length()-1);
 								}
 								else if (sb.length() < readBuffer.length*2) {
-									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
+									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000), (readBuffer.length - sb.length()/2)));
 								}
 							}
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
@@ -300,7 +300,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 									sb.delete(readBuffer.length*2, sb.length()-1);
 								}
 								else if (sb.length() < readBuffer.length*2) {
-									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
+									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000), readBuffer.length - sb.length()/2));
 								}
 							}
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
@@ -380,7 +380,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 									sb.delete(readBuffer.length*2, sb.length()-1);
 								}
 								else if (sb.length() < readBuffer.length*2) {
-									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000)));
+									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000), readBuffer.length - sb.length()/2));
 								}
 							}
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
