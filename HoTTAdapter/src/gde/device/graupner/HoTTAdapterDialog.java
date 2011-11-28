@@ -87,7 +87,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 			int actualMeasurementCount = this.device.getMeasurementNames(i).length;
 			this.measurementsCount = actualMeasurementCount > this.measurementsCount ? actualMeasurementCount : this.measurementsCount;
 		}
-		this.protocolTypeOrdinal = this.device.getBaudeRate() == 115200 ? HoTTAdapter.Protocol.TYPE_115200.ordinal() : HoTTAdapter.Protocol.TYPE_19200_3.ordinal(); //TODO HoTTAdapter.Protocol.TYPE_19200_4
+		this.protocolTypeOrdinal = this.device.getBaudeRate() == 115200 ? HoTTAdapter.Protocol.TYPE_115200.ordinal() : HoTTAdapter.Protocol.TYPE_19200_4.ordinal(); 
 		this.serialPort.setProtocolType(HoTTAdapter.Protocol.values()[this.protocolTypeOrdinal]);
 	}
 
@@ -249,10 +249,10 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.protocolTypesLabel.setText(Messages.getString(MessageIds.GDE_MSGT2411));
 						this.protocolTypesLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2415));
 						FormData timeZoneOffsetUTCLabelLData = new FormData();
-						timeZoneOffsetUTCLabelLData.width = 100;
+						timeZoneOffsetUTCLabelLData.width = 80;
 						timeZoneOffsetUTCLabelLData.height = 20;
 						timeZoneOffsetUTCLabelLData.bottom = new FormAttachment(1000, 1000, -50);
-						timeZoneOffsetUTCLabelLData.right = new FormAttachment(1000, 1000, -120);
+						timeZoneOffsetUTCLabelLData.right = new FormAttachment(1000, 1000, -125);
 						this.protocolTypesLabel.setLayoutData(timeZoneOffsetUTCLabelLData);
 					}
 					{
@@ -260,10 +260,10 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.protocolTypesCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.protocolTypesCombo.setItems(HoTTAdapter.Protocol.valuesAsStingArray());
 						FormData timeZoneOffsetUTCComboLData = new FormData();
-						timeZoneOffsetUTCComboLData.width = 70;
+						timeZoneOffsetUTCComboLData.width = 75;
 						timeZoneOffsetUTCComboLData.height = 17;
 						timeZoneOffsetUTCComboLData.bottom = new FormAttachment(1000, 1000, -50);
-						timeZoneOffsetUTCComboLData.right = new FormAttachment(1000, 1000, -45);
+						timeZoneOffsetUTCComboLData.right = new FormAttachment(1000, 1000, -40);
 						this.protocolTypesCombo.setLayoutData(timeZoneOffsetUTCComboLData);
 						this.protocolTypesCombo.select(this.protocolTypeOrdinal);
 						this.protocolTypesCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2415));
@@ -271,7 +271,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "timeZoneOffsetUTCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-								HoTTAdapterDialog.this.device.setBaudeRate(Integer.parseInt(HoTTAdapterDialog.this.protocolTypesCombo.getText().trim()));
+								HoTTAdapterDialog.this.device.setBaudeRate(Integer.parseInt(HoTTAdapterDialog.this.protocolTypesCombo.getText().trim().split(GDE.STRING_BLANK)[0]));
 								HoTTAdapterDialog.this.protocolTypeOrdinal = HoTTAdapterDialog.this.protocolTypesCombo.getSelectionIndex();
 								HoTTAdapterDialog.this.serialPort.setProtocolType(HoTTAdapter.Protocol.values()[HoTTAdapterDialog.this.protocolTypeOrdinal]);
 								HoTTAdapterDialog.this.saveButton.setEnabled(true);
@@ -284,10 +284,10 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						this.protocolTypesUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2412));
 						this.protocolTypesUnitLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2415));
 						FormData timeZoneOffsetUTCUnitLData = new FormData();
-						timeZoneOffsetUTCUnitLData.width = 40;
+						timeZoneOffsetUTCUnitLData.width = 35;
 						timeZoneOffsetUTCUnitLData.height = 20;
 						timeZoneOffsetUTCUnitLData.bottom = new FormAttachment(1000, 1000, -50);
-						timeZoneOffsetUTCUnitLData.right = new FormAttachment(1000, 1000, -10);
+						timeZoneOffsetUTCUnitLData.right = new FormAttachment(1000, 1000, -3);
 						this.protocolTypesUnitLabel.setLayoutData(timeZoneOffsetUTCUnitLData);
 					}
 					{

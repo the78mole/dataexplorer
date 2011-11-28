@@ -95,7 +95,10 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			}
 			
 			//detect master slave mode, only in slave mode data are written to receive buffer without query 
+			WaitTimer.delay(1000);
 			if (serialPort.cleanInputStream() > 2) HoTTAdapter.IS_SLAVE_MODE = true;
+			else 																	 HoTTAdapter.IS_SLAVE_MODE = false;
+			log.log(Level.OFF, "HoTTAdapter.IS_SLAVE_MODE = " + HoTTAdapter.IS_SLAVE_MODE);
 			
 			for (int i = 0; i < 3; i++) {
 				try {
@@ -117,7 +120,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				serialPort.setSensorType(serialPort.protocolType.ordinal() < 2 ? HoTTAdapter.SENSOR_TYPE_RECEIVER_19200 : HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
 			}
 		
-			log.log(Level.FINE, "detecting sensor type takes " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+			log.log(Level.OFF, (HoTTAdapter.isSensorType[0] == true ? ">>>Vario<<<" : HoTTAdapter.isSensorType[1] == true ? ">>>GPS<<<" : HoTTAdapter.isSensorType[2] == true ? ">>>General<<<" : HoTTAdapter.isSensorType[3] == true ? ">>>Electric<<<" : ">>>Receiver<<<") + ", detecting sensor type takes " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 		}
 		catch (SerialPortException e) {
 			this.serialPort.close();
@@ -410,6 +413,119 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				}
 			}
 			break;
+			
+		case TYPE_19200_4:
+			if (HoTTAdapter.IS_SLAVE_MODE) {
+				log.log(Level.FINE, "------------ Receiver");
+				serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
+				serialPort.getData(false);
+				Thread.sleep(queryGapTime_ms);
+				serialPort.getData(false);
+				Thread.sleep(queryGapTime_ms);
+				boolean isDataSignature; // = checkSignature(serialPort.getData(false));
+				if (isSensorType[0]) {
+					log.log(Level.FINE, "------------ Vario");
+					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_19200);
+					serialPort.getData(false);
+					Thread.sleep(queryGapTime_ms);
+					serialPort.getData(false);
+					Thread.sleep(queryGapTime_ms);
+					isDataSignature = checkSignature(serialPort.getData(false));
+					if (isDataSignature) isSensorType[1] = isSensorType[2] = isSensorType[3] = false;
+					Thread.sleep(queryGapTime_ms);
+				}
+				if (isSensorType[1]) {
+					log.log(Level.FINE, "------------ GPS");
+					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_19200);
+					serialPort.getData(false);
+					Thread.sleep(queryGapTime_ms);
+					serialPort.getData(false);
+					Thread.sleep(queryGapTime_ms);
+					isDataSignature = checkSignature(serialPort.getData(false));
+					if (isDataSignature) isSensorType[0] = isSensorType[2] = isSensorType[3] = false;
+					Thread.sleep(queryGapTime_ms);
+				}
+				if (isSensorType[2]) {
+					log.log(Level.FINE, "------------ General");
+					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_19200);
+					serialPort.getData(false);
+					Thread.sleep(queryGapTime_ms);
+					serialPort.getData(false);
+					Thread.sleep(queryGapTime_ms);
+					isDataSignature = checkSignature(serialPort.getData(false));
+					if (isDataSignature) isSensorType[0] = isSensorType[1] = isSensorType[3] = false;
+					Thread.sleep(queryGapTime_ms);
+				}
+				if (isSensorType[3]) {
+					log.log(Level.FINE, "------------ Electric");
+					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200);
+					serialPort.getData(false);
+					Thread.sleep(queryGapTime_ms);
+					serialPort.getData(false);
+					Thread.sleep(queryGapTime_ms);
+					isDataSignature = checkSignature(serialPort.getData(false));
+					if (isDataSignature) isSensorType[0] = isSensorType[1] = isSensorType[2] = false;
+					Thread.sleep(queryGapTime_ms);
+				}
+			}
+			else {
+				log.log(Level.FINE, "------------ Receiver");
+				serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
+				serialPort.getData(true);
+				Thread.sleep(queryGapTime_ms);
+				serialPort.getData(true);
+				Thread.sleep(queryGapTime_ms);
+				if (isSensorType[0]) {
+					log.log(Level.FINE, "------------ Vario");
+					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_19200);
+					serialPort.getData(true);
+					Thread.sleep(queryGapTime_ms);
+					serialPort.getData(true);
+					Thread.sleep(queryGapTime_ms);
+					byte[] dataBuffer = serialPort.getData(true);
+					if (true) //TODO
+						isSensorType[1] = isSensorType[2] = isSensorType[3] = false;
+					Thread.sleep(queryGapTime_ms);
+				}
+				if (isSensorType[1]) {
+					log.log(Level.FINE, "------------ GPS");
+					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_19200);
+					serialPort.getData(true);
+					Thread.sleep(queryGapTime_ms);
+					serialPort.getData(true);
+					Thread.sleep(queryGapTime_ms);
+					byte[] dataBuffer = serialPort.getData(true);
+					if (true) //TODO
+						isSensorType[0] = isSensorType[2] = isSensorType[3] = false;
+					Thread.sleep(queryGapTime_ms);
+				}
+				if (isSensorType[2]) {
+					log.log(Level.FINE, "------------ General");
+					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_19200);
+					serialPort.getData(true);
+					Thread.sleep(queryGapTime_ms);
+					serialPort.getData(true);
+					Thread.sleep(queryGapTime_ms);
+					byte[] dataBuffer = serialPort.getData(true);
+					if (true) //TODO
+						isSensorType[0] = isSensorType[1] = isSensorType[3] = false;
+					Thread.sleep(queryGapTime_ms);
+				}
+				if (isSensorType[3]) {
+					log.log(Level.FINE, "------------ Electric");
+					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200);
+					serialPort.getData(true);
+					Thread.sleep(queryGapTime_ms);
+					serialPort.getData(true);
+					Thread.sleep(queryGapTime_ms);
+					byte[] dataBuffer = serialPort.getData(true);
+					if (false)	//TODO 
+						isSensorType[0] = isSensorType[1] = isSensorType[2] = false;
+					Thread.sleep(queryGapTime_ms);
+				}
+			}
+			break;
+			
 		case TYPE_115200:
 			if (HoTTAdapter.IS_SLAVE_MODE) {
 				serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200); //set to the biggest data array size
@@ -481,7 +597,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	}	
 
 	/**
-	 * check for begin and end signature in data buffer
+	 * check for begin and end signature in data buffer 19200 V3 protocol
 	 * @param dataBuffer0
 	 * @param dataBuffer1
 	 * @return
@@ -494,8 +610,24 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		
 		for (int i = 0; i < tmpBuffer.length; i++) {
 			if (tmpBuffer[i] == HoTTAdapterSerialPort.DATA_BEGIN) {
-				int endIndex = i + dataBuffer0.length - 2;
+				int endIndex = i + dataBuffer0.length - 4;
 				isDataSignature = endIndex < tmpBuffer.length && tmpBuffer[endIndex] == HoTTAdapterSerialPort.DATA_END;
+				break;
+			}
+		}
+		return isDataSignature;
+	}
+
+	/**
+	 * check for begin and end signature in data buffer 19200 V4 protocol
+	 * @param dataBuffer
+	 * @return
+	 */
+	private boolean checkSignature(byte[] dataBuffer) {
+		boolean isDataSignature = false;
+		for (int i = 0; i < dataBuffer.length; i++) {
+			if (dataBuffer[i] == HoTTAdapterSerialPort.DATA_BEGIN) {
+				isDataSignature = dataBuffer[i - 1] == this.serialPort.SENSOR_TYPE[0];
 				break;
 			}
 		}
