@@ -2,6 +2,7 @@ Development history / change log, please read from bottom up
 
 Version 2.94 - xx yyy 2011
 DevicePropertyEditor fix out of handles problem
+DevicePropertyEditor fix problem displaying wrong measurement names while adding sync reference in cases with different measurement sets per channel
 HottAdapter fix SWT error while live data gathering and closed dialog
 HottAdapter implement 19200 protocol V3 slave mode
 
