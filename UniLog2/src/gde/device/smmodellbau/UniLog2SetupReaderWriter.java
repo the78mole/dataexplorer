@@ -181,7 +181,7 @@ public class UniLog2SetupReaderWriter {
 				this.checkSum = (short) (((buffer[191] & 0x00FF) << 8) + (buffer[190] & 0x00FF));
 
 				if (log.isLoggable(java.util.logging.Level.FINE))
-					log.log(java.util.logging.Level.FINE, "$UL2SETUP," + StringHelper.byte2Hex2CharString(buffer)); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINE, "$UL2SETUP," + StringHelper.byte2Hex2CharString(buffer, buffer.length)); //$NON-NLS-1$
 				byte[] chkBuffer = new byte[192 - 2];
 				System.arraycopy(buffer, 0, chkBuffer, 0, chkBuffer.length);
 				short checkCRC = Checksum.CRC16(chkBuffer, 0);
@@ -286,7 +286,7 @@ public class UniLog2SetupReaderWriter {
 				buffer[191] = (byte) ((tmpCheckSum & 0xFF00) >> 8);
 
 				if (log.isLoggable(java.util.logging.Level.FINE))
-					log.log(java.util.logging.Level.FINE, "$UL2SETUP," + StringHelper.byte2Hex2CharString(buffer)); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINE, "$UL2SETUP," + StringHelper.byte2Hex2CharString(buffer, buffer.length)); //$NON-NLS-1$
 				FileOutputStream file_out = new FileOutputStream(setupFile);
 				DataOutputStream data_out = new DataOutputStream(file_out);
 				data_out.write(buffer);
