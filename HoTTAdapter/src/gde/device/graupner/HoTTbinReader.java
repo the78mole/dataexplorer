@@ -125,7 +125,7 @@ public class HoTTbinReader {
 			//read all the data blocks from the file and parse
 			for (int i = 0; i < numberDatablocks; i++) {
 				data_in.read(buf);
-				if (i==0) log.log(Level.FINE, StringHelper.byte2Hex2CharString(new byte[] {buf[7]}) + GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(buf[7], false));
+				if (i==0) log.log(Level.FINE, StringHelper.byte2Hex2CharString(new byte[] {buf[7]}, 7) + GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(buf[7], false));
 				
 				if (buf[33] >= 0 && buf[33] <= 4 && buf[3] != 0 && buf[4] != 0) { //skip empty block - package loss
 					//create and fill sensor specific data record sets 
