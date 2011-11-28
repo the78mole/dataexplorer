@@ -253,7 +253,7 @@ public class SetupReaderWriter {
 				buffer[190] = (byte) (tmpCheckSum & 0x00FF);
 				buffer[191] = (byte) ((tmpCheckSum & 0xFF00) >> 8);
 
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "$SETUP," + StringHelper.byte2Hex2CharString(buffer));
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "$SETUP," + StringHelper.byte2Hex2CharString(buffer, buffer.length));
 				FileOutputStream file_out = new FileOutputStream(setupFile);
 				DataOutputStream data_out = new DataOutputStream(file_out);
 				data_out.write(buffer);
