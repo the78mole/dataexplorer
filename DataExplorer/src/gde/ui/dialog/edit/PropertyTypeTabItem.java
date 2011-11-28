@@ -445,7 +445,7 @@ public class PropertyTypeTabItem extends CTabItem {
 				else if (PropertyTypeTabItem.this.propertyType.getName().equals(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())) {
 					this.valueText.setVisible(false);
 					this.valueCombo.setVisible(true);
-					this.valueCombo.setItems(DevicePropertiesEditor.getInstance().getMeasurementNames());
+					this.valueCombo.setItems(DevicePropertiesEditor.getInstance().getMeasurementNames(this.measurementTypeTabItem.channelConfigNumber));
 					this.valueCombo.select(Integer.valueOf(this.propertyType.getValue()));
 				}
 				else {

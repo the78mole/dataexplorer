@@ -1849,9 +1849,9 @@ public class DevicePropertiesEditor extends Composite {
 	}
 
 	/**
-	 * @return the getMeasurementNames from the first channel/configuration
+	 * @return the getMeasurementNames from the given channel/configuration
 	 */
-	public String[] getMeasurementNames() {
-		return this.deviceConfig != null ? this.deviceConfig.getMeasurementNames(1): new String[0];
+	public String[] getMeasurementNames(int channelConfigNumber) {
+		return this.deviceConfig != null ? this.deviceConfig.getMeasurementNames(channelConfigNumber): new String[0];
 	}
 }
