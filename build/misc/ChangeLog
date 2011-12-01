@@ -4,7 +4,7 @@ Version 2.94 - xx yyy 2011
 DevicePropertyEditor fix out of handles problem
 DevicePropertyEditor fix problem displaying wrong measurement names while adding sync reference in cases with different measurement sets per channel
 HottAdapter fix SWT error while live data gathering and closed dialog
-HottAdapter implement 19200 protocol V3 slave mode
+HottAdapter implement 19200 new protocol master and slave mode
 
 Version 2.93 - 23 Oct 2011
 Picolario - read all available record sets with single click
