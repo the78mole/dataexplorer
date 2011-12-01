@@ -434,7 +434,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				}
 
 				//this.dataAvailable = false;
-				if (timeOutCounter <= 0 && readBytes < bytes) {
+				if (timeOutCounter <= 0) {
 					TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { bytes, timeout_msec }));
 					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
