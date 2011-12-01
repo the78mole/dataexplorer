@@ -194,8 +194,8 @@ public class HoTTAdapterLiveGatherer extends Thread {
 
 						// build the point array according curves from record set
 						switch (HoTTAdapterLiveGatherer.this.serialPort.protocolType) {
-						case TYPE_19200_3:
-						case TYPE_19200_6:
+						case TYPE_19200_L:
+						case TYPE_19200_N:
 							HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 							WaitTimer.delay(queryGapTime_ms);
 //							HoTTAdapterLiveGatherer.this.serialPort.getData(true);
@@ -294,7 +294,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	}
 
 	/**
-	 * get and detect Sensor data, retrieves data only on not detected sensors driven by boolean[] isSensorType
+	 * detect Sensor data, retrieves data only on not detected sensors driven by boolean[] isSensorType
 	 * @param isSensorType
 	 * @return points integer array of data points, to enable 3 decimal digits value is multiplied by 1000
 	 * @throws Exception 
@@ -302,7 +302,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	private void detectSensorType(boolean isSensorType[]) throws Exception {
 		
 		switch (HoTTAdapterLiveGatherer.this.serialPort.protocolType) {
-		case TYPE_19200_3:
+		case TYPE_19200_L:
 			if (HoTTAdapter.IS_SLAVE_MODE) {
 				log.log(Level.FINE, "------------ Receiver");
 				serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
@@ -414,7 +414,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			}
 			break;
 			
-		case TYPE_19200_6:
+		case TYPE_19200_N:
 			if (HoTTAdapter.IS_SLAVE_MODE) {
 				log.log(Level.FINE, "------------ Receiver");
 				serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
@@ -483,7 +483,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					serialPort.getData(true);
 					Thread.sleep(queryGapTime_ms);
 					byte[] dataBuffer = serialPort.getData(true);
-					if (true) //TODO
+					if (dataBuffer[15] == HoTTAdapter.ANSWER_SENSOR_VARIO_19200)
 						isSensorType[1] = isSensorType[2] = isSensorType[3] = false;
 					Thread.sleep(queryGapTime_ms);
 				}
@@ -495,7 +495,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					serialPort.getData(true);
 					Thread.sleep(queryGapTime_ms);
 					byte[] dataBuffer = serialPort.getData(true);
-					if (true) //TODO
+					if (dataBuffer[15] == HoTTAdapter.ANSWER_SENSOR_GPS_19200)
 						isSensorType[0] = isSensorType[2] = isSensorType[3] = false;
 					Thread.sleep(queryGapTime_ms);
 				}
@@ -507,7 +507,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					serialPort.getData(true);
 					Thread.sleep(queryGapTime_ms);
 					byte[] dataBuffer = serialPort.getData(true);
-					if (true) //TODO
+					if (dataBuffer[15] == HoTTAdapter.ANSWER_SENSOR_GENERAL_19200)
 						isSensorType[0] = isSensorType[1] = isSensorType[3] = false;
 					Thread.sleep(queryGapTime_ms);
 				}
@@ -519,7 +519,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					serialPort.getData(true);
 					Thread.sleep(queryGapTime_ms);
 					byte[] dataBuffer = serialPort.getData(true);
-					if (false)	//TODO 
+					if (dataBuffer[15] == HoTTAdapter.ANSWER_SENSOR_ELECTRIC_19200)
 						isSensorType[0] = isSensorType[1] = isSensorType[2] = false;
 					Thread.sleep(queryGapTime_ms);
 				}

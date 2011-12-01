@@ -87,7 +87,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 			int actualMeasurementCount = this.device.getMeasurementNames(i).length;
 			this.measurementsCount = actualMeasurementCount > this.measurementsCount ? actualMeasurementCount : this.measurementsCount;
 		}
-		this.protocolTypeOrdinal = this.device.getBaudeRate() == 115200 ? HoTTAdapter.Protocol.TYPE_115200.ordinal() : HoTTAdapter.Protocol.TYPE_19200_6.ordinal(); 
+		this.protocolTypeOrdinal = this.device.getBaudeRate() == 115200 ? HoTTAdapter.Protocol.TYPE_115200.ordinal() : HoTTAdapter.Protocol.TYPE_19200_N.ordinal(); 
 		this.serialPort.setProtocolType(HoTTAdapter.Protocol.values()[this.protocolTypeOrdinal]);
 	}
 

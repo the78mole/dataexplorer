@@ -61,34 +61,37 @@ import org.eclipse.swt.widgets.MenuItem;
  * @author Winfried Brügmann
  */
 public class HoTTAdapter extends DeviceConfiguration implements IDevice {
-	final static Logger					log										= Logger.getLogger(HoTTAdapter.class.getName());
+	final static Logger		log														= Logger.getLogger(HoTTAdapter.class.getName());
 
-	final static String					SENSOR_TYPE						= "SensorType";																	//$NON-NLS-1$
-	final static String					LOG_COUNT							= "LogCount";																		//$NON-NLS-1$
+	final static String		SENSOR_TYPE										= "SensorType";																	//$NON-NLS-1$
+	final static String		LOG_COUNT											= "LogCount";																		//$NON-NLS-1$
 
 	//HoTT sensor bytes 19200 Baud protocol 
-	static boolean							IS_SLAVE_MODE						= false;
-	final static byte						SENSOR_TYPE_RECEIVER_19200	= (byte) (0x80 & 0xFF);
-	final static byte						SENSOR_TYPE_VARIO_19200			= (byte) (0x89 & 0xFF);
-	final static byte						SENSOR_TYPE_GPS_19200				= (byte) (0x8A & 0xFF);
-	final static byte						SENSOR_TYPE_GENERAL_19200		= (byte) (0x8D & 0xFF);
-	final static byte						SENSOR_TYPE_ELECTRIC_19200	= (byte) (0x8E & 0xFF);
+	static boolean				IS_SLAVE_MODE									= false;
+	final static byte			SENSOR_TYPE_RECEIVER_19200		= (byte) (0x80 & 0xFF);
+	final static byte			SENSOR_TYPE_VARIO_19200				= (byte) (0x89 & 0xFF);
+	final static byte			SENSOR_TYPE_GPS_19200					= (byte) (0x8A & 0xFF);
+	final static byte			SENSOR_TYPE_GENERAL_19200			= (byte) (0x8D & 0xFF);
+	final static byte			SENSOR_TYPE_ELECTRIC_19200		= (byte) (0x8E & 0xFF);
+	final static byte			ANSWER_SENSOR_VARIO_19200			= (byte) (0x80 & 0xFF);
+	final static byte			ANSWER_SENSOR_GPS_19200				= (byte) (0x90 & 0xFF);
+	final static byte			ANSWER_SENSOR_GENERAL_19200		= (byte) (0xC0 & 0xFF);
+	final static byte			ANSWER_SENSOR_ELECTRIC_19200	= (byte) (0xD0 & 0xFF);
 
 	//HoTT sensor bytes 115200 Baud protocol (actual no slave mode)
 	//there is no real slave mode for this protocol
-	final static byte						SENSOR_TYPE_RECEIVER_115200	= 0x34;
-	final static byte						SENSOR_TYPE_VARIO_115200		= 0x37;
-	final static byte						SENSOR_TYPE_GPS_115200			= 0x38;
-	final static byte						SENSOR_TYPE_GENERAL_115200	= 0x35;
-	final static byte						SENSOR_TYPE_ELECTRIC_115200	= 0x36;
+	final static byte			SENSOR_TYPE_RECEIVER_115200		= 0x34;
+	final static byte			SENSOR_TYPE_VARIO_115200			= 0x37;
+	final static byte			SENSOR_TYPE_GPS_115200				= 0x38;
+	final static byte			SENSOR_TYPE_GENERAL_115200		= 0x35;
+	final static byte			SENSOR_TYPE_ELECTRIC_115200		= 0x36;
 
-	final static boolean 				isSensorType[] 					= {true, true, true, true}; //isVario, isGPS, isGeneral, isElectric
+	final static boolean	isSensorType[]								= { true, true, true, true };	//isVario, isGPS, isGeneral, isElectric
+	public enum Sensor { RECEIVER, VARIO, GPS, GENRAL, ELECTRIC };
 
 	//protocol definitions
 	public enum Protocol {
-		TYPE_19200_3("19200 V3"), 
-		TYPE_19200_6("19200 V6"),
-		TYPE_115200("115200");
+		TYPE_19200_L("19200 Legacy"), TYPE_19200_N("19200"),	TYPE_115200("115200");
 		
 		private final String	value;
 
@@ -265,7 +268,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		int minVotage = Integer.MAX_VALUE;
 
 		switch (this.serialPort.protocolType) {
-		case TYPE_19200_3:
+		case TYPE_19200_L:
 			switch (dataBuffer[1]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
@@ -364,7 +367,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			}
 			break;
 			
-		case TYPE_19200_6:
+		case TYPE_19200_N:
 			switch (dataBuffer[1]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
@@ -373,7 +376,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				points[2] = (dataBuffer[5] & 0xFF) * 1000;
 				points[3] = DataParser.parse2Short(dataBuffer, 11) * 1000;
 				points[4] = (dataBuffer[13] & 0xFF) * 1000;
-				points[5] = (dataBuffer[9] & 0xFF) * 1000;
+				points[5] = (dataBuffer[8] & 0xFF) * 1000;
 				points[6] = (dataBuffer[6] & 0xFF) * 1000;
 				points[7] = (dataBuffer[7] & 0xFF) * 1000;
 				break;
@@ -381,10 +384,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 				//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 				points[0] = (dataBuffer[9] & 0xFF) * 1000;
-				points[1] = DataParser.parse2Short(dataBuffer, 17) * 1000;
-				points[2] = DataParser.parse2Short(dataBuffer, 23) * 1000;
-				points[3] = DataParser.parse2Short(dataBuffer, 25) * 1000;
-				points[4] = DataParser.parse2Short(dataBuffer, 27) * 1000;
+				points[1] = DataParser.parse2Short(dataBuffer, 16) * 1000;
+				points[2] = DataParser.parse2Short(dataBuffer, 22) * 1000;
+				points[3] = DataParser.parse2Short(dataBuffer, 24) * 1000;
+				points[4] = DataParser.parse2Short(dataBuffer, 26) * 1000;
 				points[5] = (dataBuffer[6] & 0xFF) * 1000;
 				points[6] = (dataBuffer[7] & 0xFF) * 1000;
 				break;
@@ -392,16 +395,16 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 				points[0] = (dataBuffer[9] & 0xFF) * 1000;
-				points[1] = DataParser.parse2Short(dataBuffer, 22) * 10000 + DataParser.parse2Short(dataBuffer, 24);
-				points[1] = dataBuffer[21] == 1 ? -1 * points[1] : points[1];
-				points[2] = DataParser.parse2Short(dataBuffer, 27) * 10000 + DataParser.parse2Short(dataBuffer, 29);
-				points[2] = dataBuffer[26] == 1 ? -1 * points[2] : points[2];
-				points[3] = DataParser.parse2Short(dataBuffer, 33) * 1000;
-				points[4] = DataParser.parse2Short(dataBuffer, 35) * 1000;
-				points[5] = (dataBuffer[37] & 0xFF) * 1000;
-				points[6] = DataParser.parse2Short(dataBuffer, 19) * 1000;
-				points[7] = DataParser.parse2Short(dataBuffer, 31) * 1000;
-				points[8] = (dataBuffer[40] & 0xFF) * 1000;
+				points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
+				points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
+				points[2] = DataParser.parse2Short(dataBuffer, 25) * 10000 + DataParser.parse2Short(dataBuffer, 27);
+				points[2] = dataBuffer[24] == 1 ? -1 * points[2] : points[2];
+				points[3] = DataParser.parse2Short(dataBuffer, 31) * 1000;
+				points[4] = DataParser.parse2Short(dataBuffer, 33) * 1000;
+				points[5] = (dataBuffer[35] & 0xFF) * 1000;
+				points[6] = DataParser.parse2Short(dataBuffer, 17) * 1000;
+				points[7] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+				points[8] = (dataBuffer[38] & 0xFF) * 1000;
 				points[9] = 0;
 				points[10] = (dataBuffer[6] & 0xFF) * 1000;
 				points[11] = (dataBuffer[7] & 0xFF) * 1000;
@@ -410,13 +413,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 				//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
 				points[0] = (dataBuffer[9] & 0xFF) * 1000;
-				points[1] = DataParser.parse2Short(dataBuffer, 42) * 1000;
-				points[2] = DataParser.parse2Short(dataBuffer, 40) * 1000;
-				points[3] = DataParser.parse2Short(dataBuffer, 44) * 1000;
+				points[1] = DataParser.parse2Short(dataBuffer, 40) * 1000;
+				points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
+				points[3] = DataParser.parse2Short(dataBuffer, 42) * 1000;
 				points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
 				points[5] = 0; //5=Balance
 				for (int j = 0; j < 6; j++) {
-					points[j + 6] = (dataBuffer[18 + j] & 0xFF) * 1000;
+					points[j + 6] = (dataBuffer[16 + j] & 0xFF) * 1000;
 					if (points[j + 6] > 0) {
 						maxVotage = points[j + 6] > maxVotage ? points[j + 6] : maxVotage;
 						minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
@@ -424,15 +427,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				}
 				//calculate balance on the fly
 				points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
-				points[12] = DataParser.parse2Short(dataBuffer, 33) * 1000;
-				points[13] = DataParser.parse2Short(dataBuffer, 35) * 1000;
-				points[14] = DataParser.parse2Short(dataBuffer, 37) * 1000;
-				points[15] = (dataBuffer[39] & 0xFF) * 1000;
+				points[12] = DataParser.parse2Short(dataBuffer, 31) * 1000;
+				points[13] = DataParser.parse2Short(dataBuffer, 33) * 1000;
+				points[14] = DataParser.parse2Short(dataBuffer, 35) * 1000;
+				points[15] = (dataBuffer[37] & 0xFF) * 1000;
 				points[16] = DataParser.parse2Short(dataBuffer, 29) * 1000;
-				points[17] = DataParser.parse2Short(dataBuffer, 24) * 1000;
-				points[18] = DataParser.parse2Short(dataBuffer, 26) * 1000;
-				points[19] = (dataBuffer[28] & 0xFF) * 1000;
-				points[20] = (dataBuffer[29] & 0xFF) * 1000;
+				points[17] = DataParser.parse2Short(dataBuffer, 22) * 1000;
+				points[18] = DataParser.parse2Short(dataBuffer, 24) * 1000;
+				points[19] = (dataBuffer[26] & 0xFF) * 1000;
+				points[20] = (dataBuffer[27] & 0xFF) * 1000;
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:

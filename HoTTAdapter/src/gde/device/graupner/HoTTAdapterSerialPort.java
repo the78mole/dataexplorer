@@ -60,7 +60,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static int		xferErrorLimit								= 1000;
 
 	boolean							isInterruptedByUser						= false;
-	HoTTAdapter.Protocol protocolType									= HoTTAdapter.Protocol.TYPE_19200_6;
+	HoTTAdapter.Protocol protocolType									= HoTTAdapter.Protocol.TYPE_19200_N;
 
 	/**
 	 * constructor of default implementation
@@ -152,14 +152,13 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	 */
 	private synchronized byte[] synchronizeDataBlock(byte[] data, boolean checkBeginEndSignature) throws IOException, TimeOutException {
 		
-		//check if synchronization is required in slave mode
 		if (!(this.ANSWER_DATA[2] == HoTTAdapterSerialPort.DATA_BEGIN && this.ANSWER_DATA[this.ANSWER_DATA.length - 2] == HoTTAdapterSerialPort.DATA_END)) {
 			int index = 0;
 			for (byte b : this.ANSWER_DATA) {
 				if (b == HoTTAdapterSerialPort.DATA_BEGIN) break;
 				++index;
 			}
-			// 19200 V4 seams the data can not read right again
+
 			log.log(Level.FINE, "index = " + index + " begin part size = " + (this.ANSWER_DATA.length-index+2) + " end part size = " + (index-2));
 			if (index >= 2 && index < this.ANSWER_DATA.length) {
 				System.arraycopy(this.ANSWER_DATA, index-2, data, 0, this.ANSWER_DATA.length-index+2);
@@ -257,7 +256,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	public synchronized void setSensorType(byte sensorType) {
 		this.SENSOR_TYPE[0] = sensorType;
 		switch (this.protocolType) {
-		case TYPE_19200_3:
+		case TYPE_19200_L:
 			switch (sensorType) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				this.ANSWER_DATA = new byte[HoTTAdapter.IS_SLAVE_MODE ? 17 : 15];
@@ -305,7 +304,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				break;
 			}
 			break;
-		case TYPE_19200_6:
+		case TYPE_19200_N:
 			switch (sensorType) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				this.ANSWER_DATA = new byte[HoTTAdapter.IS_SLAVE_MODE ? 17 : 15];
