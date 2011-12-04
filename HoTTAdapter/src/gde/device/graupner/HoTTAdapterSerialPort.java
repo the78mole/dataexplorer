@@ -167,6 +167,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			else
 				log.log(Level.WARNING, StringHelper.byte2Hex2CharString(data, data.length));
 		}
+		else
+			System.arraycopy(this.ANSWER_DATA, 0, data, 0, this.ANSWER_DATA.length);
 		
 		return data;
 	}
@@ -183,7 +185,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		byte[] answerDBM = new byte[234];
 		byte[] answerRx = new byte[20];
 		byte[] answer = new byte[this.ANSWER_DATA.length];
-		byte[] data = new byte[this.ANSWER_DATA.length + 1];
+		byte[] data = new byte[this.DATA_LENGTH];
 
 		//sensor type is receiver need to query DBM data in addition
 		if (QUERY_SENSOR_TYPE[6] == QUERY_SENSOR_DATA_RECEIVER[6]) {
@@ -229,6 +231,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			log.logp(Level.WARNING, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> transmission error occurred, number of errors = " + this.getXferErrors());
 			if (this.getXferErrors() > HoTTAdapterSerialPort.xferErrorLimit)
 				throw new SerialPortException("Number of transfer error exceed the acceptable limit of " + HoTTAdapterSerialPort.xferErrorLimit);
+			WaitTimer.delay(200);
 			data = getData();
 		}
 	
@@ -285,22 +288,27 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_115200:
 				this.ANSWER_DATA = new byte[20];
 				this.QUERY_SENSOR_TYPE = QUERY_SENSOR_DATA_RECEIVER;
+				this.DATA_LENGTH = 21;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 				this.ANSWER_DATA = new byte[24];
 				this.QUERY_SENSOR_TYPE = QUERY_SENSOR_DATA_VARIO;
+				this.DATA_LENGTH = 25;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 				this.ANSWER_DATA = new byte[33];
 				this.QUERY_SENSOR_TYPE = QUERY_SENSOR_DATA_GPS;
+				this.DATA_LENGTH = 34;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 				this.ANSWER_DATA = new byte[48];
 				this.QUERY_SENSOR_TYPE = QUERY_SENSOR_DATA_GENERAL;
+				this.DATA_LENGTH = 49;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 				this.ANSWER_DATA = new byte[59];
 				this.QUERY_SENSOR_TYPE = QUERY_SENSOR_DATA_ELECTRIC;
+				this.DATA_LENGTH = 60;
 				break;
 			}
 			break;

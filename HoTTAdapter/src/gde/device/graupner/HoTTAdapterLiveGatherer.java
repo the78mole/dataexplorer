@@ -196,17 +196,17 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						switch (HoTTAdapterLiveGatherer.this.serialPort.protocolType) {
 						case TYPE_19200_L:
 						case TYPE_19200_N:
+							HoTTAdapterLiveGatherer.this.serialPort.getData(false);
+							WaitTimer.delay(queryGapTime_ms);
 							HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 							WaitTimer.delay(queryGapTime_ms);
-//							HoTTAdapterLiveGatherer.this.serialPort.getData(true);
-//							WaitTimer.delay(queryGapTime_ms);
 							recordSet.addPoints(usedDevice.convertDataBytes(points, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime()/1000000 - startTime);
 							break;
 						case TYPE_115200:
 							HoTTAdapterLiveGatherer.this.serialPort.getData();
 							WaitTimer.delay(queryGapTime_ms);
-//							HoTTAdapterLiveGatherer.this.serialPort.getData();
-//							WaitTimer.delay(queryGapTime_ms);
+							HoTTAdapterLiveGatherer.this.serialPort.getData();
+							WaitTimer.delay(queryGapTime_ms);
 							recordSet.addPoints(usedDevice.convertDataBytes(points, HoTTAdapterLiveGatherer.this.serialPort.getData()), System.nanoTime()/1000000 - startTime);
 							break;
 						}
@@ -236,6 +236,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					log.log(Level.WARNING, e.getMessage());
 					serialPort.addTimeoutError();
 					application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGW0045, new Object[] { e.getClass().getSimpleName(), serialPort.getTimeoutErrors() + "; xferErrors = " + serialPort.getXferErrors() }), SWT.COLOR_RED); 
+					WaitTimer.delay(2000); //give time to settle 
 				}
 				catch (IOException e) {
 					log.log(Level.WARNING, e.getMessage());
@@ -359,14 +360,14 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			else {
 				log.log(Level.FINE, "------------ Receiver");
 				serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
-				serialPort.getData(true);
+				serialPort.getData(false);
 				Thread.sleep(queryGapTime_ms);
 				serialPort.getData(true);
 				Thread.sleep(queryGapTime_ms);
 				if (isSensorType[0]) {
 					log.log(Level.FINE, "------------ Vario");
 					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_19200);
-					serialPort.getData(true);
+					serialPort.getData(false);
 					Thread.sleep(queryGapTime_ms);
 					serialPort.getData(true);
 					Thread.sleep(queryGapTime_ms);
@@ -378,7 +379,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				if (isSensorType[1]) {
 					log.log(Level.FINE, "------------ GPS");
 					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_19200);
-					serialPort.getData(true);
+					serialPort.getData(false);
 					Thread.sleep(queryGapTime_ms);
 					serialPort.getData(true);
 					Thread.sleep(queryGapTime_ms);
@@ -390,7 +391,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				if (isSensorType[2]) {
 					log.log(Level.FINE, "------------ General");
 					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_19200);
-					serialPort.getData(true);
+					serialPort.getData(false);
 					Thread.sleep(queryGapTime_ms);
 					serialPort.getData(true);
 					Thread.sleep(queryGapTime_ms);
@@ -402,7 +403,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				if (isSensorType[3]) {
 					log.log(Level.FINE, "------------ Electric");
 					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200);
-					serialPort.getData(true);
+					serialPort.getData(false);
 					Thread.sleep(queryGapTime_ms);
 					serialPort.getData(true);
 					Thread.sleep(queryGapTime_ms);
@@ -471,7 +472,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			else {
 				log.log(Level.FINE, "------------ Receiver");
 				serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
-				serialPort.getData(true);
+				serialPort.getData(false);
 				Thread.sleep(queryGapTime_ms);
 				serialPort.getData(true);
 				Thread.sleep(queryGapTime_ms);
@@ -490,7 +491,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				if (isSensorType[1]) {
 					log.log(Level.FINE, "------------ GPS");
 					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_19200);
-					serialPort.getData(true);
+					serialPort.getData(false);
 					Thread.sleep(queryGapTime_ms);
 					serialPort.getData(true);
 					Thread.sleep(queryGapTime_ms);
@@ -502,7 +503,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				if (isSensorType[2]) {
 					log.log(Level.FINE, "------------ General");
 					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_19200);
-					serialPort.getData(true);
+					serialPort.getData(false);
 					Thread.sleep(queryGapTime_ms);
 					serialPort.getData(true);
 					Thread.sleep(queryGapTime_ms);
@@ -514,7 +515,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				if (isSensorType[3]) {
 					log.log(Level.FINE, "------------ Electric");
 					serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200);
-					serialPort.getData(true);
+					serialPort.getData(false);
 					Thread.sleep(queryGapTime_ms);
 					serialPort.getData(true);
 					Thread.sleep(queryGapTime_ms);
