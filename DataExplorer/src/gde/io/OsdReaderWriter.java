@@ -640,6 +640,7 @@ public class OsdReaderWriter {
 					tmpData = data_in.readUTF();
 					data_out.writeUTF(tmpData);
 					filePointer += tmpData.getBytes("UTF8").length; //$NON-NLS-1$
+					log.log(Level.FINER, "filePointer = " + filePointer);
 					
 					int numberRecordSets = 0;
 					if (tmpData.startsWith(GDE.RECORD_SET_SIZE)) {

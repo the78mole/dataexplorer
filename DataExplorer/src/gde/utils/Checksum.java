@@ -51,13 +51,13 @@ public class Checksum {
 		byte[] HOTT_19200_N_SLAVE = new byte[] { (byte) 0x80, (byte) 0x8D, 0x7C, 0x00, 0x00, 0x53, 0x34, 0x37, 0x53, 0x64, 0x33, (byte) 0xD0, 0x07, 0x00, 0x55, (byte) 0xC0, 0x00, (byte) 0x80,
 				(byte) 0xC3, (byte) 0xC2, (byte) 0xC3, (byte) 0xC4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2B, 0x2B, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xF4, 0x01, 0x12, 0x75, 0x78, 0x00, 0x00, (byte) 0x9C,
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7D, (byte) 0xFF };
-//		System.out.println("CRC16    	= " + Integer.toHexString(Checksum.CRC16(b, 0))); //$NON-NLS-1$
-//		System.out.println("CRC16CCITT= " + Integer.toHexString(Checksum.CRC16CCITT(b, 0))); //$NON-NLS-1$
-//		System.out.println("CRC32 		= " + Integer.toHexString(Checksum.CRC32(b))); //$NON-NLS-1$
-//		System.out.println("Adler32  	= " + Long.toHexString(Checksum.adler32(b))); //$NON-NLS-1$
-//		System.out.println("AND      	= " + Integer.toHexString(Checksum.AND(b))); //$NON-NLS-1$
-//		System.out.println("XOR     	= " + Integer.toHexString(Checksum.XOR(b))); //$NON-NLS-1$
-//		System.out.println("XOR      	= " + Integer.toHexString(Checksum.XOR(b1))); //$NON-NLS-1$
+		System.out.println("CRC16    	= " + Integer.toHexString(Checksum.CRC16(b, 0))); //$NON-NLS-1$
+		System.out.println("CRC16CCITT= " + Integer.toHexString(Checksum.CRC16CCITT(b, 0))); //$NON-NLS-1$
+		System.out.println("CRC32 		= " + Integer.toHexString(Checksum.CRC32(b))); //$NON-NLS-1$
+		System.out.println("Adler32  	= " + Long.toHexString(Checksum.adler32(b))); //$NON-NLS-1$
+		System.out.println("AND      	= " + Integer.toHexString(Checksum.AND(b))); //$NON-NLS-1$
+		System.out.println("XOR     	= " + Integer.toHexString(Checksum.XOR(b))); //$NON-NLS-1$
+		System.out.println("XOR      	= " + Integer.toHexString(Checksum.XOR(b1))); //$NON-NLS-1$
 		
 		System.out.println("ADD      	= " + Integer.toHexString(0xFF & Checksum.ADD(HOTT_19200_N_MASTER, 2, HOTT_19200_N_MASTER.length-2)) + " - " + Integer.toHexString(0xFF & HOTT_19200_N_MASTER[HOTT_19200_N_MASTER.length-1])); //$NON-NLS-1$
 		System.out.println("ADD      	= " + Integer.toHexString(0xFF & Checksum.ADD(HOTT_19200_N_MASTER_1, 2, HOTT_19200_N_MASTER_1.length-2)) + " - " + Integer.toHexString(0xFF & HOTT_19200_N_MASTER_1[HOTT_19200_N_MASTER_1.length-1])); //$NON-NLS-1$
