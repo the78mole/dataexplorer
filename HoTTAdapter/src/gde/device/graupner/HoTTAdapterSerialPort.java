@@ -24,6 +24,7 @@ import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.ui.DataExplorer;
+import gde.utils.Checksum;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
@@ -120,7 +121,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				log.logp(Level.FINEST, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
 			}
 			
-			if (!this.isInterruptedByUser && checkBeginEndSignature && !(data[2] == HoTTAdapterSerialPort.DATA_BEGIN && data[data.length - 2] == HoTTAdapterSerialPort.DATA_END)) {
+			if (!this.isInterruptedByUser && !isParity19200(data) && checkBeginEndSignature && !(data[2] == HoTTAdapterSerialPort.DATA_BEGIN && data[data.length - 2] == HoTTAdapterSerialPort.DATA_END)) {
 				this.addXferError();
 				log.logp(Level.WARNING, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> data start or end does not match, number of errors = " + this.getXferErrors());
 				if (this.getXferErrors() > HoTTAdapterSerialPort.xferErrorLimit)
@@ -171,6 +172,13 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			System.arraycopy(this.ANSWER_DATA, 0, data, 0, this.ANSWER_DATA.length);
 		
 		return data;
+	}
+	
+	private boolean isParity19200(byte[] data) {
+		final String $METHOD_NAME = "isParity";
+		byte parity = Checksum.ADD(data, 2, data.length-2);
+		log.logp(Level.OFF, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, String.format("0x%02X == 0x%02X", parity, data[data.length-1]));
+		return data[data.length-1] == parity;
 	}
 
 	/**
@@ -262,22 +270,27 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		case TYPE_19200_L:
 			switch (sensorType) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
+				log.log(Level.OFF, ">>>Receiver<<<");
 				this.ANSWER_DATA = new byte[HoTTAdapter.IS_SLAVE_MODE ? 17 : 15];
 				this.DATA_LENGTH = 17;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+				log.log(Level.OFF, ">>>Vario<<<");
 				this.ANSWER_DATA = new byte[HoTTAdapter.IS_SLAVE_MODE ? 31 : 29];
 				this.DATA_LENGTH = 31;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+				log.log(Level.OFF, ">>>GPS<<<");
 				this.ANSWER_DATA = new byte[HoTTAdapter.IS_SLAVE_MODE ? 40 : 38];
 				this.DATA_LENGTH = 40;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+				log.log(Level.OFF, ">>>General<<<");
 				this.ANSWER_DATA = new byte[HoTTAdapter.IS_SLAVE_MODE ? 48 : 46];
 				this.DATA_LENGTH = 48;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+				log.log(Level.OFF, ">>>Electric<<<");
 				this.ANSWER_DATA = new byte[HoTTAdapter.IS_SLAVE_MODE ? 51 : 49];
 				this.DATA_LENGTH = 51;
 				break;
@@ -286,26 +299,31 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		case TYPE_115200:
 			switch (sensorType) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_115200:
+				log.log(Level.OFF, ">>>Receiver<<<");
 				this.ANSWER_DATA = new byte[20];
 				this.QUERY_SENSOR_TYPE = QUERY_SENSOR_DATA_RECEIVER;
 				this.DATA_LENGTH = 21;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
+				log.log(Level.OFF, ">>>Vario<<<");
 				this.ANSWER_DATA = new byte[24];
 				this.QUERY_SENSOR_TYPE = QUERY_SENSOR_DATA_VARIO;
 				this.DATA_LENGTH = 25;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_GPS_115200:
+				log.log(Level.OFF, ">>>GPS<<<");
 				this.ANSWER_DATA = new byte[33];
 				this.QUERY_SENSOR_TYPE = QUERY_SENSOR_DATA_GPS;
 				this.DATA_LENGTH = 34;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
+				log.log(Level.OFF, ">>>General<<<");
 				this.ANSWER_DATA = new byte[48];
 				this.QUERY_SENSOR_TYPE = QUERY_SENSOR_DATA_GENERAL;
 				this.DATA_LENGTH = 49;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
+				log.log(Level.OFF, ">>>Electric<<<");
 				this.ANSWER_DATA = new byte[59];
 				this.QUERY_SENSOR_TYPE = QUERY_SENSOR_DATA_ELECTRIC;
 				this.DATA_LENGTH = 60;
@@ -315,6 +333,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		case TYPE_19200_N:
 			switch (sensorType) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
+				log.log(Level.OFF, ">>>Receiver<<<");
 				this.ANSWER_DATA = new byte[HoTTAdapter.IS_SLAVE_MODE ? 17 : 15];
 				this.DATA_LENGTH = 17;
 				break;
@@ -322,13 +341,14 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+				log.log(Level.OFF, sensorType == HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200 ? ">>>Electric<<<" : sensorType == HoTTAdapter.SENSOR_TYPE_GENERAL_19200 ? ">>>General<<<" : sensorType == HoTTAdapter.SENSOR_TYPE_GPS_19200 ? ">>>GPS<<<" : sensorType == HoTTAdapter.SENSOR_TYPE_VARIO_19200 ? ">>>Vario<<<" : ">>>Receiver<<<");
 				this.ANSWER_DATA = new byte[HoTTAdapter.IS_SLAVE_MODE ? 57 : 55];
 				this.DATA_LENGTH = 57;
 				break;
 			}
 			break;
 		}
-		log.log(Level.OFF, "ANSWER_DATA_LENGTH = " + this.ANSWER_DATA.length + " DATA_LENGTH = " + DATA_LENGTH);
+		log.log(Level.FINER, "ANSWER_DATA_LENGTH = " + this.ANSWER_DATA.length + " DATA_LENGTH = " + DATA_LENGTH);
 	}
 
 	/**
