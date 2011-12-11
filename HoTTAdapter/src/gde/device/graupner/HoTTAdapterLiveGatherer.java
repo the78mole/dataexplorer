@@ -100,7 +100,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				HoTTAdapter.IS_SLAVE_MODE = true;
 			else
 				HoTTAdapter.IS_SLAVE_MODE = false;
-			log.log(java.util.logging.Level.OFF, "HoTTAdapter.IS_SLAVE_MODE = " + HoTTAdapter.IS_SLAVE_MODE);
+			log.log(java.util.logging.Level.FINE, "HoTTAdapter.IS_SLAVE_MODE = " + HoTTAdapter.IS_SLAVE_MODE);
 
 			for (int i = 0; i < 3; i++) {
 				try {
@@ -112,7 +112,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				}
 			}
 
-			if (log.isLoggable(java.util.logging.Level.OFF)) {
+			if (log.isLoggable(java.util.logging.Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
 				boolean[] tmpSensorType = HoTTAdapter.isSensorType.clone();
 				//0=isVario, 1=isGPS, 2=isGeneral, 3=isElectric
@@ -129,7 +129,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					}
 				}
 				if (sb.length() == 0) sb.append(">>>Receiver<<<");
-				log.log(java.util.logging.Level.OFF, sb.toString() + ", detecting sensor type takes " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				log.log(java.util.logging.Level.FINE, sb.toString() + ", detecting sensor type takes " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 			}
 
 			//no sensor type detected, seams only receiver is connected
@@ -385,7 +385,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			long deltatime = System.nanoTime() / 1000000 - lastTimeStamp;
 			delayTime = this.timeStep_ms - deltatime;
 
-			if (log.isLoggable(java.util.logging.Level.OFF)) log.log(java.util.logging.Level.OFF, "======> delay time = " + delayTime); //$NON-NLS-1$
+			if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, "======> delay time = " + delayTime); //$NON-NLS-1$
 			if (delayTime > 0) WaitTimer.delay(delayTime);
 			lastTimeStamp = System.nanoTime() / 1000000;
 		}
