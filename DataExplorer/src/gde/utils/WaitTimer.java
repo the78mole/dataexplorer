@@ -20,7 +20,7 @@ package gde.utils;
 
 /**
  * simple thread implementation to wait during a main thread without using existing locks
- * use -> WaitTimer.delay.delay(500); 
+ * use -> WaitTimer.delay(500); 
  */
 public class WaitTimer extends Thread {
 

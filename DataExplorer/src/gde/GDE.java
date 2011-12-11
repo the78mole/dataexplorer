@@ -509,7 +509,7 @@ public class GDE {
 //			splashShell.setLocation(splashRect.x, splashRect.y);
 //		}
 //		else {
-			Rectangle primaryMonitorBounds = GDE.display.getBounds();
+			Rectangle primaryMonitorBounds = GDE.display.getPrimaryMonitor().getBounds();
 			Point splashRect = new Point(primaryMonitorBounds.width / 2 - 185, primaryMonitorBounds.height / 2 - 103);
 			splashShell.setLocation(splashRect.x, splashRect.y);
 //		}

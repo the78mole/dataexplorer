@@ -120,10 +120,24 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	//public static final int FLOWCONTROL_XONXOFF_IN = 4;
 	//public static final int FLOWCONTROL_XONXOFF_OUT = 8;
 
+	/**
+	 * normal constructor to be used within DataExplorer
+	 * @param currentDeviceConfig
+	 * @param currentApplication
+	 */
 	public DeviceSerialPortImpl(DeviceConfiguration currentDeviceConfig, DataExplorer currentApplication) {
 		this.deviceConfig = currentDeviceConfig;
 		this.application = currentApplication;
 		this.settings = Settings.getInstance();
+	}
+	
+	/**
+	 * constructor for test purpose only, do not use within DataExplorer
+	 */
+	public DeviceSerialPortImpl() {
+		this.deviceConfig = null;
+		this.application = null;
+		this.settings = null;
 	}
 
 	/**
@@ -788,4 +802,85 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	public static TreeMap<Integer, String> getWindowsPorts() {
 		return DeviceSerialPortImpl.windowsPorts;
 	}
+	
+	/**
+	 * main method to test this class
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Logger logger = Logger.getLogger(GDE.STRING_EMPTY);
+		logger.setLevel(Level.OFF);
+
+		DeviceSerialPortImpl impl = new DeviceSerialPortImpl();
+		byte[] buffer = new byte[1024];
+		try {
+
+			if (args.length > 0 && args[0].startsWith("COM")) {
+				//open begin
+				impl.portId = CommPortIdentifier.getPortIdentifier(args[0].trim());
+				impl.serialPort = (SerialPort) impl.portId.open("Test", 10000); //$NON-NLS-1$
+				// set port parameters
+				impl.serialPort.setSerialPortParams(19200, 8, 1, 0);
+				impl.serialPort.setFlowControlMode(0);
+				impl.serialPort.setInputBufferSize(1024);
+				impl.serialPort.setOutputBufferSize(1024);
+				impl.serialPort.setRTS(false);
+				impl.serialPort.setDTR(false);
+				// init in and out stream for writing and reading
+				impl.inputStream = impl.serialPort.getInputStream();
+				impl.outputStream = impl.serialPort.getOutputStream();
+				impl.isConnected = true;
+				//open end
+				if (args.length > 1 && args[1].equals("sender")) {
+					//			for (int baud = 2400; baud <= 115200; baud+=100) {
+					//				System.out.println(baud);
+
+					for (int i = 1; i < 126; i++) {
+						impl.write(new byte[] { (byte) i });
+					}
+
+					impl.wait4Bytes(1000);
+					int numBytes = 0, redBytes = 0;
+					while ((numBytes = impl.inputStream.available()) != 0) {
+						byte[] readBuffer = new byte[numBytes];
+						impl.read(readBuffer, 1000);
+						System.arraycopy(readBuffer, 0, buffer, redBytes, numBytes);
+						redBytes += numBytes;
+					}
+					System.out.println(StringHelper.byte2CharString(buffer, redBytes));
+					//close begin
+					impl.close();
+					//close end
+					//			}
+				}
+				else { //receiver
+					while (true) {
+						try {
+							impl.wait4Bytes(1000);
+							int numBytes = 0, redBytes = 0;
+							while ((numBytes = impl.inputStream.available()) != 0) {
+								byte[] readBuffer = new byte[numBytes];
+								impl.read(readBuffer, 1000);
+								System.arraycopy(readBuffer, 0, buffer, redBytes, numBytes);
+								redBytes += numBytes;
+							}
+							System.out.println(StringHelper.byte2CharString(buffer, redBytes));
+						}
+						catch (Exception e) {
+							// ignore
+						}
+					}
+				}
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+		finally {
+			//close begin
+			impl.close();
+			//close end
+		}
+	}
+
 }

@@ -39,14 +39,30 @@ public class Checksum {
 				(byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x1C, (byte) 0x06, (byte) 0x5C,
 				(byte) 0x1C, (byte) 0x06, (byte) 0x5C, (byte) 0x07 };
 
-		System.out.println("CRC16    	= " + Integer.toHexString(Checksum.CRC16(b, 0))); //$NON-NLS-1$
-		System.out.println("CRC16CCITT= " + Integer.toHexString(Checksum.CRC16CCITT(b, 0))); //$NON-NLS-1$
-		System.out.println("CRC32 		= " + Integer.toHexString(Checksum.CRC32(b))); //$NON-NLS-1$
-		System.out.println("Adler32  	= " + Long.toHexString(Checksum.adler32(b))); //$NON-NLS-1$
-		System.out.println("ADD      	= " + Integer.toHexString(Checksum.AND(b))); //$NON-NLS-1$
-		System.out.println("XOR     	= " + Integer.toHexString(Checksum.XOR(b))); //$NON-NLS-1$
-		System.out.println("XOR      	= " + Integer.toHexString(Checksum.XOR(b1))); //$NON-NLS-1$
+		byte[] HOTT_19200_N_MASTER = new byte[] { (byte) 0x80, (byte) 0x8D, (byte) 0x8D, 0x7C, 0x00, 0x00, 0x3E, 0x34, 0x37, 0x3E, 0x64, 0x33, (byte) 0xD0, 0x07, 0x00, 0x41, (byte) 0xC0, 0x00,
+				(byte) 0x80, (byte) 0xC3, (byte) 0xC2, (byte) 0xC3, (byte) 0xC4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2B, 0x2B, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xF4, 0x01, 0x30, 0x75, 0x78, 0x00, 0x00,
+				(byte) 0x9C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7D, (byte) 0xDF
+		};
+		byte[] HOTT_19200_N_MASTER_1 = new byte[] { (byte) 0x80, (byte) 0x8D, 0x7C, 0x00, 0x00, 0x3F, 0x34, 0x37, 0x3F, 0x64, 0x33, (byte) 0xD0, 0x07, 0x00, 0x3E, (byte) 0xC0, 0x00, (byte) 0x80,
+				(byte) 0xC3, (byte) 0xC2, (byte) 0xC3, (byte) 0xC4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2B, 0x2B, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xF4, 0x01, 0x3A, 0x75, 0x78, 0x00, 0x00, (byte) 0x9C,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7D, (byte) 0xE8 };
 
+		byte[] HOTT_19200_N_MASTER_2 = new byte[] { (byte)0x80, (byte)0x89, 0x7C, 0x00, 0x00, 0x3A, 0x35, 0x36, 0x2F, 0x64, 0x35, 0x0A, 0x00, 0x00, 0x2F, (byte)0xC0, 0x00, (byte)0x80, (byte)0xC3, (byte)0xC2, (byte)0xC3, (byte)0xC4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x31, 0x2B, 0x00, 0x00, 0x00, 0x00, 0x00, (byte)0xF5, 0x01, 0x30, 0x75, 0x78, 0x00, 0x00, (byte)0x9C, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7D, (byte)0xF8}; 
+		byte[] HOTT_19200_N_SLAVE = new byte[] { (byte) 0x80, (byte) 0x8D, 0x7C, 0x00, 0x00, 0x53, 0x34, 0x37, 0x53, 0x64, 0x33, (byte) 0xD0, 0x07, 0x00, 0x55, (byte) 0xC0, 0x00, (byte) 0x80,
+				(byte) 0xC3, (byte) 0xC2, (byte) 0xC3, (byte) 0xC4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2B, 0x2B, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0xF4, 0x01, 0x12, 0x75, 0x78, 0x00, 0x00, (byte) 0x9C,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7D, (byte) 0xFF };
+//		System.out.println("CRC16    	= " + Integer.toHexString(Checksum.CRC16(b, 0))); //$NON-NLS-1$
+//		System.out.println("CRC16CCITT= " + Integer.toHexString(Checksum.CRC16CCITT(b, 0))); //$NON-NLS-1$
+//		System.out.println("CRC32 		= " + Integer.toHexString(Checksum.CRC32(b))); //$NON-NLS-1$
+//		System.out.println("Adler32  	= " + Long.toHexString(Checksum.adler32(b))); //$NON-NLS-1$
+//		System.out.println("AND      	= " + Integer.toHexString(Checksum.AND(b))); //$NON-NLS-1$
+//		System.out.println("XOR     	= " + Integer.toHexString(Checksum.XOR(b))); //$NON-NLS-1$
+//		System.out.println("XOR      	= " + Integer.toHexString(Checksum.XOR(b1))); //$NON-NLS-1$
+		
+		System.out.println("ADD      	= " + Integer.toHexString(0xFF & Checksum.ADD(HOTT_19200_N_MASTER, 2, HOTT_19200_N_MASTER.length-2)) + " - " + Integer.toHexString(0xFF & HOTT_19200_N_MASTER[HOTT_19200_N_MASTER.length-1])); //$NON-NLS-1$
+		System.out.println("ADD      	= " + Integer.toHexString(0xFF & Checksum.ADD(HOTT_19200_N_MASTER_1, 2, HOTT_19200_N_MASTER_1.length-2)) + " - " + Integer.toHexString(0xFF & HOTT_19200_N_MASTER_1[HOTT_19200_N_MASTER_1.length-1])); //$NON-NLS-1$
+		System.out.println("ADD      	= " + Integer.toHexString(0xFF & Checksum.ADD(HOTT_19200_N_MASTER_2, 2, HOTT_19200_N_MASTER_2.length-2)) + " - " + Integer.toHexString(0xFF & HOTT_19200_N_MASTER_2[HOTT_19200_N_MASTER_2.length-1])); //$NON-NLS-1$
+		System.out.println("ADD      	= " + Integer.toHexString(0xFF & Checksum.ADD(HOTT_19200_N_SLAVE, 2, HOTT_19200_N_SLAVE.length-2)) + " - " + Integer.toHexString(0xFF & HOTT_19200_N_SLAVE[HOTT_19200_N_SLAVE.length-1])); //$NON-NLS-1$
 	}
 
 	/**
@@ -213,6 +229,19 @@ public class Checksum {
 
 	/**
 	 * calculate AND bit operation
+	 * @param b byte array to compute
+	 * @return integer result
+	 */
+	public static int AND(byte[] b, int offset, int length) {
+		int value = b[offset] &0xFF;
+		for (int i = offset+1; i < length; i++) {
+			value = value & b[i];
+		}
+		return value;
+	}
+
+	/**
+	 * calculate AND bit operation
 	 * @param a integer array to compute
 	 * @return integer result
 	 */
@@ -244,12 +273,12 @@ public class Checksum {
 	 * @param len used for calculation, attention checksum if part of the byte array
 	 * @return 16-bit result
 	 */
-	public static int ADD(byte[] b, int start, int len) {
+	public static byte ADD(byte[] b, int start, int len) {
 		int value = b[start] & 0xFF;
 		for (int i = start+1; i <= len; i++) {
 			value = value  + (b[i] & 0xFF);
 		}
-		return value;
+		return (byte)(value & 0xFF);
 	}
 
 	/**
