@@ -63,8 +63,9 @@ import org.eclipse.swt.widgets.MenuItem;
 public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static Logger		log														= Logger.getLogger(HoTTAdapter.class.getName());
 
-	final static String		SENSOR_TYPE										= "SensorType";																	//$NON-NLS-1$
+	final static String		SENSOR_COUNT									= "SensorCount";																//$NON-NLS-1$
 	final static String		LOG_COUNT											= "LogCount";																		//$NON-NLS-1$
+	final static String		SD_LOG_VERSION								= "SD-Log Version";															//$NON-NLS-1$
 
 	//HoTT sensor bytes 19200 Baud protocol 
 	static boolean				IS_SLAVE_MODE									= false;
