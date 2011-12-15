@@ -477,6 +477,28 @@ public class StringHelper {
 		}
 		return sb.toString();
 	}
+	
+	public static String fourDigitsRunningNumber(int size) {
+		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%3d", size)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
+		for (int i = 0; i < size; i++) {
+			sb.append(String.format("%4d", i));
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * convert a byte array into a 4 digits 2 hex character string representation
+	 * @param bytes
+	 * @param size
+	 * @return string with converted characters
+	 */
+	public static String byte2Hex4CharString(byte[] bytes, int size) {
+		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%3d", size)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
+		for (int i = 0; i < size; i++) {
+			sb.append(String.format("  %02X", bytes[i])); //$NON-NLS-1$
+		}
+		return sb.toString();
+	}
 
 	/**
 	 * convert a byte array into a 2 hex character string representation
@@ -485,9 +507,9 @@ public class StringHelper {
 	 * @return string with converted characters
 	 */
 	public static String byte2Hex2CharString(byte[] bytes, int size) {
-		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(size).append(GDE.STRING_RIGHT_BRACKET_COMMA);
+		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%3d", size)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 		for (int i = 0; i < size; i++) {
-			sb.append(String.format("%02X ", bytes[i])); //$NON-NLS-1$
+			sb.append(String.format(" %02X", bytes[i])); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
@@ -498,7 +520,7 @@ public class StringHelper {
 	 * @return string with converted characters
 	 */
 	public static String byte2FourDigitsIntegerString(byte[] bytes) {
-		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(bytes.length).append(GDE.STRING_RIGHT_BRACKET_COMMA);
+		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%3d", bytes.length)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 		for (int i = 0; i < bytes.length; i++) {
 			sb.append(String.format("%4d", (bytes[i]&0xFF))); //$NON-NLS-1$
 		}
