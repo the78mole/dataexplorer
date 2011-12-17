@@ -202,7 +202,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * method to get unsorted recordNames within channels instance to avoid stack overflow due to never ending recursion 
 	 * @return String[] containing the records names
 	 */
-	public synchronized String[] getUnsortedRecordSetNames() {
+	public String[] getUnsortedRecordSetNames() {
 		return this.keySet().toArray( new String[1]);
 	}
 
