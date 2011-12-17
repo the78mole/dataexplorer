@@ -169,7 +169,7 @@ public class DataParser {
 	}
 	
 	/**
-	 * parse 2 byte of a data buffer to integer value, buffer byte sequence low byte high byte
+	 * parse 2 byte of a data buffer to short integer value, buffer byte sequence low byte high byte
 	 * @param buffer
 	 * @param startIndex index of low byte 
 	 */
@@ -178,7 +178,7 @@ public class DataParser {
 	}
 	
 	/**
-	 * parse high and low byte to integer value
+	 * parse high and low byte to short integer value
 	 * @param low byte
 	 * @param high byte
 	 */
