@@ -189,11 +189,11 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsGPS = new int[12];
 		HoTTbinReader.timeStep_ms = HoTTbinReader.timeOffsetReceiver_ms = HoTTbinReader.timeOffsetVario_ms = HoTTbinReader.timeOffsetGPS_ms = HoTTbinReader.timeOffsetGeneral_ms = HoTTbinReader.timeOffsetElectric_ms = 0;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
-		HoTTbinReader.buf0 = new byte[30];
-		HoTTbinReader.buf1 = new byte[30];
-		HoTTbinReader.buf2 = new byte[30];
-		HoTTbinReader.buf3 = new byte[30];
-		HoTTbinReader.buf4 = new byte[30];
+		HoTTbinReader.buf0 = null;
+		HoTTbinReader.buf1 = null;
+		HoTTbinReader.buf2 = null;
+		HoTTbinReader.buf3 = null;
+		HoTTbinReader.buf4 = null;
 		String[] lastLoadedSensorType = new String[2];
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
