@@ -273,12 +273,12 @@ public class Checksum {
 	 * @param len used for calculation, attention checksum if part of the byte array
 	 * @return 16-bit result
 	 */
-	public static byte ADD(byte[] b, int start, int len) {
+	public static int ADD(byte[] b, int start, int len) {
 		int value = b[start] & 0xFF;
 		for (int i = start+1; i <= len; i++) {
 			value = value  + (b[i] & 0xFF);
 		}
-		return (byte)(value & 0xFF);
+		return value;
 	}
 
 	/**
