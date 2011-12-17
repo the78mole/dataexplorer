@@ -24,7 +24,6 @@ import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.ui.DataExplorer;
-import gde.utils.Checksum;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
@@ -121,7 +120,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				log.logp(Level.FINEST, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
 			}
 			
-			if (!this.isInterruptedByUser && !isParity19200(data) && checkBeginEndSignature && !(data[2] == HoTTAdapterSerialPort.DATA_BEGIN && data[data.length - 2] == HoTTAdapterSerialPort.DATA_END)) {
+			if (!this.isInterruptedByUser && checkBeginEndSignature && !(data[2] == HoTTAdapterSerialPort.DATA_BEGIN && data[data.length - 2] == HoTTAdapterSerialPort.DATA_END)) {
 				this.addXferError();
 				log.logp(Level.WARNING, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> data start or end does not match, number of errors = " + this.getXferErrors());
 				if (this.getXferErrors() > HoTTAdapterSerialPort.xferErrorLimit)
@@ -174,12 +173,12 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		return data;
 	}
 	
-	private boolean isParity19200(byte[] data) {
-		final String $METHOD_NAME = "isParity";
-		byte parity = Checksum.ADD(data, 2, data.length-2);
-		log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, String.format("0x%02X == 0x%02X", parity, data[data.length-1]));
-		return data[data.length-1] == parity;
-	}
+//	private boolean isParity19200(byte[] data) {
+//		final String $METHOD_NAME = "isParity";
+//		byte parity = Checksum.ADD(data, 2, data.length-2);
+//		log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, String.format("0x%02X == 0x%02X", parity, data[data.length-1]));
+//		return data[data.length-1] == parity;
+//	}
 
 	/**
 	 * method to gather data from device, implementation is individual for device
