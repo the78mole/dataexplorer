@@ -505,7 +505,7 @@ public class HoTTbinReader {
 		HoTTbinReader.buf3 = new byte[30];
 		HoTTbinReader.buf4 = new byte[30];
 		byte actualSensor = -1, lastSensor = -1;
-		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0;
+		int lastLogCountVario = 0, lastLogCountGPS = 0, lastLogCountGeneral = 0, lastLogCountElectric = 0, logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0;
 		String[] lastLoadedSensorType = new String[2];
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
@@ -531,18 +531,18 @@ public class HoTTbinReader {
 			//read all the data blocks from the file and parse
 			for (int i = 0; i < numberDatablocks; i++) {
 				data_in.read(HoTTbinReader.buf);
-				if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINER) && i % 10 == 0) {
-					HoTTbinReader.log.log(java.util.logging.Level.FINE, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
+				if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINEST) && i % 10 == 0) {
+					HoTTbinReader.log.log(java.util.logging.Level.FINEST, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
 				}
-				HoTTbinReader.log.log(java.util.logging.Level.FINER, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
+				HoTTbinReader.log.log(java.util.logging.Level.FINEST, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 
 				if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //skip empty block - package loss
 					//create and fill sensor specific data record sets 
-					if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINER))
-						HoTTbinReader.log.log(java.util.logging.Level.FINER,
+					if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINEST))
+						HoTTbinReader.log.log(java.util.logging.Level.FINEST,
 								StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1) + GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader.buf[7], false));
 
-					if (HoTTbinReader.buf0[4] != 0) { //receiver RF_RXSQ
+					if (HoTTbinReader.buf[38] != 0) { //receiver RF_RXSQ
 						//fill receiver data
 						//printByteValues(timeStep_ms, buf);
 						if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 40) != 0 && (HoTTbinReader.timeStep_ms - HoTTbinReader.timeOffsetReceiver_ms) % 10 == 0) {
@@ -555,12 +555,6 @@ public class HoTTbinReader {
 							actualSensor = (byte) (HoTTbinReader.buf[7] & 0xFF);
 
 						if (actualSensor != lastSensor) {
-							//average log count per sensor is 40, skip 30 logs for speed up right after sensor switch
-							data_in.skip(HoTTbinReader.dataBlockSize * 30); //take from data points only each half second 
-							i += 30;
-							actualSensor += 10;
-							HoTTbinReader.timeStep_ms = HoTTbinReader.timeStep_ms += 300;
-							
 							if (logCountVario > 3 || logCountGPS > 4 || logCountGeneral > 5 || logCountElectric > 5) {
 								switch (lastSensor) {
 								case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
@@ -652,11 +646,62 @@ public class HoTTbinReader {
 											HoTTbinReader.timeStep_ms, HoTTbinReader.timeOffsetElectric_ms);
 									break;
 								}
+								
+								//skip last log count - 6 logs for speed up right after sensor switch
+								int skipCount = 0;
+								switch (actualSensor) {
+								case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
+								case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+									skipCount = lastLogCountVario-3;
+									logCountVario = skipCount;
+									HoTTbinReader.log.log(java.util.logging.Level.FINE, "lastLogCountVario = " + lastLogCountVario);
+									break;
+								case HoTTAdapter.SENSOR_TYPE_GPS_115200:
+								case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+									skipCount = lastLogCountGPS-4;
+									logCountGPS = skipCount;
+									HoTTbinReader.log.log(java.util.logging.Level.FINE, "lastLogCountGPS = " + lastLogCountGPS);
+									break;
+								case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
+								case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+									skipCount = lastLogCountGeneral-5;
+									logCountGeneral = skipCount;
+									HoTTbinReader.log.log(java.util.logging.Level.FINE, "lastLogCountGeneral = " + lastLogCountGeneral);
+									break;
+								case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
+								case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+									skipCount = lastLogCountElectric-5;
+									logCountElectric = skipCount;
+									HoTTbinReader.log.log(java.util.logging.Level.FINE, "lastLogCountElectric = " + lastLogCountElectric);
+									break;
+								}
+								if (skipCount > 0) {
+									data_in.skip(HoTTbinReader.dataBlockSize * skipCount);
+									i += skipCount;
+									HoTTbinReader.timeStep_ms = HoTTbinReader.timeStep_ms += (skipCount * 10);
+								}
+							}							
+							switch (lastSensor) {
+							case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
+							case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+								lastLogCountVario = logCountVario;
+								break;
+							case HoTTAdapter.SENSOR_TYPE_GPS_115200:
+							case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+								lastLogCountGPS = logCountGPS;
+								break;
+							case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
+							case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+								lastLogCountGeneral = logCountGeneral;
+								break;
+							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
+							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+								lastLogCountElectric = logCountElectric;
+								break;
 							}
-							HoTTbinReader.log.log(java.util.logging.Level.FINE, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS + " logCountGeneral = " + logCountGeneral
-									+ " logCountElectric = " + logCountElectric);
-							logCountVario = logCountGPS = logCountGeneral = logCountElectric = 0;
+							HoTTbinReader.log.log(java.util.logging.Level.FINE, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS + " logCountGeneral = " + logCountGeneral	+ " logCountElectric = " + logCountElectric);
 							lastSensor = actualSensor;
+							logCountVario = logCountGPS = logCountGeneral = logCountElectric = 0;
 						}
 						else {
 							switch (lastSensor) {
