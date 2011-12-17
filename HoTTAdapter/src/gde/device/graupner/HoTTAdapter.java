@@ -534,8 +534,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				points[16] = DataParser.parse2Short(dataBuffer, 40) * 1000;
 				points[17] = DataParser.parse2Short(dataBuffer, 22) * 1000;
 				points[18] = DataParser.parse2Short(dataBuffer, 24) * 1000;
-				points[19] = (dataBuffer[26] + 20) * 1000;
-				points[20] = (dataBuffer[28] + 20) * 1000;
+				points[19] = (DataParser.parse2Short(dataBuffer, 26)+20) * 1000;
+				points[20] = (DataParser.parse2Short(dataBuffer, 28)+20) * 1000;
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
