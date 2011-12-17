@@ -1,11 +1,12 @@
 Development history / change log, please read from bottom up
 
 Version 2.94 - xx yyy 2011
-DevicePropertyEditor fix out of handles problem
-DevicePropertyEditor fix problem displaying wrong measurement names while adding sync reference in cases with different measurement sets per channel
-HottAdapter fix SWT error while live data gathering and closed dialog
-HottAdapter implement 19200 new protocol master and slave mode
-HottAdapter enable multiple connected sensors
+DevicePropertyEditor - fix out of handles problem
+DevicePropertyEditor - fix problem displaying wrong measurement names while adding sync reference in cases with different measurement sets per channel
+HottAdapter - fix SWT error while live data gathering and closed dialog
+HottAdapter - implement 19200 new protocol master and slave mode
+HottAdapter - enable multiple connected sensors
+HoTTAdapter - fix data parsing error 115200 protocol temperature > 127 °C
 
 Version 2.93 - 23 Oct 2011
 Picolario - read all available record sets with single click
