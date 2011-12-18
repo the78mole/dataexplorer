@@ -484,6 +484,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 				//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 				points[0] = (dataBuffer[22] & 0xFF) * 1000;
+				points[0] = points[0] == 0 ? (dataBuffer[3] & 0xFF) * 1000 : points[0];
 				points[1] = (DataParser.parse2Short(dataBuffer, 10) + 500) * 1000;
 				points[2] = (DataParser.parse2Short(dataBuffer, 16) + 30000) * 1000;
 				points[3] = (DataParser.parse2Short(dataBuffer, 18) + 30000) * 1000;
@@ -495,6 +496,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 				points[0] = (dataBuffer[31] & 0xFF) * 1000;
+				points[0] = points[0] == 0 ? (dataBuffer[3] & 0xFF) * 1000 : points[0];
 				points[1] = DataParser.parse2Short(dataBuffer, 16) * 10000 + DataParser.parse2Short(dataBuffer, 18);
 				points[1] = dataBuffer[26] == 1 ? -1 * points[1] : points[1];
 				points[2] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
@@ -506,7 +508,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				points[7] = DataParser.parse2Short(dataBuffer, 12) * 1000;
 				points[8] = DataParser.parse2Short(dataBuffer, 24) * 500;
 				points[9] = 0;
-				points[10] = (dataBuffer[4] & 0xFF) * 1000;
+				points[10] = dataBuffer[4] * 1000;
 				points[11] = (dataBuffer[5] + 20) * 1000;
 				break;
 

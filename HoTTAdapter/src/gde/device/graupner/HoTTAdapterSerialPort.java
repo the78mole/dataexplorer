@@ -199,7 +199,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			++QUERY_SENSOR_DATA_DBM[1];
 			--QUERY_SENSOR_DATA_DBM[2];
 			this.write(QUERY_SENSOR_DATA_DBM);
-			this.read(answerDBM, READ_TIMEOUT_MS);
+			this.read(answerDBM, READ_TIMEOUT_MS*2);
 
 			if (log.isLoggable(Level.FINE)) {
 				log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(answerDBM));
@@ -216,8 +216,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			this.read(answerRx, READ_TIMEOUT_MS);
 
 			if (log.isLoggable(Level.FINE)) {
-				log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(answerDBM));
-				log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answerDBM, answerDBM.length));
+				log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(answerRx));
+				log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answerRx, answerRx.length));
 			}
 		}
 		WaitTimer.delay(20);
@@ -252,6 +252,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			data[5] = (byte) (txDBM /= 75);
 		}
 		else {
+			data[3] = answerRx[17];
 			data[4] = answerRx[14];
 			data[5] = answerRx[9];
 		}
