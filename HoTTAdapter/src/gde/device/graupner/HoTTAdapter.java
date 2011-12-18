@@ -560,8 +560,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				points[22] = (dataBuffer[46] + 120) * 1000;
 				points[23] = DataParser.parse2Short(dataBuffer, 38) * 1000;
 				points[24] = DataParser.parse2Short(dataBuffer, 40) * 1000;
-				points[25] = (dataBuffer[42] + 20) * 1000;
-				points[26] = (dataBuffer[44] + 20) * 1000;
+				points[25] = (DataParser.parse2Short(dataBuffer, 42)+20) * 1000;
+				points[26] = (DataParser.parse2Short(dataBuffer, 44)+20) * 1000;
 				break;
 			}
 			break;
