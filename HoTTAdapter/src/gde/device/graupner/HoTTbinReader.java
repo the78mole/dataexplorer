@@ -414,7 +414,11 @@ public class HoTTbinReader {
 							}
 						}
 						//recordSetElectric initialized and ready to add data
-						//fill data block 1 to 4
+						//fill data block 0 to 4
+						if (HoTTbinReader.buf0 == null && HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
+							HoTTbinReader.buf0 = new byte[30];
+							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
+						}
 						if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
 							HoTTbinReader.buf1 = new byte[30];
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);

@@ -245,8 +245,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		//sensor type is receiver need to query DBM data in addition
 		if (QUERY_SENSOR_TYPE[6] == QUERY_SENSOR_DATA_RECEIVER[6]) {
 			for (int i = 0; i < 75; i++) {
-				rxDBM += answerDBM[i + 82];
-				txDBM += answerDBM[i + 157];
+				rxDBM += answerDBM[i + 157];
+				txDBM += answerDBM[i + 82];
 			}
 			data[4] = (byte) (rxDBM /= 75);
 			data[5] = (byte) (txDBM /= 75);
