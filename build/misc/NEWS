@@ -1,15 +1,12 @@
-GNU DataExplorer - News - comes with version 2.93
+GNU DataExplorer - News - comes with version 2.94
 
-1) Picolario - read all available record sets with single click
-2) Add absolute date/time in data table for long term measurements via context menu
-3) CSV2SerailAdapter consider absolute date and time from file modification stamp
-4) WStech DataVario/LinkVario consider absolute date and time from file modification stamp
-5) HoTTAdapter consider absolute date and time from file modification stamp
-6) NMEA-Adapter consider absolute date and time from containing sentences
-7) SM GPS-Logger consider absolute date and time from containing NMEAD sentences
-8) SM UniLog 2 consider absolute date and time from containing sentence
-9) SM UniLog 2 fix sticky dialog
-10)SM UniLog 2 enable live data gathering
+1) DevicePropertyEditor - fix out of handles problem
+2) DevicePropertyEditor - fix problem displaying wrong measurement names while adding sync reference in cases with different measurement sets per channel
+3) HottAdapter - fix SWT error while live data gathering and closed dialog
+4) HottAdapter - implement 19200 new protocol master and slave mode
+5) HottAdapter - enable multiple connected sensors
+6) HoTTAdapter - fix data parsing error 115200 protocol temperature > 127 °C
+7) Documentation update
 
 
 
