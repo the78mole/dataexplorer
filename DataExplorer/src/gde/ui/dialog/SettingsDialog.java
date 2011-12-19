@@ -1107,6 +1107,9 @@ public class SettingsDialog extends Dialog {
 										String loggerName = sb.toString();
 										SettingsDialog.this.popupmenu.setData(SettingsDialog.LOGGER_NAME, loggerName);
 									}
+									else {
+										SettingsDialog.this.popupmenu.setData(SettingsDialog.LOGGER_NAME, tmpItem.getText() + GDE.STRING_DOT);
+									}
 								}
 							});
 						}
