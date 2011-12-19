@@ -63,67 +63,70 @@ public class HoTTbinReader {
 	static RecordSet					recordSetReceiver, recordSetGeneral, recordSetElectric, recordSetVario, recordSetGPS;
 
 	/**
-	 * get data file header data
+	 * get data file info data
 	 * @param buffer byte array containing the first 64 byte to analyze the header
 	 * @return hash map containing header data as string accessible by public header keys
 	 * @throws IOException 
 	 */
-	public static HashMap<String, String> getHeader(File file) throws IOException {
+	public static HashMap<String, String> getFileInfo(File file) throws IOException {
 		final String $METHOD_NAME = "getHeader";
 		DataInputStream data_in = null;
 		byte[] buffer = new byte[64];
-		HashMap<String, String> header;
+		HashMap<String, String> fileInfo;
 		int sensorCount = 0;
 		int versionCount = 0;
-
-		for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
-			HoTTAdapter.isSensorType[i] = false;
-		}
-
+		long numberLogs = (file.length() / 64);
+		
 		try {
-			FileInputStream file_input = new FileInputStream(file);
-			data_in = new DataInputStream(file_input);
-			header = new HashMap<String, String>();
+			if (numberLogs > 50) {
+				for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
+					HoTTAdapter.isSensorType[i] = false;
+				}
+				FileInputStream file_input = new FileInputStream(file);
+				data_in = new DataInputStream(file_input);
+				fileInfo = new HashMap<String, String>();
+				HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
+				for (int i = 0; i < 50; i++) {
+					data_in.read(buffer);
+					HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
 
-			HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
-			for (int i = 0; i < 50; i++) {
-				data_in.read(buffer);
-				HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+					if (buffer[5] != 0x00) versionCount += (buffer[5] & 0xFF);
 
-				if (buffer[5] != 0x00) versionCount += (buffer[5] & 0xFF);
-
-				switch (buffer[7]) {
-				case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-					HoTTAdapter.isSensorType[0] = true;
-					break;
-				case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-					HoTTAdapter.isSensorType[1] = true;
-					break;
-				case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-					HoTTAdapter.isSensorType[2] = true;
-					break;
-				case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-					HoTTAdapter.isSensorType[3] = true;
-					break;
+					switch (buffer[7]) {
+					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+						HoTTAdapter.isSensorType[0] = true;
+						break;
+					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+						HoTTAdapter.isSensorType[1] = true;
+						break;
+					case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+						HoTTAdapter.isSensorType[2] = true;
+						break;
+					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+						HoTTAdapter.isSensorType[3] = true;
+						break;
+					}
+				}
+				for (boolean element : HoTTAdapter.isSensorType) {
+					if (element == true) ++sensorCount;
+				}
+				//more then one sensor is supported with new format only, 
+				fileInfo.put(HoTTAdapter.SD_LOG_VERSION, GDE.STRING_EMPTY + (sensorCount > 1 || versionCount > 0 ? 1 : 0));
+				fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
+				fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
+				
+				if (HoTTbinReader.log.isLoggable(Level.FINE)) for (Entry<String, String> entry : fileInfo.entrySet()) {
+					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
 				}
 			}
-
-			for (boolean element : HoTTAdapter.isSensorType) {
-				if (element == true) ++sensorCount;
-			}
-			//more then one sensor is supported with new format only, 
-			header.put(HoTTAdapter.SD_LOG_VERSION, GDE.STRING_EMPTY + (sensorCount > 1 || versionCount > 0 ? 1 : 0));
-			header.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
-			header.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
-
-			if (HoTTbinReader.log.isLoggable(Level.FINE)) for (Entry<String, String> entry : header.entrySet()) {
-				HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
+			else {
+				throw new IOException("file size to small");
 			}
 		}
 		finally {
 			if (data_in != null) data_in.close();
 		}
-		return header;
+		return fileInfo;
 	}
 
 	static int convertRFRXSQ2Strenght(int inValue) {
@@ -153,7 +156,7 @@ public class HoTTbinReader {
 		int sdLogFormatVersion = 0;
 		File file = new File(filePath);
 
-		header = getHeader(file);
+		header = getFileInfo(file);
 		sdLogFormatVersion = Integer.parseInt(header.get(HoTTAdapter.SD_LOG_VERSION));
 
 		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 1)
