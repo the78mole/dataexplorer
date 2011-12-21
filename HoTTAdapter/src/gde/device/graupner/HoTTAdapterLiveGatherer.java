@@ -165,20 +165,20 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		final String recordSetKeyStem = this.channel.getNextRecordSetNumber() + this.device.getRecordSetStemName();
 		String recordSetKey = recordSetKeyStem;
 
-		//receiver is always 
-		this.dialog.selectTab(this.channelNumber = 1);
-		this.channels.switchChannel(this.channels.getChannelNames()[0]);
-		this.channel = this.application.getActiveChannel();
-		recordSetKey = recordSetKeyStem + " [Receiver]";
-		this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, 1, true, false));
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
-		recordSetReceiver = this.channel.get(recordSetKey);
-		this.channel.applyTemplateBasics(recordSetKey);
-		this.application.getMenuToolBar().addRecordSetName(HoTTAdapterLiveGatherer.this.channel.getName());
-		this.channel.switchRecordSet(recordSetKey);
-		pointsReceiver = new int[recordSetReceiver.size()];
-
+		//receiver is always - might be empty in slave modus
+		if (!HoTTAdapter.IS_SLAVE_MODE || HoTTAdapter.isSensorType[0] == false && HoTTAdapter.isSensorType[1] == false && HoTTAdapter.isSensorType[2] == false && HoTTAdapter.isSensorType[3] == false) {
+			this.dialog.selectTab(this.channelNumber = 1);
+			this.channels.switchChannel(this.channels.getChannelNames()[0]);
+			this.channel = this.application.getActiveChannel();
+			recordSetKey = recordSetKeyStem + " [Receiver]";
+			this.channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.device, 1, true, false));
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
+			recordSetReceiver = this.channel.get(recordSetKey);
+			this.channel.applyTemplateBasics(recordSetKey);
+			this.application.getMenuToolBar().addRecordSetName(HoTTAdapterLiveGatherer.this.channel.getName());
+			this.channel.switchRecordSet(recordSetKey);
+			pointsReceiver = new int[recordSetReceiver.size()];
+		}
 		//0=isVario, 1=isGPS, 2=isGeneral, 3=isElectric
 		if (HoTTAdapter.isSensorType[3]) {
 			this.dialog.selectTab(this.channelNumber = 5);
@@ -289,12 +289,14 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						WaitTimer.delay(this.queryGapTime_ms);
 						recordSetVario.addPoints(usedDevice.convertDataBytes(pointsVario, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
 					}
-					this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
-					HoTTAdapterLiveGatherer.this.serialPort.getData(false);
-					WaitTimer.delay(this.queryGapTime_ms);
-					HoTTAdapterLiveGatherer.this.serialPort.getData(true);
-					WaitTimer.delay(this.queryGapTime_ms);
-					recordSetReceiver.addPoints(usedDevice.convertDataBytes(pointsReceiver, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
+					if (!HoTTAdapter.IS_SLAVE_MODE || HoTTAdapter.isSensorType[0] == false && HoTTAdapter.isSensorType[1] == false && HoTTAdapter.isSensorType[2] == false && HoTTAdapter.isSensorType[3] == false) {
+						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
+						HoTTAdapterLiveGatherer.this.serialPort.getData(true);
+						WaitTimer.delay(this.queryGapTime_ms);
+						HoTTAdapterLiveGatherer.this.serialPort.getData(true);
+						WaitTimer.delay(this.queryGapTime_ms);
+						recordSetReceiver.addPoints(usedDevice.convertDataBytes(pointsReceiver, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
+					}
 					break;
 				case TYPE_115200:
 					if (recordSetElectric != null) {
@@ -329,17 +331,19 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						WaitTimer.delay(this.queryGapTime_ms);
 						recordSetVario.addPoints(usedDevice.convertDataBytes(pointsVario, HoTTAdapterLiveGatherer.this.serialPort.getData()), System.nanoTime() / 1000000 - startTime);
 					}
-					this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
-					HoTTAdapterLiveGatherer.this.serialPort.getData();
-					WaitTimer.delay(this.queryGapTime_ms);
-					HoTTAdapterLiveGatherer.this.serialPort.getData();
-					WaitTimer.delay(this.queryGapTime_ms);
-					recordSetReceiver.addPoints(usedDevice.convertDataBytes(pointsReceiver, HoTTAdapterLiveGatherer.this.serialPort.getData()), System.nanoTime() / 1000000 - startTime);
+					if (!HoTTAdapter.IS_SLAVE_MODE || HoTTAdapter.isSensorType[0] == false && HoTTAdapter.isSensorType[1] == false && HoTTAdapter.isSensorType[2] == false && HoTTAdapter.isSensorType[3] == false) {
+						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
+						HoTTAdapterLiveGatherer.this.serialPort.getData();
+						WaitTimer.delay(this.queryGapTime_ms);
+						HoTTAdapterLiveGatherer.this.serialPort.getData();
+						WaitTimer.delay(this.queryGapTime_ms);
+						recordSetReceiver.addPoints(usedDevice.convertDataBytes(pointsReceiver, HoTTAdapterLiveGatherer.this.serialPort.getData()), System.nanoTime() / 1000000 - startTime);
+					}
 					break;
 				}
 
 				if (++measurementCount % 5 == 0) {
-					HoTTAdapterLiveGatherer.this.device.updateVisibilityStatus(recordSetReceiver, true);
+					if (recordSetReceiver != null) HoTTAdapterLiveGatherer.this.device.updateVisibilityStatus(recordSetReceiver, true);
 					if (recordSetElectric != null) HoTTAdapterLiveGatherer.this.device.updateVisibilityStatus(recordSetElectric, true);
 					if (recordSetGeneral != null) HoTTAdapterLiveGatherer.this.device.updateVisibilityStatus(recordSetGeneral, true);
 					if (recordSetGPS != null) HoTTAdapterLiveGatherer.this.device.updateVisibilityStatus(recordSetGPS, true);
@@ -352,7 +356,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			catch (DataInconsitsentException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
 				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
-				cleanup(recordSetReceiver.getName(), message);
+				if (recordSetReceiver != null) cleanup(recordSetReceiver.getName(), message);
 				if (recordSetElectric != null) cleanup(recordSetElectric.getName(), message);
 				if (recordSetGeneral != null) cleanup(recordSetGeneral.getName(), message);
 				if (recordSetGPS != null) cleanup(recordSetGPS.getName(), message);
@@ -373,11 +377,11 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			catch (Throwable e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
 				this.application.openMessageDialogAsync(e.getClass().getSimpleName() + " - " + e.getMessage()); //$NON-NLS-1$
-				finalizeRecordSet(recordSetReceiver.getName());
-				if (recordSetElectric != null) finalizeRecordSet(recordSetElectric.getName());
-				if (recordSetGeneral != null) finalizeRecordSet(recordSetGeneral.getName());
-				if (recordSetGPS != null) finalizeRecordSet(recordSetGPS.getName());
-				if (recordSetVario != null) finalizeRecordSet(recordSetVario.getName());				
+				if (recordSetReceiver != null) finalizeRecordSet(recordSetReceiver);
+				if (recordSetElectric != null) finalizeRecordSet(recordSetElectric);
+				if (recordSetGeneral != null) finalizeRecordSet(recordSetGeneral);
+				if (recordSetGPS != null) finalizeRecordSet(recordSetGPS);
+				if (recordSetVario != null) finalizeRecordSet(recordSetVario);				
 			}
 			WaitTimer.delay(100); //make sure we have such a pause while receiving data even we have 
 
@@ -388,22 +392,25 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			if (delayTime > 0) WaitTimer.delay(delayTime);
 			lastTimeStamp = System.nanoTime() / 1000000;
 		}
-		finalizeRecordSet(recordSetKey);
+		if (recordSetReceiver != null) finalizeRecordSet(recordSetReceiver);
+		if (recordSetElectric != null) finalizeRecordSet(recordSetElectric);
+		if (recordSetGeneral != null) finalizeRecordSet(recordSetGeneral);
+		if (recordSetGPS != null) finalizeRecordSet(recordSetGPS);
+		if (recordSetVario != null) finalizeRecordSet(recordSetVario);				
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "exit"); //$NON-NLS-1$
 	}
 
 	/**
 	 * close port, set isDisplayable according channel configuration and calculate slope
-	 * @param recordSetKey
+	 * @param recordSet
 	 */
-	public void finalizeRecordSet(String recordSetKey) {
+	public void finalizeRecordSet(RecordSet recordSet) {
 		this.serialPort.isInterruptedByUser = true;
 		this.serialPort.close();
-		RecordSet recordSet = this.channel.get(recordSetKey);
 		this.device.updateVisibilityStatus(recordSet, false);
 		this.device.makeInActiveDisplayable(recordSet);
 		this.application.updateStatisticsData();
-		this.application.updateDataTable(recordSetKey, false);
+		this.application.updateDataTable(recordSet.getName(), false);
 		this.device.getDialog().resetButtons();
 	}
 
@@ -416,6 +423,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		this.serialPort.isInterruptedByUser = true;
 		this.serialPort.close();
 		this.channel.get(recordSetKey).clear();
+		this.channel.switchRecordSet(recordSetKey);
 		this.channel.remove(recordSetKey);
 		this.application.getMenuToolBar().updateRecordSetSelectCombo();
 		this.application.updateStatisticsData();
