@@ -7,6 +7,7 @@ HottAdapter - fix SWT error while live data gathering and closed dialog
 HottAdapter - implement 19200 new protocol master and slave mode
 HottAdapter - enable multiple connected sensors
 HoTTAdapter - fix data parsing error 115200 protocol temperature > 127 °C
+Linux kernel module update for cp210x SiliconLabs USB2Serial
 Documentation update
 
 Version 2.93 - 23 Oct 2011

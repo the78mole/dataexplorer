@@ -6,7 +6,8 @@ GNU DataExplorer - News - comes with version 2.94
 4) HottAdapter - implement 19200 new protocol master and slave mode
 5) HottAdapter - enable multiple connected sensors
 6) HoTTAdapter - fix data parsing error 115200 protocol temperature > 127 °C
-7) Documentation update
+7) Linux kernel module update for cp210x SiliconLabs USB2Serial
+8) Documentation update
 
 
 
