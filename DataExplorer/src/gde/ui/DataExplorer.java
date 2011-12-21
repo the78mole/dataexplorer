@@ -788,7 +788,7 @@ public class DataExplorer extends Composite {
 		final Channel activeChannel = this.channels != null ? this.channels.getActiveChannel() : null;
 		final RecordSet activeRecordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 
-		if (activeRecordSet != null && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
+		if (activeRecordSet != null && activeRecordSet.getRecordDataSize(true) > 0 && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
 				&& activeRecordSet.getName().equals(requestingRecordSetName)
 				&& activeRecordSet.getDevice().isTableTabRequested()
 				&& activeRecordSet.checkAllRecordsDisplayable()) {
