@@ -113,7 +113,7 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	/**
 	 * overwrites the size method to return faked size in case of channel type is ChannelTypes.TYPE_CONFIG
-	 * TYPE_CONFIG means the all record sets depends to the object and the different (configuration) channels enable differnt views to it
+	 * TYPE_CONFIG means the all record sets depends to the object and the different (configuration) channels enable different views to it
 	 */
 	@Override
 	public int size() {
@@ -124,8 +124,27 @@ public class Channel extends HashMap<String, RecordSet> {
 		else { // ChannelTypes.TYPE_CONFIG
 			size = 0;
 			Channels channels = Channels.getInstance();
-			for (Integer channelNumber : Channels.getInstance().keySet()) {
+			for (Integer channelNumber : this.parent.keySet()) {
 				size += channels.get(channelNumber)._size();
+			}
+		}
+		return size;
+	}
+
+	/**
+	 * query the maximum size of a channel to return faked size in case of channel type is ChannelTypes.TYPE_CONFIG
+	 * TYPE_CONFIG means the all record sets depends to the object and the different (configuration) channels enable different views to it
+	 */
+	public int maxSize() {
+		int size;
+		if(this.type == ChannelTypes.TYPE_OUTLET) {
+			size = super.size();
+		}
+		else { // ChannelTypes.TYPE_CONFIG
+			size = 0;
+			Channels channels = Channels.getInstance();
+			for (Integer channelNumber : this.parent.keySet()) {
+				size = channels.get(channelNumber)._size() > size ? channels.get(channelNumber)._size() : size;
 			}
 		}
 		return size;
