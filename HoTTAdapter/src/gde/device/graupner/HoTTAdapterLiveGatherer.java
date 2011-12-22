@@ -290,12 +290,14 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						recordSetVario.addPoints(usedDevice.convertDataBytes(pointsVario, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
 					}
 					if (!HoTTAdapter.IS_SLAVE_MODE || HoTTAdapter.isSensorType[0] == false && HoTTAdapter.isSensorType[1] == false && HoTTAdapter.isSensorType[2] == false && HoTTAdapter.isSensorType[3] == false) {
-						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
-						HoTTAdapterLiveGatherer.this.serialPort.getData(true);
-						WaitTimer.delay(this.queryGapTime_ms);
-						HoTTAdapterLiveGatherer.this.serialPort.getData(true);
-						WaitTimer.delay(this.queryGapTime_ms);
-						recordSetReceiver.addPoints(usedDevice.convertDataBytes(pointsReceiver, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
+						if (recordSetReceiver != null) {
+							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
+							HoTTAdapterLiveGatherer.this.serialPort.getData(true);
+							WaitTimer.delay(this.queryGapTime_ms);
+							HoTTAdapterLiveGatherer.this.serialPort.getData(true);
+							WaitTimer.delay(this.queryGapTime_ms);
+							recordSetReceiver.addPoints(usedDevice.convertDataBytes(pointsReceiver, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
+						}
 					}
 					break;
 				case TYPE_115200:
@@ -332,12 +334,14 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						recordSetVario.addPoints(usedDevice.convertDataBytes(pointsVario, HoTTAdapterLiveGatherer.this.serialPort.getData()), System.nanoTime() / 1000000 - startTime);
 					}
 					if (!HoTTAdapter.IS_SLAVE_MODE || HoTTAdapter.isSensorType[0] == false && HoTTAdapter.isSensorType[1] == false && HoTTAdapter.isSensorType[2] == false && HoTTAdapter.isSensorType[3] == false) {
-						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
-						HoTTAdapterLiveGatherer.this.serialPort.getData();
-						WaitTimer.delay(this.queryGapTime_ms);
-						HoTTAdapterLiveGatherer.this.serialPort.getData();
-						WaitTimer.delay(this.queryGapTime_ms);
-						recordSetReceiver.addPoints(usedDevice.convertDataBytes(pointsReceiver, HoTTAdapterLiveGatherer.this.serialPort.getData()), System.nanoTime() / 1000000 - startTime);
+						if (recordSetReceiver != null) {
+							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
+							HoTTAdapterLiveGatherer.this.serialPort.getData();
+							WaitTimer.delay(this.queryGapTime_ms);
+							HoTTAdapterLiveGatherer.this.serialPort.getData();
+							WaitTimer.delay(this.queryGapTime_ms);
+							recordSetReceiver.addPoints(usedDevice.convertDataBytes(pointsReceiver, HoTTAdapterLiveGatherer.this.serialPort.getData()), System.nanoTime() / 1000000 - startTime);
+						}
 					}
 					break;
 				}

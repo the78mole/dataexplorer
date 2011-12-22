@@ -22,7 +22,6 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
-import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
 import gde.log.Level;
@@ -41,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
@@ -55,12 +55,13 @@ public class HoTTbinReader {
 	final static DataExplorer	application		= DataExplorer.getInstance();
 	final static Channels			channels			= Channels.getInstance();
 
-	static int								dataBlockSize	= 64;
-	static byte[]							buf;
-	static byte[]							buf0, buf1, buf2, buf3, buf4;
-	static long								timeStep_ms;
-	static int[]							pointsReceiver, pointsGeneral, pointsElectric, pointsVario, pointsGPS;
-	static RecordSet					recordSetReceiver, recordSetGeneral, recordSetElectric, recordSetVario, recordSetGPS;
+	static int										dataBlockSize	= 64;
+	static byte[]									buf;
+	static byte[]									buf0, buf1, buf2, buf3, buf4;
+	static long										timeStep_ms;
+	static int[]									pointsReceiver, pointsGeneral, pointsElectric, pointsVario, pointsGPS;
+	static RecordSet							recordSetReceiver, recordSetGeneral, recordSetElectric, recordSetVario, recordSetGPS;
+	static Map<String, RecordSet>	recordSets		= new HashMap<String, RecordSet>();
 
 	/**
 	 * get data file info data
@@ -178,10 +179,10 @@ public class HoTTbinReader {
 		FileInputStream file_input = new FileInputStream(file);
 		DataInputStream data_in = new DataInputStream(file_input);
 		long fileSize = file.length();
-		IDevice device = HoTTbinReader.application.getActiveDevice();
+		HoTTAdapter device = (HoTTAdapter) HoTTbinReader.application.getActiveDevice();
+		int recordSetNumber = HoTTbinReader.channels.get(1).maxSize() + 1;
 		String recordSetName = GDE.STRING_EMPTY;
-		String recordSetNameExtend = device.getRecordSetStemName() + GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR))
-				+ GDE.STRING_RIGHT_BRACKET;
+		String recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 		Channel channel = null;
 		HoTTbinReader.recordSetReceiver = null; //0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader.recordSetGeneral = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
@@ -213,7 +214,7 @@ public class HoTTbinReader {
 			//receiver data are always contained
 			//check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate and signals
 			channel = HoTTbinReader.channels.get(1);
-			recordSetName = (channel.size() + 1) + recordSetNameExtend;
+			recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.RECEIVER.value() + recordSetNameExtend;
 			HoTTbinReader.recordSetReceiver = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 			channel.put(recordSetName, HoTTbinReader.recordSetReceiver);
 			tmpRecordSet = channel.get(recordSetName);
@@ -253,7 +254,7 @@ public class HoTTbinReader {
 						//check if recordSetVario initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (HoTTbinReader.recordSetVario == null) {
 							channel = HoTTbinReader.channels.get(2);
-							recordSetName = (channel.size() + 1) + recordSetNameExtend;
+							recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.VARIO.value() + recordSetNameExtend;
 							HoTTbinReader.recordSetVario = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 							channel.put(recordSetName, HoTTbinReader.recordSetVario);
 							tmpRecordSet = channel.get(recordSetName);
@@ -299,7 +300,7 @@ public class HoTTbinReader {
 						//check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate as signals
 						if (HoTTbinReader.recordSetGPS == null) {
 							channel = HoTTbinReader.channels.get(3);
-							recordSetName = (channel.size() + 1) + recordSetNameExtend;
+							recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GPS.value() + recordSetNameExtend;
 							HoTTbinReader.recordSetGPS = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 							channel.put(recordSetName, HoTTbinReader.recordSetGPS);
 							tmpRecordSet = channel.get(recordSetName);
@@ -349,7 +350,7 @@ public class HoTTbinReader {
 						//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (HoTTbinReader.recordSetGeneral == null) {
 							channel = HoTTbinReader.channels.get(4);
-							recordSetName = (channel.size() + 1) + recordSetNameExtend;
+							recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GENRAL.value() + recordSetNameExtend;
 							HoTTbinReader.recordSetGeneral = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 							channel.put(recordSetName, HoTTbinReader.recordSetGeneral);
 							tmpRecordSet = channel.get(recordSetName);
@@ -402,7 +403,7 @@ public class HoTTbinReader {
 						//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (HoTTbinReader.recordSetElectric == null) {
 							channel = HoTTbinReader.channels.get(5);
-							recordSetName = (channel.size() + 1) + recordSetNameExtend;
+							recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ELECTRIC.value() + recordSetNameExtend;
 							HoTTbinReader.recordSetElectric = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 							channel.put(recordSetName, HoTTbinReader.recordSetElectric);
 							tmpRecordSet = channel.get(recordSetName);
@@ -497,10 +498,10 @@ public class HoTTbinReader {
 		FileInputStream file_input = new FileInputStream(file);
 		DataInputStream data_in = new DataInputStream(file_input);
 		long fileSize = file.length();
-		IDevice device = HoTTbinReader.application.getActiveDevice();
+		HoTTAdapter device = (HoTTAdapter) HoTTbinReader.application.getActiveDevice();
+		int recordSetNumber = HoTTbinReader.channels.get(1).maxSize() + 1;
 		String recordSetName = GDE.STRING_EMPTY;
-		String recordSetNameExtend = device.getRecordSetStemName() + GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR))
-				+ GDE.STRING_RIGHT_BRACKET;
+		String recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 		Channel channel = null;
 		HoTTbinReader.recordSetReceiver = null; //0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader.recordSetGeneral = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
@@ -534,9 +535,10 @@ public class HoTTbinReader {
 			//receiver data are always contained
 			//check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate and signals
 			channel = HoTTbinReader.channels.get(1);
-			recordSetName = (channel.size() + 1) + recordSetNameExtend;
+			recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.RECEIVER.value() + recordSetNameExtend;
 			HoTTbinReader.recordSetReceiver = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 			channel.put(recordSetName, HoTTbinReader.recordSetReceiver);
+			recordSets.put(HoTTAdapter.Sensor.RECEIVER.value(), HoTTbinReader.recordSetReceiver);
 			tmpRecordSet = channel.get(recordSetName);
 			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 			tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
@@ -582,9 +584,10 @@ public class HoTTbinReader {
 									//check if recordSetVario initialized, transmitter and receiver data always present, but not in the same data rate and signals
 									if (HoTTbinReader.recordSetVario == null) {
 										channel = HoTTbinReader.channels.get(2);
-										recordSetName = (channel.size() + 1) + recordSetNameExtend;
+										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.VARIO.value() + recordSetNameExtend;
 										HoTTbinReader.recordSetVario = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 										channel.put(recordSetName, HoTTbinReader.recordSetVario);
+										recordSets.put(HoTTAdapter.Sensor.VARIO.value(), HoTTbinReader.recordSetVario);
 										tmpRecordSet = channel.get(recordSetName);
 										tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
@@ -606,9 +609,10 @@ public class HoTTbinReader {
 									//check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate ans signals
 									if (HoTTbinReader.recordSetGPS == null) {
 										channel = HoTTbinReader.channels.get(3);
-										recordSetName = (channel.size() + 1) + recordSetNameExtend;
+										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GPS.value() + recordSetNameExtend;
 										HoTTbinReader.recordSetGPS = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 										channel.put(recordSetName, HoTTbinReader.recordSetGPS);
+										recordSets.put(HoTTAdapter.Sensor.GPS.value(), HoTTbinReader.recordSetGPS);
 										tmpRecordSet = channel.get(recordSetName);
 										tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
@@ -630,9 +634,10 @@ public class HoTTbinReader {
 									//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 									if (HoTTbinReader.recordSetGeneral == null) {
 										channel = HoTTbinReader.channels.get(4);
-										recordSetName = (channel.size() + 1) + recordSetNameExtend;
+										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GENRAL.value() + recordSetNameExtend;
 										HoTTbinReader.recordSetGeneral = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 										channel.put(recordSetName, HoTTbinReader.recordSetGeneral);
+										recordSets.put(HoTTAdapter.Sensor.GENRAL.value(), HoTTbinReader.recordSetGeneral);
 										tmpRecordSet = channel.get(recordSetName);
 										tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
@@ -654,9 +659,10 @@ public class HoTTbinReader {
 									//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 									if (HoTTbinReader.recordSetElectric == null) {
 										channel = HoTTbinReader.channels.get(5);
-										recordSetName = (channel.size() + 1) + recordSetNameExtend;
+										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ELECTRIC.value() + recordSetNameExtend;
 										HoTTbinReader.recordSetElectric = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true);
 										channel.put(recordSetName, HoTTbinReader.recordSetElectric);
+										recordSets.put(HoTTAdapter.Sensor.ELECTRIC.value(), HoTTbinReader.recordSetElectric);
 										tmpRecordSet = channel.get(recordSetName);
 										tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
@@ -782,15 +788,23 @@ public class HoTTbinReader {
 			MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 			if (menuToolBar != null) {
 				HoTTbinReader.channels.switchChannel(channel.getName());
-				channel.switchRecordSet(recordSetName);
+				for (RecordSet recordSet : recordSets.values()) {
+					device.makeInActiveDisplayable(recordSet);
+					device.updateVisibilityStatus(recordSet, true);
+				}
 				HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "switch to channel " + channel.getName() + GDE.STRING_MESSAGE_CONCAT + recordSetName); //$NON-NLS-1$
+				channel.switchRecordSet(recordSetName);
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
 			}
 
 			HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
-			if (HoTTbinReader.application.getStatusBar() != null) HoTTbinReader.application.setProgress(100, sThreadId);
+			if (HoTTbinReader.application.getStatusBar() != null) {
+				HoTTbinReader.application.setProgress(100, sThreadId);
+				HoTTbinReader.application.updateStatisticsData();
+				HoTTbinReader.application.updateDataTable(HoTTbinReader.application.getActiveRecordSet().getName(), false);
+			}
 		}
 		finally {
 			data_in.close();
@@ -841,31 +855,36 @@ public class HoTTbinReader {
 			_pointsVario[1] = DataParser.parse2Short(_buf1, 3) * 1000;
 			//_pointsVario[0]max = DataParser.parse2Short(_buf1, 5) * 1000;
 			//_pointsVario[0]min = DataParser.parse2Short(_buf1, 7) * 1000;
-			_pointsVario[2] = Math.abs(DataParser.parse2Short(_buf1[9], _buf2[0]) * 1000);
-			_pointsVario[3] = Math.abs(DataParser.parse2Short(_buf1[1], _buf2[2]) * 1000);
-			_pointsVario[4] = Math.abs(DataParser.parse2Short(_buf1[3], _buf2[4]) * 1000);
+			_pointsVario[2] = DataParser.parse2UnsignedShort(_buf1[9], _buf2[0]) * 1000;
+			_pointsVario[3] = DataParser.parse2UnsignedShort(_buf1[1], _buf2[2]) * 1000;
+			_pointsVario[4] = DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) * 1000;
 			_pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
 			_pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
 			break;
 		case 1:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			_pointsVario[0] = (_buf0[4] & 0xFF) * 1000;
-			_pointsVario[1] = DataParser.parse2Short(_buf1, 2) * 1000;
-			//pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
-			//pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
-			_pointsVario[2] = Math.abs(DataParser.parse2Short(_buf1, 8) * 1000);
-			_pointsVario[3] = Math.abs(DataParser.parse2Short(_buf2, 0) * 1000);
-			_pointsVario[4] = Math.abs(DataParser.parse2Short(_buf2, 2) * 1000);
+			int tmpHeight = DataParser.parse2Short(_buf1, 2);
+			if (tmpHeight > 1 && tmpHeight < 5000) {
+				_pointsVario[1] = tmpHeight * 1000;
+				//pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
+				//pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
+				_pointsVario[2] = DataParser.parse2UnsignedShort(_buf1, 8) * 1000;
+			}
+			int tmpClimb10 = DataParser.parse2UnsignedShort(_buf2, 2);
+			if (tmpClimb10 < 40000 && tmpClimb10 > 20000) { 
+				_pointsVario[3] = DataParser.parse2UnsignedShort(_buf2, 0) * 1000;
+				_pointsVario[4] = tmpClimb10 * 1000;
+			}
 			_pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
 			_pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
 			break;
 		}
-		if (_pointsVario[3] < 0 || _pointsVario[4] < 0) {
-			printByteValues(_timeStep_ms, _buf0);
-			printShortValues(_timeStep_ms, _buf1);
-			printShortValues(_timeStep_ms, _buf2);
-			log.log(Level.FINEST, "");
-		}
+		//printByteValues(_timeStep_ms, _buf0);
+		//printShortValues(_timeStep_ms, _buf1);
+		//printShortValues(_timeStep_ms, _buf2);
+		//log.log(Level.FINEST, "");
+
 		_recordSetVario.addPoints(_pointsVario, _timeStep_ms);
 	}
 
@@ -881,7 +900,7 @@ public class HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseAddGPS(RecordSet _recordSetGPS, int[] _pointsGPS, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, long _timeStep_ms)	throws DataInconsitsentException {
-		if (_buf3[2] != 0) {
+		if (_buf3[2] > 80 && DataParser.parse2Short(_buf2, 8) > 1) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 			_pointsGPS[0] = (_buf0[4] & 0xFF) * 1000;
 			_pointsGPS[1] = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
@@ -889,7 +908,7 @@ public class HoTTbinReader {
 			_pointsGPS[2] = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
 			_pointsGPS[2] = _buf2[1] == 1 ? -1 * _pointsGPS[2] : _pointsGPS[2];
 			_pointsGPS[3] = DataParser.parse2Short(_buf2, 8) * 1000;
-			_pointsGPS[4] = DataParser.parse2Short(_buf3, 0) * 1000;
+			_pointsGPS[4] = DataParser.parse2UnsignedShort(_buf3, 0) * 1000;
 			_pointsGPS[5] = (_buf3[2] & 0xFF) * 1000;
 			_pointsGPS[6] = DataParser.parse2Short(_buf1, 4) * 1000;
 			_pointsGPS[7] = DataParser.parse2Short(_buf2, 6) * 1000;
@@ -899,10 +918,13 @@ public class HoTTbinReader {
 			_pointsGPS[11] = (_buf0[2] & 0xFF) * 1000;
 		}
 
+//		if (_buf3[2] < 0) {
 		//printShortValues(timeStep_ms, buf0);
 		//printShortValues(timeStep_ms, buf1);
 		//printShortValues(timeStep_ms, buf2);
 		//printShortValues(timeStep_ms, buf3);
+//			log.log(Level.FINEST, "");
+//		}
 		
 		_recordSetGPS.addPoints(_pointsGPS, _timeStep_ms);
 	}
@@ -921,7 +943,7 @@ public class HoTTbinReader {
 	 */
 	private static void parseAddGeneral(RecordSet _recordSetGeneral, int[] _pointsGeneral, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4, long _timeStep_ms) throws DataInconsitsentException {
 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
-		if (_buf3[4] != 0) {
+		if (_buf3[4] > 80 && DataParser.parse2Short(_buf3, 0) > 1 && Math.abs(DataParser.parse2Short(_buf1[9], _buf2[0])) < 600 && Math.abs(DataParser.parse2Short(_buf2[1], _buf2[2])) < 600 && DataParser.parse2Short(_buf3[9], _buf4[0]) >= _pointsGeneral[3]/1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			_pointsGeneral[0] = (_buf0[4] & 0xFF) * 1000;
@@ -940,7 +962,7 @@ public class HoTTbinReader {
 			_pointsGeneral[5] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 			_pointsGeneral[12] = DataParser.parse2Short(_buf2, 8) * 1000;
 			_pointsGeneral[13] = DataParser.parse2Short(_buf3, 0) * 1000;
-			_pointsGeneral[14] = DataParser.parse2Short(_buf3, 2) * 1000;
+			_pointsGeneral[14] = DataParser.parse2UnsignedShort(_buf3, 2) * 1000;
 			_pointsGeneral[15] = (_buf3[4] & 0xFF) * 1000;
 			_pointsGeneral[16] = DataParser.parse2Short(_buf2, 6) * 1000;
 			_pointsGeneral[17] = DataParser.parse2Short(_buf1[9], _buf2[0]) * 1000;
@@ -949,7 +971,7 @@ public class HoTTbinReader {
 			_pointsGeneral[20] = (_buf2[4] & 0xFF) * 1000;
 		}
 		
-//		if (_pointsGeneral[17] > 50000 || _pointsGeneral[18] > 50000) {
+//		if (DataParser.parse2Short(_buf1[9], _buf2[0]) > 200 || DataParser.parse2Short(_buf2[1], _buf2[2]) > 200) {
 //			printByteValues(timeStep_ms, buf0);
 //			printShortValues(timeStep_ms, buf1);
 //			printShortValues(timeStep_ms, buf2);
@@ -974,7 +996,7 @@ public class HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseAddElectric(RecordSet _recordSetElectric, int[] _pointsElectric, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4, long _timeStep_ms) throws DataInconsitsentException {
-		if (_buf3[4] != 0) {
+		if (_buf4[3] > 80 && DataParser.parse2Short(_buf3, 3) > 1 && Math.abs(DataParser.parse2Short(_buf2, 7)) < 600 && Math.abs(DataParser.parse2Short(_buf2[9], _buf3[0])) < 600 && DataParser.parse2Short(_buf3[9], _buf4[0]) >= _pointsElectric[3]/1000) {
 			//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
@@ -1001,7 +1023,7 @@ public class HoTTbinReader {
 			//calculate balance on the fly
 			_pointsElectric[5] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 			_pointsElectric[20] = DataParser.parse2Short(_buf3, 3) * 1000;
-			_pointsElectric[21] = DataParser.parse2Short(_buf4, 1) * 1000;
+			_pointsElectric[21] = DataParser.parse2UnsignedShort(_buf4, 1) * 1000;
 			_pointsElectric[22] = (_buf4[3] & 0xFF) * 1000;
 			_pointsElectric[23] = DataParser.parse2Short(_buf2, 7) * 1000;
 			_pointsElectric[24] = DataParser.parse2Short(_buf2[9], _buf3[0]) * 1000;

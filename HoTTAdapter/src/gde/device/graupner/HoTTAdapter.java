@@ -88,21 +88,21 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static byte			SENSOR_TYPE_ELECTRIC_115200		= 0x36;
 
 	final static boolean	isSensorType[]								= { false, false, false, false };	//isVario, isGPS, isGeneral, isElectric
-	public enum Sensor { RECEIVER, VARIO, GPS, GENRAL, ELECTRIC };
+	public enum Sensor { RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GENRAL("General-Air"), ELECTRIC("Electric-Air");
+	private final String	value;
+	private Sensor(String v) { this.value = v; }
+
+	public String value() {	return this.value; }
+};
 
 	//protocol definitions
 	public enum Protocol {
 		TYPE_19200_L("19200 Legacy"), TYPE_19200_N("19200"),	TYPE_115200("115200");
 		
 		private final String	value;
+		private Protocol(String v) { this.value = v; }
 
-		Protocol(String v) {
-			this.value = v;
-		}
-
-		public String value() {
-			return this.value;
-		}
+		public String value() {	return this.value; }
 
 		public static Protocol fromValue(String v) {
 			for (Protocol c : Protocol.values()) {
@@ -587,7 +587,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.getRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int progressCycle = 0;
+		int progressCycle = 1;
 		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
