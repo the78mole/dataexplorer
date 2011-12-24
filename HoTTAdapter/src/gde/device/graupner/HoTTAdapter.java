@@ -34,7 +34,6 @@ import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.io.LogViewReader;
 import gde.io.NMEAParser;
-import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
@@ -43,6 +42,7 @@ import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -61,48 +61,62 @@ import org.eclipse.swt.widgets.MenuItem;
  * @author Winfried Brügmann
  */
 public class HoTTAdapter extends DeviceConfiguration implements IDevice {
-	final static Logger		log														= Logger.getLogger(HoTTAdapter.class.getName());
+	final static Logger									log														= Logger.getLogger(HoTTAdapter.class.getName());
 
-	final static String		SENSOR_COUNT									= "SensorCount";																//$NON-NLS-1$
-	final static String		LOG_COUNT											= "LogCount";																		//$NON-NLS-1$
-	final static String		SD_LOG_VERSION								= "SD-Log Version";															//$NON-NLS-1$
+	final static String									SENSOR_COUNT									= "SensorCount";																	//$NON-NLS-1$
+	final static String									LOG_COUNT											= "LogCount";																		//$NON-NLS-1$
+	final static String									SD_LOG_VERSION								= "SD-Log Version";															//$NON-NLS-1$
+	final static Map<String, RecordSet>	recordSets										= new HashMap<String, RecordSet>();
 
 	//HoTT sensor bytes 19200 Baud protocol 
-	static boolean				IS_SLAVE_MODE									= false;
-	final static byte			SENSOR_TYPE_RECEIVER_19200		= (byte) (0x80 & 0xFF);
-	final static byte			SENSOR_TYPE_VARIO_19200				= (byte) (0x89 & 0xFF);
-	final static byte			SENSOR_TYPE_GPS_19200					= (byte) (0x8A & 0xFF);
-	final static byte			SENSOR_TYPE_GENERAL_19200			= (byte) (0x8D & 0xFF);
-	final static byte			SENSOR_TYPE_ELECTRIC_19200		= (byte) (0x8E & 0xFF);
-	final static byte			ANSWER_SENSOR_VARIO_19200			= (byte) (0x80 & 0xFF);
-	final static byte			ANSWER_SENSOR_GPS_19200				= (byte) (0x90 & 0xFF);
-	final static byte			ANSWER_SENSOR_GENERAL_19200		= (byte) (0xC0 & 0xFF);
-	final static byte			ANSWER_SENSOR_ELECTRIC_19200	= (byte) (0xD0 & 0xFF);
+	static boolean											IS_SLAVE_MODE									= false;
+	final static byte										SENSOR_TYPE_RECEIVER_19200		= (byte) (0x80 & 0xFF);
+	final static byte										SENSOR_TYPE_VARIO_19200				= (byte) (0x89 & 0xFF);
+	final static byte										SENSOR_TYPE_GPS_19200					= (byte) (0x8A & 0xFF);
+	final static byte										SENSOR_TYPE_GENERAL_19200			= (byte) (0x8D & 0xFF);
+	final static byte										SENSOR_TYPE_ELECTRIC_19200		= (byte) (0x8E & 0xFF);
+	final static byte										ANSWER_SENSOR_VARIO_19200			= (byte) (0x80 & 0xFF);
+	final static byte										ANSWER_SENSOR_GPS_19200				= (byte) (0x90 & 0xFF);
+	final static byte										ANSWER_SENSOR_GENERAL_19200		= (byte) (0xC0 & 0xFF);
+	final static byte										ANSWER_SENSOR_ELECTRIC_19200	= (byte) (0xD0 & 0xFF);
 
 	//HoTT sensor bytes 115200 Baud protocol (actual no slave mode)
 	//there is no real slave mode for this protocol
-	final static byte			SENSOR_TYPE_RECEIVER_115200		= 0x34;
-	final static byte			SENSOR_TYPE_VARIO_115200			= 0x37;
-	final static byte			SENSOR_TYPE_GPS_115200				= 0x38;
-	final static byte			SENSOR_TYPE_GENERAL_115200		= 0x35;
-	final static byte			SENSOR_TYPE_ELECTRIC_115200		= 0x36;
+	final static byte										SENSOR_TYPE_RECEIVER_115200		= 0x34;
+	final static byte										SENSOR_TYPE_VARIO_115200			= 0x37;
+	final static byte										SENSOR_TYPE_GPS_115200				= 0x38;
+	final static byte										SENSOR_TYPE_GENERAL_115200		= 0x35;
+	final static byte										SENSOR_TYPE_ELECTRIC_115200		= 0x36;
 
-	final static boolean	isSensorType[]								= { false, false, false, false };	//isVario, isGPS, isGeneral, isElectric
-	public enum Sensor { RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GENRAL("General-Air"), ELECTRIC("Electric-Air");
-	private final String	value;
-	private Sensor(String v) { this.value = v; }
+	final static int										queryGapTime_ms								= 30;
+	final static boolean								isSensorType[]								= { false, false, false, false };								//isVario, isGPS, isGeneral, isElectric
 
-	public String value() {	return this.value; }
-};
+	public enum Sensor {
+		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GENRAL("General-Air"), ELECTRIC("Electric-Air");
+		private final String	value;
+
+		private Sensor(String v) {
+			this.value = v;
+		}
+
+		public String value() {
+			return this.value;
+		}
+	};
 
 	//protocol definitions
 	public enum Protocol {
-		TYPE_19200_L("19200 Legacy"), TYPE_19200_N("19200"),	TYPE_115200("115200");
-		
-		private final String	value;
-		private Protocol(String v) { this.value = v; }
+		TYPE_19200_L("19200 Legacy"), TYPE_19200_N("19200"), TYPE_115200("115200");
 
-		public String value() {	return this.value; }
+		private final String	value;
+
+		private Protocol(String v) {
+			this.value = v;
+		}
+
+		public String value() {
+			return this.value;
+		}
 
 		public static Protocol fromValue(String v) {
 			for (Protocol c : Protocol.values()) {
@@ -113,15 +127,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			throw new IllegalArgumentException(v);
 		}
 
-  	public static String[] valuesAsStingArray() {
-  		StringBuilder sb = new StringBuilder();
-  		for (Protocol protocol : Protocol.values()) {
-  			sb.append(protocol.value).append(GDE.STRING_SEMICOLON);  //$NON-NLS-1$
-  		}
-  		return sb.toString().split(GDE.STRING_SEMICOLON);
-  	}
+		public static String[] valuesAsStingArray() {
+			StringBuilder sb = new StringBuilder();
+			for (Protocol protocol : Protocol.values()) {
+				sb.append(protocol.value).append(GDE.STRING_SEMICOLON);
+			}
+			return sb.toString().split(GDE.STRING_SEMICOLON);
+		}
 	}
-
 
 	final DataExplorer					application;
 	final Channels							channels;
@@ -180,6 +193,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
+	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 		// ...
 		return lov2osdMap;
@@ -192,6 +206,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return converted configuration data
 	 */
+	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
 		return ""; //$NON-NLS-1$
@@ -200,6 +215,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
+	@Override
 	public int getLovDataByteSize() {
 		return 0; // sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
@@ -215,6 +231,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
+	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		NMEAParser data = new NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), Math.abs(this.getDataBlockSize()), this,
 				this.channels.getActiveChannelNumber(), this.getUTCdelta());
@@ -252,7 +269,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		}
 		catch (Exception e) {
 			String msg = e.getMessage() + Messages.getString(gde.messages.MessageIds.GDE_MSGW0543);
-			log.log(java.util.logging.Level.WARNING, msg, e);
+			HoTTAdapter.log.log(java.util.logging.Level.WARNING, msg, e);
 			this.application.openMessageDialog(msg);
 			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);
 		}
@@ -264,6 +281,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
+	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
@@ -367,7 +385,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				break;
 			}
 			break;
-			
+
 		case TYPE_19200_N:
 			switch (dataBuffer[1]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
@@ -385,88 +403,112 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 				//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 				points[0] = (dataBuffer[9] & 0xFF) * 1000;
-				points[1] = DataParser.parse2Short(dataBuffer, 16) * 1000;
-				points[2] = DataParser.parse2Short(dataBuffer, 22) * 1000;
-				points[3] = DataParser.parse2Short(dataBuffer, 24) * 1000;
-				points[4] = DataParser.parse2Short(dataBuffer, 26) * 1000;
+				int tmpHeight = DataParser.parse2Short(dataBuffer, 16);
+				if (tmpHeight > 1 && tmpHeight < 5000) {
+					points[1] = tmpHeight * 1000;
+					points[2] = DataParser.parse2Short(dataBuffer, 22) * 1000;
+				}
+				int tmpClimb10 = DataParser.parse2Short(dataBuffer, 26);
+				if (tmpClimb10 < 40000 && tmpClimb10 > 20000) {
+					points[3] = DataParser.parse2Short(dataBuffer, 24) * 1000;
+					points[4] = tmpClimb10 * 1000;
+				}
 				points[5] = (dataBuffer[6] & 0xFF) * 1000;
 				points[6] = (dataBuffer[7] & 0xFF) * 1000;
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-				points[0] = (dataBuffer[9] & 0xFF) * 1000;
-				points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
-				points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
-				points[2] = DataParser.parse2Short(dataBuffer, 25) * 10000 + DataParser.parse2Short(dataBuffer, 27);
-				points[2] = dataBuffer[24] == 1 ? -1 * points[2] : points[2];
-				points[3] = DataParser.parse2Short(dataBuffer, 31) * 1000;
-				points[4] = DataParser.parse2Short(dataBuffer, 33) * 1000;
-				points[5] = (dataBuffer[35] & 0xFF) * 1000;
-				points[6] = DataParser.parse2Short(dataBuffer, 17) * 1000;
-				points[7] = DataParser.parse2Short(dataBuffer, 29) * 1000;
-				points[8] = (dataBuffer[38] & 0xFF) * 1000;
-				points[9] = 0;
-				points[10] = (dataBuffer[6] & 0xFF) * 1000;
-				points[11] = (dataBuffer[7] & 0xFF) * 1000;
+				tmpHeight = DataParser.parse2Short(dataBuffer, 31);
+				int tmpClimb3 = dataBuffer[35] & 0xFF;
+				if (tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
+					points[0] = (dataBuffer[9] & 0xFF) * 1000;
+					points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
+					points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
+					points[2] = DataParser.parse2Short(dataBuffer, 25) * 10000 + DataParser.parse2Short(dataBuffer, 27);
+					points[2] = dataBuffer[24] == 1 ? -1 * points[2] : points[2];
+					points[3] = tmpHeight * 1000;
+					points[4] = DataParser.parse2Short(dataBuffer, 33) * 1000;
+					points[5] = tmpClimb3 * 1000;
+					points[6] = DataParser.parse2Short(dataBuffer, 17) * 1000;
+					points[7] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+					points[8] = (dataBuffer[38] & 0xFF) * 1000;
+					points[9] = 0;
+					points[10] = (dataBuffer[6] & 0xFF) * 1000;
+					points[11] = (dataBuffer[7] & 0xFF) * 1000;
+				}
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 				//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
-				points[0] = (dataBuffer[9] & 0xFF) * 1000;
-				points[1] = DataParser.parse2Short(dataBuffer, 40) * 1000;
-				points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
-				points[3] = DataParser.parse2Short(dataBuffer, 42) * 1000;
-				points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
-				points[5] = 0; //5=Balance
-				for (int j = 0; j < 6; j++) {
-					points[j + 6] = (dataBuffer[16 + j] & 0xFF) * 1000;
-					if (points[j + 6] > 0) {
-						maxVotage = points[j + 6] > maxVotage ? points[j + 6] : maxVotage;
-						minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
+				int tmpCapacity = DataParser.parse2Short(dataBuffer, 42);
+				tmpHeight = DataParser.parse2Short(dataBuffer, 33);
+				tmpClimb3 = dataBuffer[37] & 0xFF;
+				int tmpVoltage1 = DataParser.parse2Short(dataBuffer, 22);
+				int tmpVoltage2 = DataParser.parse2Short(dataBuffer, 24);
+				if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					points[0] = (dataBuffer[9] & 0xFF) * 1000;
+					points[1] = DataParser.parse2Short(dataBuffer, 40) * 1000;
+					points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
+					points[3] = tmpCapacity * 1000;
+					points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
+					points[5] = 0; //5=Balance
+					for (int j = 0; j < 6; j++) {
+						points[j + 6] = (dataBuffer[16 + j] & 0xFF) * 1000;
+						if (points[j + 6] > 0) {
+							maxVotage = points[j + 6] > maxVotage ? points[j + 6] : maxVotage;
+							minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
+						}
 					}
+					//calculate balance on the fly
+					points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
+					points[12] = DataParser.parse2Short(dataBuffer, 31) * 1000;
+					points[13] = tmpHeight * 1000;
+					points[14] = DataParser.parse2Short(dataBuffer, 35) * 1000;
+					points[15] = tmpClimb3 * 1000;
+					points[16] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+					points[17] = tmpVoltage1 * 1000;
+					points[18] = tmpVoltage2 * 1000;
+					points[19] = (dataBuffer[26] & 0xFF) * 1000;
+					points[20] = (dataBuffer[27] & 0xFF) * 1000;
 				}
-				//calculate balance on the fly
-				points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
-				points[12] = DataParser.parse2Short(dataBuffer, 31) * 1000;
-				points[13] = DataParser.parse2Short(dataBuffer, 33) * 1000;
-				points[14] = DataParser.parse2Short(dataBuffer, 35) * 1000;
-				points[15] = (dataBuffer[37] & 0xFF) * 1000;
-				points[16] = DataParser.parse2Short(dataBuffer, 29) * 1000;
-				points[17] = DataParser.parse2Short(dataBuffer, 22) * 1000;
-				points[18] = DataParser.parse2Short(dataBuffer, 24) * 1000;
-				points[19] = (dataBuffer[26] & 0xFF) * 1000;
-				points[20] = (dataBuffer[27] & 0xFF) * 1000;
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 				//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
-				points[0] = (dataBuffer[9] & 0xFF) * 1000;
-				points[1] = DataParser.parse2Short(dataBuffer, 40) * 1000;
-				points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
-				points[3] = DataParser.parse2Short(dataBuffer, 42) * 1000;
-				points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
-				points[5] = 0; //5=Balance
-				for (int j = 0; j < 14; j++) {
-					points[j + 6] = (dataBuffer[16 + j] & 0xFF) * 1000;
-					if (points[j + 6] > 0) {
-						maxVotage = points[j + 6] > maxVotage ? points[j + 6] : maxVotage;
-						minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
+				tmpCapacity = DataParser.parse2Short(dataBuffer, 42);
+				tmpHeight = DataParser.parse2Short(dataBuffer, 36);
+				tmpClimb3 = dataBuffer[46] & 0xFF;
+				tmpVoltage1 = DataParser.parse2Short(dataBuffer, 30);
+				tmpVoltage2 = DataParser.parse2Short(dataBuffer, 32);
+				if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					points[0] = (dataBuffer[9] & 0xFF) * 1000;
+					points[1] = DataParser.parse2Short(dataBuffer, 40) * 1000;
+					points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
+					points[3] = tmpCapacity * 1000;
+					points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
+					points[5] = 0; //5=Balance
+					for (int j = 0; j < 14; j++) {
+						points[j + 6] = (dataBuffer[16 + j] & 0xFF) * 1000;
+						if (points[j + 6] > 0) {
+							maxVotage = points[j + 6] > maxVotage ? points[j + 6] : maxVotage;
+							minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
+						}
 					}
+					//calculate balance on the fly
+					points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
+					points[20] = tmpHeight * 1000;
+					points[21] = DataParser.parse2Short(dataBuffer, 44) * 1000;
+					points[22] = tmpClimb3 * 1000;
+					points[23] = tmpVoltage1 * 1000;
+					points[24] = tmpVoltage2 * 1000;
+					points[25] = (dataBuffer[34] & 0xFF) * 1000;
+					points[26] = (dataBuffer[35] & 0xFF) * 1000;
 				}
-				//calculate balance on the fly
-				points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
-				points[20] = DataParser.parse2Short(dataBuffer, 36) * 1000;
-				points[21] = DataParser.parse2Short(dataBuffer, 44) * 1000;
-				points[22] = (dataBuffer[46] & 0xFF) * 1000;
-				points[23] = DataParser.parse2Short(dataBuffer, 30) * 1000;
-				points[24] = DataParser.parse2Short(dataBuffer, 32) * 1000;
-				points[25] = (dataBuffer[34] & 0xFF) * 1000;
-				points[26] = (dataBuffer[35] & 0xFF) * 1000;
 				break;
 			}
 			break;
-			
+
 		case TYPE_115200:
 			switch (dataBuffer[0]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_115200:
@@ -480,90 +522,112 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				points[6] = (dataBuffer[15] & 0xFF) * 1000;
 				points[7] = (DataParser.parse2Short(dataBuffer, 10) + 20) * 1000;
 				break;
-				
+
 			case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 				//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-				points[0] = (dataBuffer[22] & 0xFF) * 1000;
-				points[0] = points[0] == 0 ? (dataBuffer[3] & 0xFF) * 1000 : points[0];
-				points[1] = (DataParser.parse2Short(dataBuffer, 10) + 500) * 1000;
-				points[2] = (DataParser.parse2Short(dataBuffer, 16) + 30000) * 1000;
-				points[3] = (DataParser.parse2Short(dataBuffer, 18) + 30000) * 1000;
-				points[4] = (DataParser.parse2Short(dataBuffer, 20) + 30000) * 1000;
+				points[0] = (dataBuffer[3] & 0xFF) * 1000;
+				int tmpHeight = DataParser.parse2Short(dataBuffer, 10) + 500;
+				if (tmpHeight > 1 && tmpHeight < 5000) {
+					points[1] = tmpHeight * 1000;
+					points[2] = (DataParser.parse2Short(dataBuffer, 16) + 30000) * 1000;
+				}
+				int tmpClimb10 = DataParser.parse2Short(dataBuffer, 20) + 30000;
+				if (tmpClimb10 < 40000 && tmpClimb10 > 20000) {
+					points[3] = (DataParser.parse2Short(dataBuffer, 18) + 30000) * 1000;
+					points[4] = tmpClimb10 * 1000;
+				}
 				points[5] = dataBuffer[4] * 1000;
 				points[6] = (dataBuffer[5] + 20) * 1000;
 				break;
-				
+
 			case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-				points[0] = (dataBuffer[31] & 0xFF) * 1000;
-				points[0] = points[0] == 0 ? (dataBuffer[3] & 0xFF) * 1000 : points[0];
-				points[1] = DataParser.parse2Short(dataBuffer, 16) * 10000 + DataParser.parse2Short(dataBuffer, 18);
-				points[1] = dataBuffer[26] == 1 ? -1 * points[1] : points[1];
-				points[2] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
-				points[2] = dataBuffer[27] == 1 ? -1 * points[2] : points[2];
-				points[3] = (DataParser.parse2Short(dataBuffer, 14) + 500) * 1000;
-				points[4] = (DataParser.parse2Short(dataBuffer, 28) + 30000) * 1000;
-				points[5] = (dataBuffer[30] + 120) * 1000;
-				points[6] = DataParser.parse2Short(dataBuffer, 10) * 1000;
-				points[7] = DataParser.parse2Short(dataBuffer, 12) * 1000;
-				points[8] = DataParser.parse2Short(dataBuffer, 24) * 500;
-				points[9] = 0;
-				points[10] = dataBuffer[4] * 1000;
-				points[11] = (dataBuffer[5] + 20) * 1000;
+				tmpHeight = DataParser.parse2Short(dataBuffer, 14) + 500;
+				int tmpClimb3 = dataBuffer[30] + 120;
+				if (tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
+					points[0] = (dataBuffer[3] & 0xFF) * 1000;
+					points[1] = DataParser.parse2Short(dataBuffer, 16) * 10000 + DataParser.parse2Short(dataBuffer, 18);
+					points[1] = dataBuffer[26] == 1 ? -1 * points[1] : points[1];
+					points[2] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
+					points[2] = dataBuffer[27] == 1 ? -1 * points[2] : points[2];
+					points[3] = tmpHeight * 1000;
+					points[4] = (DataParser.parse2Short(dataBuffer, 28) + 30000) * 1000;
+					points[5] = tmpClimb3 * 1000;
+					points[6] = DataParser.parse2Short(dataBuffer, 10) * 1000;
+					points[7] = DataParser.parse2Short(dataBuffer, 12) * 1000;
+					points[8] = DataParser.parse2Short(dataBuffer, 24) * 500;
+					points[9] = 0;
+					points[10] = dataBuffer[4] * 1000;
+					points[11] = (dataBuffer[5] + 20) * 1000;
+				}
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
-				//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
-				points[0] = (dataBuffer[46] & 0xFF) * 1000;
-				points[1] = DataParser.parse2Short(dataBuffer, 36) * 1000;
-				points[2] = DataParser.parse2Short(dataBuffer, 34) * 1000;
-				points[3] = DataParser.parse2Short(dataBuffer, 38) * 1000;
-				points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
-				points[5] = 0; //5=Balance
-				for (int i=0, j=0; i < 6; i++,j+=2) {
-					points[i + 6] = DataParser.parse2Short(dataBuffer, j+10) * 500;
-					if (points[i + 6] > 0) {
-						maxVotage = points[i + 6] > maxVotage ? points[i + 6] : maxVotage;
-						minVotage = points[i + 6] < minVotage ? points[i + 6] : minVotage;
+				//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
+				int tmpCapacity = DataParser.parse2Short(dataBuffer, 38);
+				tmpHeight = DataParser.parse2Short(dataBuffer, 32) + 500;
+				tmpClimb3 = dataBuffer[37] + 120;
+				int tmpVoltage1 = DataParser.parse2Short(dataBuffer, 22);
+				int tmpVoltage2 = DataParser.parse2Short(dataBuffer, 24);
+				if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					points[0] = (dataBuffer[3] & 0xFF) * 1000;
+					points[1] = DataParser.parse2Short(dataBuffer, 36) * 1000;
+					points[2] = DataParser.parse2Short(dataBuffer, 34) * 1000;
+					points[3] = tmpCapacity * 1000;
+					points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
+					points[5] = 0; //5=Balance
+					for (int i = 0, j = 0; i < 6; i++, j += 2) {
+						points[i + 6] = DataParser.parse2Short(dataBuffer, j + 10) * 500;
+						if (points[i + 6] > 0) {
+							maxVotage = points[i + 6] > maxVotage ? points[i + 6] : maxVotage;
+							minVotage = points[i + 6] < minVotage ? points[i + 6] : minVotage;
+						}
 					}
+					//calculate balance on the fly
+					points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
+					points[12] = DataParser.parse2Short(dataBuffer, 30) * 1000;
+					points[13] = tmpHeight * 1000;
+					points[14] = (DataParser.parse2Short(dataBuffer, 42) + 30000) * 1000;
+					points[15] = tmpClimb3 * 1000;
+					points[16] = DataParser.parse2Short(dataBuffer, 40) * 1000;
+					points[17] = tmpVoltage1 * 1000;
+					points[18] = tmpVoltage2 * 1000;
+					points[19] = (DataParser.parse2Short(dataBuffer, 26) + 20) * 1000;
+					points[20] = (DataParser.parse2Short(dataBuffer, 28) + 20) * 1000;
 				}
-				//calculate balance on the fly
-				points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
-				points[12] = DataParser.parse2Short(dataBuffer, 30) * 1000;
-				points[13] = (DataParser.parse2Short(dataBuffer, 32) + 500) * 1000;
-				points[14] = (DataParser.parse2Short(dataBuffer, 42) + 30000) * 1000;
-				points[15] = (dataBuffer[37] + 120) * 1000;
-				points[16] = DataParser.parse2Short(dataBuffer, 40) * 1000;
-				points[17] = DataParser.parse2Short(dataBuffer, 22) * 1000;
-				points[18] = DataParser.parse2Short(dataBuffer, 24) * 1000;
-				points[19] = (DataParser.parse2Short(dataBuffer, 26)+20) * 1000;
-				points[20] = (DataParser.parse2Short(dataBuffer, 28)+20) * 1000;
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 				//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
-				points[0] = (dataBuffer[57] & 0xFF) * 1000;
-				points[1] = DataParser.parse2Short(dataBuffer, 50) * 1000;
-				points[2] = DataParser.parse2Short(dataBuffer, 48) * 1000;
-				points[3] = DataParser.parse2Short(dataBuffer, 52) * 1000;
-				points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
-				points[5] = 0; //5=Balance
-				for (int i=0, j=0; i < 14; i++, j+=2) {
-					points[i + 6] = DataParser.parse2Short(dataBuffer, j+10) * 500;
-					if (points[i + 6] > 0) {
-						maxVotage = points[i + 6] > maxVotage ? points[i + 6] : maxVotage;
-						minVotage = points[i + 6] < minVotage ? points[i + 6] : minVotage;
+				tmpCapacity = DataParser.parse2Short(dataBuffer, 52);
+				tmpHeight = DataParser.parse2Short(dataBuffer, 46) + 500;
+				tmpClimb3 = dataBuffer[37] + 120;
+				tmpVoltage1 = DataParser.parse2Short(dataBuffer, 38);
+				tmpVoltage2 = DataParser.parse2Short(dataBuffer, 40);
+				if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					points[0] = (dataBuffer[3] & 0xFF) * 1000;
+					points[1] = DataParser.parse2Short(dataBuffer, 50) * 1000;
+					points[2] = DataParser.parse2Short(dataBuffer, 48) * 1000;
+					points[3] = tmpCapacity * 1000;
+					points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
+					points[5] = 0; //5=Balance
+					for (int i = 0, j = 0; i < 14; i++, j += 2) {
+						points[i + 6] = DataParser.parse2Short(dataBuffer, j + 10) * 500;
+						if (points[i + 6] > 0) {
+							maxVotage = points[i + 6] > maxVotage ? points[i + 6] : maxVotage;
+							minVotage = points[i + 6] < minVotage ? points[i + 6] : minVotage;
+						}
 					}
+					//calculate balance on the fly
+					points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
+					points[20] = tmpHeight * 1000;
+					points[21] = (DataParser.parse2Short(dataBuffer, 54) + 30000) * 1000;
+					points[22] = (dataBuffer[46] + 120) * 1000;
+					points[23] = tmpVoltage1 * 1000;
+					points[24] = tmpVoltage2 * 1000;
+					points[25] = (DataParser.parse2Short(dataBuffer, 42) + 20) * 1000;
+					points[26] = (DataParser.parse2Short(dataBuffer, 44) + 20) * 1000;
 				}
-				//calculate balance on the fly
-				points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
-				points[20] = (DataParser.parse2Short(dataBuffer, 46) + 500) * 1000;
-				points[21] = (DataParser.parse2Short(dataBuffer, 54) + 30000) * 1000;
-				points[22] = (dataBuffer[46] + 120) * 1000;
-				points[23] = DataParser.parse2Short(dataBuffer, 38) * 1000;
-				points[24] = DataParser.parse2Short(dataBuffer, 40) * 1000;
-				points[25] = (DataParser.parse2Short(dataBuffer, 42)+20) * 1000;
-				points[26] = (DataParser.parse2Short(dataBuffer, 44)+20) * 1000;
 				break;
 			}
 			break;
@@ -582,6 +646,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
+	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
@@ -601,10 +666,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
 			}
 		}
-		log.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
+		HoTTAdapter.log.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
 
 		for (int i = 0; i < recordDataSize; i++) {
-			log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
+			HoTTAdapter.log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 
 			for (int j = 0; j < points.length; j++) {
@@ -626,6 +691,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
+	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
 			String[] recordNames = recordSet.getRecordNames();
@@ -646,7 +712,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			HoTTAdapter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -656,6 +722,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double translateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -671,8 +738,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		else {
 			newValue = (value - reduction) * factor + offset;
 		}
- 
-		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		HoTTAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -681,6 +748,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -697,7 +765,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			newValue = (value - offset) / factor + reduction;
 		}
 
-		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		HoTTAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -709,6 +777,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
+	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
@@ -721,7 +790,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordNames.length; ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(recordNames[i]);
-			log.log(java.util.logging.Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
+			HoTTAdapter.log.log(java.util.logging.Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
 			MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
@@ -729,19 +798,19 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
-				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
-			}	
+				HoTTAdapter.log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-				log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
+				HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
-				log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				HoTTAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
-		log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		HoTTAdapter.log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 		this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
 	}
@@ -752,6 +821,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * for calculation which requires more effort or is time consuming it can call a background thread, 
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
+	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 
 		if (recordSet.getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude 3=Height
@@ -779,19 +849,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				this.updateVisibilityStatus(recordSet, true);
 			}
 		}
-		//TODO check strength calculation
-		//		else if (recordSet.getChannelConfigNumber() == 1) { // receiver
-		//			//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 			
-		//			Record recordRF_RXSQ = recordSet.get(1);
-		//			Record recordStrength = recordSet.get(2);
-		//			recordStrength.clear();
-		//			for (int i=0; i < recordRF_RXSQ.size(); ++i) {
-		//				recordStrength.add(HoTTbinReader.convertRFRXSQ2Strenght(recordRF_RXSQ.get(i) / 1000));
-		//			}		
-		//			this.application.updateStatisticsData(true);
-		//			this.updateVisibilityStatus(recordSet, true);
-		//		}
-
 	}
 
 	/**
@@ -807,6 +864,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
+	@Override
 	public String[] getUsedPropertyKeys() {
 		return new String[] { IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION };
 	}
@@ -816,6 +874,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
+	@Override
 	public void open_closeCommPort() {
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
@@ -824,7 +883,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		}
 		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2400), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
 				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
-		
+
 		this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
@@ -838,7 +897,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						}
 						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_BIN;
 					}
-					log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+					HoTTAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 					if (fd.getFileName().length() > 4) {
 						Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
@@ -849,7 +908,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 							WaitTimer.delay(500);
 						}
 						catch (Exception e) {
-							log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+							HoTTAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 						}
 					}
 				}
@@ -874,8 +933,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2405));
 			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
+					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
 				}
 			});
@@ -883,8 +943,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2406));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
 				}
 			});
@@ -892,8 +953,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2407));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
 				}
 			});
