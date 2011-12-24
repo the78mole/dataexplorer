@@ -148,7 +148,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * switch the channel according selection and set applications active channel
 	 * @param channelName assuming p.e. " 1 : Ausgang"
 	 */
-	public synchronized void switchChannel(String channelName) {
+	public void switchChannel(String channelName) {
 		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) recordSet.resetZoomAndMeasurement();
 		
