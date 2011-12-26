@@ -242,8 +242,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				activeChannel.objectKey = GDE.STRING_EMPTY;
 				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 				if (activeRecordSet != null) {
-					String activeRecordName = activeRecordSet.getName();
-					activeChannel.get(activeRecordName).clear();
+					activeRecordSet.parent.clear();
 				}
 			}
 		}
