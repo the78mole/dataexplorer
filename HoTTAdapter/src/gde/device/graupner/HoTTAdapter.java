@@ -88,7 +88,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static byte										SENSOR_TYPE_GENERAL_115200		= 0x35;
 	final static byte										SENSOR_TYPE_ELECTRIC_115200		= 0x36;
 
-	final static int										queryGapTime_ms								= 30;
+	final static int										QUERY_GAP_MS									= 30;
 	final static boolean								isSensorType[]								= { false, false, false, false };								//isVario, isGPS, isGeneral, isElectric
 
 	public enum Sensor {

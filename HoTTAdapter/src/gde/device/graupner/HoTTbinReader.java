@@ -905,16 +905,18 @@ public class HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseAddGPS(RecordSet _recordSetGPS, int[] _pointsGPS, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, long _timeStep_ms) throws DataInconsitsentException {
-		if (_buf3[2] > 80 && DataParser.parse2Short(_buf2, 8) > 1) {
+		int tmpHeight = DataParser.parse2Short(_buf2, 8);
+		int tmpClimb3 = (_buf3[2] & 0xFF);
+		if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 			_pointsGPS[0] = (_buf0[4] & 0xFF) * 1000;
 			_pointsGPS[1] = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
 			_pointsGPS[1] = _buf1[6] == 1 ? -1 * _pointsGPS[1] : _pointsGPS[1];
 			_pointsGPS[2] = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
 			_pointsGPS[2] = _buf2[1] == 1 ? -1 * _pointsGPS[2] : _pointsGPS[2];
-			_pointsGPS[3] = DataParser.parse2Short(_buf2, 8) * 1000;
+			_pointsGPS[3] = tmpHeight * 1000;
 			_pointsGPS[4] = DataParser.parse2UnsignedShort(_buf3, 0) * 1000;
-			_pointsGPS[5] = (_buf3[2] & 0xFF) * 1000;
+			_pointsGPS[5] = tmpClimb3 * 1000;
 			_pointsGPS[6] = DataParser.parse2Short(_buf1, 4) * 1000;
 			_pointsGPS[7] = DataParser.parse2Short(_buf2, 6) * 1000;
 			_pointsGPS[8] = (_buf1[3] & 0xFF) * 1000;
@@ -948,15 +950,19 @@ public class HoTTbinReader {
 	 */
 	private static void parseAddGeneral(RecordSet _recordSetGeneral, int[] _pointsGeneral, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4, long _timeStep_ms)
 			throws DataInconsitsentException {
-		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
-		if (_buf3[4] > 80 && DataParser.parse2Short(_buf3, 0) > 1 && Math.abs(DataParser.parse2Short(_buf1[9], _buf2[0])) < 600 && Math.abs(DataParser.parse2Short(_buf2[1], _buf2[2])) < 600
-				&& DataParser.parse2Short(_buf3[9], _buf4[0]) >= _pointsGeneral[3] / 1000) {
+		int tmpHeight = DataParser.parse2Short(_buf3, 0);
+		int tmpClimb3 = (_buf3[4] & 0xFF);
+		int tmpVoltage1 = DataParser.parse2Short(_buf1[9], _buf2[0]);
+		int tmpVoltage2 = DataParser.parse2Short(_buf2, 1);
+		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
+		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
+		if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsGeneral[3] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			_pointsGeneral[0] = (_buf0[4] & 0xFF) * 1000;
 			_pointsGeneral[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			_pointsGeneral[2] = DataParser.parse2Short(_buf3, 5) * 1000;
-			_pointsGeneral[3] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
+			_pointsGeneral[3] = tmpCapacity * 1000;
 			_pointsGeneral[4] = Double.valueOf(_pointsGeneral[1] / 1000.0 * _pointsGeneral[2]).intValue();
 			_pointsGeneral[5] = 0;
 			for (int j = 0; j < 6; j++) {
@@ -968,12 +974,12 @@ public class HoTTbinReader {
 			}
 			_pointsGeneral[5] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 			_pointsGeneral[12] = DataParser.parse2Short(_buf2, 8) * 1000;
-			_pointsGeneral[13] = DataParser.parse2Short(_buf3, 0) * 1000;
+			_pointsGeneral[13] = tmpHeight * 1000;
 			_pointsGeneral[14] = DataParser.parse2UnsignedShort(_buf3, 2) * 1000;
-			_pointsGeneral[15] = (_buf3[4] & 0xFF) * 1000;
+			_pointsGeneral[15] = tmpClimb3 * 1000;
 			_pointsGeneral[16] = DataParser.parse2Short(_buf2, 6) * 1000;
-			_pointsGeneral[17] = DataParser.parse2Short(_buf1[9], _buf2[0]) * 1000;
-			_pointsGeneral[18] = DataParser.parse2Short(_buf2[1], _buf2[2]) * 1000;
+			_pointsGeneral[17] = tmpVoltage1 * 1000;
+			_pointsGeneral[18] = tmpVoltage2 * 1000;
 			_pointsGeneral[19] = (_buf2[3] & 0xFF) * 1000;
 			_pointsGeneral[20] = (_buf2[4] & 0xFF) * 1000;
 		}
@@ -1004,15 +1010,19 @@ public class HoTTbinReader {
 	 */
 	private static void parseAddElectric(RecordSet _recordSetElectric, int[] _pointsElectric, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4, long _timeStep_ms)
 			throws DataInconsitsentException {
-		if (_buf4[3] > 80 && DataParser.parse2Short(_buf3, 3) > 1 && Math.abs(DataParser.parse2Short(_buf2, 7)) < 600 && Math.abs(DataParser.parse2Short(_buf2[9], _buf3[0])) < 600
-				&& DataParser.parse2Short(_buf3[9], _buf4[0]) >= _pointsElectric[3] / 1000) {
-			//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
+		int tmpHeight = DataParser.parse2Short(_buf3, 3);
+		int tmpClimb3 = (_buf4[3] & 0xFF);
+		int tmpVoltage1 = DataParser.parse2Short(_buf2, 7);
+		int tmpVoltage2 = DataParser.parse2Short(_buf2[9], _buf3[0]);
+		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
+		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
+		if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsElectric[3] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			_pointsElectric[0] = (_buf1[4] & 0xFF) * 1000;
 			_pointsElectric[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			_pointsElectric[2] = DataParser.parse2Short(_buf3, 5) * 1000;
-			_pointsElectric[3] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
+			_pointsElectric[3] = tmpCapacity * 1000;
 			_pointsElectric[4] = Double.valueOf(_pointsElectric[1] / 1000.0 * _pointsElectric[2]).intValue(); // power U*I [W];
 			_pointsElectric[5] = 0; //5=Balance
 			for (int j = 0; j < 7; j++) {
@@ -1031,11 +1041,11 @@ public class HoTTbinReader {
 			}
 			//calculate balance on the fly
 			_pointsElectric[5] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-			_pointsElectric[20] = DataParser.parse2Short(_buf3, 3) * 1000;
+			_pointsElectric[20] = tmpHeight * 1000;
 			_pointsElectric[21] = DataParser.parse2UnsignedShort(_buf4, 1) * 1000;
-			_pointsElectric[22] = (_buf4[3] & 0xFF) * 1000;
-			_pointsElectric[23] = DataParser.parse2Short(_buf2, 7) * 1000;
-			_pointsElectric[24] = DataParser.parse2Short(_buf2[9], _buf3[0]) * 1000;
+			_pointsElectric[22] = tmpClimb3 * 1000;
+			_pointsElectric[23] = tmpVoltage1 * 1000;
+			_pointsElectric[24] = tmpVoltage2 * 1000;
 			_pointsElectric[25] = (_buf3[1] & 0xFF) * 1000;
 			_pointsElectric[26] = (_buf3[2] & 0xFF) * 1000;
 		}

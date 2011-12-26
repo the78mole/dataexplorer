@@ -194,34 +194,6 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		byte[] answer = new byte[this.ANSWER_DATA.length];
 		byte[] data = new byte[this.DATA_LENGTH];
 
-		//sensor type is receiver need to query DBM data in addition
-		if (queryDBM > 0 && this.QUERY_SENSOR_TYPE[6] == HoTTAdapterSerialPort.QUERY_SENSOR_DATA_RECEIVER[6]) {
-			++HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[1];
-			--HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2];
-			this.write(HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM);
-			this.read(answerDBM, HoTTAdapterSerialPort.READ_TIMEOUT_MS * 2);
-
-			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) {
-				HoTTAdapterSerialPort.log.logp(java.util.logging.Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(answerDBM));
-				HoTTAdapterSerialPort.log.logp(java.util.logging.Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answerDBM, answerDBM.length));
-			}
-			if (HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2] == 0xFE) {
-				HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[1] = 0;
-				HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2] = (byte) 0xFF;
-			}
-			WaitTimer.delay(HoTTAdapter.queryGapTime_ms);
-		}
-		//		//query receiver to add voltageRx and temperatureRx
-		//		else {
-		//			this.write(QUERY_SENSOR_DATA_RECEIVER);
-		//			this.read(answerRx, READ_TIMEOUT_MS);
-		//
-		//			if (log.isLoggable(Level.FINE)) {
-		//				log.logp(Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(answerRx));
-		//				log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answerRx, answerRx.length));
-		//			}
-		//		}
-
 		this.write(this.QUERY_SENSOR_TYPE);
 
 		this.read(answer, HoTTAdapterSerialPort.READ_TIMEOUT_MS);
@@ -243,8 +215,24 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			data = getData(queryDBM);
 		}
 
+
 		//sensor type is receiver need to query DBM data in addition
 		if (queryDBM > 0 && this.QUERY_SENSOR_TYPE[6] == HoTTAdapterSerialPort.QUERY_SENSOR_DATA_RECEIVER[6]) {
+			WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
+			++HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[1];
+			--HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2];
+			this.write(HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM);
+			this.read(answerDBM, HoTTAdapterSerialPort.READ_TIMEOUT_MS);
+
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) {
+				HoTTAdapterSerialPort.log.logp(java.util.logging.Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(answerDBM));
+				HoTTAdapterSerialPort.log.logp(java.util.logging.Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answerDBM, answerDBM.length));
+			}
+			if (HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2] == 0xFE) {
+				HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[1] = 0;
+				HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2] = (byte) 0xFF;
+			}
+
 			for (int i = 0; i < 75; i++) {
 				rxDBM += answerDBM[i + 157];
 				txDBM += answerDBM[i + 82];
