@@ -662,10 +662,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 	}
 
 	/**
-	 * test reading CSV files in configured base directory (DataExplorer.properties and writes OSD files to %TEMP%\Write_1_OSD
+	 * test reading Graupner HoTT bin log files in configured base directory (DataExplorer.properties and writes OSD files to %TEMP%\Write_1_OSD
 	 * all files must identical except time stamp
 	 */
-	public final void testHoTTAdapterWriterOsd() {
+	public final void testHoTTAdapterBinReaderOsdWriter() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
 		try {
