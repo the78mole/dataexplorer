@@ -6,6 +6,7 @@ HoTTAdapter - change record set naming and numbering, all of one import starts i
 HoTTAdapter - adapt to latest firmware version
 HoTTAdapter - make query sensor sequence more efficiency
 HoTTAdapter - enable detection of missed query sensor writes
+HoTTAdapter - 19200 Baud slave-modus, refine error handling while switch sensor/receiver 
 Documentation update
 
 Version 2.94 - 20 Dec 2011
