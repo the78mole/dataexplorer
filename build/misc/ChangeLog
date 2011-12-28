@@ -4,6 +4,9 @@ Version 2.95 - xx yy 2012
 HoTTAdapter - filter misplaced measurements while loading or gathering data from multiple sensors
 HoTTAdapter - change record set naming and numbering, all of one import starts identical
 HoTTAdapter - adapt to latest firmware version
+HoTTAdapter - make query sensor sequence more efficiency
+HoTTAdapter - enable detection of missed query sensor writes
+Documentation update
 
 Version 2.94 - 20 Dec 2011
 DevicePropertyEditor - fix out of handles problem
