@@ -1,12 +1,13 @@
-GNU DataExplorer - News - comes with version 2.94
+GNU DataExplorer - News - comes with version 2.95
 
-1) DevicePropertyEditor - fix out of handles problem
-2) DevicePropertyEditor - fix problem displaying wrong measurement names while adding sync reference in cases with different measurement sets per channel
-3) HottAdapter - fix SWT error while live data gathering and closed dialog
-4) HottAdapter - implement 19200 new protocol master and slave mode
-5) HottAdapter - enable multiple connected sensors
-6) HoTTAdapter - fix data parsing error 115200 protocol temperature > 127 °C
-7) Linux kernel module update for cp210x SiliconLabs USB2Serial
+1) HoTTAdapter - filter misplaced measurements while loading or gathering data from multiple sensors
+2) HoTTAdapter - change record set naming and numbering, all of one import starts identical
+3) HoTTAdapter - adapt to latest firmware version
+4) HoTTAdapter - make query sensor sequence more efficiency
+5) HoTTAdapter - enable detection of missed query sensor writes
+6) HoTTAdapter - 19200 Baud slave-modus, refine error handling while switch sensor/receiver 
+
+
 8) Documentation update
 
 
