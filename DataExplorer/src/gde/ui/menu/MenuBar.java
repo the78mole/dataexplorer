@@ -890,6 +890,13 @@ public class MenuBar {
 		this.iconSet = newIconSet;
 		this.setPortConnected(false);
 	}
+	
+	/**
+	 * method to query icon set by active device
+	 */
+	public int getSerialPortIconSet() {
+		return this.iconSet;
+	}
 
 	/**
 	 * set selection of record comment window 

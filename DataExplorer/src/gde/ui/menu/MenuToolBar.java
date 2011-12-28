@@ -383,8 +383,11 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "toolBoxToolItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuToolBar.this.application.getDeviceDialog() != null && MenuToolBar.this.application.getDeviceDialog().isDisposed()) {
-								MenuToolBar.this.application.getDeviceDialog().open();
+							if (MenuToolBar.this.application.getDeviceDialog() != null) {
+								if (MenuToolBar.this.application.getDeviceDialog().isDisposed())
+									MenuToolBar.this.application.getDeviceDialog().open();
+								else
+									MenuToolBar.this.application.getDeviceDialog().getDialogShell().setFocus();
 							}
 						}
 					});
