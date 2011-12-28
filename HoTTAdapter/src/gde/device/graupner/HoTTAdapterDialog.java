@@ -19,6 +19,7 @@
 package gde.device.graupner;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.device.DeviceDialog;
@@ -179,6 +180,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "startLifeDataCapturing.widgetSelected, event=" + evt); //$NON-NLS-1$
 								try {
+									HoTTAdapterDialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
 									HoTTAdapterDialog.this.lifeGatherer = new HoTTAdapterLiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort,
 											HoTTAdapterDialog.this);
 									HoTTAdapterDialog.this.lifeGatherer.start();
@@ -189,6 +191,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								}
 								catch (Exception e) {
 									log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+									HoTTAdapterDialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
 									HoTTAdapterDialog.this.serialPort.close();
 									HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
 									HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
