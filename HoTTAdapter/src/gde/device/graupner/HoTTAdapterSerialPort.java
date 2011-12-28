@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static String		$CLASS_NAME									= HoTTAdapterSerialPort.class.getName();
 	final static Logger		log													= Logger.getLogger(HoTTAdapterSerialPort.$CLASS_NAME);
-	static final int			READ_TIMEOUT_MS							= 400;
+	static final int			READ_TIMEOUT_MS							= 600;
 
 	//HoTT sensor bytes legacy
 	final static byte[]		QUERY_SENSOR_DATA						= new byte[] { (byte) 0x80 };
