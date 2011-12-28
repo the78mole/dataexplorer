@@ -19,6 +19,7 @@
 package gde.device.graupner;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -370,6 +371,11 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
 			finalizeRecordSet(recordSet);
 		}
+		GDE.display.asyncExec(new Runnable() {
+			public void run() {
+				HoTTAdapterLiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
+			}
+		});
 		if (HoTTAdapterLiveGatherer.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterLiveGatherer.log.log(java.util.logging.Level.FINE, "exit"); //$NON-NLS-1$
 	}
 
