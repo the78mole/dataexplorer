@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
 import gde.exception.ApplicationConfigurationException;
+import gde.exception.FailedQueryException;
 import gde.exception.ReadWriteOutOfSyncException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
@@ -79,6 +80,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	final Settings												settings;
 	protected SerialPort									serialPort								= null;
 	protected int													xferErrors								= 0;
+	protected int													queryErrors								= 0;
 	protected int													timeoutErrors							= 0;
 
 	boolean																isConnected								= false;
@@ -428,15 +430,14 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 */
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
-		int sleepTime = 10; // ms
+		int sleepTime = 2 ; // ms
 		int bytes = readBuffer.length;
 		int readBytes = 0;
 		int timeOutCounter = timeout_msec / (sleepTime + 18); //18 ms read blocking time
 
 		try {
 			if (this.application != null) this.application.setSerialRxOn();
-			WaitTimer.delay(2);
-			//wait4Bytes(bytes, timeout_msec - (timeout_msec / 5));
+			wait4Bytes(bytes, timeout_msec - (timeout_msec / 5));
 
 
 			while (bytes != readBytes && timeOutCounter-- > 0) {
@@ -449,6 +450,62 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 
 				//this.dataAvailable = false;
 				if (timeOutCounter <= 0) {
+					TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { bytes, timeout_msec }));
+					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
+					throw e;
+				}
+			}
+
+			if (log.isLoggable(Level.FINE)) {
+				log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
+			}
+		}
+		catch (IOException e) {
+			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			throw e;
+		}
+		finally {
+			if (this.application != null) this.application.setSerialRxOff();
+		}
+		return readBuffer;
+	}
+
+	/**
+	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
+	 * @param readBuffer
+	 * @param timeout_msec
+	 * @param checkFailedQuery
+	 * @return the red byte array
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, boolean checkFailedQuery) throws IOException, FailedQueryException, TimeOutException {
+		final String $METHOD_NAME = "read"; //$NON-NLS-1$
+		int sleepTime = 10; // ms
+		int bytes = readBuffer.length;
+		int readBytes = 0;
+		int timeOutCounter = timeout_msec / (sleepTime + 18); //18 ms read blocking time
+
+		try {
+			if (this.application != null) this.application.setSerialRxOn();
+			WaitTimer.delay(2);
+
+			//loop inputStream and read available bytes
+			while (bytes != readBytes && timeOutCounter-- > 0) {
+				if (this.inputStream.available() > 0) {
+					readBytes += this.inputStream.read(readBuffer, 0 + readBytes, bytes - readBytes);
+				}
+				if (bytes != readBytes) {
+					WaitTimer.delay(sleepTime);
+				}
+
+				if (timeOutCounter/4 <= 0 && readBytes == 0) {
+					FailedQueryException e = new FailedQueryException(Messages.getString(MessageIds.GDE_MSGE0012, new Object[] { timeout_msec/4 }));
+					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage());
+					throw e;
+				}
+				else if (timeOutCounter <= 0) {
 					TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { bytes, timeout_msec }));
 					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));

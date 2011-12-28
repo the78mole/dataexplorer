@@ -35,6 +35,7 @@ public class MessageIds {
 	public final static String	GDE_MSGE0009 = "GDE_MSGE0009";
 	public final static String	GDE_MSGE0010 = "GDE_MSGE0010";
 	public final static String	GDE_MSGE0011 = "GDE_MSGE0011";
+	public final static String	GDE_MSGE0012 = "GDE_MSGE0012";
 	public final static String	GDE_MSGE0013 = "GDE_MSGE0013";
 	public final static String	GDE_MSGE0014 = "GDE_MSGE0014";
 	public final static String	GDE_MSGE0015 = "GDE_MSGE0015";

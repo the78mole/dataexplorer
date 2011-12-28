@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
 import gde.exception.ApplicationConfigurationException;
+import gde.exception.FailedQueryException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.io.LogViewReader;
@@ -237,6 +238,14 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 			}
 		}
 		return readBuffer;
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceSerialPort#read(byte[], int, boolean)
+	 */
+	public byte[] read(byte[] readBuffer, int timeout_msec, boolean checkFailedQuery) throws IOException, FailedQueryException, TimeOutException {
+		log.log(Level.WARNING, "read() not supported in simulation");
+		return new byte[0];
 	}
 
 	/* (non-Javadoc)

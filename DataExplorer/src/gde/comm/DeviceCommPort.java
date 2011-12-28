@@ -22,6 +22,7 @@ import gde.config.Settings;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.exception.ApplicationConfigurationException;
+import gde.exception.FailedQueryException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.ui.DataExplorer;
@@ -106,6 +107,19 @@ public class DeviceCommPort implements IDeviceCommPort {
 	 */
 	public byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
 		return this.port.read(readBuffer, timeout_msec);
+	}
+
+	/**
+	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
+	 * @param readBuffer
+	 * @param timeout_msec
+	 * @param checkFailedQuery
+	 * @return the red byte array
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, boolean checkFailedQuery) throws IOException, FailedQueryException, TimeOutException {
+		return this.port.read(readBuffer, timeout_msec, checkFailedQuery);
 	}
 
 	/* (non-Javadoc)

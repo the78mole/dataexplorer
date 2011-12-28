@@ -19,6 +19,7 @@
 package gde.comm;
 
 import gde.exception.ApplicationConfigurationException;
+import gde.exception.FailedQueryException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gnu.io.SerialPort;
@@ -54,6 +55,17 @@ public interface IDeviceCommPort {
 	 * @throws TimeOutException
 	 */
 	public byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException;
+
+	/**
+	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
+	 * @param readBuffer
+	 * @param timeout_msec
+	 * @param checkFailedQuery
+	 * @return the red byte array
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public byte[] read(byte[] readBuffer, int timeout_msec, boolean checkFailedQuery) throws IOException, FailedQueryException, TimeOutException;
 
 	/**
 	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
@@ -133,7 +145,7 @@ public interface IDeviceCommPort {
 	public boolean isConnected();
 
 	/**
-	 * @return number of transfer errors occur (checksum)
+	 * @return number of transfer errors occur
 	 */
 	public int getXferErrors();
 
@@ -143,7 +155,7 @@ public interface IDeviceCommPort {
 	public void addXferError();
 
 	/**
-	 * @return number of transfer errors occur (checksum)
+	 * @return number of query errors occur
 	 */
 	public int getTimeoutErrors();
 
