@@ -271,7 +271,7 @@ public class RecordSet extends HashMap<String, Record> {
 				tmpRecord.setProperties(this.device.getProperties(channelConfigurationNumber, i));
 		}
 
-		this.timeStep_ms = recordSet.timeStep_ms.clone();
+		this.timeStep_ms = recordSet.timeStep_ms.clone(0, true);
 		this.description = recordSet.description;
 		this.isSaved = false;
 		this.isRaw = recordSet.isRaw;
@@ -336,17 +336,22 @@ public class RecordSet extends HashMap<String, Record> {
 			this.put(recordKey, this.get(recordKey).clone(dataIndex, isFromBegin));
 		}
 
-		if (recordSet.timeStep_ms != null && !recordSet.timeStep_ms.isConstant) { //time step vector must be updated as well
+		if (recordSet.timeStep_ms != null) { //time step vector must be updated as well
 			this.timeStep_ms = recordSet.timeStep_ms.clone(dataIndex, isFromBegin);
 		}
-		else if (recordSet.timeStep_ms != null && recordSet.timeStep_ms.isConstant) { 
-			this.timeStep_ms = recordSet.timeStep_ms.clone();
+		
+		if (isFromBegin && recordSet.timeStep_ms != null && this.timeStep_ms != null) {
+			String[] splitDescription = recordSet.description.split(StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", recordSet.timeStep_ms.getStartTimeStamp()));
+			if (splitDescription.length > 1)
+				this.description = splitDescription[0] + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", this.timeStep_ms.getStartTimeStamp()) + splitDescription[1];
+			else if (splitDescription.length > 0)
+				this.description = splitDescription[0] + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", this.timeStep_ms.getStartTimeStamp());
+			else 		
+				this.description = recordSet.description;
 		}
 		else {
-			this.timeStep_ms = null;
+			this.description = recordSet.description;
 		}
-		
-		this.description = recordSet.description;
 		this.isSaved = false;
 		this.isRaw = recordSet.isRaw;
 		this.isFromFile = recordSet.isFromFile;

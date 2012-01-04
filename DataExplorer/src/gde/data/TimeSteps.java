@@ -59,13 +59,14 @@ public class TimeSteps extends Vector<Long> {
 	private TimeSteps(TimeSteps toBeClonedTimeSteps) {
   	super(toBeClonedTimeSteps);
   	this.isConstant = toBeClonedTimeSteps.isConstant;
+		this.startTime = toBeClonedTimeSteps.startTime;
 	}
 	
 	/**
-	 * copy constructor with cutting edges
+	 * copy constructor
 	 */
 	private TimeSteps(TimeSteps toBeClonedTimeSteps, int index, boolean isFromBegin) {
-  	//super(toBeClonedTimeSteps);
+		this.startTime = isFromBegin ? toBeClonedTimeSteps.startTime + toBeClonedTimeSteps.get(index)/10 : toBeClonedTimeSteps.startTime;
   	if (!(this.isConstant = toBeClonedTimeSteps.isConstant)) {
 			if (isFromBegin) {
 				long cutOffVal = toBeClonedTimeSteps.get(index);
