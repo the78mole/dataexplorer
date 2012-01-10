@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
-Copyright (c) 2008,2009,2010,2011 Winfried Bruegmann 
+Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann 
 ****************************************************************************************/
 package gde.messages;
 
@@ -747,5 +747,56 @@ public class MessageIds {
 	public final static String	GDE_MSGT0608 = "GDE_MSGT0608";
 	public final static String	GDE_MSGT0609 = "GDE_MSGT0609";
 	public final static String	GDE_MSGT0610 = "GDE_MSGT0610";
+	public final static String	GDE_MSGT0611 = "GDE_MSGT0611";
+	public final static String	GDE_MSGT0612 = "GDE_MSGT0612";
+	public final static String	GDE_MSGT0613 = "GDE_MSGT0613";
+	public final static String	GDE_MSGT0614 = "GDE_MSGT0614";
+	public final static String	GDE_MSGT0615 = "GDE_MSGT0615";
+	public final static String	GDE_MSGT0616 = "GDE_MSGT0616";
+	public final static String	GDE_MSGT0617 = "GDE_MSGT0617";
+	public final static String	GDE_MSGT0618 = "GDE_MSGT0618";
+	public final static String	GDE_MSGT0619 = "GDE_MSGT0619";
+	public final static String	GDE_MSGT0620 = "GDE_MSGT0620";
+	public final static String	GDE_MSGT0621 = "GDE_MSGT0621";
+	public final static String	GDE_MSGT0622 = "GDE_MSGT0622";
+	public final static String	GDE_MSGT0623 = "GDE_MSGT0623";
+	public final static String	GDE_MSGT0624 = "GDE_MSGT0624";
+	public final static String	GDE_MSGT0626 = "GDE_MSGT0626";
+	public final static String	GDE_MSGT0627 = "GDE_MSGT0627";
+	public final static String	GDE_MSGT0628 = "GDE_MSGT0628";
+	public final static String	GDE_MSGT0629 = "GDE_MSGT0629";
+	public final static String	GDE_MSGT0630 = "GDE_MSGT0630";
+	public final static String	GDE_MSGT0631 = "GDE_MSGT0631";
+	public final static String	GDE_MSGT0632 = "GDE_MSGT0632";
+	public final static String	GDE_MSGT0633 = "GDE_MSGT0633";
+	public final static String	GDE_MSGT0634 = "GDE_MSGT0634";
+	public final static String	GDE_MSGT0635 = "GDE_MSGT0635";
+	public final static String	GDE_MSGT0636 = "GDE_MSGT0636";
+	public final static String	GDE_MSGT0637 = "GDE_MSGT0637";
+	public final static String	GDE_MSGT0638 = "GDE_MSGT0638";
+	public final static String	GDE_MSGT0639 = "GDE_MSGT0639";
+	public final static String	GDE_MSGT0640 = "GDE_MSGT0640";
+	public final static String	GDE_MSGT0641 = "GDE_MSGT0641";
+	public final static String	GDE_MSGT0642 = "GDE_MSGT0642";
+	public final static String	GDE_MSGT0643 = "GDE_MSGT0643";
+	public final static String	GDE_MSGT0644 = "GDE_MSGT0644";
+	public final static String	GDE_MSGT0645 = "GDE_MSGT0645";
+	public final static String	GDE_MSGT0646 = "GDE_MSGT0646";
+	public final static String	GDE_MSGT0647 = "GDE_MSGT0647";
+	public final static String	GDE_MSGT0648 = "GDE_MSGT0648";
+	public final static String	GDE_MSGT0649 = "GDE_MSGT0649";
+	public final static String	GDE_MSGT0650 = "GDE_MSGT0650";
+	public final static String	GDE_MSGT0651 = "GDE_MSGT0651";
+	public final static String	GDE_MSGT0652 = "GDE_MSGT0652";
+	public final static String	GDE_MSGT0653 = "GDE_MSGT0653";
+	public final static String	GDE_MSGT0654 = "GDE_MSGT0654";
+	public final static String	GDE_MSGT0655 = "GDE_MSGT0655";
+	public final static String	GDE_MSGT0656 = "GDE_MSGT0656";
+	public final static String	GDE_MSGT0657 = "GDE_MSGT0657";
+	public final static String	GDE_MSGT0658 = "GDE_MSGT0658";
+	public final static String	GDE_MSGT0659 = "GDE_MSGT0659";
+	public final static String	GDE_MSGT0660 = "GDE_MSGT0660";
+	public final static String	GDE_MSGT0661 = "GDE_MSGT0661";
+	public final static String	GDE_MSGT0662 = "GDE_MSGT0662";
 
  }
