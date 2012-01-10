@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2011 Winfried Bruegmann
+    Copyright (c) 2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
 
@@ -36,6 +36,7 @@ import gde.io.LogViewReader;
 import gde.io.NMEAParser;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.ui.dialog.IgcExportDialog;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
 import gde.utils.WaitTimer;
@@ -157,7 +158,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		this.dialog = new HoTTAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
-			updateFileMenu(this.application.getMenuBar().getExportMenu());
+			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
+			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 
@@ -176,7 +178,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		this.dialog = new HoTTAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
-			updateFileMenu(this.application.getMenuBar().getExportMenu());
+			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
+			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 
@@ -909,51 +912,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public void open_closeCommPort() {
 		switch (application.getMenuBar().getSerialPortIconSet()) {
 		case DeviceCommPort.ICON_SET_IMPORT_CLOSE:
-			String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-			String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-			if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
-				searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
-			}
-			final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2400), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
-					GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
-
-			this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
-
-			Thread reader = new Thread("reader") { //$NON-NLS-1$
-				@Override
-				public void run() {
-					try {
-						HoTTAdapter.this.application.setPortConnected(true);
-						for (String tmpFileName : fd.getFileNames()) {
-							String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-							if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-								if (selectedImportFile.contains(GDE.STRING_DOT)) {
-									selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
-								}
-								selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_BIN;
-							}
-							HoTTAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-
-							if (fd.getFileName().length() > 4) {
-								Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
-								channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
-								//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-								try {
-									HoTTbinReader.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
-									WaitTimer.delay(500);
-								}
-								catch (Exception e) {
-									HoTTAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-								}
-							}
-						}
-					}
-					finally  {
-						HoTTAdapter.this.application.setPortConnected(false);
-					}
-				}
-			};
-			reader.start();
+			importDeviceData();
 			break;
 			
 		case DeviceCommPort.ICON_SET_START_STOP:
@@ -963,14 +922,64 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * update the file menu by adding two new entries to export KML/GPX files
+	 * import device specific *.bin data files
+	 */
+	private void importDeviceData() {
+		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
+			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
+		}
+		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2400), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
+				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
+
+		this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+
+		Thread reader = new Thread("reader") { //$NON-NLS-1$
+			@Override
+			public void run() {
+				try {
+					HoTTAdapter.this.application.setPortConnected(true);
+					for (String tmpFileName : fd.getFileNames()) {
+						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
+							if (selectedImportFile.contains(GDE.STRING_DOT)) {
+								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+							}
+							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_BIN;
+						}
+						HoTTAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+
+						if (fd.getFileName().length() > 4) {
+							Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
+							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
+							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+							try {
+								HoTTbinReader.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								WaitTimer.delay(500);
+							}
+							catch (Exception e) {
+								HoTTAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+							}
+						}
+					}
+				}
+				finally  {
+					HoTTAdapter.this.application.setPortConnected(false);
+				}
+			}
+		};
+		reader.start();
+	}
+
+	/**
+	 * update the file export menu by adding two new entries to export KML/GPX files
 	 * @param exportMenue
 	 */
-	public void updateFileMenu(Menu exportMenue) {
+	public void updateFileExportMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZDAbsoluteItem;
-		//		MenuItem convert2GPXRelativeItem;
-		//		MenuItem convert2GPXAbsoluteItem;
+		MenuItem convertIGCItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -1001,7 +1010,41 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				@Override
 				public void handleEvent(Event e) {
 					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
-					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
+					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+				}
+			});
+			
+			new MenuItem(exportMenue, SWT.SEPARATOR);
+
+			convertIGCItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
+			convertIGCItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
+					new IgcExportDialog().open(2, 1, 3);
+				}
+			});
+		}
+	}
+
+	/**
+	 * update the file import menu by adding new entry to import device specific files
+	 * @param importMenue
+	 */
+	public void updateFileImportMenu(Menu importMenue) {
+		MenuItem importDeviceLogItem;
+
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
+			new MenuItem(importMenue, SWT.SEPARATOR);
+
+			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
+			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2416));
+			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					importDeviceData();
 				}
 			});
 		}
@@ -1024,7 +1067,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public boolean isActualRecordSetWithGpsData() {
 		boolean containsGPSdata = false;
 		Channel activeChannel = this.channels.getActiveChannel();
-		if (activeChannel != null) {
+		if (activeChannel != null && activeChannel.getNumber() == 3) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
