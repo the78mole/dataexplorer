@@ -8,6 +8,10 @@ HoTTAdapter - make query sensor sequence more efficiency
 HoTTAdapter - enable detection of missed query sensor writes
 HoTTAdapter - 19200 Baud slave-modus, refine error handling while switch sensor/receiver 
 fix error removing absolute time stamp while cutting curve from begin
+HoTTAdapter - enable IGC export format while GPS data available
+NMEAAdapter - enable IGC export format
+SM GPS-Logger - enable IGC export format
+WStech DataVario/LinkVario - enable IGC export format while GPS data available
 Documentation update
 
 Version 2.94 - 20 Dec 2011
