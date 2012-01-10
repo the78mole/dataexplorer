@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
-Copyright (c) 2008,2009,2010,2011 Winfried Bruegmann 
+Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann 
 ****************************************************************************************/
 package gde.device.wstech;
 
@@ -102,6 +102,7 @@ public class MessageIds {
 	public final static String	GDE_MSGT1874 = "GDE_MSGT1874";
 	public final static String	GDE_MSGT1875 = "GDE_MSGT1875";
 	public final static String	GDE_MSGT1876 = "GDE_MSGT1876";
+	public final static String	GDE_MSGT1877 = "GDE_MSGT1877";
 	public final static String	GDE_MSGT1878 = "GDE_MSGT1878";
 	public final static String	GDE_MSGT1879 = "GDE_MSGT1879";
 	public final static String	GDE_MSGT1880 = "GDE_MSGT1880";
