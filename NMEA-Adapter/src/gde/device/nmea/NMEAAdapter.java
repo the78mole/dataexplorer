@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2011 Winfried Bruegmann
+    Copyright (c) 2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.nmea;
 
@@ -38,6 +38,7 @@ import gde.io.NMEAReaderWriter;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.ui.dialog.IgcExportDialog;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
 import gde.utils.LinearRegression;
@@ -84,6 +85,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2104), Messages.getString(MessageIds.GDE_MSGT2104));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
+			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 
@@ -102,6 +104,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2104), Messages.getString(MessageIds.GDE_MSGT2104));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
+			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 
@@ -525,8 +528,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileMenu(Menu exportMenue) {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZDAbsoluteItem;
-//		MenuItem convert2GPXRelativeItem;
-//		MenuItem convert2GPXAbsoluteItem;
+		MenuItem convertIGCItem;
 
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
@@ -554,7 +556,21 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
-					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
+					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+				}
+			});
+			
+			new MenuItem(exportMenue, SWT.SEPARATOR);
+
+			convertIGCItem = new MenuItem(exportMenue, SWT.PUSH);
+			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
+			convertIGCItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
+					//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+					//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
+					new IgcExportDialog().open(1, 0, 2);
 				}
 			});
 		}
@@ -616,5 +632,27 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 		return 7;
+	}
+	
+	/**
+	 * update the file import menu by adding new entry to import device specific files
+	 * @param importMenue
+	 */
+	public void updateFileImportMenu(Menu importMenue) {
+		MenuItem importDeviceLogItem;
+
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
+			new MenuItem(importMenue, SWT.SEPARATOR);
+
+			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
+			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2108));
+			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					open_closeCommPort();
+				}
+			});
+		}
 	}
 }
