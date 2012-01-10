@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright (c) 2010,2011 Winfried Bruegmann
+    Copyright (c) 2010,2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.wstech;
 
@@ -49,6 +49,7 @@ public class LinkVario extends DataVario {
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1858), Messages.getString(MessageIds.GDE_MSGT1858));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
+			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 
@@ -64,6 +65,7 @@ public class LinkVario extends DataVario {
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1858), Messages.getString(MessageIds.GDE_MSGT1858));
 			updateFileMenu(this.application.getMenuBar().getExportMenu());
+			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 	
