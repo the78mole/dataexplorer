@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2011 Winfried Bruegmann
+    Copyright (c) 2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
@@ -49,7 +49,11 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -83,6 +87,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		this.dialog = new UniLog2Dialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
+			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 
@@ -101,6 +106,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		this.dialog = new UniLog2Dialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
+			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 
@@ -646,5 +652,27 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 			searchPath = searchPath.substring(0, searchPath.indexOf(UniLog2.SM_UNILOG_2_DIR_STUB)) + UniLog2.SM_UNILOG_2_INI_PATH;
 		}
 		return searchPath;
+	}
+	
+	/**
+	 * update the file import menu by adding new entry to import device specific files
+	 * @param importMenue
+	 */
+	public void updateFileImportMenu(Menu importMenue) {
+		MenuItem importDeviceLogItem;
+
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
+			new MenuItem(importMenue, SWT.SEPARATOR);
+
+			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
+			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2550));
+			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					open_closeCommPort();
+				}
+			});
+		}
 	}
 }
