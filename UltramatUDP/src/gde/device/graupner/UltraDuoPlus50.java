@@ -15,7 +15,7 @@ package gde.device.graupner;
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2011 Winfried Bruegmann
+    Copyright (c) 2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 
 
