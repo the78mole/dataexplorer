@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
 
@@ -63,7 +63,7 @@ public class CSVReaderWriter {
 	static DecimalFormat	df3			= new DecimalFormat("0.000"); //$NON-NLS-1$
 	static StringBuffer		sb;
 	
-	final static DataExplorer	application	= DataExplorer.getInstance();
+	final static DataExplorer						application	= DataExplorer.getInstance();
 	final static Channels								channels		= Channels.getInstance();
 
 	/**

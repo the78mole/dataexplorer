@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2011 Winfried Bruegmann
+    Copyright (c) 2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.utils;
 
@@ -33,6 +33,36 @@ import java.util.logging.Logger;
 public class GPSHelper {
 	private static Logger log = Logger.getLogger(GPSHelper.class.getName());
 	final static double rad = Math.PI / 180;
+	
+	/**
+	 * find the start index where GPS longitude and latitude has coordinate data
+	 * @param recordSet
+	 * @param recordOrdinalLatitude
+	 * @param recordOrdinalLongitude
+	 * @return
+	 */
+	public static int getStartIndexGPS(RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude) {
+		int startIndexGPS = -1;
+		//input records
+		Record recordLatitude = recordSet.get(recordOrdinalLatitude);
+		Record recordLongitude = recordSet.get(recordOrdinalLongitude);
+		int recordSize = recordLatitude.realSize();
+
+		if (recordSize >= 3 && recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData()) {
+			//check GPS latitude and longitude				
+			startIndexGPS = 0;
+			int i = 0;
+			for (; i < recordSize; ++i) {
+				if (recordLatitude.get(i) != 0 && recordLongitude.get(i) != 0) {
+					startIndexGPS = i;
+					++i;
+					break;
+				}
+			}
+		}
+
+		return startIndexGPS;
+	}
 
 	/**
 	 * calculate values of relative altitude, trip length, distance from start point, azimuth and direction from start point

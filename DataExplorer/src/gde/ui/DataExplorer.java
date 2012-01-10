@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui;
 
@@ -1533,6 +1533,14 @@ public class DataExplorer extends Composite {
 		}
 	}
 
+	/**
+	 * update menu items and tool bar items according GPS data availability
+	 */
+	public void updateMenusRegardingGPSData() {
+		this.menuBar.updateAdditionalGPSMenuItems();
+		this.menuToolBar.updateGoogleEarthToolItem();		
+	}
+	
 	public FileDialog openFileOpenDialog(String name, String[] extensions, String path, String fileName, int addStyle) {
 		final String $METHOD_NAME = "openFileOpenDialog"; //$NON-NLS-1$
 		FileDialog fileOpenDialog = new FileDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);

@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde;
 
@@ -160,6 +160,7 @@ public class GDE {
 	public static final String		FILE_ENDING_STAR_LOV						= "*.lov";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_OSD						= "*.osd";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_CSV						= "*.csv";																																																										//$NON-NLS-1$
+	public static final String		FILE_ENDING_STAR_IGC						= "*.igc";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_JPG						= "*.jpg";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_PNG						= "*.png";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_GIF						= "*.gif";																																																										//$NON-NLS-1$
@@ -175,6 +176,7 @@ public class GDE {
 	public static final String		FILE_ENDING_DOT_LOV							= ".lov";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_OSD							= ".osd";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_CSV							= ".csv";																																																										//$NON-NLS-1$
+	public static final String		FILE_ENDING_DOT_IGC							= ".igc";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_NMEA						= ".nmea";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_JPG							= ".jpg";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_PNG							= ".png";																																																										//$NON-NLS-1$
@@ -196,6 +198,7 @@ public class GDE {
 	public static final String		FILE_ENDING_LOV									= "lov";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_OSD									= "osd";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_CSV									= "csv";																																																											//$NON-NLS-1$
+	public static final String		FILE_ENDING_IGC									= "igc";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_NMEA								= "nmea";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_XML									= "xml";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_JPG									= "jpg";																																																											//$NON-NLS-1$

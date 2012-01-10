@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.menu;
 
@@ -940,12 +940,22 @@ public class MenuBar {
 	}
 	
 	/**
+	 * @return the file menu for update purpose
+	 */
+	public Menu getImportMenu() {
+		return this.importMenu;
+	}
+	
+	/**
 	 * remove menu entries not any longer required
 	 */
 	public void cleanup() {
 		//cleanup exportMenu for device specific entries
 		for (int i = this.exportMenu.getItemCount()-1; !this.exportMenu.getItem(i).getText().equals(Messages.getString(MessageIds.GDE_MSGT0018)); i--) {
 			this.exportMenu.getItem(i).dispose();
+		}
+		for (int i = this.importMenu.getItemCount()-1; !this.importMenu.getItem(i).getText().equals(Messages.getString(MessageIds.GDE_MSGT0018)); i--) {
+			this.importMenu.getItem(i).dispose();
 		}
 	}
 
@@ -956,4 +966,38 @@ public class MenuBar {
 	public void enablePanButton(boolean enable) {
 		this.panGraphicMenuItem.setEnabled(enable);
 	}
+
+	/**
+	 * toggle enabling additional export menu items in dependency of device data capability
+	 */
+	public void updateAdditionalGPSMenuItems() {
+		final boolean isGPSData = this.application.getActiveDevice().isActualRecordSetWithGpsData();
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			boolean isAdditionalExportItem = false;
+			for (MenuItem menuItem : this.exportMenu.getItems()) {
+				if (menuItem.getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+					isAdditionalExportItem = true;
+				}
+				else {
+					if (isAdditionalExportItem) menuItem.setEnabled(isGPSData);
+				}
+			}
+		}
+		else {
+			GDE.display.asyncExec(new Runnable() {
+				public void run() {
+					boolean isAdditionalExportItem = false;
+					for (MenuItem menuItem : MenuBar.this.exportMenu.getItems()) {
+						if (menuItem.getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+							isAdditionalExportItem = true;
+						}
+						else {
+							if (isAdditionalExportItem) menuItem.setEnabled(isGPSData);
+						}
+					}
+				}
+			});
+		}
+	}
 }
+

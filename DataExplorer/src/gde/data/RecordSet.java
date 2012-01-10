@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.data;
 
@@ -2104,5 +2104,13 @@ public class RecordSet extends HashMap<String, Record> {
 		}
 		else 
 			log.log(Level.WARNING, "time step vector is null !");
+	}
+	
+	/**
+	 * query the record set start time stamp
+	 * @return
+	 */
+	public long getStartTimeStamp() {
+		return this.timeStep_ms.getStartTimeStamp();
 	}
 }

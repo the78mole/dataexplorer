@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2010,2011 Winfried Bruegmann
+    Copyright (c) 2010,2011,2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
 
@@ -53,7 +53,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 
 /**
- * Class to write KML XML files
+ * Class to write KMz XML files
  * @author Winfried Brügmann
  */
 public class KMZWriter {
