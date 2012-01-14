@@ -612,7 +612,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 					log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
 					//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
 					//13=tripLength 14=distance 15=azimuth 16=directionStart
-					new IgcExportDialog().open(7, 8, 1);
+					new IgcExportDialog().open(7, 8, 9);
 				}
 			});
 		}
@@ -672,6 +672,24 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
 		//13=tripLength 14=distance 15=azimuth 16=directionStart
 		return 10; 
+	}
+	
+	/**
+	 * @return the translated latitude and longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W, baroAlt, gpsAlt} for GPS devices only
+	 */
+	@Override
+	public String translateGPS2IGC(RecordSet recordSet, int index, char fixValidity, int startAltitude, int offsetAltitude) {
+		//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
+		//13=tripLength 14=distance 15=azimuth 16=directionStart
+		Record recordLatitude = recordSet.get(8);
+		Record recordLongitude = recordSet.get(7);
+		Record baroAlitude = recordSet.get(1);
+		Record gpsAlitude = recordSet.get(9);
+		
+		return String.format("%02d%05d%s%03d%05d%s%c%05d%05d", 																																														//$NON-NLS-1$
+				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
+				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$
+				fixValidity, Double.valueOf(baroAlitude.get(index) / 10000.0 + startAltitude + offsetAltitude).intValue(), Double.valueOf(gpsAlitude.get(index) / 1000.0 + offsetAltitude).intValue());
 	}
 
 	/**
