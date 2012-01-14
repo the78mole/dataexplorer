@@ -2019,6 +2019,13 @@ public class DeviceConfiguration {
 	}
 	
 	/**
+	 * @return the translated latitude or longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W} for GPS devices only
+	 */
+	public String translateGPS2IGC(@SuppressWarnings("unused") RecordSet recordSet, @SuppressWarnings("unused") int index, @SuppressWarnings("unused") char fixValidity, @SuppressWarnings("unused") int startAltitude, @SuppressWarnings("unused") int offsetAltitude) {
+		return "DDMMmmmNDDDMMmmm0V000000000000";
+	}
+	
+	/**
 	 * query the default stem used as record set name
 	 * @return recordSetStemName
 	 */

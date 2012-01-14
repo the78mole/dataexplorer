@@ -89,7 +89,7 @@ public class IgcExportDialog extends Dialog {
 	final DataExplorer					application									= DataExplorer.getInstance();
 	final Settings							settings										= Settings.getInstance();
 	final String[]							gliderTypes									= {
-			"0 - 1500 mm", "1501 - 2000 mm", "2001 - 2500 mm", "2501 - 3000 mm", "3001 - 3500 mm", "3501 - 4000 mm", "4001 - 4500 mm", "4501 - 5000 mm", "5001 - 5500 mm", "5501 - 6000 mm", "6001 - 6500 mm", "6501 - 7000 mm", "7001 - 7500 mm", "7501 - 8000 mm", "8001 - 8500 mm", "8501 - 9000 mm", "9001 - 9500 mm", "9501 - 10000 mm", "10001 - 10500 mm", "10501 - 11000mm" };	//$NON-NLS-1$
+			"0 - 1500 mm", "1501 - 2000 mm", "2001-2500 mm", "2501-3000 mm", "3001-3500 mm", "3501-4000 mm", "4001-4500 mm", "4501-5000 mm", "5001-5500 mm", "5501-6000 mm", "6001-6500 mm", "6501-7000 mm", "7001-7500 mm", "7501-8000 mm", "8001-8500 mm", "8501-9000 mm", "9001-9500 mm", "9501-10000 mm", "10001-10500 mm", "10501-11000mm" };	//$NON-NLS-1$
 	final String[]							deltaUTC										= { " -12", " -11", " -10", " -9", " -8", " -7", " -6", " -5", " -4", " -3", " -2", " -1", " 0", " +1", " +2", " +3", " +4", " +5", " +6",
 			" +7", " +8", " +9", " +10", " +11", " +12"				};																																																																																																																																																											//$NON-NLS-4$
 
@@ -634,8 +634,8 @@ public class IgcExportDialog extends Dialog {
 			int startIndex = GPSHelper.getStartIndexGPS(recordSet, ordinalLatitude, ordinalLongitude);
 			String latitudeNS = recordLatitude.get(startIndex) > 0 ? "N" : "S"; //$NON-NLS-1$ //$NON-NLS-2$
 			String longitudeEW = recordLongitude.get(startIndex) > 0 ? "E" : "W"; //$NON-NLS-1$ //$NON-NLS-2$
-			this.latitude = String.format("%08.6f %s", recordLatitude.get(startIndex) / 1000000.0, latitudeNS);
-			this.longitude = String.format("%09.6f %s", recordLongitude.get(startIndex) / 1000000.0, longitudeEW);
+			this.latitude = String.format("%08.6f %s", device.translateValue(recordLatitude, recordLatitude.get(startIndex) / 1000.0), latitudeNS);
+			this.longitude = String.format("%09.6f %s", device.translateValue(recordLongitude, recordLongitude.get(startIndex) / 1000.0), longitudeEW);
 
 			this.startAltitude = String.format("%.0f", device.translateValue(recordSet.get(ordinalHeight), recordSet.get(ordinalHeight).get(startIndex) / 1000.0)); //$NON-NLS-1$
 			this.startTime = new SimpleDateFormat("HH:mm:ss").format(recordSet.getStartTimeStamp()); //$NON-NLS-1$

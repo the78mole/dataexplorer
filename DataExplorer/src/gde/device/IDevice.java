@@ -882,6 +882,11 @@ public interface IDevice {
 	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
 	 */
 	public Integer getGPS2KMZMeasurementOrdinal();
+	
+	/**
+	 * @return the translated latitude and longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W} for GPS devices only
+	 */
+	public String translateGPS2IGC(RecordSet recordSet, int index, char fixValidity, int startAltitude, int offsetAltitude);
 
 	/**
 	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML

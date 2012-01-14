@@ -72,27 +72,19 @@ public class IGCWriter {
 
 			if (recordSet != null) {
 				int startIndex = GPSHelper.getStartIndexGPS(recordSet, ordinalLatitude, ordinalLongitude);
-				Record recordLatitude = recordSet.get(ordinalLatitude);
-				Record recordLongitude = recordSet.get(ordinalLongitude);
 				Record recordAlitude = recordSet.get(ordinalAltitude);
-				String latitudeNS = recordLatitude.get(startIndex) > 0 ? "N" : "S"; //$NON-NLS-1$ //$NON-NLS-2$
-				String longitudeEW = recordLongitude.get(startIndex) > 0 ? "E" : "W"; //$NON-NLS-1$ //$NON-NLS-2$
 				SimpleDateFormat sdf = new SimpleDateFormat("HHmmss"); //$NON-NLS-1$
 				int offsetHeight = (int) (startAltitude - device.translateValue(recordAlitude, recordAlitude.get(startIndex) / 1000.0));
-				String fixValidity = offsetHeight == 0 ? "A" : "V"; //$NON-NLS-1$ //$NON-NLS-2$
-
+				char fixValidity = offsetHeight == 0 ? 'A' : 'V'; //$NON-NLS-1$ //$NON-NLS-2$
 				long lastTimeStamp = -1, timeStamp;
 				long recordSetStatTimeStamp = recordSet.getStartTimeStamp() - offsetUTC * 3600000;
+				log.log(Level.TIME, "start time stamp = " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", recordSetStatTimeStamp));
+				
 				for (int i = startIndex; i < recordSet.get(ordinalLongitude).realSize(); i++) {
 					// absolute time as recorded, needs to be converted into UTC
 					timeStamp = recordSet.getTime(i) / 10 + recordSetStatTimeStamp;
 					if ((timeStamp - lastTimeStamp) >= 950 || lastTimeStamp == -1) {
-						content.append(String.format("B%s%07d%s%08d%s%s", sdf.format(timeStamp - 3600000), recordLatitude.get(i) / 10, latitudeNS, recordLongitude.get(i) / 10, longitudeEW, fixValidity)); //$NON-NLS-1$
-						double altitude = device.translateValue(recordAlitude, recordAlitude.get(i) / 1000.0);
-						if (altitude >= 0)
-							content.append(String.format("%05.0f%05.0f\r\n", altitude + offsetHeight, altitude + offsetHeight)); //$NON-NLS-1$
-						else
-							content.append(String.format("-%04.0f%05.0f\r\n", altitude + offsetHeight, 0.0)); //$NON-NLS-1$
+						content.append(String.format("B%s%s\r\n", sdf.format(timeStamp), device.translateGPS2IGC(recordSet, i, fixValidity, startAltitude, offsetHeight))); //$NON-NLS-1$
 
 						lastTimeStamp = timeStamp;
 					}
