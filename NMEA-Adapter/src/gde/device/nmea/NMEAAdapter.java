@@ -635,6 +635,23 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	}
 	
 	/**
+	 * @return the translated latitude and longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W} for GPS devices only
+	 */
+	@Override
+	public String translateGPS2IGC(RecordSet recordSet, int index, char fixValidity, int startAltitude, int offsetAltitude) {
+		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
+		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
+		Record recordLatitude = recordSet.get(0);
+		Record recordLongitude = recordSet.get(1);
+		Record gpsAlitude = recordSet.get(2);
+		
+		return String.format("%02d%05d%s%03d%05d%s%c%05.0f%05.0f", 																																														//$NON-NLS-1$
+				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
+				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$
+				fixValidity, 0.0, gpsAlitude.get(index) / 1000.0 + offsetAltitude);
+	}
+	
+	/**
 	 * update the file import menu by adding new entry to import device specific files
 	 * @param importMenue
 	 */
