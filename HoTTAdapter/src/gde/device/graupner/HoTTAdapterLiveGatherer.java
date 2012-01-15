@@ -142,7 +142,6 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			this.serialPort.close();
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 			GDE.display.asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					HoTTAdapterLiveGatherer.this.application.getDeviceSelectionDialog().open();
 				}
