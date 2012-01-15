@@ -566,7 +566,6 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			convertIGCItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
 			convertIGCItem.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
 					//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
@@ -702,7 +701,6 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
 			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2008));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					open_closeCommPort();
