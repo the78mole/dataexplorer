@@ -607,7 +607,6 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			convertIGCItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
 			convertIGCItem.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
 					//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
@@ -728,7 +727,6 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
 			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT1877));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					open_closeCommPort();
