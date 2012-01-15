@@ -39,6 +39,8 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
@@ -84,7 +86,7 @@ public class IgcExportDialog extends Dialog {
 	Text												startAltitudeDescrptionText, startAltitudeText, startTimeDescriptionText, startTimeText, latitudeText, longitudeText;
 	String											startAltitude, startTime, latitude, longitude;
 
-	Button											cancelButton, saveButton;
+	Button											cancelButton, helpButton, saveButton;
 
 	final DataExplorer					application									= DataExplorer.getInstance();
 	final Settings							settings										= Settings.getInstance();
@@ -129,6 +131,12 @@ public class IgcExportDialog extends Dialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(800, 480);
+			this.dialogShell.addHelpListener(new HelpListener() {
+				public void helpRequested(HelpEvent evt) {
+					log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+					IgcExportDialog.this.application.openHelpDialog("", "HelpInfo_37.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
 			{
 				this.igcHeaderInfoGroup = new Group(this.dialogShell, SWT.NONE);
 				RowLayout personalInfoGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -159,6 +167,7 @@ public class IgcExportDialog extends Dialog {
 					this.headerARecordText.setLayoutData(headerARecordTextLData);
 					this.headerARecordText.setText(this.headerARecord);
 					this.headerARecordText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerARecordText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
 					this.headerRecordDateLabel = new CLabel(this.igcHeaderInfoGroup, SWT.NONE);
@@ -179,7 +188,6 @@ public class IgcExportDialog extends Dialog {
 					this.headerRecordDateText.setText(this.headerRecordDate);
 					this.headerRecordDateText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 					this.headerRecordDateText.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent evt) {
 							IgcExportDialog.log.log(java.util.logging.Level.FINEST, "headerRecordDateText.verifyText, event=" + evt); //$NON-NLS-1$
 							StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -204,8 +212,8 @@ public class IgcExportDialog extends Dialog {
 					this.headerFixAccuracyText.setLayoutData(headerFixAccuracyTextLData);
 					this.headerFixAccuracyText.setText("035"); //$NON-NLS-1$
 					this.headerFixAccuracyText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerFixAccuracyText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					this.headerFixAccuracyText.addVerifyListener(new VerifyListener() {
-						@Override
 						public void verifyText(VerifyEvent evt) {
 							IgcExportDialog.log.log(java.util.logging.Level.FINEST, "headerFixAccuracyText.verifyText, event=" + evt); //$NON-NLS-1$
 							StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -305,6 +313,7 @@ public class IgcExportDialog extends Dialog {
 					this.headerGpsDatumText.setLayoutData(headerGpsDatumTextLData);
 					this.headerGpsDatumText.setText(this.headerGpsDatum);
 					this.headerGpsDatumText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerGpsDatumText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
 					this.headerFirmwareVersionLabel = new CLabel(this.igcHeaderInfoGroup, SWT.NONE);
@@ -452,6 +461,7 @@ public class IgcExportDialog extends Dialog {
 						this.startAltitudeDescrptionText.setLayoutData(startAltitudeLabelLData);
 						this.startAltitudeDescrptionText.setText(Messages.getString(MessageIds.GDE_MSGT0647));
 						this.startAltitudeDescrptionText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.startAltitudeDescrptionText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					}
 					{
 						this.latitudeLabel = new CLabel(this.startAltitudeGroup, SWT.NONE);
@@ -462,6 +472,7 @@ public class IgcExportDialog extends Dialog {
 						this.latitudeText = new Text(this.startAltitudeGroup, SWT.READ_ONLY | SWT.BORDER);
 						this.latitudeText.setText(this.latitude);
 						this.latitudeText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.latitudeText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					}
 					{
 						this.longitudeLabel = new CLabel(this.startAltitudeGroup, SWT.NONE);
@@ -472,6 +483,7 @@ public class IgcExportDialog extends Dialog {
 						this.longitudeText = new Text(this.startAltitudeGroup, SWT.READ_ONLY | SWT.BORDER);
 						this.longitudeText.setText(this.longitude);
 						this.longitudeText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.longitudeText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					}
 					{
 						this.startAltitudeLabel = new CLabel(this.startAltitudeGroup, SWT.NONE);
@@ -492,7 +504,6 @@ public class IgcExportDialog extends Dialog {
 						this.startAltitudeText.setText(this.startAltitude);
 						this.startAltitudeText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 						this.startAltitudeText.addVerifyListener(new VerifyListener() {
-							@Override
 							public void verifyText(VerifyEvent evt) {
 								IgcExportDialog.log.log(java.util.logging.Level.FINEST, "startAltitudeText.verifyText, event=" + evt); //$NON-NLS-1$
 								StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -523,6 +534,7 @@ public class IgcExportDialog extends Dialog {
 						this.startTimeDescriptionText.setLayoutData(startTimeDescriptionTextLData);
 						this.startTimeDescriptionText.setText(Messages.getString(MessageIds.GDE_MSGT0651));
 						this.startTimeDescriptionText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.startTimeDescriptionText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					}
 					{
 						this.startTimeLabel = new CLabel(this.startTimeGroup, SWT.NONE);
@@ -563,6 +575,23 @@ public class IgcExportDialog extends Dialog {
 						IgcExportDialog.this.dialogShell.close();
 					}
 				});
+				}
+				{
+					this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+					this.helpButton.setImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif")); //$NON-NLS-1$
+					FormData helpButtonLData = new FormData();
+					helpButtonLData.width = 60;
+					helpButtonLData.height = 34;
+					helpButtonLData.left = new FormAttachment(0, 1000, 370);
+					helpButtonLData.top = new FormAttachment(0, 1000, 407);
+					this.helpButton.setLayoutData(helpButtonLData);
+					this.helpButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							IgcExportDialog.log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							IgcExportDialog.this.application.openHelpDialog("", "HelpInfo_37.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						}
+					});
 				{
 					this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData saveButtonLData = new FormData();
