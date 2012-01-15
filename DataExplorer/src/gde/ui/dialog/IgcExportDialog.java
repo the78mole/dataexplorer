@@ -655,7 +655,7 @@ public class IgcExportDialog extends Dialog {
 		if (this.application.isObjectoriented()) {
 			String objectText = this.application.getObject().getStyledText();
 
-			this.headerPilot = ""; //$NON-NLS-1$
+			this.headerPilot = Messages.getString(MessageIds.GDE_MSGT0655);
 			if (objectText.split(IgcExportDialog.IGC_PILOT_NAME).length >= 2) {
 				this.headerPilot = objectText.split(IgcExportDialog.IGC_PILOT_NAME)[1].split(":|\\r|\\n")[1].trim(); //$NON-NLS-1$
 			}
@@ -691,27 +691,27 @@ public class IgcExportDialog extends Dialog {
 			if (objectText.split(IgcExportDialog.IGC_GLIDER_ID).length >= 2) {
 				this.headerGliderId = objectText.split(IgcExportDialog.IGC_GLIDER_ID)[1].split(":|\\r|\\n")[1].trim(); //$NON-NLS-1$
 			}
-			this.headerFirmwareVersion = ""; //$NON-NLS-1$
+			this.headerFirmwareVersion = Messages.getString(MessageIds.GDE_MSGT0658);
 			if (objectText.split(IgcExportDialog.IGC_GPS_FIRMWARE_VERSION).length >= 2) {
 				this.headerFirmwareVersion = objectText.split(IgcExportDialog.IGC_GPS_FIRMWARE_VERSION)[1].split(":|\\r|\\n")[1].trim(); //$NON-NLS-1$
 			}
-			this.headerHardwareVersion = ""; //$NON-NLS-1$
+			this.headerHardwareVersion = Messages.getString(MessageIds.GDE_MSGT0659);
 			if (objectText.split(IgcExportDialog.IGC_GPS_HARDWARE_VERSION).length >= 2) {
 				this.headerHardwareVersion = objectText.split(IgcExportDialog.IGC_GPS_HARDWARE_VERSION)[1].split(":|\\r|\\n")[1].trim(); //$NON-NLS-1$
 			}
-			this.headerGpsManufacturerModel = ""; //$NON-NLS-1$
+			this.headerGpsManufacturerModel = Messages.getString(MessageIds.GDE_MSGT0660);
 			if (objectText.split(IgcExportDialog.IGC_GPS_TYPE_IDENTIFIER).length >= 2) {
 				this.headerGpsManufacturerModel = objectText.split(IgcExportDialog.IGC_GPS_TYPE_IDENTIFIER)[1].split(":|\\r|\\n")[1].trim(); //$NON-NLS-1$
 			}
-			this.headerCompetitionId = ""; //$NON-NLS-1$
+			this.headerCompetitionId = Messages.getString(MessageIds.GDE_MSGT0661);
 			if (objectText.split(IgcExportDialog.IGC_COMPETITION_IDENTIFIER).length >= 2) {
 				this.headerCompetitionId = objectText.split(IgcExportDialog.IGC_COMPETITION_IDENTIFIER)[1].split(":|\\r|\\n")[1].trim(); //$NON-NLS-1$
 			}
-			this.headerCompetitionClass = ""; //$NON-NLS-1$
+			this.headerCompetitionClass = Messages.getString(MessageIds.GDE_MSGT0662);
 			if (objectText.split(IgcExportDialog.IGC_COMPETITION_CLASS).length >= 2) {
 				this.headerCompetitionClass = objectText.split(IgcExportDialog.IGC_COMPETITION_CLASS)[1].split(":|\\r|\\n")[1].trim(); //$NON-NLS-1$
 			}
-			this.headerUtcOffset = 14; // +2
+			this.headerUtcOffset = 12; // 0
 			if (objectText.split(IgcExportDialog.IGC_UTC_OFFSET).length >= 2) {
 				String tmpUtcOffset = objectText.split(IgcExportDialog.IGC_UTC_OFFSET)[1].split(":|\\r|\\n")[1].trim(); //$NON-NLS-1$
 				if (tmpUtcOffset.startsWith("+"))this.headerUtcOffset = 12 + Integer.parseInt(tmpUtcOffset.substring(1)); //$NON-NLS-1$
@@ -721,7 +721,6 @@ public class IgcExportDialog extends Dialog {
 			}
 		}
 		else {
-			this.headerFixAccuracy = "035"; //$NON-NLS-1$
 			this.headerPilot = Messages.getString(MessageIds.GDE_MSGT0655);
 			this.headerCoPilot = Messages.getString(MessageIds.GDE_MSGT0656);
 			this.headerGliderType = 4;
@@ -731,7 +730,7 @@ public class IgcExportDialog extends Dialog {
 			this.headerGpsManufacturerModel = Messages.getString(MessageIds.GDE_MSGT0660);
 			this.headerCompetitionId = Messages.getString(MessageIds.GDE_MSGT0661);
 			this.headerCompetitionClass = Messages.getString(MessageIds.GDE_MSGT0662);
-			this.headerUtcOffset = 14; // +2
+			this.headerUtcOffset = 12; // 0
 		}
 	}
 }
