@@ -65,7 +65,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	boolean								isQueryRetry								= false;
 
 	boolean								isInterruptedByUser					= false;
-	HoTTAdapter.Protocol	protocolType								= HoTTAdapter.Protocol.TYPE_19200_N;
+	HoTTAdapter.Protocol	protocolType								= HoTTAdapter.Protocol.TYPE_19200_V4;
 
 	/**
 	 * constructor of default implementation
@@ -172,7 +172,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				++index;
 			}
 
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "index = " + index + " begin part size = " + (this.ANSWER_DATA.length - index + 2) + " end part size = " + (index - 2));
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINER, "index = " + index + " begin part size = " + (this.ANSWER_DATA.length - index + 2) + " end part size = " + (index - 2));
 			if (index >= 2 && index < this.ANSWER_DATA.length) {
 				System.arraycopy(this.ANSWER_DATA, index - 2, data, 0, this.ANSWER_DATA.length - index + 2);
 				System.arraycopy(this.ANSWER_DATA, 0, data, this.ANSWER_DATA.length - index + 2, index - 2);
@@ -278,7 +278,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	public synchronized void setSensorType(byte sensorType) {
 		this.SENSOR_TYPE[0] = sensorType;
 		switch (this.protocolType) {
-		case TYPE_19200_L:
+		case TYPE_19200_V3:
 			switch (sensorType) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, ">>>Receiver<<<");
@@ -341,7 +341,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				break;
 			}
 			break;
-		case TYPE_19200_N:
+		case TYPE_19200_V4:
 			switch (sensorType) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, ">>>Receiver<<<");

@@ -76,10 +76,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static byte										SENSOR_TYPE_GPS_19200					= (byte) (0x8A & 0xFF);
 	final static byte										SENSOR_TYPE_GENERAL_19200			= (byte) (0x8D & 0xFF);
 	final static byte										SENSOR_TYPE_ELECTRIC_19200		= (byte) (0x8E & 0xFF);
-	final static byte										ANSWER_SENSOR_VARIO_19200			= (byte) (0x80 & 0xFF);
-	final static byte										ANSWER_SENSOR_GPS_19200				= (byte) (0x90 & 0xFF);
-	final static byte										ANSWER_SENSOR_GENERAL_19200		= (byte) (0xC0 & 0xFF);
-	final static byte										ANSWER_SENSOR_ELECTRIC_19200	= (byte) (0xD0 & 0xFF);
+//	final static byte										ANSWER_SENSOR_VARIO_19200			= (byte) (0x80 & 0xFF);
+//	final static byte										ANSWER_SENSOR_GPS_19200				= (byte) (0x90 & 0xFF);
+//	final static byte										ANSWER_SENSOR_GENERAL_19200		= (byte) (0xC0 & 0xFF);
+//	final static byte										ANSWER_SENSOR_ELECTRIC_19200	= (byte) (0xD0 & 0xFF);
+	final static byte										ANSWER_SENSOR_VARIO_19200			= (byte) (0x90 & 0xFF);
+	final static byte										ANSWER_SENSOR_GPS_19200				= (byte) (0xA0 & 0xFF);
+	final static byte										ANSWER_SENSOR_GENERAL_19200		= (byte) (0xD0 & 0xFF);
+	final static byte										ANSWER_SENSOR_ELECTRIC_19200	= (byte) (0xE0 & 0xFF);
 
 	//HoTT sensor bytes 115200 Baud protocol (actual no slave mode)
 	//there is no real slave mode for this protocol
@@ -107,7 +111,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 	//protocol definitions
 	public enum Protocol {
-		TYPE_19200_L("19200 Legacy"), TYPE_19200_N("19200"), TYPE_115200("115200");
+		TYPE_19200_V3("19200 V3"), TYPE_19200_V4("19200 V4"), TYPE_115200("115200");
 
 		private final String	value;
 
@@ -291,7 +295,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		int tmpHeight, tmpClimb3, tmpClimb10, tmpCapacity, tmpVoltage1, tmpVoltage2;
 
 		switch (this.serialPort.protocolType) {
-		case TYPE_19200_L:
+		case TYPE_19200_V3:
 			switch (dataBuffer[1]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				if (dataBuffer.length == 17) {
@@ -400,7 +404,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			}
 			break;
 
-		case TYPE_19200_N:
+		case TYPE_19200_V4:
 			switch (dataBuffer[1]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				if (dataBuffer.length == 17) {
