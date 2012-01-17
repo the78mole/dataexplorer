@@ -27,9 +27,11 @@ import gde.device.graupner.HoTTbinReader;
 import gde.exception.NotSupportedException;
 import gde.io.CSVReaderWriter;
 import gde.io.CSVSerialDataReaderWriter;
+import gde.io.IGCWriter;
 import gde.io.LogViewReader;
 import gde.io.NMEAReaderWriter;
 import gde.io.OsdReaderWriter;
+import gde.ui.dialog.IgcExportDialog;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
@@ -710,6 +712,120 @@ public class TestFileReaderWriter extends TestSuperClass {
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						failures.put(file.getAbsolutePath(), e);
+					}
+				}
+			}
+
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
+	/**
+	 * test reading data files from device directory check for GPS data content and writes IGC files to %TEMP%\Write_1_OSD
+	 * all consistent files must red without failures
+	 */
+	public final void testGPSReaderIGCWriter() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		this.setDataPath(); //set the dataPath variable
+
+		try {
+			List<File> files = FileUtils.getFileListing(this.dataPath);
+
+			IgcExportDialog igcExport = new IgcExportDialog();
+			int ordinalLongitude = 1, ordinalLatitude = 0, ordinalAltitude = 2;
+			RecordSet recordSet = null;
+			
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".nmea") || file.getAbsolutePath().toLowerCase().endsWith(".csv") || file.getAbsolutePath().toLowerCase().endsWith(".bin")) {
+					
+					try {
+						//System.out.println("file.getPath() = " + file.getPath());
+						String deviceName = file.getPath().substring(0, file.getPath().lastIndexOf(GDE.FILE_SEPARATOR));
+						deviceName = deviceName.substring(1+deviceName.lastIndexOf(GDE.FILE_SEPARATOR));
+						//System.out.println("deviceName = " + deviceName);
+						if (deviceName.startsWith("NMEA") || deviceName.startsWith("GPS") || deviceName.startsWith("DataVario") || deviceName.startsWith("LinkVario") || deviceName.startsWith("HoTT")) {
+						
+							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+							if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
+	
+							// GPS, GPS-Logger, WStech Varios, HoTTbiaries
+							IDevice device = this.getInstanceOfDevice(deviceConfig);
+							this.application.setActiveDeviceWoutUI(device);
+	
+							setupDataChannels(device);
+	
+							this.channels.setActiveChannelNumber(1);
+							Channel activeChannel = this.channels.getActiveChannel();
+							activeChannel.setFileName(file.getAbsolutePath());
+							activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from GPS file");
+							activeChannel.setSaved(true);
+	
+							if (file.getAbsolutePath().toLowerCase().endsWith(".nmea")) {
+								recordSet = NMEAReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1);
+								if (recordSet != null) {
+									activeChannel.setActiveRecordSet(recordSet);
+								}
+								//NMEA, GPS-Logger
+								ordinalLongitude = 1;
+								ordinalLatitude = 0;
+								ordinalAltitude = 2;
+							}
+							else if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && (device.getName().startsWith("DataVario") || device.getName().startsWith("LinkVario"))) {
+								recordSet = CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1, true);
+								if (recordSet != null) {
+									activeChannel.setActiveRecordSet(recordSet);
+								}
+								if (!device.isActualRecordSetWithGpsData()) continue;
+								//WStech
+								ordinalLongitude = 7;
+								ordinalLatitude = 8;
+								ordinalAltitude = 9;
+							}
+							else if (file.getAbsolutePath().toLowerCase().endsWith(".bin")) {
+								HoTTbinReader.read(file.getAbsolutePath());
+								this.channels.setActiveChannelNumber(3);
+								activeChannel = this.channels.getActiveChannel();
+								activeChannel.setActiveRecordSet(activeChannel.getFirstRecordSetName());
+								recordSet = activeChannel.getActiveRecordSet();
+								if (recordSet != null) {
+									activeChannel.setActiveRecordSet(recordSet);
+								}
+								else continue;
+								if (!device.isActualRecordSetWithGpsData()) continue;
+								//HoTT
+								ordinalLongitude = 2;
+								ordinalLatitude = 1;
+								ordinalAltitude = 3;
+							}
+							
+							System.out.println("working with : " + file);
+							if (recordSet != null) {
+								activeChannel.applyTemplate(recordSet.getName(), true);
+								drawCurves(recordSet, 1024, 768);
+							}
+	
+							String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
+							new File(tmpDir1).mkdirs();
+							String absolutFilePath = tmpDir1 + file.getName();
+							absolutFilePath = absolutFilePath.trim().substring(0, absolutFilePath.lastIndexOf(GDE.STRING_DOT)) + GDE.FILE_ENDING_DOT_IGC;
+							System.out.println("writing as   : " + absolutFilePath);
+							igcExport.initializeValues(ordinalLongitude, ordinalLatitude, ordinalAltitude);
+							IGCWriter.write(device, absolutFilePath, igcExport.getHeader(), recordSet, ordinalLongitude, ordinalLatitude, ordinalAltitude, 487);
+						}
 					}
 					catch (Exception e) {
 						e.printStackTrace();

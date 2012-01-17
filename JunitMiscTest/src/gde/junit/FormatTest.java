@@ -1,3 +1,4 @@
+package gde.junit;
 /**************************************************************************************
   	This file is part of GNU DataExplorer.
 
