@@ -76,10 +76,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static byte										SENSOR_TYPE_GPS_19200					= (byte) (0x8A & 0xFF);
 	final static byte										SENSOR_TYPE_GENERAL_19200			= (byte) (0x8D & 0xFF);
 	final static byte										SENSOR_TYPE_ELECTRIC_19200		= (byte) (0x8E & 0xFF);
-//	final static byte										ANSWER_SENSOR_VARIO_19200			= (byte) (0x80 & 0xFF);
-//	final static byte										ANSWER_SENSOR_GPS_19200				= (byte) (0x90 & 0xFF);
-//	final static byte										ANSWER_SENSOR_GENERAL_19200		= (byte) (0xC0 & 0xFF);
-//	final static byte										ANSWER_SENSOR_ELECTRIC_19200	= (byte) (0xD0 & 0xFF);
 	final static byte										ANSWER_SENSOR_VARIO_19200			= (byte) (0x90 & 0xFF);
 	final static byte										ANSWER_SENSOR_GPS_19200				= (byte) (0xA0 & 0xFF);
 	final static byte										ANSWER_SENSOR_GENERAL_19200		= (byte) (0xD0 & 0xFF);
