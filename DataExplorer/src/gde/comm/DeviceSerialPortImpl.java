@@ -500,7 +500,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 					WaitTimer.delay(sleepTime);
 				}
 
-				if (timeOutCounter/4 <= 0 && readBytes == 0) {
+				if (timeOutCounter/8 <= 0 && readBytes == 0) {
 					FailedQueryException e = new FailedQueryException(Messages.getString(MessageIds.GDE_MSGE0012, new Object[] { timeout_msec/4 }));
 					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage());
 					throw e;
