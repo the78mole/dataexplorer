@@ -638,10 +638,9 @@ public class FileHandler {
 	 * @param ordinalLatitude
 	 * @param ordinalAltitude
 	 * @param offsetAltitude
-	 * @param offsetUTC
 	 */
 	public void exportFileIGC(final String dialogName, final IDevice device, final StringBuilder igcFileHeader, final int ordinalLongitude, final int ordinalLatitude, final int ordinalAltitude,
-			final int offsetAltitude, final int offsetUTC) {
+			final int offsetAltitude) {
 		final Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel == null) {
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0005));
@@ -681,7 +680,7 @@ public class FileHandler {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 
-				IGCWriter.write(device, igcFilePath, igcFileHeader, activeChannel.getActiveRecordSet(), ordinalLongitude, ordinalLatitude, ordinalAltitude, offsetAltitude, offsetUTC);
+				IGCWriter.write(device, igcFilePath, igcFileHeader, activeChannel.getActiveRecordSet(), ordinalLongitude, ordinalLatitude, ordinalAltitude, offsetAltitude);
 			}
 			catch (Exception e) {
 				FileHandler.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);

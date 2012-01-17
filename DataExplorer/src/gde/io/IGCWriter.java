@@ -61,7 +61,7 @@ public class IGCWriter {
 	 * @throws Exception
 	 */
 	public static void write(IDevice device, String igcFilePath, StringBuilder header, RecordSet recordSet, final int ordinalLongitude, final int ordinalLatitude, final int ordinalAltitude,
-			final int startAltitude, final int offsetUTC) throws Exception {
+			final int startAltitude) throws Exception {
 		BufferedWriter writer;
 		StringBuilder content = new StringBuilder().append(header);
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -77,10 +77,10 @@ public class IGCWriter {
 				int offsetHeight = (int) (startAltitude - device.translateValue(recordAlitude, recordAlitude.get(startIndex) / 1000.0));
 				char fixValidity = offsetHeight == 0 ? 'A' : 'V'; //$NON-NLS-1$ //$NON-NLS-2$
 				long lastTimeStamp = -1, timeStamp;
-				long recordSetStatTimeStamp = recordSet.getStartTimeStamp() - offsetUTC * 3600000;
+				long recordSetStatTimeStamp = recordSet.getStartTimeStamp();
 				log.log(Level.TIME, "start time stamp = " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", recordSetStatTimeStamp));
 				
-				for (int i = startIndex; i < recordSet.get(ordinalLongitude).realSize(); i++) {
+				for (int i = startIndex; startIndex >= 0 && i < recordSet.get(ordinalLongitude).realSize(); i++) {
 					// absolute time as recorded, needs to be converted into UTC
 					timeStamp = recordSet.getTime(i) / 10 + recordSetStatTimeStamp;
 					if ((timeStamp - lastTimeStamp) >= 950 || lastTimeStamp == -1) {

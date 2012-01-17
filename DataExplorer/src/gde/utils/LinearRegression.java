@@ -126,7 +126,7 @@ public class LinearRegression extends CalculationThread {
 				log.log(Level.FINE, "startPosition = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (this.recordSet.get(this.sourceRecordKey) != null && this.recordSet.get(this.sourceRecordKey).isDisplayable()) record.setDisplayable(true); // depending record influence
-				if (this.recordSet.getName().equals(Channels.getInstance().getActiveChannel().getActiveRecordSet().getName()) && record.isVisible()) {
+				if (this.application.getActiveRecordSet() != null && this.recordSet.getName().equals(this.application.getActiveRecordSet().getName()) && record.isVisible()) {
 					this.application.updateGraphicsWindow();
 				}
 			}
