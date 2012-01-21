@@ -164,6 +164,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @see gde.serial.IDeviceSerialPort#read(byte[], int)
 	 */
 	public byte[] read(byte[] readBuffer, int timeout_msec) throws IOException, TimeOutException {
+		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		try {
 			wait4Bytes(timeout_msec);
 		}
@@ -200,12 +201,12 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				else if (this.fileType.equals(GDE.FILE_ENDING_STAR_LOG)) {
 					String line;
 					if ((line = txt_in.readLine()) != null) {
-						while(!line.contains("WARNING") && !line.contains("Read  data:") && (line = txt_in.readLine()) != null) ;
+						while(!line.contains("WARNING") && !(line.contains("Read") && line.length() > line.indexOf("Read") + 15) && (line = txt_in.readLine()) != null) ;
 						
 						//System.out.println(line);
-						if(line != null && line.contains("Read  data:")) {
+						if(line != null && line.contains("Read")) {
 							boolean isQCdata = false;
-							line = line.substring(line.indexOf("Read  data:") + 12);
+							line = line.substring(line.indexOf("Read") + 15);
 							StringTokenizer token = new StringTokenizer(line);
 							StringBuffer sb = new StringBuffer();
 							while (token.hasMoreElements()) {
@@ -224,7 +225,12 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000), (readBuffer.length - sb.length()/2)));
 								}
 							}
-							readBuffer = StringHelper.convert2ByteArray(sb.toString());
+							byte[] tmpData = StringHelper.convert2ByteArray(sb.toString());
+							System.arraycopy(tmpData, 0, readBuffer, 0, tmpData.length <= readBuffer.length ? tmpData.length : readBuffer.length);
+							if (log.isLoggable(Level.FINE)) {
+								log.logp(java.util.logging.Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(readBuffer));
+								log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBuffer.length));
+							}
 						}
 						else { // WARNING, assume time out
 							if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, $CLASS_NAME, "read()", "delay " + timeout_msec);

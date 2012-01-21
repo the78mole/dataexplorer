@@ -940,4 +940,11 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		}
 	}
 
+	/**
+	 * @return the available serial port names
+	 */
+	public static synchronized Vector<String> getAvailableports() {
+		return availablePorts;
+	}
+
 }

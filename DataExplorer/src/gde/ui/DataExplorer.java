@@ -19,6 +19,7 @@
 package gde.ui;
 
 import gde.GDE;
+import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -323,6 +324,20 @@ public class DataExplorer extends Composite {
 			//init settings
 			this.settings = Settings.getInstance();
 			log.logp(Level.INFO, $CLASS_NAME, $METHOD_NAME, this.settings.toString());
+			
+			new Thread("updateAvailablePorts") {
+				@Override
+				public void run() {
+					try {
+						DeviceSerialPortImpl.listConfiguredSerialPorts(DataExplorer.this.settings.doPortAvailabilityCheck(),
+								DataExplorer.this.settings.isSerialPortBlackListEnabled() ? DataExplorer.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
+								DataExplorer.this.settings.isSerialPortWhiteListEnabled() ? DataExplorer.this.settings.getSerialPortWhiteList() : new Vector<String>());
+					}
+					catch (Throwable t) {
+						log.log(java.util.logging.Level.WARNING, t.getMessage(), t);
+					}
+				}
+			}.start();
 
 			this.isDeviceDialogModal = this.settings.isDeviceDialogsModal();
 

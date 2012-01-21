@@ -151,6 +151,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.application = currentApplication;
 		this.settings = Settings.getInstance();
 		this.activeDeviceName = this.settings.getActiveDevice();
+		this.availablePorts = DeviceSerialPortImpl.getAvailableports();
 		
 		//add this two renamed device plug-ins to the list of legacy devices
 		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
@@ -892,7 +893,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				this.deviceTypeText.setText(Settings.EMPTY);
 				this.internetLinkText.setText(Settings.EMPTY);
 
-				this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));
+				this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(this.availablePorts));
 				this.portSelectCombo.select(0);
 
 				// com port adjustments group
@@ -985,6 +986,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	/**
 	 * check if the configure serial port matches system available
 	 */
+	@Deprecated
 	public boolean checkPortSelection() {
 		boolean matches = true;
 		if (this.availablePorts == null) {
@@ -1241,11 +1243,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								});
 							}
 						}
-						WaitTimer.delay(1000);
+						//WaitTimer.delay(1000);
 					}
 				}
 				catch (Throwable t) {
-					SettingsDialog.log.log(java.util.logging.Level.WARNING, t.getMessage(), t);
+					DeviceSelectionDialog.log.log(java.util.logging.Level.WARNING, t.getMessage(), t);
 				}
 			}
 		};

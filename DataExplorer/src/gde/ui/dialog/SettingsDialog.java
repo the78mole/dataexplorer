@@ -32,7 +32,6 @@ import gde.ui.menu.LogLevelSelectionContextMenu;
 import gde.utils.ObjectKeyScanner;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
 
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -1231,7 +1230,7 @@ public class SettingsDialog extends Dialog {
 								}
 							}
 							});
-						WaitTimer.delay(1000);
+						//WaitTimer.delay(1000);
 					}
 				}
 				catch (Throwable t) {
