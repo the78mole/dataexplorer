@@ -102,7 +102,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				HoTTAdapter.IS_SLAVE_MODE = false;
 			HoTTAdapterLiveGatherer.log.log(java.util.logging.Level.FINE, "HoTTAdapter.IS_SLAVE_MODE = " + HoTTAdapter.IS_SLAVE_MODE);
 
-			for (int i = 0; i < (this.serialPort.protocolType == HoTTAdapter.Protocol.TYPE_115200 ? 20 : 10) && (HoTTAdapter.isSensorType[0] == false && HoTTAdapter.isSensorType[1] == false && HoTTAdapter.isSensorType[2] == false && HoTTAdapter.isSensorType[3] == false); i++) {
+			for (int i = 0; i < 10 && (HoTTAdapter.isSensorType[0] == false && HoTTAdapter.isSensorType[1] == false && HoTTAdapter.isSensorType[2] == false && HoTTAdapter.isSensorType[3] == false); i++) {
 				try {
 					detectSensorType(HoTTAdapter.isSensorType);
 				}
@@ -137,12 +137,14 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		}
 		catch (SerialPortException e) {
 			this.serialPort.close();
+			this.dialog.resetButtons();
 			this.application.openMessageDialogAsync(this.dialog.getDialogShell(),
 					Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 			return;
 		}
 		catch (ApplicationConfigurationException e) {
 			this.serialPort.close();
+			this.dialog.resetButtons();
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
@@ -154,6 +156,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		catch (Throwable t) {
 			this.serialPort.close();
 			HoTTAdapterLiveGatherer.log.log(java.util.logging.Level.SEVERE, t.getMessage(), t);
+			this.dialog.resetButtons();
 			this.application.openMessageDialogAsync(this.dialog.getDialogShell(),
 					Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { t.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + t.getMessage() }));
 			return;

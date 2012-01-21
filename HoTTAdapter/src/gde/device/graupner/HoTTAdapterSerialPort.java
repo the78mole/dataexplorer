@@ -97,10 +97,10 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		try {
 			if (!HoTTAdapter.IS_SLAVE_MODE) {
 				this.write(HoTTAdapterSerialPort.QUERY_SENSOR_DATA);
-				this.read(HoTTAdapterSerialPort.ANSWER, HoTTAdapterSerialPort.READ_TIMEOUT_MS);
+				this.read(HoTTAdapterSerialPort.ANSWER, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
 				data[0] = HoTTAdapterSerialPort.ANSWER[0];
 				this.write(this.SENSOR_TYPE);
-				this.read(HoTTAdapterSerialPort.ANSWER, HoTTAdapterSerialPort.READ_TIMEOUT_MS);
+				this.read(HoTTAdapterSerialPort.ANSWER, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
 				data[1] = HoTTAdapterSerialPort.ANSWER[0];
 			}
 			else {
@@ -142,7 +142,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				data = getData(true);
 			}
 			else {
-				this.isQueryRetry = true;
+				this.isQueryRetry = false;
+				WaitTimer.delay(HoTTAdapterSerialPort.READ_TIMEOUT_MS);
 				TimeOutException te = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { this.ANSWER_DATA.length, HoTTAdapterSerialPort.READ_TIMEOUT_MS }));
 				log.log(Level.SEVERE, te.getMessage(), te);
 				throw te;
