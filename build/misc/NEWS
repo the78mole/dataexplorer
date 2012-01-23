@@ -6,9 +6,14 @@ GNU DataExplorer - News - comes with version 2.95
 4) HoTTAdapter - make query sensor sequence more efficiency
 5) HoTTAdapter - enable detection of missed query sensor writes
 6) HoTTAdapter - 19200 Baud slave-modus, refine error handling while switch sensor/receiver 
-
-
-8) Documentation update
+7) fix error removing absolute time stamp while cutting curve from begin
+8) HoTTAdapter - enable IGC export format while GPS data available
+9) NMEAAdapter - enable IGC export format
+10)SM GPS-Logger - enable IGC export format
+11)WStech DataVario/LinkVario - enable IGC export format while GPS data available
+12)VC8x0 - fix error displaying integer values 
+13)VC8x0 - enable changeable time steps value for long term measurements
+14)Documentation update
 
 
 

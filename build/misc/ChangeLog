@@ -16,7 +16,7 @@ VC8x0 - fix error displaying integer values
 VC8x0 - enable changeable time steps value for long term measurements
 Documentation update
 
-Version 2.94 - 20 Dec 2011
+Version 2.95 - 20 Dec 2011
 DevicePropertyEditor - fix out of handles problem
 DevicePropertyEditor - fix problem displaying wrong measurement names while adding sync reference in cases with different measurement sets per channel
 HottAdapter - fix SWT error while live data gathering and closed dialog
