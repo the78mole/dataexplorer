@@ -12,6 +12,8 @@ HoTTAdapter - enable IGC export format while GPS data available
 NMEAAdapter - enable IGC export format
 SM GPS-Logger - enable IGC export format
 WStech DataVario/LinkVario - enable IGC export format while GPS data available
+VC8x0 - fix error displaying integer values 
+VC8x0 - enable changeable time steps value for long term measurements
 Documentation update
 
 Version 2.94 - 20 Dec 2011
