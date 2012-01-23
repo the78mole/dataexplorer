@@ -30,6 +30,7 @@ import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.WaitTimer;
 
 import java.util.HashMap;
 import java.util.logging.Logger;
@@ -60,7 +61,7 @@ public class GathererThread extends Thread {
 
 	final static int					WAIT_TIME_RETRYS						= 36;
 	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;	// 36 * 5 sec timeout = 180 sec
-	long											timeStamp;
+	final long								cycleTime_ms;
 	boolean										isCollectDataStopped				= false;
 
 	/**
@@ -86,6 +87,8 @@ public class GathererThread extends Thread {
 			this.isPortOpenedByLiveGatherer = true;
 		}
 		this.setPriority(Thread.MAX_PRIORITY);
+		
+		this.cycleTime_ms = (long) this.device.getTimeStep_ms();
 	}
 
 	@Override
@@ -97,6 +100,7 @@ public class GathererThread extends Thread {
 		final HashMap<String, String>	configData = this.dialog.getConfigData();
 		long startCycleTime = 0;
 		long tmpCycleTime = 0;
+		long deltaTime = 0;
 		long measurementCount = 0;
 		byte[] dataBuffer = null;
 		String m_unit = "", old_unit = ""; //$NON-NLS-1$ //$NON-NLS-2$
@@ -105,6 +109,13 @@ public class GathererThread extends Thread {
 		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry " + "initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
 		this.application.setStatusMessage(""); //$NON-NLS-1$
 
+		long lastTimeStamp = System.nanoTime() / 1000000, delayTime = 0;
+		try {
+			this.serialPort.getData();
+		}
+		catch (Exception e1) {
+			// ignore here
+		}
 		while (!this.isCollectDataStopped) {
 			try {
 				// get data from device
@@ -172,6 +183,14 @@ public class GathererThread extends Thread {
 				else {
 					stopDataGatheringThread(true);
 				}
+			}
+			
+			if (cycleTime_ms > 1000) {
+				deltaTime = System.nanoTime() / 1000000 - lastTimeStamp;
+				delayTime = this.cycleTime_ms - deltaTime;
+				log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> delay time = " + delayTime); //$NON-NLS-1$
+				if (delayTime > 0) WaitTimer.delay(delayTime);
+				lastTimeStamp = System.nanoTime() / 1000000;
 			}
 		}
 		configData.clear();

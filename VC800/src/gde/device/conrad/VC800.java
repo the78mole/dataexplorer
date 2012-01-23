@@ -33,6 +33,7 @@ import gde.exception.SerialPortException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -165,9 +166,10 @@ public class VC800 extends DeviceConfiguration implements IDevice {
     points[0] += 1 * getDigit(((dataBuffer[7] & 0x07) << 4) | (dataBuffer[8] & 0x0f));
 		log.log(Level.FINEST, "digits = " + points[0]); //$NON-NLS-1$
 
-    //if 		((dataBuffer[3] & 0x08) > 0) ; 									//points[0] /= 1000.0;
-    if 			((dataBuffer[5] & 0x08) > 0) points[0] *= 10 ; 	// /= 100.0;
+    if 			((dataBuffer[3] & 0x08) > 0) points[0] *= 1;		// /= 1000.0;
+    else if ((dataBuffer[5] & 0x08) > 0) points[0] *= 10 ; 	// /= 100.0;
     else if ((dataBuffer[7] & 0x08) > 0) points[0] *= 100; 	// /= 10.0;
+    else																 points[0] *= 1000; // /= 1.0
     
     if ((dataBuffer[1] & 0x08) > 0) points[0] *= -1;  
 
@@ -295,6 +297,9 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 	 * @return measurement unit as string
 	 */
 	public HashMap<String, String> getMeasurementInfo(byte[] buffer, HashMap<String, String> measurementInfo) {
+		if (log.isLoggable(Level.FINE)) {
+			log.log(Level.FINE, "  buffer : " + StringHelper.byte2Hex2CharString(buffer, buffer.length));
+		}
 		String unit = ""; //$NON-NLS-1$
 		if 			((buffer[9] & 0x02) > 0)	unit = "k"; //$NON-NLS-1$
 		else if ((buffer[9] & 0x04) > 0)	unit = "n"; //$NON-NLS-1$
@@ -308,7 +313,8 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		else if ((buffer[12] & 0x02) > 0)	unit += "Hz"; //$NON-NLS-1$
 		else if ((buffer[12] & 0x04) > 0)	unit += "V"; //$NON-NLS-1$
 		else if ((buffer[12] & 0x08) > 0)	unit += "A"; //$NON-NLS-1$
-		else if ((buffer[13] & 0x01) > 0) unit += "°C"; //$NON-NLS-1$
+		//else if ((buffer[13] & 0x01) > 0) unit += "°C"; //$NON-NLS-1$
+		else 															unit += "°C"; //$NON-NLS-1$
 		
 		measurementInfo.put(VC800.INPUT_UNIT, unit);
 		
@@ -320,8 +326,13 @@ public class VC800 extends DeviceConfiguration implements IDevice {
 		else if (unit.endsWith("Hz")) 	typeSymbol = Messages.getString(MessageIds.GDE_MSGT1506); //$NON-NLS-1$
 		else if (unit.endsWith("°C")) 	typeSymbol = Messages.getString(MessageIds.GDE_MSGT1507); //$NON-NLS-1$
 		
-		measurementInfo.put(VC800.INPUT_TYPE, typeSymbol.split(" ")[0]); //$NON-NLS-1$
-		measurementInfo.put(VC800.INPUT_SYMBOL, typeSymbol.split(" ")[1]); //$NON-NLS-1$
+		try {
+			measurementInfo.put(VC800.INPUT_TYPE, typeSymbol.split(" ")[0]); //$NON-NLS-1$
+			measurementInfo.put(VC800.INPUT_SYMBOL, typeSymbol.split(" ")[1]); //$NON-NLS-1$
+		}
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage());
+		}
 
 		return measurementInfo;
 	}
