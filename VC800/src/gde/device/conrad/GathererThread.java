@@ -30,7 +30,6 @@ import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.utils.WaitTimer;
 
 import java.util.HashMap;
 import java.util.logging.Logger;
@@ -100,7 +99,6 @@ public class GathererThread extends Thread {
 		final HashMap<String, String>	configData = this.dialog.getConfigData();
 		long startCycleTime = 0;
 		long tmpCycleTime = 0;
-		long deltaTime = 0;
 		long measurementCount = 0;
 		byte[] dataBuffer = null;
 		String m_unit = "", old_unit = ""; //$NON-NLS-1$ //$NON-NLS-2$
@@ -109,13 +107,13 @@ public class GathererThread extends Thread {
 		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry " + "initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$ //$NON-NLS-2$
 		this.application.setStatusMessage(""); //$NON-NLS-1$
 
-		long lastTimeStamp = System.nanoTime() / 1000000, delayTime = 0;
 		try {
 			this.serialPort.getData();
 		}
 		catch (Exception e1) {
 			// ignore here
 		}
+		long lastTimeStamp = 0;
 		while (!this.isCollectDataStopped) {
 			try {
 				// get data from device
@@ -157,7 +155,18 @@ public class GathererThread extends Thread {
 					if (measurementCount++ == 0) {
 						startCycleTime = tmpCycleTime;
 					}
-					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
+					
+					long timeStamp = System.nanoTime() / 1000000;
+					if (cycleTime_ms > 1000 || lastTimeStamp == 0) {
+						if ((timeStamp - lastTimeStamp) > (cycleTime_ms-150)) {
+							log.log(Level.TIME, "deltaTime = " + (lastTimeStamp == 0 ? 0 : timeStamp - lastTimeStamp));
+							recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
+							lastTimeStamp = timeStamp;
+						}
+					}
+					else {
+						recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
+					}
 
 					if (recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 						GathererThread.this.application.updateAllTabs(false);
@@ -183,14 +192,6 @@ public class GathererThread extends Thread {
 				else {
 					stopDataGatheringThread(true);
 				}
-			}
-			
-			if (cycleTime_ms > 1000) {
-				deltaTime = System.nanoTime() / 1000000 - lastTimeStamp;
-				delayTime = this.cycleTime_ms - deltaTime;
-				log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> delay time = " + delayTime); //$NON-NLS-1$
-				if (delayTime > 0) WaitTimer.delay(delayTime);
-				lastTimeStamp = System.nanoTime() / 1000000;
 			}
 		}
 		configData.clear();
