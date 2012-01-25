@@ -90,7 +90,7 @@ public class DigitalDisplay extends Composite {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
 							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
-							if (record != null) {
+							if (record != null && record.size() > 0) {
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "update label for " + DigitalDisplay.this.recordKey); //$NON-NLS-1$
 								DigitalDisplay.this.textDigitalLabel.setText(activeRecordSet.get(DigitalDisplay.this.recordKey).getName() + " [ " + activeRecordSet.get(DigitalDisplay.this.recordKey).getUnit() + " ]");
 								DecimalFormat df = record.getDecimalFormat();
@@ -148,7 +148,7 @@ public class DigitalDisplay extends Composite {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
 							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
-							if (record != null) {
+							if (record != null && record.size() > 0) {
 								DecimalFormat df = record.getDecimalFormat();
 								String actualValue = df.format(DigitalDisplay.this.device.translateValue(record, (record.lastElement() / 1000.0)));
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, DigitalDisplay.this.recordKey + " actualValue=" + actualValue);

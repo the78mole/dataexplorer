@@ -81,14 +81,15 @@ public class AnalogDisplay extends Composite {
 
 	final DataExplorer						application;
 	final Channel									channel;
-	final RecordSet								recordSet;
-	final Record									record;
 	final String									recordKey;
 	final IDevice									device;
 	
 	final Color										backgroundColor;
 	final Menu										popupmenu;
 	final TabAreaContextMenu			contextMenu;
+
+	RecordSet								recordSet;
+	Record									record;
 
 	/**
 	 * 
@@ -138,7 +139,11 @@ public class AnalogDisplay extends Composite {
 		this.tacho.setMenu(this.popupmenu);
 		this.tacho.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {
-				tachoPaintControl(evt);
+				AnalogDisplay.this.recordSet = AnalogDisplay.this.channel.getActiveRecordSet();
+				if (AnalogDisplay.this.recordSet != null) {
+					AnalogDisplay.this.record = AnalogDisplay.this.recordSet.get(AnalogDisplay.this.recordKey);
+					tachoPaintControl(evt);
+				}
 			}
 		});
 		this.textAnalogLabel = new CLabel(this.tacho, SWT.CENTER);
@@ -151,25 +156,10 @@ public class AnalogDisplay extends Composite {
 
 	void tachoPaintControl(PaintEvent evt) {
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "tacho.paintControl, event=" + evt); //$NON-NLS-1$
+		
 		if (this.record != null) {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "record name = " + this.recordKey); //$NON-NLS-1$
-
 			// Get the canvas and its dimensions to check if size changed
 			this.tachoImageBounds = ((Canvas) evt.widget).getClientArea();
-
-			// get min max values and check if this has been changed
-			double tmpMinValue = this.record.isScaleSynced() ? this.record.getSyncMinValue() : this.record.getMinValue();
-			tmpMinValue = this.device.translateValue(this.record, tmpMinValue / 1000.0);
-			double tmpMaxValue = this.record.isScaleSynced() ? this.record.getSyncMaxValue() : this.record.getMaxValue();
-			tmpMaxValue = this.device.translateValue(this.record, tmpMaxValue / 1000.0);
-			double deltaScale = tmpMaxValue - tmpMinValue;
-			tmpMinValue = MathUtils.roundDown(tmpMinValue, deltaScale);
-			tmpMaxValue = MathUtils.roundUp(tmpMaxValue, deltaScale);
-			if (tmpMinValue != this.minValue || tmpMaxValue != this.maxValue) {
-				this.minValue = tmpMinValue;
-				this.maxValue = tmpMaxValue;
-				redraw(this.tachoImageBounds.x, this.tachoImageBounds.y, this.tachoImageBounds.width, this.tachoImageBounds.height, true);
-			}
 
 			// draw new tacho
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "tacho redaw required for " + this.recordKey); //$NON-NLS-1$
@@ -215,7 +205,7 @@ public class AnalogDisplay extends Composite {
 				dxtick = Double.valueOf((tickRadius + 10) * Math.cos(angle * Math.PI / 180)).intValue();
 				dytick = Double.valueOf((tickRadius + 10) * Math.sin(angle * Math.PI / 180)).intValue();
 				this.tachoImageGC.drawLine(this.centerX - dxtick, this.centerY - dytick, this.centerX - dxr, this.centerY - dyr);
-
+	
 				dxtext = Double.valueOf((this.radius + 30) * Math.cos(angle * Math.PI / 180)).intValue();
 				dytext = Double.valueOf((this.radius + 30) * Math.sin(angle * Math.PI / 180)).intValue();
 				String valueText = df.format(this.minValue + (i * deltaValue));
@@ -229,20 +219,38 @@ public class AnalogDisplay extends Composite {
 			this.tachoImageGC.setBackground(DataExplorer.COLOR_BLACK);
 			knobRradius = Double.valueOf(this.radius / 10.0 * 0.2).intValue();
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
-
+	
 			evt.gc.drawImage(this.tachoImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
-
-			//draw the new needle if required
-			Rectangle damageBounds = getNeedleBounds();
-			double tmpActualValue = this.device.translateValue(this.record, (this.record.lastElement() / 1000.0));
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
-			if (tmpActualValue != this.actualValue) {
-				this.actualValue = tmpActualValue;
-				damageBounds = getNeedleBounds();
-				redraw(damageBounds.x, damageBounds.y, damageBounds.width, damageBounds.height, true);
+	
+			if (this.record.size() > 0) {
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "record name = " + this.recordKey); //$NON-NLS-1$
+	
+				// get min max values and check if this has been changed
+				double tmpMinValue = this.record.isScaleSynced() ? this.record.getSyncMinValue() : this.record.getMinValue();
+				tmpMinValue = this.device.translateValue(this.record, tmpMinValue / 1000.0);
+				double tmpMaxValue = this.record.isScaleSynced() ? this.record.getSyncMaxValue() : this.record.getMaxValue();
+				tmpMaxValue = this.device.translateValue(this.record, tmpMaxValue / 1000.0);
+				double deltaScale = tmpMaxValue - tmpMinValue;
+				tmpMinValue = MathUtils.roundDown(tmpMinValue, deltaScale);
+				tmpMaxValue = MathUtils.roundUp(tmpMaxValue, deltaScale);
+				if (tmpMinValue != this.minValue || tmpMaxValue != this.maxValue) {
+					this.minValue = tmpMinValue;
+					this.maxValue = tmpMaxValue;
+					redraw(this.tachoImageBounds.x, this.tachoImageBounds.y, this.tachoImageBounds.width, this.tachoImageBounds.height, true);
+				}
+	
+				//draw the new needle if required
+				Rectangle damageBounds = getNeedleBounds();
+				double tmpActualValue = this.device.translateValue(this.record, (this.record.lastElement() / 1000.0));
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
+				if (tmpActualValue != this.actualValue) {
+					this.actualValue = tmpActualValue;
+					damageBounds = getNeedleBounds();
+					redraw(damageBounds.x, damageBounds.y, damageBounds.width, damageBounds.height, true);
+				}
+	
+				drawTachoNeedle(evt.gc, DataExplorer.COLOR_BLACK);
 			}
-
-			drawTachoNeedle(evt.gc, DataExplorer.COLOR_BLACK);
 		}
 	}
 
@@ -305,11 +313,13 @@ public class AnalogDisplay extends Composite {
 	 * - this may initiate redraw of the whole tacho if scale values are changed
 	 */
 	public void checkTachoNeedlePosition() {
-		double tmpActualValue = this.device.translateValue(this.record, (this.record.lastElement() / 1000.0));
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
-		if (tmpActualValue != this.actualValue) {
-			Rectangle damageBounds = getNeedleBounds(); 
-			redraw(damageBounds.x, damageBounds.y, damageBounds.width, damageBounds.height, true);
+		if (this.record != null && this.record.size() > 0) {
+			double tmpActualValue = this.device.translateValue(this.record, (this.record.lastElement() / 1000.0));
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("value = %3.2f; min = %3.2f; max = %3.2f", this.actualValue, this.minValue, this.maxValue)); //$NON-NLS-1$
+			if (tmpActualValue != this.actualValue) {
+				Rectangle damageBounds = getNeedleBounds();
+				redraw(damageBounds.x, damageBounds.y, damageBounds.width, damageBounds.height, true);
+			}
 		}
 	}
 }
