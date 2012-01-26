@@ -368,7 +368,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					finalizeRecordSet(recordSet);
 				}
 			}
-			WaitTimer.delay(100); //make sure we have such a pause while receiving data even we have 
+			WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS); //make sure we have such a pause while receiving data even we have 
 		}
 		for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
 			finalizeRecordSet(recordSet);
