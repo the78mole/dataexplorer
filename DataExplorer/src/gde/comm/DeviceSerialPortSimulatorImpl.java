@@ -37,6 +37,7 @@ import gnu.io.SerialPort;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -238,8 +239,10 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 							throw new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
 						}
 					}
-					else
+					else {
 						this.close();
+						throw new EOFException();
+					} 
 				}
 			}
 		}
