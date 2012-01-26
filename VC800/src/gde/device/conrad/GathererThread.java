@@ -113,7 +113,7 @@ public class GathererThread extends Thread {
 		catch (Exception e1) {
 			// ignore here
 		}
-		long lastTimeStamp = 0;
+		long delayTime, lastTimeStamp = 0;
 		while (!this.isCollectDataStopped) {
 			try {
 				// get data from device
@@ -152,16 +152,18 @@ public class GathererThread extends Thread {
 					}
 					// prepare the data for adding to record set
 					tmpCycleTime = System.nanoTime()/1000000;
-					if (measurementCount++ == 0) {
+					if (measurementCount == 0) {
+						measurementCount++;
 						startCycleTime = tmpCycleTime;
 					}
 					
-					long timeStamp = System.nanoTime() / 1000000;
 					if (cycleTime_ms > 1000 || lastTimeStamp == 0) {
-						if ((timeStamp - lastTimeStamp) > (cycleTime_ms-150)) {
-							log.log(Level.TIME, "deltaTime = " + (lastTimeStamp == 0 ? 0 : timeStamp - lastTimeStamp));
+						if ((tmpCycleTime - lastTimeStamp) > (cycleTime_ms-150)) {
 							recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
-							lastTimeStamp = timeStamp;
+							
+							delayTime = lastTimeStamp == 0 ? 0 : (tmpCycleTime - startCycleTime)-(measurementCount++ * cycleTime_ms);
+							log.logp(Level.TIME, $CLASS_NAME, $METHOD_NAME, "deltaTime = " + (lastTimeStamp == 0 ? 0 : ((tmpCycleTime - startCycleTime)/(measurementCount-1))) + ", delayTime = " + delayTime);
+							lastTimeStamp = tmpCycleTime - delayTime;
 						}
 					}
 					else {
