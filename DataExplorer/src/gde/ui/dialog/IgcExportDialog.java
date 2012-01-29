@@ -73,7 +73,7 @@ public class IgcExportDialog extends Dialog {
 
 	Shell												dialogShell;
 	Group												igcHeaderInfoGroup, extraEntriesGroup, startAltitudeGroup, startTimeGroup;
-	CLabel											headerARecordLabel, headerRecordDateLabel, headerFixAccuracyLabel, headerPilotLabel, headerCoPilotLabel, headerGliderTypeLabel, headerGliderIdLabel, headerGpsDatumLabel,
+	CLabel											separatorLabel, headerARecordLabel, headerRecordDateLabel, headerFixAccuracyLabel, headerPilotLabel, headerCoPilotLabel, headerGliderTypeLabel, headerGliderIdLabel, headerGpsDatumLabel,
 															headerFirmwareVersionLabel, headerHardwareVersionLabel, headerGpsManufacturerModelLabel, headerCompetitionIdLabel, headerCompetitionClassLabel, headerUtcOffsetLabel;
 	Text												headerARecordText, headerRecordDateText, headerFixAccuracyText, headerPilotText, headerCoPilotText, headerGliderIdText, headerGpsDatumText, headerFirmwareVersionText,
 															headerHardwareVersionText, headerGpsManufacturerModelText, headerCompetitionIdText, headerCompetitionClassText;
@@ -148,7 +148,14 @@ public class IgcExportDialog extends Dialog {
 				personalInfoGroupLData.top = new FormAttachment(0, 1000, 7);
 				this.igcHeaderInfoGroup.setLayoutData(personalInfoGroupLData);
 				this.igcHeaderInfoGroup.setText(Messages.getString(MessageIds.GDE_MSGT0615));
-				this.igcHeaderInfoGroup.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+				this.igcHeaderInfoGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+2, SWT.NORMAL));
+				{
+					this.separatorLabel = new CLabel(this.igcHeaderInfoGroup, SWT.NONE);
+					RowData headerARecordLabelLData = new RowData();
+					headerARecordLabelLData.width = 400;
+					headerARecordLabelLData.height = 5;
+					this.separatorLabel.setLayoutData(headerARecordLabelLData);
+				}
 				{
 					this.headerARecordLabel = new CLabel(this.igcHeaderInfoGroup, SWT.NONE);
 					RowData headerARecordLabelLData = new RowData();
@@ -157,16 +164,16 @@ public class IgcExportDialog extends Dialog {
 					this.headerARecordLabel.setLayoutData(headerARecordLabelLData);
 					this.headerARecordLabel.setText(Messages.getString(MessageIds.GDE_MSGT0616));
 					this.headerARecordLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0617));
-					this.headerARecordLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerARecordLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.headerARecordText = new Text(this.igcHeaderInfoGroup, SWT.SINGLE | SWT.READ_ONLY | SWT.BORDER);
 					RowData headerARecordTextLData = new RowData();
 					headerARecordTextLData.width = 236;
-					headerARecordTextLData.height = 16;
+					headerARecordTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerARecordText.setLayoutData(headerARecordTextLData);
 					this.headerARecordText.setText(this.headerARecord);
-					this.headerARecordText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerARecordText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerARecordText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
@@ -177,16 +184,16 @@ public class IgcExportDialog extends Dialog {
 					this.headerRecordDateLabel.setLayoutData(headerRecordDateLabelLData);
 					this.headerRecordDateLabel.setText(Messages.getString(MessageIds.GDE_MSGT0618));
 					this.headerRecordDateLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0619));
-					this.headerRecordDateLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerRecordDateLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.headerRecordDateText = new Text(this.igcHeaderInfoGroup, SWT.BORDER);
 					RowData headerRecordDateTextLData = new RowData();
 					headerRecordDateTextLData.width = 236;
-					headerRecordDateTextLData.height = 16;
+					headerRecordDateTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerRecordDateText.setLayoutData(headerRecordDateTextLData);
 					this.headerRecordDateText.setText(this.headerRecordDate);
-					this.headerRecordDateText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerRecordDateText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerRecordDateText.addVerifyListener(new VerifyListener() {
 						public void verifyText(VerifyEvent evt) {
 							IgcExportDialog.log.log(java.util.logging.Level.FINEST, "headerRecordDateText.verifyText, event=" + evt); //$NON-NLS-1$
@@ -201,17 +208,17 @@ public class IgcExportDialog extends Dialog {
 					headerFixAccuracyLabelLData.height = 22;
 					this.headerFixAccuracyLabel.setLayoutData(headerFixAccuracyLabelLData);
 					this.headerFixAccuracyLabel.setText(Messages.getString(MessageIds.GDE_MSGT0620));
-					this.headerFixAccuracyLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerFixAccuracyLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerFixAccuracyLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0621));
 				}
 				{
 					this.headerFixAccuracyText = new Text(this.igcHeaderInfoGroup, SWT.READ_ONLY | SWT.BORDER);
 					RowData headerFixAccuracyTextLData = new RowData();
 					headerFixAccuracyTextLData.width = 236;
-					headerFixAccuracyTextLData.height = 16;
+					headerFixAccuracyTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerFixAccuracyText.setLayoutData(headerFixAccuracyTextLData);
 					this.headerFixAccuracyText.setText("035"); //$NON-NLS-1$
-					this.headerFixAccuracyText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerFixAccuracyText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerFixAccuracyText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					this.headerFixAccuracyText.addVerifyListener(new VerifyListener() {
 						public void verifyText(VerifyEvent evt) {
@@ -227,17 +234,17 @@ public class IgcExportDialog extends Dialog {
 					headerPilotLabelLData.height = 22;
 					this.headerPilotLabel.setLayoutData(headerPilotLabelLData);
 					this.headerPilotLabel.setText(Messages.getString(MessageIds.GDE_MSGT0622));
-					this.headerPilotLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerPilotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerPilotLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0623));
 				}
 				{
 					this.headerPilotText = new Text(this.igcHeaderInfoGroup, SWT.BORDER);
 					RowData headerPilotTextLData = new RowData();
 					headerPilotTextLData.width = 236;
-					headerPilotTextLData.height = 16;
+					headerPilotTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerPilotText.setLayoutData(headerPilotTextLData);
 					this.headerPilotText.setText(this.headerPilot);
-					this.headerPilotText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerPilotText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.headerCoPilotLabel = new CLabel(this.igcHeaderInfoGroup, SWT.NONE);
@@ -246,13 +253,13 @@ public class IgcExportDialog extends Dialog {
 					headerCoPilotLabelLData.height = 22;
 					this.headerCoPilotLabel.setLayoutData(headerCoPilotLabelLData);
 					this.headerCoPilotLabel.setText(Messages.getString(MessageIds.GDE_MSGT0624));
-					this.headerCoPilotLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerCoPilotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerCoPilotLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0626));
 				}
 				{
 					RowData headerCoPilotTextLData = new RowData();
 					headerCoPilotTextLData.width = 236;
-					headerCoPilotTextLData.height = 16;
+					headerCoPilotTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerCoPilotText = new Text(this.igcHeaderInfoGroup, SWT.BORDER);
 					this.headerCoPilotText.setLayoutData(headerCoPilotTextLData);
 				}
@@ -263,7 +270,7 @@ public class IgcExportDialog extends Dialog {
 					headerGliderTypeLabelLData.height = 22;
 					this.headerGliderTypeLabel.setLayoutData(headerGliderTypeLabelLData);
 					this.headerGliderTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT0627));
-					this.headerGliderTypeLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerGliderTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerGliderTypeLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0628));
 				}
 				{
@@ -273,7 +280,7 @@ public class IgcExportDialog extends Dialog {
 					headerGliderTypeTextLData.height = 17;
 					this.headerGliderTypeText.setLayoutData(headerGliderTypeTextLData);
 					this.headerGliderTypeText.setItems(this.gliderTypes);
-					this.headerGliderTypeText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerGliderTypeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerGliderTypeText.select(this.headerGliderType);
 				}
 				{
@@ -283,17 +290,17 @@ public class IgcExportDialog extends Dialog {
 					headerGliderIdLabelLData.height = 22;
 					this.headerGliderIdLabel.setLayoutData(headerGliderIdLabelLData);
 					this.headerGliderIdLabel.setText(Messages.getString(MessageIds.GDE_MSGT0629));
-					this.headerGliderIdLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerGliderIdLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerGliderIdLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0630));
 				}
 				{
 					this.headerGliderIdText = new Text(this.igcHeaderInfoGroup, SWT.BORDER);
 					RowData headerGliderIdTextLData = new RowData();
 					headerGliderIdTextLData.width = 236;
-					headerGliderIdTextLData.height = 16;
+					headerGliderIdTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerGliderIdText.setLayoutData(headerGliderIdTextLData);
 					this.headerGliderIdText.setText(this.headerGliderId);
-					this.headerGliderIdText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerGliderIdText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.headerGpsDatumLabel = new CLabel(this.igcHeaderInfoGroup, SWT.NONE);
@@ -302,17 +309,17 @@ public class IgcExportDialog extends Dialog {
 					headerGpsDatumLabelLData.height = 22;
 					this.headerGpsDatumLabel.setLayoutData(headerGpsDatumLabelLData);
 					this.headerGpsDatumLabel.setText(Messages.getString(MessageIds.GDE_MSGT0631));
-					this.headerGpsDatumLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerGpsDatumLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerGpsDatumLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0632));
 				}
 				{
 					this.headerGpsDatumText = new Text(this.igcHeaderInfoGroup, SWT.READ_ONLY | SWT.BORDER);
 					RowData headerGpsDatumTextLData = new RowData();
 					headerGpsDatumTextLData.width = 236;
-					headerGpsDatumTextLData.height = 16;
+					headerGpsDatumTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerGpsDatumText.setLayoutData(headerGpsDatumTextLData);
 					this.headerGpsDatumText.setText(this.headerGpsDatum);
-					this.headerGpsDatumText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerGpsDatumText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerGpsDatumText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				}
 				{
@@ -322,17 +329,17 @@ public class IgcExportDialog extends Dialog {
 					headerFirmwareVersionLabelLData.height = 22;
 					this.headerFirmwareVersionLabel.setLayoutData(headerFirmwareVersionLabelLData);
 					this.headerFirmwareVersionLabel.setText(Messages.getString(MessageIds.GDE_MSGT0633));
-					this.headerFirmwareVersionLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerFirmwareVersionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerFirmwareVersionLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0634));
 				}
 				{
 					this.headerFirmwareVersionText = new Text(this.igcHeaderInfoGroup, SWT.BORDER);
 					RowData textheaderFirmwareVersionTextLData = new RowData();
 					textheaderFirmwareVersionTextLData.width = 236;
-					textheaderFirmwareVersionTextLData.height = 16;
+					textheaderFirmwareVersionTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerFirmwareVersionText.setLayoutData(textheaderFirmwareVersionTextLData);
 					this.headerFirmwareVersionText.setText(this.headerFirmwareVersion);
-					this.headerFirmwareVersionText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerFirmwareVersionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.headerHardwareVersionLabel = new CLabel(this.igcHeaderInfoGroup, SWT.NONE);
@@ -341,17 +348,17 @@ public class IgcExportDialog extends Dialog {
 					headerHardwareVersionLabelLData.height = 22;
 					this.headerHardwareVersionLabel.setLayoutData(headerHardwareVersionLabelLData);
 					this.headerHardwareVersionLabel.setText(Messages.getString(MessageIds.GDE_MSGT0635));
-					this.headerHardwareVersionLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerHardwareVersionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerHardwareVersionLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0636));
 				}
 				{
 					this.headerHardwareVersionText = new Text(this.igcHeaderInfoGroup, SWT.BORDER);
 					RowData headerHardwareVersionTextLData = new RowData();
 					headerHardwareVersionTextLData.width = 236;
-					headerHardwareVersionTextLData.height = 16;
+					headerHardwareVersionTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerHardwareVersionText.setLayoutData(headerHardwareVersionTextLData);
 					this.headerHardwareVersionText.setText(this.headerHardwareVersion);
-					this.headerHardwareVersionText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerHardwareVersionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.headerGpsManufacturerModelLabel = new CLabel(this.igcHeaderInfoGroup, SWT.NONE);
@@ -360,17 +367,17 @@ public class IgcExportDialog extends Dialog {
 					headerGpsManufacturerModelLabelLData.height = 22;
 					this.headerGpsManufacturerModelLabel.setLayoutData(headerGpsManufacturerModelLabelLData);
 					this.headerGpsManufacturerModelLabel.setText(Messages.getString(MessageIds.GDE_MSGT0637));
-					this.headerGpsManufacturerModelLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerGpsManufacturerModelLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerGpsManufacturerModelLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0638));
 				}
 				{
 					this.headerGpsManufacturerModelText = new Text(this.igcHeaderInfoGroup, SWT.BORDER);
 					RowData headerGpsManufacturerModelTextLData = new RowData();
 					headerGpsManufacturerModelTextLData.width = 236;
-					headerGpsManufacturerModelTextLData.height = 16;
+					headerGpsManufacturerModelTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerGpsManufacturerModelText.setLayoutData(headerGpsManufacturerModelTextLData);
 					this.headerGpsManufacturerModelText.setText(this.headerGpsManufacturerModel);
-					this.headerGpsManufacturerModelText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerGpsManufacturerModelText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.headerCompetitionIdLabel = new CLabel(this.igcHeaderInfoGroup, SWT.NONE);
@@ -379,17 +386,17 @@ public class IgcExportDialog extends Dialog {
 					headerCompetitionIdLabelLData.height = 22;
 					this.headerCompetitionIdLabel.setLayoutData(headerCompetitionIdLabelLData);
 					this.headerCompetitionIdLabel.setText(Messages.getString(MessageIds.GDE_MSGT0639));
-					this.headerCompetitionIdLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerCompetitionIdLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerCompetitionIdLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0640));
 				}
 				{
 					this.headerCompetitionIdText = new Text(this.igcHeaderInfoGroup, SWT.BORDER);
 					RowData headerCompetitionIdTextLData = new RowData();
 					headerCompetitionIdTextLData.width = 236;
-					headerCompetitionIdTextLData.height = 16;
+					headerCompetitionIdTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerCompetitionIdText.setLayoutData(headerCompetitionIdTextLData);
 					this.headerCompetitionIdText.setText(this.headerCompetitionId);
-					this.headerCompetitionIdText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerCompetitionIdText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.headerCompetitionClassLabel = new CLabel(this.igcHeaderInfoGroup, SWT.NONE);
@@ -398,17 +405,17 @@ public class IgcExportDialog extends Dialog {
 					headerCompetitionClassLabelLData.height = 22;
 					this.headerCompetitionClassLabel.setLayoutData(headerCompetitionClassLabelLData);
 					this.headerCompetitionClassLabel.setText(Messages.getString(MessageIds.GDE_MSGT0641));
-					this.headerCompetitionClassLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerCompetitionClassLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerCompetitionClassLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0642));
 				}
 				{
 					this.headerCompetitionClassText = new Text(this.igcHeaderInfoGroup, SWT.BORDER);
 					RowData headerCompetitionClassTextLData = new RowData();
 					headerCompetitionClassTextLData.width = 236;
-					headerCompetitionClassTextLData.height = 16;
+					headerCompetitionClassTextLData.height = GDE.IS_LINUX ? 14 : 16;
 					this.headerCompetitionClassText.setLayoutData(headerCompetitionClassTextLData);
 					this.headerCompetitionClassText.setText(this.headerCompetitionClass);
-					this.headerCompetitionClassText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerCompetitionClassText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				}
 				{
 					this.headerUtcOffsetLabel = new CLabel(this.igcHeaderInfoGroup, SWT.NONE);
@@ -417,7 +424,7 @@ public class IgcExportDialog extends Dialog {
 					headerUtcOffsetLabelLData.height = 22;
 					this.headerUtcOffsetLabel.setLayoutData(headerUtcOffsetLabelLData);
 					this.headerUtcOffsetLabel.setText(Messages.getString(MessageIds.GDE_MSGT0643));
-					this.headerUtcOffsetLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerUtcOffsetLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerUtcOffsetLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0644));
 				}
 				{
@@ -427,7 +434,7 @@ public class IgcExportDialog extends Dialog {
 					this.headerUtcOffsetCombo = new CCombo(this.igcHeaderInfoGroup, SWT.BORDER);
 					this.headerUtcOffsetCombo.setLayoutData(headerUtcOffsetComboLData);
 					this.headerUtcOffsetCombo.setItems(this.deltaUTC);
-					this.headerUtcOffsetCombo.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.headerUtcOffsetCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.headerUtcOffsetCombo.select(this.headerUtcOffset);
 				}
 			}
@@ -442,7 +449,14 @@ public class IgcExportDialog extends Dialog {
 				extraEntriesGroupLData.right = new FormAttachment(1000, 1000, -7);
 				this.extraEntriesGroup.setLayoutData(extraEntriesGroupLData);
 				this.extraEntriesGroup.setText(Messages.getString(MessageIds.GDE_MSGT0645));
-				this.extraEntriesGroup.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+				this.extraEntriesGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+2, SWT.NORMAL));
+				{
+					this.separatorLabel = new CLabel(this.extraEntriesGroup, SWT.NONE);
+					RowData headerARecordLabelLData = new RowData();
+					headerARecordLabelLData.width = 250;
+					headerARecordLabelLData.height = 5;
+					this.separatorLabel.setLayoutData(headerARecordLabelLData);
+				}
 				{
 					this.startAltitudeGroup = new Group(this.extraEntriesGroup, SWT.NONE);
 					RowLayout startAltitudeGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -452,7 +466,14 @@ public class IgcExportDialog extends Dialog {
 					startAltitudeGroupLData.height = 166;
 					this.startAltitudeGroup.setLayoutData(startAltitudeGroupLData);
 					this.startAltitudeGroup.setText(Messages.getString(MessageIds.GDE_MSGT0646));
-					this.startAltitudeGroup.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.startAltitudeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+2, SWT.NORMAL));
+					{
+						this.separatorLabel = new CLabel(this.startAltitudeGroup, SWT.NONE);
+						RowData headerARecordLabelLData = new RowData();
+						headerARecordLabelLData.width = 240;
+						headerARecordLabelLData.height = 5;
+						this.separatorLabel.setLayoutData(headerARecordLabelLData);
+					}
 					{
 						this.startAltitudeDescrptionText = new Text(this.startAltitudeGroup, SWT.WRAP | SWT.READ_ONLY);
 						RowData startAltitudeLabelLData = new RowData();
@@ -460,29 +481,29 @@ public class IgcExportDialog extends Dialog {
 						startAltitudeLabelLData.height = 104;
 						this.startAltitudeDescrptionText.setLayoutData(startAltitudeLabelLData);
 						this.startAltitudeDescrptionText.setText(Messages.getString(MessageIds.GDE_MSGT0647));
-						this.startAltitudeDescrptionText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.startAltitudeDescrptionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.startAltitudeDescrptionText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					}
 					{
 						this.latitudeLabel = new CLabel(this.startAltitudeGroup, SWT.NONE);
 						this.latitudeLabel.setText("lat :");
-						this.latitudeLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.latitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					}
 					{
 						this.latitudeText = new Text(this.startAltitudeGroup, SWT.READ_ONLY | SWT.BORDER);
 						this.latitudeText.setText(this.latitude);
-						this.latitudeText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.latitudeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.latitudeText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					}
 					{
 						this.longitudeLabel = new CLabel(this.startAltitudeGroup, SWT.NONE);
 						this.longitudeLabel.setText("long :");
-						this.longitudeLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.longitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					}
 					{
 						this.longitudeText = new Text(this.startAltitudeGroup, SWT.READ_ONLY | SWT.BORDER);
 						this.longitudeText.setText(this.longitude);
-						this.longitudeText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.longitudeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.longitudeText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					}
 					{
@@ -492,17 +513,17 @@ public class IgcExportDialog extends Dialog {
 						startAltitudeLabelLData.height = 22;
 						this.startAltitudeLabel.setLayoutData(startAltitudeLabelLData);
 						this.startAltitudeLabel.setText(Messages.getString(MessageIds.GDE_MSGT0648));
-						this.startAltitudeLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.startAltitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.startAltitudeLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0649));
 					}
 					{
 						this.startAltitudeText = new Text(this.startAltitudeGroup, SWT.BORDER);
 						RowData startAltitudeTextLData = new RowData();
 						startAltitudeTextLData.width = 48;
-						startAltitudeTextLData.height = 16;
+						startAltitudeTextLData.height = GDE.IS_LINUX ? 14 : 16;
 						this.startAltitudeText.setLayoutData(startAltitudeTextLData);
 						this.startAltitudeText.setText(this.startAltitude);
-						this.startAltitudeText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.startAltitudeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.startAltitudeText.addVerifyListener(new VerifyListener() {
 							public void verifyText(VerifyEvent evt) {
 								IgcExportDialog.log.log(java.util.logging.Level.FINEST, "startAltitudeText.verifyText, event=" + evt); //$NON-NLS-1$
@@ -513,7 +534,7 @@ public class IgcExportDialog extends Dialog {
 					{
 						this.startAltitudeUnitLabel = new CLabel(this.startAltitudeGroup, SWT.NONE);
 						this.startAltitudeUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT0613));
-						this.startAltitudeUnitLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.startAltitudeUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					}
 				}
 				{
@@ -525,7 +546,14 @@ public class IgcExportDialog extends Dialog {
 					startTimeGroupLData.height = 150;
 					this.startTimeGroup.setLayoutData(startTimeGroupLData);
 					this.startTimeGroup.setText(Messages.getString(MessageIds.GDE_MSGT0650));
-					this.startTimeGroup.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.startTimeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+2, SWT.NORMAL));
+					{
+						this.separatorLabel = new CLabel(this.startTimeGroup, SWT.NONE);
+						RowData headerARecordLabelLData = new RowData();
+						headerARecordLabelLData.width = 240;
+						headerARecordLabelLData.height = 5;
+						this.separatorLabel.setLayoutData(headerARecordLabelLData);
+					}
 					{
 						this.startTimeDescriptionText = new Text(this.startTimeGroup, SWT.READ_ONLY | SWT.WRAP);
 						RowData startTimeDescriptionTextLData = new RowData();
@@ -533,7 +561,7 @@ public class IgcExportDialog extends Dialog {
 						startTimeDescriptionTextLData.height = 118;
 						this.startTimeDescriptionText.setLayoutData(startTimeDescriptionTextLData);
 						this.startTimeDescriptionText.setText(Messages.getString(MessageIds.GDE_MSGT0651));
-						this.startTimeDescriptionText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.startTimeDescriptionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.startTimeDescriptionText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 					}
 					{
@@ -543,25 +571,25 @@ public class IgcExportDialog extends Dialog {
 						startTimeLabelLData.height = 22;
 						this.startTimeLabel.setLayoutData(startTimeLabelLData);
 						this.startTimeLabel.setText(Messages.getString(MessageIds.GDE_MSGT0652));
-						this.startTimeLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.startTimeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.startTimeLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0653));
 					}
 					{
 						this.startTimeText = new Text(this.startTimeGroup, SWT.BORDER);
 						this.startTimeText.setText(this.startTime);
-						this.startTimeText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.startTimeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					}
 					{
 						this.startTimeUnitLabel = new CLabel(this.startTimeGroup, SWT.NONE);
 						this.startTimeUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT0612));
-						this.startTimeUnitLabel.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+						this.startTimeUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					}
 				}
 			}
 			{
 				this.cancelButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 				this.cancelButton.setText(Messages.getString(MessageIds.GDE_MSGT0452));
-				this.cancelButton.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+				this.cancelButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				FormData cancelButtonLData = new FormData();
 				cancelButtonLData.width = 172;
 				cancelButtonLData.height = 34;
@@ -601,7 +629,7 @@ public class IgcExportDialog extends Dialog {
 					saveButtonLData.top = new FormAttachment(0, 1000, 407);
 					this.saveButton.setLayoutData(saveButtonLData);
 					this.saveButton.setText(Messages.getString(MessageIds.GDE_MSGT0005));
-					this.saveButton.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.saveButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
