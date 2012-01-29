@@ -543,7 +543,7 @@ public class IgcExportDialog extends Dialog {
 					this.startTimeGroup.setLayout(startTimeGroupLayout);
 					RowData startTimeGroupLData = new RowData();
 					startTimeGroupLData.width = 250;
-					startTimeGroupLData.height = 150;
+					startTimeGroupLData.height = 140;
 					this.startTimeGroup.setLayoutData(startTimeGroupLData);
 					this.startTimeGroup.setText(Messages.getString(MessageIds.GDE_MSGT0650));
 					this.startTimeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+2, SWT.NORMAL));
@@ -558,7 +558,7 @@ public class IgcExportDialog extends Dialog {
 						this.startTimeDescriptionText = new Text(this.startTimeGroup, SWT.READ_ONLY | SWT.WRAP);
 						RowData startTimeDescriptionTextLData = new RowData();
 						startTimeDescriptionTextLData.width = 227;
-						startTimeDescriptionTextLData.height = 118;
+						startTimeDescriptionTextLData.height = 105;
 						this.startTimeDescriptionText.setLayoutData(startTimeDescriptionTextLData);
 						this.startTimeDescriptionText.setText(Messages.getString(MessageIds.GDE_MSGT0651));
 						this.startTimeDescriptionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
