@@ -209,6 +209,7 @@ public class GathererThread extends Thread {
 
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
 			log.log(Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+			this.application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026), SWT.COLOR_RED);						
 		}
 		if (this.serialPort != null && this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
 			this.serialPort.close();
