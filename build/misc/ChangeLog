@@ -2,6 +2,7 @@ Development history / change log, please read from bottom up
 
 Version 2.96 - xx yyy 2012
 VC8x0 - add warning message while error limit is reached. 
+add HoTTAdapter2 to have all possible sensor values within same curve
 
 Version 2.95 - 28 Jan 2012
 HoTTAdapter - filter misplaced measurements while loading or gathering data from multiple sensors
