@@ -63,7 +63,7 @@
 			<attribute name="Built-Date" value="${TODAY}"/> 
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
-    		<attribute name="Bundle-Description" value="Implemntation for device UniLog2 SM-Modellbau"/>
+    		<attribute name="Bundle-Description" value="Implementation for device UniLog2 SM-Modellbau"/>
     		<attribute name="Export-Service" value="gde.device.smmodellbau.UniLog2"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
