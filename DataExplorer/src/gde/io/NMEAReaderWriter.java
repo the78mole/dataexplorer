@@ -232,7 +232,7 @@ public class NMEAReaderWriter {
 							if(!data.deviceSerialNumber.equals(GDE.STRING_EMPTY)) description = description + GDE.LINE_SEPARATOR + "S/N : " + data.deviceSerialNumber; //$NON-NLS-1$
 							if(!data.firmwareVersion.equals(GDE.STRING_EMPTY)) description = description.contains(GDE.LINE_SEPARATOR) ? description + "; Firmware  : " + data.firmwareVersion : GDE.LINE_SEPARATOR + "Firmware  : " + data.firmwareVersion; //$NON-NLS-1$ //$NON-NLS-2$
 							recordSet.setRecordSetDescription(description);
-							activeChannel.setFileDescription(dateTime.substring(0, 10) + activeChannel.getFileDescription().substring(10));
+							activeChannel.setFileDescription(dateTime.substring(0, 10) + (activeChannel.getFileDescription().length() < 11 ? "" : activeChannel.getFileDescription().substring(10)));
 						}
 						else {
 							recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
