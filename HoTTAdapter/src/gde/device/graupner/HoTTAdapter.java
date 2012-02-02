@@ -578,7 +578,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpLatitudeGrad = DataParser.parse2Short(dataBuffer, 16);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 14) + 500;
 					tmpClimb3 = dataBuffer[30] + 120;
-					if (tmpLatitudeGrad > 0 && tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
+					if (tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
 						points[0] = (dataBuffer[3] & 0xFF) * 1000;
 						points[1] = tmpLatitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 18);
 						points[1] = dataBuffer[26] == 1 ? -1 * points[1] : points[1];
@@ -603,7 +603,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 36);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 38);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 32) + 500;
-					tmpClimb3 = dataBuffer[37] + 120;
+					tmpClimb3 = dataBuffer[44] + 120;
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 22);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 24);
 					if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
