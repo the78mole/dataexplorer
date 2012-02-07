@@ -214,7 +214,7 @@ public class TimeSteps extends Vector<Long> {
 						break;
 					}
 					else if (value < get(index2)) {
-						index1 = index2 - 1;
+						index1 = index2 > 0 ? index2 - 1 : 0;
 						break;
 					}
 					index1 = index2 + 1;
