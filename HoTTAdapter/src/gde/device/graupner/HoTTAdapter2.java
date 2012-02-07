@@ -93,7 +93,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-		int tmpHeight, tmpClimb3, tmpClimb10, tmpCapacity, tmpVoltage, tmpCellVoltage, tmpVoltage1, tmpVoltage2, tmpLatitudeGrad;
+		int tmpHeight, tmpClimb3, tmpClimb10, tmpCapacity, tmpVoltage, tmpCellVoltage, tmpVoltage1, tmpVoltage2, tmpLatitudeGrad, tmpLongitudeGrad;
 
 		switch (this.serialPort.protocolType) {
 		case TYPE_19200_V3:
@@ -108,98 +108,95 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					points[4] = (dataBuffer[13] & 0xFF) * 1000;
 					points[5] = (dataBuffer[9] & 0xFF) * 1000;
 					points[6] = (dataBuffer[6] & 0xFF) * 1000;
-					points[7] = (dataBuffer[7] & 0xFF) * 1000;
+					points[7] = ((dataBuffer[7] & 0xFF) - 20) * 1000;
 				}
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_VARIO_19200:
 				if (dataBuffer.length == 31) {
 					//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-					points[0] = (dataBuffer[15] & 0xFF) * 1000;
-					points[1] = DataParser.parse2Short(dataBuffer, 16) * 1000;
-					points[2] = DataParser.parse2Short(dataBuffer, 22) * 1000;
-					points[3] = DataParser.parse2Short(dataBuffer, 24) * 1000;
-					points[4] = DataParser.parse2Short(dataBuffer, 26) * 1000;
-					points[5] = (dataBuffer[8] & 0xFF) * 1000;
-					points[6] = (dataBuffer[5] & 0xFF) * 1000;
+					//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+					points[8] = (DataParser.parse2Short(dataBuffer, 16) - 500) * 1000;
+					points[9] = (DataParser.parse2Short(dataBuffer, 22) - 30000) * 10;
+					points[10] = (DataParser.parse2Short(dataBuffer, 24) - 30000) * 10;
+					points[11] = (DataParser.parse2Short(dataBuffer, 26) - 30000) * 10;
 				}
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_GPS_19200:
 				if (dataBuffer.length == 40) {
 					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-					points[0] = (dataBuffer[15] & 0xFF) * 1000;
-					points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
-					points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
-					points[2] = DataParser.parse2Short(dataBuffer, 25) * 10000 + DataParser.parse2Short(dataBuffer, 27);
-					points[2] = dataBuffer[24] == 1 ? -1 * points[2] : points[2];
-					points[3] = DataParser.parse2Short(dataBuffer, 31) * 1000;
-					points[4] = DataParser.parse2Short(dataBuffer, 33) * 1000;
-					points[5] = (dataBuffer[35] & 0xFF) * 1000;
-					points[6] = DataParser.parse2Short(dataBuffer, 17) * 1000;
-					points[7] = DataParser.parse2Short(dataBuffer, 29) * 1000;
-					points[8] = (dataBuffer[16] & 0xFF) * 1000;
-					points[9] = 0;
-					points[10] = (dataBuffer[8] & 0xFF) * 1000;
-					points[11] = (dataBuffer[5] & 0xFF) * 1000;
+					//8=Height, 9=Climb 1, 10=Climb 3
+					//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+					points[12] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
+					points[12] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
+					points[13] = DataParser.parse2Short(dataBuffer, 25) * 10000 + DataParser.parse2Short(dataBuffer, 27);
+					points[13] = dataBuffer[24] == 1 ? -1 * points[2] : points[2];
+					points[8] = (DataParser.parse2Short(dataBuffer, 31) - 500) * 1000;
+					points[9] = (DataParser.parse2Short(dataBuffer, 33) - 30000) * 10;
+					points[10] = ((dataBuffer[35] & 0xFF) - 120) * 1000;
+					points[14] = DataParser.parse2Short(dataBuffer, 17) * 1000;
+					points[15] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+					points[16] = (dataBuffer[16] & 0xFF) * 1000;
+					points[17] = 0;
 				}
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_GENERAL_19200:
 				if (dataBuffer.length == 48) {
 					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
-					points[0] = (dataBuffer[15] & 0xFF) * 1000;
-					points[1] = DataParser.parse2Short(dataBuffer, 40) * 1000;
-					points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
-					points[3] = DataParser.parse2Short(dataBuffer, 42) * 1000;
-					points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
-					points[5] = 0; //5=Balance
+					//8=Height, 9=Climb 1, 10=Climb 3
+					//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
+					points[18] = DataParser.parse2Short(dataBuffer, 40) * 1000;
+					points[19] = DataParser.parse2Short(dataBuffer, 38) * 1000;
+					points[20] = DataParser.parse2Short(dataBuffer, 42) * 1000;
+					points[21] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
 					for (int j = 0; j < 6; j++) {
-						points[j + 6] = (dataBuffer[16 + j] & 0xFF) * 1000;
-						if (points[j + 6] > 0) {
-							maxVotage = points[j + 6] > maxVotage ? points[j + 6] : maxVotage;
-							minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
+						points[j + 23] = (dataBuffer[23 + j] & 0xFF) * 1000;
+						if (points[j + 23] > 0) {
+							maxVotage = points[j + 23] > maxVotage ? points[j + 23] : maxVotage;
+							minVotage = points[j + 23] < minVotage ? points[j + 23] : minVotage;
 						}
 					}
 					//calculate balance on the fly
-					points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
-					points[12] = DataParser.parse2Short(dataBuffer, 31) * 1000;
-					points[13] = DataParser.parse2Short(dataBuffer, 33) * 1000;
-					points[14] = DataParser.parse2Short(dataBuffer, 35) * 1000;
-					points[15] = (dataBuffer[37] & 0xFF) * 1000;
-					points[16] = DataParser.parse2Short(dataBuffer, 29) * 1000;
-					points[17] = DataParser.parse2Short(dataBuffer, 22) * 1000;
-					points[18] = DataParser.parse2Short(dataBuffer, 24) * 1000;
-					points[19] = (dataBuffer[26] & 0xFF) * 1000;
-					points[20] = (dataBuffer[27] & 0xFF) * 1000;
+					points[22] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
+					points[29] = DataParser.parse2Short(dataBuffer, 31) * 1000;
+					points[8] = (DataParser.parse2Short(dataBuffer, 33) - 500) * 1000;
+					points[9] = (DataParser.parse2Short(dataBuffer, 35) - 30000) * 10;
+					points[10] = ((dataBuffer[37] & 0xFF) - 120) * 1000;
+					points[30] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+					points[31] = DataParser.parse2Short(dataBuffer, 22) * 1000;
+					points[32] = DataParser.parse2Short(dataBuffer, 24) * 1000;
+					points[33] = ((dataBuffer[26] & 0xFF) - 20) * 1000;
+					points[34] = ((dataBuffer[27] & 0xFF) - 20) * 1000;
 				}
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_ELECTRIC_19200:
 				if (dataBuffer.length == 51) {
 					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
-					points[0] = (dataBuffer[15] & 0xFF) * 1000;
-					points[1] = DataParser.parse2Short(dataBuffer, 40) * 1000;
-					points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
-					points[3] = DataParser.parse2Short(dataBuffer, 42) * 1000;
-					points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
-					points[5] = 0; //5=Balance
+					//8=Height, 9=Climb 1, 10=Climb 3
+					//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+					points[35] = DataParser.parse2Short(dataBuffer, 40) * 1000;
+					points[36] = DataParser.parse2Short(dataBuffer, 38) * 1000;
+					points[37] = DataParser.parse2Short(dataBuffer, 42) * 1000;
+					points[38] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
 					for (int j = 0; j < 14; j++) {
-						points[j + 6] = (dataBuffer[16 + j] & 0xFF) * 1000;
-						if (points[j + 6] > 0) {
-							maxVotage = points[j + 6] > maxVotage ? points[j + 6] : maxVotage;
-							minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
+						points[j + 40] = (dataBuffer[40 + j] & 0xFF) * 1000;
+						if (points[j + 40] > 0) {
+							maxVotage = points[j + 40] > maxVotage ? points[j + 40] : maxVotage;
+							minVotage = points[j + 40] < minVotage ? points[j + 40] : minVotage;
 						}
 					}
 					//calculate balance on the fly
-					points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
-					points[20] = DataParser.parse2Short(dataBuffer, 36) * 1000;
-					points[21] = DataParser.parse2Short(dataBuffer, 44) * 1000;
-					points[22] = (dataBuffer[46] & 0xFF) * 1000;
-					points[23] = DataParser.parse2Short(dataBuffer, 30) * 1000;
-					points[24] = DataParser.parse2Short(dataBuffer, 32) * 1000;
-					points[25] = (dataBuffer[34] & 0xFF) * 1000;
-					points[26] = (dataBuffer[35] & 0xFF) * 1000;
+					points[39] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
+					points[8] = (DataParser.parse2Short(dataBuffer, 36) - 500) * 1000;
+					points[9] = (DataParser.parse2Short(dataBuffer, 44) - 30000) * 10;
+					points[10] = ((dataBuffer[46] & 0xFF) - 120) * 1000;
+					points[54] = DataParser.parse2Short(dataBuffer, 30) * 1000;
+					points[55] = DataParser.parse2Short(dataBuffer, 32) * 1000;
+					points[56] = ((dataBuffer[34] & 0xFF) - 20) * 1000;
+					points[57] = ((dataBuffer[35] & 0xFF) - 20) * 1000;
 				}
 				break;
 			}
@@ -209,7 +206,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			switch (dataBuffer[1]) {
 			case HoTTAdapter2.SENSOR_TYPE_RECEIVER_19200:
 				if (dataBuffer.length == 17) {
-					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
+					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 					points[0] = 0; // seams not part of live data ?? (dataBuffer[15] & 0xFF) * 1000;
 					points[1] = (dataBuffer[9] & 0xFF) * 1000;
 					points[2] = (dataBuffer[5] & 0xFF) * 1000;
@@ -217,51 +214,49 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					points[4] = (dataBuffer[13] & 0xFF) * 1000;
 					points[5] = (dataBuffer[8] & 0xFF) * 1000;
 					points[6] = (dataBuffer[6] & 0xFF) * 1000;
-					points[7] = (dataBuffer[7] & 0xFF) * 1000;
+					points[7] = ((dataBuffer[7] & 0xFF) - 20) * 1000;
 				}
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_VARIO_19200:
 				if (dataBuffer.length == 57) {
 					//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-					points[0] = (dataBuffer[9] & 0xFF) * 1000;
-					tmpHeight = DataParser.parse2Short(dataBuffer, 16);
-					if (tmpHeight > 1 && tmpHeight < 5000) {
-						points[1] = tmpHeight * 1000;
-						points[2] = DataParser.parse2Short(dataBuffer, 22) * 1000;
+					//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+					tmpHeight = DataParser.parse2Short(dataBuffer, 16) - 500;
+					if (tmpHeight > -500 && tmpHeight < 5000) {
+						points[8] = tmpHeight * 1000;
+						points[9] = (DataParser.parse2Short(dataBuffer, 22) - 30000) * 10;
 					}
-					tmpClimb3 = DataParser.parse2Short(dataBuffer, 24);
-					tmpClimb10 = DataParser.parse2Short(dataBuffer, 26);
-					if (tmpClimb3 > 20000 && tmpClimb10 > 20000 && tmpClimb3 < 40000 && tmpClimb10 < 40000) {
-						points[3] = tmpClimb3 * 1000;
-						points[4] = tmpClimb10 * 1000;
+					tmpClimb3 = DataParser.parse2Short(dataBuffer, 24) - 30000;
+					tmpClimb10 = DataParser.parse2Short(dataBuffer, 26) - 30000;
+					if (tmpClimb3 > -10000 && tmpClimb10 > -10000 && tmpClimb3 < 10000 && tmpClimb10 < 10000) {
+						points[10] = tmpClimb3 * 10;
+						points[11] = tmpClimb10 * 10;
 					}
-					points[5] = (dataBuffer[6] & 0xFF) * 1000;
-					points[6] = (dataBuffer[7] & 0xFF) * 1000;
 				}
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_GPS_19200:
 				if (dataBuffer.length == 57) {
 					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+					//8=Height, 9=Climb 1, 10=Climb 3
+					//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
 					tmpLatitudeGrad = DataParser.parse2Short(dataBuffer, 20);
-					tmpHeight = DataParser.parse2Short(dataBuffer, 31);
-					tmpClimb3 = dataBuffer[35] & 0xFF;
-					if (tmpLatitudeGrad > 0 && tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
-						points[0] = (dataBuffer[9] & 0xFF) * 1000;
-						points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
-						points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
-						points[2] = DataParser.parse2Short(dataBuffer, 25) * 10000 + DataParser.parse2Short(dataBuffer, 27);
-						points[2] = dataBuffer[24] == 1 ? -1 * points[2] : points[2];
-						points[3] = tmpHeight * 1000;
-						points[4] = DataParser.parse2Short(dataBuffer, 33) * 1000;
-						points[5] = tmpClimb3 * 1000;
-						points[6] = DataParser.parse2Short(dataBuffer, 17) * 1000;
-						points[7] = DataParser.parse2Short(dataBuffer, 29) * 1000;
-						points[8] = (dataBuffer[38] & 0xFF) * 1000;
-						points[9] = 0;
-						points[10] = (dataBuffer[6] & 0xFF) * 1000;
-						points[11] = (dataBuffer[7] & 0xFF) * 1000;
+					tmpLongitudeGrad = DataParser.parse2Short(dataBuffer, 25);
+					tmpHeight = DataParser.parse2Short(dataBuffer, 31) - 500;
+					tmpClimb3 = (dataBuffer[35] & 0xFF) - 120;
+					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > -500 && tmpHeight < 5000 && tmpClimb3 > -50) {
+						points[12] = tmpLatitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 22);
+						points[12] = dataBuffer[19] == 1 ? -1 * points[12] : points[12];
+						points[13] = tmpLongitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 27);
+						points[13] = dataBuffer[24] == 1 ? -1 * points[13] : points[13];
+						points[8] = tmpHeight * 1000;
+						points[9] = (DataParser.parse2Short(dataBuffer, 33) - 30000) * 10;
+						points[10] = tmpClimb3 * 1000;
+						points[14] = DataParser.parse2Short(dataBuffer, 17) * 1000;
+						points[15] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+						points[16] = (dataBuffer[38] & 0xFF) * 1000;
+						points[17] = 0;
 					}
 				}
 				break;
@@ -269,39 +264,40 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			case HoTTAdapter2.SENSOR_TYPE_GENERAL_19200:
 				if (dataBuffer.length == 57) {
 					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
+					//8=Height, 9=Climb 1, 10=Climb 3
+					//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 40);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 42);
-					tmpHeight = DataParser.parse2Short(dataBuffer, 33);
-					tmpClimb3 = dataBuffer[37] & 0xFF;
+					tmpHeight = DataParser.parse2Short(dataBuffer, 33) - 500;
+					tmpClimb3 = (dataBuffer[37] & 0xFF) - 120;
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 22);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 24);
-					if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
-						points[0] = (dataBuffer[9] & 0xFF) * 1000;
-						points[1] = tmpVoltage * 1000;
-						points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
-						points[3] = tmpCapacity * 1000;
-						points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
+					if (tmpClimb3 > -50 && tmpHeight > -5001 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[20] / 1000) {
+						points[18] = tmpVoltage * 1000;
+						points[19] = DataParser.parse2Short(dataBuffer, 38) * 1000;
+						points[20] = tmpCapacity * 1000;
+						points[21] = Double.valueOf(points[18] / 1000.0 * points[19]).intValue(); // power U*I [W];
 						if (tmpVoltage > 0) {
 							for (int j = 0; j < 6; j++) {
 								tmpCellVoltage = (dataBuffer[16 + j] & 0xFF);
-								points[j + 6] = tmpCellVoltage > 0 ? tmpCellVoltage * 1000 : points[j + 6];
-								if (points[j + 6] > 0) {
-									maxVotage = points[j + 6] > maxVotage ? points[j + 6] : maxVotage;
-									minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
+								points[j + 23] = tmpCellVoltage > 0 ? tmpCellVoltage * 20 : points[j + 23];
+								if (points[j + 23] > 0) {
+									maxVotage = points[j + 23] > maxVotage ? points[j + 23] : maxVotage;
+									minVotage = points[j + 23] < minVotage ? points[j + 23] : minVotage;
 								}
 							}
 							//calculate balance on the fly
-							points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
+							points[22] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
 						}
-						points[12] = DataParser.parse2Short(dataBuffer, 31) * 1000;
-						points[13] = tmpHeight * 1000;
-						points[14] = DataParser.parse2Short(dataBuffer, 35) * 1000;
-						points[15] = tmpClimb3 * 1000;
-						points[16] = DataParser.parse2Short(dataBuffer, 29) * 1000;
-						points[17] = tmpVoltage1 * 1000;
-						points[18] = tmpVoltage2 * 1000;
-						points[19] = (dataBuffer[26] & 0xFF) * 1000;
-						points[20] = (dataBuffer[27] & 0xFF) * 1000;
+						points[29] = DataParser.parse2Short(dataBuffer, 31) * 1000;
+						points[8] = tmpHeight * 1000;
+						points[9] = (DataParser.parse2Short(dataBuffer, 35) - 30000) * 10;
+						points[10] = tmpClimb3 * 1000;
+						points[30] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+						points[31] = tmpVoltage1 * 100;
+						points[32] = tmpVoltage2 * 100;
+						points[33] = ((dataBuffer[26] & 0xFF) - 20) * 1000;
+						points[34] = ((dataBuffer[27] & 0xFF) - 20) * 1000;
 					}
 				}
 				break;
@@ -309,37 +305,38 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			case HoTTAdapter2.SENSOR_TYPE_ELECTRIC_19200:
 				if (dataBuffer.length == 57) {
 					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
+					//8=Height, 9=Climb 1, 10=Climb 3
+					//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 40);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 42);
-					tmpHeight = DataParser.parse2Short(dataBuffer, 36);
-					tmpClimb3 = dataBuffer[46] & 0xFF;
+					tmpHeight = DataParser.parse2Short(dataBuffer, 36) - 500;
+					tmpClimb3 = (dataBuffer[46] & 0xFF) - 120;
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 30);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 32);
-					if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
-						points[0] = (dataBuffer[9] & 0xFF) * 1000;
-						points[1] = tmpVoltage * 1000;
-						points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
-						points[3] = tmpCapacity * 1000;
-						points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
+					if (tmpClimb3 > -50 && tmpHeight > -500 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[37] / 1000) {
+						points[35] = tmpVoltage * 1000;
+						points[36] = DataParser.parse2Short(dataBuffer, 38) * 1000;
+						points[37] = tmpCapacity * 1000;
+						points[38] = Double.valueOf(points[35] / 1000.0 * points[36]).intValue(); // power U*I [W];
 						if (tmpVoltage > 0) {
 							for (int j = 0; j < 14; j++) {
 								tmpCellVoltage = (dataBuffer[16 + j] & 0xFF);
-								points[j + 6] = tmpCellVoltage > 0 ? tmpCellVoltage * 1000 : points[j + 6];
-								if (points[j + 6] > 0) {
-									maxVotage = points[j + 6] > maxVotage ? points[j + 6] : maxVotage;
-									minVotage = points[j + 6] < minVotage ? points[j + 6] : minVotage;
+								points[j + 40] = tmpCellVoltage > 0 ? tmpCellVoltage * 20 : points[j + 40];
+								if (points[j + 40] > 0) {
+									maxVotage = points[j + 40] > maxVotage ? points[j + 40] : maxVotage;
+									minVotage = points[j + 40] < minVotage ? points[j + 40] : minVotage;
 								}
 							}
 							//calculate balance on the fly
-							points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
+							points[39] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
 						}
-						points[20] = tmpHeight * 1000;
-						points[21] = DataParser.parse2Short(dataBuffer, 44) * 1000;
-						points[22] = tmpClimb3 * 1000;
-						points[23] = tmpVoltage1 * 1000;
-						points[24] = tmpVoltage2 * 1000;
-						points[25] = (dataBuffer[34] & 0xFF) * 1000;
-						points[26] = (dataBuffer[35] & 0xFF) * 1000;
+						points[8] = tmpHeight * 1000;
+						points[9] = (DataParser.parse2Short(dataBuffer, 44) - 30000) * 10;
+						points[10] = tmpClimb3 * 1000;
+						points[54] = tmpVoltage1 * 100;
+						points[55] = tmpVoltage2 * 100;
+						points[56] = ((dataBuffer[34] & 0xFF) - 20) * 1000;
+						points[57] = ((dataBuffer[35] & 0xFF) - 20) * 1000;
 					}
 				}
 				break;
@@ -358,51 +355,49 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					points[4] = (dataBuffer[5] & 0xFF) * 1000;
 					points[5] = (dataBuffer[4] & 0xFF) * 1000;
 					points[6] = (dataBuffer[15] & 0xFF) * 1000;
-					points[7] = (DataParser.parse2Short(dataBuffer, 10) + 20) * 1000;
+					points[7] = DataParser.parse2Short(dataBuffer, 10) * 1000;
 				}
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_VARIO_115200:
 				if (dataBuffer.length == 25) {
 					//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-					points[0] = (dataBuffer[3] & 0xFF) * 1000;
-					tmpHeight = DataParser.parse2Short(dataBuffer, 10) + 500;
-					if (tmpHeight > 1 && tmpHeight < 5000) {
-						points[1] = tmpHeight * 1000;
-						points[2] = (DataParser.parse2Short(dataBuffer, 16) + 30000) * 1000;
+					//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+					tmpHeight = DataParser.parse2Short(dataBuffer, 10);
+					if (tmpHeight > -500 && tmpHeight < 5000) {
+						points[8] = tmpHeight * 1000;
+						points[9] = DataParser.parse2Short(dataBuffer, 16) * 10;
 					}
-					tmpClimb3 = DataParser.parse2Short(dataBuffer, 18) + 30000;
-					tmpClimb10 = DataParser.parse2Short(dataBuffer, 20) + 30000;
-					if (tmpClimb3 > 20000 && tmpClimb10 > 20000 && tmpClimb3 < 40000 && tmpClimb10 < 40000) {
-						points[3] = tmpClimb3 * 1000;
-						points[4] = tmpClimb10 * 1000;
+					tmpClimb3 = DataParser.parse2Short(dataBuffer, 18);
+					tmpClimb10 = DataParser.parse2Short(dataBuffer, 20);
+					if (tmpClimb3 > -10000 && tmpClimb10 > -10000 && tmpClimb3 < 10000 && tmpClimb10 < 10000) {
+						points[10] = tmpClimb3 * 10;
+						points[11] = tmpClimb10 * 10;
 					}
-					points[5] = dataBuffer[4] * 1000;
-					points[6] = (dataBuffer[5] + 20) * 1000;
 				}
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_GPS_115200:
 				if (dataBuffer.length == 34) {
 					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+					//8=Height, 9=Climb 1, 10=Climb 3
+					//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
 					tmpLatitudeGrad = DataParser.parse2Short(dataBuffer, 16);
-					tmpHeight = DataParser.parse2Short(dataBuffer, 14) + 500;
-					tmpClimb3 = dataBuffer[30] + 120;
-					if (tmpLatitudeGrad > 0 && tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
-						points[0] = (dataBuffer[3] & 0xFF) * 1000;
-						points[1] = tmpLatitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 18);
-						points[1] = dataBuffer[26] == 1 ? -1 * points[1] : points[1];
-						points[2] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
-						points[2] = dataBuffer[27] == 1 ? -1 * points[2] : points[2];
-						points[3] = tmpHeight * 1000;
-						points[4] = (DataParser.parse2Short(dataBuffer, 28) + 30000) * 1000;
-						points[5] = tmpClimb3 * 1000;
-						points[6] = DataParser.parse2Short(dataBuffer, 10) * 1000;
-						points[7] = DataParser.parse2Short(dataBuffer, 12) * 1000;
-						points[8] = DataParser.parse2Short(dataBuffer, 24) * 500;
-						points[9] = 0;
-						points[10] = dataBuffer[4] * 1000;
-						points[11] = (dataBuffer[5] + 20) * 1000;
+					tmpLongitudeGrad = DataParser.parse2Short(dataBuffer, 20);
+					tmpHeight = DataParser.parse2Short(dataBuffer, 14);
+					tmpClimb3 = dataBuffer[30];
+					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > -500 && tmpHeight < 5000 && tmpClimb3 > -50) {
+						points[12] = tmpLatitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 18);
+						points[12] = dataBuffer[26] == 1 ? -1 * points[12] : points[12];
+						points[13] = tmpLongitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 22);
+						points[13] = dataBuffer[27] == 1 ? -1 * points[13] : points[13];
+						points[8] = tmpHeight * 1000;
+						points[9] = DataParser.parse2Short(dataBuffer, 28) * 10;
+						points[10] = tmpClimb3 * 1000;
+						points[14] = DataParser.parse2Short(dataBuffer, 10) * 1000;
+						points[15] = DataParser.parse2Short(dataBuffer, 12) * 1000;
+						points[16] = DataParser.parse2Short(dataBuffer, 24) * 500;
+						points[17] = 0;
 					}
 				}
 				break;
@@ -410,39 +405,40 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			case HoTTAdapter2.SENSOR_TYPE_GENERAL_115200:
 				if (dataBuffer.length == 49) {
 					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
+					//8=Height, 9=Climb 1, 10=Climb 3
+					//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 36);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 38);
-					tmpHeight = DataParser.parse2Short(dataBuffer, 32) + 500;
-					tmpClimb3 = dataBuffer[37] + 120;
+					tmpHeight = DataParser.parse2Short(dataBuffer, 32);
+					tmpClimb3 = dataBuffer[44];
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 22);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 24);
-					if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
-						points[0] = (dataBuffer[3] & 0xFF) * 1000;
-						points[1] = tmpVoltage * 1000;
-						points[2] = DataParser.parse2Short(dataBuffer, 34) * 1000;
-						points[3] = tmpCapacity * 1000;
-						points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
+					if (tmpClimb3 > -50 && tmpHeight > -500 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[20] / 1000) {
+						points[18] = tmpVoltage * 1000;
+						points[19] = DataParser.parse2Short(dataBuffer, 34) * 1000;
+						points[20] = tmpCapacity * 1000;
+						points[21] = Double.valueOf(points[18] / 1000.0 * points[19]).intValue(); // power U*I [W];
 						if (tmpVoltage > 0) {
 							for (int i = 0, j = 0; i < 6; i++, j += 2) {
 								tmpCellVoltage = DataParser.parse2Short(dataBuffer, j + 10);
-								points[j + 6] = tmpCellVoltage > 0 ? tmpCellVoltage * 500 : points[j + 6];
-								if (points[i + 6] > 0) {
-									maxVotage = points[i + 6] > maxVotage ? points[i + 6] : maxVotage;
-									minVotage = points[i + 6] < minVotage ? points[i + 6] : minVotage;
+								points[i + 23] = tmpCellVoltage > 0 ? tmpCellVoltage * 10 : points[i + 23];
+								if (points[i + 23] > 0) {
+									maxVotage = points[i + 23] > maxVotage ? points[i + 23] : maxVotage;
+									minVotage = points[i + 23] < minVotage ? points[i + 23] : minVotage;
 								}
 							}
 							//calculate balance on the fly
-							points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
+							points[22] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
 						}
-						points[12] = DataParser.parse2Short(dataBuffer, 30) * 1000;
-						points[13] = tmpHeight * 1000;
-						points[14] = (DataParser.parse2Short(dataBuffer, 42) + 30000) * 1000;
-						points[15] = tmpClimb3 * 1000;
-						points[16] = DataParser.parse2Short(dataBuffer, 40) * 1000;
-						points[17] = tmpVoltage1 * 1000;
-						points[18] = tmpVoltage2 * 1000;
-						points[19] = (DataParser.parse2Short(dataBuffer, 26) + 20) * 1000;
-						points[20] = (DataParser.parse2Short(dataBuffer, 28) + 20) * 1000;
+						points[29] = DataParser.parse2Short(dataBuffer, 30) * 1000;
+						points[8] = tmpHeight * 1000;
+						points[9] = DataParser.parse2Short(dataBuffer, 42) * 10;
+						points[10] = tmpClimb3 * 1000;
+						points[30] = DataParser.parse2Short(dataBuffer, 40) * 1000;
+						points[31] = tmpVoltage1 * 100;
+						points[32] = tmpVoltage2 * 100;
+						points[33] = DataParser.parse2Short(dataBuffer, 26) * 1000;
+						points[34] = DataParser.parse2Short(dataBuffer, 28) * 1000;
 					}
 				}
 				break;
@@ -450,37 +446,38 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			case HoTTAdapter2.SENSOR_TYPE_ELECTRIC_115200:
 				if (dataBuffer.length == 60) {
 					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
+					//8=Height, 9=Climb 1, 10=Climb 3
+					//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 50);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 52);
-					tmpHeight = DataParser.parse2Short(dataBuffer, 46) + 500;
-					tmpClimb3 = dataBuffer[56] + 120;
+					tmpHeight = DataParser.parse2Short(dataBuffer, 46);
+					tmpClimb3 = dataBuffer[56];
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 38);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 40);
-					if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
-						points[0] = (dataBuffer[3] & 0xFF) * 1000;
-						points[1] = DataParser.parse2Short(dataBuffer, 50) * 1000;
-						points[2] = DataParser.parse2Short(dataBuffer, 48) * 1000;
-						points[3] = tmpCapacity * 1000;
-						points[4] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
+					if (tmpClimb3 > -50 && tmpHeight > -500 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[37] / 1000) {
+						points[35] = DataParser.parse2Short(dataBuffer, 50) * 1000;
+						points[36] = DataParser.parse2Short(dataBuffer, 48) * 1000;
+						points[37] = tmpCapacity * 1000;
+						points[38] = Double.valueOf(points[35] / 1000.0 * points[36]).intValue(); // power U*I [W];
 						if (tmpVoltage > 0) {
 							for (int i = 0, j = 0; i < 14; i++, j += 2) {
 								tmpCellVoltage = DataParser.parse2Short(dataBuffer, j + 10);
-								points[j + 6] = tmpCellVoltage > 0 ? tmpCellVoltage * 500 : points[j + 6];
-								if (points[i + 6] > 0) {
-									maxVotage = points[i + 6] > maxVotage ? points[i + 6] : maxVotage;
-									minVotage = points[i + 6] < minVotage ? points[i + 6] : minVotage;
+								points[i + 40] = tmpCellVoltage > 0 ? tmpCellVoltage * 10 : points[i + 40];
+								if (points[i + 40] > 0) {
+									maxVotage = points[i + 40] > maxVotage ? points[i + 40] : maxVotage;
+									minVotage = points[i + 40] < minVotage ? points[i + 40] : minVotage;
 								}
 							}
 							//calculate balance on the fly
-							points[5] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
+							points[39] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
 						}
-						points[20] = tmpHeight * 1000;
-						points[21] = (DataParser.parse2Short(dataBuffer, 54) + 30000) * 1000;
-						points[22] = (dataBuffer[46] + 120) * 1000;
-						points[23] = tmpVoltage1 * 1000;
-						points[24] = tmpVoltage2 * 1000;
-						points[25] = (DataParser.parse2Short(dataBuffer, 42) + 20) * 1000;
-						points[26] = (DataParser.parse2Short(dataBuffer, 44) + 20) * 1000;
+						points[8] = tmpHeight * 1000;
+						points[9] = DataParser.parse2Short(dataBuffer, 54) * 10;
+						points[10] = dataBuffer[46] * 1000;
+						points[54] = tmpVoltage1 * 100;
+						points[55] = tmpVoltage2 * 100;
+						points[56] = DataParser.parse2Short(dataBuffer, 42) * 1000;
+						points[57] = DataParser.parse2Short(dataBuffer, 44) * 1000;
 					}
 				}
 				break;
@@ -665,7 +662,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		
 		if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData() && recordAlitude.hasReasonableData()) { // 12=Latitude, 13=Longitude 8=Height
 			int recordSize = recordLatitude.realSize();
-			int startAltitude = recordAlitude.get(0); // using this as start point might be sense less if the GPS data has no 3D-fix
+			int startAltitude = recordAlitude.get(8); // using this as start point might be sense less if the GPS data has no 3D-fix
 			//check GPS latitude and longitude				
 			int indexGPS = 0;
 			int i = 0;
@@ -783,7 +780,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			convertIGCItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					HoTTAdapter2.logger.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
-					new IgcExportDialog().open(2, 1, 3);
+					new IgcExportDialog().open(13, 12, 8);
 				}
 			});
 		}
@@ -818,7 +815,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	@Override
 	public void export2KMZ3D(int type) {
 		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2403), 2, 1, 3, 6, 5, 9, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
+		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2403), 13, 12, 8, 14, 9, 17, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 		
 	/**
@@ -827,9 +829,14 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	@Override
 	public String translateGPS2IGC(RecordSet recordSet, int index, char fixValidity, int startAltitude, int offsetAltitude) {
 		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-		Record recordLatitude = recordSet.get(1);
-		Record recordLongitude = recordSet.get(2);
-		Record gpsAlitude = recordSet.get(3);
+		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
+		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+		Record recordLatitude = recordSet.get(12);
+		Record recordLongitude = recordSet.get(13);
+		Record gpsAlitude = recordSet.get(8);
 		
 		return String.format("%02d%05d%s%03d%05d%s%c%05.0f%05.0f", 																																														//$NON-NLS-1$
 				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
@@ -849,7 +856,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-				containsGPSdata = activeRecordSet.get(1).hasReasonableData() && activeRecordSet.get(2).hasReasonableData();
+				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+				//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+				//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+				//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
+				//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+				containsGPSdata = activeRecordSet.get(12).hasReasonableData() && activeRecordSet.get(13).hasReasonableData();
 			}
 		}
 		return containsGPSdata;
@@ -867,7 +879,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-				exportFileName = new FileHandler().exportFileKMZ(2, 1, 3, 6, 5, 9, -1, true, isExport2TmpDir);
+				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+				//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+				//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+				//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
+				//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+				exportFileName = new FileHandler().exportFileKMZ(13, 12, 8, 14, 9, 17, -1, true, isExport2TmpDir);
 			}
 		}
 		return exportFileName;
@@ -879,6 +896,11 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
 		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-		return 6;
+		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
+		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+		return 14;
 	}
 }

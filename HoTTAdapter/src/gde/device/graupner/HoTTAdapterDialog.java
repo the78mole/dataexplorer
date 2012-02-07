@@ -84,10 +84,11 @@ public class HoTTAdapterDialog extends DeviceDialog {
 		this.device = useDevice;
 		this.serialPort = useDevice.getCommunicationPort();
 		this.settings = Settings.getInstance();
-		for (int i = 1; i <= this.device.getChannelCount(); i++) {
-			int actualMeasurementCount = this.device.getMeasurementNames(i).length;
-			this.measurementsCount = actualMeasurementCount > this.measurementsCount ? actualMeasurementCount : this.measurementsCount;
-		}
+		this.measurementsCount = 30;
+//		for (int i = 1; i <= this.device.getChannelCount(); i++) {
+//			int actualMeasurementCount = this.device.getMeasurementNames(i).length;
+//			this.measurementsCount = actualMeasurementCount > this.measurementsCount ? actualMeasurementCount : this.measurementsCount;
+//		}
 		this.protocolTypeOrdinal = this.device.getBaudeRate() == 115200 ? HoTTAdapter.Protocol.TYPE_115200.ordinal() : HoTTAdapter.Protocol.TYPE_19200_V4.ordinal(); 
 		this.serialPort.setProtocolType(HoTTAdapter.Protocol.values()[this.protocolTypeOrdinal]);
 	}
@@ -114,7 +115,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				//dialogShell.pack();
-				this.dialogShell.setSize(620, (30 + 25 + this.measurementsCount * 28 + 40 + 80) / 2); //header + tab + label + this.measurementsCount * 23 + loadButton + save/close buttons
+				this.dialogShell.setSize(620, 560); //header + tab + label + this.measurementsCount * 28 + loadButton + save/close buttons
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -181,8 +182,10 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								log.log(java.util.logging.Level.FINEST, "startLifeDataCapturing.widgetSelected, event=" + evt); //$NON-NLS-1$
 								try {
 									HoTTAdapterDialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
-									HoTTAdapterDialog.this.lifeGatherer = new HoTTAdapterLiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort,
-											HoTTAdapterDialog.this);
+									HoTTAdapterDialog.this.lifeGatherer = 
+											(HoTTAdapterDialog.this.device != null && HoTTAdapterDialog.this.device.getName().equals("HoTTAdapter")) 
+											? new HoTTAdapterLiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this)
+													: new HoTTAdapter2LiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this);
 									HoTTAdapterDialog.this.lifeGatherer.start();
 									HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(false);
 									HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(true);
@@ -377,7 +380,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.tabFolder.setSelection(0);
 				}
 
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - this.dialogShell.getSize().x/2, 50));
 				this.dialogShell.open();
 			}
 			else {

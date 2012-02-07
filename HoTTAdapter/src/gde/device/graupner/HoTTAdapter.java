@@ -64,7 +64,7 @@ import org.eclipse.swt.widgets.MenuItem;
 public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static Logger									log														= Logger.getLogger(HoTTAdapter.class.getName());
 
-	final static String									SENSOR_COUNT									= "SensorCount";																	//$NON-NLS-1$
+	final static String									SENSOR_COUNT									= "SensorCount";																//$NON-NLS-1$
 	final static String									LOG_COUNT											= "LogCount";																		//$NON-NLS-1$
 	final static String									SD_LOG_VERSION								= "SD-Log Version";															//$NON-NLS-1$
 	final static Map<String, RecordSet>	recordSets										= new HashMap<String, RecordSet>();
@@ -90,7 +90,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static byte										SENSOR_TYPE_ELECTRIC_115200		= 0x36;
 
 	final static int										QUERY_GAP_MS									= 30;
-	final static boolean								isSensorType[]								= { false, false, false, false };								//isVario, isGPS, isGeneral, isElectric
+	final static boolean								isSensorType[]								= { false, false, false, false, false };		//isReceiver, isVario, isGPS, isGeneral, isElectric
 
 	public enum Sensor {
 		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GENRAL("General-Air"), ELECTRIC("Electric-Air");
@@ -283,7 +283,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-		int tmpHeight, tmpClimb3, tmpClimb10, tmpCapacity, tmpVoltage, tmpCellVoltage, tmpVoltage1, tmpVoltage2, tmpLatitudeGrad;
+		int tmpHeight, tmpClimb3, tmpClimb10, tmpCapacity, tmpVoltage, tmpCellVoltage, tmpVoltage1, tmpVoltage2, tmpLatitudeGrad, tmpLongitudeGrad;
 
 		switch (this.serialPort.protocolType) {
 		case TYPE_19200_V3:
@@ -435,13 +435,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				if (dataBuffer.length == 57) {
 					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 					tmpLatitudeGrad = DataParser.parse2Short(dataBuffer, 20);
+					tmpLongitudeGrad = DataParser.parse2Short(dataBuffer, 25);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 31);
 					tmpClimb3 = dataBuffer[35] & 0xFF;
-					if (tmpLatitudeGrad > 0 && tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
+					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
 						points[0] = (dataBuffer[9] & 0xFF) * 1000;
 						points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
 						points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
-						points[2] = DataParser.parse2Short(dataBuffer, 25) * 10000 + DataParser.parse2Short(dataBuffer, 27);
+						points[2] = tmpLongitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 27);
 						points[2] = dataBuffer[24] == 1 ? -1 * points[2] : points[2];
 						points[3] = tmpHeight * 1000;
 						points[4] = DataParser.parse2Short(dataBuffer, 33) * 1000;
@@ -576,13 +577,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				if (dataBuffer.length == 34) {
 					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 					tmpLatitudeGrad = DataParser.parse2Short(dataBuffer, 16);
+					tmpLongitudeGrad = DataParser.parse2Short(dataBuffer, 20);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 14) + 500;
 					tmpClimb3 = dataBuffer[30] + 120;
-					if (tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
+					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
 						points[0] = (dataBuffer[3] & 0xFF) * 1000;
 						points[1] = tmpLatitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 18);
 						points[1] = dataBuffer[26] == 1 ? -1 * points[1] : points[1];
-						points[2] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
+						points[2] = tmpLongitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 22);
 						points[2] = dataBuffer[27] == 1 ? -1 * points[2] : points[2];
 						points[3] = tmpHeight * 1000;
 						points[4] = (DataParser.parse2Short(dataBuffer, 28) + 30000) * 1000;
@@ -615,7 +617,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						if (tmpVoltage > 0) {
 							for (int i = 0, j = 0; i < 6; i++, j += 2) {
 								tmpCellVoltage = DataParser.parse2Short(dataBuffer, j + 10);
-								points[j + 6] = tmpCellVoltage > 0 ? tmpCellVoltage * 500 : points[j + 6];
+								points[i + 6] = tmpCellVoltage > 0 ? tmpCellVoltage * 500 : points[i + 6];
 								if (points[i + 6] > 0) {
 									maxVotage = points[i + 6] > maxVotage ? points[i + 6] : maxVotage;
 									minVotage = points[i + 6] < minVotage ? points[i + 6] : minVotage;
@@ -655,7 +657,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						if (tmpVoltage > 0) {
 							for (int i = 0, j = 0; i < 14; i++, j += 2) {
 								tmpCellVoltage = DataParser.parse2Short(dataBuffer, j + 10);
-								points[j + 6] = tmpCellVoltage > 0 ? tmpCellVoltage * 500 : points[j + 6];
+								points[i + 6] = tmpCellVoltage > 0 ? tmpCellVoltage * 500 : points[i + 6];
 								if (points[i + 6] > 0) {
 									maxVotage = points[i + 6] > maxVotage ? points[i + 6] : maxVotage;
 									minVotage = points[i + 6] < minVotage ? points[i + 6] : minVotage;
