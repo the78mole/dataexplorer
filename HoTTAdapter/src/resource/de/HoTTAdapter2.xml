@@ -101,14 +101,14 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics countTriggerText="Ermittelt im Steigungstriggerbereich" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+                <statistics sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="9" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 1</name>
                 <symbol>vh</symbol>
                 <unit>m/sec</unit>
                 <active>true</active>
-                <statistics sumTriggerTimeText="~ Motorlaufzeit" countTriggerText="Anzahl gewerteter Steigflüge" countByTrigger="true" sigma="false" avg="false" max="true" min="false">
+                <statistics sumTriggerTimeText="~ Motorlaufzeit" countTriggerText="Anzahl gewerteter Steigflüge" countByTrigger="true" sigma="false" avg="false" max="true" min="true">
                     <trigger comment="Trigger: Steigrate &gt; 1.5 m/sec &gt; 10 sec" minTimeSec="10" isGreater="true" level="1500"/>
                 </statistics>
             </Measurement>
@@ -190,13 +190,14 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Leistung G </name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
@@ -258,7 +259,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Tankfüllstand</name>
@@ -303,6 +304,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -311,6 +313,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -351,7 +354,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -359,7 +362,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -367,7 +370,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -547,13 +550,14 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics countTriggerText="Ermittelt im Steigungstriggerbereich" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+                <statistics countTriggerText="Ermittelt über Stromtrigger" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="19" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 1</name>
                 <symbol>vh</symbol>
                 <unit>m/sec</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 3</name>
@@ -619,6 +623,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
+                <statistics comment="Ermittelt über Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
@@ -636,7 +641,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+                <statistics comment="Ermittelt über Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -644,7 +649,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics comment="Ermittelt über Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
@@ -1001,6 +1006,7 @@
                 <symbol>vh</symbol>
                 <unit>m/sec</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 3</name>
@@ -1212,7 +1218,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="36" sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -1221,7 +1227,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="36" sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>

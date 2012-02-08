@@ -101,7 +101,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics countTriggerText="Calculated within climb trigger range" sumTriggerText="Sum motor height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+                <statistics sumTriggerText="Sum motor height" sumByTriggerRefOrdinal="9" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Climb 1</name>
@@ -118,7 +118,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Climb 10</name>
@@ -126,7 +126,7 @@
                 <unit>m/10sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Latitude</name>
@@ -190,13 +190,14 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Power G</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
@@ -258,7 +259,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>FuelLevel</name>
@@ -280,7 +281,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature G1</name>
@@ -288,7 +289,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature G2</name>
@@ -296,23 +297,25 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Voltage E</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Current E</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Capacity E</name>
@@ -320,7 +323,7 @@
                 <unit>mAh</unit>
                 <active>true</active>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Power E</name>
@@ -328,7 +331,7 @@
                 <unit>W</unit>
                 <active>true</active>
                 <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Balance E</name>
@@ -336,7 +339,7 @@
                 <unit>mV</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="22" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="22" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage E1</name>
@@ -344,14 +347,14 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="23" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage E2</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -359,7 +362,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -367,7 +370,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -376,7 +379,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property type="Integer" value="6" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage E6</name>
@@ -456,7 +459,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Voltage ES2</name>
@@ -464,7 +467,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature E1</name>
@@ -472,7 +475,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature E2</name>
@@ -480,7 +483,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorGeneral">
@@ -547,13 +550,14 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics countTriggerText="Calculated within climb trigger range" sumTriggerText="Sum motor height" sumByTriggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+                <statistics countTriggerText="Calculated within current trigger" sumTriggerText="Sum motor height" sumByTriggerRefOrdinal="19" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Climb 1</name>
                 <symbol>vh</symbol>
                 <unit>m/sec</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Climb 3</name>
@@ -561,7 +565,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Climb 10</name>
@@ -569,7 +573,7 @@
                 <unit>m/10sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Latitude</name>
@@ -619,6 +623,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
+                <statistics comment="Related to current trigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
@@ -636,7 +641,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+                <statistics comment="Related to current trigger" triggerRefOrdinal="19" sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -644,7 +649,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics comment="Related to current trigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
@@ -728,7 +733,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature G1</name>
@@ -736,7 +741,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature G2</name>
@@ -744,7 +749,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Voltage E</name>
@@ -752,7 +757,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Current E</name>
@@ -760,7 +765,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Capacity E</name>
@@ -768,7 +773,7 @@
                 <unit>mAh</unit>
                 <active>true</active>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Power E</name>
@@ -776,7 +781,7 @@
                 <unit>W</unit>
                 <active>true</active>
                 <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Balance E</name>
@@ -784,7 +789,7 @@
                 <unit>mV</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="22" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="22" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage E1</name>
@@ -792,7 +797,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="23" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage E2</name>
@@ -904,7 +909,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Voltage ES2</name>
@@ -912,7 +917,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature E1</name>
@@ -920,7 +925,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature E2</name>
@@ -928,7 +933,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorElectric">
@@ -1001,6 +1006,7 @@
                 <symbol>vh</symbol>
                 <unit>m/sec</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Climb 3</name>
@@ -1008,7 +1014,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Climb 10</name>
@@ -1016,7 +1022,7 @@
                 <unit>m/10sec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="9" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Latitude</name>
@@ -1170,7 +1176,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature G1</name>
@@ -1178,7 +1184,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature G2</name>
@@ -1186,7 +1192,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Voltage E</name>
@@ -1194,7 +1200,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Current E</name>
@@ -1205,25 +1211,25 @@
                     <trigger comment="Current &gt; 3 A over &gt; 3 Seconds" minTimeSec="3" isGreater="true" level="3000"/>
                 </statistics>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Capacity E</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
+                <statistics comment="Related to current trigger" triggerRefOrdinal="36" sigma="true" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Power E</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="Related to current trigger" triggerRefOrdinal="36" sigma="true" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Balance E</name>
@@ -1231,7 +1237,7 @@
                 <unit>mV</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="22" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="22" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage E1</name>
@@ -1239,7 +1245,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="23" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>CellVoltage E2</name>
@@ -1351,7 +1357,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Voltage ES2</name>
@@ -1359,7 +1365,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="31" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature E1</name>
@@ -1367,7 +1373,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperature E2</name>
@@ -1375,7 +1381,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
     </Channels>
