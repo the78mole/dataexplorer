@@ -574,14 +574,14 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					isSensorType[4] = (DataParser.parse2Short(dataBuffer, 40) != 0);
 					Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 				}
-				if (isSensorType[1] || isSensorType[2] | isSensorType[3] || isSensorType[4]) isSensorType[0] = true;
+				if (isSensorType[1] || isSensorType[2] || isSensorType[3] || isSensorType[4]) isSensorType[0] = true;
 				if (!isSensorType[0]) {
 					HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Receiver");
 					this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
 					this.serialPort.getData(false);
 					Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					byte[] dataBuffer = this.serialPort.getData(true);
-					isSensorType[4] = (dataBuffer[9] != 0 && dataBuffer[6] != 0 && dataBuffer[7] != 0);
+					isSensorType[0] = (dataBuffer[9] != 0 && dataBuffer[6] != 0 && dataBuffer[7] != 0);
 					Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 				}
 			}
@@ -596,7 +596,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					this.serialPort.getData(false);
 					Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-					isSensorType[4] = checkSignature(this.serialPort.getData(false), HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
+					isSensorType[0] = checkSignature(this.serialPort.getData(false), HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
 					Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 				}
 				if (!isSensorType[1]) {
@@ -690,8 +690,8 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					isSensorType[4] = (this.serialPort.getData(true)[15] == HoTTAdapter.ANSWER_SENSOR_ELECTRIC_19200);
 					Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 				}
-				if (isSensorType[1] || isSensorType[2] | isSensorType[3] || isSensorType[4]) isSensorType[0] = true;
-				if (!isSensorType[4]) {
+				if (isSensorType[1] || isSensorType[2] || isSensorType[3] || isSensorType[4]) isSensorType[0] = true;
+				if (!isSensorType[0]) {
 					HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Receiver");
 					this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
 					this.serialPort.getData(false);
@@ -700,7 +700,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					this.serialPort.getData(true);
 					Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-					isSensorType[4] = (this.serialPort.getData(true)[15] == HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
+					isSensorType[0] = (this.serialPort.getData(true)[15] == HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
 					Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 				}
 			}
@@ -777,7 +777,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					isSensorType[1] = (DataParser.parse2Short(dataBuffer, 10) != 0 || dataBuffer[16] != 0);
 					Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 				}
-				if (isSensorType[1] || isSensorType[2] | isSensorType[3] || isSensorType[4]) isSensorType[0] = true;
+				if (isSensorType[1] || isSensorType[2] || isSensorType[3] || isSensorType[4]) isSensorType[0] = true;
 				if (!isSensorType[0]) {
 					HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Receiver");
 					this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_115200);
