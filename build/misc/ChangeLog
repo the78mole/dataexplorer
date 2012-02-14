@@ -6,6 +6,7 @@ HottAdapter - General-Air-Sensor 115200 protocol, fix several error value displa
 HoTTAdapter2 - introduce to have all possible sensor values on identical time line
 HottAdapter - correct sign of dBm gauge values
 HottAdapter - refine sensor detection while slave modus
+VC8x0 - refine timeout error handling
 
 Version 2.95 - 28 Jan 2012
 HoTTAdapter - filter misplaced measurements while loading or gathering data from multiple sensors
