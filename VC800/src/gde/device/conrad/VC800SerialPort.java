@@ -2,9 +2,9 @@ package gde.device.conrad;
 
 import gde.comm.DeviceCommPort;
 import gde.device.IDevice;
-import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
+import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
 import java.io.IOException;
@@ -69,8 +69,10 @@ public class VC800SerialPort extends DeviceCommPort {
 			if ((answer[0]& 0xF0) != 0x10 || (answer[13]& 0xF0) != 0xE0) {
 				VC800SerialPort.log.logp(java.util.logging.Level.WARNING, VC800SerialPort.$CLASS_NAME, $METHOD_NAME,	"=====> data start or end does not match, number of errors = " + this.getXferErrors());
 				this.addXferError();
-				if (this.getXferErrors() > VC800SerialPort.xferErrorLimit)
-					throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + VC800SerialPort.xferErrorLimit);
+				if (this.getXferErrors() > 0 && this.getXferErrors() % VC800SerialPort.xferErrorLimit == 0) {
+					VC800SerialPort.log.logp(java.util.logging.Level.WARNING, VC800SerialPort.$CLASS_NAME, $METHOD_NAME,	"Number of tranfer error exceed the acceptable limit! number errors = " + this.getXferErrors());
+					application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGW0045,		new Object[] { "SerialPortException",  this.getXferErrors() }));
+				}
 				data = getData();
 			}
 			else {
