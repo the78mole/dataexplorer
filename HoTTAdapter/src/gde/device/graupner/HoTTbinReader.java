@@ -88,11 +88,13 @@ public class HoTTbinReader {
 					data_in.read(buffer);
 					HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
 
-					if (buffer[5] != 0x00) versionCount += (buffer[5] & 0xFF);
-
 					switch (buffer[7]) {
 					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 						HoTTAdapter.isSensorType[1] = true;
+						//if (buffer[33] == 0) {
+						//	printByteValues(10, buffer);
+						//}
+						versionCount += (buffer[25] != 0 && buffer[30] != 0) ? 1 : 0;
 						break;
 					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 						HoTTAdapter.isSensorType[2] = true;
@@ -127,21 +129,51 @@ public class HoTTbinReader {
 		return fileInfo;
 	}
 
+	static int[] lookup = new int[] {100, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 85, 85, 85, 85, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 30, 25, 25, 20, 20, 20, 15, 15, 10, 10, 5, 5, 5, 5, 0};
+	
+//	static {
+//		StringBuilder sb = new StringBuilder().append("{");
+//		String line;
+//		try {
+//			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("c:\\temp\\Test.csv"), "ISO-8859-1"));
+//			while ((line = br.readLine()) != null) {
+//				String[] tmpLine = line.split(";");
+//				try {
+//					int index = Double.valueOf(tmpLine[0]).intValue();
+//					System.out.println(tmpLine + " lookup[" + (index > 100 ? 100 : index) + "] = " + Integer.parseInt(tmpLine[1]));
+//					lookup[index > 100 ? 100 : index] = Integer.parseInt(tmpLine[1]);
+//				}
+//				catch (Exception e) {
+//				}
+//			}
+//			for (int i = 0; i < lookup.length; i++) {
+//				sb.append(lookup[i]).append(", ");
+//			}
+//		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		System.out.println(sb.append("}").toString());
+//	}
+//	static {
+//		StringBuilder sb = new StringBuilder().append("{");
+//		for (int i = 0, j = 100; i < lookup.length; i++) {
+//			lookup[i] = j;
+//			sb.append(j).append(", ");
+//			if (i%10 == 0) j -=5;
+//		}
+//		System.out.println(sb.append("}").toString());
+//	}
+
 	static int convertRFRXSQ2Strenght(int inValue) {
 		// RF_RXSQ_to_Strength(72-ShortInt(buf[0].data_3_1[3]) DIV 2)
-		int result = 0;
-		inValue = 72 - inValue;
-		if (inValue < 31)
-			result = 100;
-		else if (inValue >= 31 && inValue <= 64)
-			result = ((int) ((inValue * (-0.5) + 117.25) / 5) * 5);
-		else if (inValue >= 65 && inValue <= 76)
-			result = ((int) ((inValue * (-5.0) + 410.00) / 5) * 5);
-		else if (inValue >= 77 && inValue <= 89)
-			result = ((int) ((inValue * (-2.5) + 223.75) / 5) * 5);
-		else
-			result = 0;
-		return result * 5 / 10;
+		if (inValue >= 40 && inValue < lookup.length+40) {
+			return lookup[inValue - 40];
+		}
+		else if (inValue < 40)
+			return 100;
+		else 
+			return 0;
 	}
 
 	/**
@@ -871,8 +903,8 @@ public class HoTTbinReader {
 		_pointsReceiver[1] = (_buf[38] & 0xFF) * 1000;
 		_pointsReceiver[2] = (convertRFRXSQ2Strenght(_buf[37] & 0xFF)) * 1000;
 		_pointsReceiver[3] = DataParser.parse2Short(_buf, 40) * 1000;
-		_pointsReceiver[4] = (_buf[3] & 0xFF) * 1000;
-		_pointsReceiver[5] = (_buf[4] & 0xFF) * 1000;
+		_pointsReceiver[4] = (_buf[3] & 0xFF) * -1000;
+		_pointsReceiver[5] = (_buf[4] & 0xFF) * -1000;
 		_pointsReceiver[6] = (_buf[35] & 0xFF) * 1000;
 		_pointsReceiver[7] = (_buf[36] & 0xFF) * 1000;
 
@@ -1120,14 +1152,16 @@ public class HoTTbinReader {
 			List<File> files = FileUtils.getFileListing(new File(directory));
 			for (File file : files) {
 				if (!file.isDirectory() && file.getName().endsWith(".bin")) {
-					FileInputStream file_input = new FileInputStream(file);
-					DataInputStream data_in = new DataInputStream(file_input);
-					HoTTbinReader.buf = new byte[64];
-					data_in.read(HoTTbinReader.buf);
-					System.out.println(file.getName());
-					System.out.println(StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
-					System.out.println(StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
-					data_in.close();
+//					FileInputStream file_input = new FileInputStream(file);
+//					DataInputStream data_in = new DataInputStream(file_input);
+//					HoTTbinReader.buf = new byte[64];
+//					data_in.read(HoTTbinReader.buf);
+//					System.out.println(file.getName());
+//					System.out.println(StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
+//					System.out.println(StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
+//					data_in.close();
+					System.out.println(file.getName() + " - " + Integer.parseInt(getFileInfo(file).get(HoTTAdapter.SD_LOG_VERSION)));
+
 				}
 			}
 		}
