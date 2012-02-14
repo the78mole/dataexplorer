@@ -105,8 +105,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					points[1] = (dataBuffer[9] & 0xFF) * 1000;
 					points[2] = (dataBuffer[5] & 0xFF) * 1000;
 					points[3] = DataParser.parse2Short(dataBuffer, 11) * 1000;
-					points[4] = (dataBuffer[13] & 0xFF) * 1000;
-					points[5] = (dataBuffer[9] & 0xFF) * 1000;
+					points[4] = (dataBuffer[13] & 0xFF) * -1000;
+					points[5] = (dataBuffer[9] & 0xFF) * -1000;
 					points[6] = (dataBuffer[6] & 0xFF) * 1000;
 					points[7] = ((dataBuffer[7] & 0xFF) - 20) * 1000;
 				}
@@ -564,6 +564,9 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					int grad = record.get(rowIndex) / 1000000;
 					double minuten = record.get(rowIndex) % 1000000 / 10000.0;
 					dataTableRow[j + 1] = String.format("%d %.4f", grad, minuten); //$NON-NLS-1$
+				}
+				else if (j >= 0 && j <= 5){
+					dataTableRow[j + 1] = String.format("%.0f",(record.get(rowIndex) / 1000.0));
 				}
 				else {
 					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));

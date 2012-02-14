@@ -86,6 +86,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		Channel channel = null;
 		int channelNumber = device.getLastChannelNumber();
 		boolean isInitialSwitched = false;
+		boolean isReceiverData = false;
 		boolean isSensorData = false;
 		HoTTbinReader2.recordSet = null; 
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
@@ -137,6 +138,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 				//fill receiver data
 				if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0 && HoTTbinReader2.timeStep_ms % 10 == 0) {
 					parseReceiver(HoTTbinReader2.recordSet, HoTTbinReader2.points, HoTTbinReader2.buf);
+					isReceiverData = true;
 				}
 
 				if (HoTTbinReader2.buf[33] >= 0 && HoTTbinReader2.buf[33] <= 4 && HoTTbinReader2.buf[3] != 0 && HoTTbinReader2.buf[4] != 0) { //skip empty block - package loss
@@ -262,7 +264,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 						break;
 					}
 
-					if (isSensorData) {
+					if (isSensorData || isReceiverData) {
 						HoTTbinReader2.recordSet.addPoints(points, timeStep_ms);
 						if (numberDatablocks > 30000) { //5 minutes log time
 							data_in.skip(HoTTbinReader2.dataBlockSize * 50); //take from data points only each half second 
@@ -271,7 +273,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 						}
 						// add default time step from device of 10 msec
 						HoTTbinReader2.timeStep_ms += 10;
-						isSensorData = false;
+						isReceiverData = isSensorData = false;
 					}
 					else { // add default time step from device of 10 msec
 						HoTTbinReader2.timeStep_ms += 10;
@@ -671,8 +673,8 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		_points[1] = (_buf[38] & 0xFF) * 1000;
 		_points[2] = (convertRFRXSQ2Strenght(_buf[37] & 0xFF)) * 1000;
 		_points[3] = DataParser.parse2Short(_buf, 40) * 1000;
-		_points[4] = (_buf[3] & 0xFF) * 1000;
-		_points[5] = (_buf[4] & 0xFF) * 1000;
+		_points[4] = (_buf[3] & 0xFF) * -1000;
+		_points[5] = (_buf[4] & 0xFF) * -1000;
 		_points[6] = (_buf[35] & 0xFF) * 1000;
 		_points[7] = ((_buf[36] & 0xFF) + 20) * 1000;
 	}

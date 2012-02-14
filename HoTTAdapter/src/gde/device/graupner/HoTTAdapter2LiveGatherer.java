@@ -174,8 +174,10 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 						//HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 						//WaitTimer.delay(HoTTAdapter.queryGapTime_ms);
 						byte[] dataBuffer = HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
-						while (!checkContainsDataBegin(dataBuffer))
+						while (!checkContainsDataBegin(dataBuffer)) {
+							WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 							dataBuffer = HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
+						}
 						WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 						if (checkSignature(dataBuffer, HoTTAdapter.SENSOR_TYPE_RECEIVER_19200)) {
 							recordSet.addPoints(this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
@@ -195,8 +197,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 						else if (checkSignature(dataBuffer, HoTTAdapter.SENSOR_TYPE_VARIO_19200)) {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_19200);
 							recordSet.addPoints(this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
-						}
-						
+						}			
 					}
 					else {
 						if (HoTTAdapter2.isSensorType[0] == true) {

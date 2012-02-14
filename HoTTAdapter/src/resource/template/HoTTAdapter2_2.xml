@@ -12,7 +12,7 @@
 <entry key="0_isVisible">false</entry>
 <entry key="0_lineStyle">1</entry>
 <entry key="0_lineWidth">1</entry>
-<entry key="0_numberFormat">-1</entry>
+<entry key="0_numberFormat">0</entry>
 <entry key="1_color">255,0,0</entry>
 <entry key="1_defMaxValue">100.0</entry>
 <entry key="1_defMinValue">50.0</entry>
@@ -23,7 +23,7 @@
 <entry key="1_isVisible">true</entry>
 <entry key="1_lineStyle">1</entry>
 <entry key="1_lineWidth">1</entry>
-<entry key="1_numberFormat">-1</entry>
+<entry key="1_numberFormat">0</entry>
 <entry key="2_color">0,174,0</entry>
 <entry key="2_defMaxValue">50.0</entry>
 <entry key="2_defMinValue">47.0</entry>
@@ -34,7 +34,7 @@
 <entry key="2_isVisible">false</entry>
 <entry key="2_lineStyle">1</entry>
 <entry key="2_lineWidth">1</entry>
-<entry key="2_numberFormat">-1</entry>
+<entry key="2_numberFormat">0</entry>
 <entry key="3_color">255,0,255</entry>
 <entry key="3_defMaxValue">2000.0</entry>
 <entry key="3_defMinValue">2000.0</entry>
@@ -45,7 +45,7 @@
 <entry key="3_isVisible">false</entry>
 <entry key="3_lineStyle">1</entry>
 <entry key="3_lineWidth">1</entry>
-<entry key="3_numberFormat">-1</entry>
+<entry key="3_numberFormat">0</entry>
 <entry key="4_color">64,0,64</entry>
 <entry key="4_defMaxValue">58.0</entry>
 <entry key="4_defMinValue">33.0</entry>
@@ -56,7 +56,7 @@
 <entry key="4_isVisible">false</entry>
 <entry key="4_lineStyle">1</entry>
 <entry key="4_lineWidth">1</entry>
-<entry key="4_numberFormat">-1</entry>
+<entry key="4_numberFormat">0</entry>
 <entry key="5_color">0,128,128</entry>
 <entry key="5_defMaxValue">58.0</entry>
 <entry key="5_defMinValue">33.0</entry>
@@ -67,7 +67,7 @@
 <entry key="5_isVisible">false</entry>
 <entry key="5_lineStyle">1</entry>
 <entry key="5_lineWidth">1</entry>
-<entry key="5_numberFormat">-1</entry>
+<entry key="5_numberFormat">0</entry>
 <entry key="6_color">0,0,255</entry>
 <entry key="6_defMaxValue">6.0</entry>
 <entry key="6_defMinValue">4.5</entry>
