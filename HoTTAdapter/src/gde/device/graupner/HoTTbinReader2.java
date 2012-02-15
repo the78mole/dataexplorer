@@ -53,14 +53,12 @@ public class HoTTbinReader2 extends HoTTbinReader{
 	 */
 	public static synchronized void read(String filePath) throws Exception {
 		HashMap<String, String> header = null;
-		int sdLogFormatVersion = 0;
 		File file = new File(filePath);
-
+		log.log(Level.OFF, file.getName() + " - " + new SimpleDateFormat("yyyy-MM-dd").format(file.lastModified()));
 		header = getFileInfo(file);
-		sdLogFormatVersion = Integer.parseInt(header.get(HoTTAdapter.SD_LOG_VERSION));
 
 		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1)
-			readSingle(file, sdLogFormatVersion);
+			readSingle(file);
 		else
 			readMultiple(file);
 	}
@@ -72,7 +70,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 	* @throws IOException 
 	* @throws DataInconsitsentException 
 	*/
-	static void readSingle(File file, int version) throws IOException, DataInconsitsentException {
+	static void readSingle(File file) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readSingle";
 		long startTime = System.nanoTime() / 1000000;
 		long actualTime_ms = 0, drawTime_ms = startTime;
@@ -102,6 +100,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		HoTTbinReader2.buf2 = null;
 		HoTTbinReader2.buf3 = null;
 		HoTTbinReader2.buf4 = null;
+		int version = -1;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader2.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -166,7 +165,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 						}
 
 						if (HoTTbinReader2.buf0 != null && HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null) {
-							parseVario(HoTTbinReader2.recordSet, HoTTbinReader2.points, version, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
+							version = parseVario(HoTTbinReader2.recordSet, HoTTbinReader2.points, version, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
 							HoTTbinReader2.buf0 = HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = null;
 							isSensorData = true;
 						}
@@ -671,7 +670,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		_points[0] = (_buf[34] & 0xFF) * 1000;
 		_points[1] = (_buf[38] & 0xFF) * 1000;
-		_points[2] = (convertRFRXSQ2Strenght(_buf[37] & 0xFF)) * 1000;
+		_points[2] = (convertRFRXSQ2Strength(_buf[37] & 0xFF)) * 1000;
 		_points[3] = DataParser.parse2Short(_buf, 40) * 1000;
 		_points[4] = (_buf[3] & 0xFF) * -1000;
 		_points[5] = (_buf[4] & 0xFF) * -1000;
@@ -688,9 +687,10 @@ public class HoTTbinReader2 extends HoTTbinReader{
 	 * @param _buf1
 	 * @param _buf2
 	 */
-	private static void parseVario(RecordSet _recordSet, int[] _points, int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) {
+	private static int parseVario(RecordSet _recordSet, int[] _points, int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) {
+		if (sdLogVersion == -1) sdLogVersion = getSdLogVerion(_buf1, _buf2);
 		switch (sdLogVersion) {
-		case 0:
+		case 3:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 			_points[8] = (DataParser.parse2Short(_buf1, 3) - 500) * 1000;
@@ -700,7 +700,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 			_points[10] = (DataParser.parse2UnsignedShort(_buf1[1], _buf2[2]) - 30000) * 10;
 			_points[11] = (DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) * 10;
 			break;
-		case 1:
+		case 4:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 			int tmpHeight = DataParser.parse2Short(_buf1, 2);
@@ -717,6 +717,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 			}
 			break;
 		}
+		return sdLogVersion;
 	}
 
 	/**
@@ -731,7 +732,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 	private static void parseGPS(RecordSet _recordSet, int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) {
 		int tmpHeight = DataParser.parse2Short(_buf2, 8) - 500;
 		int tmpClimb3 = (_buf3[2] & 0xFF) - 120;
-		if (tmpClimb3 > -50 && tmpHeight > -500 && tmpHeight < 5000) {
+		if (tmpClimb3 > -50 && tmpHeight > -490 && tmpHeight < 5000) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 			//8=Height, 9=Climb 1, 10=Climb 3
 			//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -768,7 +769,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
-		if (tmpClimb3 > -50 && tmpHeight > -500 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _points[20] / 1000) {
+		if (tmpClimb3 > -50 && tmpHeight > -490 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _points[20] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			_points[18] = DataParser.parse2Short(_buf3, 7) * 1000;
@@ -817,7 +818,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
-		if (tmpClimb3 > -50 && tmpHeight > -500 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _points[37] / 1000) {
+		if (tmpClimb3 > -50 && tmpHeight > -490 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _points[37] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			_points[35] = DataParser.parse2Short(_buf3, 7) * 1000;

@@ -416,7 +416,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 					points[0] = (dataBuffer[9] & 0xFF) * 1000;
 					tmpHeight = DataParser.parse2Short(dataBuffer, 16);
-					if (tmpHeight > 1 && tmpHeight < 5000) {
+					if (tmpHeight > 10 && tmpHeight < 5000) {
 						points[1] = tmpHeight * 1000;
 						points[2] = DataParser.parse2Short(dataBuffer, 22) * 1000;
 					}
@@ -438,7 +438,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpLongitudeGrad = DataParser.parse2Short(dataBuffer, 25);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 31);
 					tmpClimb3 = dataBuffer[35] & 0xFF;
-					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
+					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > 10 && tmpHeight < 5000 && tmpClimb3 > 80) {
 						points[0] = (dataBuffer[9] & 0xFF) * 1000;
 						points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
 						points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
@@ -466,7 +466,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpClimb3 = dataBuffer[37] & 0xFF;
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 22);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 24);
-					if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					if (tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
 						points[0] = (dataBuffer[9] & 0xFF) * 1000;
 						points[1] = tmpVoltage * 1000;
 						points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
@@ -506,7 +506,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpClimb3 = dataBuffer[46] & 0xFF;
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 30);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 32);
-					if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					if (tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
 						points[0] = (dataBuffer[9] & 0xFF) * 1000;
 						points[1] = tmpVoltage * 1000;
 						points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
@@ -558,7 +558,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 					points[0] = (dataBuffer[3] & 0xFF) * 1000;
 					tmpHeight = DataParser.parse2Short(dataBuffer, 10) + 500;
-					if (tmpHeight > 1 && tmpHeight < 5000) {
+					if (tmpHeight > 10 && tmpHeight < 5000) {
 						points[1] = tmpHeight * 1000;
 						points[2] = (DataParser.parse2Short(dataBuffer, 16) + 30000) * 1000;
 					}
@@ -580,7 +580,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpLongitudeGrad = DataParser.parse2Short(dataBuffer, 20);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 14) + 500;
 					tmpClimb3 = dataBuffer[30] + 120;
-					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > 1 && tmpHeight < 5000 && tmpClimb3 > 80) {
+					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > 10 && tmpHeight < 5000 && tmpClimb3 > 80) {
 						points[0] = (dataBuffer[3] & 0xFF) * 1000;
 						points[1] = tmpLatitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 18);
 						points[1] = dataBuffer[26] == 1 ? -1 * points[1] : points[1];
@@ -608,7 +608,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpClimb3 = dataBuffer[44] + 120;
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 22);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 24);
-					if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					if (tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
 						points[0] = (dataBuffer[3] & 0xFF) * 1000;
 						points[1] = tmpVoltage * 1000;
 						points[2] = DataParser.parse2Short(dataBuffer, 34) * 1000;
@@ -648,7 +648,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					tmpClimb3 = dataBuffer[56] + 120;
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 38);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 40);
-					if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					if (tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
 						points[0] = (dataBuffer[3] & 0xFF) * 1000;
 						points[1] = DataParser.parse2Short(dataBuffer, 50) * 1000;
 						points[2] = DataParser.parse2Short(dataBuffer, 48) * 1000;

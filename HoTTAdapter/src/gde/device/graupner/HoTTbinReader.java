@@ -72,7 +72,6 @@ public class HoTTbinReader {
 		byte[] buffer = new byte[64];
 		HashMap<String, String> fileInfo;
 		int sensorCount = 0;
-		int versionCount = 0;
 		long numberLogs = (file.length() / 64);
 
 		try {
@@ -83,18 +82,14 @@ public class HoTTbinReader {
 				FileInputStream file_input = new FileInputStream(file);
 				data_in = new DataInputStream(file_input);
 				fileInfo = new HashMap<String, String>();
-				HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
+				HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
 				for (int i = 0; i < 50; i++) {
 					data_in.read(buffer);
-					HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
 
 					switch (buffer[7]) {
 					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 						HoTTAdapter.isSensorType[1] = true;
-						//if (buffer[33] == 0) {
-						//	printByteValues(10, buffer);
-						//}
-						versionCount += (buffer[25] != 0 && buffer[30] != 0) ? 1 : 0;
 						break;
 					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 						HoTTAdapter.isSensorType[2] = true;
@@ -110,8 +105,6 @@ public class HoTTbinReader {
 				for (boolean element : HoTTAdapter.isSensorType) {
 					if (element == true) ++sensorCount;
 				}
-				//more then one sensor is supported with new format only, 
-				fileInfo.put(HoTTAdapter.SD_LOG_VERSION, GDE.STRING_EMPTY + (sensorCount > 1 || versionCount > 0 ? 1 : 0));
 				fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
 				fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
 
@@ -129,8 +122,25 @@ public class HoTTbinReader {
 		return fileInfo;
 	}
 
+	//0=RF_RXSQ to Strength lookup table
 	static int[] lookup = new int[] {100, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 85, 85, 85, 85, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 30, 25, 25, 20, 20, 20, 15, 15, 10, 10, 5, 5, 5, 5, 0};
+	/**
+	 * convert from RF_RXSQ to strength using lookup table
+	 * @param inValue
+	 * @return
+	 */
+	static int convertRFRXSQ2Strength(int inValue) {
+		// RF_RXSQ_to_Strength(72-ShortInt(buf[0].data_3_1[3]) DIV 2)
+		if (inValue >= 40 && inValue < lookup.length+40) {
+			return lookup[inValue - 40];
+		}
+		else if (inValue < 40)
+			return 100;
+		else 
+			return 0;
+	}
 	
+//  build lookup table from csv file
 //	static {
 //		StringBuilder sb = new StringBuilder().append("{");
 //		String line;
@@ -165,17 +175,6 @@ public class HoTTbinReader {
 //		System.out.println(sb.append("}").toString());
 //	}
 
-	static int convertRFRXSQ2Strenght(int inValue) {
-		// RF_RXSQ_to_Strength(72-ShortInt(buf[0].data_3_1[3]) DIV 2)
-		if (inValue >= 40 && inValue < lookup.length+40) {
-			return lookup[inValue - 40];
-		}
-		else if (inValue < 40)
-			return 100;
-		else 
-			return 0;
-	}
-
 	/**
 	 * read complete file data and display the first found record set
 	 * @param filePath
@@ -183,14 +182,12 @@ public class HoTTbinReader {
 	 */
 	public static synchronized void read(String filePath) throws Exception {
 		HashMap<String, String> header = null;
-		int sdLogFormatVersion = 0;
 		File file = new File(filePath);
 
 		header = getFileInfo(file);
-		sdLogFormatVersion = Integer.parseInt(header.get(HoTTAdapter.SD_LOG_VERSION));
 
 		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1)
-			readSingle(file, sdLogFormatVersion);
+			readSingle(file);
 		else
 			readMultiple(file);
 	}
@@ -198,11 +195,10 @@ public class HoTTbinReader {
 	/**
 	* read log data according to version 0
 	* @param file
-	* @param data_in
 	* @throws IOException 
 	* @throws DataInconsitsentException 
 	*/
-	static void readSingle(File file, int version) throws IOException, DataInconsitsentException {
+	static void readSingle(File file) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readSingle";
 		long startTime = System.nanoTime() / 1000000;
 		long actualTime_ms = 0, drawTime_ms = startTime;
@@ -232,6 +228,7 @@ public class HoTTbinReader {
 		HoTTbinReader.buf2 = null;
 		HoTTbinReader.buf3 = null;
 		HoTTbinReader.buf4 = null;
+		int version = -1;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -314,7 +311,7 @@ public class HoTTbinReader {
 						}
 
 						if (HoTTbinReader.buf0 != null && HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null) {
-							parseAddVario(HoTTbinReader.recordSetVario, HoTTbinReader.pointsVario, version, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.timeStep_ms);
+							version = parseAddVario(HoTTbinReader.recordSetVario, HoTTbinReader.pointsVario, version, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.timeStep_ms);
 							HoTTbinReader.buf0 = HoTTbinReader.buf1 = HoTTbinReader.buf2 = null;
 							if (numberDatablocks > 30000) { //5 minutes
 								data_in.skip(HoTTbinReader.dataBlockSize * 50); //take from data points only each half second 
@@ -901,7 +898,7 @@ public class HoTTbinReader {
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		_pointsReceiver[0] = (_buf[34] & 0xFF) * 1000;
 		_pointsReceiver[1] = (_buf[38] & 0xFF) * 1000;
-		_pointsReceiver[2] = (convertRFRXSQ2Strenght(_buf[37] & 0xFF)) * 1000;
+		_pointsReceiver[2] = (convertRFRXSQ2Strength(_buf[37] & 0xFF)) * 1000;
 		_pointsReceiver[3] = DataParser.parse2Short(_buf, 40) * 1000;
 		_pointsReceiver[4] = (_buf[3] & 0xFF) * -1000;
 		_pointsReceiver[5] = (_buf[4] & 0xFF) * -1000;
@@ -924,9 +921,10 @@ public class HoTTbinReader {
 	 * @param _timeStep_ms
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddVario(RecordSet _recordSetVario, int[] _pointsVario, int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2, long _timeStep_ms) throws DataInconsitsentException {
+	private static int parseAddVario(RecordSet _recordSetVario, int[] _pointsVario, int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2, long _timeStep_ms) throws DataInconsitsentException {
+		if (sdLogVersion == -1) sdLogVersion = getSdLogVerion(_buf1, _buf2);
 		switch (sdLogVersion) {
-		case 0:
+		case 3:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			_pointsVario[0] = (_buf1[0] & 0xFF) * 1000;
 			_pointsVario[1] = DataParser.parse2Short(_buf1, 3) * 1000;
@@ -938,11 +936,11 @@ public class HoTTbinReader {
 			_pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
 			_pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
 			break;
-		case 1:
+		case 4:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			_pointsVario[0] = (_buf0[4] & 0xFF) * 1000;
 			int tmpHeight = DataParser.parse2Short(_buf1, 2);
-			if (tmpHeight > 1 && tmpHeight < 5000) {
+			if (tmpHeight > 10 && tmpHeight < 5000) {
 				_pointsVario[1] = tmpHeight * 1000;
 				//pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
 				//pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
@@ -963,6 +961,20 @@ public class HoTTbinReader {
 		//log.log(Level.FINEST, "");
 
 		_recordSetVario.addPoints(_pointsVario, _timeStep_ms);
+		return sdLogVersion;
+	}
+
+	/**
+	 * detect the SD Log Version V3 or V4
+	 * @param _buf1
+	 * @param _buf2
+	 * @return
+	 */
+	protected static int getSdLogVerion(byte[] _buf1, byte[] _buf2) {
+		printByteValues(1, _buf1);
+		printByteValues(2, _buf2);
+		log.log(Level.OFF, "version = " + (((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3));
+		return ((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3;
 	}
 
 	/**
@@ -979,7 +991,7 @@ public class HoTTbinReader {
 	private static void parseAddGPS(RecordSet _recordSetGPS, int[] _pointsGPS, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, long _timeStep_ms) throws DataInconsitsentException {
 		int tmpHeight = DataParser.parse2Short(_buf2, 8);
 		int tmpClimb3 = (_buf3[2] & 0xFF);
-		if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000) {
+		if (tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 			_pointsGPS[0] = (_buf0[4] & 0xFF) * 1000;
 			_pointsGPS[1] = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
@@ -1028,7 +1040,7 @@ public class HoTTbinReader {
 		int tmpVoltage2 = DataParser.parse2Short(_buf2, 1);
 		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
-		if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsGeneral[3] / 1000) {
+		if (tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsGeneral[3] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			_pointsGeneral[0] = (_buf0[4] & 0xFF) * 1000;
@@ -1088,7 +1100,7 @@ public class HoTTbinReader {
 		int tmpVoltage2 = DataParser.parse2Short(_buf2[9], _buf3[0]);
 		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
 		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
-		if (tmpClimb3 > 80 && tmpHeight > 1 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsElectric[3] / 1000) {
+		if (tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsElectric[3] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			_pointsElectric[0] = (_buf1[4] & 0xFF) * 1000;
