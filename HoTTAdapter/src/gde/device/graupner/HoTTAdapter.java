@@ -751,6 +751,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					double minuten = record.get(rowIndex) % 1000000 / 10000.0;
 					dataTableRow[j + 1] = String.format("%d %.4f", grad, minuten); //$NON-NLS-1$
 				}
+				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
+				else if (j >= 0 && j <= 5 && record.getParent().getChannelConfigNumber() == 1){ //Receiver
+					dataTableRow[j + 1] = String.format("%.0f",(record.get(rowIndex) / 1000.0));
+				}
 				else {
 					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
 				}

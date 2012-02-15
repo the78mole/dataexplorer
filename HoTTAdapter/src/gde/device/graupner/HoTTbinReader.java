@@ -220,6 +220,7 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsGeneral = new int[21];
 		HoTTbinReader.pointsElectric = new int[27];
 		HoTTbinReader.pointsVario = new int[7];
+		HoTTbinReader.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[12];
 		HoTTbinReader.timeStep_ms = 0;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
@@ -585,6 +586,7 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsGeneral = new int[21];
 		HoTTbinReader.pointsElectric = new int[27];
 		HoTTbinReader.pointsVario = new int[7];
+		HoTTbinReader.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[12];
 		HoTTbinReader.timeStep_ms = 0;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
@@ -896,7 +898,7 @@ public class HoTTbinReader {
 	 */
 	private static void parseAddReceiver(RecordSet _recordSetReceiver, int[] _pointsReceiver, byte[] _buf, long _timeStep_ms) throws DataInconsitsentException {
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
-		_pointsReceiver[0] = (_buf[34] & 0xFF) * 1000;
+		_pointsReceiver[0] = (_buf[37] & 0xFF) * 1000;
 		_pointsReceiver[1] = (_buf[38] & 0xFF) * 1000;
 		_pointsReceiver[2] = (convertRFRXSQ2Strength(_buf[37] & 0xFF)) * 1000;
 		_pointsReceiver[3] = DataParser.parse2Short(_buf, 40) * 1000;
@@ -971,9 +973,9 @@ public class HoTTbinReader {
 	 * @return
 	 */
 	protected static int getSdLogVerion(byte[] _buf1, byte[] _buf2) {
-		printByteValues(1, _buf1);
-		printByteValues(2, _buf2);
-		log.log(Level.OFF, "version = " + (((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3));
+		//printByteValues(1, _buf1);
+		//printByteValues(2, _buf2);
+		log.log(Level.FINER, "version = " + (((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3));
 		return ((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3;
 	}
 

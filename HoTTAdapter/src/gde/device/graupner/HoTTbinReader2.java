@@ -54,7 +54,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 	public static synchronized void read(String filePath) throws Exception {
 		HashMap<String, String> header = null;
 		File file = new File(filePath);
-		log.log(Level.OFF, file.getName() + " - " + new SimpleDateFormat("yyyy-MM-dd").format(file.lastModified()));
+		log.log(Level.FINER, file.getName() + " - " + new SimpleDateFormat("yyyy-MM-dd").format(file.lastModified()));
 		header = getFileInfo(file);
 
 		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1)
@@ -93,6 +93,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 		HoTTbinReader2.points = new int[58];
+		HoTTbinReader2.points[2] = 100000;
 		HoTTbinReader2.timeStep_ms = 0;
 		HoTTbinReader2.buf = new byte[HoTTbinReader2.dataBlockSize];
 		HoTTbinReader2.buf0 = null;
@@ -270,6 +271,11 @@ public class HoTTbinReader2 extends HoTTbinReader{
 							i += 50;
 							HoTTbinReader2.timeStep_ms = HoTTbinReader2.timeStep_ms += 500;
 						}
+						if (isReceiverData && !isSensorData) {
+							data_in.skip(HoTTbinReader2.dataBlockSize * 4); //take from data points only each half second 
+							i += 4;
+							HoTTbinReader2.timeStep_ms = HoTTbinReader2.timeStep_ms += 40;
+						}
 						// add default time step from device of 10 msec
 						HoTTbinReader2.timeStep_ms += 10;
 						isReceiverData = isSensorData = false;
@@ -362,6 +368,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		HoTTbinReader.pointsGeneral = new int[58];
 		HoTTbinReader.pointsElectric = new int[58];
 		HoTTbinReader.pointsVario = new int[58];
+		HoTTbinReader2.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[58];
 		long pointsTimeStep_ms = 0;
 		HoTTbinReader2.timeStep_ms = 0;
@@ -668,7 +675,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 	 */
 	private static void parseReceiver(RecordSet _recordSet, int[] _points, byte[] _buf) {
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
-		_points[0] = (_buf[34] & 0xFF) * 1000;
+		_points[0] = (_buf[37] & 0xFF) * 1000;
 		_points[1] = (_buf[38] & 0xFF) * 1000;
 		_points[2] = (convertRFRXSQ2Strength(_buf[37] & 0xFF)) * 1000;
 		_points[3] = DataParser.parse2Short(_buf, 40) * 1000;
