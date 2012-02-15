@@ -67,14 +67,14 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Tx</name>
+                <name> Tx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Rx</name>
+                <name> Rx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -516,14 +516,14 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Tx</name>
+                <name> Tx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Rx</name>
+                <name> Rx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -966,14 +966,14 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Tx</name>
+                <name> Tx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Rx</name>
+                <name> Rx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
