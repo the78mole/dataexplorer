@@ -202,10 +202,16 @@ public class UniLogLiveGatherer extends Thread {
 						cleanup(recordSetKey, message);
 					}
 					catch (TimeOutException e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
-						String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
-								+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1301); //$NON-NLS-1$ 
-						cleanup(recordSetKey, message);
+						log.log(Level.WARNING, e.getMessage(), e);
+						try {
+							serialPort.checkDataReady();
+						}
+						catch (Exception e1) {
+							log.log(Level.SEVERE, e1.getMessage(), e1);
+							String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
+									+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1301); //$NON-NLS-1$ 
+							cleanup(recordSetKey, message);
+						}
 					}
 					catch (IOException e) {
 						log.log(Level.SEVERE, e.getMessage(), e);

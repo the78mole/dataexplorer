@@ -150,6 +150,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 		if (this.application != null && this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1376), Messages.getString(MessageIds.GDE_MSGT1375));
+		UniLogSerialPort.TIME_OUT_MS = 2000 + this.getRTOExtraDelayTime();
 	}
 
 	/**
@@ -166,6 +167,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		this.serialPort = this.application != null ? new UniLogSerialPort(this, this.application) : new UniLogSerialPort(this, null);
 		this.dialog = this.application != null ? new UniLogDialog(this.application.getShell(), this) : new UniLogDialog(new Shell(Display.getDefault()), this);
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1376), Messages.getString(MessageIds.GDE_MSGT1375));
+		UniLogSerialPort.TIME_OUT_MS = 2000 + this.getRTOExtraDelayTime();
 	}
 
 	/**

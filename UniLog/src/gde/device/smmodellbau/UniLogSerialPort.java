@@ -64,6 +64,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 	final static byte			DATA_STATE_OK						= 0x6A;		// 'j' operation successful ended
 
 	final static int			DATA_LENGTH_BYTES				= 24;			
+	static int						TIME_OUT_MS 						= 2000;
 	
 	boolean 							isLoggingActive 				= false;
 	boolean 							isTransmitFinished			= false;
@@ -263,12 +264,12 @@ public class UniLogSerialPort extends DeviceCommPort {
 		if (this.isConnected()) {
 			try {
 				this.write(COMMAND_LIVE_VALUES);
-				readBuffer = this.read(readBuffer, 4000);
+				readBuffer = this.read(readBuffer, UniLogSerialPort.TIME_OUT_MS * 2);
 
 				// give it another try
 				if (!isChecksumOK(readBuffer)) {
 					this.write(COMMAND_LIVE_VALUES);
-					readBuffer = this.read(readBuffer, 4000);
+					readBuffer = this.read(readBuffer, UniLogSerialPort.TIME_OUT_MS * 2);
 					verifyChecksum(readBuffer); // throws exception if checksum miss match
 				}
 			}
@@ -294,7 +295,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 			if (!this.isConnected()) {
 				this.open();
 				isPortOpenedByMe = true;
-				WaitTimer.delay(2000);
+				WaitTimer.delay(UniLogSerialPort.TIME_OUT_MS);
 			}
 
 			this.write(COMMAND_START_LOGGING);
@@ -353,7 +354,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 					//this.write(COMMAND_PREPARE_DELETE);
 					this.write(COMMAND_DELETE);
 					byte[] readBuffer = new byte[1];
-					readBuffer = this.read(readBuffer, 4000);
+					readBuffer = this.read(readBuffer, UniLogSerialPort.TIME_OUT_MS * 2);
 					if (readBuffer[0] != DATA_STATE_OK) success = true;
 
 				}
@@ -394,7 +395,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 
 					this.write(updateBuffer);
 					byte[] readBuffer = new byte[1];
-					readBuffer = this.read(readBuffer, 4000);
+					readBuffer = this.read(readBuffer, UniLogSerialPort.TIME_OUT_MS * 2);
 					if (readBuffer[0] == DATA_STATE_OK) success = true;
 					
 				}
@@ -434,7 +435,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 				if (this.checkDataReady()) {
 
 					this.write(COMMAND_QUERY_CONFIG);
-					readBuffer = this.read(readBuffer, 4000);
+					readBuffer = this.read(readBuffer, UniLogSerialPort.TIME_OUT_MS * 2);
 
 					verifyChecksum(readBuffer); // valid data set -> set values
 					
@@ -475,7 +476,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 				if (this.checkDataReady()) {
 
 					this.write(COMMAND_QUERY_TELE_CONFIG);
-					readBuffer = this.read(readBuffer, 4000);
+					readBuffer = this.read(readBuffer, UniLogSerialPort.TIME_OUT_MS * 2);
 
 					verifyChecksum(readBuffer); // valid data set -> set values
 					
@@ -510,7 +511,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 			this.write(COMMAND_QUERY_STATE);
 			byte[] buffer = new byte[1];
 			WaitTimer.delay(100);
-			buffer = this.read(buffer, 2000);
+			buffer = this.read(buffer, UniLogSerialPort.TIME_OUT_MS);
 			if (buffer[0] == DATA_STATE_WAITING || buffer[0] == DATA_STATE_READY) {
 				isConnect = true;
 			}
@@ -530,7 +531,7 @@ public class UniLogSerialPort extends DeviceCommPort {
 		while (!isReady && counter-- > 0) {
 			this.write(COMMAND_QUERY_STATE);
 			byte[] buffer = new byte[1];
-			buffer = this.read(buffer, 2000);
+			buffer = this.read(buffer, UniLogSerialPort.TIME_OUT_MS);
 			if (buffer[0] == DATA_STATE_READY) {
 				isReady = true;
 			}
