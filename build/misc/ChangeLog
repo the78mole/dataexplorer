@@ -8,6 +8,7 @@ HottAdapter - correct sign of dBm gauge values
 HottAdapter - refine sensor detection while slave modus
 HottAdapter - refine binary log version detection
 HoTTAdapter2 - have all possible sensor values on identical time line
+UniLog2 - make live data gathering more robust
 
 Version 2.95 - 28 Jan 2012
 HoTTAdapter - filter misplaced measurements while loading or gathering data from multiple sensors
