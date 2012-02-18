@@ -682,7 +682,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		_points[4] = (_buf[3] & 0xFF) * -1000;
 		_points[5] = (_buf[4] & 0xFF) * -1000;
 		_points[6] = (_buf[35] & 0xFF) * 1000;
-		_points[7] = ((_buf[36] & 0xFF) + 20) * 1000;
+		_points[7] = ((_buf[36] & 0xFF) - 20) * 1000;
 	}
 
 	/**
