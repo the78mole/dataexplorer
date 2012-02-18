@@ -19,6 +19,7 @@
 package gde.device.smmodellbau;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -53,7 +54,6 @@ public class UniLog2LiveGatherer extends Thread {
 	final Channel						channel;
 	final Integer						channelNumber;
 	int											timeStep_ms;
-	boolean									isDataGatheringActive				= false;
 	boolean									isPortOpenedByLiveGatherer	= false;
 	final int[]							time_ms											= { 1000 / 4, 1000 / 4, 1000 / 4, 1000 / 2, 1000, 2000, 5000, 10000 };
 	boolean 								isSwitchedRecordSet 				= false;
@@ -130,12 +130,12 @@ public class UniLog2LiveGatherer extends Thread {
 			cleanup(recordSetKey, message);
 			return;
 		}
-		this.isDataGatheringActive = true;
+		this.serialPort.isInterruptedByUser = false;
 		String[] liveAnswers = new String[3];
 		long startCycleTime = 0;
 		long tmpCycleTime = 0;
 
-		while (this.isDataGatheringActive) {
+		while (!this.serialPort.isInterruptedByUser) {
 			try {
 				// prepare the data for adding to record set
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -183,11 +183,17 @@ public class UniLog2LiveGatherer extends Thread {
 				return;
 			}
 			catch (TimeOutException e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
-				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
-						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW2500); //$NON-NLS-1$ 
-				cleanup(recordSetKey, message);
-				return;
+				log.log(Level.WARNING, e.getMessage(), e);
+				try {
+					this.serialPort.checkDataReady();
+				}
+				catch (Exception e1) {
+					log.log(Level.SEVERE, e1.getMessage(), e1);
+					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
+							+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW2500); //$NON-NLS-1$ 
+					cleanup(recordSetKey, message);
+					return;
+				}
 			}
 			catch (IOException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -204,6 +210,11 @@ public class UniLog2LiveGatherer extends Thread {
 			}
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
 		}
+		GDE.display.asyncExec(new Runnable() {
+			public void run() {
+				UniLog2LiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
+			}
+		});
 		cleanup(recordSetKey, null);
 	}
 
@@ -213,7 +224,7 @@ public class UniLog2LiveGatherer extends Thread {
 	 * @param message
 	 */
 	void cleanup(final String recordSetKey, String message) {
-		this.isDataGatheringActive = false;
+		this.serialPort.isInterruptedByUser = true;
 		if (this.serialPort.isConnected()) 
 			try {
 				this.serialPort.write(UniLog2SerialPort.COMMAND_STOP_LOGGING);
@@ -248,6 +259,6 @@ public class UniLog2LiveGatherer extends Thread {
 	 * stop data gathering
 	 */
 	public synchronized void stopDataGathering() {
-		this.isDataGatheringActive = false;
+		this.serialPort.isInterruptedByUser = true;
 	}
 }

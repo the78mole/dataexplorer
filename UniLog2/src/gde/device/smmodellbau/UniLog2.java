@@ -70,7 +70,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	final Channels					channels;
 	final UniLog2Dialog			dialog;
 	final UniLog2SerialPort	serialPort;
-
+	
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
@@ -89,6 +89,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
+		UniLog2SerialPort.TIME_OUT_MS = 2000 + this.getRTOExtraDelayTime();
 	}
 
 	/**
@@ -108,6 +109,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
+		UniLog2SerialPort.TIME_OUT_MS = 2000 + this.getRTOExtraDelayTime();
 	}
 
 	/**
@@ -267,28 +269,34 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 					points[12] = (int) (Double.parseDouble(dataArray[i].split("V5")[1].split("V")[0].trim()) * 1000.0);
 					break;
 				case 13: // A1         0.6mV
-					if(dataArray[i].substring(2).contains("mV"))
-						points[17] = (int) (Double.parseDouble(dataArray[i].substring(2).split("mV")[0].trim()) * 1000.0);
-					else if(dataArray[i].substring(2).contains("`C"))
-						points[17] = (int) (Double.parseDouble(dataArray[i].substring(2).split("`C")[0].trim()) * 1000.0);
-					else if(dataArray[i].substring(2).contains("km/h"))
-						points[17] = (int) (Double.parseDouble(dataArray[i].substring(2).split("km/h")[0].trim()) * 1000.0);
+					String tmpValueA1 =dataArray[i].substring(2).trim();
+					tmpValueA1 = tmpValueA1.contains("|") ? tmpValueA1.substring(0, tmpValueA1.indexOf('|')) + tmpValueA1.substring(tmpValueA1.indexOf('|')+1) : tmpValueA1;
+					if(tmpValueA1.contains("mV"))
+						points[17] = (int) (Double.parseDouble(tmpValueA1.split("mV")[0].trim()) * 1000.0);
+					else if(tmpValueA1.contains("`C"))
+						points[17] = (int) (Double.parseDouble(tmpValueA1.split("`C")[0].trim()) * 1000.0);
+					else if(tmpValueA1.contains("km/h"))
+						points[17] = (int) (Double.parseDouble(tmpValueA1.split("km/h")[0].trim()) * 1000.0);
 					break;
 				case 14: // A2         0.6mV
-					if(dataArray[i].substring(2).contains("mV"))
-						points[18] = (int) (Double.parseDouble(dataArray[i].substring(2).split("mV")[0].trim()) * 1000.0);
-					else if(dataArray[i].substring(2).contains("`C"))
-						points[18] = (int) (Double.parseDouble(dataArray[i].substring(2).split("`C")[0].trim()) * 1000.0);
-					else if(dataArray[i].substring(2).contains("km/h"))
-						points[18] = (int) (Double.parseDouble(dataArray[i].substring(2).split("km/h")[0].trim()) * 1000.0);
+					String tmpValueA2 =dataArray[i].substring(2).trim();
+					tmpValueA2 = tmpValueA2.contains("|") ? tmpValueA2.substring(0, tmpValueA2.indexOf('|')) + tmpValueA2.substring(tmpValueA2.indexOf('|')+1) : tmpValueA2;
+					if(tmpValueA2.contains("mV"))
+						points[18] = (int) (Double.parseDouble(tmpValueA2.split("mV")[0].trim()) * 1000.0);
+					else if(tmpValueA2.contains("`C"))
+						points[18] = (int) (Double.parseDouble(tmpValueA2.split("`C")[0].trim()) * 1000.0);
+					else if(tmpValueA2.contains("km/h"))
+						points[18] = (int) (Double.parseDouble(tmpValueA2.split("km/h")[0].trim()) * 1000.0);
 					break;
 				case 15: // A3         0.6mV
-					if(dataArray[i].substring(2).contains("mV"))
-						points[19] = (int) (Double.parseDouble(dataArray[i].substring(2).split("mV")[0].trim()) * 1000.0);
-					else if(dataArray[i].substring(2).contains("`C"))
-						points[19] = (int) (Double.parseDouble(dataArray[i].substring(2).split("`C")[0].trim()) * 1000.0);
-					else if(dataArray[i].substring(2).contains("km/h"))
-						points[19] = (int) (Double.parseDouble(dataArray[i].substring(2).split("km/h")[0].trim()) * 1000.0);
+					String tmpValueA3 =dataArray[i].substring(2).trim();
+					tmpValueA3 = tmpValueA3.contains("|") ? tmpValueA3.substring(0, tmpValueA3.indexOf('|')) + tmpValueA3.substring(tmpValueA3.indexOf('|')+1) : tmpValueA3;
+					if(tmpValueA3.contains("mV"))
+						points[19] = (int) (Double.parseDouble(tmpValueA3.split("mV")[0].trim()) * 1000.0);
+					else if(tmpValueA3.contains("`C"))
+						points[19] = (int) (Double.parseDouble(tmpValueA3.split("`C")[0].trim()) * 1000.0);
+					else if(tmpValueA3.contains("km/h"))
+						points[19] = (int) (Double.parseDouble(tmpValueA3.split("km/h")[0].trim()) * 1000.0);
 					break;
 				case 18: // Druck  970.74hPa
 					points[20] = (int) (Double.parseDouble(dataArray[i].substring(dataArray[i].lastIndexOf(" "), dataArray[i].length()-3).trim()) * 1000.0);
@@ -602,6 +610,21 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
+		switch (application.getMenuBar().getSerialPortIconSet()) {
+		case DeviceCommPort.ICON_SET_IMPORT_CLOSE:
+			importDeviceData();
+			break;
+			
+		case DeviceCommPort.ICON_SET_START_STOP:
+			this.serialPort.isInterruptedByUser = true;
+			break;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void importDeviceData() {
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
 		if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {

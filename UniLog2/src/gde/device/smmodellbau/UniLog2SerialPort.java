@@ -49,6 +49,8 @@ public class UniLog2SerialPort extends DeviceCommPort {
 	final static byte			DATA_STATE_READY				= 0x47;		// 'G' UniLog ready to receive command
 
 	static int						DATA_LENGTH_BYTES				= 24;			
+	static int						TIME_OUT_MS 						= 2000;
+
 	
 	boolean 							isLoggingActive 				= false;
 	boolean 							isTransmitFinished			= false;
@@ -80,13 +82,13 @@ public class UniLog2SerialPort extends DeviceCommPort {
 			try {
 				this.write(COMMAND_START_LOGGING);
 				this.write(COMMAND_LIVE_VALUES);
-				this.read(readBufferTmp, 1000);
+				this.read(readBufferTmp, UniLog2SerialPort.TIME_OUT_MS);
 				System.arraycopy(readBufferTmp, 0, readBuffer, 0, 38);
-				this.read(readBufferTmp, 1000);
+				this.read(readBufferTmp, UniLog2SerialPort.TIME_OUT_MS);
 				System.arraycopy(readBufferTmp, 0, readBuffer, 38, 38);
-				this.read(readBufferTmp, 1000);
+				this.read(readBufferTmp, UniLog2SerialPort.TIME_OUT_MS);
 				System.arraycopy(readBufferTmp, 0, readBuffer, 76, 38);
-				this.read(readBufferTmp, 1000);
+				this.read(readBufferTmp, UniLog2SerialPort.TIME_OUT_MS);
 				System.arraycopy(readBufferTmp, 0, readBuffer, 114, 38);
 
 				//log.log(Level.FINE, StringHelper.byte2Hex2CharString(readBuffer));
@@ -170,7 +172,7 @@ public class UniLog2SerialPort extends DeviceCommPort {
 		while (!isReady && counter-- > 0) {
 			this.write(COMMAND_QUERY_STATE);
 			byte[] buffer = new byte[1];
-			buffer = this.read(buffer, 2000);
+			buffer = this.read(buffer, UniLog2SerialPort.TIME_OUT_MS * 2);
 			if (buffer[0] == DATA_STATE_READY) {
 				isReady = true;
 			}
@@ -178,8 +180,8 @@ public class UniLog2SerialPort extends DeviceCommPort {
 		
 		if (isReady) {
 			byte[] buffer = new byte[50];
-			this.read(buffer, 2000);
-			this.read(buffer, 2000);
+			this.read(buffer, UniLog2SerialPort.TIME_OUT_MS * 2);
+			this.read(buffer, UniLog2SerialPort.TIME_OUT_MS * 2);
 			buffer = new byte[this.waitForStableReceiveBuffer(50, 1000, 50)];
 			this.read(buffer, 2000);
 			//log.log(Level.FINE, "###" + StringHelper.convert2CharString(buffer));
@@ -188,10 +190,10 @@ public class UniLog2SerialPort extends DeviceCommPort {
 		for (int i = 0; i < 3; i++) {
 			this.write(UniLog2SerialPort.COMMAND_RESET);
 			byte[] buffer = new byte[50];
-			this.read(buffer, 2000);
-			this.read(buffer, 2000);
+			this.read(buffer, UniLog2SerialPort.TIME_OUT_MS * 2);
+			this.read(buffer, UniLog2SerialPort.TIME_OUT_MS * 2);
 			buffer = new byte[this.waitForStableReceiveBuffer(50, 1000, 50)];
-			this.read(buffer, 2000);
+			this.read(buffer, UniLog2SerialPort.TIME_OUT_MS * 2);
 			//log.log(Level.FINE, "***" + StringHelper.convert2CharString(buffer));
 		}
 		

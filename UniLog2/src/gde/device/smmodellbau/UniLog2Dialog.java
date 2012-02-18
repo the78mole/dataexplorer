@@ -19,6 +19,7 @@
 package gde.device.smmodellbau;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -370,6 +371,7 @@ public class UniLog2Dialog extends DeviceDialog {
 								try {
 									UniLog2Dialog.this.liveThread = new UniLog2LiveGatherer(UniLog2Dialog.this.application, UniLog2Dialog.this.device, UniLog2Dialog.this.serialPort, UniLog2Dialog.this);
 									try {
+										UniLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
 										UniLog2Dialog.this.liveThread.start();
 									}
 									catch (RuntimeException e) {
@@ -381,6 +383,7 @@ public class UniLog2Dialog extends DeviceDialog {
 										UniLog2Dialog.this.liveThread.stopDataGathering();
 										UniLog2Dialog.this.liveThread.interrupt();
 									}
+									UniLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
 									UniLog2Dialog.this.application.updateGraphicsWindow();
 									UniLog2Dialog.this.application.openMessageDialog(UniLog2Dialog.this.getDialogShell(),
 											Messages.getString(MessageIds.GDE_MSGW2500, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
@@ -394,9 +397,10 @@ public class UniLog2Dialog extends DeviceDialog {
 									UniLog2Dialog.this.liveThread.stopDataGathering();
 									UniLog2Dialog.this.liveThread.interrupt();
 								}
+								UniLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
 								UniLog2Dialog.this.application.updateGraphicsWindow();
 								UniLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2576));
-								UniLog2Dialog.this.liveThread = null;
+								//UniLog2Dialog.this.liveThread = null;
 							}
 						}
 					});
