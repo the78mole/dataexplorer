@@ -2021,7 +2021,7 @@ public class DeviceConfiguration {
 	/**
 	 * @return the translated latitude or longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W} for GPS devices only
 	 */
-	public String translateGPS2IGC(@SuppressWarnings("unused") RecordSet recordSet, @SuppressWarnings("unused") int index, @SuppressWarnings("unused") char fixValidity, @SuppressWarnings("unused") int startAltitude, @SuppressWarnings("unused") int offsetAltitude) {
+	public String translateGPS2IGC(RecordSet recordSet, int index, char fixValidity, int startAltitude, int offsetAltitude) {
 		return "DDMMmmmNDDDMMmmm0V000000000000";
 	}
 	

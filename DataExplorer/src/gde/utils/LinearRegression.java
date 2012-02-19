@@ -21,7 +21,6 @@ package gde.utils;
 import gde.log.Level;
 import java.util.logging.Logger;
 
-import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 
