@@ -9,6 +9,7 @@ HottAdapter - refine sensor detection while slave modus
 HottAdapter - refine binary log version detection
 HoTTAdapter2 - have all possible sensor values on identical time line
 UniLog2 - make live data gathering more robust
+update Linux cp210x kernel module for kernel 3.0.0.16 
 
 Version 2.95 - 28 Jan 2012
 HoTTAdapter - filter misplaced measurements while loading or gathering data from multiple sensors
