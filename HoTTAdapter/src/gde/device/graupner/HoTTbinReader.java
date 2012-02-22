@@ -75,7 +75,7 @@ public class HoTTbinReader {
 		long numberLogs = (file.length() / 64);
 
 		try {
-			if (numberLogs > 50) {
+			if (numberLogs > 120) {
 				for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
 					HoTTAdapter.isSensorType[i] = false;
 				}
@@ -83,7 +83,7 @@ public class HoTTbinReader {
 				data_in = new DataInputStream(file_input);
 				fileInfo = new HashMap<String, String>();
 				HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
-				for (int i = 0; i < 50; i++) {
+				for (int i = 0; i < 120; i++) {
 					data_in.read(buffer);
 					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
 

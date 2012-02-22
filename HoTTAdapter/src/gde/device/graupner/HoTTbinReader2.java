@@ -86,6 +86,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		boolean isInitialSwitched = false;
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
+		boolean isSensorDataPart = false;
 		HoTTbinReader2.recordSet = null; 
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
@@ -150,6 +151,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 					switch ((byte) (HoTTbinReader2.buf[7] & 0xFF)) {
 					case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+						isSensorDataPart = true;
 						//fill data block 0 receiver voltage an temperature
 						if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 0) != 0) {
 							HoTTbinReader2.buf0 = new byte[30];
@@ -174,6 +176,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 
 					case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+						isSensorDataPart = true;
 						//fill data block 0 receiver voltage an temperature
 						if (HoTTbinReader2.buf0 == null && HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 0) != 0) {
 							HoTTbinReader2.buf0 = new byte[30];
@@ -202,6 +205,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 					case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+						isSensorDataPart = true;
 						//fill data block 1 to 4
 						if (HoTTbinReader2.buf0 == null && HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 0) != 0) {
 							HoTTbinReader2.buf0 = new byte[30];
@@ -233,6 +237,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+						isSensorDataPart = true;
 						//fill data block 0 to 4
 						if (HoTTbinReader2.buf0 == null && HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 0) != 0) {
 							HoTTbinReader2.buf0 = new byte[30];
@@ -264,21 +269,16 @@ public class HoTTbinReader2 extends HoTTbinReader{
 						break;
 					}
 
-					if (isSensorData || isReceiverData) {
+					if (isSensorData || (isReceiverData && !isSensorDataPart)) {
 						HoTTbinReader2.recordSet.addPoints(points, timeStep_ms);
-						if (numberDatablocks > 30000) { //5 minutes log time
+						if (isSensorData && numberDatablocks > 30000) { //5 minutes log time
 							data_in.skip(HoTTbinReader2.dataBlockSize * 50); //take from data points only each half second 
 							i += 50;
 							HoTTbinReader2.timeStep_ms = HoTTbinReader2.timeStep_ms += 500;
-						}
-						if (isReceiverData && !isSensorData) {
-							data_in.skip(HoTTbinReader2.dataBlockSize * 4); //take from data points only each half second 
-							i += 4;
-							HoTTbinReader2.timeStep_ms = HoTTbinReader2.timeStep_ms += 40;
+							isSensorData = isSensorDataPart = isReceiverData = false;
 						}
 						// add default time step from device of 10 msec
 						HoTTbinReader2.timeStep_ms += 10;
-						isReceiverData = isSensorData = false;
 					}
 					else { // add default time step from device of 10 msec
 						HoTTbinReader2.timeStep_ms += 10;
