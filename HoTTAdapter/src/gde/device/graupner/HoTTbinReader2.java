@@ -370,7 +370,6 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		HoTTbinReader.pointsVario = new int[58];
 		HoTTbinReader2.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[58];
-		long pointsTimeStep_ms = 0;
 		HoTTbinReader2.timeStep_ms = 0;
 		HoTTbinReader2.buf = new byte[HoTTbinReader2.dataBlockSize];
 		HoTTbinReader2.buf0 = new byte[30];
@@ -425,7 +424,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 							parseReceiver(HoTTbinReader2.recordSet, HoTTbinReader2.points, HoTTbinReader2.buf);
 							isReceiverData = true;
 						}
-						
+
 						if (actualSensor == -1)
 							lastSensor = actualSensor = (byte) (HoTTbinReader2.buf[7] & 0xFF);
 						else
@@ -438,7 +437,8 @@ public class HoTTbinReader2 extends HoTTbinReader{
 								case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 									++logCountVario;
 									if (isVarioData && isReceiverData) {
-										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, pointsTimeStep_ms);
+										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
+										//System.out.println("isVarioData i = " + i);
 										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
 									}
 									parseVario(HoTTbinReader2.recordSet, HoTTbinReader2.pointsVario, 1, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
@@ -449,7 +449,8 @@ public class HoTTbinReader2 extends HoTTbinReader{
 								case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 									++logCountGPS;
 									if (isGPSData && isReceiverData) {
-										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, pointsTimeStep_ms);
+										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
+										//System.out.println("isGPSData i = " + i);
 										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
 									}
 									parseGPS(HoTTbinReader2.recordSet, HoTTbinReader2.pointsGPS, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3);
@@ -460,7 +461,8 @@ public class HoTTbinReader2 extends HoTTbinReader{
 								case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 									++logCountGeneral;
 									if (isGeneralData && isReceiverData) {
-										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, pointsTimeStep_ms);
+										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
+										//System.out.println("isGeneralData i = " + i);
 										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
 									}
 									parseGeneral(HoTTbinReader2.recordSet, HoTTbinReader2.pointsGeneral, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
@@ -471,7 +473,8 @@ public class HoTTbinReader2 extends HoTTbinReader{
 								case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 									++logCountElectric;
 									if (isElectricData && isReceiverData) {
-										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, pointsTimeStep_ms);
+										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
+										//System.out.println("isElectricData i = " + i);
 										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
 									}
 									parseElectric(HoTTbinReader2.recordSet, HoTTbinReader2.pointsElectric, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4,	HoTTbinReader2.timeStep_ms);
@@ -510,7 +513,6 @@ public class HoTTbinReader2 extends HoTTbinReader{
 									break;
 								}
 								if (skipCount > 0) {
-									pointsTimeStep_ms = HoTTbinReader2.timeStep_ms;
 									data_in.skip(HoTTbinReader2.dataBlockSize * skipCount);
 									i += skipCount;
 									HoTTbinReader2.timeStep_ms = HoTTbinReader2.timeStep_ms += (skipCount * 10);
@@ -557,6 +559,12 @@ public class HoTTbinReader2 extends HoTTbinReader{
 								++logCountElectric;
 								break;
 							}
+						}
+						
+						if (isReceiverData && (logCountVario > 0 || logCountGPS > 0 || logCountGeneral > 0 || logCountElectric > 0)) {
+							recordSet.addPoints(points, HoTTbinReader2.timeStep_ms);
+							//System.out.println("isReceiverData i = " + i);
+							isReceiverData = false;
 						}
 					}
 					//fill data block 0 to 4
@@ -628,6 +636,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 	}
 
 	/**
+	 * migrate sensor measurement values and add to record set, receiver data are always updated
 	 * @param isVarioData
 	 * @param isGPSData
 	 * @param isGeneralData

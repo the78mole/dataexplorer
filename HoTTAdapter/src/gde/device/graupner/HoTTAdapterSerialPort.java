@@ -99,6 +99,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				this.write(HoTTAdapterSerialPort.QUERY_SENSOR_DATA);
 				this.read(HoTTAdapterSerialPort.ANSWER, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
 				data[0] = HoTTAdapterSerialPort.ANSWER[0];
+				WaitTimer.delay(5);
 				this.write(this.SENSOR_TYPE);
 				this.read(HoTTAdapterSerialPort.ANSWER, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
 				data[1] = HoTTAdapterSerialPort.ANSWER[0];
