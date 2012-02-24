@@ -24,6 +24,7 @@ import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.graupner.HoTTbinReader;
+import gde.device.graupner.HoTTbinReader2;
 import gde.exception.NotSupportedException;
 import gde.io.CSVReaderWriter;
 import gde.io.CSVSerialDataReaderWriter;
@@ -766,7 +767,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from NMEA file");
 						activeChannel.setSaved(true);
 
-						HoTTbinReader.read(file.getAbsolutePath());
+						HoTTbinReader2.read(file.getAbsolutePath());
 						RecordSet recordSet = activeChannel.getActiveRecordSet();
 
 						if (recordSet != null) {
