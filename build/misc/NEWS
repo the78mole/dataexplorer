@@ -2,7 +2,7 @@ GNU DataExplorer - News - comes with version 2.96
 
 1) VC8x0 - add warning message while error limit is reached. 
 2) VC8x0 - refine timeout error handling
-3) HottAdapter - General-Air-Sensor 115200 protocol, fix several error value display
+3) HottAdapter - General-Air-Sensor 115200 protocol, fix several errors in value display
 4) HottAdapter - correct sign of dBm gauge values
 5) HottAdapter - refine sensor detection while slave modus
 6) HottAdapter - refine binary log version detection
