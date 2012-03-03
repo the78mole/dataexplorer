@@ -358,16 +358,12 @@ public class UniLog2Dialog extends DeviceDialog {
 					saveSetupButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 					this.liveGathererButton.setLayoutData(saveSetupButtonLData);
 					this.liveGathererButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					if (this.serialPort != null && this.serialPort.isConnected()) 
-						this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2577));
-					else
-						this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2576));
 					this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2578));
 					this.liveGathererButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (UniLog2Dialog.log.isLoggable(java.util.logging.Level.FINE)) UniLog2Dialog.log.log(java.util.logging.Level.FINE, "liveGathererButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (UniLog2Dialog.this.liveThread == null) {
+							if (UniLog2Dialog.this.liveThread == null || !UniLog2Dialog.this.serialPort.isConnected()) {
 								try {
 									UniLog2Dialog.this.liveThread = new UniLog2LiveGatherer(UniLog2Dialog.this.application, UniLog2Dialog.this.device, UniLog2Dialog.this.serialPort, UniLog2Dialog.this);
 									try {
@@ -431,6 +427,12 @@ public class UniLog2Dialog extends DeviceDialog {
 				this.dialogShell.setVisible(true);
 				this.dialogShell.setActive();
 			}
+			
+			if (this.serialPort != null && this.serialPort.isConnected()) 
+				this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2577));
+			else
+				this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2576));
+			
 			Display display = this.dialogShell.getDisplay();
 			while (!this.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
