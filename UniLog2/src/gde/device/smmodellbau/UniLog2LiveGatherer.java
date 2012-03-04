@@ -208,13 +208,15 @@ public class UniLog2LiveGatherer extends Thread {
 				cleanup(recordSetKey, message);
 				return;
 			}
+			finally {
+				GDE.display.asyncExec(new Runnable() {
+					public void run() {
+						UniLog2LiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
+					}
+				});
+			}
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
 		}
-		GDE.display.asyncExec(new Runnable() {
-			public void run() {
-				UniLog2LiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
-			}
-		});
 		cleanup(recordSetKey, null);
 	}
 
