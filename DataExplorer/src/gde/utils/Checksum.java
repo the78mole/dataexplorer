@@ -203,6 +203,19 @@ public class Checksum {
 
 	/**
 	 * calculate XOR bit operation
+	 * @param b byte array to compute
+	 * @return 8-bit result
+	 */
+	public static int XOR(byte[] b, int length) {
+		int value = 0;
+		for (int i = 0; i < length; i++) {
+			value ^= b[i];
+		}
+		return value;
+	}
+
+	/**
+	 * calculate XOR bit operation
 	 * @param a integer array to compute
 	 * @return integer result
 	 */
@@ -249,6 +262,20 @@ public class Checksum {
 		int value = a[offset];
 		for (int i = offset+1; i < length; i++) {
 			value = value & a[i];
+		}
+		return value;
+	}
+	
+	/**
+	 * calculate ADD operation
+	 * @param b byte array to compute
+	 * @param len length of checksum if part of the byte array
+	 * @return 16-bit result
+	 */
+	public static int ADD(byte[] b) {
+		int value = b[0] & 0xFF;
+		for (int i = 1; i < b.length; i++) {
+			value = value  + (b[i] & 0xFF);
 		}
 		return value;
 	}
