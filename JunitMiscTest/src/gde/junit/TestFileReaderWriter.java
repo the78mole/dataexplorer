@@ -65,7 +65,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 		this.setDataPath(); //set the dataPath variable
 
 		try {
-			List<File> files = FileUtils.getFileListing(this.dataPath);
+			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && !file.getPath().toLowerCase().contains("csv2serialadapter")) {
@@ -175,7 +175,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 		this.setDataPath(); //set the dataPath variable
 
 		try {
-			List<File> files = FileUtils.getFileListing(this.dataPath);
+			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".nmea")) {
@@ -248,7 +248,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 		this.setDataPath(); //set the dataPath variable
 
 		try {
-			List<File> files = FileUtils.getFileListing(new File(this.dataPath.getAbsolutePath() + "/UniLog2/"));
+			List<File> files = FileUtils.getFileListing(new File(this.dataPath.getAbsolutePath() + "/UniLog2/"), 1);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".txt")) {
@@ -320,7 +320,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 		try {
 			String tmpDir1 = this.tmpDir + GDE.FILE_SEPARATOR + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-			List<File> files = FileUtils.getFileListing(new File(tmpDir1));
+			List<File> files = FileUtils.getFileListing(new File(tmpDir1), 1);
 
 			for (File file : files) {
 				String filePath = file.getAbsolutePath();
@@ -397,7 +397,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 		this.setDataPath(); //set the dataPath variable
 
 		try {
-			List<File> files = FileUtils.getFileListing(this.dataPath);
+			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
 
 			for (File file : files) {
 				String filePath = file.getAbsolutePath();
@@ -470,7 +470,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 		this.setDataPath(); //set the dataPath variable
 
 		try {
-			List<File> files = FileUtils.getFileListing(this.dataPath);
+			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".lov")) {
@@ -541,7 +541,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 		try {
 			String tmpDir1 = this.tmpDir + GDE.FILE_SEPARATOR + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-			List<File> files = FileUtils.getFileListing(new File(tmpDir1));
+			List<File> files = FileUtils.getFileListing(new File(tmpDir1), 1);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".osd")) {
@@ -607,7 +607,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 		try {
 			String tmpDir1 = this.tmpDir + GDE.FILE_SEPARATOR + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-			List<File> files = FileUtils.getFileListing(new File(tmpDir1));
+			List<File> files = FileUtils.getFileListing(new File(tmpDir1), 1);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && file.getName().toLowerCase().startsWith("LOG")) {
@@ -673,7 +673,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 		try {
 			String binDir = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "HoTTAdapter" + GDE.FILE_SEPARATOR;
-			List<File> files = FileUtils.getFileListing(new File(binDir));
+			List<File> files = FileUtils.getFileListing(new File(binDir), 2);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".bin")) {
@@ -743,7 +743,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 		try {
 			String binDir = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "HoTTAdapter" + GDE.FILE_SEPARATOR;
-			List<File> files = FileUtils.getFileListing(new File(binDir));
+			List<File> files = FileUtils.getFileListing(new File(binDir), 2);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".bin")) {
@@ -814,7 +814,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 		this.setDataPath(); //set the dataPath variable
 
 		try {
-			List<File> files = FileUtils.getFileListing(this.dataPath);
+			List<File> files = FileUtils.getFileListing(this.dataPath, 2);
 
 			IgcExportDialog igcExport = new IgcExportDialog();
 			int ordinalLongitude = 1, ordinalLatitude = 0, ordinalAltitude = 2;

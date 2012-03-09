@@ -55,7 +55,7 @@ public class TestValidateXML extends TestCase {
 
 		try {
 			loadXSD(xsdBasePath);
-			List<File> files = FileUtils.getFileListing(new File(basePath));
+			List<File> files = FileUtils.getFileListing(new File(basePath), 2);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".xml") && file.getPath().contains("src") && file.getPath().contains("resource") 
