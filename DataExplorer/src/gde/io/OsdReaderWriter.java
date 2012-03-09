@@ -582,7 +582,7 @@ public class OsdReaderWriter {
 	public static void updateObjectKey(String oldObjectKey, String newObjectKey) {
 		try {
 			//scan all data files for object key
-			List<File> files = FileUtils.getFileListing(new File(Settings.getInstance().getDataFilePath()));
+			List<File> files = FileUtils.getFileListing(new File(Settings.getInstance().getDataFilePath()), 1);
 			Iterator<File> iterator = files.iterator();
 			while(iterator.hasNext()){
 				File file  = iterator.next();			
