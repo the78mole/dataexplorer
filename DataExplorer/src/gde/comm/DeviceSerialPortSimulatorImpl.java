@@ -261,6 +261,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @see gde.serial.IDeviceSerialPort#read(byte[], int, int)
 	 */
 	public byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
+		byte[] resultBuffer = new byte[0];
 		try {
 			waitForStableReceiveBuffer(readBuffer.length, timeout_msec, 100);
 		}
@@ -269,15 +270,41 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		}
 		if (this.isConnected) {
 			if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
-				if (data_in.read(readBuffer) > 0) {
-					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize());
-					if (data_in.read(new byte[size2Read]) != size2Read) {
-						log.log(Level.WARNING, "expected byte size to  read does not macht really red size of bytes !");
+				Vector<Byte> tmpVector = new Vector<Byte>();
+				byte tmpByte, lastByte = 0x00;
+				try {
+					while ((tmpByte = data_in.readByte()) != 0xff) {
+						tmpVector.add(tmpByte);
+						if (tmpByte == 0x0A && lastByte == 0x0D) 
+							break;
+						lastByte = tmpByte;
+					}
+					
+					int size2Read = this.device.getLovDataByteSize() - readBuffer.length; //Math.abs(this.device.getDataBlockSize());
+					byte[] tmpBuffer = new byte[size2Read];
+					if (data_in.read(tmpBuffer) != size2Read) {
+						//end of file reached
+						this.close();
+					}
+				}
+				catch (Exception e) {
+					this.close();
+				}
+
+				if (this.device.getDataBlockLeader().length() > 0) {
+					while (tmpVector.size() > 1 && tmpVector.get(0) != this.device.getDataBlockLeader().charAt(0))
+						tmpVector.remove(0);
+				}
+				if (tmpVector.size() != readBuffer.length) {
+					resultBuffer = new byte[tmpVector.size()];
+					for (int i = 0; i < resultBuffer.length; i++) {
+						resultBuffer[i] = tmpVector.get(i);
 					}
 				}
 				else {
-					readBuffer = new byte[0];
-					this.close();
+					for (int i = 0; i < readBuffer.length; i++) {
+						readBuffer[i] = tmpVector.get(i);
+					}
 				}
 			}
 			else if (txt_in != null) {
@@ -334,7 +361,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				}
 			}
 		}
-		return readBuffer;
+		return resultBuffer.length == readBuffer.length ? readBuffer : resultBuffer;
 	}
 
 	/* (non-Javadoc)
@@ -417,10 +444,22 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		return readBuffer;
 	}
 
-	/* (non-Javadoc)
-	 * @see gde.serial.IDeviceSerialPort#write(byte[])
+	/**
+	 * write bytes to serial port output stream, cleans receive buffer if available byes prior to send data 
+	 * @param writeBuffer writes size of writeBuffer to output stream
+	 * @throws IOException
 	 */
 	public void write(byte[] writeBuffer) throws IOException {
+		log.log(Level.WARNING, "write() not supported in simulation");
+	}
+
+	/**
+	 * write bytes to serial port output stream, each byte individual with the given time gap in msec
+	 * cleans receive buffer if available byes prior to send data 
+	 * @param writeBuffer writes size of writeBuffer to output stream
+	 * @throws IOException
+	 */
+	public synchronized void write(byte[] writeBuffer, long gap_ms) throws IOException {
 		log.log(Level.WARNING, "write() not supported in simulation");
 	}
 

@@ -100,6 +100,14 @@ public interface IDeviceCommPort {
 	public void write(byte[] writeBuffer) throws IOException;
 
 	/**
+	 * write bytes to serial port output stream, each byte individual with the given time gap in msec
+	 * cleans receive buffer if available byes prior to send data 
+	 * @param writeBuffer writes size of writeBuffer to output stream
+	 * @throws IOException
+	 */
+	public void write(byte[] writeBuffer, long gap_ms) throws IOException;
+
+	/**
 	 * cleanup the input stream if there are bytes available
 	 * @return number of bytes in receive buffer which get removed
 	 * @throws IOException

@@ -100,7 +100,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	//	public static final String[]	STRING_ARRAY_PARITY				= new String[] { "PARITY_NONE", "PARITY_ODD", "PARITY_EVEN", "PARITY_MARK", "PARITY_SPACE" }; //$NON-NLS-1$
 	//	public static final String[]	STRING_ARRAY_STOP_BITS		= new String[] { "STOPBITS_1", "STOPBITS_2", "STOPBITS_1_5" }; //$NON-NLS-1$
 	//	public static final String[]	STRING_ARRAY_DATA_BITS		= new String[] { "DATABITS_5", "DATABITS_6", "DATABITS_7", "DATABITS_8" }; //$NON-NLS-1$
-	public static final String[]					STRING_ARRAY_BAUDE_RATES	= new String[] { "2400", "4800", "7200", "9600", "14400", "19200", "28800", "38400", "57600", "115200" };	//$NON-NLS-1$
+	public static final String[]					STRING_ARRAY_BAUDE_RATES	= new String[] { "2400", "4800", "7200", "9600", "14400", "19200", "28800", "38400", "57600", "115200" , "128000", "256000"};	//$NON-NLS-1$
 
 	//public static final int STOPBITS_1 = 1;
 	//public static final int STOPBITS_2 = 2;
@@ -379,6 +379,38 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	}
 
 	/**
+	 * write bytes to serial port output stream, each byte individual with the given time gap in msec
+	 * cleans receive buffer if available byes prior to send data 
+	 * @param writeBuffer writes size of writeBuffer to output stream
+	 * @throws IOException
+	 */
+	public synchronized void write(byte[] writeBuffer, long gap_ms) throws IOException {
+		final String $METHOD_NAME = "write"; //$NON-NLS-1$
+
+		try {
+			if (this.application != null) this.application.setSerialTxOn();
+			cleanInputStream();
+
+			for (int i = 0; i < writeBuffer.length; i++) {
+				this.outputStream.write(writeBuffer[i]);
+				WaitTimer.delay(gap_ms);
+			}
+			if (GDE.IS_LINUX && GDE.IS_ARCH_DATA_MODEL_64) {
+				this.outputStream.flush();
+			}
+
+			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Write : " + StringHelper.byte2Hex2CharString(writeBuffer, writeBuffer.length));
+		}
+		catch (IOException e) {
+			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			throw e;
+		}
+		finally {
+			if (this.application != null) this.application.setSerialTxOff();
+		}
+	}
+
+	/**
 	 * cleanup the input stream if there are bytes available
 	 * @return number of bytes in receive buffer which get removed
 	 * @throws IOException
@@ -500,12 +532,13 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 					WaitTimer.delay(sleepTime);
 				}
 
-				if (timeOutCounter/8 <= 0 && readBytes == 0) {
-					FailedQueryException e = new FailedQueryException(Messages.getString(MessageIds.GDE_MSGE0012, new Object[] { timeout_msec/4 }));
-					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage());
-					throw e;
-				}
-				else if (timeOutCounter <= 0) {
+//				if (timeOutCounter/4 <= 0 && readBytes == 0) {
+//					FailedQueryException e = new FailedQueryException(Messages.getString(MessageIds.GDE_MSGE0012, new Object[] { timeout_msec/4 }));
+//					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage());
+//					throw e;
+//				}
+//				else 
+					if (timeOutCounter <= 0) {
 					TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { bytes, timeout_msec }));
 					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 					log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));

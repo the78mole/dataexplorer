@@ -146,6 +146,13 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#write(byte[])
 	 */
+	public void write(byte[] writeBuffer, long gap_ms) throws IOException {
+		this.port.write(writeBuffer, gap_ms);
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceCommPort#write(byte[])
+	 */
 	public int cleanInputStream() throws IOException {
 		return this.port.cleanInputStream();
 	}
