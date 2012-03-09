@@ -1163,7 +1163,7 @@ public class HoTTbinReader {
 		String directory = "f:\\Documents\\DataExplorer\\HoTTAdapter\\";
 
 		try {
-			List<File> files = FileUtils.getFileListing(new File(directory));
+			List<File> files = FileUtils.getFileListing(new File(directory), 2);
 			for (File file : files) {
 				if (!file.isDirectory() && file.getName().endsWith(".bin")) {
 //					FileInputStream file_input = new FileInputStream(file);
