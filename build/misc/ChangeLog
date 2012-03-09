@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 2.97 - xx yyy 2012
 UniLog2 - fix error restart live gathering not possible if stopped while dialog is closed
 HottAdapter2 - fix GPS data detection to enable Google Earth visualization
+HottAdapter(2) - fix Receiver detection and add data error correction 
 
 Version 2.96 - 24 Feb 2012
 VC8x0 - add warning message while error limit is reached. 
