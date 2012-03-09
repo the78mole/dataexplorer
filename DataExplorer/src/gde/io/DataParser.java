@@ -25,6 +25,7 @@ import gde.messages.Messages;
 import java.util.logging.Logger;
 
 import gde.device.CheckSumTypes;
+import gde.device.FormatTypes;
 import gde.exception.DevicePropertiesInconsistenceException;
 import gde.utils.Checksum;
 
@@ -49,14 +50,28 @@ public class DataParser {
 	final String				separator;
 	final String				leader;
 	final CheckSumTypes	checkSumType;
+	final FormatTypes		checkSumFormatType;
 	final int						size;
+	final boolean				isMultiply1000;
 
 	public DataParser(int useTimeFactor, String useLeaderChar, String useSeparator, CheckSumTypes useCheckSumType, int useDataSize) {
 		this.timeFactor = useTimeFactor;
 		this.separator = useSeparator;
 		this.leader = useLeaderChar;
 		this.checkSumType = useCheckSumType;
+		this.checkSumFormatType = FormatTypes.TEXT;
 		this.size = useDataSize;
+		this.isMultiply1000 = true;
+	}
+	
+	public DataParser(int useTimeFactor, String useLeaderChar, String useSeparator, CheckSumTypes useCheckSumType, FormatTypes useCheckSumFormatType, int useDataSize, boolean doMultiply1000) {
+		this.timeFactor = useTimeFactor;
+		this.separator = useSeparator;
+		this.leader = useLeaderChar;
+		this.checkSumType = useCheckSumType;
+		this.checkSumFormatType = useCheckSumFormatType;
+		this.size = useDataSize;
+		this.isMultiply1000 = doMultiply1000;
 	}
 
 	public void parse(String inputLine) throws DevicePropertiesInconsistenceException, NumberFormatException {
@@ -78,6 +93,7 @@ public class DataParser {
 			this.state = Integer.parseInt(strValue);
 
 			strValue = strValues[2].trim();
+			strValue = strValue.length() > 0 ? strValue : "0";
 			if (start_time_ms == Integer.MIN_VALUE)	start_time_ms = Integer.parseInt(strValue) * this.timeFactor; // Seconds * 1000 = msec
 			else																					time_ms = Integer.parseInt(strValue) * this.timeFactor - start_time_ms; // Seconds * 1000 = msec
 			
@@ -85,7 +101,7 @@ public class DataParser {
 				strValue = strValues[i+3].trim();
 				try {
 					long tmpValue = strValue.length() > 0 ? Long.parseLong(strValue) : 0;
-					if (tmpValue < Integer.MAX_VALUE/1000 && tmpValue > Integer.MIN_VALUE/1000)
+					if (isMultiply1000 && tmpValue < Integer.MAX_VALUE/1000 && tmpValue > Integer.MIN_VALUE/1000)
 						this.values[i] = (int) (tmpValue*1000); // enable 3 positions after decimal place
 					else // needs special processing within IDevice.translateValue(), IDevice.reverseTranslateValue()
 						if (tmpValue < Integer.MAX_VALUE || tmpValue > Integer.MIN_VALUE) {
@@ -100,22 +116,54 @@ public class DataParser {
 				}
 			}
 
-			strValue = strValues[this.values.length].trim();
+			strValue = strValues[strValues.length-1].trim();
 			int tmpCheckSum = Integer.parseInt(strValue);
 			boolean isValid = true;
 			if (checkSumType != null) {
 				switch (checkSumType) {
 				case ADD:
-					isValid = tmpCheckSum == Checksum.ADD(this.values, 0, this.size);
+					switch (checkSumFormatType) {
+					case TEXT:
+						isValid = tmpCheckSum == Checksum.ADD(this.values, 0, this.size);
+						break;
+					case BINARY:
+					default:
+						isValid = tmpCheckSum == Checksum.ADD(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
+						break;
+					}
 					break;
 				case XOR:
-					isValid = tmpCheckSum == Checksum.XOR(this.values, 0, this.size);
+					switch (checkSumFormatType) {
+					case TEXT:
+						isValid = tmpCheckSum == Checksum.XOR(this.values, 0, this.size);
+						break;
+					case BINARY:
+					default:
+						isValid = tmpCheckSum == Checksum.XOR(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
+						break;
+					}
 					break;
 				case OR:
-					isValid = tmpCheckSum == Checksum.OR(this.values, 0, this.size);
+					switch (checkSumFormatType) {
+					case TEXT:
+						isValid = tmpCheckSum == Checksum.OR(this.values, 0, this.size);
+						break;
+					case BINARY:
+					default:
+						isValid = tmpCheckSum == Checksum.OR(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
+						break;
+					}
 					break;
 				case AND:
-					isValid = tmpCheckSum == Checksum.AND(this.values, 0, this.size);
+					switch (checkSumFormatType) {
+					case TEXT:
+						isValid = tmpCheckSum == Checksum.AND(this.values, 0, this.size);
+						break;
+					case BINARY:
+					default:
+						isValid = tmpCheckSum == Checksum.AND(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
+						break;
+					}
 					break;
 				}
 			}
