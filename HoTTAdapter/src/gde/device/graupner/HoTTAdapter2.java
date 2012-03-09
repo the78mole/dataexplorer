@@ -855,7 +855,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	public boolean isActualRecordSetWithGpsData() {
 		boolean containsGPSdata = false;
 		Channel activeChannel = this.channels.getActiveChannel();
-		if (activeChannel != null && activeChannel.getNumber() == 3) {
+		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
