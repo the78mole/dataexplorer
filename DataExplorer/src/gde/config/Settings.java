@@ -278,7 +278,7 @@ public class Settings extends Properties {
 
 		this.load();
 		
-		// check existens of application home directory, check XSD version, copy all device XML+XSD and image files
+		// check existent of application home directory, check XSD version, copy all device XML+XSD and image files
 		FileUtils.checkDirectoryAndCreate(this.applHomePath);
 		String devicePropertiesTargetpath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + DEVICE_PROPERTIES_DIR_NAME;
 		devicePropertiesTargetpath = devicePropertiesTargetpath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);

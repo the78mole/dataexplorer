@@ -97,7 +97,7 @@ public class BuildCompleteHelpHtml {
 					
 				String langFilePath = baseFilePath + GDE.FILE_SEPARATOR_UNIX + SUPPORTED_LANGUAGES[i];
 				log.log(Level.INFO, "langFilePath = " + langFilePath);
-				List<File> files = FileUtils.getFileListing(new File(langFilePath));
+				List<File> files = FileUtils.getFileListing(new File(langFilePath), 4);
 				
 				for (File file : files) {
 					if (file.getAbsolutePath().toLowerCase().endsWith(".html") || file.getAbsolutePath().toLowerCase().endsWith(".htm")) {
@@ -135,7 +135,7 @@ public class BuildCompleteHelpHtml {
 						String pluginLangFilePath = pluginBaseFilePath + GDE.FILE_SEPARATOR_UNIX + SUPPORTED_LANGUAGES[i];
 						log.log(Level.INFO, "pluginLangFilePath = " + pluginLangFilePath);
 						
-						files = FileUtils.getFileListing(new File(pluginLangFilePath));
+						files = FileUtils.getFileListing(new File(pluginLangFilePath), 5);
 						for (File file : files) {
 							if (file.getAbsolutePath().toLowerCase().endsWith(".html") || file.getAbsolutePath().toLowerCase().endsWith(".htm")) {
 								log.log(Level.INFO, "working with : " + file);

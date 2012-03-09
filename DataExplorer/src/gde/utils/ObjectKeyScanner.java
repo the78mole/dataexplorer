@@ -111,7 +111,7 @@ public class ObjectKeyScanner extends Thread {
 				}
 				
 				//scan all data files for object key
-				List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()));
+				List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()), 1);
 				for (File file : files) {
 					try {
 						String actualFilePath = file.getAbsolutePath();
@@ -145,7 +145,7 @@ public class ObjectKeyScanner extends Thread {
 				int fileCounter = 0;
 				if (this.searchForKeys) {
 					log.log(Level.FINE, "this.settings.getDataFilePath() = " + this.settings.getDataFilePath());
-					List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()));
+					List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()), 1);
 					for (File file : files) {
 						try {
 							String actualFilePath = file.getAbsolutePath();
@@ -237,7 +237,7 @@ public class ObjectKeyScanner extends Thread {
 	 */
 	public static void cleanFileLinks() {	
 		try {
-			List<File> files = FileUtils.getFileListing(new File(Settings.getInstance().getDataFilePath()));
+			List<File> files = FileUtils.getFileListing(new File(Settings.getInstance().getDataFilePath()), 1);
 			for (File file : files) {
 				try {
 					String actualFilePath = file.getAbsolutePath();

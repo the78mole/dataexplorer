@@ -160,7 +160,7 @@ public class FileUtils {
 				if (!file.exists()) {
 					try {
 						//find directory contained version file and rename directory, do not use actual version -1 to enable support for several installed GDE versions
-						for(File tmpFile : FileUtils.getFileListingNoSort(dir)) {
+						for(File tmpFile : FileUtils.getFileListingNoSort(dir, 3)) {
 							if(tmpFile.getPath().endsWith(GDE.FILE_ENDING_DOT_XSD)) {
 								int oldVersion = Integer.parseInt(tmpFile.getPath().substring(tmpFile.getPath().length()-6, tmpFile.getPath().length()-4));
 								if(!dir.renameTo(new File(directory + "_V" + oldVersion))) {
@@ -195,7 +195,8 @@ public class FileUtils {
 	}
 
 	/**
-	 * check existent of a directory and delete underlaying files as well as the directory
+	 * check existent of a directory and delete underlying files as well as the directory
+	 * attention, this runs for structure up to 5 directory levels only
 	 * @param fullQualifiedDirectoryPath
 	 * @return true false if directory needs to be created
 	 */
@@ -206,9 +207,9 @@ public class FileUtils {
 			exist = true;
 			
 			try {
-				for (File file : FileUtils.getFileListing(dir)) {
+				for (File file : FileUtils.getFileListing(dir, 5)) {
 					if (file.canWrite()) {
-						log.log(Level.INFO, file.getAbsolutePath() + " deletion " + file.delete());
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, file.getAbsolutePath() + " deletion " + file.delete());
 					}
 					else {
 						log.log(Level.WARNING, "no delete permission on " + file.getAbsolutePath()); //$NON-NLS-1$
@@ -302,6 +303,7 @@ public class FileUtils {
 
 	/**
 	 * delete a file list, if exist
+	 * attention, only 4 directory levels gets visited !
 	 */
 	public static void cleanFiles(String fileBasePath, String[] fileNames) {
 		fileBasePath = fileBasePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
@@ -320,7 +322,7 @@ public class FileUtils {
 				try {
 					String startSignature = fileName.substring(0, fileName.indexOf(GDE.STRING_STAR));
 					String endingSignature = fileName.substring(fileName.lastIndexOf(GDE.STRING_STAR) + 1);
-					List<File> fileList = FileUtils.getFileListingNoSort(new File(fileBasePath));
+					List<File> fileList = FileUtils.getFileListingNoSort(new File(fileBasePath), 0); //no directories to be scanned here
 					for (File file : fileList) {
 						String tmpFileName = file.getName();
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "evaluating " + tmpFileName); //$NON-NLS-1$
@@ -796,11 +798,6 @@ public class FileUtils {
 				String tmpDeviceJarPath = null;
 				deviceJarPath = getJarFileNameOfDevice(deviceConfig);
 
-				// remove comment to test within eclipse, comment out the isStartedWithinEclipe block above
-//				if (isStartedWithinEclipse) {
-//					deviceJarPath = "c:\\Program Files\\DataExplorer\\devices\\Simulator.jar";
-//				}
-
 				tmpDeviceJarPath = GDE.JAVA_IO_TMPDIR + deviceJarPath.substring(deviceJarPath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1, deviceJarPath.length());
 				log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1182,12 +1179,13 @@ public class FileUtils {
 	/**
 	  * Recursively walk a directory tree and return a List of all files found.
 	  * @param rootDirectory is a valid directory
+	  * @param recursionDepth specifies the depth of recursion cycles
 	  * @return List<File> sorted using File.compareTo()
 	  * @throws FileNotFoundException
 	  */
-	public static List<File> getFileListing(File rootDirectory) throws FileNotFoundException {
+	public static List<File> getFileListing(File rootDirectory, int recursionDepth) throws FileNotFoundException {
 		validateDirectory(rootDirectory);
-		List<File> result = getFileListingNoSort(rootDirectory);
+		List<File> result = getFileListingNoSort(rootDirectory, recursionDepth);
 		Collections.sort(result);
 		return result;
 	}
@@ -1208,10 +1206,12 @@ public class FileUtils {
 	/**
 	 * Recursively walk a directory tree and return a List of all Files found;
 	 * @param rootDirectory
+	 * @param recursionDepth
 	 * @return List<File>
 	 * @throws FileNotFoundException
 	 */
-	private static List<File> getFileListingNoSort(File rootDirectory) throws FileNotFoundException {
+	private static List<File> getFileListingNoSort(File rootDirectory, int recursionDepth) throws FileNotFoundException {
+		int depth = recursionDepth;
 		List<File> result = new ArrayList<File>();
 		if (rootDirectory.isDirectory() && rootDirectory.canRead()) {
 			File[] filesAndDirs = rootDirectory.listFiles();
@@ -1219,11 +1219,13 @@ public class FileUtils {
 				List<File> filesDirs = Arrays.asList(filesAndDirs);
 				for (File file : filesDirs) {
 					if (file.isFile()) {
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, file.getAbsolutePath());
 						result.add(file);
-					} else { // isDirectory()
-								//recursive walk by calling itself
-						List<File> deeperList = getFileListingNoSort(file);
+					} else if (file.isDirectory() && recursionDepth > 0) {	//recursive walk by calling itself
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, depth + " " + file.getAbsolutePath());
+						List<File> deeperList = getFileListingNoSort(file, --recursionDepth);
 						result.addAll(deeperList);
+						++recursionDepth;
 					}
 				}
 			}
@@ -1232,7 +1234,7 @@ public class FileUtils {
 	}
 	
 	/**
-	 * Recursively walk a directory tree and return a List of all Files found;
+	 * Recursively walk a directory tree and return a list of all directories found;
 	 * @param rootDirectory
 	 * @return List<File>
 	 * @throws FileNotFoundException
@@ -1245,11 +1247,6 @@ public class FileUtils {
 			for (File file : filesDirs) {
 				if (file.isDirectory()) {
 					result.add(file);
-				}
-				else { // isDirectory()
-					//recursive walk by calling itself
-					List<File> deeperList = getFileListingNoSort(file);
-					result.addAll(deeperList);
 				}
 			}
 		}
