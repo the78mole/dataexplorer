@@ -99,21 +99,20 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				this.write(HoTTAdapterSerialPort.QUERY_SENSOR_DATA);
 				this.read(HoTTAdapterSerialPort.ANSWER, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
 				data[0] = HoTTAdapterSerialPort.ANSWER[0];
-				WaitTimer.delay(5);
+				WaitTimer.delay(4);
 				this.write(this.SENSOR_TYPE);
 				this.read(HoTTAdapterSerialPort.ANSWER, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
+				HoTTAdapterSerialPort.ANSWER[0] = this.SENSOR_TYPE[0];
 				data[1] = HoTTAdapterSerialPort.ANSWER[0];
 			}
 			else {
 				//simulate answers
-				data[0] = (byte) 0x80;
+				data[0] = HoTTAdapterSerialPort.QUERY_SENSOR_DATA[0];
 				HoTTAdapterSerialPort.ANSWER[0] = this.SENSOR_TYPE[0];
 				data[1] = HoTTAdapterSerialPort.ANSWER[0];
 			}
 
-			if (HoTTAdapterSerialPort.ANSWER[0] == this.SENSOR_TYPE[0]) {
-				this.read(this.ANSWER_DATA, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
-			}
+			this.read(this.ANSWER_DATA, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
 
 			if (checkBeginEndSignature && HoTTAdapter.IS_SLAVE_MODE) {
 				synchronizeDataBlock(data, checkBeginEndSignature);

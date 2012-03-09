@@ -72,42 +72,50 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 
 			//detect master slave mode, only in slave mode data are written to receive buffer without query 
 			WaitTimer.delay(1000);
-			if (this.serialPort.cleanInputStream() > 2)
+			if (this.serialPort.cleanInputStream() > 2) {
 				HoTTAdapter2.IS_SLAVE_MODE = true;
-			else
+				logger.log(Level.FINE, "HoTTAdapter2.IS_SLAVE_MODE = " + HoTTAdapter2.IS_SLAVE_MODE);
+			}
+			else {
 				HoTTAdapter2.IS_SLAVE_MODE = false;
-			logger.log(Level.FINE, "HoTTAdapter2.IS_SLAVE_MODE = " + HoTTAdapter2.IS_SLAVE_MODE);
+				logger.log(Level.FINE, "HoTTAdapter2.IS_SLAVE_MODE = " + HoTTAdapter2.IS_SLAVE_MODE);
 
-			for (int i = 0; i < 10 && (HoTTAdapter2.isSensorType[1] == false && HoTTAdapter2.isSensorType[2] == false && HoTTAdapter2.isSensorType[3] == false && HoTTAdapter2.isSensorType[4] == false); i++) {
+				for (int i = 0; i < 10 && (HoTTAdapter2.isSensorType[0] == false && HoTTAdapter2.isSensorType[1] == false && HoTTAdapter2.isSensorType[2] == false && HoTTAdapter2.isSensorType[3] == false && HoTTAdapter2.isSensorType[4] == false); i++) {
+					try {
+						detectSensorType(HoTTAdapter2.isSensorType);
+					}
+					catch (Exception e) {
+						logger.log(Level.WARNING, e.getMessage(), e);
+					}
+				}
 				try {
 					detectSensorType(HoTTAdapter2.isSensorType);
 				}
 				catch (Exception e) {
 					logger.log(Level.WARNING, e.getMessage(), e);
 				}
-			}
-			detectSensorType(HoTTAdapter2.isSensorType);
-			
-			StringBuilder sb = new StringBuilder();
-			boolean[] tmpSensorType = HoTTAdapter.isSensorType.clone();
-			//0=isReceiver, 1=isVario, 2=isGPS, 3=isGeneral, 4=isElectric
-			for (int i = HoTTAdapter.isSensorType.length - 1; i >= 0; i--) {
-				if (sb.length() == 0 && tmpSensorType[i]) {
-					sb.append(tmpSensorType[4] ? ">>>Electric<<<" : tmpSensorType[3] ? ">>>General<<<" : tmpSensorType[2] ? ">>>GPS<<<" : tmpSensorType[1] ? ">>>Vario<<<" : tmpSensorType[0] ? ">>>Receiver<<<" : "");
-					tmpSensorType[i] = false;
+				
+				StringBuilder sb = new StringBuilder();
+				boolean[] tmpSensorType = HoTTAdapter.isSensorType.clone();
+				//0=isReceiver, 1=isVario, 2=isGPS, 3=isGeneral, 4=isElectric
+				for (int i = HoTTAdapter.isSensorType.length - 1; i >= 0; i--) {
+					if (sb.length() == 0 && tmpSensorType[i]) {
+						sb.append(tmpSensorType[4] ? ">>>Electric<<<" : tmpSensorType[3] ? ">>>General<<<" : tmpSensorType[2] ? ">>>GPS<<<" : tmpSensorType[1] ? ">>>Vario<<<" : tmpSensorType[0] ? ">>>Receiver<<<" : "");
+						tmpSensorType[i] = false;
+					}
+					else if (tmpSensorType[i]) {
+						sb.append(GDE.STRING_MESSAGE_CONCAT).append(tmpSensorType[4] ? ">>>Electric<<<" : tmpSensorType[3] ? ">>>General<<<" : tmpSensorType[2] ? ">>>GPS<<<" : tmpSensorType[1] ? ">>>Vario<<<" : tmpSensorType[0] ? ">>>Receiver<<<" : "");
+						tmpSensorType[i] = false;
+					}
 				}
-				else if (tmpSensorType[i]) {
-					sb.append(GDE.STRING_MESSAGE_CONCAT).append(tmpSensorType[4] ? ">>>Electric<<<" : tmpSensorType[3] ? ">>>General<<<" : tmpSensorType[2] ? ">>>GPS<<<" : tmpSensorType[1] ? ">>>Vario<<<" : tmpSensorType[0] ? ">>>Receiver<<<" : "");
-					tmpSensorType[i] = false;
-				}
-			}
-			HoTTAdapterLiveGatherer.log.log(Level.OFF, sb.toString() + ", detecting sensor type takes " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				HoTTAdapterLiveGatherer.log.log(Level.OFF, sb.toString() + ", detecting sensor type takes " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 
-			//no sensor type detected, seams only receiver is connected
-			if (HoTTAdapter2.isSensorType[1] == false && HoTTAdapter2.isSensorType[2] == false && HoTTAdapter2.isSensorType[3] == false && HoTTAdapter2.isSensorType[4] == false) {
-				this.serialPort.setSensorType(this.serialPort.protocolType.ordinal() < 2 ? HoTTAdapter2.SENSOR_TYPE_RECEIVER_19200 : HoTTAdapter2.SENSOR_TYPE_RECEIVER_115200);
-				if (HoTTAdapter2.isSensorType[0] == false)
-					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW2400));
+				//no sensor type detected, seams only receiver is connected
+				if (HoTTAdapter2.isSensorType[1] == false && HoTTAdapter2.isSensorType[2] == false && HoTTAdapter2.isSensorType[3] == false && HoTTAdapter2.isSensorType[4] == false) {
+					this.serialPort.setSensorType(this.serialPort.protocolType.ordinal() < 2 ? HoTTAdapter2.SENSOR_TYPE_RECEIVER_19200 : HoTTAdapter2.SENSOR_TYPE_RECEIVER_115200);
+					if (HoTTAdapter2.isSensorType[0] == false)
+						this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW2400));
+				}
 			}
 		}
 		catch (SerialPortException e) {
@@ -171,13 +179,13 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 				case TYPE_19200_V4:
 					if (HoTTAdapter.IS_SLAVE_MODE) {
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200); //receiver has shortest data array
-						//HoTTAdapterLiveGatherer.this.serialPort.getData(true);
-						//WaitTimer.delay(HoTTAdapter.queryGapTime_ms);
 						byte[] dataBuffer = HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
-						while (!checkContainsDataBegin(dataBuffer)) {
+						while (!this.serialPort.isInterruptedByUser && !checkContainsDataBegin(dataBuffer)) {
 							WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 							dataBuffer = HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
 						}
+						WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
+						HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
 						WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 						if (checkSignature(dataBuffer, HoTTAdapter.SENSOR_TYPE_RECEIVER_19200)) {
 							recordSet.addPoints(this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
@@ -201,89 +209,149 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 					}
 					else {
 						if (HoTTAdapter2.isSensorType[0] == true) {
-							//always gather receiver data first, anserRx are used to fill RXSQ, VoltageRx and TemperatureRx
-							this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_RECEIVER_19200);
-							//HoTTAdapterLiveGatherer.this.serialPort.getData(true);
-							//WaitTimer.delay(HoTTAdapter2.queryGapTime_ms);
-							HoTTAdapter2LiveGatherer.this.serialPort.getData(true);
-							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-							this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true));
+							try {
+								//always gather receiver data first, anserRx are used to fill RXSQ, VoltageRx and TemperatureRx
+								this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_RECEIVER_19200);
+								HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
+								WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+								HoTTAdapter2LiveGatherer.this.serialPort.getData(true);
+								WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+								this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true));
+							}
+							catch (TimeOutException e) {
+								// ignore and go ahead gathering sensor data
+								this.serialPort.addTimeoutError();
+							}
 						}
 						if (queryRing.firstElement() == 4) {
-							this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_ELECTRIC_19200);
-							HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
-							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-							HoTTAdapter2LiveGatherer.this.serialPort.getData(true);
-							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-							this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true));
+							try {
+								this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_ELECTRIC_19200);
+								HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
+								WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+								HoTTAdapter2LiveGatherer.this.serialPort.getData(true);
+								WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+								this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true));
+							}
+							catch (TimeOutException e) {
+								// ignore and go ahead gathering sensor data
+								this.serialPort.addTimeoutError();
+							}
 						}
 						if (queryRing.firstElement() == 3) {
-							this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_GENERAL_19200);
-							HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
-							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-							HoTTAdapter2LiveGatherer.this.serialPort.getData(true);
-							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-							this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true));
+							try {
+								this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_GENERAL_19200);
+								HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
+								WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+								HoTTAdapter2LiveGatherer.this.serialPort.getData(true);
+								WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+								this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true));
+							}
+							catch (TimeOutException e) {
+								// ignore and go ahead gathering sensor data
+								this.serialPort.addTimeoutError();
+							}
 						}
 						if (queryRing.firstElement() == 2) {
-							this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_GPS_19200);
-							HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
-							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-							HoTTAdapter2LiveGatherer.this.serialPort.getData(true);
-							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-							this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true));
+							try {
+								this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_GPS_19200);
+								HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
+								WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+								HoTTAdapter2LiveGatherer.this.serialPort.getData(true);
+								WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+								this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true));
+							}
+							catch (TimeOutException e) {
+								// ignore and go ahead gathering sensor data
+								this.serialPort.addTimeoutError();
+							}
 						}
 						if (queryRing.firstElement() == 1) {
-							this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_VARIO_19200);
-							HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
-							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-							HoTTAdapter2LiveGatherer.this.serialPort.getData(true);
-							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-							this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true));
+							try {
+								this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_VARIO_19200);
+								HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
+								WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+								HoTTAdapter2LiveGatherer.this.serialPort.getData(true);
+								WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+								this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(true));
+							}
+							catch (TimeOutException e) {
+								// ignore and go ahead gathering sensor data
+								this.serialPort.addTimeoutError();
+							}
 						}
 					}
 					break;
 				case TYPE_115200:
 					if (HoTTAdapter2.isSensorType[0]) {
-						//always gather receiver data first, anserRx are used to fill RXSQ, VoltageRx and TemperatureRx
-						this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_RECEIVER_115200);
-						//HoTTAdapterLiveGatherer.this.serialPort.getData(0);
-						//WaitTimer.delay(HoTTAdapter2.queryGapTime_ms);
-						HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
-						WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-						this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(0));
+						try {
+							//always gather receiver data first, anserRx are used to fill RXSQ, VoltageRx and TemperatureRx
+							this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_RECEIVER_115200);
+							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
+							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
+							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+							this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(0));
+						}
+						catch (TimeOutException e) {
+							// ignore and go ahead gathering sensor data
+							this.serialPort.addTimeoutError();
+						}
 					}
 					if (queryRing.firstElement() == 4) {
-						this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_ELECTRIC_115200);
-						//HoTTAdapterLiveGatherer.this.serialPort.getData(0);
-						//WaitTimer.delay(HoTTAdapter2.queryGapTime_ms);
-						HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
-						WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-						this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(0));
+						try {
+							this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_ELECTRIC_115200);
+							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
+							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
+							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+							this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(0));
+						}
+						catch (TimeOutException e) {
+							// ignore and go ahead gathering sensor data
+							this.serialPort.addTimeoutError();
+						}
 					}
 					if (queryRing.firstElement() == 3) {
-						this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_GENERAL_115200);
-						//HoTTAdapterLiveGatherer.this.serialPort.getData(0);
-						//WaitTimer.delay(HoTTAdapter2.queryGapTime_ms);
-						HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
-						WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-						this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(0));
+						try {
+							this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_GENERAL_115200);
+							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
+							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
+							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+							this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(0));
+						}
+						catch (TimeOutException e) {
+							// ignore and go ahead gathering sensor data
+							this.serialPort.addTimeoutError();
+						}
 					}
 					if (queryRing.firstElement() == 2) {
-						this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_GPS_115200);
-						//HoTTAdapterLiveGatherer.this.serialPort.getData(0);
-						//WaitTimer.delay(HoTTAdapter2.queryGapTime_ms);
-						HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
-						WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-						this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(0));
+						try {
+							this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_GPS_115200);
+							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
+							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
+							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+							this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(0));
+						}
+						catch (TimeOutException e) {
+							// ignore and go ahead gathering sensor data
+							this.serialPort.addTimeoutError();
+						}
 					}
 					if (queryRing.firstElement() == 1) {
-						this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_VARIO_115200);
-						//HoTTAdapterLiveGatherer.this.serialPort.getData(0);
-						//WaitTimer.delay(HoTTAdapter2.queryGapTime_ms);
-						HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
-						WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
-						this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(0));
+						try {
+							this.serialPort.setSensorType(HoTTAdapter2.SENSOR_TYPE_VARIO_115200);
+							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
+							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
+							WaitTimer.delay(HoTTAdapter2.QUERY_GAP_MS);
+							this.device.convertDataBytes(points, HoTTAdapter2LiveGatherer.this.serialPort.getData(0));
+						}
+						catch (TimeOutException e) {
+							// ignore and go ahead gathering sensor data
+							this.serialPort.addTimeoutError();
+						}
 					}
 					break;
 				}
@@ -296,9 +364,14 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 						this.device.updateVisibilityStatus(tmpRecordSet, true);
 					}
 				}
-				//if (recordSet.isChildOfActiveChannel() && recordSet.equals(HoTTAdapterLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
+
 				HoTTAdapter2LiveGatherer.this.application.updateAllTabs(false);
-				//}
+				
+				if (this.serialPort.getTimeoutErrors() > 0 && this.serialPort.getTimeoutErrors() % 10 == 0) {
+					this.application.setStatusMessage(
+							Messages.getString(gde.messages.MessageIds.GDE_MSGW0045,
+									new Object[] { "TimeOutException", this.serialPort.getTimeoutErrors() + "; xferErrors = " + this.serialPort.getXferErrors() }), SWT.COLOR_RED);
+				}
 			}
 			catch (DataInconsitsentException e) {
 				logger.log(Level.SEVERE, e.getMessage(), e);
