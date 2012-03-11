@@ -144,7 +144,8 @@ public class MeasurementControlConfigurable extends Composite {
 			measurementNameLData.height = GDE.IS_MAC ? 15 : 12;
 			this.measurementName.setLayoutData(measurementNameLData);
 			this.measurementName.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-			this.measurementName.setText(this.measurementType.getName().endsWith(this.filterExtend) ? this.measurementType.getName().substring(0, this.measurementType.getName().length() - 3)
+			this.measurementName.setText(this.measurementType.getName().endsWith(this.filterExtend) 
+					? this.measurementType.getName().substring(0, this.measurementType.getName().length() - this.filterExtend.length())
 					: this.measurementType.getName());
 			this.measurementName.addKeyListener(new KeyAdapter() {
 				@Override
