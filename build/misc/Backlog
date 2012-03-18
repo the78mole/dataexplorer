@@ -3,19 +3,16 @@
 check group membership on UNIX systems (uucp for serial port locking)
  
 write temporary files of all actual records while live data gathering
- 
-enable plug-in to create it own tabulator based view 
- 
+  
 create more junit tests 
  
 ongoing update help content
 
 XML file format, compressed
+Zipped file format
 
-performance inspection/update
-
-memory analysis/optimization
-
-universal device
+universal device (CSV via serial)
 
 refine adding association for existing key MRUList, RegisteryHelper.cpp
+
+Skynavigator Export

@@ -103,10 +103,10 @@ Für Windows Anwender: Je nach verwendeter Windows Version und Patchlevel kann es
 "Microsoft Visual C++ 2008 Redistributable Package" von www.microsoft.com/downloads nachzurüsten (Desktopicon, Objektlink).
 
 Für GNU/Linux Anwender: RXTXcomm locked den seriellen Port über die Gruppe "uucp", welcher der Anwendungsnutzer angehören sollte.
-Bei Problemen mit dem USB2Serial UART von SiliconLabs cp210x siehe das GNULinux_cp210x Verzeichnis im Downloadbereich.
+Bei Problemen mit dem USB2Serial UART von SiliconLabs cp210x siehe das GNULinux_cp210x Verzeichnis im Downloadbereich. Rechte von lock unter /var auf root:uucp setzen.
 
 Für Mac OS Anwender: Hier gilt prinzipiell das Gleiche wie für GNU/Linux, nur dass das Verzeichnis /var/lock erst angelegt werden muss, siehe
-Anwendungsordner Inhalt RXTX_Post-Install_MacOS.sh
+DataExplorer Anwendungsordner Inhalt RXTX_Post-Install_MacOS.sh. Für die Verwendung von seriellen Schnittstellen müssen Treiber des jeweils benutzten USB2Serial Converters installiert werden. 
 
 Hinweis: Soll der DataExplorer gleichzeitig auf mehreren Betriebssystemen verwendet werden, oder werden die Daten auf zentraler Stelle abgelegt,
 sind Umlaute in den Dateinamen und Objektnamen zu vermeiden. (Umwandlung ISO-8859-1 nach UTF-8 und umgekehrt). Dateilinks unterscheiden sich von den 
