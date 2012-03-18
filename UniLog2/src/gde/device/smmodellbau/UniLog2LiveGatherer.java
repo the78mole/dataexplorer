@@ -191,7 +191,7 @@ public class UniLog2LiveGatherer extends Thread {
 					log.log(Level.SEVERE, e1.getMessage(), e1);
 					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
 							+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW2500); //$NON-NLS-1$ 
-					cleanup(recordSetKey, message);
+					this.application.openMessageDialog(this.dialog.getDialogShell(), message);
 					return;
 				}
 			}
@@ -199,13 +199,13 @@ public class UniLog2LiveGatherer extends Thread {
 				log.log(Level.SEVERE, e.getMessage(), e);
 				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW2500); //$NON-NLS-1$ 
-				cleanup(recordSetKey, message);
+				this.application.openMessageDialog(this.dialog.getDialogShell(), message);
 				return;
 			}
 			catch (Throwable e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
 				String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$ 
-				cleanup(recordSetKey, message);
+				this.application.openMessageDialog(this.dialog.getDialogShell(), message);
 				return;
 			}
 			finally {
@@ -225,7 +225,7 @@ public class UniLog2LiveGatherer extends Thread {
 	 * @param recordSetKey
 	 * @param message
 	 */
-	void cleanup(final String recordSetKey, String message) {
+	private void cleanup(final String recordSetKey, String message) {
 		this.serialPort.isInterruptedByUser = true;
 		if (this.serialPort.isConnected()) 
 			try {
