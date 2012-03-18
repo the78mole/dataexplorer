@@ -711,12 +711,13 @@ public class RecordSet extends HashMap<String, Record> {
 		int deviceDataBlockSize = Math.abs(this.device.getDataBlockSize());
 		deviceDataBlockSize = deviceDataBlockSize <= 0 ? deviceMeasurements.length : deviceDataBlockSize;
 		// record names may not match device measurements, but device measurements might be more then existing records
-		for (int i = 0; i < deviceMeasurements.length; ++i) {
+		for (int i = 0; i < deviceMeasurements.length && i < this.size(); ++i) {
 			MeasurementType measurement = this.device.getMeasurement(this.parent.number, i);
 			if (!measurement.isCalculation()) { // active or inactive 
 				tmpCalculationRecords.add(this.recordNames[i]);
 			}
 		}
+		//assume attached records are calculations like DataVario
 		while (tmpCalculationRecords.size() > deviceDataBlockSize) {
 			tmpCalculationRecords.remove(deviceDataBlockSize);
 		}
