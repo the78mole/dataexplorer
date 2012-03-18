@@ -32,8 +32,6 @@ import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
 import gde.io.FileHandler;
-import gde.io.LogViewReader;
-import gde.io.NMEAParser;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.dialog.IgcExportDialog;
@@ -44,7 +42,6 @@ import gde.utils.WaitTimer;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -232,46 +229,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		NMEAParser data = new NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), Math.abs(this.getDataBlockSize()), this,
-				this.channels.getActiveChannelNumber(), this.getUTCdelta());
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int progressCycle = 0;
-		byte[] lineBuffer;
-		byte[] subLengthBytes;
-		int subLenght;
-		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-
-		try {
-			int lastLength = 0;
-			for (int i = 0; i < recordDataSize; i++) {
-				subLengthBytes = new byte[4];
-				System.arraycopy(dataBuffer, lastLength, subLengthBytes, 0, 4);
-				subLenght = LogViewReader.parse2Int(subLengthBytes) - 8;
-				//System.out.println((subLenght+8));
-				lineBuffer = new byte[subLenght];
-				System.arraycopy(dataBuffer, 4 + lastLength, lineBuffer, 0, subLenght);
-				String textInput = new String(lineBuffer, "ISO-8859-1"); //$NON-NLS-1$
-				//System.out.println(textInput);
-				StringTokenizer st = new StringTokenizer(textInput);
-				Vector<String> vec = new Vector<String>();
-				while (st.hasMoreTokens())
-					vec.add(st.nextToken("\r\n"));
-				data.parse(vec, vec.size());
-				lastLength += (subLenght + 12);
-
-				recordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms());
-
-				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
-			}
-			this.updateVisibilityStatus(recordSet, true);
-			if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		}
-		catch (Exception e) {
-			String msg = e.getMessage() + Messages.getString(gde.messages.MessageIds.GDE_MSGW0543);
-			HoTTAdapter.log.log(java.util.logging.Level.WARNING, msg, e);
-			this.application.openMessageDialog(msg);
-			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);
-		}
+		//LogView doesn't support HoTT sensor logfiles
 	}
 
 	/**
