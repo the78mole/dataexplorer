@@ -173,6 +173,8 @@
 		<ant antfile="build.xml" target="clean" dir="UltramatUDP" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="HoTTAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="UniLog2" inheritall="true" />
+		<!-- ant antfile="build.xml" target="clean" dir="iCharger" inheritall="true" / -->
+		<ant antfile="build.xml" target="clean" dir="FlightRecorder" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -276,6 +278,8 @@
 		<ant antfile="build.xml" target="package" dir="UltramatUDP" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="HoTTAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="UniLog2" inheritall="true" />
+		<!-- ant antfile="build.xml" target="package" dir="iCharger" inheritall="true" / -->
+		<ant antfile="build.xml" target="package" dir="FlightRecorder" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -296,6 +300,8 @@
 			<include name="UltramatUDP/build/*.jar" />
 			<include name="HoTTAdapter/build/*.jar" />
 			<include name="UniLog2/build/*.jar" />
+			<!-- include name="iCharger/build/*.jar" / -->
+			<include name="FlightRecorder/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
