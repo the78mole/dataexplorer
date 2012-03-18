@@ -18,6 +18,22 @@
 ****************************************************************************************/
 package gde.io;
 
+import gde.GDE;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.IDevice;
+import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
+import gde.exception.DevicePropertiesInconsistenceException;
+import gde.exception.MissMatchDeviceException;
+import gde.exception.NotSupportedFileFormatException;
+import gde.io.NMEAParser.NMEA;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
@@ -29,21 +45,6 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
-
-import gde.GDE;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.device.IDevice;
-import gde.exception.DataInconsitsentException;
-import gde.exception.DataTypeException;
-import gde.exception.DevicePropertiesInconsistenceException;
-import gde.exception.MissMatchDeviceException;
-import gde.exception.NotSupportedFileFormatException;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
 
 /**
  * Class to read and write comma separated value files which simulates serial data 
@@ -84,6 +85,8 @@ public class CSVSerialDataReaderWriter {
 		BufferedReader reader; // to read the data
 		Channel activeChannel = null;
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
+		long inputFileSize = new File(filePath).length();
+		int progressLineLength = Math.abs(device.getDataBlockSize());
 		boolean isOutdated = false;
 		int lineNumber = 0;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
@@ -96,7 +99,10 @@ public class CSVSerialDataReaderWriter {
 				activeChannel = channels.get(channelConfigNumber);
 
 			if (activeChannel != null) {
-				if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
+				if (application.getStatusBar() != null) {
+					application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
+					application.setProgress(0, sThreadId);
+				}
 				activeChannelConfigNumber = activeChannel.getNumber();
 				
 				
@@ -112,9 +118,9 @@ public class CSVSerialDataReaderWriter {
 				//now get all data   $1;1;0; 14780;  598;  1000;  8838;  0002
 				//$recordSetNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
-				int dataBlockSize = Math.abs(device.getDataBlockSize()); // measurements size must not match data block size, there are some measurements which are result of calculation			
+				int dataBlockSize = device.getDataBlockSize(); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
-				if (measurementSize < dataBlockSize)  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] {filePath}));
+				if (measurementSize < Math.abs(dataBlockSize))  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] {filePath}));
 				DataParser data = new DataParser(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize); //$NON-NLS-1$  //$NON-NLS-2$
 
 				DataInputStream binReader    = new DataInputStream(new FileInputStream(new File(filePath)));
@@ -134,6 +140,11 @@ public class CSVSerialDataReaderWriter {
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$			
 				while ((line = reader.readLine()) != null) {
 					++lineNumber;
+					if (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPGGA.name())) {
+						data.parse(line);
+						continue;
+					}
+					
 					data.parse(line);
 
 					if (device.getStateType() == null) 
@@ -193,7 +204,13 @@ public class CSVSerialDataReaderWriter {
 						recordSet.addNoneCalculationRecordsPoints(data.values, data.time_ms);
 					else
 						recordSet.addPoints(data.values, data.time_ms);
+					
+					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
+					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
+					if (application.getStatusBar() != null && progress % 5 == 0) 	application.setProgress(progress, sThreadId);
+
 				}
+				if (application.getStatusBar() != null) 	application.setProgress(100, sThreadId);
 
 				activeChannel.setActiveRecordSet(recordSetName);
 				activeChannel.applyTemplate(recordSetName, true);
@@ -238,7 +255,6 @@ public class CSVSerialDataReaderWriter {
 		}
 		finally {
 			if (application.getStatusBar() != null) {
-				application.setProgress(100, sThreadId);
 				application.setStatusMessage(GDE.STRING_EMPTY);
 			}
 		}
