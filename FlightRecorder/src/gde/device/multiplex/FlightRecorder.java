@@ -467,7 +467,7 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 					if (fd.getFileName().length() > 4) {
 						try {
 							Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-							String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+							String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 							CSVSerialDataReaderWriter.read(selectedImportFile, FlightRecorder.this, recordNameExtend, channelConfigNumber, true);
 						}
 						catch (Throwable e) {
