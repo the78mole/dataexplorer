@@ -77,12 +77,12 @@ public class IGCWriter {
 				int offsetHeight = (int) (startAltitude - device.translateValue(recordAlitude, recordAlitude.get(startIndex) / 1000.0));
 				char fixValidity = offsetHeight == 0 ? 'A' : 'V'; //$NON-NLS-1$ //$NON-NLS-2$
 				long lastTimeStamp = -1, timeStamp;
-				long recordSetStatTimeStamp = recordSet.getStartTimeStamp();
-				log.log(Level.TIME, "start time stamp = " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", recordSetStatTimeStamp));
+				long recordSetStartTimeStamp = recordSet.getStartTimeStamp();
+				log.log(Level.TIME, "start time stamp = " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", recordSetStartTimeStamp));
 				
 				for (int i = startIndex; startIndex >= 0 && i < recordSet.get(ordinalLongitude).realSize(); i++) {
 					// absolute time as recorded, needs to be converted into UTC
-					timeStamp = recordSet.getTime(i) / 10 + recordSetStatTimeStamp;
+					timeStamp = recordSet.getTime(i) / 10 + recordSetStartTimeStamp;
 					if ((timeStamp - lastTimeStamp) >= 950 || lastTimeStamp == -1) {
 						content.append(String.format("B%s%s\r\n", sdf.format(timeStamp), device.translateGPS2IGC(recordSet, i, fixValidity, startAltitude, offsetHeight))); //$NON-NLS-1$
 
