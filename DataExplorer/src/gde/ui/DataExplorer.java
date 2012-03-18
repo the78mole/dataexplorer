@@ -2760,11 +2760,11 @@ public class DataExplorer extends Composite {
 	 * @return the number of the active channel or null
 	 */
 	public Integer getActiveChannelNumber() {
-		Integer activeChannelNumber = null;
-		Channel activeChannnel = this.channels.getActiveChannel();
-		if(activeChannnel != null)
-			activeChannelNumber = activeChannnel.getNumber();
-		
+		Integer activeChannelNumber = 1;
+		if (this.channels != null) {
+			Channel activeChannnel = this.channels.getActiveChannel();
+			if (activeChannnel != null) activeChannelNumber = activeChannnel.getNumber();
+		}
 		return activeChannelNumber;
 	}
 	
