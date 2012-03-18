@@ -755,7 +755,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		while (byteCounter < expectedBytes && !isStable && !isTimedOut) {
 			WaitTimer.delay(sleepTime);
 
-			if (byteCounter == (numBytesAvailable = this.inputStream.available())) {
+			if (byteCounter == (numBytesAvailable = this.inputStream.available()) && byteCounter > 0) {
 				//log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "stableCounter = " + stableCounter + " byteCounter = " + byteCounter); //$NON-NLS-1$ //$NON-NLS-2$
 				--stableCounter;
 			}
