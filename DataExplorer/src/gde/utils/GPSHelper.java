@@ -115,6 +115,8 @@ public class GPSHelper {
 					recordAzimuth.add(0);
 					recordDirection.add(0);
 				}
+				recordTripLength.add(0);
+				recordDistance.add(0);
 
 				int lastLongitude = recordLongitude.get(indexGPS);
 				int startLongitude = recordLongitude.get(indexGPS);
@@ -249,6 +251,7 @@ public class GPSHelper {
 					}
 					recordTripLength.add(0);
 				}
+				recordTripLength.add(0);
 
 				int lastLongitude = recordLongitude.get(indexGPS);
 				int startLongitude = recordLongitude.get(indexGPS);
