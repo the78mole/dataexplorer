@@ -6,6 +6,7 @@ update CSV data parser
 UniLog2 - fix error restart live gathering not possible if stopped while dialog is closed
 HottAdapter2 - fix GPS data detection to enable Google Earth visualization
 HottAdapter(2) - fix Receiver detection and add data error correction 
+HottAdapter(2) - add filter to filter Latitude/Longitude spikes 
 UniLog2 - live data gathering keep already gathered data in case of an error
 add Multiplex FlightRecorder support
 
