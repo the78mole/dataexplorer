@@ -139,6 +139,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final HoTTAdapterDialog			dialog;
 	final HoTTAdapterSerialPort	serialPort;
 
+	static double latitudeTolranceFactor = 100.0;
+	static double longitudeTolranceFactor = 100.0;
+	
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException 
@@ -241,7 +244,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-		int tmpVoltageRx, tmpHeight, tmpClimb3, tmpClimb10, tmpCapacity, tmpVoltage, tmpCellVoltage, tmpVoltage1, tmpVoltage2, tmpLatitudeGrad, tmpLongitudeGrad;
+		int tmpVoltageRx, tmpHeight, tmpClimb3, tmpClimb10, tmpCapacity, tmpVoltage, tmpCellVoltage, tmpVoltage1, tmpVoltage2, tmpLatitude, tmpLongitude;
 
 		switch (this.serialPort.protocolType) {
 		case TYPE_19200_V3:
@@ -398,15 +401,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 				if (dataBuffer.length == 57) {
 					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-					tmpLatitudeGrad = DataParser.parse2Short(dataBuffer, 20);
-					tmpLongitudeGrad = DataParser.parse2Short(dataBuffer, 25);
+					tmpLatitude = DataParser.parse2Short(dataBuffer, 20);
+					tmpLongitude = DataParser.parse2Short(dataBuffer, 25);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 31);
 					tmpClimb3 = dataBuffer[35] & 0xFF;
-					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > 10 && tmpHeight < 5000 && tmpClimb3 > 80) {
+					if ((tmpLatitude == tmpLongitude || tmpLatitude > 0) && tmpHeight > 10 && tmpHeight < 5000 && tmpClimb3 > 80) {
 						points[0] = (dataBuffer[9] & 0xFF) * 1000;
 						points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
 						points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
-						points[2] = tmpLongitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 27);
+						points[2] = tmpLongitude * 10000 + DataParser.parse2Short(dataBuffer, 27);
 						points[2] = dataBuffer[24] == 1 ? -1 * points[2] : points[2];
 						points[3] = tmpHeight * 1000;
 						points[4] = DataParser.parse2Short(dataBuffer, 33) * 1000;
@@ -543,15 +546,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 				if (dataBuffer.length == 34) {
 					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-					tmpLatitudeGrad = DataParser.parse2Short(dataBuffer, 16);
-					tmpLongitudeGrad = DataParser.parse2Short(dataBuffer, 20);
+					tmpLatitude = DataParser.parse2Short(dataBuffer, 16);
+					tmpLongitude = DataParser.parse2Short(dataBuffer, 20);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 14) + 500;
 					tmpClimb3 = dataBuffer[30] + 120;
-					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > 10 && tmpHeight < 5000 && tmpClimb3 > 80) {
+					if ((tmpLatitude == tmpLongitude || tmpLatitude > 0) && tmpHeight > 10 && tmpHeight < 5000 && tmpClimb3 > 80) {
 						points[0] = (dataBuffer[3] & 0xFF) * 1000;
-						points[1] = tmpLatitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 18);
+						points[1] = tmpLatitude * 10000 + DataParser.parse2Short(dataBuffer, 18);
 						points[1] = dataBuffer[26] == 1 ? -1 * points[1] : points[1];
-						points[2] = tmpLongitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 22);
+						points[2] = tmpLongitude * 10000 + DataParser.parse2Short(dataBuffer, 22);
 						points[2] = dataBuffer[27] == 1 ? -1 * points[2] : points[2];
 						points[3] = tmpHeight * 1000;
 						points[4] = (DataParser.parse2Short(dataBuffer, 28) + 30000) * 1000;

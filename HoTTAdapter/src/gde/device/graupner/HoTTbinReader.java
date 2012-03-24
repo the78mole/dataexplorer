@@ -59,6 +59,17 @@ public class HoTTbinReader {
 	static long										timeStep_ms;
 	static int[]									pointsReceiver, pointsGeneral, pointsElectric, pointsVario, pointsGPS;
 	static RecordSet							recordSetReceiver, recordSetGeneral, recordSetElectric, recordSetVario, recordSetGPS;
+	static int tmpHeight = 0;
+	static int tmpClimb3 = 0;
+	static int tmpClimb10 = 0;
+	static int tmpLatitude = 0;
+	static int tmpLatitudeDelta = 0;
+	static double latitudeTolerance = 1;
+	static long lastLatitudeTimeStep = 0;
+	static int tmpLongitude = 0;
+	static int tmpLongitudeDelta = 0;
+	static double longitudeTolerance = 1;
+	static long lastLongitudeTimeStep = 0;
 
 	/**
 	 * get data file info data
@@ -211,6 +222,8 @@ public class HoTTbinReader {
 		String recordSetNameExtend = getRecordSetExtend(file);	
 		Channel channel = null;
 		boolean isInitialSwitched = false;
+		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementFactor(3, 1);
+		HoTTAdapter.longitudeTolranceFactor = device.getMeasurementFactor(3, 2);
 		HoTTbinReader.recordSetReceiver = null; //0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader.recordSetGeneral = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
@@ -577,6 +590,8 @@ public class HoTTbinReader {
 		String recordSetNameExtend = getRecordSetExtend(file);	
 		Channel channel = null;
 		boolean isInitialSwitched = false;
+		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementFactor(3, 1);
+		HoTTAdapter.longitudeTolranceFactor = device.getMeasurementFactor(3, 2);
 		HoTTbinReader.recordSetReceiver = null; //0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader.recordSetGeneral = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
@@ -937,32 +952,32 @@ public class HoTTbinReader {
 			_pointsVario[4] = DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) * 1000;
 			_pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
 			_pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
+
+			_recordSetVario.addPoints(_pointsVario, _timeStep_ms);
 			break;
 		case 4:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			_pointsVario[0] = (_buf0[4] & 0xFF) * 1000;
-			int tmpHeight = DataParser.parse2Short(_buf1, 2);
-			if (tmpHeight > 10 && tmpHeight < 5000) {
+			tmpHeight = DataParser.parse2Short(_buf1, 2);
+			tmpClimb10 = DataParser.parse2UnsignedShort(_buf2, 2);
+			if (tmpHeight > 10 && tmpHeight < 5000 && tmpClimb10 < 40000 && tmpClimb10 > 20000) {
 				_pointsVario[1] = tmpHeight * 1000;
 				//pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
 				//pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
 				_pointsVario[2] = DataParser.parse2UnsignedShort(_buf1, 8) * 1000;
-			}
-			int tmpClimb10 = DataParser.parse2UnsignedShort(_buf2, 2);
-			if (tmpClimb10 < 40000 && tmpClimb10 > 20000) {
 				_pointsVario[3] = DataParser.parse2UnsignedShort(_buf2, 0) * 1000;
 				_pointsVario[4] = tmpClimb10 * 1000;
+				_pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
+				_pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
+
+				_recordSetVario.addPoints(_pointsVario, _timeStep_ms);
 			}
-			_pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
-			_pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
 			break;
 		}
 		//printByteValues(_timeStep_ms, _buf0);
 		//printShortValues(_timeStep_ms, _buf1);
 		//printShortValues(_timeStep_ms, _buf2);
 		//log.log(Level.FINEST, "");
-
-		_recordSetVario.addPoints(_pointsVario, _timeStep_ms);
 		return sdLogVersion;
 	}
 
@@ -991,24 +1006,51 @@ public class HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseAddGPS(RecordSet _recordSetGPS, int[] _pointsGPS, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, long _timeStep_ms) throws DataInconsitsentException {
-		int tmpHeight = DataParser.parse2Short(_buf2, 8);
-		int tmpClimb3 = (_buf3[2] & 0xFF);
+		tmpHeight = DataParser.parse2Short(_buf2, 8);
+		tmpClimb3 = (_buf3[2] & 0xFF);
 		if (tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 			_pointsGPS[0] = (_buf0[4] & 0xFF) * 1000;
-			_pointsGPS[1] = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
-			_pointsGPS[1] = _buf1[6] == 1 ? -1 * _pointsGPS[1] : _pointsGPS[1];
-			_pointsGPS[2] = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
-			_pointsGPS[2] = _buf2[1] == 1 ? -1 * _pointsGPS[2] : _pointsGPS[2];
+			_pointsGPS[6] = DataParser.parse2Short(_buf1, 4) * 1000;
+			
+			tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
+			tmpLatitude = _buf1[6] == 1 ? -1 * tmpLatitude : tmpLatitude;
+			tmpLatitudeDelta = Math.abs(tmpLatitude -_pointsGPS[1]);
+			latitudeTolerance = _pointsGPS[6] / 1000.0  * (_timeStep_ms - lastLatitudeTimeStep) / HoTTAdapter.latitudeTolranceFactor;
+			latitudeTolerance = latitudeTolerance > 0 ? latitudeTolerance : 5;
+
+			if (_pointsGPS[1] == 0 	|| tmpLatitudeDelta <= latitudeTolerance) {
+				lastLatitudeTimeStep = _timeStep_ms;
+				_pointsGPS[1] = tmpLatitude;
+			}
+			else {
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", _timeStep_ms) + " Lat " + tmpLatitude + " - " + tmpLatitudeDelta);
+			}
+			
+			tmpLongitude = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
+			tmpLongitude = _buf2[1] == 1 ? -1 * tmpLongitude : tmpLongitude;
+//			tmpLongitudeDelta = Math.abs(tmpLongitude -_pointsGPS[2]);
+//			longitudeTolerance = _pointsGPS[6] / 1000.0  * (_timeStep_ms - lastLongitudeTimeStep) / HoTTAdapter.longitudeTolranceFactor;
+//			longitudeTolerance = longitudeTolerance > 0 ? longitudeTolerance : 5;
+//
+//			if (_pointsGPS[2] == 0 	|| tmpLongitudeDelta <= longitudeTolerance) {
+//				lastLongitudeTimeStep = _timeStep_ms;
+				_pointsGPS[2] = tmpLongitude;
+//			}
+//			else {
+//				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", _timeStep_ms) + " Long " + tmpLongitude + " - " + tmpLongitudeDelta);
+//			}
+
 			_pointsGPS[3] = tmpHeight * 1000;
 			_pointsGPS[4] = DataParser.parse2UnsignedShort(_buf3, 0) * 1000;
 			_pointsGPS[5] = tmpClimb3 * 1000;
-			_pointsGPS[6] = DataParser.parse2Short(_buf1, 4) * 1000;
 			_pointsGPS[7] = DataParser.parse2Short(_buf2, 6) * 1000;
 			_pointsGPS[8] = (_buf1[3] & 0xFF) * 1000;
 			_pointsGPS[9] = 0;
 			_pointsGPS[10] = (_buf0[1] & 0xFF) * 1000;
 			_pointsGPS[11] = (_buf0[2] & 0xFF) * 1000;
+			
+			_recordSetGPS.addPoints(_pointsGPS, _timeStep_ms);
 		}
 
 		//		if (_buf3[2] < 0) {
@@ -1018,8 +1060,6 @@ public class HoTTbinReader {
 		//printShortValues(timeStep_ms, buf3);
 		//			log.log(Level.FINEST, "");
 		//		}
-
-		_recordSetGPS.addPoints(_pointsGPS, _timeStep_ms);
 	}
 
 	/**
@@ -1036,8 +1076,8 @@ public class HoTTbinReader {
 	 */
 	private static void parseAddGeneral(RecordSet _recordSetGeneral, int[] _pointsGeneral, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4, long _timeStep_ms)
 			throws DataInconsitsentException {
-		int tmpHeight = DataParser.parse2Short(_buf3, 0);
-		int tmpClimb3 = (_buf3[4] & 0xFF);
+		tmpHeight = DataParser.parse2Short(_buf3, 0);
+		tmpClimb3 = (_buf3[4] & 0xFF);
 		int tmpVoltage1 = DataParser.parse2Short(_buf1[9], _buf2[0]);
 		int tmpVoltage2 = DataParser.parse2Short(_buf2, 1);
 		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
@@ -1068,6 +1108,8 @@ public class HoTTbinReader {
 			_pointsGeneral[18] = tmpVoltage2 * 1000;
 			_pointsGeneral[19] = (_buf2[3] & 0xFF) * 1000;
 			_pointsGeneral[20] = (_buf2[4] & 0xFF) * 1000;
+
+			_recordSetGeneral.addPoints(_pointsGeneral, _timeStep_ms);
 		}
 
 		//		if (DataParser.parse2Short(_buf1[9], _buf2[0]) > 200 || DataParser.parse2Short(_buf2[1], _buf2[2]) > 200) {
@@ -1078,8 +1120,6 @@ public class HoTTbinReader {
 		//			printShortValues(timeStep_ms, buf4);
 		//			log.log(Level.FINEST, "");
 		//		}
-
-		_recordSetGeneral.addPoints(_pointsGeneral, _timeStep_ms);
 	}
 
 	/**
@@ -1096,8 +1136,8 @@ public class HoTTbinReader {
 	 */
 	private static void parseAddElectric(RecordSet _recordSetElectric, int[] _pointsElectric, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4, long _timeStep_ms)
 			throws DataInconsitsentException {
-		int tmpHeight = DataParser.parse2Short(_buf3, 3);
-		int tmpClimb3 = (_buf4[3] & 0xFF);
+		tmpHeight = DataParser.parse2Short(_buf3, 3);
+		tmpClimb3 = (_buf4[3] & 0xFF);
 		int tmpVoltage1 = DataParser.parse2Short(_buf2, 7);
 		int tmpVoltage2 = DataParser.parse2Short(_buf2[9], _buf3[0]);
 		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
@@ -1134,9 +1174,9 @@ public class HoTTbinReader {
 			_pointsElectric[24] = tmpVoltage2 * 1000;
 			_pointsElectric[25] = (_buf3[1] & 0xFF) * 1000;
 			_pointsElectric[26] = (_buf3[2] & 0xFF) * 1000;
-		}
 
-		_recordSetElectric.addPoints(_pointsElectric, _timeStep_ms);
+			_recordSetElectric.addPoints(_pointsElectric, _timeStep_ms);
+		}
 	}
 
 	static void printByteValues(long millisec, byte[] buffer) {

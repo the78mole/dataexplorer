@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  * Class to read Graupner HoTT binary data as saved on SD-Cards 
  * @author Winfried Brügmann
  */
-public class HoTTbinReader2 extends HoTTbinReader{
+public class HoTTbinReader2 extends HoTTbinReader {
 	final static Logger						logger											= Logger.getLogger(HoTTbinReader2.class.getName());
 	static int[]									points;
 	static RecordSet							recordSet;
@@ -83,11 +83,13 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		String recordSetNameExtend = getRecordSetExtend(file);	
 		Channel channel = null;
 		int channelNumber = device.getLastChannelNumber();
+		device.getMeasurementFactor(channelNumber, 12);
 		boolean isInitialSwitched = false;
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
 		boolean isSensorDataPart = false;
 		HoTTbinReader2.recordSet = null; 
+		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementFactor(channelNumber, 12);
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -261,8 +263,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 						}
 
 						if (HoTTbinReader2.buf0 != null && HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null && HoTTbinReader2.buf4 != null) {
-							parseElectric(HoTTbinReader2.recordSet, HoTTbinReader2.points, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4,
-									HoTTbinReader2.timeStep_ms);
+							parseElectric(HoTTbinReader2.recordSet, HoTTbinReader2.points, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
 							HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
 							isSensorData = true;	
 						}
@@ -359,6 +360,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		boolean isElectricData = false;
 		boolean isInitialSwitched = false;
 		HoTTbinReader2.recordSet = null; 
+		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementFactor(channelNumber, 12);
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -477,7 +479,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 										//System.out.println("isElectricData i = " + i);
 										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
 									}
-									parseElectric(HoTTbinReader2.recordSet, HoTTbinReader2.pointsElectric, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4,	HoTTbinReader2.timeStep_ms);
+									parseElectric(HoTTbinReader2.recordSet, HoTTbinReader2.pointsElectric, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
 									isElectricData = true;
 									break;
 								}
@@ -641,6 +643,7 @@ public class HoTTbinReader2 extends HoTTbinReader{
 	 * @param isGPSData
 	 * @param isGeneralData
 	 * @param isElectricData
+	 * @param _timeStep_ms
 	 * @throws DataInconsitsentException
 	 */
 	public static void migrateAddPoints(boolean isVarioData, boolean isGPSData, boolean isGeneralData, boolean isElectricData, long _timeStep_ms) throws DataInconsitsentException {
@@ -719,14 +722,14 @@ public class HoTTbinReader2 extends HoTTbinReader{
 		case 4:
 			//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 			//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
-			int tmpHeight = DataParser.parse2Short(_buf1, 2);
+			tmpHeight = DataParser.parse2Short(_buf1, 2);
 			if (tmpHeight > 1 && tmpHeight < 5000) {
 				_points[8] = (tmpHeight - 500) * 1000;
 				//pointsMax = DataParser.parse2Short(buf1, 4) * 1000;
 				//pointsMin = DataParser.parse2Short(buf1, 6) * 1000;
 				_points[9] = (DataParser.parse2UnsignedShort(_buf1, 8) - 30000) * 10;
 			}
-			int tmpClimb10 = DataParser.parse2UnsignedShort(_buf2, 2) - 30000;
+			tmpClimb10 = DataParser.parse2UnsignedShort(_buf2, 2) - 30000;
 			if (tmpClimb10 > -10000 && tmpClimb10 < 10000) {
 				_points[10] = (DataParser.parse2UnsignedShort(_buf2, 0) - 30000) * 10;
 				_points[11] = tmpClimb10 * 10;
@@ -746,16 +749,42 @@ public class HoTTbinReader2 extends HoTTbinReader{
 	 * @param _buf3
 	 */
 	private static void parseGPS(RecordSet _recordSet, int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) {
-		int tmpHeight = DataParser.parse2Short(_buf2, 8) - 500;
-		int tmpClimb3 = (_buf3[2] & 0xFF) - 120;
+		tmpHeight = DataParser.parse2Short(_buf2, 8) - 500;
+		tmpClimb3 = (_buf3[2] & 0xFF) - 120;
 		if (tmpClimb3 > -50 && tmpHeight > -490 && tmpHeight < 5000) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 			//8=Height, 9=Climb 1, 10=Climb 3
 			//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
-			_points[12] = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
-			_points[12] = _buf1[6] == 1 ? -1 * _points[12] : _points[12];
-			_points[13] = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
-			_points[13] = _buf2[1] == 1 ? -1 * _points[13] : _points[13];
+			_points[14] = DataParser.parse2Short(_buf1, 4) * 1000;
+			
+			tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
+			tmpLatitude = _buf1[6] == 1 ? -1 * tmpLatitude : tmpLatitude;
+			tmpLatitudeDelta = Math.abs(tmpLatitude -_points[12]);
+			latitudeTolerance = (_points[14] / 1000.0)  * (HoTTbinReader2.timeStep_ms - lastLatitudeTimeStep) / HoTTAdapter.latitudeTolranceFactor;
+			latitudeTolerance = latitudeTolerance > 0 ? latitudeTolerance : 5;
+
+			if (_points[12] == 0 	|| tmpLatitudeDelta <= latitudeTolerance) {
+				lastLatitudeTimeStep = HoTTbinReader2.timeStep_ms;
+				_points[12] = tmpLatitude;
+			}
+			else {
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", HoTTbinReader2.timeStep_ms) + " Lat " + tmpLatitude + " - " + tmpLatitudeDelta);
+			}
+			
+			tmpLongitude = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
+			tmpLongitude = _buf2[1] == 1 ? -1 * tmpLongitude : tmpLongitude;
+//			tmpLongitudeDelta = Math.abs(tmpLongitude -_points[13]);
+//			longitudeTolerance = (_points[14] / 1000.0)  * (HoTTbinReader2.timeStep_ms - lastLongitudeTimeStep) / HoTTAdapter.longitudeTolranceFactor;
+//			longitudeTolerance = longitudeTolerance > 0 ? longitudeTolerance : 5;
+//
+//			if (_points[13] == 0 	|| tmpLongitudeDelta <= longitudeTolerance) {
+//				lastLongitudeTimeStep = HoTTbinReader2.timeStep_ms;
+				_points[13] = tmpLongitude;
+//			}
+//			else {
+//				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", HoTTbinReader2.timeStep_ms) + " Long " + tmpLongitude + " - " + tmpLongitudeDelta);
+//			}
+
 			_points[8] = tmpHeight * 1000;
 			_points[9] = (DataParser.parse2UnsignedShort(_buf3, 0) - 30000) * 10;
 			_points[10] = tmpClimb3 * 1000;
@@ -777,8 +806,8 @@ public class HoTTbinReader2 extends HoTTbinReader{
 	 * @param _buf4
 	 */
 	private static void parseGeneral(RecordSet _recordSet, int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) {
-		int tmpHeight = DataParser.parse2Short(_buf3, 0) - 500;
-		int tmpClimb3 = (_buf3[4] & 0xFF) - 120;
+		tmpHeight = DataParser.parse2Short(_buf3, 0) - 500;
+		tmpClimb3 = (_buf3[4] & 0xFF) - 120;
 		int tmpVoltage1 = DataParser.parse2Short(_buf1[9], _buf2[0]);
 		int tmpVoltage2 = DataParser.parse2Short(_buf2, 1);
 		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
@@ -821,13 +850,12 @@ public class HoTTbinReader2 extends HoTTbinReader{
 	 * @param _buf2
 	 * @param _buf3
 	 * @param _buf4
-	 * @param _timeStep_ms
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseElectric(RecordSet _recordSet, int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4, long _timeStep_ms)
+	private static void parseElectric(RecordSet _recordSet, int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4)
 			throws DataInconsitsentException {
-		int tmpHeight = DataParser.parse2Short(_buf3, 3) - 500;
-		int tmpClimb3 = (_buf4[3] & 0xFF) - 120;
+		tmpHeight = DataParser.parse2Short(_buf3, 3) - 500;
+		tmpClimb3 = (_buf4[3] & 0xFF) - 120;
 		int tmpVoltage1 = DataParser.parse2Short(_buf2, 7);
 		int tmpVoltage2 = DataParser.parse2Short(_buf2[9], _buf3[0]);
 		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
