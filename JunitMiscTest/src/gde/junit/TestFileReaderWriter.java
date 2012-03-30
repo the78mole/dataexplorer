@@ -432,12 +432,12 @@ public class TestFileReaderWriter extends TestSuperClass {
 							String absolutFilePath = tmpDir2 + file.getName();
 							absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_abs.csv";
 							System.out.println("writing as   : " + absolutFilePath);
-							CSVReaderWriter.write(';', activeChannel.getActiveRecordSet().getName(), absolutFilePath, false);
+							CSVReaderWriter.write(';', activeChannel.getActiveRecordSet() != null ? activeChannel.getActiveRecordSet().getName() : "DummyRecord", absolutFilePath, false);
 
 							absolutFilePath = tmpDir2 + file.getName();
 							absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_raw.csv";
 							System.out.println("writing as   : " + absolutFilePath);
-							CSVReaderWriter.write(';', activeChannel.getActiveRecordSet().getName(), absolutFilePath, true);
+							CSVReaderWriter.write(';', activeChannel.getActiveRecordSet() != null ? activeChannel.getActiveRecordSet().getName() : "DummyRecord", absolutFilePath, true);
 						}
 					}
 					catch (Exception e) {
