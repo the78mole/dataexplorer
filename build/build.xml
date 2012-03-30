@@ -175,6 +175,7 @@
 		<ant antfile="build.xml" target="clean" dir="UniLog2" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="iCharger" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="FlightRecorder" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="JLog2" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -280,6 +281,7 @@
 		<ant antfile="build.xml" target="package" dir="UniLog2" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="iCharger" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="FlightRecorder" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="JLog2" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -302,6 +304,7 @@
 			<include name="UniLog2/build/*.jar" />
 			<include name="iCharger/build/*.jar" />
 			<include name="FlightRecorder/build/*.jar" />
+			<include name="JLog2/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>

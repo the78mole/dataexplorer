@@ -9,6 +9,7 @@ HottAdapter(2) - fix Receiver detection and add data error correction
 HottAdapter(2) - add filter to filter Latitude/Longitude spikes 
 UniLog2 - live data gathering keep already gathered data in case of an error
 add Multiplex FlightRecorder support
+add SM Modellbau JLog2 support (import, configure)
 
 
 Version 2.96 - 24 Feb 2012
