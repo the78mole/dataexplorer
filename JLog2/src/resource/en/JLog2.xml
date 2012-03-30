@@ -93,14 +93,14 @@
                 <symbol>msec</symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Revolution Uni</name>
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="10.0" name="factor"/>
                 <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -109,7 +109,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -117,7 +117,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Temperature PA</name>
@@ -139,14 +139,14 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Power intern</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
                 <property type="Integer" value="12" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -193,10 +193,10 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>ALARM: Temp ext 1</name>
+                <name>ALARM:Temp_ext 1</name>
                 <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
@@ -204,58 +204,50 @@
                 <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>ALARM: Temp ext 2</name>
+                <name>ALARM:Temp_ext 2</name>
                 <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
-                <property type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ALARM: Temp ext 3</name>
+                <name>ALARM:Temp_ext 3</name>
                 <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
-                <property type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ALARM: Temp ext 4</name>
+                <name>ALARM:Temp_ext 4</name>
                 <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
-                <property type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ALARM: Temp ext 5</name>
+                <name>ALARM:Temp_ext 5</name>
                 <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
-                <property type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Temperature ext 1</name>
+                <name>Temperature_ext 1</name>
                 <symbol>T</symbol>
                 <unit>C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Temperature ext 2</name>
-                <symbol>T</symbol>
-                <unit>C</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
-            </Measurement>
-            <Measurement>
-                <name>Temperature ext 3</name>
+                <name>Temperature_ext 2</name>
                 <symbol>T</symbol>
                 <unit>C</unit>
                 <active>true</active>
@@ -263,7 +255,7 @@
                 <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Temperature ext 4</name>
+                <name>Temperature_ext 3</name>
                 <symbol>T</symbol>
                 <unit>C</unit>
                 <active>true</active>
@@ -271,7 +263,15 @@
                 <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Temperature ext 5</name>
+                <name>Temperature_ext 4</name>
+                <symbol>T</symbol>
+                <unit>C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature_ext 5</name>
                 <symbol>T</symbol>
                 <unit>C</unit>
                 <active>true</active>
@@ -283,7 +283,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
                 <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -293,7 +293,7 @@
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
-                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="33" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Altitude GPS</name>
