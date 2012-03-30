@@ -108,7 +108,7 @@ public class JLog2Dialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(675, 30 + 25 + 25 + (this.measurementsCount+1)/2 * 26 + 50 + 45); //header + tab + label + this.measurementsCount * 26 + buttons
+				this.dialogShell.setSize(GDE.IS_LINUX ? 740 : 675, 30 + 25 + 25 + (this.measurementsCount+1)/2 * 26 + 50 + 45); //header + tab + label + this.measurementsCount * 26 + buttons
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
