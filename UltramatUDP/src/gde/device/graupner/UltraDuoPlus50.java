@@ -72,7 +72,7 @@ public class UltraDuoPlus50 extends Ultramat {
 				Messages.getString(MessageIds.GDE_MSGT2236), Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
-		this.dialog = null; //there is a setup interface, but without checksums in communication strings, temorary disabled
+		this.dialog = null; //there is a setup interface, but without checksums in communication strings, temporary disabled
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class UltraDuoPlus50 extends Ultramat {
 				Messages.getString(MessageIds.GDE_MSGT2236), Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
-		this.dialog = null; //there is a setup interface, but without checksums in communication strings, temorary disabled
+		this.dialog = null; //there is a setup interface, but without checksums in communication strings, temporary disabled
 	}
 
 	/**
