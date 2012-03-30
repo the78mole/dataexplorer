@@ -105,7 +105,9 @@ public class GDE {
 
 	public final static int				SIZE_BYTES_INTEGER							= Integer.SIZE / 8;																																																					// 32 bits / 8 bits per byte 
 	public final static int				SIZE_BYTES_LONG									= Long.SIZE / 8;																																																							// 64 bits / 8 bits per byte 
-	public final static int				SIZE_UTF_SIGNATURE							= 2;																																																													// 2 byte UTF line header 
+	public final static int				SIZE_UTF_SIGNATURE							= 2;																																																													// 2 byte UTF line header
+	public final static long			ONE_HOUR_MS											= 1 * 60 * 60 * 1000;
+
 
 	public final static String		STRING_NEW_LINE									= "\n";																																																											// is OS dependent //$NON-NLS-1$
 	public final static String		STRING_RETURN										= "\r";																																																											// is OS dependent //$NON-NLS-1$

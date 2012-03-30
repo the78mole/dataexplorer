@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.io;
 
+import gde.GDE;
 import gde.device.CheckSumTypes;
 import gde.device.FormatTypes;
 import gde.exception.DevicePropertiesInconsistenceException;
@@ -125,10 +126,10 @@ public class DataParser extends NMEAParser {
 		strValue = strValues[1].trim();
 		this.state = Integer.parseInt(strValue);
 
-		strValue = strValues[2].trim();
+		strValue = strValues[2].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT);
 		strValue = strValue.length() > 0 ? strValue : "0";
-		if (start_time_ms == Integer.MIN_VALUE)	start_time_ms = Integer.parseInt(strValue) * this.timeFactor; // Seconds * 1000 = msec
-		else																					time_ms = Integer.parseInt(strValue) * this.timeFactor - start_time_ms; // Seconds * 1000 = msec
+		if (start_time_ms == Integer.MIN_VALUE)	start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
+		else																					time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - start_time_ms; // Seconds * 1000 = msec
 		
 		for (int i = 0; i < this.valueSize; i++) { 
 			strValue = strValues[i+3].trim();

@@ -58,7 +58,37 @@ public class LogViewReader {
 
 	final static DataExplorer		application	= DataExplorer.getInstance();
 	final static Channels 								channels 		= Channels.getInstance();
-	final static HashMap<String, String> 	deviceMap		=	new HashMap<String, String>();
+	private static class LogViewDeviceMap extends HashMap<String, String> {
+		private static final long	serialVersionUID	= 1L;
+
+		public boolean containsKey(String key) {
+			String openFormat = "openformat"; 
+			String jlog2 = "jlog2";
+			if (key.startsWith(openFormat)) {
+				if (key.contains(jlog2)) {
+					for (String tmpKey : this.keySet()) {
+						if (tmpKey.startsWith(openFormat) && tmpKey.contains("jlog2")) 
+							return super.containsKey(openFormat + "\\" + jlog2);			
+					}
+				}
+			}
+			return super.containsKey(key);
+		}
+		 public String get(String key) {
+				String openFormat = "openformat"; 
+				String jlog2 = "jlog2";
+				if (key.startsWith(openFormat)) {
+					if (key.contains(jlog2)) {
+						for (String tmpKey : this.keySet()) {
+							if (tmpKey.startsWith(openFormat) && tmpKey.contains("jlog2")) 
+								return super.get(openFormat + "\\" + jlog2);			
+						}
+					}
+				}
+				return super.get(key);
+			}
+	}
+	final static LogViewDeviceMap 	deviceMap		=	new LogViewDeviceMap();
 	final static HashMap<String, String> 	lov2osdMap	=	new HashMap<String, String>();
 	
 	// fill device Map with 
@@ -79,6 +109,7 @@ public class LogViewReader {
 		deviceMap.put("unilog", "UniLog"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("sm unilog", "UniLog"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("sm unilog 2", "UniLog2"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("sm jlog2", "JLog2"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("lipowatch", "LiPoWatch"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("sm lipowatch", "LiPoWatch"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("sm gps logger", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -98,6 +129,7 @@ public class LogViewReader {
 		deviceMap.put("junsi icharger 208b", "iCharger208B"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("junsi icharger 306b", "iCharger306B"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("junsi icharger 3010b", "iCharger3010B"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("openformat\\jlog2", "JLog2"); //$NON-NLS-1$ //$NON-NLS-2$
 		// add more supported devices here, key in lower case
 	}
 
@@ -1469,7 +1501,7 @@ public class LogViewReader {
 			header.put(GDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new Integer(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue();
+		int channelNumber = new String(buffer).contains(GDE.STRING_EQUAL) ? new Integer(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue() : 1;
 		log.log(Level.FINE, GDE.CHANNEL_CONFIG_NUMBER + channelNumber);		
 		header.put(GDE.CHANNEL_CONFIG_NUMBER, GDE.STRING_EMPTY+channelNumber);
 				

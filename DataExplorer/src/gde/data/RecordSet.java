@@ -474,7 +474,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public synchronized void addNoneCalculationRecordsPoints(int[] points) throws DataInconsitsentException {
 		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
-		if (points.length == this.getNoneCalculationRecordNames().length) {
+		if (points.length <= this.getNoneCalculationRecordNames().length) {
 			for (int i = 0; i < points.length; i++) {
 				this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
 			}
@@ -1763,11 +1763,11 @@ public class RecordSet extends HashMap<String, Record> {
 					this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
 				}
 				if (!isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
-					if ((i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
+					if (Math.abs(i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
 						this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
 					else
 						//sort while add
-						this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add((i - syncMasterRecordOrdinal), tmpRecord);
+						this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(Math.abs(i - syncMasterRecordOrdinal), tmpRecord);
 
 					this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
 					this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);

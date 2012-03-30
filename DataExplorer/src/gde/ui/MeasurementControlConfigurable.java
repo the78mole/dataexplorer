@@ -56,7 +56,7 @@ public class MeasurementControlConfigurable extends Composite {
 	Composite							measurementComposite;
 	Button								measurement;
 	Text									measurementName;
-	CLabel								measurementUnit;
+	Text									measurementUnit;
 	Text									measurementSymbol;
 	Button								measurementSynch;
 	Button								inputFileButton;
@@ -172,13 +172,20 @@ public class MeasurementControlConfigurable extends Composite {
 			});
 		}
 		{
-			this.measurementUnit = new CLabel(this, SWT.CENTER);
+			this.measurementUnit = new Text(this, SWT.CENTER | SWT.BORDER);
 			RowData measurementUnitLabelLData = new RowData();
 			measurementUnitLabelLData.width = 35;
-			measurementUnitLabelLData.height = 20;
+			measurementUnitLabelLData.height = GDE.IS_MAC ? 16 : 12;
 			this.measurementUnit.setLayoutData(measurementUnitLabelLData);
 			this.measurementUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE - 1, SWT.NORMAL));
 			this.measurementUnit.setText(GDE.STRING_LEFT_BRACKET + this.measurementType.getUnit() + GDE.STRING_RIGHT_BRACKET);
+			this.measurementUnit.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyReleased(KeyEvent evt) {
+					MeasurementControlConfigurable.this.measurementType.setUnit(MeasurementControlConfigurable.this.measurementUnit.getText());
+					MeasurementControlConfigurable.this.dialog.enableSaveButton(true);
+				}
+			});
 		}
 		{
 			Composite spacer = new Composite(this, SWT.NONE);
