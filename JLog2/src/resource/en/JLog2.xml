@@ -36,7 +36,7 @@
         <property description="" type="Integer" value="01" name="Record"/>
     </State>
     <Channels lastUseOrdinal="0">
-        <Channel type="TYPE_CONFIG" name="Konfig_1">
+        <Channel type="TYPE_CONFIG" name="Config_1">
 			<Measurement>
 				<name>Voltage BEC</name>
 				<symbol>U</symbol>
