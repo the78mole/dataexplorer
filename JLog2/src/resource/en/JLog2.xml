@@ -67,7 +67,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics sumTriggerTimeText="Motorlaufzeit" sigma="true" avg="true" max="true" min="true">
+                <statistics sumTriggerTimeText="Motor runtime" sigma="true" avg="true" max="true" min="true">
                     <trigger comment="Trigger 2 A &gt; 10 sec" minTimeSec="10" isGreater="true" level="2500"/>
                 </statistics>
                 <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
@@ -93,14 +93,14 @@
                 <symbol>msec</symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Revolution Uni</name>
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="10.0" name="factor"/>
                 <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -109,7 +109,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -117,7 +117,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Temperature PA</name>
@@ -139,14 +139,14 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Power intern</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
                 <property type="Integer" value="12" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -193,7 +193,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>ALARM:Temp_ext 1</name>
@@ -283,7 +283,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
                 <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
