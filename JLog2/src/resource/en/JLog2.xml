@@ -5,7 +5,7 @@
         <manufacturer>SM-Modellbau</manufacturer>
         <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
-        <image>JLog2.jpg</image>
+        <image>JLog2.png</image>
         <usage>false</usage>
     </Device>
     <SerialPort>
@@ -21,185 +21,334 @@
     <TimeBase>
         <name>Time</name>
         <symbol>t</symbol>
-        <unit>sec</unit>
-        <timeStep>-1.0</timeStep>
+        <unit>msec</unit>
+        <timeStep>50.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="42" type="TEXT"/>
+        <format size="-40" type="TEXT"/>
         <timeUnit>sec</timeUnit>
-        <separator>comma</separator>
+        <separator>semicolon</separator>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredFileExtention>*.csv</preferredFileExtention>
+        <preferredFileExtention>*.txt</preferredFileExtention>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="Flugaufzeichnung"/>
+        <property description="" type="Integer" value="01" name="Record"/>
     </State>
     <Channels lastUseOrdinal="0">
-        <Channel type="TYPE_CONFIG" name="Config_1">
+        <Channel type="TYPE_CONFIG" name="Konfig_1">
 			<Measurement>
-				<name>Latitude</name>
-				<symbol>B</symbol>
-				<unit>°</unit>
+				<name>Voltage BEC</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
 				<active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 			</Measurement>
 			<Measurement>
-				<name>Longitude</name>
-				<symbol>L</symbol>
-				<unit>°</unit>
+				<name>Current BEC</name>
+				<symbol>I</symbol>
+				<unit>A</unit>
 				<active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
 			</Measurement>
 			<Measurement>
-				<name>Altitude (GPS)</name>
-				<symbol>h</symbol>
-				<unit>m</unit>
+				<name>Voltage</name>
+				<symbol>U</symbol>
+				<unit>V</unit>
 				<active>true</active>
-				<statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 			</Measurement>
-	        <Measurement>
-	            <name>Satellites</name>
-	            <symbol></symbol>
-	            <unit></unit>
-	            <active>true</active>
-	            <statistics sigma="false" avg="true" max="true" min="true"/>
-	        </Measurement>
             <Measurement>
-                <name>?</name>
+                <name>Current</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sumTriggerTimeText="Motorlaufzeit" sigma="true" avg="true" max="true" min="true">
+                    <trigger comment="Trigger 2 A &gt; 10 sec" minTimeSec="10" isGreater="true" level="2500"/>
+                </statistics>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Current intern</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+                <property type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Throttle</name>
+                <symbol>Th</symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Puls Width</name>
+                <symbol>msec</symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution Uni</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="10.0" name="factor"/>
+                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Capacity</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature PA</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature BEC</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="10" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Power</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Power intern</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="12" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Current BEC max</name>
+                <symbol>Imax</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+                <property type="Integer" value="1" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Current Motor max</name>
+                <symbol>Imax</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+                <property type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM: Capacity</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM: Voltage</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM: Temp PA</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM: Voltage BEC drop</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM: Temp ext 1</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM: Temp ext 2</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
+                <property type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM: Temp ext 3</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
+                <property type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM: Temp ext 4</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
+                <property type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>ALARM: Temp ext 5</name>
+                <symbol>T</symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="1.0" name="factor"/>
+                <property type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature ext 1</name>
+                <symbol>T</symbol>
+                <unit>C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature ext 2</name>
+                <symbol>T</symbol>
+                <unit>C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature ext 3</name>
+                <symbol>T</symbol>
+                <unit>C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature ext 4</name>
+                <symbol>T</symbol>
+                <unit>C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature ext 5</name>
+                <symbol>T</symbol>
+                <unit>C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution ext</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Speed GPS</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+                <property type="Integer" value="34" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Altitude GPS</name>
+                <symbol>h</symbol>
+                <unit>m</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Speed</name>
+                <symbol>v</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>BID:Cell type</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
+                <name>BID:Cell nummer</name>
+                <symbol>n</symbol>
+                <unit>#</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
+                <name>BID:Capacity</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
+                <name>BID:Charge</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
+                <name>BID:Discahrge</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
-                <name>?</name>
-                <symbol></symbol>
-                <unit></unit>
+                <name>BID:MaxDisch</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
