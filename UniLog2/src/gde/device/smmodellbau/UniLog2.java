@@ -26,6 +26,7 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
@@ -163,7 +164,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
-		NMEAParser data = new NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), Math.abs(this.getDataBlockSize()), this,
+		NMEAParser data = new NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)), this,
 				this.channels.getActiveChannelNumber(), this.getUTCdelta());
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
