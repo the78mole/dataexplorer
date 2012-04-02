@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V15.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V16.xsd">
     <Device>
         <name>UniLog</name>
         <manufacturer>SM-Modellbau</manufacturer>
@@ -25,7 +25,7 @@
         <timeStep>-1</timeStep>
     </TimeBase>
     <DataBlock>
-        <format type="BINARY" size="24"/>
+        <format inputType="SERIAL_IO" formatType="BYTE" size="24"/>
 		<checkSum type="XOR" format="BINARY"/>
 	</DataBlock>
 	<Channels>
