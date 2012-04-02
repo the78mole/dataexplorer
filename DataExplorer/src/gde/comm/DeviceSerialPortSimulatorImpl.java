@@ -21,6 +21,7 @@ package gde.comm;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.FailedQueryException;
 import gde.exception.SerialPortException;
@@ -175,7 +176,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		if (this.isConnected) {
 			if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
 				if (data_in.read(readBuffer) > 0) {
-					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize());
+					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
 					if (data_in.read(new byte[size2Read]) != size2Read) {
 						log.log(Level.WARNING, "expected byte size to  read does not macht really red size of bytes !");
 					}
@@ -377,7 +378,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		if (this.isConnected) {
 			if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
 				if (data_in.read(readBuffer) > 0) {
-					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize());
+					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize(InputTypes.FILE_IO));
 					if (data_in.read(new byte[size2Read]) != size2Read) {
 						log.log(Level.WARNING, "expected byte size to  read does not macht really red size of bytes !");
 					}

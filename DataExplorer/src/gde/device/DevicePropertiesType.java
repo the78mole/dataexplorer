@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
  *                   &lt;element name="Channel" type="{}ChannelType" maxOccurs="unbounded"/>
+ *                   &lt;element name="property" type="{}PropertyType" maxOccurs="unbounded" minOccurs="0"/>
  *                 &lt;/sequence>
  *                 &lt;attribute name="lastUseOrdinal" type="{http://www.w3.org/2001/XMLSchema}integer" />
  *               &lt;/restriction>
@@ -260,6 +261,7 @@ public class DevicePropertiesType {
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
      *         &lt;element name="Channel" type="{}ChannelType" maxOccurs="unbounded"/>
+     *         &lt;element name="property" type="{}PropertyType" maxOccurs="unbounded" minOccurs="0"/>
      *       &lt;/sequence>
      *       &lt;attribute name="lastUseOrdinal" type="{http://www.w3.org/2001/XMLSchema}integer" />
      *     &lt;/restriction>
@@ -271,12 +273,14 @@ public class DevicePropertiesType {
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "channel"
+        "channel",
+        "property"
     })
     public static class Channels {
 
         @XmlElement(name = "Channel", required = true)
         protected List<ChannelType> channel;
+        protected List<ChannelPropertyType> property;
         @XmlAttribute
         protected Integer lastUseOrdinal;
 
@@ -307,6 +311,35 @@ public class DevicePropertiesType {
                 channel = new ArrayList<ChannelType>();
             }
             return this.channel;
+        }
+
+        /**
+         * Gets the value of the property property.
+         * 
+         * <p>
+         * This accessor method returns a reference to the live list,
+         * not a snapshot. Therefore any modification you make to the
+         * returned list will be present inside the JAXB object.
+         * This is why there is not a <CODE>set</CODE> method for the property property.
+         * 
+         * <p>
+         * For example, to add a new item, do as follows:
+         * <pre>
+         *    getProperty().add(newItem);
+         * </pre>
+         * 
+         * 
+         * <p>
+         * Objects of the following type(s) are allowed in the list
+         * {@link PropertyType }
+         * 
+         * 
+         */
+        public List<ChannelPropertyType> getProperty() {
+            if (property == null) {
+                property = new ArrayList<ChannelPropertyType>();
+            }
+            return this.property;
         }
 
         /**

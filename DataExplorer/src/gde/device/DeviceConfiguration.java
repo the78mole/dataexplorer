@@ -761,34 +761,121 @@ public class DeviceConfiguration {
 		this.dataBlock = this.deviceProps.dataBlock = new DataBlockType();
 	}
 	
-	public int getDataBlockSize() {
-		return this.dataBlock != null && this.dataBlock.getFormat() != null ? this.dataBlock.getFormat().getSize() : -1;
+	/**
+	 * there are two data block format input types, 
+	 * - FILE_IO, where the data comes in most cases in character form
+	 * - SERIAL_IO, where the data are received through serial connection in bytes
+	 * @param inputType the input type to query the input size
+	 * @return
+	 */
+	public int getDataBlockSize(InputTypes inputType) {
+		int dataBlockSize = -1;
+		for (DataBlockType.Format format : this.dataBlock.getFormat()) {
+			if (format.getInputType() == inputType)
+				dataBlockSize = format.getSize();
+		}
+		return dataBlockSize;
+	}
+	
+	/**
+	 * there are two data block format types, 
+	 * - VALUE, where the data comes in most cases in character form with file I/O and defines the number of values, example CSV file input
+	 * - BYTE, where the data are received through serial connection in bytes
+	 * @param formatType the format to query the input size
+	 * @return
+	 */
+	public int getDataBlockSize(FormatTypes formatType) {
+		int dataBlockSize = -1;
+		for (DataBlockType.Format format : this.dataBlock.getFormat()) {
+			if (format.getType() == formatType)
+				dataBlockSize = format.getSize();
+		}
+		return dataBlockSize;
 	}
 
-	public void setDataBlockSize(Integer newSize) {
+	/**
+	 * set the size of a data block of given format type and input type
+	 * @param useInputType
+	 * @param useFormat
+	 * @param newSize
+	 */
+	public void setDataBlockSize(InputTypes useInputType, FormatTypes useFormat, Integer newSize) {
 		this.isChangePropery = true;
 		if (this.dataBlock == null) {
 			this.dataBlock = this.deviceProps.dataBlock = new DataBlockType();
-			if (this.dataBlock.getFormat() == null) {
-				this.dataBlock.format = new DataBlockType.Format();
+			DataBlockType.Format format = new DataBlockType.Format();
+			format.setFormatType(useFormat);
+			format.setInputType(useInputType);
+			format.setSize(newSize);
+			this.dataBlock.getFormat().add(format);
+		}
+		else {
+			boolean isSizeSet = false;
+			for (DataBlockType.Format format : this.dataBlock.getFormat()) {
+				if (!isSizeSet && format.getType() == useFormat) {
+					format.setInputType(useInputType);
+					format.setSize(newSize);
+					isSizeSet = true;
+					break;
+				}
+			}
+			if (!isSizeSet && this.dataBlock.getFormat().size() == 1) {
+				DataBlockType.Format format = new DataBlockType.Format();
+				format.setFormatType(useFormat);
+				format.setInputType(useInputType);
+				format.setSize(newSize);
+				this.dataBlock.getFormat().add(format);
 			}
 		}
-		this.dataBlock.getFormat().setSize(newSize);
 	}
 	
-	public FormatTypes getDataBlockFormat() {
-		return this.dataBlock != null ? this.dataBlock.getFormat().getType() : FormatTypes.BINARY;
+	/**
+	 * query the FormatTypes type according to the input format type
+	 * @param inputType
+	 * @return
+	 */
+	public FormatTypes getDataBlockFormat(InputTypes inputType) {
+		FormatTypes dataBlockformat = inputType == InputTypes.FILE_IO ? FormatTypes.VALUE : inputType == InputTypes.SERIAL_IO ? FormatTypes.BYTE : FormatTypes.BINARY;
+		for (DataBlockType.Format format : this.dataBlock.getFormat()) {
+			if (format.getInputType() == inputType)
+				dataBlockformat = format.getType();
+		}
+		return dataBlockformat;
 	}
 	
-	public void setDataBlockFormat(FormatTypes value) {
+	/**
+	 * set the data block format specifying input type and format type
+	 * @param inputType
+	 * @param value
+	 */
+	public void setDataBlockFormat(InputTypes inputType, FormatTypes value) {
 		this.isChangePropery = true;
 		if (this.dataBlock == null) {
-			this.dataBlock = this.deviceProps.dataBlock = new ObjectFactory().createDataBlockType();
-			if (this.dataBlock.getFormat() == null) {
-				this.dataBlock.format = new DataBlockType.Format();
+			this.dataBlock = this.deviceProps.dataBlock = new DataBlockType();
+			DataBlockType.Format format = new DataBlockType.Format();
+			format.setFormatType(value);
+			format.setInputType(inputType);
+			format.setSize(-1);
+			this.dataBlock.getFormat().add(format);
+		}
+		else {
+			boolean isSizeSet = false;
+			for (DataBlockType.Format format : this.dataBlock.getFormat()) {
+				if (!isSizeSet && format.getType() == value) {
+					format.setInputType(inputType);
+					format.setSize(-1);
+					isSizeSet = true;
+					break;
+				}
+			}
+			if (!isSizeSet && this.dataBlock.getFormat().size() == 1) {
+				DataBlockType.Format format = new DataBlockType.Format();
+				format.setFormatType(value);
+				format.setInputType(inputType);
+				format.setSize(-1);
+				this.dataBlock.getFormat().add(format);
 			}
 		}
-		this.dataBlock.getFormat().setType(value);
 	}
 
 	public boolean isDataBlockCheckSumDefined() {

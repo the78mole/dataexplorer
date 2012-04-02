@@ -62,8 +62,8 @@ public class DataParser extends NMEAParser {
 	public DataParser(int useTimeFactor, String useLeaderChar, String useSeparator, CheckSumTypes useCheckSumType, int useDataSize) {
 		super(useLeaderChar, useSeparator, useCheckSumType, useDataSize, DataExplorer.getInstance().getActiveDevice(), DataExplorer.getInstance().getActiveChannelNumber(), (short) 0);
 		this.timeFactor = useTimeFactor;
-		this.checkSumFormatType = FormatTypes.TEXT; //checksum is build using contained values
-		this.dataFormatType = FormatTypes.TEXT; //dataBlockSize specifies the number of contained values
+		this.checkSumFormatType = FormatTypes.VALUE; //checksum is build using contained values
+		this.dataFormatType = FormatTypes.VALUE; //dataBlockSize specifies the number of contained values
 		this.isMultiply1000 = true;
 	}
 	
@@ -94,7 +94,7 @@ public class DataParser extends NMEAParser {
 			try {
 				Integer.parseInt(strValues[0].substring(1).trim());
 				this.valueSize = this.dataFormatType != null && this.dataFormatType == FormatTypes.BINARY ? strValues.length-4 
-						: this.dataFormatType != null && this.dataFormatType == FormatTypes.TEXT &&  this.dataBlockSize > 0 ? Math.abs(this.dataBlockSize) : strValues.length-4;
+						: this.dataFormatType != null && this.dataFormatType == FormatTypes.VALUE &&  this.dataBlockSize > 0 ? Math.abs(this.dataBlockSize) : strValues.length-4;
 				this.values = new int[this.valueSize];
 				log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
 				if (strValues.length-4 != this.valueSize)  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0048, new String[] {inputLine}));
@@ -171,7 +171,7 @@ public class DataParser extends NMEAParser {
 			switch (checkSumType) {
 			case ADD:
 				switch (checkSumFormatType) {
-				case TEXT:
+				case VALUE:
 					isValid = tmpCheckSum == Checksum.ADD(this.values, 0, this.valueSize);
 					break;
 				case BINARY:
@@ -182,7 +182,7 @@ public class DataParser extends NMEAParser {
 				break;
 			case XOR:
 				switch (checkSumFormatType) {
-				case TEXT:
+				case VALUE:
 					isValid = tmpCheckSum == Checksum.XOR(this.values, 0, this.valueSize);
 					break;
 				case BINARY:
@@ -193,7 +193,7 @@ public class DataParser extends NMEAParser {
 				break;
 			case OR:
 				switch (checkSumFormatType) {
-				case TEXT:
+				case VALUE:
 					isValid = tmpCheckSum == Checksum.OR(this.values, 0, this.valueSize);
 					break;
 				case BINARY:
@@ -204,7 +204,7 @@ public class DataParser extends NMEAParser {
 				break;
 			case AND:
 				switch (checkSumFormatType) {
-				case TEXT:
+				case VALUE:
 					isValid = tmpCheckSum == Checksum.AND(this.values, 0, this.valueSize);
 					break;
 				case BINARY:

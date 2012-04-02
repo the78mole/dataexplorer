@@ -23,6 +23,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.DevicePropertiesInconsistenceException;
@@ -109,7 +110,7 @@ public class NMEAReaderWriter {
 				}
 				String recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
-				int dataBlockSize = Math.abs(device.getDataBlockSize()); // measurements size must not match data block size, there are some measurements which are result of calculation			
+				int dataBlockSize = Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize < dataBlockSize) {
 					dataBlockSize = measurementSize;

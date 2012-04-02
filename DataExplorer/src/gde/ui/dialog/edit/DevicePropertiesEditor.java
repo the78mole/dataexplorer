@@ -22,11 +22,13 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.device.CheckSumTypes;
 import gde.device.CommaSeparatorTypes;
+import gde.device.DataBlockType;
 import gde.device.DataTypes;
 import gde.device.DesktopPropertyTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.DeviceTypes;
 import gde.device.FormatTypes;
+import gde.device.InputTypes;
 import gde.device.LineEndingTypes;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.ObjectFactory;
@@ -140,14 +142,18 @@ public class DevicePropertiesEditor extends Composite {
 	CTabItem															dataBlockTabItem;
 	Composite															dataBlockComposite;
 	Label																	dataBlockDescriptionLabel;
-	Label																	dataBlockFormatLabel, dataBlockSizeLabel, dataBlockSeparatorLabel, dataBlockTimeUnitLabel, dataBlockLeaderLabel, dataBlockEndingLabel, dataBlockCheckSumTypeLabel;
+	Label																	dataBlockInputLabel, dataBlockFormatLabel, dataBlockSizeLabel, dataBlockSeparatorLabel, dataBlockTimeUnitLabel, dataBlockLeaderLabel, dataBlockEndingLabel, dataBlockCheckSumTypeLabel;
 	Button																dataBlockCheckSumFormatButton, preferredDataLocationButton, preferredFileExtensionButton;
-	CCombo																dataBlockEndingCombo, dataBlockFormatCombo, dataBlockTimeUnitCombo, dataBlockcheckSumFormatCombo, dataBlockCheckSumTypeCombo, dataBlockSeparatorCombo;
-	Text																	dataBlockSizeText, dataBlockLeaderText, preferredDataLocationText, preferredFileExtensionText;
+	CCombo																dataBlockEndingCombo, dataBlockInputCombo1, dataBlockFormatCombo1, dataBlockInputCombo2, dataBlockFormatCombo2, dataBlockTimeUnitCombo, dataBlockcheckSumFormatCombo, dataBlockCheckSumTypeCombo, dataBlockSeparatorCombo;
+	Text																	dataBlockSizeText1, dataBlockSizeText2, dataBlockLeaderText, preferredDataLocationText, preferredFileExtensionText;
 	Group																	dataBlockRequiredGroup, dataBlockOptionalGroup;
 
-	FormatTypes														dataBlockFormat													= FormatTypes.BINARY, dataBlockcheckSumFormat = FormatTypes.BINARY;
-	int																		dataBlockSize														= 30;
+	FormatTypes														dataBlockFormatType1										= FormatTypes.BYTE, dataBlockcheckSumFormat = FormatTypes.BINARY;
+	InputTypes														dataBlockInputType1											= InputTypes.SERIAL_IO;
+	int																		dataBlockSize1													= 90;
+	FormatTypes														dataBlockFormatType2										= FormatTypes.BYTE;
+	InputTypes														dataBlockInputType2											= InputTypes.FILE_IO;
+	int																		dataBlockSize2													= 30;
 	TimeUnitTypes													dataBlockTimeUnit												= TimeUnitTypes.MSEC;
 	CommaSeparatorTypes										dataBlockSeparator											= CommaSeparatorTypes.SEMICOLON;
 	CheckSumTypes													dataBlockCheckSumType										= CheckSumTypes.ADD;
@@ -964,7 +970,7 @@ public class DevicePropertiesEditor extends Composite {
 			}
 			initializeDeviceProperties();
 			initializeTimeBase();
-			initializeTimeBlock();
+			initializeDataBlock();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -1114,28 +1120,113 @@ public class DevicePropertiesEditor extends Composite {
 				this.dataBlockRequiredGroup.setLayout(null);
 				this.dataBlockRequiredGroup.setText(Messages.getString(MessageIds.GDE_MSGT0517));
 				this.dataBlockRequiredGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.dataBlockRequiredGroup.setBounds(50, 80, 240, 230);
+				this.dataBlockRequiredGroup.setBounds(50, 80, 270, 260);
+				{
+					this.dataBlockInputLabel = new Label(this.dataBlockRequiredGroup, SWT.RIGHT);
+					this.dataBlockInputLabel.setText(Messages.getString(MessageIds.GDE_MSGT0601));
+					this.dataBlockInputLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+					this.dataBlockInputLabel.setBounds(15, GDE.IS_MAC_COCOA ? 15 : 30, 60, 20);
+				}
+				{
+					this.dataBlockInputCombo1 = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
+					this.dataBlockInputCombo1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+					this.dataBlockInputCombo1.setBounds(80, GDE.IS_MAC_COCOA ? 15 : 30, 90, 20);
+					this.dataBlockInputCombo1.setItems(InputTypes.valuesAsStingArray());
+					this.dataBlockInputCombo1.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockInputCombo1.setLayout(null);
+					this.dataBlockInputCombo1.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "dataBlockFormatCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							DevicePropertiesEditor.this.dataBlockFormatType1 = FormatTypes.valueOf(DevicePropertiesEditor.this.dataBlockFormatCombo1.getText());
+							DevicePropertiesEditor.this.dataBlockInputType1 = InputTypes.valueOf(DevicePropertiesEditor.this.dataBlockInputCombo1.getText());
+							if (DevicePropertiesEditor.this.deviceConfig != null) {
+								DevicePropertiesEditor.this.deviceConfig.setDataBlockFormat(DevicePropertiesEditor.this.dataBlockInputType1, DevicePropertiesEditor.this.dataBlockFormatType1);
+								if (DevicePropertiesEditor.this.dataBlockFormatType1 == FormatTypes.BINARY) {
+									DevicePropertiesEditor.this.deviceConfig.setDataBlockSeparator(null);
+								}
+								else {
+									DevicePropertiesEditor.this.deviceConfig.setDataBlockSeparator(DevicePropertiesEditor.this.dataBlockSeparator);
+								}
+								DevicePropertiesEditor.this.enableSaveButton(true);
+							}
+						}
+					});
+				}
+				{
+					this.dataBlockInputCombo2 = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
+					this.dataBlockInputCombo2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+					this.dataBlockInputCombo2.setBounds(175, GDE.IS_MAC_COCOA ? 15 : 30, 90, 20);
+					this.dataBlockInputCombo2.setItems(InputTypes.valuesAsStingArray());
+					this.dataBlockInputCombo2.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockInputCombo2.setLayout(null);
+					this.dataBlockInputCombo2.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "dataBlockFormatCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							DevicePropertiesEditor.this.dataBlockFormatType2 = FormatTypes.valueOf(DevicePropertiesEditor.this.dataBlockFormatCombo2.getText());
+							DevicePropertiesEditor.this.dataBlockInputType2 = InputTypes.valueOf(DevicePropertiesEditor.this.dataBlockInputCombo2.getText());
+							if (DevicePropertiesEditor.this.deviceConfig != null) {
+								DevicePropertiesEditor.this.deviceConfig.setDataBlockFormat(DevicePropertiesEditor.this.dataBlockInputType2, DevicePropertiesEditor.this.dataBlockFormatType2);
+								if (DevicePropertiesEditor.this.dataBlockFormatType2 == FormatTypes.BINARY) {
+									DevicePropertiesEditor.this.deviceConfig.setDataBlockSeparator(null);
+								}
+								else {
+									DevicePropertiesEditor.this.deviceConfig.setDataBlockSeparator(DevicePropertiesEditor.this.dataBlockSeparator);
+								}
+								DevicePropertiesEditor.this.enableSaveButton(true);
+							}
+						}
+					});
+				}
 				{
 					this.dataBlockFormatLabel = new Label(this.dataBlockRequiredGroup, SWT.RIGHT);
 					this.dataBlockFormatLabel.setText(Messages.getString(MessageIds.GDE_MSGT0518));
 					this.dataBlockFormatLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.dataBlockFormatLabel.setBounds(25, GDE.IS_MAC_COCOA ? 15 : 30, 100, 20);
+					this.dataBlockFormatLabel.setBounds(15, GDE.IS_MAC_COCOA ? 45 : 60, 60, 20);
 				}
 				{
-					this.dataBlockFormatCombo = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
-					this.dataBlockFormatCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.dataBlockFormatCombo.setBounds(130, GDE.IS_MAC_COCOA ? 15 : 30, 80, 20);
-					this.dataBlockFormatCombo.setItems(FormatTypes.valuesAsStingArray());
-					this.dataBlockFormatCombo.setBackground(DataExplorer.COLOR_WHITE);
-					this.dataBlockFormatCombo.setLayout(null);
-					this.dataBlockFormatCombo.addSelectionListener(new SelectionAdapter() {
+					this.dataBlockFormatCombo1 = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
+					this.dataBlockFormatCombo1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+					this.dataBlockFormatCombo1.setBounds(80, GDE.IS_MAC_COCOA ? 45 : 60, 90, 20);
+					this.dataBlockFormatCombo1.setItems(FormatTypes.valuesAsStingArray());
+					this.dataBlockFormatCombo1.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockFormatCombo1.setLayout(null);
+					this.dataBlockFormatCombo1.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "dataBlockFormatCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							DevicePropertiesEditor.this.dataBlockFormat = FormatTypes.valueOf(DevicePropertiesEditor.this.dataBlockFormatCombo.getText());
+							DevicePropertiesEditor.this.dataBlockFormatType1 = FormatTypes.valueOf(DevicePropertiesEditor.this.dataBlockFormatCombo1.getText());
+							DevicePropertiesEditor.this.dataBlockInputType1 = InputTypes.valueOf(DevicePropertiesEditor.this.dataBlockInputCombo1.getText());
 							if (DevicePropertiesEditor.this.deviceConfig != null) {
-								DevicePropertiesEditor.this.deviceConfig.setDataBlockFormat(DevicePropertiesEditor.this.dataBlockFormat);
-								if (DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.BINARY) {
+								DevicePropertiesEditor.this.deviceConfig.setDataBlockFormat(DevicePropertiesEditor.this.dataBlockInputType1, DevicePropertiesEditor.this.dataBlockFormatType1);
+								if (DevicePropertiesEditor.this.dataBlockFormatType1 == FormatTypes.BINARY) {
+									DevicePropertiesEditor.this.deviceConfig.setDataBlockSeparator(null);
+								}
+								else {
+									DevicePropertiesEditor.this.deviceConfig.setDataBlockSeparator(DevicePropertiesEditor.this.dataBlockSeparator);
+								}
+								DevicePropertiesEditor.this.enableSaveButton(true);
+							}
+						}
+					});
+				}
+				{
+					this.dataBlockFormatCombo2 = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
+					this.dataBlockFormatCombo2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+					this.dataBlockFormatCombo2.setBounds(175, GDE.IS_MAC_COCOA ? 45 : 60, 90, 20);
+					this.dataBlockFormatCombo2.setItems(FormatTypes.valuesAsStingArray());
+					this.dataBlockFormatCombo2.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockFormatCombo2.setLayout(null);
+					this.dataBlockFormatCombo2.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "dataBlockFormatCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							DevicePropertiesEditor.this.dataBlockFormatType2 = FormatTypes.valueOf(DevicePropertiesEditor.this.dataBlockFormatCombo2.getText());
+							DevicePropertiesEditor.this.dataBlockInputType2 = InputTypes.valueOf(DevicePropertiesEditor.this.dataBlockInputCombo2.getText());
+							if (DevicePropertiesEditor.this.deviceConfig != null) {
+								DevicePropertiesEditor.this.deviceConfig.setDataBlockFormat(DevicePropertiesEditor.this.dataBlockInputType2, DevicePropertiesEditor.this.dataBlockFormatType2);
+								if (DevicePropertiesEditor.this.dataBlockFormatType2 == FormatTypes.BINARY) {
 									DevicePropertiesEditor.this.deviceConfig.setDataBlockSeparator(null);
 								}
 								else {
@@ -1151,24 +1242,50 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockSizeLabel.setText(Messages.getString(MessageIds.GDE_MSGT0520));
 					this.dataBlockSizeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 					this.dataBlockSizeLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0521));
-					this.dataBlockSizeLabel.setBounds(25, GDE.IS_MAC_COCOA ? 45 : 60, 100, 20);
+					this.dataBlockSizeLabel.setBounds(15, GDE.IS_MAC_COCOA ? 75 : 90, 60, 20);
 				}
 				{
-					this.dataBlockSizeText = new Text(this.dataBlockRequiredGroup, SWT.RIGHT | SWT.BORDER);
-					this.dataBlockSizeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.dataBlockSizeText.setBounds(130, GDE.IS_MAC_COCOA ? 45 : 60, 40, 20);
-					this.dataBlockSizeText.addKeyListener(new KeyAdapter() {
+					this.dataBlockSizeText1 = new Text(this.dataBlockRequiredGroup, SWT.RIGHT | SWT.BORDER);
+					this.dataBlockSizeText1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+					this.dataBlockSizeText1.setBounds(80, GDE.IS_MAC_COCOA ? 75 : 90, 70, 20);
+					this.dataBlockSizeText1.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "dataBlockSizeText.keyReleased, event=" + evt); //$NON-NLS-1$
-							DevicePropertiesEditor.this.dataBlockSize = Integer.parseInt(DevicePropertiesEditor.this.dataBlockSizeText.getText());
+							DevicePropertiesEditor.this.dataBlockSize1 = Integer.parseInt(DevicePropertiesEditor.this.dataBlockSizeText1.getText());
 							if (DevicePropertiesEditor.this.deviceConfig != null) {
-								DevicePropertiesEditor.this.deviceConfig.setDataBlockSize(DevicePropertiesEditor.this.dataBlockSize);
+								DevicePropertiesEditor.this.dataBlockFormatType1 = FormatTypes.valueOf(DevicePropertiesEditor.this.dataBlockFormatCombo1.getText());
+								DevicePropertiesEditor.this.dataBlockInputType1 = InputTypes.valueOf(DevicePropertiesEditor.this.dataBlockInputCombo1.getText());
+								DevicePropertiesEditor.this.deviceConfig.setDataBlockSize(DevicePropertiesEditor.this.dataBlockInputType1, DevicePropertiesEditor.this.dataBlockFormatType1, DevicePropertiesEditor.this.dataBlockSize1);
 								DevicePropertiesEditor.this.enableSaveButton(true);
 							}
 						}
 					});
-					this.dataBlockSizeText.addVerifyListener(new VerifyListener() {
+					this.dataBlockSizeText1.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "dataBlockSizeText.verifyText, event=" + evt); //$NON-NLS-1$
+							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
+						}
+					});
+				}
+				{
+					this.dataBlockSizeText2 = new Text(this.dataBlockRequiredGroup, SWT.RIGHT | SWT.BORDER);
+					this.dataBlockSizeText2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+					this.dataBlockSizeText2.setBounds(175, GDE.IS_MAC_COCOA ? 75 : 90, 70, 20);
+					this.dataBlockSizeText2.addKeyListener(new KeyAdapter() {
+						@Override
+						public void keyReleased(KeyEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "dataBlockSizeText.keyReleased, event=" + evt); //$NON-NLS-1$
+							DevicePropertiesEditor.this.dataBlockSize2 = Integer.parseInt(DevicePropertiesEditor.this.dataBlockSizeText2.getText());
+							if (DevicePropertiesEditor.this.deviceConfig != null) {
+								DevicePropertiesEditor.this.dataBlockFormatType2 = FormatTypes.valueOf(DevicePropertiesEditor.this.dataBlockFormatCombo2.getText());
+								DevicePropertiesEditor.this.dataBlockInputType2 = InputTypes.valueOf(DevicePropertiesEditor.this.dataBlockInputCombo2.getText());
+								DevicePropertiesEditor.this.deviceConfig.setDataBlockSize(DevicePropertiesEditor.this.dataBlockInputType2, DevicePropertiesEditor.this.dataBlockFormatType2, DevicePropertiesEditor.this.dataBlockSize2);
+								DevicePropertiesEditor.this.enableSaveButton(true);
+							}
+						}
+					});
+					this.dataBlockSizeText2.addVerifyListener(new VerifyListener() {
 						public void verifyText(VerifyEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "dataBlockSizeText.verifyText, event=" + evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -1180,12 +1297,12 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockTimeUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT0592));
 					this.dataBlockTimeUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 					this.dataBlockTimeUnitLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0593));
-					this.dataBlockTimeUnitLabel.setBounds(25, GDE.IS_MAC_COCOA ? 75 : 90, 100, 20);
+					this.dataBlockTimeUnitLabel.setBounds(25, GDE.IS_MAC_COCOA ? 105 : 120, 100, 20);
 				}
 				{
 					this.dataBlockTimeUnitCombo = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
 					this.dataBlockTimeUnitCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.dataBlockTimeUnitCombo.setBounds(130, GDE.IS_MAC_COCOA ? 75 : 90, 60, 20);
+					this.dataBlockTimeUnitCombo.setBounds(130, GDE.IS_MAC_COCOA ? 105 : 120, 60, 20);
 					this.dataBlockTimeUnitCombo.setItems(TimeUnitTypes.valuesAsStingArray());
 					this.dataBlockTimeUnitCombo.setEditable(false);
 					this.dataBlockTimeUnitCombo.setBackground(DataExplorer.COLOR_WHITE);
@@ -1206,12 +1323,12 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockSeparatorLabel.setText(Messages.getString(MessageIds.GDE_MSGT0476));
 					this.dataBlockSeparatorLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 					this.dataBlockSeparatorLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0329));
-					this.dataBlockSeparatorLabel.setBounds(25, GDE.IS_MAC_COCOA ? 105 : 120, 100, 20);
+					this.dataBlockSeparatorLabel.setBounds(25, GDE.IS_MAC_COCOA ? 135 : 150, 100, 20);
 				}
 				{
 					this.dataBlockSeparatorCombo = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
 					this.dataBlockSeparatorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD, false, false));
-					this.dataBlockSeparatorCombo.setBounds(130, GDE.IS_MAC_COCOA ? 105 : 120, 40, 20);
+					this.dataBlockSeparatorCombo.setBounds(130, GDE.IS_MAC_COCOA ? 135 : 150, 40, 20);
 					this.dataBlockSeparatorCombo.setItems(CommaSeparatorTypes.valuesAsStingArray());
 					this.dataBlockSeparatorCombo.setEditable(false);
 					this.dataBlockSeparatorCombo.setBackground(DataExplorer.COLOR_WHITE);
@@ -1232,13 +1349,13 @@ public class DevicePropertiesEditor extends Composite {
 				this.dataBlockLeaderLabel = new Label(this.dataBlockRequiredGroup, SWT.RIGHT);
 				this.dataBlockLeaderLabel.setText(Messages.getString(MessageIds.GDE_MSGT0469));
 				this.dataBlockLeaderLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.dataBlockLeaderLabel.setBounds(25, GDE.IS_MAC_COCOA ? 135 : 150, 100, 20);
+				this.dataBlockLeaderLabel.setBounds(25, GDE.IS_MAC_COCOA ? 165 : 180, 100, 20);
 			}
 			{
 				this.dataBlockLeaderText = new Text(this.dataBlockRequiredGroup, SWT.BORDER);
 				this.dataBlockLeaderText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 				this.dataBlockLeaderText.setBackground(DataExplorer.COLOR_WHITE);
-				this.dataBlockLeaderText.setBounds(130, GDE.IS_MAC_COCOA ? 135 : 150, 30, 20);
+				this.dataBlockLeaderText.setBounds(130, GDE.IS_MAC_COCOA ? 165 : 180, 30, 20);
 				this.dataBlockLeaderText.setText(GDE.STRING_BLANK + DevicePropertiesEditor.this.dataBlockLeader);
 				this.dataBlockLeaderText.setEnabled(false);
 				this.dataBlockLeaderText.addKeyListener(new KeyAdapter() {
@@ -1258,13 +1375,13 @@ public class DevicePropertiesEditor extends Composite {
 				this.dataBlockEndingLabel.setText(Messages.getString(MessageIds.GDE_MSGT0468));
 				this.dataBlockEndingLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0475));
 				this.dataBlockEndingLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.dataBlockEndingLabel.setBounds(25, GDE.IS_MAC_COCOA ? 165 : 180, 100, 20);
+				this.dataBlockEndingLabel.setBounds(25, GDE.IS_MAC_COCOA ? 195 : 210, 100, 20);
 			}
 			{
 				this.dataBlockEndingCombo = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
 				this.dataBlockEndingCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 				this.dataBlockEndingCombo.setBackground(DataExplorer.COLOR_WHITE);
-				this.dataBlockEndingCombo.setBounds(130, GDE.IS_MAC_COCOA ? 165 : 180, 90, 20);
+				this.dataBlockEndingCombo.setBounds(130, GDE.IS_MAC_COCOA ? 195 : 210, 90, 20);
 				this.dataBlockEndingCombo.setItems(LineEndingTypes.valuesAsStingArray());
 				this.dataBlockEndingCombo.setEnabled(false);
 				this.dataBlockEndingCombo.addSelectionListener(new SelectionAdapter() {
@@ -1630,8 +1747,18 @@ public class DevicePropertiesEditor extends Composite {
 								if (DevicePropertiesEditor.this.dataBlockTabItem != null && DevicePropertiesEditor.this.dataBlockTabItem.isDisposed()) {
 									createDataBlockType();
 								}
-								DevicePropertiesEditor.this.dataBlockFormat = DevicePropertiesEditor.this.deviceConfig.getDataBlockFormat();
-								DevicePropertiesEditor.this.dataBlockSize = DevicePropertiesEditor.this.deviceConfig.getDataBlockSize();
+								if (DevicePropertiesEditor.this.deviceConfig.getDataBlockType().getFormat().size() >= 1) {
+									DataBlockType.Format dataBLockFormat0 = DevicePropertiesEditor.this.deviceConfig.getDataBlockType().getFormat().get(0);
+									DevicePropertiesEditor.this.dataBlockInputType1 = dataBLockFormat0.getInputType();
+									DevicePropertiesEditor.this.dataBlockFormatType1 = dataBLockFormat0.getType();
+									DevicePropertiesEditor.this.dataBlockSize1 = dataBLockFormat0.getSize();
+									if (DevicePropertiesEditor.this.deviceConfig.getDataBlockType().getFormat().size() == 2) {
+										DataBlockType.Format dataBLockFormat1 = DevicePropertiesEditor.this.deviceConfig.getDataBlockType().getFormat().get(1);
+										DevicePropertiesEditor.this.dataBlockInputType2 = dataBLockFormat1.getInputType();
+										DevicePropertiesEditor.this.dataBlockFormatType2 = dataBLockFormat1.getType();
+										DevicePropertiesEditor.this.dataBlockSize2 = dataBLockFormat1.getSize();
+									}
+								}
 								DevicePropertiesEditor.this.dataBlockSeparator = DevicePropertiesEditor.this.deviceConfig.getDataBlockSeparator();
 								DevicePropertiesEditor.this.dataBlockTimeUnit = DevicePropertiesEditor.this.deviceConfig.getDataBlockTimeUnit();
 								DevicePropertiesEditor.this.dataBlockLeader = DevicePropertiesEditor.this.deviceConfig.getDataBlockLeader();
@@ -1648,7 +1775,7 @@ public class DevicePropertiesEditor extends Composite {
 								DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled = DevicePropertiesEditor.this.deviceConfig.isDataBlockPreferredFileExtentionDefined();
 							}
 						}
-						initializeTimeBlock();
+						initializeDataBlock();
 						//DataBlockType end
 						//StateType begin
 						int stateCount = (DevicePropertiesEditor.this.deviceConfig.getStateType() == null) ? 0 : DevicePropertiesEditor.this.deviceConfig.getStateSize();
@@ -1812,38 +1939,42 @@ public class DevicePropertiesEditor extends Composite {
 	/**
 	 * 
 	 */
-	private void initializeTimeBlock() {
-		DevicePropertiesEditor.this.dataBlockFormatCombo.select(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT ? 0 : 1);
-		DevicePropertiesEditor.this.dataBlockSizeText.setText(GDE.STRING_EMPTY + DevicePropertiesEditor.this.dataBlockSize);
+	private void initializeDataBlock() {
+		DevicePropertiesEditor.this.dataBlockInputCombo1.select(DevicePropertiesEditor.this.dataBlockInputType1 == InputTypes.FILE_IO ? 0 : 1);
+		DevicePropertiesEditor.this.dataBlockFormatCombo1.select(DevicePropertiesEditor.this.dataBlockFormatType1 == FormatTypes.BYTE ? 0 : 1);
+		DevicePropertiesEditor.this.dataBlockSizeText1.setText(GDE.STRING_EMPTY + DevicePropertiesEditor.this.dataBlockSize1);
+		DevicePropertiesEditor.this.dataBlockInputCombo2.select(DevicePropertiesEditor.this.dataBlockInputType2 == InputTypes.FILE_IO ? 0 : 1);
+		DevicePropertiesEditor.this.dataBlockFormatCombo2.select(DevicePropertiesEditor.this.dataBlockFormatType2 == FormatTypes.BYTE ? 0 : 1);
+		DevicePropertiesEditor.this.dataBlockSizeText2.setText(GDE.STRING_EMPTY + DevicePropertiesEditor.this.dataBlockSize2);
 
-		DevicePropertiesEditor.this.dataBlockSeparatorLabel.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
-		DevicePropertiesEditor.this.dataBlockSeparatorCombo.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
+		DevicePropertiesEditor.this.dataBlockSeparatorLabel.setEnabled(true);
+		DevicePropertiesEditor.this.dataBlockSeparatorCombo.setEnabled(true);
 		DevicePropertiesEditor.this.dataBlockSeparatorCombo.select(DevicePropertiesEditor.this.dataBlockSeparator.ordinal());
 
-		DevicePropertiesEditor.this.dataBlockTimeUnitLabel.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
-		DevicePropertiesEditor.this.dataBlockTimeUnitCombo.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
+		DevicePropertiesEditor.this.dataBlockTimeUnitLabel.setEnabled(true);
+		DevicePropertiesEditor.this.dataBlockTimeUnitCombo.setEnabled(true);
 		DevicePropertiesEditor.this.dataBlockTimeUnitCombo.select(DevicePropertiesEditor.this.dataBlockTimeUnit.ordinal());
 
-		DevicePropertiesEditor.this.dataBlockLeaderLabel.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
-		DevicePropertiesEditor.this.dataBlockLeaderText.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
+		DevicePropertiesEditor.this.dataBlockLeaderLabel.setEnabled(true);
+		DevicePropertiesEditor.this.dataBlockLeaderText.setEnabled(true);
 		DevicePropertiesEditor.this.dataBlockLeaderText.setText(GDE.STRING_BLANK + DevicePropertiesEditor.this.dataBlockLeader);
 
-		DevicePropertiesEditor.this.dataBlockEndingLabel.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
-		DevicePropertiesEditor.this.dataBlockEndingCombo.setEnabled(DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
+		DevicePropertiesEditor.this.dataBlockEndingLabel.setEnabled(true);
+		DevicePropertiesEditor.this.dataBlockEndingCombo.setEnabled(true);
 		DevicePropertiesEditor.this.dataBlockEndingCombo.select(LineEndingTypes.fromValue(DevicePropertiesEditor.this.dataBlockEnding).ordinal());
 
 		DevicePropertiesEditor.this.dataBlockCheckSumFormatButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalChecksumEnabled);
 		DevicePropertiesEditor.this.dataBlockcheckSumFormatCombo.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalChecksumEnabled);
-		DevicePropertiesEditor.this.dataBlockcheckSumFormatCombo.select(DevicePropertiesEditor.this.dataBlockcheckSumFormat == FormatTypes.TEXT ? 0 : 1);
+		DevicePropertiesEditor.this.dataBlockcheckSumFormatCombo.select(DevicePropertiesEditor.this.dataBlockcheckSumFormat == FormatTypes.BYTE ? 0 : DevicePropertiesEditor.this.dataBlockcheckSumFormat == FormatTypes.VALUE ? 1 : 2);
 		DevicePropertiesEditor.this.dataBlockCheckSumTypeCombo.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalChecksumEnabled);
 		DevicePropertiesEditor.this.dataBlockCheckSumTypeCombo.select(DevicePropertiesEditor.this.dataBlockCheckSumType == CheckSumTypes.XOR ? 0 : 1);
 
-		DevicePropertiesEditor.this.preferredDataLocationButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled && DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
-		DevicePropertiesEditor.this.preferredDataLocationText.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled && DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
+		DevicePropertiesEditor.this.preferredDataLocationButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled && (DevicePropertiesEditor.this.dataBlockFormatType1 == FormatTypes.VALUE || DevicePropertiesEditor.this.dataBlockFormatType2 == FormatTypes.VALUE));
+		DevicePropertiesEditor.this.preferredDataLocationText.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalDataLocationEnabled && (DevicePropertiesEditor.this.dataBlockFormatType1 == FormatTypes.VALUE || DevicePropertiesEditor.this.dataBlockFormatType2 == FormatTypes.VALUE));
 		DevicePropertiesEditor.this.preferredDataLocationText.setText(DevicePropertiesEditor.this.dataBlockOptionalDataLocation == null ? GDE.STRING_EMPTY
 				: DevicePropertiesEditor.this.dataBlockOptionalDataLocation);
-		DevicePropertiesEditor.this.preferredFileExtensionButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled && DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
-		DevicePropertiesEditor.this.preferredFileExtensionText.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled && DevicePropertiesEditor.this.dataBlockFormat == FormatTypes.TEXT);
+		DevicePropertiesEditor.this.preferredFileExtensionButton.setSelection(DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled && (DevicePropertiesEditor.this.dataBlockFormatType1 == FormatTypes.VALUE || DevicePropertiesEditor.this.dataBlockFormatType2 == FormatTypes.VALUE));
+		DevicePropertiesEditor.this.preferredFileExtensionText.setEnabled(DevicePropertiesEditor.this.isDataBlockOptionalFileExtentionEnabled && (DevicePropertiesEditor.this.dataBlockFormatType1 == FormatTypes.VALUE || DevicePropertiesEditor.this.dataBlockFormatType2 == FormatTypes.VALUE));
 		DevicePropertiesEditor.this.preferredFileExtensionText.setText(DevicePropertiesEditor.this.dataBlockOptionalFileExtention == null ? GDE.STRING_EMPTY
 				: DevicePropertiesEditor.this.dataBlockOptionalFileExtention);
 	}

@@ -23,6 +23,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.DevicePropertiesInconsistenceException;
@@ -86,7 +87,7 @@ public class CSVSerialDataReaderWriter {
 		Channel activeChannel = null;
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
 		long inputFileSize = new File(filePath).length();
-		int progressLineLength = Math.abs(device.getDataBlockSize());
+		int progressLineLength = Math.abs(device.getDataBlockSize(InputTypes.FILE_IO));
 		boolean isOutdated = false;
 		int lineNumber = 0;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
@@ -118,7 +119,7 @@ public class CSVSerialDataReaderWriter {
 				//now get all data   $1;1;0; 14780;  598;  1000;  8838;  0002
 				//$recordSetNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
-				int dataBlockSize = device.getDataBlockSize(); // measurements size must not match data block size, there are some measurements which are result of calculation			
+				int dataBlockSize = device.getDataBlockSize(InputTypes.FILE_IO); // measurements size must not match data block size, there are some measurements which are result of calculation			
 				log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize < Math.abs(dataBlockSize))  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] {filePath}));
 				DataParser data = new DataParser(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize); //$NON-NLS-1$  //$NON-NLS-2$

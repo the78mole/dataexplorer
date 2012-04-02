@@ -281,24 +281,32 @@ public interface IDevice {
 	public boolean isRTS();
 	
 	/**
-	 * @return the current data block size
+	 * @return the current data block size by given input format type
 	 */
-	public int getDataBlockSize();
+	public int getDataBlockSize(InputTypes inputType);
+	
+	/**
+	 * @return the current data block size by given format type
+	 */
+	public int getDataBlockSize(FormatTypes formatType);
 
 	/**
-	 * @param newSize set a new date block size/length
+	 * set the size of a data block of given format type and input type
+	 * @param useInputType
+	 * @param useFormat
+	 * @param newSize
 	 */
-	public void setDataBlockSize(Integer newSize);
+	public void setDataBlockSize(InputTypes useInputType, FormatTypes useFormat, Integer newSize);
 	
 	/**
 	 * @return the format type of the data block ASCII(text) or BINARY(hex)
 	 */
-	public FormatTypes getDataBlockFormat();
+	public FormatTypes getDataBlockFormat(InputTypes inputType);
 	
 	/**
 	 * @param value set a new format type of the data block ASCII(text) or BINARY(hex)
 	 */
-	public void setDataBlockFormat(FormatTypes value);
+	public void setDataBlockFormat(InputTypes inputType, FormatTypes value);
 	
 	/**
 	 * @return the checksum type of the data block XOR, ADD, ..

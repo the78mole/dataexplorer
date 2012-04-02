@@ -20,6 +20,7 @@ package gde.data;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.device.FormatTypes;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
@@ -708,8 +709,8 @@ public class RecordSet extends HashMap<String, Record> {
 	public String[] getNoneCalculationRecordNames() {
 		Vector<String> tmpCalculationRecords = new Vector<String>();
 		String[] deviceMeasurements = this.device.getMeasurementNames(this.parent.number);
-		int deviceDataBlockSize = Math.abs(this.device.getDataBlockSize());
-		deviceDataBlockSize = deviceDataBlockSize <= 0 ? deviceMeasurements.length : deviceDataBlockSize;
+		int deviceDataBlockSize = Math.abs(this.device.getDataBlockSize(FormatTypes.VALUE));
+		deviceDataBlockSize = this.device.getDataBlockSize(FormatTypes.VALUE) <= 0 ? deviceMeasurements.length : deviceDataBlockSize;
 		// record names may not match device measurements, but device measurements might be more then existing records
 		for (int i = 0; i < deviceMeasurements.length && i < this.size(); ++i) {
 			MeasurementType measurement = this.device.getMeasurement(this.parent.number, i);
