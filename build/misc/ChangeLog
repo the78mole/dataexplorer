@@ -8,8 +8,12 @@ HottAdapter2 - fix GPS data detection to enable Google Earth visualization
 HottAdapter(2) - fix Receiver detection and add data error correction 
 HottAdapter(2) - add filter to filter Latitude/Longitude spikes 
 UniLog2 - live data gathering keep already gathered data in case of an error
+UniLog2 - live data gathering enable loop to reset live gathering
 add Multiplex FlightRecorder support
 add SM Modellbau JLog2 support (import, configure)
+fix error cut curves with constant time step
+update device properties schema to enable extended configuration
+update device properties editor to reflect schema updates
 
 
 Version 2.96 - 24 Feb 2012
