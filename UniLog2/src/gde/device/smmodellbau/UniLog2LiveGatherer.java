@@ -135,89 +135,90 @@ public class UniLog2LiveGatherer extends Thread {
 		long startCycleTime = 0;
 		long tmpCycleTime = 0;
 
-		while (!this.serialPort.isInterruptedByUser) {
-			try {
-				// prepare the data for adding to record set
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
-
-				// build the point array according curves from record set
-				liveAnswers = new String[3];
-				while (liveAnswers[0] == null || liveAnswers[1] == null || liveAnswers[2] == null) {
-					String liveAnswer = UniLog2LiveGatherer.this.serialPort.queryLiveData();
-					if(liveAnswer.length() < 100) break;
-					if (liveAnswer.contains("rpm") && liveAnswer.contains("VRx")) {
-						liveAnswers[0] = liveAnswer;
-					}
-					else if (liveAnswer.contains("V1") && liveAnswer.contains("V6")) {
-						liveAnswers[1] = liveAnswer;
-					}
-					else if (liveAnswer.contains("hPa") && liveAnswer.contains("intern")) {
-						liveAnswers[2] = liveAnswer;
-					}
-				}
-
-				tmpCycleTime = System.nanoTime()/1000000;
-				if (startCycleTime == 0) startCycleTime = tmpCycleTime;
-				recordSet.addPoints(usedDevice.convertLiveData(points, (new StringBuilder().append(liveAnswers[0]).append(liveAnswers[1]).append(liveAnswers[2])).toString()), (tmpCycleTime - startCycleTime));
-				log.logp(Level.TIME, $CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
-
-				// switch the active record set if the current record set is child of active channel
-				if (!UniLog2LiveGatherer.this.isSwitchedRecordSet && UniLog2LiveGatherer.this.channel.getName().equals(UniLog2LiveGatherer.this.channels.getActiveChannel().getName())) {
-					UniLog2LiveGatherer.this.channel.applyTemplateBasics(recordSetKey);
-					UniLog2LiveGatherer.this.application.getMenuToolBar().addRecordSetName(recordSetKey);
-					UniLog2LiveGatherer.this.channels.getActiveChannel().switchRecordSet(recordSetKey);
-					UniLog2LiveGatherer.this.isSwitchedRecordSet = true;
-				}
-
-				if (++measurementCount % 5 == 0) {
-					UniLog2LiveGatherer.this.device.updateVisibilityStatus(recordSet, true);
-				}
-				if (recordSet.isChildOfActiveChannel() && recordSet.equals(UniLog2LiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
-					UniLog2LiveGatherer.this.application.updateAllTabs(false);
-				}
-			}
-			catch (DataInconsitsentException e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
-				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
-				cleanup(recordSetKey, message);
-				return;
-			}
-			catch (TimeOutException e) {
-				log.log(Level.WARNING, e.getMessage(), e);
+		try {
+			while (!this.serialPort.isInterruptedByUser) {
 				try {
-					this.serialPort.checkDataReady();
+					// prepare the data for adding to record set
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordSetKey = " + recordSetKey + " channelKonfigKey = " + recordSet.getChannelConfigName()); //$NON-NLS-1$ //$NON-NLS-2$
+
+					// build the point array according curves from record set
+					liveAnswers = new String[3];
+					while (liveAnswers[0] == null || liveAnswers[1] == null || liveAnswers[2] == null) {
+						String liveAnswer = UniLog2LiveGatherer.this.serialPort.queryLiveData();
+						if(liveAnswer.length() < 100) break;
+						if (liveAnswer.contains("rpm") && liveAnswer.contains("VRx")) {
+							liveAnswers[0] = liveAnswer;
+						}
+						else if (liveAnswer.contains("V1") && liveAnswer.contains("V6")) {
+							liveAnswers[1] = liveAnswer;
+						}
+						else if (liveAnswer.contains("hPa") && liveAnswer.contains("intern")) {
+							liveAnswers[2] = liveAnswer;
+						}
+					}
+
+					tmpCycleTime = System.nanoTime()/1000000;
+					if (startCycleTime == 0) startCycleTime = tmpCycleTime;
+					recordSet.addPoints(usedDevice.convertLiveData(points, (new StringBuilder().append(liveAnswers[0]).append(liveAnswers[1]).append(liveAnswers[2])).toString()), (tmpCycleTime - startCycleTime));
+					log.logp(Level.TIME, $CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
+
+					// switch the active record set if the current record set is child of active channel
+					if (!UniLog2LiveGatherer.this.isSwitchedRecordSet && UniLog2LiveGatherer.this.channel.getName().equals(UniLog2LiveGatherer.this.channels.getActiveChannel().getName())) {
+						UniLog2LiveGatherer.this.channel.applyTemplateBasics(recordSetKey);
+						UniLog2LiveGatherer.this.application.getMenuToolBar().addRecordSetName(recordSetKey);
+						UniLog2LiveGatherer.this.channels.getActiveChannel().switchRecordSet(recordSetKey);
+						UniLog2LiveGatherer.this.isSwitchedRecordSet = true;
+					}
+
+					if (++measurementCount % 5 == 0) {
+						UniLog2LiveGatherer.this.device.updateVisibilityStatus(recordSet, true);
+					}
+					if (recordSet.isChildOfActiveChannel() && recordSet.equals(UniLog2LiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
+						UniLog2LiveGatherer.this.application.updateAllTabs(false);
+					}
 				}
-				catch (Exception e1) {
-					log.log(Level.SEVERE, e1.getMessage(), e1);
+				catch (DataInconsitsentException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
+					cleanup(recordSetKey, message);
+					return;
+				}
+				catch (TimeOutException e) {
+					log.log(Level.WARNING, e.getMessage(), e);
+					try {
+						this.serialPort.checkDataReady();
+					}
+					catch (Exception e1) {
+						log.log(Level.WARNING, e1.getMessage(), e1);
+					}
+				}
+				catch (IOException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
 					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
 							+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW2500); //$NON-NLS-1$ 
 					this.application.openMessageDialog(this.dialog.getDialogShell(), message);
 					return;
 				}
+				catch (Throwable e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+					String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$ 
+					this.application.openMessageDialog(this.dialog.getDialogShell(), message);
+					return;
+				}
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
 			}
-			catch (IOException e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
-				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() })
-						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW2500); //$NON-NLS-1$ 
-				this.application.openMessageDialog(this.dialog.getDialogShell(), message);
-				return;
-			}
-			catch (Throwable e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
-				String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$ 
-				this.application.openMessageDialog(this.dialog.getDialogShell(), message);
-				return;
-			}
-			finally {
-				GDE.display.asyncExec(new Runnable() {
-					public void run() {
-						UniLog2LiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
-					}
-				});
-			}
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
 		}
-		cleanup(recordSetKey, null);
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
+		finally {
+			cleanup(recordSetKey, null);
+			GDE.display.asyncExec(new Runnable() {
+				public void run() {
+					UniLog2LiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
+				}
+			});
+		}
 	}
 
 	/**
