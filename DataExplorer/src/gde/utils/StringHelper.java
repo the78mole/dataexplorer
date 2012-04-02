@@ -349,7 +349,10 @@ public class StringHelper {
 		switch (useType) {
 		case INTEGER:
 			try {
-				if (eventText.equals(GDE.STRING_EMPTY)) eventText = "0";
+				if (eventText.equals("-")) 
+					return doIt;
+				else if (eventText.equals(GDE.STRING_EMPTY)) 
+					eventText = "0";
 				Integer.parseInt(eventText.trim());
 			}
 			catch (Exception e) {
@@ -358,7 +361,7 @@ public class StringHelper {
 			break;
 		case DOUBLE:
 			try {
-				if (eventText.equals("-") || eventText.equals(",") || eventText.equals(".") || eventText.equals("")) 
+				if (eventText.equals("-") || eventText.equals(",") || eventText.equals(".") || eventText.equals(GDE.STRING_EMPTY)) 
 					doIt = true;
 				else
 					Double.parseDouble(eventText.replace(",", ".").trim());
