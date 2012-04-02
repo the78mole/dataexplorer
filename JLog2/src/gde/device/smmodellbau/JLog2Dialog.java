@@ -23,6 +23,7 @@ import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
+import gde.device.InputTypes;
 import gde.device.smmodellbau.jlog2.MessageIds;
 import gde.log.Level;
 import gde.messages.Messages;
@@ -84,7 +85,7 @@ public class JLog2Dialog extends DeviceDialog {
 		super(parent);
 		this.device = useDevice;
 		this.settings = Settings.getInstance();
-		this.measurementsCount = Math.abs(this.device.getDataBlockSize());
+		this.measurementsCount = Math.abs(this.device.getDataBlockSize(InputTypes.FILE_IO));
 	}
 
 	@Override
