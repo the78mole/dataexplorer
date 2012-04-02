@@ -27,6 +27,7 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.device.MeasurementType;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
@@ -272,7 +273,7 @@ public class QcCopter extends DeviceConfiguration implements IDevice {
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = Math.abs(this.getDataBlockSize());;
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO));;
 		int[] points = new int[this.getNumberOfMeasurements(1)];
 		int offset = 0;
 		int progressCycle = 0;

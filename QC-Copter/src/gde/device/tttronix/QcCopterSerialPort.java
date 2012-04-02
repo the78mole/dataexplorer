@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.comm.IDeviceCommPort;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
@@ -57,7 +58,7 @@ public class QcCopterSerialPort extends DeviceCommPort implements IDeviceCommPor
 	 */
 	public QcCopterSerialPort(IDevice currentDevice, DataExplorer currentApplication) {
 		super(currentDevice, currentApplication);
-		this.dataSize = this.deviceConfig.getDataBlockSize();
+		this.dataSize = this.deviceConfig.getDataBlockSize(InputTypes.SERIAL_IO);
 	}
 	
 	/**
