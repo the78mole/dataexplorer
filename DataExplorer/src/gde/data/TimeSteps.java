@@ -66,8 +66,9 @@ public class TimeSteps extends Vector<Long> {
 	 * copy constructor
 	 */
 	private TimeSteps(TimeSteps toBeClonedTimeSteps, int index, boolean isFromBegin) {
-		this.startTime = isFromBegin ? toBeClonedTimeSteps.startTime + toBeClonedTimeSteps.get(index)/10 : toBeClonedTimeSteps.startTime;
+  	super(toBeClonedTimeSteps);
   	if (!(this.isConstant = toBeClonedTimeSteps.isConstant)) {
+			this.startTime = isFromBegin ? toBeClonedTimeSteps.startTime + toBeClonedTimeSteps.get(index)/10 : toBeClonedTimeSteps.startTime;
 			if (isFromBegin) {
 				long cutOffVal = toBeClonedTimeSteps.get(index);
 				for (int i = index; i < toBeClonedTimeSteps.elementCount; i++) {
@@ -80,6 +81,9 @@ public class TimeSteps extends Vector<Long> {
 				}
 			}
 		}
+  	else {
+  		this.startTime = toBeClonedTimeSteps.startTime;
+  	}
   	if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.toString());
 	}
 	
@@ -180,6 +184,8 @@ public class TimeSteps extends Vector<Long> {
 	public double getMaxTime_ms() {
 		double maxTime = 0.0;
 		if (isConstant) {
+			if (this.size() < 1)
+				System.out.println();
 			maxTime = this.get(0)/10.0; 
 		}
 		else {
