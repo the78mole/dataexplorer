@@ -27,6 +27,7 @@ import gde.data.RecordSet;
 import gde.device.DesktopPropertyType;
 import gde.device.DesktopPropertyTypes;
 import gde.device.DeviceConfiguration;
+import gde.device.InputTypes;
 import gde.exception.DataInconsitsentException;
 import gde.messages.Messages;
 
@@ -123,7 +124,7 @@ public class UltraDuoPlus60 extends Ultramat {
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = Math.abs(this.getDataBlockSize()); // const.
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO)); // const.
 		int deviceDataBufferSize2 = deviceDataBufferSize / 2;
 		int channel2Offset = deviceDataBufferSize2 - 5;
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
@@ -165,7 +166,7 @@ public class UltraDuoPlus60 extends Ultramat {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-		int deviceDataBufferSize = Math.abs(this.getDataBlockSize());
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO));
 
 		if (deviceDataBufferSize == dataBuffer.length && this.isLinkedMode(dataBuffer)) {
 			try {

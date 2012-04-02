@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
+import gde.device.InputTypes;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
@@ -150,7 +151,7 @@ public class GathererThread extends Thread {
 							this.recordSetKey1 = (String) ch1[1];
 						}
 						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
-							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2];
 							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
 							System.arraycopy(dataBuffer, 49, buffer, 9, 2); //copy operation mode
 							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
@@ -160,7 +161,7 @@ public class GathererThread extends Thread {
 							this.recordSetKey2 = (String) ch2[1];
 						}
 						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
-							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2];
 							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
 							System.arraycopy(dataBuffer, 75, buffer, 9, 2); //copy operation mode
 							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 3 does not support cycles
@@ -178,7 +179,7 @@ public class GathererThread extends Thread {
 							this.recordSetKey1 = (String) ch1[1];
 						}
 						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
-							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2];
 							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
 							System.arraycopy(dataBuffer, 57, buffer, 9, 2); //copy operation mode
 							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
@@ -188,7 +189,7 @@ public class GathererThread extends Thread {
 							this.recordSetKey2 = (String) ch2[1];
 						}
 						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
-							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2];
 							System.arraycopy(dataBuffer, 0, buffer, 0, 9); //copy until input voltage
 							System.arraycopy(dataBuffer, 83, buffer, 9, 2); //copy operation mode
 							buffer[11] = buffer[12] = 48; //blank out cycle number, channel 2 does not support cycles
@@ -206,7 +207,7 @@ public class GathererThread extends Thread {
 							this.recordSetKey1 = (String) ch1[1];
 						}
 						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
-							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2];
 							System.arraycopy(dataBuffer, 91, buffer, 5, 8); //sync to same value positions, only point array length is different
 							buffer[13] = buffer[14] = 48; //blank out cycle number
 							System.arraycopy(dataBuffer, 99, buffer, 15, 41);
@@ -223,7 +224,7 @@ public class GathererThread extends Thread {
 							this.recordSetKey1 = (String) ch1[1];
 						}
 						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
-							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2];
 							System.arraycopy(dataBuffer, 97, buffer, 11, 8); //sync to same value positions, only point array length is different
 							buffer[19] = buffer[20] = 48; //blank out cycle number
 							System.arraycopy(dataBuffer, 105, buffer, 21, 41);
@@ -247,7 +248,7 @@ public class GathererThread extends Thread {
 								this.recordSetKey1 = (String) ch1[1];
 							}
 							if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
-								byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize()) / 2];
+								byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2];
 								System.arraycopy(dataBuffer, buffer.length - 5, buffer, 0, buffer.length);
 								ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2);
 								recordSet2 = (RecordSet) ch2[0];

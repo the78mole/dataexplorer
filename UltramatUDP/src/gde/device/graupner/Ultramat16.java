@@ -41,6 +41,7 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
+import gde.device.InputTypes;
 import gde.exception.DataInconsitsentException;
 import gde.messages.Messages;
 
@@ -110,7 +111,7 @@ public class Ultramat16 extends Ultramat16S {
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = Math.abs(this.getDataBlockSize());
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO));
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
 		int offset = 0;
 		int progressCycle = 0;

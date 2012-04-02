@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.comm.DeviceSerialPortImpl;
 import gde.device.DeviceConfiguration;
+import gde.device.InputTypes;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.log.Level;
@@ -116,7 +117,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 */
 	public synchronized byte[] getData(boolean checkBeginEndSignature) throws Exception {
 		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
-		byte[] data = new byte[Math.abs(this.device.getDataBlockSize())];
+		byte[] data = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO))];
 		byte[] answer = new byte[] { 0x00 };
 
 		try {

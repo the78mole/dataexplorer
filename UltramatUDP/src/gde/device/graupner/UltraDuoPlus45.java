@@ -27,6 +27,7 @@ import gde.data.RecordSet;
 import gde.device.DesktopPropertyType;
 import gde.device.DesktopPropertyTypes;
 import gde.device.DeviceConfiguration;
+import gde.device.InputTypes;
 import gde.exception.DataInconsitsentException;
 import gde.messages.Messages;
 
@@ -123,7 +124,7 @@ public class UltraDuoPlus45 extends Ultramat {
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = Math.abs(this.getDataBlockSize()); // const.
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO)); // const.
 		int channel2Offset1 = 97;
 		int channel2Offset2 = 105;
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
