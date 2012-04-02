@@ -20,6 +20,7 @@ package gde.device.wb;
 
 import gde.comm.DeviceCommPort;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.ui.DataExplorer;
 
 import java.io.IOException;
@@ -60,11 +61,11 @@ public class SimulatorSerialPort extends DeviceCommPort {
 			this.lastVoltage = 0;
 			this.lastCurrent = 0;
 			this.xBound = 0;
-			numPoints = this.deviceConfig.getDataBlockSize()+1;
+			numPoints = this.deviceConfig.getDataBlockSize(InputTypes.SERIAL_IO)+1;
 			i=0;
 		}
 		else {
-			numPoints = this.deviceConfig.getDataBlockSize();
+			numPoints = this.deviceConfig.getDataBlockSize(InputTypes.SERIAL_IO);
 			i=1;
 		}
 
@@ -75,9 +76,9 @@ public class SimulatorSerialPort extends DeviceCommPort {
 		//int xBound = new Double(Math.random() * 1000000).intValue();
 		this.xBound = this.xBound + 100;
 		this.lastVoltage = this.xBound / 2;
-		int yBound = this.deviceConfig.getDataBlockSize();
+		int yBound = this.deviceConfig.getDataBlockSize(InputTypes.SERIAL_IO);
 		log.fine("numPoints = " + numPoints);
-		for (; i < this.deviceConfig.getDataBlockSize()+1; i++) {
+		for (; i < this.deviceConfig.getDataBlockSize(InputTypes.SERIAL_IO)+1; i++) {
 			current.add(i * 1000 + this.lastCurrent);
 			voltage.add(getNormalizedSine(i, this.xBound/2, yBound) - this.lastVoltage);
 			//log.info("i = " + i);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V15.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V16.xsd">
     <Device>
         <name>Simulator</name>
         <manufacturer>WB</manufacturer>
@@ -15,7 +15,7 @@
         <timeStep>5</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="100" type="BINARY"/>
+        <format inputType="SERIAL_IO" formatType="BYTE" size="100"/>
     </DataBlock>
     <Channels>
 	    <Channel type="TYPE_CONFIG" name="Sinus">

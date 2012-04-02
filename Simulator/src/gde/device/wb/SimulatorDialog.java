@@ -24,6 +24,8 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
+import gde.device.FormatTypes;
+import gde.device.InputTypes;
 import gde.device.wb.simulator.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.log.Level;
@@ -180,13 +182,13 @@ public class SimulatorDialog extends DeviceDialog {
 					this.clusterCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.clusterCombo.setLayoutData(clusterComboLData);
 					this.clusterCombo.setItems(new String[] { "10", "20", "50", "100" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					this.clusterCombo.setText(Integer.valueOf(Math.abs(this.device.getDataBlockSize())).toString());
+					this.clusterCombo.setText(Integer.valueOf(Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO))).toString());
 					this.clusterCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINE, "clusterCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							SimulatorDialog.this.device.setDataBlockSize(new Integer(SimulatorDialog.this.clusterCombo.getText()).intValue());
-							log.log(Level.FINE, " new clusterSize = " + Math.abs(SimulatorDialog.this.device.getDataBlockSize())); //$NON-NLS-1$
+							SimulatorDialog.this.device.setDataBlockSize(InputTypes.SERIAL_IO, FormatTypes.BYTE, new Integer(SimulatorDialog.this.clusterCombo.getText()).intValue());
+							log.log(Level.FINE, " new clusterSize = " + Math.abs(SimulatorDialog.this.device.getDataBlockSize(InputTypes.SERIAL_IO))); //$NON-NLS-1$
 						}
 					});
 				}
@@ -374,7 +376,7 @@ public class SimulatorDialog extends DeviceDialog {
 
 							// prepare timed data gatherer thread
 							int delay = 0;
-							int period = Double.valueOf(SimulatorDialog.this.device.getTimeStep_ms() * Math.abs(SimulatorDialog.this.device.getDataBlockSize())).intValue();
+							int period = Double.valueOf(SimulatorDialog.this.device.getTimeStep_ms() * Math.abs(SimulatorDialog.this.device.getDataBlockSize(InputTypes.SERIAL_IO))).intValue();
 							log.log(Level.FINE, "timer period = " + period + " ms"); //$NON-NLS-1$ //$NON-NLS-2$
 							SimulatorDialog.this.timer = new Timer();
 							SimulatorDialog.this.timerTask = new TimerTask() {
