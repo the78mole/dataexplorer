@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V15.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V16.xsd">
 	<Device>
 		<name implementation="gde.device.wstech.DataVario">DataVarioDuo</name>
 		<manufacturer>WSTech</manufacturer>
@@ -15,7 +15,7 @@
 		<timeStep>-1.0</timeStep>
 	</TimeBase>
 	<DataBlock>
-		<format size="13" type="TEXT"/>
+		<format inputType="FILE_IO" formatType="VALUE" size="13"/>
 		<timeUnit>sec</timeUnit>
 		<separator>semicolon</separator>
 		<leader>$</leader>
