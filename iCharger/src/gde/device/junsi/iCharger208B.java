@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBException;
 import gde.GDE;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
+import gde.device.InputTypes;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
 import gde.log.Level;
@@ -132,7 +133,7 @@ public class iCharger208B extends iCharger {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
 		// prepare the serial CSV data parser
-		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), null, null, Math.abs(this.getDataBlockSize()), this.getDataBlockFormat(), false);
+		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), null, null, Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)), this.getDataBlockFormat(InputTypes.SERIAL_IO), false);
 		int[] startLength = new int[] {0,0};
 		byte[] lineBuffer = null;
 				
