@@ -26,6 +26,7 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
 import gde.device.smmodellbau.jlog2.MessageIds;
@@ -146,7 +147,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = Math.abs(this.getDataBlockSize()) * 4;
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)) * 4;
 		int[] points = new int[this.getNumberOfMeasurements(1)];
 		int offset = 0;
 		int progressCycle = 0;
@@ -229,7 +230,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	 */
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		// prepare the serial CSV data parser
-		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), null, null, this.getDataBlockSize(), this.getDataBlockFormat(), true);
+		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), null, null, this.getDataBlockSize(InputTypes.FILE_IO), this.getDataBlockFormat(InputTypes.FILE_IO), true);
 		int[] startLength = new int[] {0,0};
 		byte[] lineBuffer = null;
 				
