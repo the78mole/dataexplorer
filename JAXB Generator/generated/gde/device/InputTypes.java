@@ -13,34 +13,32 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for format_types.
+ * <p>Java class for input_types.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
- * &lt;simpleType name="format_types">
+ * &lt;simpleType name="input_types">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="BYTE"/>
- *     &lt;enumeration value="VALUE"/>
- *     &lt;enumeration value="BINARY"/>
+ *     &lt;enumeration value="FILE_IO"/>
+ *     &lt;enumeration value="SERIAL_IO"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "format_types")
+@XmlType(name = "input_types")
 @XmlEnum
-public enum FormatTypes {
+public enum InputTypes {
 
-    BYTE,
-    VALUE,
-    BINARY;
+    FILE_IO,
+    SERIAL_IO;
 
     public String value() {
         return name();
     }
 
-    public static FormatTypes fromValue(String v) {
+    public static InputTypes fromValue(String v) {
         return valueOf(v);
     }
 
