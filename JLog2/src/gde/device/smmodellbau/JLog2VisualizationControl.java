@@ -24,7 +24,6 @@ import gde.device.IDevice;
 import gde.device.smmodellbau.jlog2.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.ui.MeasurementControl;
 import gde.ui.MeasurementControlConfigurable;
 import gde.ui.SWTResourceManager;
 
