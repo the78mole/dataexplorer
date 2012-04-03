@@ -502,6 +502,9 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	public void open_closeCommPort() {
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String fileEnding = this.getDataBlockPreferredFileExtention();
+		fileEnding = fileEnding.startsWith(GDE.STRING_STAR) ? fileEnding.substring(1) : fileEnding;
+		final String dotFileEnding = fileEnding.startsWith(GDE.STRING_DOT) ? fileEnding : GDE.STRING_DOT+fileEnding;
 		if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
@@ -514,11 +517,11 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 			public void run() {
 				for (String tmpFileName : fd.getFileNames()) {
 					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-					if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
+					if (!selectedImportFile.toLowerCase().endsWith(dotFileEnding)) {
 						if (selectedImportFile.contains(GDE.STRING_DOT)) {
 							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
 						}
-						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_TXT;
+						selectedImportFile = selectedImportFile + dotFileEnding;
 					}
 					log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 					
