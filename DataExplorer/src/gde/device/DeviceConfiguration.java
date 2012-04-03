@@ -2140,11 +2140,32 @@ public class DeviceConfiguration {
 	 * @return the last used channel number
 	 */
 	public void setLastChannelNumber(int channelNumber) {
-		if (this.deviceProps.getChannels().getLastUseOrdinal() != (channelNumber - 1))  {
+		if (this.deviceProps.getChannels().getLastUseOrdinal() != (channelNumber - 1) && channelNumber <= this.deviceProps.getChannels().channel.size())  {
 			this.isChangePropery = true;
 			this.deviceProps.getChannels().setLastUseOrdinal(channelNumber - 1);
 		}
 		this.storeDeviceProperties();
+	}
+	
+	/**
+	 * query the channel properties if there are any
+	 * @return
+	 */
+	public List<ChannelPropertyType> getChannelProperties() {
+		return this.deviceProps.getChannels().property;
+	}
+	
+	/**
+	 * query the channel properties if there are any
+	 * @return property type if exist or null if not exist
+	 */
+	public ChannelPropertyType getChannelProperty(ChannelPropertyTypes key) {
+		if (getChannelProperties() != null) {
+			for (ChannelPropertyType property : getChannelProperties()) {
+				if (property.name.equals(key)) return property;
+			}
+		}
+		return null;
 	}
 
 	/**
