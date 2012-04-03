@@ -26,8 +26,8 @@
         <UTCdelta>0</UTCdelta>
     </TimeBase>
     <DataBlock>
-        <format inputType="SERIAL_IO" formatType="BYTE" size="57"/>
-        <format inputType="FILE_IO" formatType="BYTE" size="64"/>
+        <format size="57" formatType="BYTE" inputType="SERIAL_IO"/>
+        <format size="64" formatType="BYTE" inputType="FILE_IO"/>
         <timeUnit>msec</timeUnit>
         <leader>$</leader>
         <trailer>0D0A</trailer>
@@ -135,7 +135,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Toleranzfaktor - höherer Wert, stärkerer Filter" type="Double" value="90.0" name="factor"/>
+                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="90.0" name="filter_factor"/>
             </Measurement>
             <Measurement>
                 <name>Längengrad</name>
@@ -143,7 +143,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Toleranzfaktor - höherer Wert, stärkerer Filter" type="Double" value="25.0" name="factor"/>
+                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="25.0" name="filter_factor"/>
             </Measurement>
             <Measurement>
                 <name>Geschwindigkeit</name>
@@ -1391,6 +1391,7 @@
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
+        <property type="Boolean" value="true" name="enable_filter"/>
     </Channels>
     <Desktop>
         <property value="true" name="table_tab"/>

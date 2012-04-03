@@ -139,8 +139,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final HoTTAdapterDialog			dialog;
 	final HoTTAdapterSerialPort	serialPort;
 
-	static double latitudeTolranceFactor = 100.0;
-	static double longitudeTolranceFactor = 100.0;
+	static boolean							isFilterEnabled					= true;
+	static double								latitudeTolranceFactor	= 90.0;
+	static double								longitudeTolranceFactor	= 25.0;
 	
 	/**
 	 * constructor using properties file

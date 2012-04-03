@@ -22,6 +22,8 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
+import gde.device.ChannelPropertyTypes;
+import gde.device.MeasurementPropertyTypes;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
 import gde.log.Level;
@@ -78,7 +80,7 @@ public class HoTTbinReader {
 	 * @throws IOException 
 	 */
 	public static HashMap<String, String> getFileInfo(File file) throws IOException {
-		final String $METHOD_NAME = "getHeader";
+		final String $METHOD_NAME = "getFileInfo";
 		DataInputStream data_in = null;
 		byte[] buffer = new byte[64];
 		HashMap<String, String> fileInfo;
@@ -93,10 +95,10 @@ public class HoTTbinReader {
 				FileInputStream file_input = new FileInputStream(file);
 				data_in = new DataInputStream(file_input);
 				fileInfo = new HashMap<String, String>();
-				HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
+				if (HoTTbinReader.log.isLoggable(Level.FINER)) HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(buffer.length));
 				for (int i = 0; i < 120; i++) {
 					data_in.read(buffer);
-					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+					if (HoTTbinReader.log.isLoggable(Level.FINER)) HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
 
 					switch (buffer[7]) {
 					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
@@ -222,8 +224,9 @@ public class HoTTbinReader {
 		String recordSetNameExtend = getRecordSetExtend(file);	
 		Channel channel = null;
 		boolean isInitialSwitched = false;
-		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementFactor(3, 1);
-		HoTTAdapter.longitudeTolranceFactor = device.getMeasurementFactor(3, 2);
+		HoTTAdapter.isFilterEnabled = device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null ? Boolean.parseBoolean(device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 90.0;
+		HoTTAdapter.longitudeTolranceFactor = device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 25.0;
 		HoTTbinReader.recordSetReceiver = null; //0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader.recordSetGeneral = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
@@ -590,8 +593,9 @@ public class HoTTbinReader {
 		String recordSetNameExtend = getRecordSetExtend(file);	
 		Channel channel = null;
 		boolean isInitialSwitched = false;
-		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementFactor(3, 1);
-		HoTTAdapter.longitudeTolranceFactor = device.getMeasurementFactor(3, 2);
+		HoTTAdapter.isFilterEnabled = device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null ? Boolean.parseBoolean(device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 90.0;
+		HoTTAdapter.longitudeTolranceFactor = device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 25.0;
 		HoTTbinReader.recordSetReceiver = null; //0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader.recordSetGeneral = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
@@ -960,7 +964,7 @@ public class HoTTbinReader {
 			_pointsVario[0] = (_buf0[4] & 0xFF) * 1000;
 			tmpHeight = DataParser.parse2Short(_buf1, 2);
 			tmpClimb10 = DataParser.parse2UnsignedShort(_buf2, 2);
-			if (tmpHeight > 10 && tmpHeight < 5000 && tmpClimb10 < 40000 && tmpClimb10 > 20000) {
+			if (!HoTTAdapter.isFilterEnabled || tmpHeight > 10 && tmpHeight < 5000 && tmpClimb10 < 40000 && tmpClimb10 > 20000) {
 				_pointsVario[1] = tmpHeight * 1000;
 				//pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
 				//pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
@@ -1008,7 +1012,7 @@ public class HoTTbinReader {
 	private static void parseAddGPS(RecordSet _recordSetGPS, int[] _pointsGPS, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, long _timeStep_ms) throws DataInconsitsentException {
 		tmpHeight = DataParser.parse2Short(_buf2, 8);
 		tmpClimb3 = (_buf3[2] & 0xFF);
-		if (tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000) {
+		if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 			_pointsGPS[0] = (_buf0[4] & 0xFF) * 1000;
 			_pointsGPS[6] = DataParser.parse2Short(_buf1, 4) * 1000;
@@ -1019,27 +1023,27 @@ public class HoTTbinReader {
 			latitudeTolerance = _pointsGPS[6] / 1000.0  * (_timeStep_ms - lastLatitudeTimeStep) / HoTTAdapter.latitudeTolranceFactor;
 			latitudeTolerance = latitudeTolerance > 0 ? latitudeTolerance : 5;
 
-			if (_pointsGPS[1] == 0 	|| tmpLatitudeDelta <= latitudeTolerance) {
+			if (!HoTTAdapter.isFilterEnabled || _pointsGPS[1] == 0 	|| tmpLatitudeDelta <= latitudeTolerance) {
 				lastLatitudeTimeStep = _timeStep_ms;
 				_pointsGPS[1] = tmpLatitude;
 			}
 			else {
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", _timeStep_ms) + " Lat " + tmpLatitude + " - " + tmpLatitudeDelta);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", _timeStep_ms - GDE.ONE_HOUR_MS) + " Lat " + tmpLatitude + " - " + tmpLatitudeDelta);
 			}
 			
 			tmpLongitude = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
 			tmpLongitude = _buf2[1] == 1 ? -1 * tmpLongitude : tmpLongitude;
-//			tmpLongitudeDelta = Math.abs(tmpLongitude -_pointsGPS[2]);
-//			longitudeTolerance = _pointsGPS[6] / 1000.0  * (_timeStep_ms - lastLongitudeTimeStep) / HoTTAdapter.longitudeTolranceFactor;
-//			longitudeTolerance = longitudeTolerance > 0 ? longitudeTolerance : 5;
-//
-//			if (_pointsGPS[2] == 0 	|| tmpLongitudeDelta <= longitudeTolerance) {
-//				lastLongitudeTimeStep = _timeStep_ms;
+			tmpLongitudeDelta = Math.abs(tmpLongitude -_pointsGPS[2]);
+			longitudeTolerance = _pointsGPS[6] / 1000.0  * (_timeStep_ms - lastLongitudeTimeStep) / HoTTAdapter.longitudeTolranceFactor;
+			longitudeTolerance = longitudeTolerance > 0 ? longitudeTolerance : 5;
+
+			if (!HoTTAdapter.isFilterEnabled || _pointsGPS[2] == 0 	|| tmpLongitudeDelta <= longitudeTolerance) {
+				lastLongitudeTimeStep = _timeStep_ms;
 				_pointsGPS[2] = tmpLongitude;
-//			}
-//			else {
-//				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", _timeStep_ms) + " Long " + tmpLongitude + " - " + tmpLongitudeDelta);
-//			}
+			}
+			else {
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", _timeStep_ms - GDE.ONE_HOUR_MS) + " Long " + tmpLongitude + " - " + tmpLongitudeDelta);
+			}
 
 			_pointsGPS[3] = tmpHeight * 1000;
 			_pointsGPS[4] = DataParser.parse2UnsignedShort(_buf3, 0) * 1000;
@@ -1082,7 +1086,7 @@ public class HoTTbinReader {
 		int tmpVoltage2 = DataParser.parse2Short(_buf2, 1);
 		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
-		if (tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsGeneral[3] / 1000) {
+		if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsGeneral[3] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			_pointsGeneral[0] = (_buf0[4] & 0xFF) * 1000;
@@ -1142,7 +1146,7 @@ public class HoTTbinReader {
 		int tmpVoltage2 = DataParser.parse2Short(_buf2[9], _buf3[0]);
 		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
 		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
-		if (tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsElectric[3] / 1000) {
+		if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsElectric[3] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			_pointsElectric[0] = (_buf1[4] & 0xFF) * 1000;
