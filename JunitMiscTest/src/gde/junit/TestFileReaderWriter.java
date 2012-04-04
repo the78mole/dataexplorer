@@ -1010,8 +1010,10 @@ public class TestFileReaderWriter extends TestSuperClass {
 						//System.out.println("file.getPath() = " + file.getPath());
 						String deviceName = file.getPath().substring(0, file.getPath().lastIndexOf(GDE.FILE_SEPARATOR));
 						deviceName = deviceName.substring(1+deviceName.lastIndexOf(GDE.FILE_SEPARATOR));
+						deviceName = deviceName.contains(GDE.STRING_UNDER_BAR) ? deviceName.substring(1+deviceName.lastIndexOf(GDE.STRING_UNDER_BAR)) : deviceName;
 						//System.out.println("deviceName = " + deviceName);
-						if (deviceName.startsWith("NMEA") || deviceName.startsWith("GPS") || deviceName.startsWith("DataVario") || deviceName.startsWith("LinkVario") || deviceName.startsWith("HoTT")) {
+						if (deviceName.startsWith("NMEA") || deviceName.startsWith("GPS") || deviceName.startsWith("DataVario") || deviceName.startsWith("LinkVario") 
+								|| deviceName.startsWith("HoTT")) {
 						
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
 							if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
