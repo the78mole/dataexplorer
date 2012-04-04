@@ -333,6 +333,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			UltraDuoPlusDialog.numberMemories = 45;
 			this.channelNumbers = new String[] { "1" }; //$NON-NLS-1$
 			break;
+		case UltraDuoPlus50:
+			UltraDuoPlusDialog.numberMemories = 50;
+			this.channelNumbers = new String[] { "1", "2" }; //$NON-NLS-1$ //$NON-NLS-2$
+			break;
 		case UltraDuoPlus60:
 			UltraDuoPlusDialog.numberMemories = 60;
 			this.channelNumbers = new String[] { "1", "2" }; //$NON-NLS-1$ //$NON-NLS-2$
@@ -474,6 +478,13 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										UltraDuoPlusDialog.this.channelValues1[15] = Integer.parseInt(date[0]);
 										UltraDuoPlusDialog.this.channelValues1[16] = Integer.parseInt(date[3]);
 										UltraDuoPlusDialog.this.channelValues1[17] = Integer.parseInt(date[4]);
+										break;
+									case UltraDuoPlus50:
+										UltraDuoPlusDialog.this.channelValues1[10] = Integer.parseInt(date[2]);
+										UltraDuoPlusDialog.this.channelValues1[11] = Integer.parseInt(date[1]);
+										UltraDuoPlusDialog.this.channelValues1[12] = Integer.parseInt(date[0]);
+										UltraDuoPlusDialog.this.channelValues1[13] = Integer.parseInt(date[3]);
+										UltraDuoPlusDialog.this.channelValues1[14] = Integer.parseInt(date[4]);
 										break;
 									case UltraDuoPlus60:
 										UltraDuoPlusDialog.this.channelValues1[10] = Integer.parseInt(date[2]);

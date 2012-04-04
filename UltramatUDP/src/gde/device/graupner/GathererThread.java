@@ -234,6 +234,7 @@ public class GathererThread extends Thread {
 						}
 						break;
 
+					case UltraDuoPlus50:
 					case UltraDuoPlus60:
 						if (this.isProgrammExecuting3) { // checks for processes active includes check state change waiting to discharge to charge
 							this.isCombinedMode = true;
