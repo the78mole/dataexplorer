@@ -14,6 +14,7 @@ add SM Modellbau JLog2 support (import, configure)
 fix error cut curves with constant time step
 update device properties schema to enable extended configuration
 update device properties editor to reflect schema updates
+UltraDuoPlus 50 - fix error to enable curve recording
 
 
 Version 2.96 - 24 Feb 2012
