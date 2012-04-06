@@ -933,7 +933,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 														"100 ~ 20000 mA", 220, true, 50, 150, 100, 20000, -100); //$NON-NLS-1$ 
 												this.memoryParameters[11] = new ParameterConfigControl(this.chargeGroup, this.memoryValues, 11, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2265), 175,
 														Messages.getString(MessageIds.GDE_MSGT2310), 220, true, 50, 150, 10, 155);
-												this.memoryParameters[10] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0)//°C
+												this.memoryParameters[10] = (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 ||this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus40 ? this.channelValues1[4] == 0 : this.channelValues1[0] == 0)//°C
 												? new ParameterConfigControl(this.chargeGroup, this.memoryValues, 10, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2264), 175,
 														"10 ~ 80°C", 220, false, 50, 150, 10, 80) //$NON-NLS-1$ 
 														: new ParameterConfigControl(this.chargeGroup, this.memoryValues, 10, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2264), 175,
@@ -1834,7 +1834,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		}
 		catch (Throwable e) {
 			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-			e.printStackTrace();
 		}
 		log.log(java.util.logging.Level.FINER, GDE.STRING_EXIT);
 	}

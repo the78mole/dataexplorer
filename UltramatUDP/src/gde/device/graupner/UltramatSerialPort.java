@@ -65,10 +65,10 @@ public class UltramatSerialPort extends DeviceCommPort {
 	final static byte[]	READ_GRAPHICS_DATA						= new byte[] { DeviceSerialPortImpl.FF, '8', '9', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 1001
 	final static byte[]	WRITE_GRAPHICS_DATA						= new byte[] { DeviceSerialPortImpl.FF, '0', '9' };																																//0000 1001
 
-	final static int		SIZE_MEMORY_SETUP							= 28;
+	static int					SIZE_MEMORY_SETUP							= 28;
 	final static int		SIZE_MEMORY_STEP_CHARGE_SETUP	= 20;
-	final static int		SIZE_MEMORY_TRACE							= 6;
-	final static int		SIZE_MEMORY_CYCLE							= 121;
+	static int					SIZE_MEMORY_TRACE							= 6;
+	static int					SIZE_MEMORY_CYCLE							= 121;
 	static int					SIZE_CHANNEL_1_SETUP					= 16;
 	final static int		SIZE_CHANNEL_2_SETUP					= 4;
 	final static int		SIZE_TIRE_HEATER_SETUP				= 8;
@@ -90,10 +90,22 @@ public class UltramatSerialPort extends DeviceCommPort {
 	public UltramatSerialPort(Ultramat currentDevice, DataExplorer currentApplication) {
 		super(currentDevice, currentApplication);
 		switch (currentDevice.getDeviceTypeIdentifier()) {
+		case UltraDuoPlus40:
+			UltramatSerialPort.SIZE_CHANNEL_1_SETUP = 19; // additional supply input 2 voltage, current
+			UltramatSerialPort.SIZE_MEMORY_SETUP = 27;
+			break;
+			
 		case UltraDuoPlus45:
 			UltramatSerialPort.SIZE_CHANNEL_1_SETUP = 19; // additional supply input 2 voltage, current
+			UltramatSerialPort.SIZE_MEMORY_TRACE = 5;
 			break;
 
+		case UltraDuoPlus50:
+			UltramatSerialPort.SIZE_CHANNEL_1_SETUP = 16;
+			UltramatSerialPort.SIZE_MEMORY_TRACE = 5;
+			UltramatSerialPort.SIZE_MEMORY_SETUP = 27;
+			break;
+			
 		case UltraDuoPlus60:
 		default:
 			UltramatSerialPort.SIZE_CHANNEL_1_SETUP = 16;
@@ -219,6 +231,9 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 */
 	public synchronized String readMemoryName(int number) throws IOException, TimeOutException, SerialPortException {
 		byte[] answer = this.readConfigData(UltramatSerialPort.READ_MEMORY_NAME, 23, number);
+		for (int i = 1; i < answer.length-1; i++) {
+			if (answer[i] < 31 || answer[i] > 126) answer[i] = ' ';
+		}
 		return String.format(DeviceSerialPortImpl.FORMAT_16_CHAR, answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12],
 				answer[13], answer[14], answer[15], answer[16]);
 	}
@@ -232,7 +247,16 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 * @throws SerialPortException 
 	 */
 	public synchronized String readMemorySetup(int number) throws IOException, TimeOutException, SerialPortException {
-		return new String(this.readConfigData(UltramatSerialPort.READ_MEMORY_SETUP, UltramatSerialPort.SIZE_MEMORY_SETUP * 4 + 7, number)).substring(1, UltramatSerialPort.SIZE_MEMORY_SETUP * 4 + 1);
+		switch (((Ultramat)this.device).getDeviceTypeIdentifier()) {
+		case UltraDuoPlus40:
+		case UltraDuoPlus50: //no checksum !
+			return new String(this.readConfigData(UltramatSerialPort.READ_MEMORY_SETUP, UltramatSerialPort.SIZE_MEMORY_SETUP * 4 + 3, number)).substring(1, UltramatSerialPort.SIZE_MEMORY_SETUP * 4 + 1);
+			
+		case UltraDuoPlus45:
+		case UltraDuoPlus60:
+		default:
+			return new String(this.readConfigData(UltramatSerialPort.READ_MEMORY_SETUP, UltramatSerialPort.SIZE_MEMORY_SETUP * 4 + 7, number)).substring(1, UltramatSerialPort.SIZE_MEMORY_SETUP * 4 + 1);
+		}
 	}
 
 	/**

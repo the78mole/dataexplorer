@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabItem;
 
 /**
  * Graupner Ultra Duo Plus base class which extends the Ultramat base class
@@ -73,7 +74,6 @@ public class UltraDuoPlus40 extends Ultramat {
 				Messages.getString(MessageIds.GDE_MSGT2236), Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
-		this.dialog = null; //there is a setup interface, but without checksums in communication strings, temorary disabled
 	}
 
 	/**
@@ -101,7 +101,6 @@ public class UltraDuoPlus40 extends Ultramat {
 				Messages.getString(MessageIds.GDE_MSGT2236), Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
-		this.dialog = null; //there is a setup interface, but without checksums in communication strings, temorary disabled
 	}
 
 	/**
@@ -422,5 +421,15 @@ public class UltraDuoPlus40 extends Ultramat {
 		if (Integer.parseInt(unit) == 0)
 			this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 5, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
 		else if (Integer.parseInt(unit) == 1) this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 5, DeviceConfiguration.UNIT_DEGREE_FAHRENHEIT);
+	}
+
+	/**
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * specific curve calculated from point combinations or other specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
+	 */
+	@Override
+	public CTabItem getUtilityDeviceTabItem() {
+		return this.application.getUtilGraphicsWindow(Messages.getString(MessageIds.GDE_MSGT2340));
 	}
 }
