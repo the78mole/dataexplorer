@@ -147,7 +147,7 @@ public class RecordSet extends HashMap<String, Record> {
 //	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
 	
 	private final String[]				propertyKeys									= new String[] { TIME_STEP_MS, START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE,
-			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, VOLTAGE_LIMITS	};
+			HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, VOLTAGE_LIMITS	};
 
 	int														configuredDisplayable					= 0;																						// number of record which must be displayable before table calculation begins
 
@@ -1597,8 +1597,8 @@ public class RecordSet extends HashMap<String, Record> {
 		sb.append(HORIZONTAL_GRID_COLOR).append(GDE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(GDE.STRING_COMMA).append(this.horizontalGridColor.getGreen())
 				.append(GDE.STRING_COMMA).append(this.horizontalGridColor.getBlue()).append(Record.DELIMITER);
 		
-//		sb.append(SYNC_RECORD_SELECTED).append(GDE.STRING_EQUAL).append(this.isSyncRecordSelected).append(Record.DELIMITER);
-
+		sb.append(SMOOTH_AT_CURRENT_DROP).append(GDE.STRING_EQUAL).append(this.isSmoothAtCurrentDrop).append(Record.DELIMITER);
+		
 		sb.append(VOLTAGE_LIMITS).append(GDE.STRING_EQUAL);
 		for (int value : this.voltageLimits) {
 			sb.append(value).append(GDE.STRING_COMMA);
@@ -1684,6 +1684,9 @@ public class RecordSet extends HashMap<String, Record> {
 				this.horizontalGridColor = SWTResourceManager.getColor(new Integer(tmpValue.split(GDE.STRING_COMMA)[0]), new Integer(tmpValue.split(GDE.STRING_COMMA)[1]), new Integer(tmpValue
 						.split(GDE.STRING_COMMA)[2]));
 				
+			tmpValue = recordSetProps.get(SMOOTH_AT_CURRENT_DROP);
+			if (tmpValue != null && tmpValue.length() > 0) this.isSmoothAtCurrentDrop = new Boolean(tmpValue.trim()).booleanValue();
+
 			tmpValue = recordSetProps.get(VOLTAGE_LIMITS);
 			if (tmpValue != null && tmpValue.length() > 0) {
 				String[] strVoltageValues = tmpValue.trim().split(GDE.STRING_COMMA);
