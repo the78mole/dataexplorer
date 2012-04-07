@@ -53,7 +53,6 @@
 				<active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
-                <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
 			</Measurement>
 			<Measurement>
 				<name>Voltage</name>

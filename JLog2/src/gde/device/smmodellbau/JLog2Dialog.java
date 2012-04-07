@@ -19,6 +19,7 @@
 package gde.device.smmodellbau;
 
 import gde.GDE;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -64,12 +65,14 @@ public class JLog2Dialog extends DeviceDialog {
 	Composite											visualizationMainComposite, uniLogVisualization, mLinkVisualization;
 	Composite											configurationMainComposite;
 
-	Button												saveVisualizationButton, inputFileButton, helpButton, closeButton;
+	Button												saveVisualizationButton, inputFileButton, helpButton, liveGathererButton, closeButton;
 
 	CTabItem											gpsLoggerTabItem, telemetryTabItem;
+	JLog2LiveGathererThread				liveThread;
 
 	final JLog2								device;																																						// get device specific things, get serial port, ...
 	final Settings								settings;																																					// application configuration settings
+	final JLog2SerialPort			serialPort;																																			// open/close port execute getData()....
 
 	RecordSet											lastActiveRecordSet		= null;
 	boolean												isVisibilityChanged	= false;
@@ -84,6 +87,7 @@ public class JLog2Dialog extends DeviceDialog {
 	public JLog2Dialog(Shell parent, JLog2 useDevice) {
 		super(parent);
 		this.device = useDevice;
+		this.serialPort = useDevice.getCommunicationPort();
 		this.settings = Settings.getInstance();
 		this.measurementsCount = Math.abs(this.device.getDataBlockSize(InputTypes.FILE_IO));
 	}
@@ -227,6 +231,58 @@ public class JLog2Dialog extends DeviceDialog {
 					});
 				}
 				{
+					this.liveGathererButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
+					FormData saveSetupButtonLData = new FormData();
+					saveSetupButtonLData.width = 130;
+					saveSetupButtonLData.height = GDE.IS_MAC ? 33 : 30;
+					saveSetupButtonLData.right = new FormAttachment(1000, 1000, -155);
+					saveSetupButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
+					this.liveGathererButton.setLayoutData(saveSetupButtonLData);
+					this.liveGathererButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2807));
+					this.liveGathererButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (JLog2Dialog.log.isLoggable(java.util.logging.Level.FINE)) JLog2Dialog.log.log(java.util.logging.Level.FINE, "liveGathererButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (JLog2Dialog.this.liveThread == null || !JLog2Dialog.this.serialPort.isConnected()) {
+								try {
+									JLog2Dialog.this.liveThread = new JLog2LiveGathererThread(JLog2Dialog.this.application, JLog2Dialog.this.device, JLog2Dialog.this.serialPort, JLog2Dialog.this.application.getActiveChannelNumber());
+									try {
+										JLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2806), Messages.getString(MessageIds.GDE_MSGT2806));
+										JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2806));
+										JLog2Dialog.this.liveThread.start();
+									}
+									catch (RuntimeException e) {
+										JLog2Dialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+									}
+								}
+								catch (Exception e) {
+									if (JLog2Dialog.this.liveThread != null && JLog2Dialog.this.liveThread.isAlive()) {
+										JLog2Dialog.this.liveThread.stopDataGathering();
+										JLog2Dialog.this.liveThread.interrupt();
+									}
+									JLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2804), Messages.getString(MessageIds.GDE_MSGT2804));
+									JLog2Dialog.this.application.updateGraphicsWindow();
+									JLog2Dialog.this.application.openMessageDialog(JLog2Dialog.this.getDialogShell(),
+											Messages.getString(MessageIds.GDE_MSGW2801, new Object[] { e.getClass().getSimpleName(), e.getMessage() }));
+									JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2805));
+									JLog2Dialog.this.liveThread = null;
+								}
+							}
+							else {
+								if (JLog2Dialog.this.liveThread != null && JLog2Dialog.this.liveThread.isAlive()) {
+									JLog2Dialog.this.liveThread.stopDataGathering();
+									JLog2Dialog.this.liveThread.interrupt();
+								}
+								JLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2804), Messages.getString(MessageIds.GDE_MSGT2804));
+								JLog2Dialog.this.application.updateGraphicsWindow();
+								JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2805));
+								//JLog2Dialog.this.liveThread = null;
+							}
+						}
+					});
+				}
+				{
 					this.closeButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData closeButtonLData = new FormData();
 					closeButtonLData.width = 130;
@@ -252,6 +308,12 @@ public class JLog2Dialog extends DeviceDialog {
 				this.dialogShell.setVisible(true);
 				this.dialogShell.setActive();
 			}
+			
+			if (this.serialPort != null && this.serialPort.isConnected()) 
+				this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2806));
+			else
+				this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2805));
+
 			Display display = this.dialogShell.getDisplay();
 			while (!this.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();

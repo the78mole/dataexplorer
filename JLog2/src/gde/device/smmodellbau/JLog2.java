@@ -67,6 +67,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	final DataExplorer		application;
 	final Channels				channels;
 	final JLog2Dialog	dialog;
+	final JLog2SerialPort	serialPort;
 
 	/**
 	 * constructor using properties file
@@ -80,6 +81,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.serialPort = this.application != null ? new JLog2SerialPort(this, this.application) : new JLog2SerialPort(this, null);
 		this.dialog = new JLog2Dialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2804), Messages.getString(MessageIds.GDE_MSGT2804));
@@ -98,6 +100,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.serialPort = this.application != null ? new JLog2SerialPort(this, this.application) : new JLog2SerialPort(this, null);
 		this.dialog = new JLog2Dialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2804), Messages.getString(MessageIds.GDE_MSGT2804));
@@ -495,11 +498,42 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * @return the serialPort
+	 */
+	@Override
+	public JLog2SerialPort getCommunicationPort() {
+		return this.serialPort;
+	}
+
+	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
+		switch (application.getMenuBar().getSerialPortIconSet()) {
+		case DeviceCommPort.ICON_SET_IMPORT_CLOSE:
+			importDeviceData();
+			break;
+			
+		case DeviceCommPort.ICON_SET_START_STOP:
+			this.serialPort.isInterruptedByUser = true;
+			if (this.dialog != null && !this.dialog.isDisposed())
+				GDE.display.asyncExec(new Runnable() {
+					public void run() {
+						JLog2.this.dialog.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2805));
+					}
+				});
+			break;
+		}
+	}
+
+	/**
+	 * method toggle open close serial port or start/stop gathering data from device
+	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
+	 * as example a file selection dialog could be opened to import serialized ASCII data 
+	 */
+	public void importDeviceData() {
 		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
 		String fileEnding = this.getDataBlockPreferredFileExtention();
@@ -568,5 +602,14 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 				}
 			});
 		}
+	}
+	
+	/**
+	 * query the process name according defined states
+	 * @param buffer
+	 * @return
+	 */
+	public String getProcessName(byte[] buffer) {
+		return this.getStateProperty(Integer.parseInt((new String(buffer).split(this.getDataBlockSeparator().value())[1]))).getName();
 	}
 }

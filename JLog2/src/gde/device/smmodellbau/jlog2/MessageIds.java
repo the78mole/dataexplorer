@@ -24,6 +24,8 @@ package gde.device.smmodellbau.jlog2;
  */ 
 public class MessageIds { 
 
+	public final static String	GDE_MSGW2800 = "GDE_MSGW2800";
+	public final static String	GDE_MSGW2801 = "GDE_MSGW2801";
 	public final static String	GDE_MSGI2800 = "GDE_MSGI2800";
 	public final static String	GDE_MSGT2800 = "GDE_MSGT2800";
 	public final static String	GDE_MSGT2801 = "GDE_MSGT2801";
