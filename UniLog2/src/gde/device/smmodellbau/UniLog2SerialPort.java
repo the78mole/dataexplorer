@@ -56,8 +56,6 @@ public class UniLog2SerialPort extends DeviceCommPort {
 	boolean 							isTransmitFinished			= false;
 	
 	int 									reveiceErrors 					= 0;
-	
-	boolean								isInterruptedByUser			= false;	
 
 	/**
 	 * constructor of default implementation
