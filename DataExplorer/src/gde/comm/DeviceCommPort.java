@@ -47,6 +47,8 @@ public class DeviceCommPort implements IDeviceCommPort {
 	public static final int ICON_SET_OPEN_CLOSE = 0;
 	public static final int ICON_SET_START_STOP = 1;
 	public static final int ICON_SET_IMPORT_CLOSE = 2;
+	
+	public boolean				isInterruptedByUser	= false;	
 
 	/**
 	 * constructor of default implementation
@@ -225,5 +227,12 @@ public class DeviceCommPort implements IDeviceCommPort {
 	 */
 	public int getAvailableBytes() throws IOException {
 		return this.port.getAvailableBytes();
+	}
+
+	/**
+	 * @param setInterruptedByUser the isInterruptedByUser to set
+	 */
+	public synchronized void setInterruptedByUser(boolean setInterruptedByUser) {
+		this.isInterruptedByUser = setInterruptedByUser;
 	}
 }

@@ -133,6 +133,7 @@ public class DataExplorer extends Composite {
 	public final static Color			COLOR_BLUE												= SWTResourceManager.getColor(SWT.COLOR_BLUE);
 	public final static Color			COLOR_DARK_GREEN									= SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
 	public final static Color			COLOR_BLACK												= SWTResourceManager.getColor(SWT.COLOR_BLACK);
+	public final static Color			COLOR_RED													= SWTResourceManager.getColor(SWT.COLOR_RED);
 
 	public final static int				TAB_INDEX_GRAPHIC									= 0;
 	public final static int				TAB_INDEX_DATA_TABLE							= 1;

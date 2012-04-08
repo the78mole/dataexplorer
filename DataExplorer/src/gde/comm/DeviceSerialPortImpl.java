@@ -367,7 +367,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				this.outputStream.flush();
 			}
 
-			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Write : " + StringHelper.byte2Hex2CharString(writeBuffer, writeBuffer.length));
+			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Write : " + StringHelper.byte2Hex2CharString(writeBuffer, writeBuffer.length));
 		}
 		catch (IOException e) {
 			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -399,7 +399,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				this.outputStream.flush();
 			}
 
-			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Write : " + StringHelper.byte2Hex2CharString(writeBuffer, writeBuffer.length));
+			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Write : " + StringHelper.byte2Hex2CharString(writeBuffer, writeBuffer.length));
 		}
 		catch (IOException e) {
 			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -419,7 +419,8 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		final String $METHOD_NAME = "cleanInputStream"; //$NON-NLS-1$
 		int num = 0;
 		if ((num = this.inputStream.available()) != 0) {
-			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "clean inputStream left bytes -> " + this.inputStream.read(new byte[num])); //$NON-NLS-1$
+			this.inputStream.read(new byte[num]);
+			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "clean inputStream left bytes -> " + num); //$NON-NLS-1$
 		}
 		return num;
 	}
@@ -716,8 +717,12 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				readBuffer = tmpBuffer;
 			}
 
-			log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
+			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
 
+		}
+		catch (IndexOutOfBoundsException e) {
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			throw e;
 		}
 		catch (IOException e) {
 			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
@@ -756,7 +761,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			WaitTimer.delay(sleepTime);
 
 			if (byteCounter == (numBytesAvailable = this.inputStream.available()) && byteCounter > 0) {
-				//log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "stableCounter = " + stableCounter + " byteCounter = " + byteCounter); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "stableCounter = " + stableCounter + " byteCounter = " + byteCounter); //$NON-NLS-1$ //$NON-NLS-2$
 				--stableCounter;
 			}
 			else 
