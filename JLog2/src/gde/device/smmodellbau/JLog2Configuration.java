@@ -1385,6 +1385,10 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					jlogVersionCombo.setEditable(false);
 					jlogVersionCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
 					jlogVersionCombo.setToolTipText("Select JLog type");
+					RowData jlogConfigurationComboLData = new RowData();
+					jlogConfigurationComboLData.width = 80;
+					jlogConfigurationComboLData.height = 17;
+					jlogVersionCombo.setLayoutData(jlogConfigurationComboLData);
 				}
 				{
 					jlogFirmwareCombo = new CCombo(mainConfigGroup, SWT.BORDER);
@@ -1392,6 +1396,10 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					jlogFirmwareCombo.setText("3.3.2");
 					jlogFirmwareCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
 					jlogFirmwareCombo.setToolTipText("Select JLog firmware version");
+					RowData jlogConfigurationComboLData = new RowData();
+					jlogConfigurationComboLData.width = 80;
+					jlogConfigurationComboLData.height = 17;
+					jlogFirmwareCombo.setLayoutData(jlogConfigurationComboLData);
 					jlogFirmwareCombo.setEditable(false);
 					jlogFirmwareCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
