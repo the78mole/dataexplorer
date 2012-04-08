@@ -486,8 +486,8 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				RowLayout optionalGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				optionalGroup.setLayout(optionalGroupLayout);
 				FormData optionalGroupLData = new FormData();
-				optionalGroupLData.left = new FormAttachment(0, 1000, 252);
-				optionalGroupLData.top = new FormAttachment(0, 1000, 325);
+				optionalGroupLData.top =  new FormAttachment(0, 1000, 325);
+				optionalGroupLData.right =  new FormAttachment(1000, 1000, -7);
 				optionalGroupLData.width = 400;
 				optionalGroupLData.height = 240;
 				optionalGroup.setLayoutData(optionalGroupLData);
