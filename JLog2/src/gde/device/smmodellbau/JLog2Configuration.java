@@ -72,6 +72,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 	private Button								logStopButton;
 	private Button								highPulsWidthButton;
 	private Button								ext1smallerButton, ext2smallerButton, ext3smallerButton, ext4smallerButton, ext5smallerButton;
+	private Label label_IL3;
 	private Button								sensorAdapterButton;
 	private CCombo								telemetryCombo;
 	private Button								telemetryButton;
@@ -1586,7 +1587,13 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					});
 				}
 				{
-					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(120, 19));
+					label_IL3 = new Label(mainConfigGroup, SWT.NONE);
+					RowData label_IL3LData = new RowData();
+					label_IL3LData.width = 199;
+					label_IL3LData.height = 19;
+					label_IL3.setLayoutData(label_IL3LData);
+				}
+				{
 				}
 				{
 					logModeLabel = new CLabel(mainConfigGroup, SWT.NONE);
