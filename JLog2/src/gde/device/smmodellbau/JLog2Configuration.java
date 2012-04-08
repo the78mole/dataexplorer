@@ -1470,11 +1470,11 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					gearRatioLabel = new CLabel(mainConfigGroup, SWT.CENTER | SWT.EMBEDDED);
 					RowData gearRatioLabelLData = new RowData();
-					gearRatioLabelLData.width = 328;
+					gearRatioLabelLData.width = 395;
 					gearRatioLabelLData.height = 20;
 					gearRatioLabel.setLayoutData(gearRatioLabelLData);
 					gearRatioLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					gearRatioLabel.setText("adjust gear ratio");
+					gearRatioLabel.setText("adjust gear ratio                                             ");
 				}
 				{
 					sysModeLabel = new CLabel(mainConfigGroup, SWT.NONE);
