@@ -159,7 +159,7 @@ public class JLog2Dialog extends DeviceDialog {
 					}
 					{
 						this.configurationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
-						this.configurationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.configurationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+(GDE.IS_LINUX ? 1 : 0), SWT.NORMAL));
 						this.configurationTabItem.setText("Configuration");
 						this.configurationTabItem.setControl(new JLog2Configuration(this.tabFolder, SWT.NONE));
 					}
@@ -222,9 +222,9 @@ public class JLog2Dialog extends DeviceDialog {
 				{
 					this.helpButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData helpButtonLData = new FormData();
-					helpButtonLData.width = GDE.IS_MAC ? 50 : 40;
+					helpButtonLData.width = GDE.IS_MAC ? 60 : GDE.IS_LINUX ? 70 : 50;
 					helpButtonLData.height = GDE.IS_MAC ? 33 : 30;
-					helpButtonLData.left = new FormAttachment(0, 1000, 302);
+					helpButtonLData.left = new FormAttachment(0, 1000, GDE.IS_LINUX ? 332 : 302);
 					helpButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 					this.helpButton.setLayoutData(helpButtonLData);
 					this.helpButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -337,7 +337,7 @@ public class JLog2Dialog extends DeviceDialog {
 	 */
 	private void createVisualizationTabItem(int channelNumber, int numMeasurements) {
 		this.visualizationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
-		this.visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		this.visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+(GDE.IS_LINUX ? 1 : 0), SWT.NORMAL));
 		this.visualizationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2809) + GDE.STRING_MESSAGE_CONCAT + this.device.getChannelName(channelNumber));
 
 		this.visualizationMainComposite = new Composite(this.tabFolder, SWT.NONE);

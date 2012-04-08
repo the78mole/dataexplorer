@@ -72,7 +72,6 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 	private Button								logStopButton;
 	private Button								highPulsWidthButton;
 	private Button								ext1smallerButton, ext2smallerButton, ext3smallerButton, ext4smallerButton, ext5smallerButton;
-	private Label label_IL3;
 	private Button								sensorAdapterButton;
 	private CCombo								telemetryCombo;
 	private Button								telemetryButton;
@@ -353,7 +352,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 			super(parent, style);
 			RowLayout mpxAddressCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			RowData mpxAddressCompositeLData = new RowData();
-			mpxAddressCompositeLData.width = 95;
+			mpxAddressCompositeLData.width = GDE.IS_LINUX ? 105 : 95;
 			mpxAddressCompositeLData.height = 22;
 			this.setLayoutData(mpxAddressCompositeLData);
 			this.setLayout(mpxAddressCompositeLayout);
@@ -368,12 +367,12 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 			}
 			{
 				RowData mpxAddressComboLData = new RowData();
-				mpxAddressComboLData.width = 35;
+				mpxAddressComboLData.width = GDE.IS_LINUX ? 45 : 35;
 				mpxAddressComboLData.height = 16;
 				mpxAddressCombo = new CCombo(this, SWT.BORDER);
 				mpxAddressCombo.setLayoutData(mpxAddressComboLData);
 				mpxAddressCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				mpxAddressCombo.setItems(new String[] { " 0", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", "10", "11", "12", "13", "14", "15", "--" });
+				mpxAddressCombo.setItems(new String[] { " 0", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " 11", " 12", " 13", " 14", " 15", " --" });
 				mpxAddressCombo.select(16);
 				mpxAddressCombo.setEnabled(false);
 				mpxAddressCombo.addSelectionListener(new SelectionAdapter() {
@@ -489,10 +488,10 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				FormData optionalGroupLData = new FormData();
 				optionalGroupLData.top =  new FormAttachment(0, 1000, 325);
 				optionalGroupLData.right =  new FormAttachment(1000, 1000, -7);
-				optionalGroupLData.width = 400;
+				optionalGroupLData.width = GDE.IS_LINUX ? 440 : 400;
 				optionalGroupLData.height = 240;
 				optionalGroup.setLayoutData(optionalGroupLData);
-				optionalGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				optionalGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+(GDE.IS_LINUX ? 2 : 0), SWT.NORMAL));
 				optionalGroup.setText("optional");
 				{
 					alarmLinesButton = new Button(optionalGroup, SWT.PUSH | SWT.CENTER);
@@ -506,7 +505,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					alarmLinesCombo = new CCombo(optionalGroup, SWT.BORDER);
 					RowData alarmLinesComboLData = new RowData();
-					alarmLinesComboLData.width = 32;
+					alarmLinesComboLData.width = GDE.IS_LINUX ? 45 : 32;
 					alarmLinesComboLData.height = 17;
 					alarmLinesCombo.setLayoutData(alarmLinesComboLData);
 					alarmLinesCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -538,7 +537,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					line1signalCombo = new CCombo(optionalGroup, SWT.BORDER);
 					RowData line1signalComboLData = new RowData();
-					line1signalComboLData.width = 74;
+					line1signalComboLData.width = GDE.IS_LINUX ? 84 : 74;
 					line1signalComboLData.height = 17;
 					line1signalCombo.setLayoutData(line1signalComboLData);
 					line1signalCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -575,7 +574,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					subDevicesCombo.setText("none");
 					subDevicesCombo.setEditable(false);
 					RowData subDevicesComboLData = new RowData();
-					subDevicesComboLData.width = 62;
+					subDevicesComboLData.width = GDE.IS_LINUX ? 72 : 62;
 					subDevicesComboLData.height = 17;
 					subDevicesCombo.setLayoutData(subDevicesComboLData);
 					subDevicesCombo.setEnabled(false);
@@ -605,7 +604,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					tempSensorTypeCombo = new CCombo(optionalGroup, SWT.BORDER);
 					RowData tempSensorTypeComboLData = new RowData();
-					tempSensorTypeComboLData.width = 74;
+					tempSensorTypeComboLData.width = GDE.IS_LINUX ? 84 : 74;
 					tempSensorTypeComboLData.height = 17;
 					tempSensorTypeCombo.setLayoutData(tempSensorTypeComboLData);
 					tempSensorTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -637,7 +636,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					rpmSensorCombo = new CCombo(optionalGroup, SWT.BORDER);
 					RowData rpmSensorComboLData = new RowData();
-					rpmSensorComboLData.width = 62;
+					rpmSensorComboLData.width = GDE.IS_LINUX ? 72 : 62;
 					rpmSensorComboLData.height = 17;
 					rpmSensorCombo.setLayoutData(rpmSensorComboLData);
 					rpmSensorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -723,7 +722,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					telemetryCombo = new CCombo(optionalGroup, SWT.BORDER);
 					RowData telemetryComboLData = new RowData();
-					telemetryComboLData.width = 113;
+					telemetryComboLData.width = GDE.IS_LINUX ?  123 : 113;
 					telemetryComboLData.height = 17;
 					telemetryCombo.setLayoutData(telemetryComboLData);
 					telemetryCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -800,10 +799,10 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				FormData alarmGroupLData = new FormData();
 				alarmGroupLData.left = new FormAttachment(0, 1000, 5);
 				alarmGroupLData.top = new FormAttachment(0, 1000, 325);
-				alarmGroupLData.width = 235;
+				alarmGroupLData.width = GDE.IS_LINUX ? 265 : 235;
 				alarmGroupLData.height = 240;
 				alarmGroup.setLayoutData(alarmGroupLData);
-				alarmGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				alarmGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+(GDE.IS_LINUX ? 2 : 0), SWT.NORMAL));
 				alarmGroup.setText("alarms");
 				{
 					alarmsClearButton = new Button(alarmGroup, SWT.PUSH | SWT.CENTER);
@@ -830,7 +829,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					uBecDipDetectButton = new Button(alarmGroup, SWT.CHECK | SWT.CENTER);
 					RowData uBecDipDetectButtonLData = new RowData();
-					uBecDipDetectButtonLData.width = 138;
+					uBecDipDetectButtonLData.width =  GDE.IS_LINUX ? 158 : 138;
 					uBecDipDetectButtonLData.height = 21;
 					uBecDipDetectButton.setLayoutData(uBecDipDetectButtonLData);
 					uBecDipDetectButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -862,7 +861,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					capacityAlarmCombo = new CCombo(alarmGroup, SWT.BORDER);
 					RowData capacityAlarmComboLData = new RowData();
-					capacityAlarmComboLData.width = 57;
+					capacityAlarmComboLData.width =  GDE.IS_LINUX ? 77 : 57;
 					capacityAlarmComboLData.height = 17;
 					capacityAlarmCombo.setLayoutData(capacityAlarmComboLData);
 					capacityAlarmCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -903,7 +902,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					voltagebatteryMinCombo1 = new CCombo(alarmGroup, SWT.BORDER);
 					RowData voltagebatteryMinCombo1LData = new RowData();
-					voltagebatteryMinCombo1LData.width = 34;
+					voltagebatteryMinCombo1LData.width =  GDE.IS_LINUX ? 45 : 35;
 					voltagebatteryMinCombo1LData.height = 17;
 					voltagebatteryMinCombo1.setLayoutData(voltagebatteryMinCombo1LData);
 					voltagebatteryMinCombo1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -925,10 +924,10 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				}
 				{
 					dotLabel = new CLabel(alarmGroup, SWT.NONE);
-					dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					dotLabel.setText(".");
 					RowData RALData = new RowData();
-					RALData.width = 7;
+					RALData.width = 8;
 					RALData.height = 20;
 					dotLabel.setLayoutData(RALData);
 					dotLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
@@ -936,7 +935,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					voltagebatteryAlarmMaxCombo2 = new CCombo(alarmGroup, SWT.BORDER);
 					RowData voltagebatteryAlarmMaxCombo2LData = new RowData();
-					voltagebatteryAlarmMaxCombo2LData.width = 34;
+					voltagebatteryAlarmMaxCombo2LData.width =  GDE.IS_LINUX ? 45 : 35;
 					voltagebatteryAlarmMaxCombo2LData.height = 17;
 					voltagebatteryAlarmMaxCombo2.setLayoutData(voltagebatteryAlarmMaxCombo2LData);
 					voltagebatteryAlarmMaxCombo2.setText("05");
@@ -976,7 +975,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					paTempMaxCombo = new CCombo(alarmGroup, SWT.BORDER);
 					RowData paTempMaxComboLData = new RowData();
-					paTempMaxComboLData.width = 57;
+					paTempMaxComboLData.width = GDE.IS_LINUX ? 55 :45;
 					paTempMaxComboLData.height = 17;
 					paTempMaxCombo.setLayoutData(paTempMaxComboLData);
 					paTempMaxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1017,7 +1016,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					extern1Combo = new CCombo(alarmGroup, SWT.BORDER);
 					RowData extern1ComboLData = new RowData();
-					extern1ComboLData.width = 46;
+					extern1ComboLData.width = GDE.IS_LINUX ? 55 :45;
 					extern1ComboLData.height = 17;
 					extern1Combo.setLayoutData(extern1ComboLData);
 					extern1Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1049,7 +1048,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					ext1smallerButton = new Button(alarmGroup, SWT.CHECK | SWT.LEFT);
 					RowData ext1smallerButtonLData = new RowData();
-					ext1smallerButtonLData.width = 31;
+					ext1smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
 					ext1smallerButtonLData.height = 20;
 					ext1smallerButton.setLayoutData(ext1smallerButtonLData);
 					ext1smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1067,7 +1066,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					extern2Combo = new CCombo(alarmGroup, SWT.BORDER);
 					RowData extern2ComboLData = new RowData();
-					extern2ComboLData.width = 46;
+					extern2ComboLData.width = GDE.IS_LINUX ? 55 :45;
 					extern2ComboLData.height = 17;
 					extern2Combo.setLayoutData(extern2ComboLData);
 					extern2Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1099,7 +1098,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					ext2smallerButton = new Button(alarmGroup, SWT.CHECK | SWT.LEFT);
 					RowData ext2smallerButtonLData = new RowData();
-					ext2smallerButtonLData.width = 31;
+					ext2smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
 					ext2smallerButtonLData.height = 20;
 					ext2smallerButton.setLayoutData(ext2smallerButtonLData);
 					ext2smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1147,7 +1146,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					extern3Combo = new CCombo(alarmGroup, SWT.BORDER);
 					RowData extern3ComboLData = new RowData();
-					extern3ComboLData.width = 46;
+					extern3ComboLData.width = GDE.IS_LINUX ? 55 :45;
 					extern3ComboLData.height = 17;
 					extern3Combo.setLayoutData(extern3ComboLData);
 					extern3Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1179,7 +1178,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					ext3smallerButton = new Button(alarmGroup, SWT.CHECK | SWT.LEFT);
 					RowData ext3smallerButtonLData = new RowData();
-					ext3smallerButtonLData.width = 31;
+					ext3smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
 					ext3smallerButtonLData.height = 20;
 					ext3smallerButton.setLayoutData(ext3smallerButtonLData);
 					ext3smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1211,7 +1210,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					extern4Combo = new CCombo(alarmGroup, SWT.BORDER);
 					RowData extern4ComboLData = new RowData();
-					extern4ComboLData.width = 46;
+					extern4ComboLData.width = GDE.IS_LINUX ? 55 :45;
 					extern4ComboLData.height = 17;
 					extern4Combo.setLayoutData(extern4ComboLData);
 					extern4Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1243,7 +1242,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					ext4smallerButton = new Button(alarmGroup, SWT.CHECK | SWT.LEFT);
 					RowData ext4smallerButtonLData = new RowData();
-					ext4smallerButtonLData.width = 31;
+					ext4smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
 					ext4smallerButtonLData.height = 20;
 					ext4smallerButton.setLayoutData(ext4smallerButtonLData);
 					ext4smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1275,7 +1274,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					extern5Combo = new CCombo(alarmGroup, SWT.BORDER);
 					RowData extern5ComboLData = new RowData();
-					extern5ComboLData.width = 46;
+					extern5ComboLData.width = GDE.IS_LINUX ? 55 :45;
 					extern5ComboLData.height = 17;
 					extern5Combo.setLayoutData(extern5ComboLData);
 					extern5Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1307,7 +1306,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					ext5smallerButton = new Button(alarmGroup, SWT.CHECK | SWT.LEFT);
 					RowData ext5smallerButtonLData = new RowData();
-					ext5smallerButtonLData.width = 31;
+					ext5smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
 					ext5smallerButtonLData.height = 20;
 					ext5smallerButton.setLayoutData(ext5smallerButtonLData);
 					ext5smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1338,7 +1337,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				mainConfigGroupLData.right =  new FormAttachment(1000, 1000, -7);
 				mainConfigGroupLData.height = 290;
 				mainConfigGroup.setLayoutData(mainConfigGroupLData);
-				mainConfigGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				mainConfigGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+(GDE.IS_LINUX ? 2 : 0), SWT.NORMAL));
 				mainConfigGroup.setText("main configuration");
 				{
 					jlcUrlLabel = new CLabel(mainConfigGroup, SWT.CENTER | SWT.EMBEDDED);
@@ -1368,7 +1367,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					jlcForumButton.setText("JCL forum");
 				}
 				{
-					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(620, 5));
+					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(this.getClientArea().width - 30, 5));
 				}
 				{
 					mainConfigLabel = new CLabel(mainConfigGroup, SWT.NONE);
@@ -1442,7 +1441,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					});
 				}
 				{
-					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(620, 5));
+					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(this.getClientArea().width - 30, 5));
 				}
 				{
 					baudrateLabel = new CLabel(mainConfigGroup, SWT.NONE);
@@ -1540,7 +1539,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					directRatioCombo = new CCombo(mainConfigGroup, SWT.BORDER);
 					RowData directRatioComboLData = new RowData();
-					directRatioComboLData.width = 45;
+					directRatioComboLData.width = GDE.IS_LINUX ? 55 :45;
 					directRatioComboLData.height = 17;
 					directRatioCombo.setLayoutData(directRatioComboLData);
 					directRatioCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1561,13 +1560,17 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				}
 				{
 					dotLabel = new CLabel(mainConfigGroup, SWT.NONE);
-					dotLabel.setText(" . ");
-					dotLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
+					RowData dotLabelLData = new RowData();
+					dotLabelLData.width = 8;
+					dotLabelLData.height = 20;
+					dotLabel.setLayoutData(dotLabelLData);
+					dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					dotLabel.setText(".");
 				}
 				{
 					gearRatioMinorCombo = new CCombo(mainConfigGroup, SWT.BORDER);
 					RowData gearRatioMinorComboLData = new RowData();
-					gearRatioMinorComboLData.width = 45;
+					gearRatioMinorComboLData.width = GDE.IS_LINUX ? 55 :45;
 					gearRatioMinorComboLData.height = 17;
 					gearRatioMinorCombo.setLayoutData(gearRatioMinorComboLData);
 					gearRatioMinorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1587,7 +1590,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					});
 				}
 				{
-					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(200, 19));
+					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(GDE.IS_LINUX ? 190 : 120, 19));
 				}
 				{
 					logModeLabel = new CLabel(mainConfigGroup, SWT.NONE);
@@ -1651,7 +1654,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					pinionCombo = new CCombo(mainConfigGroup, SWT.BORDER);
 					RowData pinionComboLData = new RowData();
-					pinionComboLData.width = 45;
+					pinionComboLData.width = GDE.IS_LINUX ? 55 :45;
 					pinionComboLData.height = 17;
 					pinionCombo.setLayoutData(pinionComboLData);
 					pinionCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1685,7 +1688,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					mainGearCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					mainGearCombo.setText("45");
 					RowData mainGearComboLData = new RowData();
-					mainGearComboLData.width = 45;
+					mainGearComboLData.width = GDE.IS_LINUX ? 55 :45;
 					mainGearComboLData.height = 17;
 					mainGearCombo.setLayoutData(mainGearComboLData);
 					mainGearCombo.setEnabled(false);
@@ -1705,19 +1708,19 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				}
 				{
 					dotLabel = new CLabel(mainConfigGroup, SWT.NONE);
-					dotLabel.setText(".");
 					RowData dotLabelLData = new RowData();
 					dotLabelLData.width = 8;
 					dotLabelLData.height = 20;
 					dotLabel.setLayoutData(dotLabelLData);
 					dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					dotLabel.setText(".");
 				}
 				{
 					secondgearCombo = new CCombo(mainConfigGroup, SWT.BORDER);
 					secondgearCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					secondgearCombo.setText("27");
 					RowData secondgearComboLData = new RowData();
-					secondgearComboLData.width = 45;
+					secondgearComboLData.width = GDE.IS_LINUX ? 55 :45;
 					secondgearComboLData.height = 17;
 					secondgearCombo.setLayoutData(secondgearComboLData);
 					secondgearCombo.setEnabled(false);
@@ -1736,7 +1739,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					});
 				}
 				{
-					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(75, 19));
+					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(GDE.IS_LINUX ? 85 : 75, 19));
 				}
 				{
 					motorPolsLabel = new CLabel(mainConfigGroup, SWT.NONE);
@@ -1782,7 +1785,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					motorShuntCombo = new CCombo(mainConfigGroup, SWT.BORDER);
 					RowData motorShuntComboLData = new RowData();
-					motorShuntComboLData.width = 45;
+					motorShuntComboLData.width = GDE.IS_LINUX ? 55 :45;
 					motorShuntComboLData.height = 17;
 					motorShuntCombo.setLayoutData(motorShuntComboLData);
 					motorShuntCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1811,7 +1814,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					mainExplanationText = new Text(mainConfigGroup, SWT.BORDER);
 					RowData mainExplanationTextLData = new RowData();
 					//int w = this.getClientArea().width;
-					mainExplanationTextLData.width = this.getClientArea().width - (GDE.IS_MAC ? 35 : 45);
+					mainExplanationTextLData.width = this.getClientArea().width - (GDE.IS_MAC ? 35 : GDE.IS_LINUX ? 0 : 45);
 					mainExplanationTextLData.height = 80;
 					mainExplanationText.setLayoutData(mainExplanationTextLData);
 					mainExplanationText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
