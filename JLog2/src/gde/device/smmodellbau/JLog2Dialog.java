@@ -62,6 +62,7 @@ public class JLog2Dialog extends DeviceDialog {
 
 	CTabFolder										tabFolder, subTabFolder1, subTabFolder2;
 	CTabItem											visualizationTabItem;
+	CTabItem											configurationTabItem;
 	Composite											visualizationMainComposite, uniLogVisualization, mLinkVisualization;
 	Composite											configurationMainComposite;
 
@@ -155,6 +156,12 @@ public class JLog2Dialog extends DeviceDialog {
 						for (int i = 1; i <= this.device.getChannelCount(); i++) {
 							createVisualizationTabItem(i, this.measurementsCount);
 						}
+					}
+					{
+						this.configurationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
+						this.configurationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.configurationTabItem.setText("Configuration");
+						this.configurationTabItem.setControl(new JLog2Configuration(this.tabFolder, SWT.NONE));
 					}
 					FormData tabFolderLData = new FormData();
 					tabFolderLData.top = new FormAttachment(0, 1000, 0);

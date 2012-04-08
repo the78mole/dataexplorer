@@ -486,10 +486,10 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				RowLayout optionalGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				optionalGroup.setLayout(optionalGroupLayout);
 				FormData optionalGroupLData = new FormData();
-				optionalGroupLData.width = 397;
-				optionalGroupLData.height = 237;
-				optionalGroupLData.left = new FormAttachment(0, 1000, 260);
-				optionalGroupLData.top = new FormAttachment(0, 1000, 328);
+				optionalGroupLData.left = new FormAttachment(0, 1000, 252);
+				optionalGroupLData.top = new FormAttachment(0, 1000, 325);
+				optionalGroupLData.width = 400;
+				optionalGroupLData.height = 240;
 				optionalGroup.setLayoutData(optionalGroupLData);
 				optionalGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				optionalGroup.setText("optional");
@@ -797,10 +797,10 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				RowLayout alarmGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				alarmGroup.setLayout(alarmGroupLayout);
 				FormData alarmGroupLData = new FormData();
+				alarmGroupLData.left = new FormAttachment(0, 1000, 5);
+				alarmGroupLData.top = new FormAttachment(0, 1000, 325);
 				alarmGroupLData.width = 235;
-				alarmGroupLData.height = 237;
-				alarmGroupLData.left = new FormAttachment(0, 1000, 7);
-				alarmGroupLData.top = new FormAttachment(0, 1000, 328);
+				alarmGroupLData.height = 240;
 				alarmGroup.setLayoutData(alarmGroupLData);
 				alarmGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				alarmGroup.setText("alarms");
@@ -1798,7 +1798,8 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				{
 					mainExplanationText = new Text(mainConfigGroup, SWT.BORDER);
 					RowData mainExplanationTextLData = new RowData();
-					mainExplanationTextLData.width = 640;
+					//int w = this.getClientArea().width;
+					mainExplanationTextLData.width = this.getClientArea().width - 45;
 					mainExplanationTextLData.height = 80;
 					mainExplanationText.setLayoutData(mainExplanationTextLData);
 					mainExplanationText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
