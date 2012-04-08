@@ -373,7 +373,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 				mpxAddressCombo = new CCombo(this, SWT.BORDER);
 				mpxAddressCombo.setLayoutData(mpxAddressComboLData);
 				mpxAddressCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				mpxAddressCombo.setItems(new String[] { " 0", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " 11", " 12", " 13", " 14", " 15", " --" });
+				mpxAddressCombo.setItems(new String[] { " 0", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", "10", "11", "12", "13", "14", "15", "--" });
 				mpxAddressCombo.select(16);
 				mpxAddressCombo.setEnabled(false);
 				mpxAddressCombo.addSelectionListener(new SelectionAdapter() {
@@ -1710,7 +1710,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					dotLabelLData.width = 8;
 					dotLabelLData.height = 20;
 					dotLabel.setLayoutData(dotLabelLData);
-					dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 				}
 				{
 					secondgearCombo = new CCombo(mainConfigGroup, SWT.BORDER);
@@ -1811,7 +1811,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					mainExplanationText = new Text(mainConfigGroup, SWT.BORDER);
 					RowData mainExplanationTextLData = new RowData();
 					//int w = this.getClientArea().width;
-					mainExplanationTextLData.width = this.getClientArea().width - 45;
+					mainExplanationTextLData.width = this.getClientArea().width - (GDE.IS_MAC ? 35 : 45);
 					mainExplanationTextLData.height = 80;
 					mainExplanationText.setLayoutData(mainExplanationTextLData);
 					mainExplanationText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
