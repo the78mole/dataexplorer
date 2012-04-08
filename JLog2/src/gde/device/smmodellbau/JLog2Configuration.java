@@ -1587,13 +1587,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 					});
 				}
 				{
-					label_IL3 = new Label(mainConfigGroup, SWT.NONE);
-					RowData label_IL3LData = new RowData();
-					label_IL3LData.width = 199;
-					label_IL3LData.height = 19;
-					label_IL3.setLayoutData(label_IL3LData);
-				}
-				{
+					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(200, 19));
 				}
 				{
 					logModeLabel = new CLabel(mainConfigGroup, SWT.NONE);
@@ -1740,6 +1734,9 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 							//TODO add your code for secondgearCombo.mouseMove
 						}
 					});
+				}
+				{
+					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(75, 19));
 				}
 				{
 					motorPolsLabel = new CLabel(mainConfigGroup, SWT.NONE);
