@@ -564,11 +564,11 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 								File oldConfigDataFile = new File(UltraDuoPlusDialog.this.settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
 										+ UltraDuoPlusDialog.this.deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML);
 								if (oldConfigDataFile.exists()) if (!oldConfigDataFile.delete()) log.log(java.util.logging.Level.WARNING, "could not delete " + oldConfigDataFile.getName()); //$NON-NLS-1$
-								UltraDuoPlusDialog.this.deviceIdentifierName = (UltraDuoPlusDialog.this.userNameText.getText() + UltraDuoPlusDialog.STRING_16_BLANK).substring(0, 16);
+								UltraDuoPlusDialog.this.deviceIdentifierName = (UltraDuoPlusDialog.this.userNameText.getText().trim() + UltraDuoPlusDialog.STRING_16_BLANK).substring(0, 16);
 								UltraDuoPlusDialog.this.ultraDuoPlusSetup.setIdentifierName(UltraDuoPlusDialog.this.deviceIdentifierName);
 								UltraDuoPlusDialog.this.ultraDuoPlusSetup.setChanged(true);
 								int position = UltraDuoPlusDialog.this.userNameText.getCaretPosition();
-								UltraDuoPlusDialog.this.userNameText.setText(UltraDuoPlusDialog.this.deviceIdentifierName);
+								UltraDuoPlusDialog.this.userNameText.setText(UltraDuoPlusDialog.this.deviceIdentifierName.trim());
 								UltraDuoPlusDialog.this.userNameText.setSelection(position);
 							}
 
