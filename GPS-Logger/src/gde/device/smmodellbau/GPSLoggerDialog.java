@@ -205,7 +205,8 @@ public class GPSLoggerDialog extends DeviceDialog {
 					this.tabFolder.setSelection(0);
 					this.tabFolder.addListener(SWT.Selection, new Listener() {
 						public void handleEvent(Event event) {
-							if (GPSLoggerDialog.this.tabFolder.getSelectionIndex() == 2) GPSLoggerDialog.this.loggerSetup.loadSetup();
+							if (GPSLoggerDialog.this.tabFolder.getSelectionIndex() == GPSLoggerDialog.this.tabFolder.getItemCount()-1) 
+								GPSLoggerDialog.this.loggerSetup.loadSetup();
 							GPSLoggerDialog.this.configuration1Composite.updateValues();
 							GPSLoggerDialog.this.configuration2Composite.updateValues();
 						}
