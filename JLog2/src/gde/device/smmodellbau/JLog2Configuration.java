@@ -1,17 +1,40 @@
+/**************************************************************************************
+  	This file is part of GNU DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GNU DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Copyright (c) 2012 Winfried Bruegmann
+****************************************************************************************/
 package gde.device.smmodellbau;
 
 import gde.GDE;
-import gde.log.Level;
+import gde.device.smmodellbau.jlog2.MessageIds;
+import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
 
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -25,6 +48,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -42,304 +66,465 @@ import org.eclipse.swt.widgets.Text;
 * THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
-public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
-	final static Logger						log						= Logger.getLogger(JLog2Configuration.class.getName());
-
-	{
-		//Register as a resource user - SWTResourceManager will
-		//handle the obtaining and disposing of resources
-		SWTResourceManager.registerResourceUser(this);
-	}
+public class JLog2Configuration extends Composite {
+	final static Logger						log									= Logger.getLogger(JLog2Configuration.class.getName());
 
 	private Group									mainConfigGroup;
-	private CLabel								jlcUrlLabel;
-	private Button								jlcDownloadButton;
-	private Button								jlcForumButton;
-	private CCombo								jlogConfigurationCombo;
-	private Button								directRatioButton;
-	private CLabel								logModeLabel;
-	private CCombo								paTempMaxCombo;
-	private CLabel								paTempMaxLabel;
-	private CLabel								voltageLabel;
-	private CLabel								mAhLabel;
-	private CCombo								voltagebatteryAlarmMaxCombo2;
-	private CCombo								voltagebatteryMinCombo1;
-	private CLabel								uBatMinAlarmLabel;
-	private CCombo								capacityAlarmCombo;
-	private CLabel								capacityAlarmLabel;
+	private CLabel								jlcUrlLabel, logModeLabel, flagsLabel;
+	private Button								jlcDownloadButton, jlcForumButton, resetButton;
+	private Button								directRatioButton, extRpmButton, logStopButton, highPulsWidthButton, gearSelectionButton;
+	private CLabel								dotLabel, sysModeLabel, gearRatioLabel, baudrateLabel, motorPolsLabel;
+	private CCombo								jlogVersionCombo, jlogFirmwareCombo, jlogConfigurationCombo, logModeCombo, sysModeCombo, baudrateCombo;
+	private CCombo								motorShuntCombo, motorPolsCombo, directGearRatioMajorCombo, directGearRatioDecimalsCombo;
+	private CCombo								gearMainWheelDecimalsCombo, gearMainWheelCombo, gearPinionWheelCombo;
+	private CLabel								mainConfigLabel, gearMainWheelLabel, percentLabel, motorShuntLabel;
+	private Text									mainExplanationText;
+
 	private Group									alarmGroup;
-	private Button								extRpmButton;
-	private Button								logStopButton;
-	private Button								highPulsWidthButton;
-	private Button								ext1smallerButton, ext2smallerButton, ext3smallerButton, ext4smallerButton, ext5smallerButton;
-	private Button								sensorAdapterButton;
-	private CCombo								telemetryCombo;
-	private Button								telemetryButton;
-	private Label									spacer;
-	private Button								brushLessButton;
-	private Button								motorButton;
-	private CCombo								rpmSensorCombo;
-	private Button								rpmSensorButton;
-	private CCombo								tempSensorTypeCombo;
-	private Button								tempSensorTypeButton;
-	private CCombo								subDevicesCombo;
-	private Button								subDevicesButton;
-	private CCombo								line1signalCombo;
-	private CLabel								Line1signalLabel;
-	private CCombo								alarmLinesCombo;
-	private Button								alarmLinesButton;
-	private Group									optionalGroup;
-	private Button								alarmsClearButton;
+	private CLabel								uBecDipDetectLabel, paTempMaxLabel, voltageLabel, mAhLabel, uBatMinAlarmLabel, capacityAlarmLabel;
+	private CLabel								temperaureLabel, temperaure1Label;
+	private CCombo								paTempMaxCombo, voltageBatteryAlarmDecimalsCombo, voltageBatteryAlarmCombo, capacityAlarmCombo;
+	private Button								alarmsClearButton, uBecDipDetectButton, ext1smallerButton, ext2smallerButton, ext3smallerButton, ext4smallerButton, ext5smallerButton;
+	private Button								speedSensorButton;
+	private CLabel								speedSensorLabel;
+	private CCombo								hv2BecCombo;
+	private CLabel								hv2BecLabel;
 	private CCombo								extern1Combo, extern2Combo, extern3Combo, extern4Combo, extern5Combo;
 	private CLabel								ext1Label, ext2Label, ext3Label, ext4Label, ext5Label;
-	private Button								uBecDipDetectButton;
-	private CLabel								temperaureLabel;
-	private Button								resetButton;
-	private CLabel								flagsLabel;
-	private CLabel								mpxAddessesLabel;
-	private Text									mainExplanationText;
-	private CLabel								mainConfigLabel;
-	private CLabel								percentLabel;
-	private CCombo								motorShuntCombo;
-	private CLabel								motorShuntLabel;
-	private CCombo								motorPolsCombo;
-	private CCombo								secondgearCombo;
-	private CLabel								mainGearLabel;
-	private CCombo								mainGearCombo;
-	private CCombo								pinionCombo;
-	private Button								gearSelectionButton;
-	private CCombo								logModeCombo;
-	private CCombo								gearRatioMinorCombo;
-	private CLabel								dotLabel;
-	private CCombo								directRatioCombo;
-	private CCombo								sysModeCombo;
-	private CLabel								sysModeLabel;
-	private CLabel								gearRatioLabel;
-	private CLabel								baudrateLabel;
-	private CLabel								motorPolsLabel;
-	private CCombo								baudrateCombo;
-	private CCombo								jlogFirmwareCombo;
-	private CCombo								jlogVersionCombo;
-	private MpxAddressComposite[]	mpxAddresses	= new MpxAddressComposite[16];
+
+	private Group									optionalGroup;
+	private Composite							optionalStuff;
+	private Button								sensorAdapterButton, motorButton, brushLessButton;
+	private CCombo								alarmLinesCombo, telemetryCombo, pulsPerRevolutionSensorCombo, tempSensorTypeCombo, subDevicesCombo, line1signalTypeCombo;
+	private CLabel								telemetryLabel, rpmSensorLabel, tempSensorTypeLabel, subDevicesLabel, line1signalTypeLabel, alarmLinesLabel, mpxAddessesLabel;
+	private MpxAddressComposite[]	mpxAddresses				= new MpxAddressComposite[16];
+
+	final DataExplorer						application;
+	final JLog2Dialog							dialog;
+	final JLog2										device;
+	final String[]								jlogFirmware				= new String[] { "3.1", "3.2, 3.2.1", "3.2.2" };																																																															//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	final String[]								jlogConfigurations	= new String[] {
+			"---- normal ----", //$NON-NLS-1$
+			Messages.getString(MessageIds.GDE_MSGT2894), Messages.getString(MessageIds.GDE_MSGI2878), Messages.getString(MessageIds.GDE_MSGI2879), Messages.getString(MessageIds.GDE_MSGI2880),
+			Messages.getString(MessageIds.GDE_MSGI2881), Messages.getString(MessageIds.GDE_MSGI2882), Messages.getString(MessageIds.GDE_MSGT2817), Messages.getString(MessageIds.GDE_MSGT2818),
+			Messages.getString(MessageIds.GDE_MSGT2819), Messages.getString(MessageIds.GDE_MSGT2820), Messages.getString(MessageIds.GDE_MSGT2821), Messages.getString(MessageIds.GDE_MSGT2822),
+			Messages.getString(MessageIds.GDE_MSGT2823), Messages.getString(MessageIds.GDE_MSGT2824), Messages.getString(MessageIds.GDE_MSGT2825), Messages.getString(MessageIds.GDE_MSGT2831),
+			Messages.getString(MessageIds.GDE_MSGT2837), Messages.getString(MessageIds.GDE_MSGT2843), Messages.getString(MessageIds.GDE_MSGT2846), Messages.getString(MessageIds.GDE_MSGT2852),
+			Messages.getString(MessageIds.GDE_MSGT2856), Messages.getString(MessageIds.GDE_MSGT2862)
+																										//"P1 (Outputs a phase pulse for VBar Governor on K4-1  -  Slow update rate: 100ms! Yet untested w/ VBar!)", 
+																										//"P2 (Outputs a phase pulse for VBar Governor on K4-2  -  Slow update rate: 100ms! Yet untested w/ VBar!)", 
+																										//"AVP1 (JTX telemetry, \"JLog Air\" module + volt 0..12.8V for temp0 + ppulse for VBar Gov on K4-1  -  Slow update rate: 100ms!)", 
+																										//"AP2 (JTX telemetry, \"JLog Air\" module + outputs a phase pulse for VBar Gov on K4-2  -  Slow update rate: 100ms! Yet untested!)", 
+																										};
+	final String									normal							= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,2,3,4,5,6,7,8,12,13,16,16,16,14,9,10,11,36,0";																													//$NON-NLS-1$
+	final String									HSS									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,9,0,0,6,2,3,4,5,6,7,8,12,13,16,16,16,14,9,10,11,36,200";																											//$NON-NLS-1$
+	final String									HSSG2								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,201";																							//$NON-NLS-1$
+	final String									HSST								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,202";																							//$NON-NLS-1$
+	final String									BH									= "9600,0,128,6,2,1,0,10,10,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,210,0";																						//$NON-NLS-1$
+	final String									BM									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,211,0";																						//$NON-NLS-1$
+	final String									BHSS								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,212,0";																						//$NON-NLS-1$
+	final String									BHSST								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,213,0";																						//$NON-NLS-1$
+	final String									G										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,10";																								//$NON-NLS-1$
+	final String									S										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,15";																											//$NON-NLS-1$
+	final String									L										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,2,3,4,5,6,7,8,16,16,16,16,16,12,9,10,11,36,40";																												//$NON-NLS-1$
+	final String									T										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,9,0,0,6,2,3,4,5,6,7,8,16,16,16,16,16,12,9,10,11,36,110";																												//$NON-NLS-1$
+	final String									GT									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,111";																								//$NON-NLS-1$
+	final String									V										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,1";																									//$NON-NLS-1$
+	final String									VG									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,23";																								//$NON-NLS-1$
+	final String									VS									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,4,5,6,7,8,9,10,16,14,16,16,16,16,11,12,13,36,16";																											//$NON-NLS-1$
+	final String									BID									= "9600,0,192,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,4,5,6,7,8,9,10,16,14,16,16,16,16,11,12,13,36,2";																												//$NON-NLS-1$
+	final String									BIDG								= "9600,0,192,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,20";																								//$NON-NLS-1$
+	final String									BIDS								= "9600,0,192,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,25";																											//$NON-NLS-1$
+	final String									A										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,5";																												//$NON-NLS-1$
+	final String									AV									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,6";																												//$NON-NLS-1$
+	final String									B										= "0,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,3,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,132,3";																													//$NON-NLS-1$
+	final String									BV									= "0,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,3,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,132,4";																													//$NON-NLS-1$
+	final String									P1									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,91";																											//$NON-NLS-1$
+	final String									P2									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,92";																											//$NON-NLS-1$
+	final String									AVP1								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,180";																											//$NON-NLS-1$
+	final String									AP2									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,170";																											//$NON-NLS-1$
+
+	final String[]								baudrates						= new String[] { "JIVE", "2400", "4800", "9600", "38400", "57600", "115200", "CMT" };																																												//$NON-NLS-1$
+	final String[]								sysModes						= new String[] { "NEWLOG", "SEQLOG" };																																																																				//$NON-NLS-1$ //$NON-NLS-2$
+	final String[]								logModes						= new String[] { "(0) OF/CSV", "(2) SER", "(8) JLV" };																																																												//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	final String[]								motorPols						= new String[] {
+			"2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24", "26", "38", "30", "32", "34", "36", "38", "40", "42", "44", "46", "48" };																																							//$NON-NLS-1$
+	final String[]								motorShuntAdjust		= new String[] {
+			"-15", "-14", "-13", "-12", "-11", "-10", " -9", " -8", " -7", " -6", " -5", " -4", " -3", " -2", " -1", "  0", "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15" };	//$NON-NLS-1$
+	final String[]								zeroTo9							= new String[10];																																																																															;
+	final String[]								zeroTo99						= new String[100];																																																																														;
+	final String[]								zeroTo50						= new String[51];
+	final String[]								oneTo50							= new String[50];
+	final String[]								eightTo30						= new String[23];
+	final String[]								eightTo255					= new String[248];
+	final String[]								zeroTo127						= new String[127];																																																																														;
+	final String[]								zeroTo25500					= new String[256];
+	final String[]								zeroAlarms					= new String[] { "0" };																																																																											//$NON-NLS-1$
+	final String[]								oneAlarms						= new String[] { "0", "1" };																																																																									//$NON-NLS-1$
+	final String[]								greaterOneAlarms		= new String[] { "0", "1", "2" };																																																																						//$NON-NLS-1$
 
 	public class Configuration {
 
-		final String[]	config;
-		String					version							= "3.2.2";
-		int							configurationLength	= 48;
+		String[]	config;
+		String		version	= "3.2.2";	//$NON-NLS-1$
 
-		Configuration() {
-			this.config = new String[48];
-			this.config[4] = "2";
-			this.config[7] = "10";
-			this.config[8] = "10";
-			this.config[26] = "9";
+		Configuration(String newConfiguration) {
+			String[] tmpConfig = newConfiguration.split(GDE.STRING_COMMA);
+			this.config = new String[tmpConfig.length];
+			for (int i = 0; i < tmpConfig.length; i++) {
+				this.config[i] = tmpConfig[i];
+			}
 		}
 
-		public void setVersion(String newVersion) {
+		public void update(String updatedConfig) {
+			String[] tmpConfig = updatedConfig.split(GDE.STRING_COMMA);
+			this.config = new String[tmpConfig.length];
+			for (int i = 0; i < tmpConfig.length; i++) {
+				this.config[i] = tmpConfig[i];
+			}
+			JLog2Configuration.log.log(java.util.logging.Level.FINE, getConfiguration());
+			initialyzeGUI(this, false);
+		}
+
+		public int get(int index) {
+			return Integer.valueOf(this.config[index]);
+		}
+
+		public void setFirmwareVersion(String newVersion) {
 			this.version = newVersion;
-			this.config[46] = newVersion.equals("3.1") ? "4" : newVersion.startsWith("3.2") && newVersion.endsWith("3.2.1") ? "36" : "36";
-			this.configurationLength = newVersion.equals("3.2.2") ? this.config.length : this.config.length - 1;
+			this.config[46] = newVersion.equals("3.1") ? "4" : newVersion.startsWith("3.2") && newVersion.endsWith("3.2.1") ? "36" : "36"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		}
 
 		public String getConfiguration() {
 			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < this.config.length; i++) {
-				sb.append(this.config[i]).append(GDE.STRING_COMMA);
+			for (String element : this.config) {
+				sb.append(element).append(GDE.STRING_COMMA);
 			}
-			return sb.delete(sb.length() - 1, sb.length() - 1).toString();
+			return sb.delete(sb.length() - 1, sb.length()).toString();
 		}
 
-		public void setBaudRate(String baudeRate) {
+		public void setBaudRate(int baudeRateIndex) {
+			String baudeRate = "9600"; //$NON-NLS-1$
+			switch (baudeRateIndex) {
+			case 1:
+				baudeRate = "2400"; //$NON-NLS-1$
+				break;
+			case 2:
+				baudeRate = "4800"; //$NON-NLS-1$
+				break;
+			case 3:
+				baudeRate = "9600"; //$NON-NLS-1$
+				break;
+			case 4:
+			case 7: //CMT
+				baudeRate = "38400"; //$NON-NLS-1$
+				break;
+			case 5:
+				baudeRate = "57600"; //$NON-NLS-1$
+				break;
+			case 6:
+				baudeRate = "115200"; //$NON-NLS-1$
+				break;
+			case 0:
+			default:
+				baudeRate = "9600"; //$NON-NLS-1$
+				break;
+			}
 			this.config[0] = baudeRate;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setSysMode(String sysMode) {
-			this.config[1] = sysMode;
-		}
-
-		public void setLogMode(int logMode) { //0=NEWLOG; 1=SEQLOG
-			this.config[2] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[2]) & 0x00FE) + (logMode & 0x01));
+		public void setSysMode(int sysMode) { //0=NEWLOG; 1=SEQLOG
+			this.config[1] = GDE.STRING_EMPTY + sysMode;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMotorCalibration(String calibration) {
-			this.config[2] = GDE.STRING_EMPTY + (calibration + (Integer.valueOf(this.config[2]) & 0x0001));
+			int value = Integer.valueOf(calibration.trim());
+			if ((value & 0x80) == 0)
+				this.config[1] = GDE.STRING_EMPTY + ((value << 1) + (Integer.valueOf(this.config[1]) & 0x0001));
+			else
+				this.config[1] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[1]) & 0x0001) - ((value << 1) - 128));
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
+		public void setLogMode(int logMode) { //0:CSV=0, 1:SER=2, 2:JLV=8
+			switch (logMode) {
+			case 0:
+			default:
+				this.config[2] = GDE.STRING_EMPTY + (Integer.valueOf(this.config[2]) & 0x00F4);
+				break;
+			case 1:
+				this.config[2] = GDE.STRING_EMPTY + (2 + (Integer.valueOf(this.config[2]) & 0x00F4));
+				break;
+			case 2:
+				this.config[2] = GDE.STRING_EMPTY + (8 + (Integer.valueOf(this.config[2]) & 0x00F4));
+				break;
+			}
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMotorPols(String numMotorPols) {
 			this.config[3] = numMotorPols;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setGearRatioMajor(String gearRatioMajor) {
+		public void setGearDirectConfig(boolean isConfig) {
+			this.config[4] = GDE.STRING_EMPTY + (isConfig ? 2 : 1);
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
+		public void setGearRatioMinor(String gearRatioMajor) {
 			this.config[5] = gearRatioMajor;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setGearRatioMinor(String gearRatioMinor) {
-			this.config[6] = gearRatioMinor;
+		public void setGearRatioDecimals(String gearRatioDecimals) {
+			this.config[6] = GDE.STRING_EMPTY + Integer.valueOf(gearRatioDecimals);
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setHighPwmWarning(int highPwmWarning) {
-			this.config[10] = GDE.STRING_EMPTY + (highPwmWarning + (Integer.valueOf(this.config[10]) & 0x0001));
-			;
+		public void setGearPinionWheel(String gearPinionWheel) {
+			this.config[7] = gearPinionWheel;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
+		public void setGearMajorWheel(String gearMainWheel) {
+			this.config[8] = gearMainWheel;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
+		public void setGearMajorWheelDecimals(String gearMainWheelDecimals) {
+			this.config[9] = gearMainWheelDecimals;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setLogStop(int logStop) {
-			this.config[10] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[10]) & 0x00FE) + (logStop & 0x01));
+			this.config[10] = GDE.STRING_EMPTY + ((logStop & 0x0001) + (Integer.valueOf(this.config[10]) & 0xFFFE));
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
+		public void setHighPwmWarning(int highPwmWarning) {
+			this.config[10] = GDE.STRING_EMPTY + ((highPwmWarning & 0x0002) + (this.get(10) & 0xFFFD));
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
+		public void setLogStopExtRpmSensor(int extRpmSensorEffect) {
+			this.config[10] = GDE.STRING_EMPTY + ((extRpmSensorEffect & 0x0004) + (Integer.valueOf(this.config[10]) & 0xFFFB));
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setReset(String reset) {
 			this.config[11] = reset;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setCapacityAlarm(String capacity) {
-			this.config[12] = capacity;
+		public void setCapacityAlarm(int capacity) {
+			this.config[12] = GDE.STRING_EMPTY + capacity;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setBatteryAlarmMajor(String alarmVoltageMajor) {
 			this.config[13] = alarmVoltageMajor;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setBatteryAlarmMinor(String alarmVoltageMinor) {
+		public void setBatteryAlarmDecimals(String alarmVoltageMinor) {
 			this.config[14] = alarmVoltageMinor;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setPaMaxTempAlarm(String pamaxTemperature) {
 			this.config[15] = pamaxTemperature;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setBecDip(String isUbecDip) {
-			this.config[16] = isUbecDip;
+		public void setBecDip(boolean isUbecDip) {
+			this.config[16] = GDE.STRING_EMPTY + (isUbecDip ? 1 : 0);
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setExtTemp1(String extTemp1) {
 			this.config[17] = extTemp1;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setExtTemp2(String extTemp2) {
 			this.config[18] = extTemp2;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setExtTemp3(String extTemp3) {
 			this.config[19] = extTemp3;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setExtTemp4(String extTemp4) {
 			this.config[20] = extTemp4;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setExtTemp5(String extTemp5) {
 			this.config[21] = extTemp5;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setExtTemp1LowerThan(int ltExtTemp1) {
 			this.config[22] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[22]) & 0x00FE) + (ltExtTemp1 & 0x01));
-			;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setExtTemp2LowerThan(int ltExtTemp2) {
-			this.config[22] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[22]) & 0x00FD) + (ltExtTemp2 & 0x02));
-			;
+			this.config[22] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[22]) & 0x00FD) + (ltExtTemp2 << 1 & 0x02));
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setExtTemp3LowerThan(int ltExtTemp3) {
-			this.config[22] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[22]) & 0x00FB) + (ltExtTemp3 & 0x04));
-			;
+			this.config[22] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[22]) & 0x00FB) + (ltExtTemp3 << 2 & 0x04));
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setExtTemp4LowerThan(int ltExtTemp4) {
-			this.config[22] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[22]) & 0x00F7) + (ltExtTemp4 & 0x08));
-			;
+			this.config[22] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[22]) & 0x00F7) + (ltExtTemp4 << 3 & 0x08));
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setExtTemp5LowerThan(int ltExtTemp5) {
-			this.config[22] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[22]) & 0x00EF) + (ltExtTemp5 & 0x10));
-			;
+			this.config[22] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[22]) & 0x00EF) + (ltExtTemp5 << 4 & 0x10));
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setNumAddressLines(int numAddressLines) {
-			this.config[23] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[22]) & 0x00FD) + (numAddressLines == 0 ? 0 : 3));
-			;
+		public void setNumberAlarmLines(int numAddressLines) {
+			this.config[23] = GDE.STRING_EMPTY + numAddressLines;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setTemperaturSensorType(String tempSensorType) {
-			this.config[24] = tempSensorType;
+		public void setTemperaturSensorType(int tempSensorType) {
+			this.config[24] = GDE.STRING_EMPTY + tempSensorType;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setRpmSensorType(int rpmSensorPulsePerRevolution) {
-			this.config[27] = rpmSensorPulsePerRevolution >= 1 ? "1" : "0";
-			this.config[28] = rpmSensorPulsePerRevolution >= 1 ? GDE.STRING_EMPTY + rpmSensorPulsePerRevolution : "0";
+		public void setPulsePerRevolution(int rpmSensorPulsePerRevolution) {
+			this.config[27] = rpmSensorPulsePerRevolution >= 1 ? "1" : "0"; //$NON-NLS-1$ //$NON-NLS-2$
+			this.config[28] = rpmSensorPulsePerRevolution >= 1 ? GDE.STRING_EMPTY + rpmSensorPulsePerRevolution : "0"; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setIsMotor(boolean isMotor) {
-			this.config[29] = isMotor ? GDE.STRING_EMPTY + (Integer.valueOf(this.config[28]) | 0x80) : GDE.STRING_EMPTY + (Integer.valueOf(this.config[29]) & 0xFFBF);
+			this.config[29] = isMotor ? GDE.STRING_EMPTY + (Integer.valueOf(this.config[29]) | 0x40) : GDE.STRING_EMPTY + (Integer.valueOf(this.config[29]) & 0xFFBF);
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setIsBlMotorPols(int brushLessMotorPols) {
-			this.config[29] = GDE.STRING_EMPTY + (Integer.valueOf(this.config[29]) | 0x0180) + brushLessMotorPols;
+		public void setIsBrushlessMotor(boolean isBrushLessMotor, int numMotorPols) {
+			this.config[29] = isBrushLessMotor ? GDE.STRING_EMPTY + (0x80 + numMotorPols) : GDE.STRING_EMPTY + (Integer.valueOf(this.config[29]) & 0xFF7F);
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress0(int mpxSensorAddress) {
-			this.config[30] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[30] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress1(int mpxSensorAddress) {
-			this.config[31] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[31] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress2(int mpxSensorAddress) {
-			this.config[32] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[32] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress3(int mpxSensorAddress) {
-			this.config[33] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[33] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress4(int mpxSensorAddress) {
-			this.config[34] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[34] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress5(int mpxSensorAddress) {
-			this.config[35] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[35] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress6(int mpxSensorAddress) {
-			this.config[36] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[36] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress7(int mpxSensorAddress) {
-			this.config[37] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[37] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress8(int mpxSensorAddress) {
-			this.config[38] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[38] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress9(int mpxSensorAddress) {
-			this.config[39] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[39] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress10(int mpxSensorAddress) {
-			this.config[40] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[40] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress11(int mpxSensorAddress) {
-			this.config[41] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[41] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress12(int mpxSensorAddress) {
-			this.config[42] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[42] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress13(int mpxSensorAddress) {
-			this.config[43] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[43] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress14(int mpxSensorAddress) {
-			this.config[44] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[44] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
 		public void setMpxSensorAddress15(int mpxSensorAddress) {
-			this.config[45] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress;
+			this.config[45] = mpxSensorAddress >= 16 ? "16" : GDE.STRING_EMPTY + mpxSensorAddress; //$NON-NLS-1$
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
+		public void setLine1signalType(int signalType) {
+			this.config[46] = GDE.STRING_EMPTY + (signalType & 0x00E0);
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
+		public void setTelemetryBaudrateType(int type) {
+			this.config[46] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[46]) & 0xFFF0) + (type & 0x000F));
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
+		public void setSubDeviceType(int type) {
+			this.config[46] = GDE.STRING_EMPTY + ((Integer.valueOf(this.config[46]) & 0xFFF0) + (type & 0x000F));
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
+		public void setHV2BecVoltage(int slectionIndex) {
+			if (this.config.length < 48) {
+				String[] tmpConfig = new String[48];
+				for (int i = 0; i < this.config.length; i++) {
+					tmpConfig[i] = this.config[i];
+				}
+				this.config = tmpConfig;
+			}
+			this.config[47] = GDE.STRING_EMPTY + slectionIndex;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 	}
 
@@ -357,85 +542,95 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 			this.setLayoutData(mpxAddressCompositeLData);
 			this.setLayout(mpxAddressCompositeLayout);
 			{
-				mpxAddressLabel = new CLabel(this, SWT.NONE);
+				this.mpxAddressLabel = new CLabel(this, SWT.RIGHT);
 				RowData mpxAddressLabelLData = new RowData();
 				mpxAddressLabelLData.width = 50;
 				mpxAddressLabelLData.height = 20;
-				mpxAddressLabel.setLayoutData(mpxAddressLabelLData);
-				mpxAddressLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				mpxAddressLabel.setText(labelText);
+				this.mpxAddressLabel.setLayoutData(mpxAddressLabelLData);
+				this.mpxAddressLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.mpxAddressLabel.setText(labelText);
 			}
 			{
 				RowData mpxAddressComboLData = new RowData();
 				mpxAddressComboLData.width = GDE.IS_LINUX ? 45 : 35;
 				mpxAddressComboLData.height = 16;
-				mpxAddressCombo = new CCombo(this, SWT.BORDER);
-				mpxAddressCombo.setLayoutData(mpxAddressComboLData);
-				mpxAddressCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				mpxAddressCombo.setItems(new String[] { " 0", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " 11", " 12", " 13", " 14", " 15", " --" });
-				mpxAddressCombo.select(16);
-				mpxAddressCombo.setEnabled(false);
-				mpxAddressCombo.addSelectionListener(new SelectionAdapter() {
+				this.mpxAddressCombo = new CCombo(this, SWT.BORDER);
+				this.mpxAddressCombo.setLayoutData(mpxAddressComboLData);
+				this.mpxAddressCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.mpxAddressCombo.setItems(new String[] { " 0", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " 11", " 12", " 13", " 14", " 15", " --" }); //$NON-NLS-1$
+				this.mpxAddressCombo.select(16);
+				this.mpxAddressCombo.setEnabled(false);
+				this.mpxAddressCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
-						log.log(Level.FINEST, "mpxAddressCombo.widgetSelected, event=" + evt);
+						JLog2Configuration.log.log(java.util.logging.Level.FINEST, "mpxAddressCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						switch (index) {
 						case 0:
-							configuration.setMpxSensorAddress0(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress0(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 1:
-							configuration.setMpxSensorAddress1(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress1(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 2:
-							configuration.setMpxSensorAddress2(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress2(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 3:
-							configuration.setMpxSensorAddress3(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress3(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 4:
-							configuration.setMpxSensorAddress4(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress4(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 5:
-							configuration.setMpxSensorAddress5(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress5(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 6:
-							configuration.setMpxSensorAddress6(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress6(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 7:
-							configuration.setMpxSensorAddress7(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress7(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 8:
-							configuration.setMpxSensorAddress8(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress8(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 9:
-							configuration.setMpxSensorAddress9(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress9(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 10:
-							configuration.setMpxSensorAddress10(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress10(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 11:
-							configuration.setMpxSensorAddress11(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress11(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 12:
-							configuration.setMpxSensorAddress12(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress12(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 13:
-							configuration.setMpxSensorAddress13(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress13(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 14:
-							configuration.setMpxSensorAddress14(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress14(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						case 15:
-							configuration.setMpxSensorAddress15(mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress15(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
 							break;
 						}
+						enableSaveSettings();
 					}
 				});
 			}
 		}
+
+		public void setSelection(int addressIndex) {
+			this.mpxAddressCombo.select(addressIndex);
+		}
 	}
 
 	final Configuration	configuration;
+
+	public void loadConfiuration(String configString) {
+		this.configuration.update(configString);
+		initialyzeGUI(this.configuration, true);
+	}
 
 	/**
 	* Auto-generated main method to display this 
@@ -452,7 +647,7 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 	public static void showGUI() {
 		Display display = Display.getDefault();
 		Shell shell = new Shell(display);
-		JLog2Configuration inst = new JLog2Configuration(shell, SWT.NULL);
+		JLog2Configuration inst = new JLog2Configuration(shell, SWT.NULL, null, null);
 		Point size = inst.getSize();
 		shell.setLayout(new FillLayout());
 		shell.layout();
@@ -470,1447 +665,1875 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 		}
 	}
 
-	public JLog2Configuration(org.eclipse.swt.widgets.Composite parent, int style) {
+	public JLog2Configuration(Composite parent, int style, JLog2Dialog useDialog, JLog2 useDevice) {
 		super(parent, style);
-		this.configuration = new Configuration();
+		this.application = DataExplorer.getInstance();
+		this.dialog = useDialog;
+		this.device = useDevice;
+
+		for (int i = 0; i < this.zeroTo9.length; i++) {
+			this.zeroTo9[i] = GDE.STRING_EMPTY + i;
+		}
+		for (int i = 0; i < this.zeroTo99.length; i++) {
+			this.zeroTo99[i] = (i < 10 ? "0" : GDE.STRING_EMPTY) + i; //$NON-NLS-1$
+		}
+		for (int i = 0; i < this.zeroTo50.length; i++) {
+			this.zeroTo50[i] = GDE.STRING_EMPTY + i;
+		}
+		for (int i = 0; i < this.oneTo50.length; i++) {
+			this.oneTo50[i] = GDE.STRING_EMPTY + (i + 1);
+		}
+		for (int i = 0; i < this.eightTo30.length; i++) {
+			this.eightTo30[i] = GDE.STRING_EMPTY + (i + 8);
+		}
+		for (int i = 0; i < this.eightTo255.length; i++) {
+			this.eightTo255[i] = GDE.STRING_EMPTY + (i + 8);
+		}
+		for (int i = 0; i < this.zeroTo127.length; i++) {
+			this.zeroTo127[i] = GDE.STRING_EMPTY + i;
+		}
+		for (int i = 0; i < this.zeroTo25500.length; i++) {
+			this.zeroTo25500[i] = GDE.STRING_EMPTY + (i * 100);
+		}
+
+		this.configuration = new Configuration(this.normal);
 		initGUI();
+	}
+
+	public void enableSaveSettings() {
+		this.dialog.liveGathererButton.setEnabled(true);
 	}
 
 	private void initGUI() {
 		try {
 			this.setLayout(new FormLayout());
-			this.setSize(675, 596);
-			this.setEnabled(false);
+			this.setSize(675, 600);
 			{
-				optionalGroup = new Group(this, SWT.NONE);
-				RowLayout optionalGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				optionalGroup.setLayout(optionalGroupLayout);
-				FormData optionalGroupLData = new FormData();
-				optionalGroupLData.top =  new FormAttachment(0, 1000, 325);
-				optionalGroupLData.right =  new FormAttachment(1000, 1000, -7);
-				optionalGroupLData.width = GDE.IS_LINUX ? 440 : 400;
-				optionalGroupLData.height = 240;
-				optionalGroup.setLayoutData(optionalGroupLData);
-				optionalGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+(GDE.IS_LINUX ? 2 : 0), SWT.NORMAL));
-				optionalGroup.setText("optional");
-				{
-					alarmLinesButton = new Button(optionalGroup, SWT.PUSH | SWT.CENTER);
-					RowData alarmLinesButtonLData = new RowData();
-					alarmLinesButtonLData.width = 118;
-					alarmLinesButtonLData.height = 25;
-					alarmLinesButton.setLayoutData(alarmLinesButtonLData);
-					alarmLinesButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					alarmLinesButton.setText("# alarm lines");
-				}
-				{
-					alarmLinesCombo = new CCombo(optionalGroup, SWT.BORDER);
-					RowData alarmLinesComboLData = new RowData();
-					alarmLinesComboLData.width = GDE.IS_LINUX ? 45 : 32;
-					alarmLinesComboLData.height = 17;
-					alarmLinesCombo.setLayoutData(alarmLinesComboLData);
-					alarmLinesCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					alarmLinesCombo.setText("2");
-					alarmLinesCombo.setToolTipText("Anzahl der Alarmausgangsleitungen, die Sie haben wollen. Der Alarmpegel ist \"TTL\", low-aktives Signal.");
-					alarmLinesCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("alarmLinesCombo.widgetSelected, event=" + evt);
-							//TODO add your code for alarmLinesCombo.widgetSelected
-						}
-					});
-					alarmLinesCombo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("alarmLinesCombo.mouseMove, event=" + evt);
-							//TODO add your code for alarmLinesCombo.mouseMove
-						}
-					});
-				}
-				{
-					Line1signalLabel = new CLabel(optionalGroup, SWT.RIGHT);
-					RowData Line1signalLabelLData = new RowData();
-					Line1signalLabelLData.width = 126;
-					Line1signalLabelLData.height = 20;
-					Line1signalLabel.setLayoutData(Line1signalLabelLData);
-					Line1signalLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					Line1signalLabel.setText("L1 signal type");
-				}
-				{
-					line1signalCombo = new CCombo(optionalGroup, SWT.BORDER);
-					RowData line1signalComboLData = new RowData();
-					line1signalComboLData.width = GDE.IS_LINUX ? 84 : 74;
-					line1signalComboLData.height = 17;
-					line1signalCombo.setLayoutData(line1signalComboLData);
-					line1signalCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					line1signalCombo.setText("switched");
-					line1signalCombo
-							.setToolTipText("Signaltyp der ersten Alarmausgangsleitung (low-aktiv). Die zweite Leitung ist immer \"switched\". \"switch(ed)\": geschaltet,  \"interval\": 3x on272-off96 off1396 ms \"flash\": 8x on16-off96 off1604 ms\"flash\": 8x on16-off96 off1604 ms \"Morse\": \"C\"=Capacity  \"V\"=Voltage  \"T\"=Temperature  \"B\"=BEC voltage drop  \"X\"=eXternal (temperatures)");
-					line1signalCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("line1signalCombo.widgetSelected, event=" + evt);
-							//TODO add your code for line1signalCombo.widgetSelected
-						}
-					});
-					line1signalCombo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("line1signalCombo.mouseMove, event=" + evt);
-							//TODO add your code for line1signalCombo.mouseMove
-						}
-					});
-				}
-				{
-					subDevicesButton = new Button(optionalGroup, SWT.PUSH | SWT.CENTER);
-					RowData subDevicesButtonLData = new RowData();
-					subDevicesButtonLData.width = 118;
-					subDevicesButtonLData.height = 25;
-					subDevicesButton.setLayoutData(subDevicesButtonLData);
-					subDevicesButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					subDevicesButton.setText("sub devices");
-					subDevicesButton.setEnabled(false);
-				}
-				{
-					subDevicesCombo = new CCombo(optionalGroup, SWT.BORDER);
-					subDevicesCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					subDevicesCombo.setText("none");
-					subDevicesCombo.setEditable(false);
-					RowData subDevicesComboLData = new RowData();
-					subDevicesComboLData.width = GDE.IS_LINUX ? 72 : 62;
-					subDevicesComboLData.height = 17;
-					subDevicesCombo.setLayoutData(subDevicesComboLData);
-					subDevicesCombo.setEnabled(false);
-					subDevicesCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("subDevicesCombo.widgetSelected, event=" + evt);
-							//TODO add your code for subDevicesCombo.widgetSelected
-						}
-					});
-					subDevicesCombo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("subDevicesCombo.mouseMove, event=" + evt);
-							//TODO add your code for subDevicesCombo.mouseMove
-						}
-					});
-				}
-				{
-					tempSensorTypeButton = new Button(optionalGroup, SWT.PUSH | SWT.CENTER);
-					RowData tempSensorTypeButtonLData = new RowData();
-					tempSensorTypeButtonLData.width = 97;
-					tempSensorTypeButtonLData.height = 25;
-					tempSensorTypeButton.setLayoutData(tempSensorTypeButtonLData);
-					tempSensorTypeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					tempSensorTypeButton.setText("temp sensor");
-				}
-				{
-					tempSensorTypeCombo = new CCombo(optionalGroup, SWT.BORDER);
-					RowData tempSensorTypeComboLData = new RowData();
-					tempSensorTypeComboLData.width = GDE.IS_LINUX ? 84 : 74;
-					tempSensorTypeComboLData.height = 17;
-					tempSensorTypeCombo.setLayoutData(tempSensorTypeComboLData);
-					tempSensorTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					tempSensorTypeCombo.setText("digital");
-					tempSensorTypeCombo.setToolTipText("Sind externe Temperatursensoren angeschlossen und von welchem Typ? Es kann EIN analoger Sensor angeschlossen sein oder bis zu fünf digitale.");
-					tempSensorTypeCombo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("tempSensorTypeCombo.mouseMove, event=" + evt);
-							//TODO add your code for tempSensorTypeCombo.mouseMove
-						}
-					});
-					tempSensorTypeCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("tempSensorTypeCombo.widgetSelected, event=" + evt);
-							//TODO add your code for tempSensorTypeCombo.widgetSelected
-						}
-					});
-				}
-				{
-					rpmSensorButton = new Button(optionalGroup, SWT.PUSH | SWT.CENTER);
-					RowData rpmSensorButtonLData = new RowData();
-					rpmSensorButtonLData.width = 115;
-					rpmSensorButtonLData.height = 25;
-					rpmSensorButton.setLayoutData(rpmSensorButtonLData);
-					rpmSensorButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					rpmSensorButton.setText("RPM sensor");
-				}
-				{
-					rpmSensorCombo = new CCombo(optionalGroup, SWT.BORDER);
-					RowData rpmSensorComboLData = new RowData();
-					rpmSensorComboLData.width = GDE.IS_LINUX ? 72 : 62;
-					rpmSensorComboLData.height = 17;
-					rpmSensorCombo.setLayoutData(rpmSensorComboLData);
-					rpmSensorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					rpmSensorCombo.setText("15");
-					rpmSensorCombo.setToolTipText("\"0\"==kein Sensor   \">0\"==Sensor angeschlossen Der Wert >0 gibt die Anzahl der Impulse pro Umdrehung an. Das ist insbesondere für Langsamdreher. ");
-					rpmSensorCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("rpmSensorCombo.widgetSelected, event=" + evt);
-							//TODO add your code for rpmSensorCombo.widgetSelected
-						}
-					});
-					rpmSensorCombo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("rpmSensorCombo.mouseMove, event=" + evt);
-							//TODO add your code for rpmSensorCombo.mouseMove
-						}
-					});
-				}
-				{
-					RowData spacerLData = new RowData();
-					spacerLData.width = 9;
-					spacerLData.height = 19;
-					spacer = new Label(optionalGroup, SWT.NONE);
-					spacer.setLayoutData(spacerLData);
-				}
-				{
-					motorButton = new Button(optionalGroup, SWT.CHECK | SWT.CENTER);
-					RowData motorButtonLData = new RowData();
-					motorButtonLData.width = 77;
-					motorButtonLData.height = 21;
-					motorButton.setLayoutData(motorButtonLData);
-					motorButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					motorButton.setText("is motor");
-					motorButton.setToolTipText("Wenn die mittlere Drehzahl 2000 UPM übersteigt aktivieren Sie \"Mot\".");
-					motorButton.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("motorButton.mouseMove, event=" + evt);
-							//TODO add your code for motorButton.mouseMove
-						}
-					});
-					motorButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("motorButton.widgetSelected, event=" + evt);
-							//TODO add your code for motorButton.widgetSelected
-						}
-					});
-				}
-				{
-					brushLessButton = new Button(optionalGroup, SWT.CHECK | SWT.CENTER);
-					RowData brushLessButtonLData = new RowData();
-					brushLessButtonLData.width = 103;
-					brushLessButtonLData.height = 20;
-					brushLessButton.setLayoutData(brushLessButtonLData);
-					brushLessButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					brushLessButton.setText("is brush less");
-					brushLessButton
-							.setToolTipText("Ist der Drehzahlsensor für einen bürstenlosen Motor, aktivieren Sie \"BL\". \"PPR\" (Pulse Per Revolution) wird nun nicht mehr gewertet, stattdessen die Polzahl des Motors.");
-					brushLessButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("brushLessButton.widgetSelected, event=" + evt);
-							//TODO add your code for brushLessButton.widgetSelected
-						}
-					});
-					brushLessButton.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("brushLessButton.mouseMove, event=" + evt);
-							//TODO add your code for brushLessButton.mouseMove
-						}
-					});
-				}
-				{
-					telemetryButton = new Button(optionalGroup, SWT.PUSH | SWT.CENTER);
-					RowData telemetryButtonLData = new RowData();
-					telemetryButtonLData.width = 114;
-					telemetryButtonLData.height = 25;
-					telemetryButton.setLayoutData(telemetryButtonLData);
-					telemetryButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					telemetryButton.setText("telemetry/live");
-				}
-				{
-					telemetryCombo = new CCombo(optionalGroup, SWT.BORDER);
-					RowData telemetryComboLData = new RowData();
-					telemetryComboLData.width = GDE.IS_LINUX ?  123 : 113;
-					telemetryComboLData.height = 17;
-					telemetryCombo.setLayoutData(telemetryComboLData);
-					telemetryCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					telemetryCombo.setText(" --- ");
-					telemetryCombo
-							.setToolTipText("Telemetrieausgang benutzt und für welches Protokoll? \nDefault: COM ist ungenutzt:\n(Unidisplay: Das Terminal kann nur direkt an den Logger gesteckt werden.\n\"JTX\" im Eigenbau mit 2x XBee. Siehe j-log.net. Die JETIbox kann auch direkt am Logger betrieben werden.)");
-					telemetryCombo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("telemetryCombo.mouseMove, event=" + evt);
-							//TODO add your code for telemetryCombo.mouseMove
-						}
-					});
-					telemetryCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("telemetryCombo.widgetSelected, event=" + evt);
-							//TODO add your code for telemetryCombo.widgetSelected
-						}
-					});
-				}
-				{
-					sensorAdapterButton = new Button(optionalGroup, SWT.PUSH | SWT.CENTER);
-					RowData sensorAdapterButtonLData = new RowData();
-					sensorAdapterButtonLData.width = 141;
-					sensorAdapterButtonLData.height = 25;
-					sensorAdapterButton.setLayoutData(sensorAdapterButtonLData);
-					sensorAdapterButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					sensorAdapterButton.setText("adapter required");
-					sensorAdapterButton.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("sensorAdapterButton.mouseMove, event=" + evt);
-							//TODO add your code for sensorAdapterButton.mouseMove
-						}
-					});
-					sensorAdapterButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("sensorAdapterButton.widgetSelected, event=" + evt);
-							//TODO add your code for sensorAdapterButton.widgetSelected
-						}
-					});
-				}
-				{
-					mpxAddessesLabel = new CLabel(optionalGroup, SWT.CENTER | SWT.EMBEDDED);
-					RowData mpxAddessesLabelLData = new RowData();
-					mpxAddessesLabelLData.width = 384;
-					mpxAddessesLabelLData.height = 17;
-					mpxAddessesLabel.setLayoutData(mpxAddessesLabelLData);
-					mpxAddessesLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					mpxAddessesLabel.setText("Multiplex Adress Configuration");
-
-					mpxAddresses[0] = new MpxAddressComposite(optionalGroup, SWT.NONE, "U bec", this.configuration, 0);
-					mpxAddresses[1] = new MpxAddressComposite(optionalGroup, SWT.NONE, "I mot", this.configuration, 1);
-					mpxAddresses[2] = new MpxAddressComposite(optionalGroup, SWT.NONE, "rpm U", this.configuration, 2);
-					mpxAddresses[3] = new MpxAddressComposite(optionalGroup, SWT.NONE, "1 PA", this.configuration, 3);
-					mpxAddresses[4] = new MpxAddressComposite(optionalGroup, SWT.NONE, "Capacity", this.configuration, 4);
-					mpxAddresses[5] = new MpxAddressComposite(optionalGroup, SWT.NONE, "U bec dip", this.configuration, 5);
-					mpxAddresses[6] = new MpxAddressComposite(optionalGroup, SWT.NONE, "I bec", this.configuration, 6);
-					mpxAddresses[7] = new MpxAddressComposite(optionalGroup, SWT.NONE, "e RPM", this.configuration, 7);
-					mpxAddresses[8] = new MpxAddressComposite(optionalGroup, SWT.NONE, "11", this.configuration, 8);
-					mpxAddresses[9] = new MpxAddressComposite(optionalGroup, SWT.NONE, "12", this.configuration, 9);
-					mpxAddresses[10] = new MpxAddressComposite(optionalGroup, SWT.NONE, "13", this.configuration, 10);
-					mpxAddresses[11] = new MpxAddressComposite(optionalGroup, SWT.NONE, "14", this.configuration, 11);
-					mpxAddresses[12] = new MpxAddressComposite(optionalGroup, SWT.NONE, "Pwr int", this.configuration, 12);
-					mpxAddresses[13] = new MpxAddressComposite(optionalGroup, SWT.NONE, "THR", this.configuration, 13);
-					mpxAddresses[14] = new MpxAddressComposite(optionalGroup, SWT.NONE, "PWM", this.configuration, 14);
-					mpxAddresses[15] = new MpxAddressComposite(optionalGroup, SWT.NONE, "rpm Motor", this.configuration, 15);
-				}
-			}
-			{
-				alarmGroup = new Group(this, SWT.NONE);
-				RowLayout alarmGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				alarmGroup.setLayout(alarmGroupLayout);
-				FormData alarmGroupLData = new FormData();
-				alarmGroupLData.left = new FormAttachment(0, 1000, 5);
-				alarmGroupLData.top = new FormAttachment(0, 1000, 325);
-				alarmGroupLData.width = GDE.IS_LINUX ? 265 : 235;
-				alarmGroupLData.height = 240;
-				alarmGroup.setLayoutData(alarmGroupLData);
-				alarmGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+(GDE.IS_LINUX ? 2 : 0), SWT.NORMAL));
-				alarmGroup.setText("alarms");
-				{
-					alarmsClearButton = new Button(alarmGroup, SWT.PUSH | SWT.CENTER);
-					RowData alarmsClearButtonLData = new RowData();
-					alarmsClearButtonLData.width = 86;
-					alarmsClearButtonLData.height = 25;
-					alarmsClearButton.setLayoutData(alarmsClearButtonLData);
-					alarmsClearButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					alarmsClearButton.setText("clear alarms");
-					alarmsClearButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("alarmsClearButton.widgetSelected, event=" + evt);
-							//TODO add your code for alarmsClearButton.widgetSelected
-						}
-					});
-					alarmsClearButton.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("alarmsClearButton.mouseMove, event=" + evt);
-							//TODO add your code for alarmsClearButton.mouseMove
-						}
-					});
-				}
-				{
-					uBecDipDetectButton = new Button(alarmGroup, SWT.CHECK | SWT.CENTER);
-					RowData uBecDipDetectButtonLData = new RowData();
-					uBecDipDetectButtonLData.width =  GDE.IS_LINUX ? 158 : 138;
-					uBecDipDetectButtonLData.height = 21;
-					uBecDipDetectButton.setLayoutData(uBecDipDetectButtonLData);
-					uBecDipDetectButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					uBecDipDetectButton.setText("Ubec dip detection");
-					uBecDipDetectButton.setToolTipText("U-BEC Spannungsdip. Alarm löst aus, wenn der negative Dip > 0,5V ist.");
-					uBecDipDetectButton.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("uBecDipDetectButton.mouseMove, event=" + evt);
-							//TODO add your code for uBecDipDetectButton.mouseMove
-						}
-					});
-					uBecDipDetectButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("uBecDipDetectButton.widgetSelected, event=" + evt);
-							//TODO add your code for uBecDipDetectButton.widgetSelected
-						}
-					});
-				}
-				{
-					capacityAlarmLabel = new CLabel(alarmGroup, SWT.NONE);
-					RowData capacityAlarmLabelLData = new RowData();
-					capacityAlarmLabelLData.width = 106;
-					capacityAlarmLabelLData.height = 20;
-					capacityAlarmLabel.setLayoutData(capacityAlarmLabelLData);
-					capacityAlarmLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					capacityAlarmLabel.setText("capacity");
-				}
-				{
-					capacityAlarmCombo = new CCombo(alarmGroup, SWT.BORDER);
-					RowData capacityAlarmComboLData = new RowData();
-					capacityAlarmComboLData.width =  GDE.IS_LINUX ? 77 : 57;
-					capacityAlarmComboLData.height = 17;
-					capacityAlarmCombo.setLayoutData(capacityAlarmComboLData);
-					capacityAlarmCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					capacityAlarmCombo.setText("2700");
-					capacityAlarmCombo.setToolTipText("Verbrauchte Kapazität in Wert * 100mAh. Löst den Alarm aus, wenn der Wert erreicht ist");
-					capacityAlarmCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("capacityAlarmCombo.widgetSelected, event=" + evt);
-							//TODO add your code for capacityAlarmCombo.widgetSelected
-						}
-					});
-					capacityAlarmCombo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("capacityAlarmCombo.mouseMove, event=" + evt);
-							//TODO add your code for capacityAlarmCombo.mouseMove
-						}
-					});
-				}
-				{
-					mAhLabel = new CLabel(alarmGroup, SWT.NONE);
-					RowData mAhLabelLData = new RowData();
-					mAhLabelLData.width = 41;
-					mAhLabelLData.height = 20;
-					mAhLabel.setLayoutData(mAhLabelLData);
-					mAhLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					mAhLabel.setText("[mAh]");
-				}
-				{
-					uBatMinAlarmLabel = new CLabel(alarmGroup, SWT.NONE);
-					RowData uBatMinAlarmLabelLData = new RowData();
-					uBatMinAlarmLabelLData.width = 106;
-					uBatMinAlarmLabelLData.height = 20;
-					uBatMinAlarmLabel.setLayoutData(uBatMinAlarmLabelLData);
-					uBatMinAlarmLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					uBatMinAlarmLabel.setText("bat voltage min");
-				}
-				{
-					voltagebatteryMinCombo1 = new CCombo(alarmGroup, SWT.BORDER);
-					RowData voltagebatteryMinCombo1LData = new RowData();
-					voltagebatteryMinCombo1LData.width =  GDE.IS_LINUX ? 45 : 35;
-					voltagebatteryMinCombo1LData.height = 17;
-					voltagebatteryMinCombo1.setLayoutData(voltagebatteryMinCombo1LData);
-					voltagebatteryMinCombo1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					voltagebatteryMinCombo1.setText("12");
-					voltagebatteryMinCombo1.setToolTipText("Akku-Minimalspannung, ganzzahliger Teil. Alarm löst aus, wenn der Wert unterschritten wird.");
-					voltagebatteryMinCombo1.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("voltagebatteryMinCombo1.mouseMove, event=" + evt);
-							//TODO add your code for voltagebatteryMinCombo1.mouseMove
-						}
-					});
-					voltagebatteryMinCombo1.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("voltagebatteryMinCombo1.widgetSelected, event=" + evt);
-							//TODO add your code for voltagebatteryMinCombo1.widgetSelected
-						}
-					});
-				}
-				{
-					dotLabel = new CLabel(alarmGroup, SWT.NONE);
-					dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
-					dotLabel.setText(".");
-					RowData RALData = new RowData();
-					RALData.width = 8;
-					RALData.height = 20;
-					dotLabel.setLayoutData(RALData);
-					dotLabel.setFont(SWTResourceManager.getFont("Microsoft Sans Serif", 10, 1, false, false));
-				}
-				{
-					voltagebatteryAlarmMaxCombo2 = new CCombo(alarmGroup, SWT.BORDER);
-					RowData voltagebatteryAlarmMaxCombo2LData = new RowData();
-					voltagebatteryAlarmMaxCombo2LData.width =  GDE.IS_LINUX ? 45 : 35;
-					voltagebatteryAlarmMaxCombo2LData.height = 17;
-					voltagebatteryAlarmMaxCombo2.setLayoutData(voltagebatteryAlarmMaxCombo2LData);
-					voltagebatteryAlarmMaxCombo2.setText("05");
-					voltagebatteryAlarmMaxCombo2.setToolTipText("Akku-Minimalspannung, Zehntel.");
-					voltagebatteryAlarmMaxCombo2.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("voltagebatteryAlarmMaxCombo2.widgetSelected, event=" + evt);
-							//TODO add your code for voltagebatteryAlarmMaxCombo2.widgetSelected
-						}
-					});
-					voltagebatteryAlarmMaxCombo2.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("voltagebatteryAlarmMaxCombo2.mouseMove, event=" + evt);
-							//TODO add your code for voltagebatteryAlarmMaxCombo2.mouseMove
-						}
-					});
-				}
-				{
-					voltageLabel = new CLabel(alarmGroup, SWT.NONE);
-					RowData voltageLabelLData = new RowData();
-					voltageLabelLData.width = 23;
-					voltageLabelLData.height = 19;
-					voltageLabel.setLayoutData(voltageLabelLData);
-					voltageLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					voltageLabel.setText("[V]");
-				}
-				{
-					paTempMaxLabel = new CLabel(alarmGroup, SWT.NONE);
-					RowData paTempMaxLabelLData = new RowData();
-					paTempMaxLabelLData.width = 106;
-					paTempMaxLabelLData.height = 20;
-					paTempMaxLabel.setLayoutData(paTempMaxLabelLData);
-					paTempMaxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					paTempMaxLabel.setText("PA temp max");
-				}
-				{
-					paTempMaxCombo = new CCombo(alarmGroup, SWT.BORDER);
-					RowData paTempMaxComboLData = new RowData();
-					paTempMaxComboLData.width = GDE.IS_LINUX ? 55 :45;
-					paTempMaxComboLData.height = 17;
-					paTempMaxCombo.setLayoutData(paTempMaxComboLData);
-					paTempMaxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					paTempMaxCombo.setText("100");
-					paTempMaxCombo.setToolTipText("Temperatur (°C) der Endstufen. Alarm löst aus, wenn der Wert überschritten wird.");
-					paTempMaxCombo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("paTempMaxCombo.mouseMove, event=" + evt);
-							//TODO add your code for paTempMaxCombo.mouseMove
-						}
-					});
-					paTempMaxCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("paTempMaxCombo.widgetSelected, event=" + evt);
-							//TODO add your code for paTempMaxCombo.widgetSelected
-						}
-					});
-				}
-				{
-					temperaureLabel = new CLabel(alarmGroup, SWT.NONE);
-					RowData temperaureLabelLData = new RowData();
-					temperaureLabelLData.width = 27;
-					temperaureLabelLData.height = 19;
-					temperaureLabel.setLayoutData(temperaureLabelLData);
-					temperaureLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					temperaureLabel.setText("[°C]");
-				}
-				{
-					ext1Label = new CLabel(alarmGroup, SWT.CHECK | SWT.LEFT);
-					RowData ext1LabelLData = new RowData();
-					ext1LabelLData.width = 106;
-					ext1LabelLData.height = 20;
-					ext1Label.setLayoutData(ext1LabelLData);
-					ext1Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					ext1Label.setText("extern Temp 1");
-				}
-				{
-					extern1Combo = new CCombo(alarmGroup, SWT.BORDER);
-					RowData extern1ComboLData = new RowData();
-					extern1ComboLData.width = GDE.IS_LINUX ? 55 :45;
-					extern1ComboLData.height = 17;
-					extern1Combo.setLayoutData(extern1ComboLData);
-					extern1Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					extern1Combo.setText("123");
-					extern1Combo.setEnabled(false);
-					extern1Combo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("extern1Combo.widgetSelected, event=" + evt);
-							//TODO add your code for extern1Combo.widgetSelected
-						}
-					});
-					extern1Combo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("extern1Combo.mouseMove, event=" + evt);
-							//TODO add your code for extern1Combo.mouseMove
-						}
-					});
-				}
-				{
-					temperaureLabel = new CLabel(alarmGroup, SWT.NONE);
-					RowData temperaureLabelLData = new RowData();
-					temperaureLabelLData.width = 27;
-					temperaureLabelLData.height = 19;
-					temperaureLabel.setLayoutData(temperaureLabelLData);
-					temperaureLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					temperaureLabel.setText("[°C]");
-				}
-				{
-					ext1smallerButton = new Button(alarmGroup, SWT.CHECK | SWT.LEFT);
-					RowData ext1smallerButtonLData = new RowData();
-					ext1smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
-					ext1smallerButtonLData.height = 20;
-					ext1smallerButton.setLayoutData(ext1smallerButtonLData);
-					ext1smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					ext1smallerButton.setText(" <");
-				}
-				{
-					ext2Label = new CLabel(alarmGroup, SWT.CHECK | SWT.LEFT);
-					RowData ext2LabelLData = new RowData();
-					ext2LabelLData.width = 106;
-					ext2LabelLData.height = 20;
-					ext2Label.setLayoutData(ext2LabelLData);
-					ext2Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					ext2Label.setText("extern Temp 2");
-				}
-				{
-					extern2Combo = new CCombo(alarmGroup, SWT.BORDER);
-					RowData extern2ComboLData = new RowData();
-					extern2ComboLData.width = GDE.IS_LINUX ? 55 :45;
-					extern2ComboLData.height = 17;
-					extern2Combo.setLayoutData(extern2ComboLData);
-					extern2Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					extern2Combo.setText("123");
-					extern2Combo.setEnabled(false);
-					extern2Combo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("extern2Combo.widgetSelected, event=" + evt);
-							//TODO add your code for extern2Combo.widgetSelected
-						}
-					});
-					extern2Combo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("extern2Combo.mouseMove, event=" + evt);
-							//TODO add your code for extern2Combo.mouseMove
-						}
-					});
-				}
-				{
-					temperaureLabel = new CLabel(alarmGroup, SWT.NONE);
-					RowData temperaureLabelLData = new RowData();
-					temperaureLabelLData.width = 27;
-					temperaureLabelLData.height = 19;
-					temperaureLabel.setLayoutData(temperaureLabelLData);
-					temperaureLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					temperaureLabel.setText("[°C]");
-				}
-				{
-					ext2smallerButton = new Button(alarmGroup, SWT.CHECK | SWT.LEFT);
-					RowData ext2smallerButtonLData = new RowData();
-					ext2smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
-					ext2smallerButtonLData.height = 20;
-					ext2smallerButton.setLayoutData(ext2smallerButtonLData);
-					ext2smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					ext2smallerButton.setText(" <");
-					ext2smallerButton.setEnabled(false);
-					ext2smallerButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("ext2smallerButton.widgetSelected, event=" + evt);
-							//TODO add your code for ext2smallerButton.widgetSelected
-						}
-					});
-					ext2smallerButton.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("ext2smallerButton.mouseMove, event=" + evt);
-							//TODO add your code for ext2smallerButton.mouseMove
-						}
-					});
-					ext1smallerButton.setText(" <");
-					ext1smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					ext1smallerButton.setEnabled(false);
-					ext1smallerButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("ext1smallerButton.widgetSelected, event=" + evt);
-							//TODO add your code for ext1smallerButton.widgetSelected
-						}
-					});
-					ext1smallerButton.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("ext1smallerButton.mouseMove, event=" + evt);
-							//TODO add your code for ext1smallerButton.mouseMove
-						}
-					});
-				}
-				{
-					ext3Label = new CLabel(alarmGroup, SWT.CHECK | SWT.LEFT);
-					RowData ext3LabelLData = new RowData();
-					ext3LabelLData.width = 106;
-					ext3LabelLData.height = 20;
-					ext3Label.setLayoutData(ext3LabelLData);
-					ext3Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					ext3Label.setText("extern Temp 3");
-				}
-				{
-					extern3Combo = new CCombo(alarmGroup, SWT.BORDER);
-					RowData extern3ComboLData = new RowData();
-					extern3ComboLData.width = GDE.IS_LINUX ? 55 :45;
-					extern3ComboLData.height = 17;
-					extern3Combo.setLayoutData(extern3ComboLData);
-					extern3Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					extern3Combo.setText("123");
-					extern3Combo.setEnabled(false);
-					extern3Combo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("extern3Combo.mouseMove, event=" + evt);
-							//TODO add your code for extern3Combo.mouseMove
-						}
-					});
-					extern3Combo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("extern3Combo.widgetSelected, event=" + evt);
-							//TODO add your code for extern3Combo.widgetSelected
-						}
-					});
-				}
-				{
-					temperaureLabel = new CLabel(alarmGroup, SWT.NONE);
-					RowData temperaureLabelLData = new RowData();
-					temperaureLabelLData.width = 27;
-					temperaureLabelLData.height = 19;
-					temperaureLabel.setLayoutData(temperaureLabelLData);
-					temperaureLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					temperaureLabel.setText("[°C]");
-				}
-				{
-					ext3smallerButton = new Button(alarmGroup, SWT.CHECK | SWT.LEFT);
-					RowData ext3smallerButtonLData = new RowData();
-					ext3smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
-					ext3smallerButtonLData.height = 20;
-					ext3smallerButton.setLayoutData(ext3smallerButtonLData);
-					ext3smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					ext3smallerButton.setText(" <");
-					ext3smallerButton.setEnabled(false);
-					ext3smallerButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("ext3smallerButton.widgetSelected, event=" + evt);
-							//TODO add your code for ext3smallerButton.widgetSelected
-						}
-					});
-					ext3smallerButton.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("ext3smallerButton.mouseMove, event=" + evt);
-							//TODO add your code for ext3smallerButton.mouseMove
-						}
-					});
-				}
-				{
-					ext4Label = new CLabel(alarmGroup, SWT.CHECK | SWT.LEFT);
-					RowData ext4LabelLData = new RowData();
-					ext4LabelLData.width = 106;
-					ext4LabelLData.height = 20;
-					ext4Label.setLayoutData(ext4LabelLData);
-					ext4Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					ext4Label.setText("extern Temp 4");
-				}
-				{
-					extern4Combo = new CCombo(alarmGroup, SWT.BORDER);
-					RowData extern4ComboLData = new RowData();
-					extern4ComboLData.width = GDE.IS_LINUX ? 55 :45;
-					extern4ComboLData.height = 17;
-					extern4Combo.setLayoutData(extern4ComboLData);
-					extern4Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					extern4Combo.setText("123");
-					extern4Combo.setEnabled(false);
-					extern4Combo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("extern4Combo.mouseMove, event=" + evt);
-							//TODO add your code for extern4Combo.mouseMove
-						}
-					});
-					extern4Combo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("extern4Combo.widgetSelected, event=" + evt);
-							//TODO add your code for extern4Combo.widgetSelected
-						}
-					});
-				}
-				{
-					temperaureLabel = new CLabel(alarmGroup, SWT.NONE);
-					RowData temperaureLabelLData = new RowData();
-					temperaureLabelLData.width = 27;
-					temperaureLabelLData.height = 19;
-					temperaureLabel.setLayoutData(temperaureLabelLData);
-					temperaureLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					temperaureLabel.setText("[°C]");
-				}
-				{
-					ext4smallerButton = new Button(alarmGroup, SWT.CHECK | SWT.LEFT);
-					RowData ext4smallerButtonLData = new RowData();
-					ext4smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
-					ext4smallerButtonLData.height = 20;
-					ext4smallerButton.setLayoutData(ext4smallerButtonLData);
-					ext4smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					ext4smallerButton.setText(" <");
-					ext4smallerButton.setEnabled(false);
-					ext4smallerButton.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("ext4smallerButton.mouseMove, event=" + evt);
-							//TODO add your code for ext4smallerButton.mouseMove
-						}
-					});
-					ext4smallerButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("ext4smallerButton.widgetSelected, event=" + evt);
-							//TODO add your code for ext4smallerButton.widgetSelected
-						}
-					});
-				}
-				{
-					ext5Label = new CLabel(alarmGroup, SWT.CHECK | SWT.LEFT);
-					RowData ext5LabelLData = new RowData();
-					ext5LabelLData.width = 106;
-					ext5LabelLData.height = 20;
-					ext5Label.setLayoutData(ext5LabelLData);
-					ext5Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					ext5Label.setText("extern Temp 5");
-				}
-				{
-					extern5Combo = new CCombo(alarmGroup, SWT.BORDER);
-					RowData extern5ComboLData = new RowData();
-					extern5ComboLData.width = GDE.IS_LINUX ? 55 :45;
-					extern5ComboLData.height = 17;
-					extern5Combo.setLayoutData(extern5ComboLData);
-					extern5Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					extern5Combo.setText("123");
-					extern5Combo.setEnabled(false);
-					extern5Combo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("extern5Combo.widgetSelected, event=" + evt);
-							//TODO add your code for extern5Combo.widgetSelected
-						}
-					});
-					extern5Combo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("extern5Combo.mouseMove, event=" + evt);
-							//TODO add your code for extern5Combo.mouseMove
-						}
-					});
-				}
-				{
-					temperaureLabel = new CLabel(alarmGroup, SWT.NONE);
-					RowData temperaureLabelLData = new RowData();
-					temperaureLabelLData.width = 27;
-					temperaureLabelLData.height = 19;
-					temperaureLabel.setLayoutData(temperaureLabelLData);
-					temperaureLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					temperaureLabel.setText("[°C]");
-				}
-				{
-					ext5smallerButton = new Button(alarmGroup, SWT.CHECK | SWT.LEFT);
-					RowData ext5smallerButtonLData = new RowData();
-					ext5smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
-					ext5smallerButtonLData.height = 20;
-					ext5smallerButton.setLayoutData(ext5smallerButtonLData);
-					ext5smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					ext5smallerButton.setText(" <");
-					ext5smallerButton.setEnabled(false);
-					ext5smallerButton.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("ext5smallerButton.mouseMove, event=" + evt);
-							//TODO add your code for ext5smallerButton.mouseMove
-						}
-					});
-					ext5smallerButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("ext5smallerButton.widgetSelected, event=" + evt);
-							//TODO add your code for ext5smallerButton.widgetSelected
-						}
-					});
-				}
-			}
-			{
-				mainConfigGroup = new Group(this, SWT.NONE);
+				this.mainConfigGroup = new Group(this, SWT.NONE);
 				RowLayout mainConfigGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-				mainConfigGroup.setLayout(mainConfigGroupLayout);
-				FormData mainConfigGroupLData = new FormData();				mainConfigGroupLData.width = 650;
+				this.mainConfigGroup.setLayout(mainConfigGroupLayout);
+				FormData mainConfigGroupLData = new FormData();
+				mainConfigGroupLData.width = 650;
 				mainConfigGroupLData.left = new FormAttachment(0, 1000, 7);
-				mainConfigGroupLData.top = new FormAttachment(0, 1000, 7);
-				mainConfigGroupLData.right =  new FormAttachment(1000, 1000, -7);
-				mainConfigGroupLData.height = 290;
-				mainConfigGroup.setLayoutData(mainConfigGroupLData);
-				mainConfigGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+(GDE.IS_LINUX ? 2 : 0), SWT.NORMAL));
-				mainConfigGroup.setText("main configuration");
+				mainConfigGroupLData.top = new FormAttachment(0, 1000, 3);
+				mainConfigGroupLData.right = new FormAttachment(1000, 1000, -7);
+				mainConfigGroupLData.height = 280;
+				this.mainConfigGroup.setLayoutData(mainConfigGroupLData);
+				this.mainConfigGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 2 : 0), SWT.NORMAL));
+				this.mainConfigGroup.setText(Messages.getString(MessageIds.GDE_MSGT2828));
 				{
-					jlcUrlLabel = new CLabel(mainConfigGroup, SWT.CENTER | SWT.EMBEDDED);
+					this.jlcUrlLabel = new CLabel(this.mainConfigGroup, SWT.CENTER | SWT.EMBEDDED);
 					RowData jlcUrlLabelLData = new RowData();
 					jlcUrlLabelLData.width = 154;
 					jlcUrlLabelLData.height = 25;
-					jlcUrlLabel.setLayoutData(jlcUrlLabelLData);
-					jlcUrlLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					jlcUrlLabel.setText("JLC links ---->>");
+					this.jlcUrlLabel.setLayoutData(jlcUrlLabelLData);
+					this.jlcUrlLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.jlcUrlLabel.setText(Messages.getString(MessageIds.GDE_MSGT2829));
 				}
 				{
-					jlcDownloadButton = new Button(mainConfigGroup, SWT.PUSH | SWT.CENTER);
+					this.jlcDownloadButton = new Button(this.mainConfigGroup, SWT.PUSH | SWT.CENTER);
 					RowData jlcDownloadButtonLData = new RowData();
 					jlcDownloadButtonLData.width = 114;
 					jlcDownloadButtonLData.height = 25;
-					jlcDownloadButton.setLayoutData(jlcDownloadButtonLData);
-					jlcDownloadButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					jlcDownloadButton.setText("JLC downloads");
+					this.jlcDownloadButton.setLayoutData(jlcDownloadButtonLData);
+					this.jlcDownloadButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.jlcDownloadButton.setText("Homepage"); //$NON-NLS-1$
+					this.jlcDownloadButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "jlcDownloadButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.application.openWebBrowser(Messages.getString(MessageIds.GDE_MSGT2870));
+						}
+					});
 				}
 				{
-					jlcForumButton = new Button(mainConfigGroup, SWT.PUSH | SWT.CENTER);
+					this.jlcForumButton = new Button(this.mainConfigGroup, SWT.PUSH | SWT.CENTER);
 					RowData jlcForumButtonLData = new RowData();
 					jlcForumButtonLData.width = 114;
 					jlcForumButtonLData.height = 25;
-					jlcForumButton.setLayoutData(jlcForumButtonLData);
-					jlcForumButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					jlcForumButton.setText("JCL forum");
+					this.jlcForumButton.setLayoutData(jlcForumButtonLData);
+					this.jlcForumButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.jlcForumButton.setText("Forum"); //$NON-NLS-1$
+					this.jlcForumButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "jlcForumButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.application.openWebBrowser(Messages.getString(MessageIds.GDE_MSGT2816));
+						}
+					});
 				}
 				{
-					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(this.getClientArea().width - 30, 5));
+					new Label(this.mainConfigGroup, SWT.NONE).setLayoutData(new RowData(this.getClientArea().width - (GDE.IS_MAC ? 35 : GDE.IS_LINUX ? 0 : 45), 5));
 				}
 				{
-					mainConfigLabel = new CLabel(mainConfigGroup, SWT.NONE);
+					this.mainConfigLabel = new CLabel(this.mainConfigGroup, SWT.NONE);
 					RowData label_ILLData = new RowData();
-					label_ILLData.width = 71;
+					label_ILLData.width = 70;
 					label_ILLData.height = 20;
-					mainConfigLabel.setLayoutData(label_ILLData);
-					mainConfigLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					mainConfigLabel.setText("Basics :");
+					this.mainConfigLabel.setLayoutData(label_ILLData);
+					this.mainConfigLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.mainConfigLabel.setText(Messages.getString(MessageIds.GDE_MSGT2830));
 				}
 				{
-					jlogVersionCombo = new CCombo(mainConfigGroup, SWT.BORDER);
-					jlogVersionCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					jlogVersionCombo.setText("JLog2");
-					jlogVersionCombo.setEditable(false);
-					jlogVersionCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
-					jlogVersionCombo.setToolTipText("Select JLog type");
-					RowData jlogConfigurationComboLData = new RowData();
-					jlogConfigurationComboLData.width = 80;
-					jlogConfigurationComboLData.height = 17;
-					jlogVersionCombo.setLayoutData(jlogConfigurationComboLData);
+					this.jlogVersionCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
+					this.jlogVersionCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.jlogVersionCombo.setText("JLog2"); //$NON-NLS-1$
+					this.jlogVersionCombo.setEditable(false);
+					this.jlogVersionCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
+					this.jlogVersionCombo.setLayoutData(new RowData(60, 17));
+					this.jlogVersionCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "jlogVersionCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2824));
+						}
+					});
 				}
 				{
-					jlogFirmwareCombo = new CCombo(mainConfigGroup, SWT.BORDER);
-					jlogFirmwareCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					jlogFirmwareCombo.setText("3.3.2");
-					jlogFirmwareCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
-					jlogFirmwareCombo.setToolTipText("Select JLog firmware version");
+					this.jlogFirmwareCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
+					this.jlogFirmwareCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.jlogFirmwareCombo.setText("3.2.2"); //$NON-NLS-1$
+					//jlogFirmwareCombo.setItems(jlogFirmware);
+					//jlogFirmwareCombo.select(2);
+					this.jlogFirmwareCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
 					RowData jlogConfigurationComboLData = new RowData();
-					jlogConfigurationComboLData.width = 80;
+					jlogConfigurationComboLData.width = 60;
 					jlogConfigurationComboLData.height = 17;
-					jlogFirmwareCombo.setLayoutData(jlogConfigurationComboLData);
-					jlogFirmwareCombo.setEditable(false);
-					jlogFirmwareCombo.addSelectionListener(new SelectionAdapter() {
+					this.jlogFirmwareCombo.setLayoutData(jlogConfigurationComboLData);
+					this.jlogFirmwareCombo.setEditable(false);
+					this.jlogFirmwareCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "cCombo1.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2825));
+						}
+					});
+				}
+				{
+					this.jlogConfigurationCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
+					RowData jlogConfigurationComboLData = new RowData();
+					jlogConfigurationComboLData.width = 420;
+					jlogConfigurationComboLData.height = 17;
+					this.jlogConfigurationCombo.setLayoutData(jlogConfigurationComboLData);
+					this.jlogConfigurationCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.jlogConfigurationCombo.setItems(this.jlogConfigurations);
+					this.jlogConfigurationCombo.select(0);
+					this.jlogConfigurationCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
+					this.jlogConfigurationCombo.setEditable(false);
+					this.jlogConfigurationCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "jlogConfigurationCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2826));
+						}
+					});
+					this.jlogConfigurationCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("cCombo1.widgetSelected, event=" + evt);
-							//TODO add your code for cCombo1.widgetSelected
-						}
-					});
-					jlogFirmwareCombo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("cCombo1.mouseMove, event=" + evt);
-							//TODO add your code for cCombo1.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "jlogConfigurationCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							//0=normal, 1=HSS, 2=HSSG2, 3=HSST, 4=BH, 5=BM, 6=BHSS, 7=BHSST, 8=G, 9=S 10=L, 
+							//11=T, 12=GT, 13=V, 14=VG, 15=VS, 16=BID, 17=BIDG, 18=BIDS, 19=A, 20=AV, 21=B, 22=BV, 23=P1, 24=P2, 25=AVP1, 26=AP2
+							switch (JLog2Configuration.this.jlogConfigurationCombo.getSelectionIndex()) {
+							default:
+							case 0:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.normal);
+								break;
+							case 1:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.HSS);
+								break;
+							case 2:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.HSSG2);
+								break;
+							case 3:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.HSST);
+								break;
+							case 4:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.BH);
+								break;
+							case 5:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.BM);
+								break;
+							case 6:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.BHSS);
+								break;
+							case 7:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.BHSST);
+								break;
+							case 8:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.G);
+								break;
+							case 9:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.S);
+								break;
+							case 10:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.L);
+								break;
+							//11=T, 12=GT, 13=V, 14=VG, 15=VS, 16=BID, 17=BIDG, 18=BIDS, 19=A, 20=AV, 
+							case 11:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.T);
+								break;
+							case 12:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.GT);
+								break;
+							case 13:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.V);
+								break;
+							case 14:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.VG);
+								break;
+							case 15:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.VS);
+								break;
+							case 16:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.BID);
+								break;
+							case 17:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.BIDG);
+								break;
+							case 18:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.BIDS);
+								break;
+							case 19:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.A);
+								break;
+							case 20:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.AV);
+								break;
+							//21=B, 22=BV, 23=P1, 24=P2, 25=AVP1, 26=AP2
+							case 21:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.B);
+								break;
+							case 22:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.BV);
+								break;
+							case 23:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.P1);
+								break;
+							case 24:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.P2);
+								break;
+							case 25:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.AVP1);
+								break;
+							case 26:
+								JLog2Configuration.this.configuration.update(JLog2Configuration.this.AP2);
+								break;
+							}
+							enableSaveSettings();
 						}
 					});
 				}
 				{
-					jlogConfigurationCombo = new CCombo(mainConfigGroup, SWT.BORDER);
-					RowData jlogConfigurationComboLData = new RowData();
-					jlogConfigurationComboLData.width = 200;
-					jlogConfigurationComboLData.height = 17;
-					jlogConfigurationCombo.setLayoutData(jlogConfigurationComboLData);
-					jlogConfigurationCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					jlogConfigurationCombo.setText("--------------------");
-					jlogConfigurationCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
-					jlogConfigurationCombo.setToolTipText("select special configurations");
-					jlogConfigurationCombo.setEditable(false);
-					jlogConfigurationCombo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("jlogConfigurationCombo.mouseMove, event=" + evt);
-							//TODO add your code for jlogConfigurationCombo.mouseMove
-						}
-					});
-					jlogConfigurationCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("jlogConfigurationCombo.widgetSelected, event=" + evt);
-							//TODO add your code for jlogConfigurationCombo.widgetSelected
-						}
-					});
+					//new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(this.getClientArea().width - 30, 5));
 				}
 				{
-					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(this.getClientArea().width - 30, 5));
-				}
-				{
-					baudrateLabel = new CLabel(mainConfigGroup, SWT.NONE);
+					this.baudrateLabel = new CLabel(this.mainConfigGroup, SWT.NONE);
 					RowData baudrateLabelLData = new RowData();
 					baudrateLabelLData.width = 105;
 					baudrateLabelLData.height = 20;
-					baudrateLabel.setLayoutData(baudrateLabelLData);
-					baudrateLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					baudrateLabel.setText("Baudrate");
+					this.baudrateLabel.setLayoutData(baudrateLabelLData);
+					this.baudrateLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.baudrateLabel.setText(Messages.getString(MessageIds.GDE_MSGT2835));
 				}
 				{
-					baudrateCombo = new CCombo(mainConfigGroup, SWT.BORDER);
+					this.baudrateCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
 					RowData baudrateComboLData = new RowData();
 					baudrateComboLData.width = 99;
 					baudrateComboLData.height = 17;
-					baudrateCombo.setLayoutData(baudrateComboLData);
-					baudrateCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					baudrateCombo.setText("JIVE");
-					baudrateCombo.setToolTipText("selelct asynchronous data rate");
-					baudrateCombo.addSelectionListener(new SelectionAdapter() {
+					this.baudrateCombo.setLayoutData(baudrateComboLData);
+					this.baudrateCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.baudrateCombo.setItems(this.baudrates);
+					this.baudrateCombo.select(0);
+					this.baudrateCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("baudrateCombo.widgetSelected, event=" + evt);
-							//TODO add your code for baudrateCombo.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "baudrateCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setBaudRate(JLog2Configuration.this.baudrateCombo.getSelectionIndex());
+							enableSaveSettings();
 						}
 					});
-					baudrateCombo.addMouseMoveListener(new MouseMoveListener() {
+					this.baudrateCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("baudrateCombo.mouseMove, event=" + evt);
-							//TODO add your code for baudrateCombo.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "baudrateCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2827));
 						}
 					});
 				}
 				{
-					gearRatioLabel = new CLabel(mainConfigGroup, SWT.CENTER | SWT.EMBEDDED);
+					this.gearRatioLabel = new CLabel(this.mainConfigGroup, SWT.CENTER | SWT.EMBEDDED);
 					RowData gearRatioLabelLData = new RowData();
 					gearRatioLabelLData.width = 395;
 					gearRatioLabelLData.height = 20;
-					gearRatioLabel.setLayoutData(gearRatioLabelLData);
-					gearRatioLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					gearRatioLabel.setText("adjust gear ratio                                             ");
+					this.gearRatioLabel.setLayoutData(gearRatioLabelLData);
+					this.gearRatioLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.gearRatioLabel.setText(Messages.getString(MessageIds.GDE_MSGT2839));
 				}
 				{
-					sysModeLabel = new CLabel(mainConfigGroup, SWT.NONE);
+					this.sysModeLabel = new CLabel(this.mainConfigGroup, SWT.NONE);
 					RowData sysModeLabelLData = new RowData();
 					sysModeLabelLData.width = 105;
 					sysModeLabelLData.height = 20;
-					sysModeLabel.setLayoutData(sysModeLabelLData);
-					sysModeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					sysModeLabel.setText("SYSmode");
+					this.sysModeLabel.setLayoutData(sysModeLabelLData);
+					this.sysModeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.sysModeLabel.setText("SYSmode"); //$NON-NLS-1$
 				}
 				{
-					sysModeCombo = new CCombo(mainConfigGroup, SWT.BORDER);
+					this.sysModeCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
 					RowData sysModeComboLData = new RowData();
 					sysModeComboLData.width = 99;
 					sysModeComboLData.height = 17;
-					sysModeCombo.setLayoutData(sysModeComboLData);
-					sysModeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					sysModeCombo.setText("NEWLOG");
-					sysModeCombo.setToolTipText("select SYSlog type, NEWLOG starts a new Logfile each session, SEQLOG always appends");
-					sysModeCombo.addMouseMoveListener(new MouseMoveListener() {
+					this.sysModeCombo.setLayoutData(sysModeComboLData);
+					this.sysModeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.sysModeCombo.setItems(this.sysModes);
+					this.sysModeCombo.select(0);
+					this.sysModeCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("sysModeCombo.mouseMove, event=" + evt);
-							//TODO add your code for sysModeCombo.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "sysModeCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2828));
 						}
 					});
-					sysModeCombo.addSelectionListener(new SelectionAdapter() {
+					this.sysModeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("sysModeCombo.widgetSelected, event=" + evt);
-							//TODO add your code for sysModeCombo.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "sysModeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setSysMode(JLog2Configuration.this.sysModeCombo.getSelectionIndex());
+							enableSaveSettings();
 						}
 					});
 				}
 				{
-					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(19, 19));
+					new Label(this.mainConfigGroup, SWT.NONE).setLayoutData(new RowData(19, 19));
 				}
 				{
-					directRatioButton = new Button(mainConfigGroup, SWT.CHECK | SWT.RIGHT);
+					this.directRatioButton = new Button(this.mainConfigGroup, SWT.CHECK | SWT.RIGHT);
 					RowData directRatioButtonLData = new RowData();
 					directRatioButtonLData.width = 73;
 					directRatioButtonLData.height = 21;
-					directRatioButton.setLayoutData(directRatioButtonLData);
-					directRatioButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					directRatioButton.setText("ratio  1: ");
-					directRatioButton.setSelection(true);
-					directRatioButton.setToolTipText("configure gear ratio directly");
-					directRatioButton.addMouseMoveListener(new MouseMoveListener() {
+					this.directRatioButton.setLayoutData(directRatioButtonLData);
+					this.directRatioButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.directRatioButton.setText(Messages.getString(MessageIds.GDE_MSGT2841));
+					this.directRatioButton.setSelection(true);
+					this.directRatioButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("directRatioButton.mouseMove, event=" + evt);
-							//TODO add your code for directRatioButton.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "directRatioButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2829));
 						}
 					});
-				}
-				{
-					directRatioCombo = new CCombo(mainConfigGroup, SWT.BORDER);
-					RowData directRatioComboLData = new RowData();
-					directRatioComboLData.width = GDE.IS_LINUX ? 55 :45;
-					directRatioComboLData.height = 17;
-					directRatioCombo.setLayoutData(directRatioComboLData);
-					directRatioCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					directRatioCombo.setText("1");
-					directRatioCombo.addSelectionListener(new SelectionAdapter() {
+					this.directRatioButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("directRatioCombo.widgetSelected, event=" + evt);
-							//TODO add your code for directRatioCombo.widgetSelected
-						}
-					});
-					directRatioCombo.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("directRatioCombo.mouseMove, event=" + evt);
-							//TODO add your code for directRatioCombo.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "directRatioButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.gearSelectionButton.setSelection(!JLog2Configuration.this.directRatioButton.getSelection());
+							JLog2Configuration.this.configuration.setGearDirectConfig(JLog2Configuration.this.directRatioButton.getSelection());
+							JLog2Configuration.this.directGearRatioMajorCombo.setEnabled(JLog2Configuration.this.directRatioButton.getSelection());
+							JLog2Configuration.this.directGearRatioDecimalsCombo.setEnabled(JLog2Configuration.this.directRatioButton.getSelection());
+							JLog2Configuration.this.gearPinionWheelCombo.setEnabled(!JLog2Configuration.this.directRatioButton.getSelection());
+							JLog2Configuration.this.gearMainWheelCombo.setEnabled(!JLog2Configuration.this.directRatioButton.getSelection());
+							JLog2Configuration.this.gearMainWheelDecimalsCombo.setEnabled(!JLog2Configuration.this.directRatioButton.getSelection());
+							enableSaveSettings();
 						}
 					});
 				}
 				{
-					dotLabel = new CLabel(mainConfigGroup, SWT.NONE);
+					this.directGearRatioMajorCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
+					RowData directRatioComboLData = new RowData();
+					directRatioComboLData.width = GDE.IS_LINUX ? 55 : 45;
+					directRatioComboLData.height = 17;
+					this.directGearRatioMajorCombo.setLayoutData(directRatioComboLData);
+					this.directGearRatioMajorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.directGearRatioMajorCombo.setItems(this.oneTo50);
+					this.directGearRatioMajorCombo.select(0);
+					this.directGearRatioMajorCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "directRatioCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setGearRatioMinor(JLog2Configuration.this.directGearRatioMajorCombo.getText());
+							enableSaveSettings();
+						}
+					});
+					this.directGearRatioMajorCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "directRatioCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2830));
+						}
+					});
+				}
+				{
+					this.dotLabel = new CLabel(this.mainConfigGroup, SWT.NONE);
 					RowData dotLabelLData = new RowData();
 					dotLabelLData.width = 8;
 					dotLabelLData.height = 20;
-					dotLabel.setLayoutData(dotLabelLData);
-					dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
-					dotLabel.setText(".");
+					this.dotLabel.setLayoutData(dotLabelLData);
+					this.dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.dotLabel.setText("."); //$NON-NLS-1$
 				}
 				{
-					gearRatioMinorCombo = new CCombo(mainConfigGroup, SWT.BORDER);
+					this.directGearRatioDecimalsCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
 					RowData gearRatioMinorComboLData = new RowData();
-					gearRatioMinorComboLData.width = GDE.IS_LINUX ? 55 :45;
+					gearRatioMinorComboLData.width = GDE.IS_LINUX ? 55 : 45;
 					gearRatioMinorComboLData.height = 17;
-					gearRatioMinorCombo.setLayoutData(gearRatioMinorComboLData);
-					gearRatioMinorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					gearRatioMinorCombo.setText("0");
-					gearRatioMinorCombo.addMouseMoveListener(new MouseMoveListener() {
+					this.directGearRatioDecimalsCombo.setLayoutData(gearRatioMinorComboLData);
+					this.directGearRatioDecimalsCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.directGearRatioDecimalsCombo.setItems(this.zeroTo99);
+					this.directGearRatioDecimalsCombo.select(0);
+					this.directGearRatioDecimalsCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("gearRatioMinorCombo.mouseMove, event=" + evt);
-							//TODO add your code for gearRatioMinorCombo.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "gearRatioMinorCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2831));
 						}
 					});
-					gearRatioMinorCombo.addSelectionListener(new SelectionAdapter() {
+					this.directGearRatioDecimalsCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("gearRatioMinorCombo.widgetSelected, event=" + evt);
-							//TODO add your code for gearRatioMinorCombo.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "gearRatioMinorCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setGearRatioDecimals(JLog2Configuration.this.directGearRatioDecimalsCombo.getText());
+							enableSaveSettings();
 						}
 					});
 				}
 				{
-					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(GDE.IS_LINUX ? 190 : 120, 19));
+					new Label(this.mainConfigGroup, SWT.NONE).setLayoutData(new RowData(GDE.IS_LINUX ? 190 : 120, 19));
 				}
 				{
-					logModeLabel = new CLabel(mainConfigGroup, SWT.NONE);
+					this.logModeLabel = new CLabel(this.mainConfigGroup, SWT.NONE);
 					RowData logModeLabelLData = new RowData();
 					logModeLabelLData.width = 105;
 					logModeLabelLData.height = 20;
-					logModeLabel.setLayoutData(logModeLabelLData);
-					logModeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					logModeLabel.setText("LOGmode");
+					this.logModeLabel.setLayoutData(logModeLabelLData);
+					this.logModeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.logModeLabel.setText("LOGmode"); //$NON-NLS-1$
 				}
 				{
-					logModeCombo = new CCombo(mainConfigGroup, SWT.BORDER);
+					this.logModeCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
 					RowData logModeComboLData = new RowData();
 					logModeComboLData.width = 99;
 					logModeComboLData.height = 17;
-					logModeCombo.setLayoutData(logModeComboLData);
-					logModeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					logModeCombo.setText(" (0) OF/CSV");
-					logModeCombo.setToolTipText("select log file type, OF/CSV can imported to DataExplorer only");
-					logModeCombo.addSelectionListener(new SelectionAdapter() {
+					this.logModeCombo.setLayoutData(logModeComboLData);
+					this.logModeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.logModeCombo.setItems(this.logModes);
+					this.logModeCombo.select(0);
+					this.logModeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("logModeCombo.widgetSelected, event=" + evt);
-							//TODO add your code for logModeCombo.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "logModeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setLogMode(JLog2Configuration.this.logModeCombo.getSelectionIndex());
+							if (JLog2Configuration.this.logModeCombo.getSelectionIndex() != 1) {
+								enableAll(true);
+								initialyzeGUI(JLog2Configuration.this.configuration, true);
+							}
+							else {
+								enableAll(false);
+							}
+							enableSaveSettings();
 						}
 					});
-					logModeCombo.addMouseMoveListener(new MouseMoveListener() {
+					this.logModeCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("logModeCombo.mouseMove, event=" + evt);
-							//TODO add your code for logModeCombo.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "logModeCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2832));
 						}
 					});
 				}
 				{
-					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(19, 19));
+					new Label(this.mainConfigGroup, SWT.NONE).setLayoutData(new RowData(19, 19));
 				}
 				{
-					gearSelectionButton = new Button(mainConfigGroup, SWT.CHECK | SWT.RIGHT);
+					this.gearSelectionButton = new Button(this.mainConfigGroup, SWT.CHECK | SWT.RIGHT);
 					RowData gearSelectionButtonLData = new RowData();
 					gearSelectionButtonLData.width = 73;
 					gearSelectionButtonLData.height = 21;
-					gearSelectionButton.setLayoutData(gearSelectionButtonLData);
-					gearSelectionButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					gearSelectionButton.setText("pinion");
-					gearSelectionButton.setSelection(false);
-					gearSelectionButton.setToolTipText("configure gear ratio by known gear wheels");
-					gearSelectionButton.addMouseMoveListener(new MouseMoveListener() {
+					this.gearSelectionButton.setLayoutData(gearSelectionButtonLData);
+					this.gearSelectionButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.gearSelectionButton.setText(Messages.getString(MessageIds.GDE_MSGT2848));
+					this.gearSelectionButton.setSelection(false);
+					this.gearSelectionButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("gearSelectionButton.mouseMove, event=" + evt);
-							//TODO add your code for gearSelectionButton.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "gearSelectionButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2833));
 						}
 					});
-					gearSelectionButton.addSelectionListener(new SelectionAdapter() {
+					this.gearSelectionButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("gearSelectionButton.widgetSelected, event=" + evt);
-							//TODO add your code for gearSelectionButton.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "gearSelectionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.directRatioButton.setSelection(!JLog2Configuration.this.gearSelectionButton.getSelection());
+							JLog2Configuration.this.configuration.setGearDirectConfig(JLog2Configuration.this.directRatioButton.getSelection());
+							JLog2Configuration.this.directGearRatioMajorCombo.setEnabled(!JLog2Configuration.this.gearSelectionButton.getSelection());
+							JLog2Configuration.this.directGearRatioDecimalsCombo.setEnabled(!JLog2Configuration.this.gearSelectionButton.getSelection());
+							JLog2Configuration.this.gearPinionWheelCombo.setEnabled(JLog2Configuration.this.gearSelectionButton.getSelection());
+							JLog2Configuration.this.gearMainWheelCombo.setEnabled(JLog2Configuration.this.gearSelectionButton.getSelection());
+							JLog2Configuration.this.gearMainWheelDecimalsCombo.setEnabled(JLog2Configuration.this.gearSelectionButton.getSelection());
+							updateGearRatio();
+							enableSaveSettings();
 						}
 					});
 				}
 				{
-					pinionCombo = new CCombo(mainConfigGroup, SWT.BORDER);
+					this.gearPinionWheelCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
 					RowData pinionComboLData = new RowData();
-					pinionComboLData.width = GDE.IS_LINUX ? 55 :45;
+					pinionComboLData.width = GDE.IS_LINUX ? 55 : 45;
 					pinionComboLData.height = 17;
-					pinionCombo.setLayoutData(pinionComboLData);
-					pinionCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					pinionCombo.setText("10");
-					pinionCombo.setEnabled(false);
-					pinionCombo.addSelectionListener(new SelectionAdapter() {
+					this.gearPinionWheelCombo.setLayoutData(pinionComboLData);
+					this.gearPinionWheelCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.gearPinionWheelCombo.setItems(this.eightTo30);
+					this.gearPinionWheelCombo.select(2);
+					this.gearPinionWheelCombo.setEnabled(false);
+					this.gearPinionWheelCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("pinionCombo.widgetSelected, event=" + evt);
-							//TODO add your code for pinionCombo.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "pinionCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setGearPinionWheel(JLog2Configuration.this.gearPinionWheelCombo.getText());
+							updateGearRatio();
+							enableSaveSettings();
 						}
 					});
-					pinionCombo.addMouseMoveListener(new MouseMoveListener() {
+					this.gearPinionWheelCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("pinionCombo.mouseMove, event=" + evt);
-							//TODO add your code for pinionCombo.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "pinionCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2834));
 						}
 					});
 				}
 				{
-					mainGearLabel = new CLabel(mainConfigGroup, SWT.RIGHT);
+					this.gearMainWheelLabel = new CLabel(this.mainConfigGroup, SWT.RIGHT);
 					RowData mainGearLabelLData = new RowData();
 					mainGearLabelLData.width = 80;
 					mainGearLabelLData.height = 20;
-					mainGearLabel.setLayoutData(mainGearLabelLData);
-					mainGearLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					mainGearLabel.setText("main gear");
+					this.gearMainWheelLabel.setLayoutData(mainGearLabelLData);
+					this.gearMainWheelLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.gearMainWheelLabel.setText(Messages.getString(MessageIds.GDE_MSGT2851));
 				}
 				{
-					mainGearCombo = new CCombo(mainConfigGroup, SWT.BORDER);
-					mainGearCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					mainGearCombo.setText("45");
+					this.gearMainWheelCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
+					this.gearMainWheelCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.gearMainWheelCombo.setItems(this.eightTo255);
+					this.gearMainWheelCombo.select(2);
 					RowData mainGearComboLData = new RowData();
-					mainGearComboLData.width = GDE.IS_LINUX ? 55 :45;
+					mainGearComboLData.width = GDE.IS_LINUX ? 55 : 45;
 					mainGearComboLData.height = 17;
-					mainGearCombo.setLayoutData(mainGearComboLData);
-					mainGearCombo.setEnabled(false);
-					mainGearCombo.addMouseMoveListener(new MouseMoveListener() {
+					this.gearMainWheelCombo.setLayoutData(mainGearComboLData);
+					this.gearMainWheelCombo.setEnabled(false);
+					this.gearMainWheelCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("mainGearCombo.mouseMove, event=" + evt);
-							//TODO add your code for mainGearCombo.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "mainGearCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2835));
 						}
 					});
-					mainGearCombo.addSelectionListener(new SelectionAdapter() {
+					this.gearMainWheelCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("mainGearCombo.widgetSelected, event=" + evt);
-							//TODO add your code for mainGearCombo.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "mainGearCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setGearMajorWheel(JLog2Configuration.this.gearMainWheelCombo.getText());
+							updateGearRatio();
+							enableSaveSettings();
 						}
 					});
 				}
 				{
-					dotLabel = new CLabel(mainConfigGroup, SWT.NONE);
-					RowData dotLabelLData = new RowData();
-					dotLabelLData.width = 8;
-					dotLabelLData.height = 20;
-					dotLabel.setLayoutData(dotLabelLData);
-					dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
-					dotLabel.setText(".");
+					this.dotLabel = new CLabel(this.mainConfigGroup, SWT.NONE);
+					this.dotLabel.setLayoutData(new RowData(8, 20));
+					this.dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.dotLabel.setText("."); //$NON-NLS-1$
 				}
 				{
-					secondgearCombo = new CCombo(mainConfigGroup, SWT.BORDER);
-					secondgearCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					secondgearCombo.setText("27");
+					this.gearMainWheelDecimalsCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
+					this.gearMainWheelDecimalsCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.gearMainWheelDecimalsCombo.setItems(this.zeroTo99);
+					this.gearMainWheelDecimalsCombo.select(0);
 					RowData secondgearComboLData = new RowData();
-					secondgearComboLData.width = GDE.IS_LINUX ? 55 :45;
+					secondgearComboLData.width = GDE.IS_LINUX ? 55 : 45;
 					secondgearComboLData.height = 17;
-					secondgearCombo.setLayoutData(secondgearComboLData);
-					secondgearCombo.setEnabled(false);
-					secondgearCombo.addSelectionListener(new SelectionAdapter() {
+					this.gearMainWheelDecimalsCombo.setLayoutData(secondgearComboLData);
+					this.gearMainWheelDecimalsCombo.setEnabled(false);
+					this.gearMainWheelDecimalsCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("secondgearCombo.widgetSelected, event=" + evt);
-							//TODO add your code for secondgearCombo.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "secondgearCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setGearMajorWheelDecimals(JLog2Configuration.this.gearMainWheelDecimalsCombo.getText());
+							updateGearRatio();
+							enableSaveSettings();
 						}
 					});
-					secondgearCombo.addMouseMoveListener(new MouseMoveListener() {
+					this.gearMainWheelDecimalsCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("secondgearCombo.mouseMove, event=" + evt);
-							//TODO add your code for secondgearCombo.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "secondgearCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2836));
 						}
 					});
 				}
 				{
-					new Label(mainConfigGroup, SWT.NONE).setLayoutData(new RowData(GDE.IS_LINUX ? 85 : 75, 19));
+					new Label(this.mainConfigGroup, SWT.NONE).setLayoutData(new RowData(GDE.IS_LINUX ? 85 : 75, 19));
 				}
 				{
-					motorPolsLabel = new CLabel(mainConfigGroup, SWT.NONE);
+					this.motorPolsLabel = new CLabel(this.mainConfigGroup, SWT.NONE);
 					RowData motoPolsLabelLData = new RowData();
 					motoPolsLabelLData.width = 105;
 					motoPolsLabelLData.height = 20;
-					motorPolsLabel.setLayoutData(motoPolsLabelLData);
-					motorPolsLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					motorPolsLabel.setText("motor pols");
+					this.motorPolsLabel.setLayoutData(motoPolsLabelLData);
+					this.motorPolsLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.motorPolsLabel.setText(Messages.getString(MessageIds.GDE_MSGT2854));
 				}
 				{
-					motorPolsCombo = new CCombo(mainConfigGroup, SWT.BORDER);
+					this.motorPolsCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
 					RowData motorPolsComboLData = new RowData();
 					motorPolsComboLData.width = 99;
 					motorPolsComboLData.height = 17;
-					motorPolsCombo.setLayoutData(motorPolsComboLData);
-					motorPolsCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					motorPolsCombo.setText("2 ..32");
-					motorPolsCombo.setToolTipText("Configure number of pols of brushless motor");
-					motorPolsCombo.addMouseMoveListener(new MouseMoveListener() {
+					this.motorPolsCombo.setLayoutData(motorPolsComboLData);
+					this.motorPolsCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.motorPolsCombo.setItems(this.motorPols);
+					this.motorPolsCombo.select(6);
+					this.motorPolsCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("motorPolsCombo.mouseMove, event=" + evt);
-							//TODO add your code for motorPolsCombo.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "motorPolsCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2837));
 						}
 					});
-					motorPolsCombo.addSelectionListener(new SelectionAdapter() {
+					this.motorPolsCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("motorPolsCombo.widgetSelected, event=" + evt);
-							//TODO add your code for motorPolsCombo.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "motorPolsCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setMotorPols(JLog2Configuration.this.motorPolsCombo.getText());
+							enableSaveSettings();
 						}
 					});
 				}
 				{
-					motorShuntLabel = new CLabel(mainConfigGroup, SWT.RIGHT);
+					this.motorShuntLabel = new CLabel(this.mainConfigGroup, SWT.RIGHT);
 					RowData motorShuntLabelLData = new RowData();
 					motorShuntLabelLData.width = 231;
 					motorShuntLabelLData.height = 20;
-					motorShuntLabel.setLayoutData(motorShuntLabelLData);
-					motorShuntLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					motorShuntLabel.setText("current motor calibration");
+					this.motorShuntLabel.setLayoutData(motorShuntLabelLData);
+					this.motorShuntLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.motorShuntLabel.setText(Messages.getString(MessageIds.GDE_MSGT2826));
 				}
 				{
-					motorShuntCombo = new CCombo(mainConfigGroup, SWT.BORDER);
+					this.motorShuntCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
 					RowData motorShuntComboLData = new RowData();
-					motorShuntComboLData.width = GDE.IS_LINUX ? 55 :45;
+					motorShuntComboLData.width = GDE.IS_LINUX ? 55 : 45;
 					motorShuntComboLData.height = 17;
-					motorShuntCombo.setLayoutData(motorShuntComboLData);
-					motorShuntCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					motorShuntCombo.setText("-15");
-					motorShuntCombo.setToolTipText("configure motor current calibriation by a virtual shunt");
-					motorShuntCombo.addSelectionListener(new SelectionAdapter() {
+					this.motorShuntCombo.setLayoutData(motorShuntComboLData);
+					this.motorShuntCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.motorShuntCombo.setItems(this.motorShuntAdjust);
+					this.motorShuntCombo.select(15);
+					this.motorShuntCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("motorShuntCombo.widgetSelected, event=" + evt);
-							//TODO add your code for motorShuntCombo.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "motorShuntCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setMotorCalibration(JLog2Configuration.this.motorShuntCombo.getText());
+							enableSaveSettings();
 						}
 					});
-					motorShuntCombo.addMouseMoveListener(new MouseMoveListener() {
+					this.motorShuntCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("motorShuntCombo.mouseMove, event=" + evt);
-							//TODO add your code for motorShuntCombo.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "motorShuntCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2839));
 						}
 					});
 				}
 				{
-					percentLabel = new CLabel(mainConfigGroup, SWT.NONE);
-					percentLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					percentLabel.setText(" % ");
+					this.percentLabel = new CLabel(this.mainConfigGroup, SWT.NONE);
+					this.percentLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.percentLabel.setText("[%]"); //$NON-NLS-1$
 				}
 				{
-					mainExplanationText = new Text(mainConfigGroup, SWT.BORDER);
+					this.mainExplanationText = new Text(this.mainConfigGroup, SWT.BORDER | SWT.MULTI | SWT.WRAP);
 					RowData mainExplanationTextLData = new RowData();
-					//int w = this.getClientArea().width;
 					mainExplanationTextLData.width = this.getClientArea().width - (GDE.IS_MAC ? 35 : GDE.IS_LINUX ? 0 : 45);
 					mainExplanationTextLData.height = 80;
-					mainExplanationText.setLayoutData(mainExplanationTextLData);
-					mainExplanationText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					mainExplanationText.setText("explanation");
-					mainExplanationText.setEditable(false);
-					mainExplanationText.setBackground(SWTResourceManager.getColor(255, 255, 128));
+					this.mainExplanationText.setLayoutData(mainExplanationTextLData);
+					this.mainExplanationText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2801));
+					this.mainExplanationText.setEditable(false);
+					this.mainExplanationText.setBackground(SWTResourceManager.getColor(255, 255, 128));
 				}
 				{
-					flagsLabel = new CLabel(mainConfigGroup, SWT.NONE);
+					this.flagsLabel = new CLabel(this.mainConfigGroup, SWT.NONE);
 					RowData flagsLabelLData = new RowData();
 					flagsLabelLData.width = 93;
 					flagsLabelLData.height = 20;
-					flagsLabel.setLayoutData(flagsLabelLData);
-					flagsLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					flagsLabel.setText("special flags");
+					this.flagsLabel.setLayoutData(flagsLabelLData);
+					this.flagsLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.flagsLabel.setText(Messages.getString(MessageIds.GDE_MSGT2860));
 				}
 				{
-					resetButton = new Button(mainConfigGroup, SWT.CHECK | SWT.LEFT);
+					this.resetButton = new Button(this.mainConfigGroup, SWT.CHECK | SWT.LEFT);
 					RowData rstButtonLData = new RowData();
 					rstButtonLData.width = 130;
 					rstButtonLData.height = 23;
-					resetButton.setLayoutData(rstButtonLData);
-					resetButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					resetButton.setText("Reset");
-					resetButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
-					resetButton.setToolTipText("delete log directory next log start");
-					resetButton.setForeground(SWTResourceManager.getColor(255, 0, 0));
-					resetButton.addMouseMoveListener(new MouseMoveListener() {
+					this.resetButton.setLayoutData(rstButtonLData);
+					this.resetButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.resetButton.setText(Messages.getString(MessageIds.GDE_MSGT2861));
+					this.resetButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.resetButton.setForeground(SWTResourceManager.getColor(255, 0, 0));
+					this.resetButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("rstButton.mouseMove, event=" + evt);
-							//TODO add your code for rstButton.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "rstButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2802));
 						}
 					});
-					resetButton.addSelectionListener(new SelectionAdapter() {
+					this.resetButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("rstButton.widgetSelected, event=" + evt);
-							//TODO add your code for rstButton.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "rstButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setReset(JLog2Configuration.this.resetButton.getSelection() ? "1" : "0"); //$NON-NLS-1$ //$NON-NLS-2$
+							enableSaveSettings();
 						}
 					});
 				}
 				{
-					highPulsWidthButton = new Button(mainConfigGroup, SWT.CHECK | SWT.LEFT);
+					this.highPulsWidthButton = new Button(this.mainConfigGroup, SWT.CHECK | SWT.LEFT);
 					RowData hpwButtonLData = new RowData();
 					hpwButtonLData.width = 130;
 					hpwButtonLData.height = 23;
-					highPulsWidthButton.setLayoutData(hpwButtonLData);
-					highPulsWidthButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					highPulsWidthButton.setText("High PW warning");
-					highPulsWidthButton.setToolTipText("hight puls width warning (Reduziere Gas in einem Governor-Mode)");
-					highPulsWidthButton.addSelectionListener(new SelectionAdapter() {
+					this.highPulsWidthButton.setLayoutData(hpwButtonLData);
+					this.highPulsWidthButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.highPulsWidthButton.setText(Messages.getString(MessageIds.GDE_MSGT2863));
+					this.highPulsWidthButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							System.out.println("hpwButton.widgetSelected, event=" + evt);
-							//TODO add your code for hpwButton.widgetSelected
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "hpwButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setHighPwmWarning(JLog2Configuration.this.highPulsWidthButton.getSelection() ? 2 : 0);
+							enableSaveSettings();
 						}
 					});
-					highPulsWidthButton.addMouseMoveListener(new MouseMoveListener() {
+					this.highPulsWidthButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
 						public void mouseMove(MouseEvent evt) {
-							System.out.println("hpwButton.mouseMove, event=" + evt);
-							//TODO add your code for hpwButton.mouseMove
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "hpwButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2803));
 						}
 					});
 				}
 				{
-					logStopButton = new Button(mainConfigGroup, SWT.CHECK | SWT.LEFT);
+					this.logStopButton = new Button(this.mainConfigGroup, SWT.CHECK | SWT.LEFT);
 					RowData logStopButtonLData = new RowData();
 					logStopButtonLData.width = 130;
 					logStopButtonLData.height = 23;
-					logStopButton.setLayoutData(logStopButtonLData);
-					logStopButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					logStopButton.setText("log stop");
-					logStopButton.setToolTipText("Schalte LogStop ein/aus. Nicht wirksam in Firmware-Versionen mit Speed-Messungen aus GPS oder/und Prandtl Probe");
-					logStopButton.addMouseMoveListener(new MouseMoveListener() {
-						public void mouseMove(MouseEvent evt) {
-							System.out.println("logStopButton.mouseMove, event=" + evt);
-							//TODO add your code for logStopButton.mouseMove
+					this.logStopButton.setLayoutData(logStopButtonLData);
+					this.logStopButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.logStopButton.setText(Messages.getString(MessageIds.GDE_MSGT2864));
+					this.logStopButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "logStopButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setLogStop(JLog2Configuration.this.logStopButton.getSelection() ? 1 : 0);
+							enableSaveSettings();
 						}
 					});
-					logStopButton.addSelectionListener(new SelectionAdapter() {
+					this.logStopButton.addMouseMoveListener(new MouseMoveListener() {
 						@Override
-						public void widgetDefaultSelected(SelectionEvent evt) {
-							System.out.println("logStopButton.widgetDefaultSelected, event=" + evt);
-							//TODO add your code for logStopButton.widgetDefaultSelected
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "logStopButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2804));
 						}
 					});
 				}
 				{
-					extRpmButton = new Button(mainConfigGroup, SWT.CHECK | SWT.LEFT);
+					this.extRpmButton = new Button(this.mainConfigGroup, SWT.CHECK | SWT.LEFT);
 					RowData extRpmButtonLData = new RowData();
 					extRpmButtonLData.width = 130;
 					extRpmButtonLData.height = 23;
-					extRpmButton.setLayoutData(extRpmButtonLData);
-					extRpmButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					extRpmButton.setText("ext. RPM");
-					extRpmButton.setEnabled(false);
+					this.extRpmButton.setLayoutData(extRpmButtonLData);
+					this.extRpmButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.extRpmButton.setText(Messages.getString(MessageIds.GDE_MSGT2836));
+					this.extRpmButton.setEnabled(false);
+					this.extRpmButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extRpmButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setLogStopExtRpmSensor(JLog2Configuration.this.extRpmButton.getSelection() ? 4 : 0);
+							enableSaveSettings();
+						}
+					});
+					this.extRpmButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extRpmButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2805));
+						}
+					});
+				}
+			}
+			{
+				this.alarmGroup = new Group(this, SWT.NONE);
+				RowLayout alarmGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+				this.alarmGroup.setLayout(alarmGroupLayout);
+				FormData alarmGroupLData = new FormData();
+				alarmGroupLData.left = new FormAttachment(0, 1000, 5);
+				alarmGroupLData.top = new FormAttachment(0, 1000, 305);
+				alarmGroupLData.width = GDE.IS_LINUX ? 265 : 235;
+				alarmGroupLData.height = 255;
+				this.alarmGroup.setLayoutData(alarmGroupLData);
+				this.alarmGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 2 : 0), SWT.NORMAL));
+				this.alarmGroup.setText(Messages.getString(MessageIds.GDE_MSGT2866));
+				{
+					this.alarmsClearButton = new Button(this.alarmGroup, SWT.PUSH | SWT.CENTER);
+					RowData alarmsClearButtonLData = new RowData();
+					alarmsClearButtonLData.width = 200;
+					alarmsClearButtonLData.height = 25;
+					this.alarmsClearButton.setLayoutData(alarmsClearButtonLData);
+					this.alarmsClearButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.alarmsClearButton.setText(Messages.getString(MessageIds.GDE_MSGT2867));
+					this.alarmsClearButton.setEnabled(false);
+					this.alarmsClearButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "alarmsClearButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							clearAlarms();
+							enableSaveSettings();
+						}
+					});
+					this.alarmsClearButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "alarmsClearButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2806));
+						}
+					});
+				}
+				{
+					this.uBecDipDetectLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					RowData capacityAlarmLabelLData = new RowData();
+					capacityAlarmLabelLData.width = 106;
+					capacityAlarmLabelLData.height = 20;
+					this.uBecDipDetectLabel.setLayoutData(capacityAlarmLabelLData);
+					this.uBecDipDetectLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.uBecDipDetectLabel.setText(Messages.getString(MessageIds.GDE_MSGT2868));
+				}
+				{
+					this.uBecDipDetectButton = new Button(this.alarmGroup, SWT.CHECK | SWT.CENTER);
+					RowData uBecDipDetectButtonLData = new RowData();
+					uBecDipDetectButtonLData.width = 106;
+					uBecDipDetectButtonLData.height = 20;
+					this.uBecDipDetectButton.setLayoutData(uBecDipDetectButtonLData);
+					this.uBecDipDetectButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.uBecDipDetectButton.setText("< 500 [mV]"); //$NON-NLS-1$
+					this.uBecDipDetectButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "uBecDipDetectButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2807));
+						}
+					});
+					this.uBecDipDetectButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "uBecDipDetectButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setBecDip(JLog2Configuration.this.uBecDipDetectButton.getSelection());
+							checkNumberAlarms();
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+				}
+				{
+					this.capacityAlarmLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					RowData capacityAlarmLabelLData = new RowData();
+					capacityAlarmLabelLData.width = 106;
+					capacityAlarmLabelLData.height = 20;
+					this.capacityAlarmLabel.setLayoutData(capacityAlarmLabelLData);
+					this.capacityAlarmLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.capacityAlarmLabel.setText(Messages.getString(MessageIds.GDE_MSGT2869));
+				}
+				{
+					this.capacityAlarmCombo = new CCombo(this.alarmGroup, SWT.BORDER);
+					RowData capacityAlarmComboLData = new RowData();
+					capacityAlarmComboLData.width = GDE.IS_LINUX ? 77 : 57;
+					capacityAlarmComboLData.height = 17;
+					this.capacityAlarmCombo.setLayoutData(capacityAlarmComboLData);
+					this.capacityAlarmCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.capacityAlarmCombo.setItems(this.zeroTo25500);
+					this.capacityAlarmCombo.select(0);
+					this.capacityAlarmCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "capacityAlarmCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setCapacityAlarm(Integer.parseInt(JLog2Configuration.this.capacityAlarmCombo.getText().trim()) / 100);
+							checkNumberAlarms();
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+					this.capacityAlarmCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "capacityAlarmCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2808));
+						}
+					});
+				}
+				{
+					this.mAhLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					RowData mAhLabelLData = new RowData();
+					mAhLabelLData.width = 41;
+					mAhLabelLData.height = 20;
+					this.mAhLabel.setLayoutData(mAhLabelLData);
+					this.mAhLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.mAhLabel.setText("[mAh]"); //$NON-NLS-1$
+				}
+				{
+					this.uBatMinAlarmLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					RowData uBatMinAlarmLabelLData = new RowData();
+					uBatMinAlarmLabelLData.width = 106;
+					uBatMinAlarmLabelLData.height = 20;
+					this.uBatMinAlarmLabel.setLayoutData(uBatMinAlarmLabelLData);
+					this.uBatMinAlarmLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.uBatMinAlarmLabel.setText(Messages.getString(MessageIds.GDE_MSGT2871));
+				}
+				{
+					this.voltageBatteryAlarmCombo = new CCombo(this.alarmGroup, SWT.BORDER);
+					RowData voltagebatteryMinCombo1LData = new RowData();
+					voltagebatteryMinCombo1LData.width = GDE.IS_LINUX ? 45 : 35;
+					voltagebatteryMinCombo1LData.height = 17;
+					this.voltageBatteryAlarmCombo.setLayoutData(voltagebatteryMinCombo1LData);
+					this.voltageBatteryAlarmCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.voltageBatteryAlarmCombo.setItems(this.zeroTo50);
+					this.voltageBatteryAlarmCombo.select(0);
+					this.voltageBatteryAlarmCombo.setVisibleItemCount(20);
+					this.voltageBatteryAlarmCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "voltagebatteryMinCombo1.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2809));
+						}
+					});
+					this.voltageBatteryAlarmCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "voltagebatteryMinCombo1.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setBatteryAlarmMajor(JLog2Configuration.this.voltageBatteryAlarmCombo.getText().trim());
+							checkNumberAlarms();
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+				}
+				{
+					this.dotLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					this.dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+					this.dotLabel.setText("."); //$NON-NLS-1$
+					RowData RALData = new RowData();
+					RALData.width = 8;
+					RALData.height = 20;
+					this.dotLabel.setLayoutData(RALData);
+					this.dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
+				}
+				{
+					this.voltageBatteryAlarmDecimalsCombo = new CCombo(this.alarmGroup, SWT.BORDER);
+					RowData voltagebatteryAlarmMaxCombo2LData = new RowData();
+					voltagebatteryAlarmMaxCombo2LData.width = GDE.IS_LINUX ? 45 : 35;
+					voltagebatteryAlarmMaxCombo2LData.height = 17;
+					this.voltageBatteryAlarmDecimalsCombo.setLayoutData(voltagebatteryAlarmMaxCombo2LData);
+					this.voltageBatteryAlarmDecimalsCombo.setItems(this.zeroTo9);
+					this.voltageBatteryAlarmDecimalsCombo.select(0);
+					this.voltageBatteryAlarmDecimalsCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "voltagebatteryAlarmMaxCombo2.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setBatteryAlarmDecimals(JLog2Configuration.this.voltageBatteryAlarmDecimalsCombo.getText().trim());
+							checkNumberAlarms();
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+					this.voltageBatteryAlarmDecimalsCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "voltagebatteryAlarmMaxCombo2.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2810));
+						}
+					});
+				}
+				{
+					this.voltageLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					RowData voltageLabelLData = new RowData();
+					voltageLabelLData.width = 23;
+					voltageLabelLData.height = 19;
+					this.voltageLabel.setLayoutData(voltageLabelLData);
+					this.voltageLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.voltageLabel.setText("[V]"); //$NON-NLS-1$
+				}
+				{
+					this.paTempMaxLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					RowData paTempMaxLabelLData = new RowData();
+					paTempMaxLabelLData.width = 106;
+					paTempMaxLabelLData.height = 20;
+					this.paTempMaxLabel.setLayoutData(paTempMaxLabelLData);
+					this.paTempMaxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.paTempMaxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2873));
+				}
+				{
+					this.paTempMaxCombo = new CCombo(this.alarmGroup, SWT.BORDER);
+					RowData paTempMaxComboLData = new RowData();
+					paTempMaxComboLData.width = GDE.IS_LINUX ? 55 : 45;
+					paTempMaxComboLData.height = 17;
+					this.paTempMaxCombo.setLayoutData(paTempMaxComboLData);
+					this.paTempMaxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.paTempMaxCombo.setItems(this.zeroTo127);
+					this.paTempMaxCombo.select(0);
+					this.paTempMaxCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "paTempMaxCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2811));
+						}
+					});
+					this.paTempMaxCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "paTempMaxCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setPaMaxTempAlarm(JLog2Configuration.this.paTempMaxCombo.getText().trim());
+							checkNumberAlarms();
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+				}
+				{
+					this.temperaureLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					RowData temperaureLabelLData = new RowData();
+					temperaureLabelLData.width = 27;
+					temperaureLabelLData.height = 19;
+					this.temperaureLabel.setLayoutData(temperaureLabelLData);
+					this.temperaureLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.temperaureLabel.setText("[°C]"); //$NON-NLS-1$
+				}
+				{
+					this.ext1Label = new CLabel(this.alarmGroup, SWT.CHECK | SWT.LEFT);
+					RowData ext1LabelLData = new RowData();
+					ext1LabelLData.width = 106;
+					ext1LabelLData.height = 20;
+					this.ext1Label.setLayoutData(ext1LabelLData);
+					this.ext1Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGT2874));
+				}
+				{
+					this.extern1Combo = new CCombo(this.alarmGroup, SWT.BORDER);
+					RowData extern1ComboLData = new RowData();
+					extern1ComboLData.width = GDE.IS_LINUX ? 55 : 45;
+					extern1ComboLData.height = 17;
+					this.extern1Combo.setLayoutData(extern1ComboLData);
+					this.extern1Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.extern1Combo.setItems(this.zeroTo127);
+					this.extern1Combo.select(0);
+					this.extern1Combo.setEnabled(false);
+					this.extern1Combo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern1Combo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setExtTemp1(JLog2Configuration.this.extern1Combo.getText().trim());
+							if (JLog2Configuration.this.extern1Combo.getSelectionIndex() > 0)
+								JLog2Configuration.this.configuration.setExtTemp1LowerThan(JLog2Configuration.this.ext1smallerButton.getSelection() ? 1 : 0);
+							else
+								JLog2Configuration.this.configuration.setExtTemp1LowerThan(0);
+							checkNumberAlarms();
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+					this.extern1Combo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern1Combo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
+						}
+					});
+				}
+				{
+					this.temperaure1Label = new CLabel(this.alarmGroup, SWT.NONE);
+					this.temperaure1Label.setLayoutData(new RowData(27, 19));
+					this.temperaure1Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.temperaure1Label.setText("[°C]"); //$NON-NLS-1$
+				}
+				{
+					this.ext1smallerButton = new Button(this.alarmGroup, SWT.CHECK | SWT.LEFT);
+					RowData ext1smallerButtonLData = new RowData();
+					ext1smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
+					ext1smallerButtonLData.height = 20;
+					this.ext1smallerButton.setLayoutData(ext1smallerButtonLData);
+					this.ext1smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.ext1smallerButton.setText(" <"); //$NON-NLS-1$
+					this.ext1smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.ext1smallerButton.setEnabled(false);
+					this.ext1smallerButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext1smallerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (JLog2Configuration.this.extern1Combo.getSelectionIndex() > 0)
+								JLog2Configuration.this.configuration.setExtTemp1LowerThan(JLog2Configuration.this.ext1smallerButton.getSelection() ? 1 : 0);
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+					this.ext1smallerButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext1smallerButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
+						}
+					});
+				}
+				{
+					this.ext2Label = new CLabel(this.alarmGroup, SWT.CHECK | SWT.LEFT);
+					RowData ext2LabelLData = new RowData();
+					ext2LabelLData.width = 106;
+					ext2LabelLData.height = 20;
+					this.ext2Label.setLayoutData(ext2LabelLData);
+					this.ext2Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.ext2Label.setText(Messages.getString(MessageIds.GDE_MSGT2875));
+				}
+				{
+					this.extern2Combo = new CCombo(this.alarmGroup, SWT.BORDER);
+					RowData extern2ComboLData = new RowData();
+					extern2ComboLData.width = GDE.IS_LINUX ? 55 : 45;
+					extern2ComboLData.height = 17;
+					this.extern2Combo.setLayoutData(extern2ComboLData);
+					this.extern2Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.extern2Combo.setItems(this.zeroTo127);
+					this.extern2Combo.select(0);
+					this.extern2Combo.setEnabled(false);
+					this.extern2Combo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern2Combo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setExtTemp2(JLog2Configuration.this.extern2Combo.getText().trim());
+							if (JLog2Configuration.this.extern2Combo.getSelectionIndex() > 0)
+								JLog2Configuration.this.configuration.setExtTemp2LowerThan(JLog2Configuration.this.ext2smallerButton.getSelection() ? 1 : 0);
+							else
+								JLog2Configuration.this.configuration.setExtTemp2LowerThan(0);
+							checkNumberAlarms();
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+					this.extern2Combo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern2Combo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
+						}
+					});
+				}
+				{
+					this.temperaureLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					this.temperaureLabel.setLayoutData(new RowData(27, 19));
+					this.temperaureLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.temperaureLabel.setText("[°C]"); //$NON-NLS-1$
+				}
+				{
+					this.ext2smallerButton = new Button(this.alarmGroup, SWT.CHECK | SWT.LEFT);
+					RowData ext2smallerButtonLData = new RowData();
+					ext2smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
+					ext2smallerButtonLData.height = 20;
+					this.ext2smallerButton.setLayoutData(ext2smallerButtonLData);
+					this.ext2smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.ext2smallerButton.setText(" <"); //$NON-NLS-1$
+					this.ext2smallerButton.setEnabled(false);
+					this.ext2smallerButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext2smallerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (JLog2Configuration.this.extern2Combo.getSelectionIndex() > 0)
+								JLog2Configuration.this.configuration.setExtTemp2LowerThan(JLog2Configuration.this.ext2smallerButton.getSelection() ? 1 : 0);
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+					this.ext2smallerButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext2smallerButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
+						}
+					});
+				}
+				{
+					this.ext3Label = new CLabel(this.alarmGroup, SWT.CHECK | SWT.LEFT);
+					RowData ext3LabelLData = new RowData();
+					ext3LabelLData.width = 106;
+					ext3LabelLData.height = 20;
+					this.ext3Label.setLayoutData(ext3LabelLData);
+					this.ext3Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.ext3Label.setText(Messages.getString(MessageIds.GDE_MSGT2876));
+				}
+				{
+					this.extern3Combo = new CCombo(this.alarmGroup, SWT.BORDER);
+					RowData extern3ComboLData = new RowData();
+					extern3ComboLData.width = GDE.IS_LINUX ? 55 : 45;
+					extern3ComboLData.height = 17;
+					this.extern3Combo.setLayoutData(extern3ComboLData);
+					this.extern3Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.extern3Combo.setItems(this.zeroTo127);
+					this.extern3Combo.select(0);
+					this.extern3Combo.setEnabled(false);
+					this.extern3Combo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern3Combo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
+						}
+					});
+					this.extern3Combo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern3Combo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setExtTemp3(JLog2Configuration.this.extern3Combo.getText().trim());
+							if (JLog2Configuration.this.extern3Combo.getSelectionIndex() > 0)
+								JLog2Configuration.this.configuration.setExtTemp3LowerThan(JLog2Configuration.this.ext3smallerButton.getSelection() ? 1 : 0);
+							else
+								JLog2Configuration.this.configuration.setExtTemp3LowerThan(0);
+							checkNumberAlarms();
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+				}
+				{
+					this.temperaureLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					this.temperaureLabel.setLayoutData(new RowData(27, 19));
+					this.temperaureLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.temperaureLabel.setText("[°C]"); //$NON-NLS-1$
+				}
+				{
+					this.ext3smallerButton = new Button(this.alarmGroup, SWT.CHECK | SWT.LEFT);
+					RowData ext3smallerButtonLData = new RowData();
+					ext3smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
+					ext3smallerButtonLData.height = 20;
+					this.ext3smallerButton.setLayoutData(ext3smallerButtonLData);
+					this.ext3smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.ext3smallerButton.setText(" <"); //$NON-NLS-1$
+					this.ext3smallerButton.setEnabled(false);
+					this.ext3smallerButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext3smallerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (JLog2Configuration.this.extern3Combo.getSelectionIndex() > 0)
+								JLog2Configuration.this.configuration.setExtTemp3LowerThan(JLog2Configuration.this.ext3smallerButton.getSelection() ? 1 : 0);
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+					this.ext3smallerButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext3smallerButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
+						}
+					});
+				}
+				{
+					this.ext4Label = new CLabel(this.alarmGroup, SWT.CHECK | SWT.LEFT);
+					RowData ext4LabelLData = new RowData();
+					ext4LabelLData.width = 106;
+					ext4LabelLData.height = 20;
+					this.ext4Label.setLayoutData(ext4LabelLData);
+					this.ext4Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.ext4Label.setText(Messages.getString(MessageIds.GDE_MSGT2879));
+				}
+				{
+					this.extern4Combo = new CCombo(this.alarmGroup, SWT.BORDER);
+					RowData extern4ComboLData = new RowData();
+					extern4ComboLData.width = GDE.IS_LINUX ? 55 : 45;
+					extern4ComboLData.height = 17;
+					this.extern4Combo.setLayoutData(extern4ComboLData);
+					this.extern4Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.extern4Combo.setItems(this.zeroTo127);
+					this.extern4Combo.select(0);
+					this.extern4Combo.setEnabled(false);
+					this.extern4Combo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern4Combo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
+						}
+					});
+					this.extern4Combo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern4Combo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setExtTemp4(JLog2Configuration.this.extern4Combo.getText().trim());
+							if (JLog2Configuration.this.extern4Combo.getSelectionIndex() > 0)
+								JLog2Configuration.this.configuration.setExtTemp4LowerThan(JLog2Configuration.this.ext4smallerButton.getSelection() ? 1 : 0);
+							else
+								JLog2Configuration.this.configuration.setExtTemp4LowerThan(0);
+							checkNumberAlarms();
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+				}
+				{
+					this.temperaureLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					this.temperaureLabel.setLayoutData(new RowData(27, 19));
+					this.temperaureLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.temperaureLabel.setText("[°C]"); //$NON-NLS-1$
+				}
+				{
+					this.ext4smallerButton = new Button(this.alarmGroup, SWT.CHECK | SWT.LEFT);
+					RowData ext4smallerButtonLData = new RowData();
+					ext4smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
+					ext4smallerButtonLData.height = 20;
+					this.ext4smallerButton.setLayoutData(ext4smallerButtonLData);
+					this.ext4smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.ext4smallerButton.setText(" <"); //$NON-NLS-1$
+					this.ext4smallerButton.setEnabled(false);
+					this.ext4smallerButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext4smallerButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
+						}
+					});
+					this.ext4smallerButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext4smallerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (JLog2Configuration.this.extern4Combo.getSelectionIndex() > 0)
+								JLog2Configuration.this.configuration.setExtTemp4LowerThan(JLog2Configuration.this.ext4smallerButton.getSelection() ? 1 : 0);
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+				}
+				{
+					this.ext5Label = new CLabel(this.alarmGroup, SWT.CHECK | SWT.LEFT);
+					RowData ext5LabelLData = new RowData();
+					ext5LabelLData.width = 106;
+					ext5LabelLData.height = 20;
+					this.ext5Label.setLayoutData(ext5LabelLData);
+					this.ext5Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.ext5Label.setText(Messages.getString(MessageIds.GDE_MSGT2880));
+				}
+				{
+					this.extern5Combo = new CCombo(this.alarmGroup, SWT.BORDER);
+					RowData extern5ComboLData = new RowData();
+					extern5ComboLData.width = GDE.IS_LINUX ? 55 : 45;
+					extern5ComboLData.height = 17;
+					this.extern5Combo.setLayoutData(extern5ComboLData);
+					this.extern5Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.extern5Combo.setItems(this.zeroTo127);
+					this.extern5Combo.select(0);
+					this.extern5Combo.setEnabled(false);
+					this.extern5Combo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern5Combo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setExtTemp5(JLog2Configuration.this.extern5Combo.getText().trim());
+							if (JLog2Configuration.this.extern5Combo.getSelectionIndex() > 0)
+								JLog2Configuration.this.configuration.setExtTemp5LowerThan(JLog2Configuration.this.ext5smallerButton.getSelection() ? 1 : 0);
+							else
+								JLog2Configuration.this.configuration.setExtTemp5LowerThan(0);
+							checkNumberAlarms();
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+					this.extern5Combo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern5Combo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
+						}
+					});
+				}
+				{
+					this.temperaureLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					this.temperaureLabel.setLayoutData(new RowData(27, 19));
+					this.temperaureLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.temperaureLabel.setText("[°C]"); //$NON-NLS-1$
+				}
+				{
+					this.ext5smallerButton = new Button(this.alarmGroup, SWT.CHECK | SWT.LEFT);
+					RowData ext5smallerButtonLData = new RowData();
+					ext5smallerButtonLData.width = GDE.IS_LINUX ? 45 : 32;
+					ext5smallerButtonLData.height = 20;
+					this.ext5smallerButton.setLayoutData(ext5smallerButtonLData);
+					this.ext5smallerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.ext5smallerButton.setText(" <"); //$NON-NLS-1$
+					this.ext5smallerButton.setEnabled(false);
+					this.ext5smallerButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext5smallerButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
+						}
+					});
+					this.ext5smallerButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext5smallerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (JLog2Configuration.this.extern5Combo.getSelectionIndex() > 0)
+								JLog2Configuration.this.configuration.setExtTemp5LowerThan(JLog2Configuration.this.ext5smallerButton.getSelection() ? 1 : 0);
+							checkClearButtonState();
+							enableSaveSettings();
+						}
+					});
+				}
+			}
+			{
+				this.optionalGroup = new Group(this, SWT.NONE);
+				RowLayout optionalGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+				this.optionalGroup.setLayout(optionalGroupLayout);
+				FormData optionalGroupLData = new FormData();
+				optionalGroupLData.top = new FormAttachment(0, 1000, 305);
+				optionalGroupLData.right = new FormAttachment(1000, 1000, -7);
+				optionalGroupLData.width = GDE.IS_LINUX ? 440 : 400;
+				optionalGroupLData.height = 255;
+				this.optionalGroup.setLayoutData(optionalGroupLData);
+				this.optionalGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 2 : 0), SWT.NORMAL));
+				this.optionalGroup.setText(Messages.getString(MessageIds.GDE_MSGT2881));
+				{
+					this.alarmLinesLabel = new CLabel(this.optionalGroup, SWT.CENTER);
+					RowData alarmLinesButtonLData = new RowData();
+					alarmLinesButtonLData.width = 115;
+					alarmLinesButtonLData.height = 20;
+					this.alarmLinesLabel.setLayoutData(alarmLinesButtonLData);
+					this.alarmLinesLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.alarmLinesLabel.setText(Messages.getString(MessageIds.GDE_MSGT2882));
+				}
+				{
+					this.alarmLinesCombo = new CCombo(this.optionalGroup, SWT.BORDER);
+					RowData alarmLinesComboLData = new RowData();
+					alarmLinesComboLData.width = GDE.IS_LINUX ? 45 : 32;
+					alarmLinesComboLData.height = 17;
+					this.alarmLinesCombo.setLayoutData(alarmLinesComboLData);
+					this.alarmLinesCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.alarmLinesCombo.setItems(this.zeroAlarms);
+					this.alarmLinesCombo.select(0);
+					this.alarmLinesCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "alarmLinesCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (JLog2Configuration.this.alarmLinesCombo.getSelectionIndex() >= 1) {
+								JLog2Configuration.this.alarmLinesLabel.setForeground(DataExplorer.COLOR_RED);
+							}
+							else {
+								JLog2Configuration.this.alarmLinesLabel.setForeground(DataExplorer.COLOR_BLACK);
+							}
+							checkAdapterRequired();
+							JLog2Configuration.this.configuration.setNumberAlarmLines(JLog2Configuration.this.alarmLinesCombo.getSelectionIndex());
+							enableSaveSettings();
+						}
+					});
+					this.alarmLinesCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "alarmLinesCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2813));
+						}
+					});
+				}
+				{
+					this.line1signalTypeLabel = new CLabel(this.optionalGroup, SWT.RIGHT);
+					RowData Line1signalLabelLData = new RowData();
+					Line1signalLabelLData.width = 128;
+					Line1signalLabelLData.height = 20;
+					this.line1signalTypeLabel.setLayoutData(Line1signalLabelLData);
+					this.line1signalTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.line1signalTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2883));
+				}
+				{
+					this.line1signalTypeCombo = new CCombo(this.optionalGroup, SWT.BORDER);
+					RowData line1signalComboLData = new RowData();
+					line1signalComboLData.width = GDE.IS_LINUX ? 85 : 75;
+					line1signalComboLData.height = 17;
+					this.line1signalTypeCombo.setLayoutData(line1signalComboLData);
+					this.line1signalTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.line1signalTypeCombo.setItems(new String[] { "switched", "flash", "interval", "Morse" }); //$NON-NLS-1$
+					this.line1signalTypeCombo.select(0);
+					this.line1signalTypeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "line1signalCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							switch (JLog2Configuration.this.line1signalTypeCombo.getSelectionIndex()) {
+							case 0: //switch
+								JLog2Configuration.this.configuration.setLine1signalType(0);
+								break;
+							case 1: //interval
+								JLog2Configuration.this.configuration.setLine1signalType(64);
+								break;
+							case 2: //flash 
+								JLog2Configuration.this.configuration.setLine1signalType(32);
+								break;
+							case 3: //Morse
+								JLog2Configuration.this.configuration.setLine1signalType(128);
+								break;
+							}
+							enableSaveSettings();
+						}
+					});
+					this.line1signalTypeCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "line1signalCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2814));
+						}
+					});
+				}
+				{
+					this.subDevicesLabel = new CLabel(this.optionalGroup, SWT.CENTER);
+					RowData subDevicesButtonLData = new RowData();
+					subDevicesButtonLData.width = 115;
+					subDevicesButtonLData.height = 20;
+					this.subDevicesLabel.setLayoutData(subDevicesButtonLData);
+					this.subDevicesLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.subDevicesLabel.setText(Messages.getString(MessageIds.GDE_MSGT2884));
+					this.subDevicesLabel.setEnabled(false);
+				}
+				{
+					this.subDevicesCombo = new CCombo(this.optionalGroup, SWT.BORDER);
+					this.subDevicesCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.subDevicesCombo.setText(Messages.getString(MessageIds.GDE_MSGT2885));
+					this.subDevicesCombo.setEditable(false);
+					RowData subDevicesComboLData = new RowData();
+					subDevicesComboLData.width = GDE.IS_LINUX ? 75 : 65;
+					subDevicesComboLData.height = 17;
+					this.subDevicesCombo.setLayoutData(subDevicesComboLData);
+					this.subDevicesCombo.setEnabled(false);
+				}
+				{
+					this.tempSensorTypeLabel = new CLabel(this.optionalGroup, SWT.RIGHT);
+					RowData tempSensorTypeButtonLData = new RowData();
+					tempSensorTypeButtonLData.width = 95;
+					tempSensorTypeButtonLData.height = 20;
+					this.tempSensorTypeLabel.setLayoutData(tempSensorTypeButtonLData);
+					this.tempSensorTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.tempSensorTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2886));
+				}
+				{
+					this.tempSensorTypeCombo = new CCombo(this.optionalGroup, SWT.BORDER);
+					RowData tempSensorTypeComboLData = new RowData();
+					tempSensorTypeComboLData.width = GDE.IS_LINUX ? 85 : 75;
+					tempSensorTypeComboLData.height = 17;
+					this.tempSensorTypeCombo.setLayoutData(tempSensorTypeComboLData);
+					this.tempSensorTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.tempSensorTypeCombo.setItems(new String[] { " --- ", "analog", "digital" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					this.tempSensorTypeCombo.select(0);
+					this.tempSensorTypeCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "tempSensorTypeCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2815));
+						}
+					});
+					this.tempSensorTypeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "tempSensorTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							setTemperaturSensorType(JLog2Configuration.this.tempSensorTypeCombo.getSelectionIndex());
+							JLog2Configuration.this.configuration.setTemperaturSensorType(JLog2Configuration.this.tempSensorTypeCombo.getSelectionIndex());
+							checkAdapterRequired();
+							enableSaveSettings();
+						}
+					});
+				}
+				{
+					this.rpmSensorLabel = new CLabel(this.optionalGroup, SWT.CENTER);
+					RowData rpmSensorButtonLData = new RowData();
+					rpmSensorButtonLData.width = 115;
+					rpmSensorButtonLData.height = 20;
+					this.rpmSensorLabel.setLayoutData(rpmSensorButtonLData);
+					this.rpmSensorLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.rpmSensorLabel.setText(Messages.getString(MessageIds.GDE_MSGT2887));
+				}
+				{
+					this.pulsPerRevolutionSensorCombo = new CCombo(this.optionalGroup, SWT.BORDER);
+					RowData rpmSensorComboLData = new RowData();
+					rpmSensorComboLData.width = GDE.IS_LINUX ? 75 : 65;
+					rpmSensorComboLData.height = 17;
+					this.pulsPerRevolutionSensorCombo.setLayoutData(rpmSensorComboLData);
+					this.pulsPerRevolutionSensorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.pulsPerRevolutionSensorCombo.setItems(this.zeroTo127);
+					this.pulsPerRevolutionSensorCombo.select(0);
+					this.pulsPerRevolutionSensorCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "rpmSensorCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (JLog2Configuration.this.brushLessButton.getSelection()) {
+								JLog2Configuration.this.configuration.setIsBrushlessMotor(true, JLog2Configuration.this.pulsPerRevolutionSensorCombo.getSelectionIndex() * 2 + 2);
+							}
+							else {
+								JLog2Configuration.this.configuration.setPulsePerRevolution(JLog2Configuration.this.pulsPerRevolutionSensorCombo.getSelectionIndex());
+							}
+							if (JLog2Configuration.this.pulsPerRevolutionSensorCombo.getSelectionIndex() < 1) {
+								JLog2Configuration.this.motorButton.setEnabled(false);
+								JLog2Configuration.this.extRpmButton.setEnabled(false);
+							}
+							else {
+								JLog2Configuration.this.motorButton.setEnabled(true);
+								JLog2Configuration.this.extRpmButton.setEnabled(true);
+							}
+							checkAdapterRequired();
+							enableSaveSettings();
+						}
+					});
+					this.pulsPerRevolutionSensorCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "rpmSensorCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							if (JLog2Configuration.this.brushLessButton.getSelection())
+								JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2816));
+							else
+								JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2817));
+						}
+					});
+				}
+				{
+					new Label(this.optionalGroup, SWT.NONE).setLayoutData(new RowData(9, 19));
+				}
+				{
+					this.motorButton = new Button(this.optionalGroup, SWT.CHECK | SWT.CENTER);
+					RowData motorButtonLData = new RowData();
+					motorButtonLData.width = 80;
+					motorButtonLData.height = 20;
+					this.motorButton.setLayoutData(motorButtonLData);
+					this.motorButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.motorButton.setText(Messages.getString(MessageIds.GDE_MSGT2888));
+					this.motorButton.setEnabled(false);
+					this.motorButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "motorButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2818));
+						}
+					});
+					this.motorButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "motorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setIsMotor(JLog2Configuration.this.motorButton.getSelection());
+							if (JLog2Configuration.this.motorButton.getSelection()) {
+								JLog2Configuration.this.brushLessButton.setEnabled(true);
+							}
+							else {
+								JLog2Configuration.this.brushLessButton.setEnabled(false);
+							}
+							enableSaveSettings();
+						}
+					});
+				}
+				{
+					this.brushLessButton = new Button(this.optionalGroup, SWT.CHECK | SWT.CENTER);
+					RowData brushLessButtonLData = new RowData();
+					brushLessButtonLData.width = 100;
+					brushLessButtonLData.height = 20;
+					this.brushLessButton.setLayoutData(brushLessButtonLData);
+					this.brushLessButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.brushLessButton.setText(Messages.getString(MessageIds.GDE_MSGT2889));
+					this.brushLessButton.setEnabled(false);
+					this.brushLessButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "brushLessButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.configuration.setIsBrushlessMotor(JLog2Configuration.this.brushLessButton.getSelection(), JLog2Configuration.this.motorPolsCombo.getSelectionIndex() * 2 + 2);
+							if (JLog2Configuration.this.brushLessButton.getSelection()) {
+								JLog2Configuration.this.pulsPerRevolutionSensorCombo.setItems(JLog2Configuration.this.motorPols);
+								JLog2Configuration.this.pulsPerRevolutionSensorCombo.select(JLog2Configuration.this.motorPolsCombo.getSelectionIndex());
+								JLog2Configuration.this.rpmSensorLabel.setText(Messages.getString(MessageIds.GDE_MSGT2890));
+								JLog2Configuration.this.rpmSensorLabel.setForeground(DataExplorer.COLOR_RED);
+								JLog2Configuration.this.configuration.setPulsePerRevolution(1);
+							}
+							else {
+								JLog2Configuration.this.pulsPerRevolutionSensorCombo.setItems(JLog2Configuration.this.zeroTo127);
+								JLog2Configuration.this.pulsPerRevolutionSensorCombo.select(1);
+								JLog2Configuration.this.rpmSensorLabel.setText(Messages.getString(MessageIds.GDE_MSGT2891));
+								JLog2Configuration.this.rpmSensorLabel.setForeground(DataExplorer.COLOR_BLACK);
+								JLog2Configuration.this.configuration.setPulsePerRevolution(1);
+							}
+							enableSaveSettings();
+						}
+					});
+					this.brushLessButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "brushLessButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2819));
+						}
+					});
+				}
+				{
+					this.telemetryLabel = new CLabel(this.optionalGroup, SWT.CENTER);
+					RowData telemetryButtonLData = new RowData();
+					telemetryButtonLData.width = 115;
+					telemetryButtonLData.height = 20;
+					this.telemetryLabel.setLayoutData(telemetryButtonLData);
+					this.telemetryLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.telemetryLabel.setText(Messages.getString(MessageIds.GDE_MSGT2892));
+				}
+				{
+					this.telemetryCombo = new CCombo(this.optionalGroup, SWT.BORDER);
+					RowData telemetryComboLData = new RowData();
+					telemetryComboLData.width = GDE.IS_LINUX ? 123 : 113;
+					telemetryComboLData.height = 17;
+					this.telemetryCombo.setLayoutData(telemetryComboLData);
+					this.telemetryCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.telemetryCombo.setItems(new String[] { " ----------- ", "FTDI livestream", "JETI", "MPX", "Unidisplay" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					this.telemetryCombo.select(0);
+					this.telemetryCombo.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "telemetryCombo.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2820));
+						}
+					});
+					this.telemetryCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "telemetryCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							enableMpxAddressSelection(false);
+							switch (JLog2Configuration.this.telemetryCombo.getSelectionIndex()) {
+							case 0: //none
+								JLog2Configuration.this.configuration.setTelemetryBaudrateType(0);
+								break;
+							case 1: //FTDI live stream
+								JLog2Configuration.this.configuration.setTelemetryBaudrateType(4);
+								break;
+							//case 2: //Jeti
+							//	configuration.setTelemetryBaudrateType(0);
+							//	break;
+							case 3: //MPX
+								enableMpxAddressSelection(true);
+								break;
+							//case 4: //UniDisplay
+							//	configuration.setTelemetryBaudrateType(0);
+							//	break;
+							}
+							enableSaveSettings();
+						}
+					});
+				}
+				{
+					this.sensorAdapterButton = new Button(this.optionalGroup, SWT.PUSH | SWT.CENTER);
+					RowData sensorAdapterButtonLData = new RowData();
+					sensorAdapterButtonLData.width = 145;
+					sensorAdapterButtonLData.height = 26;
+					this.sensorAdapterButton.setLayoutData(sensorAdapterButtonLData);
+					this.sensorAdapterButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.sensorAdapterButton.setText(Messages.getString(MessageIds.GDE_MSGT2893));
+					this.sensorAdapterButton.setEnabled(false);
+					this.sensorAdapterButton.addMouseMoveListener(new MouseMoveListener() {
+						@Override
+						public void mouseMove(MouseEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "sensorAdapterButton.mouseMove, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2821));
+						}
+					});
+					this.sensorAdapterButton.addHelpListener(new HelpListener() {
+						@Override
+						public void helpRequested(HelpEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.application.openHelpDialog(JLog2Configuration.this.device.getName(), "HelpInfo.html"); //$NON-NLS-1$
+						}
+					});
+				}
+				{
+					this.optionalStuff = new Composite(this.optionalGroup, SWT.NONE);
+					RowLayout optionalStuffLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+					this.optionalStuff.setLayout(optionalStuffLayout);
+					this.optionalStuff.setLayoutData(new RowData(385, 25)); //this.getClientArea().width - (GDE.IS_MAC ? 35 : GDE.IS_LINUX ? 0 : 45)
+					{
+						this.hv2BecLabel = new CLabel(this.optionalStuff, SWT.RIGHT);
+						RowData hv2BecLabelLData = new RowData();
+						hv2BecLabelLData.width = 75;
+						hv2BecLabelLData.height = 20;
+						this.hv2BecLabel.setLayoutData(hv2BecLabelLData);
+						this.hv2BecLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.hv2BecLabel.setText("HV²BEC [V]"); //$NON-NLS-1$
+					}
+					{
+						this.hv2BecCombo = new CCombo(this.optionalStuff, SWT.BORDER);
+						this.hv2BecCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.hv2BecCombo.setItems(new String[] { "6.0", "6.5", "7.0", "7.5", "8.0", "8.5" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+						this.hv2BecCombo.select(0);
+						this.hv2BecCombo.setLayoutData(new RowData((GDE.IS_LINUX ? 70 : 60), 17));
+						this.hv2BecCombo.setVisible(false);
+						this.hv2BecCombo.addMouseWheelListener(new MouseWheelListener() {
+							@Override
+							public void mouseScrolled(MouseEvent evt) {
+								JLog2Configuration.log.log(java.util.logging.Level.FINEST, "hv2BecCombo.mouseScrolled, event=" + evt); //$NON-NLS-1$
+								JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2822));
+							}
+						});
+						this.hv2BecCombo.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								JLog2Configuration.log.log(java.util.logging.Level.FINEST, "hv2BecCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+								JLog2Configuration.this.configuration.setHV2BecVoltage(JLog2Configuration.this.hv2BecCombo.getSelectionIndex());
+								enableSaveSettings();
+							}
+						});
+					}
+					{
+						this.speedSensorLabel = new CLabel(this.optionalStuff, SWT.RIGHT);
+						RowData speedSensorLabelLData = new RowData();
+						speedSensorLabelLData.width = 140;
+						speedSensorLabelLData.height = 20;
+						this.speedSensorLabel.setLayoutData(speedSensorLabelLData);
+						this.speedSensorLabel.setText(Messages.getString(MessageIds.GDE_MSGT2895));
+						this.speedSensorLabel.setVisible(false);
+					}
+					{
+						this.speedSensorButton = new Button(this.optionalStuff, SWT.CHECK | SWT.LEFT);
+						RowData speedSensorButtonLData = new RowData();
+						speedSensorButtonLData.width = 90;
+						speedSensorButtonLData.height = 20;
+						this.speedSensorButton.setLayoutData(speedSensorButtonLData);
+						this.speedSensorButton.setText(Messages.getString(MessageIds.GDE_MSGT2896));
+						this.speedSensorButton.setVisible(false);
+						this.speedSensorButton.addMouseMoveListener(new MouseMoveListener() {
+							@Override
+							public void mouseMove(MouseEvent evt) {
+								JLog2Configuration.log.log(java.util.logging.Level.FINEST, "speedSensorButton.mouseMove, event=" + evt); //$NON-NLS-1$
+								JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2823));
+							}
+						});
+						this.speedSensorButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								JLog2Configuration.log.log(java.util.logging.Level.FINEST, "speedSensorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								//TODO configuration.setHV2BecVoltage(speedSensorButton.getSelection() ? 1 : 0);
+							}
+						});
+					}
+				}
+				{
+					this.mpxAddessesLabel = new CLabel(this.optionalGroup, SWT.CENTER | SWT.EMBEDDED);
+					RowData mpxAddessesLabelLData = new RowData();
+					mpxAddessesLabelLData.width = 384;
+					mpxAddessesLabelLData.height = 17;
+					this.mpxAddessesLabel.setLayoutData(mpxAddessesLabelLData);
+					this.mpxAddessesLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.mpxAddessesLabel.setText(Messages.getString(MessageIds.GDE_MSGT2897));
+
+					this.mpxAddresses[0] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGT2898), this.configuration, 0);
+					this.mpxAddresses[1] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGT2899), this.configuration, 1);
+					this.mpxAddresses[2] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2860), this.configuration, 2);
+					this.mpxAddresses[3] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2861), this.configuration, 3);
+					this.mpxAddresses[4] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2862), this.configuration, 4);
+					this.mpxAddresses[5] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2863), this.configuration, 5);
+					this.mpxAddresses[6] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2864), this.configuration, 6);
+					this.mpxAddresses[7] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2865), this.configuration, 7);
+					this.mpxAddresses[8] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2866), this.configuration, 8);
+					this.mpxAddresses[9] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2867), this.configuration, 9);
+					this.mpxAddresses[10] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2868), this.configuration, 10);
+					this.mpxAddresses[11] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2869), this.configuration, 11);
+					this.mpxAddresses[12] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2870), this.configuration, 12);
+					this.mpxAddresses[13] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2871), this.configuration, 13);
+					this.mpxAddresses[14] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2872), this.configuration, 14);
+					this.mpxAddresses[15] = new MpxAddressComposite(this.optionalGroup, SWT.NONE, Messages.getString(MessageIds.GDE_MSGI2873), this.configuration, 15);
 				}
 			}
 			this.layout();
@@ -1920,30 +2543,813 @@ public class JLog2Configuration extends org.eclipse.swt.widgets.Composite {
 		}
 	}
 
+	private void initialyzeGUI(Configuration config, boolean isInitialLoad) {
+		if (isInitialLoad) {
+			setBaudrate(config.get(0));
+			this.sysModeCombo.select(config.get(1) & 0x01);
+			setMotorShuntCalibration(config.get(1));
+			this.motorPolsCombo.select(config.get(3) > 0 ? (config.get(3) / 2 - 1) : 0);
+			setGearRatio(config);
+
+			this.resetButton.setSelection(config.get(11) == 1);
+			this.logStopButton.setSelection((config.get(10) & 0x01) == 1);
+			this.highPulsWidthButton.setSelection((config.get(10) & 0x02) == 2);
+			this.extRpmButton.setSelection((config.get(10) & 0x04) == 4);
+
+			this.uBecDipDetectButton.setSelection((config.get(16) & 0x01) == 1);
+			this.capacityAlarmCombo.select(config.get(12));
+			this.voltageBatteryAlarmCombo.select(config.get(13));
+			this.voltageBatteryAlarmDecimalsCombo.select(config.get(14));
+			this.paTempMaxCombo.select(config.get(15));
+		}
+		this.extern1Combo.select(config.get(17));
+		this.extern2Combo.select(config.get(18));
+		this.extern3Combo.select(config.get(19));
+		this.extern4Combo.select(config.get(20));
+		this.extern5Combo.select(config.get(21));
+		this.ext1smallerButton.setSelection((config.get(22) & 0x0001) != 0);
+		this.ext2smallerButton.setSelection((config.get(22) & 0x0002) != 0);
+		this.ext3smallerButton.setSelection((config.get(22) & 0x0004) != 0);
+		this.ext4smallerButton.setSelection((config.get(22) & 0x0008) != 0);
+		this.ext5smallerButton.setSelection((config.get(22) & 0x0010) != 0);
+
+		this.alarmLinesCombo.select(config.get(23));
+		if (config.get(23) > 0) this.alarmLinesLabel.setForeground(DataExplorer.COLOR_RED);
+		setLine1SignalType(config.get(46));
+		setTemperaturSensorType(config.get(24));
+		this.pulsPerRevolutionSensorCombo.select(config.get(27));
+		if (this.pulsPerRevolutionSensorCombo.getSelectionIndex() > 0) this.extRpmButton.setEnabled(true);
+		setPulsPerRevolutionSensor(config.get(28));
+		setIsMotorButton((config.get(29) & 0x0004) > 0 && config.get(28) > 0);
+		this.extRpmButton.setEnabled((config.get(29) & 0x0004) > 0 && config.get(28) > 0);
+		setIsBrushlessMotor((config.get(29) & 0x0080) > 0 && (config.get(29) & 0x0004) > 0 && config.get(28) > 0);
+		this.mpxAddresses[0].mpxAddressCombo.select(config.get(30));
+		this.mpxAddresses[1].mpxAddressCombo.select(config.get(31));
+		this.mpxAddresses[2].mpxAddressCombo.select(config.get(32));
+		this.mpxAddresses[3].mpxAddressCombo.select(config.get(33));
+		this.mpxAddresses[4].mpxAddressCombo.select(config.get(34));
+		this.mpxAddresses[5].mpxAddressCombo.select(config.get(35));
+		this.mpxAddresses[6].mpxAddressCombo.select(config.get(36));
+		this.mpxAddresses[7].mpxAddressCombo.select(config.get(37));
+		this.mpxAddresses[8].mpxAddressCombo.select(config.get(38));
+		this.mpxAddresses[9].mpxAddressCombo.select(config.get(39));
+		this.mpxAddresses[10].mpxAddressCombo.select(config.get(40));
+		this.mpxAddresses[11].mpxAddressCombo.select(config.get(41));
+		this.mpxAddresses[12].mpxAddressCombo.select(config.get(42));
+		this.mpxAddresses[13].mpxAddressCombo.select(config.get(43));
+		this.mpxAddresses[14].mpxAddressCombo.select(config.get(44));
+		this.mpxAddresses[15].mpxAddressCombo.select(config.get(45));
+		setTelemetryLivedata(config.get(46) & 0xFFF0);
+		if (isInitialLoad) {
+			setLogMode(config.get(2)); //enable/disables lots of combos
+		}
+		try {
+			updateSubDevices(config.get(47));
+		}
+		catch (Exception e) {
+			//ignore, not relevant for this configuration
+		}
+	}
+
+	//private void updateGUI(Configuration config) {
+	//		//initMainCongigSection
+	////		setBaudrate(config.get(0));	
+	////		sysModeCombo.select(config.get(1) & 0x01);
+	////		setMotorShuntCalibration(config.get(1));
+	////		motorPolsCombo.select(config.get(3) > 0 ? (config.get(3)/2 - 1) : 0);
+	////		setGearRatio(config);
+	////		
+	////		resetButton.setSelection(config.get(11) == 1);
+	////		logStopButton.setSelection((config.get(10) & 0x01) == 1);
+	////		highPulsWidthButton.setSelection((config.get(10) & 0x02) == 2);
+	////		extRpmButton.setSelection((config.get(10) & 0x04) == 4);
+	////		
+	////		uBecDipDetectButton.setSelection((config.get(16) & 0x01) == 1);
+	////		capacityAlarmCombo.select(config.get(12));
+	////		voltageBatteryAlarmCombo.select(config.get(13));
+	////		voltageBatteryAlarmDecimalsCombo.select(config.get(14));
+	////		paTempMaxCombo.select(config.get(15));
+	//		extern1Combo.select(config.get(17));
+	//		extern2Combo.select(config.get(18));
+	//		extern3Combo.select(config.get(19));
+	//		extern4Combo.select(config.get(20));
+	//		extern5Combo.select(config.get(21));
+	//		ext1smallerButton.setSelection((config.get(22) & 0x0001) != 0);
+	//		ext2smallerButton.setSelection((config.get(22) & 0x0002) != 0);
+	//		ext3smallerButton.setSelection((config.get(22) & 0x0004) != 0);
+	//		ext4smallerButton.setSelection((config.get(22) & 0x0008) != 0);
+	//		ext5smallerButton.setSelection((config.get(22) & 0x0010) != 0);
+	//		
+	//		alarmLinesCombo.select(config.get(23));
+	//		if (config.get(23) > 0) alarmLinesLabel.setForeground(DataExplorer.COLOR_RED);
+	//		setLine1SignalType(config.get(46));
+	//		setTemperaturSensorType(config.get(24));
+	//		pulsPerRevolutionSensorCombo.select(config.get(27));
+	//		if (pulsPerRevolutionSensorCombo.getSelectionIndex() > 0) extRpmButton.setEnabled(true);
+	//		setPulsPerRevolutionSensor(config.get(28));
+	//		setIsMotorButton((config.get(29) & 0x0004) > 0);
+	//		setIsBrushlessMotor((config.get(29) & 0x0080) > 0);
+	//		mpxAddresses[0].mpxAddressCombo.select(config.get(30));
+	//		mpxAddresses[1].mpxAddressCombo.select(config.get(31));
+	//		mpxAddresses[2].mpxAddressCombo.select(config.get(32));
+	//		mpxAddresses[3].mpxAddressCombo.select(config.get(33));
+	//		mpxAddresses[4].mpxAddressCombo.select(config.get(34));
+	//		mpxAddresses[5].mpxAddressCombo.select(config.get(35));
+	//		mpxAddresses[6].mpxAddressCombo.select(config.get(36));
+	//		mpxAddresses[7].mpxAddressCombo.select(config.get(37));
+	//		mpxAddresses[8].mpxAddressCombo.select(config.get(38));
+	//		mpxAddresses[9].mpxAddressCombo.select(config.get(39));
+	//		mpxAddresses[10].mpxAddressCombo.select(config.get(40));
+	//		mpxAddresses[11].mpxAddressCombo.select(config.get(41));
+	//		mpxAddresses[12].mpxAddressCombo.select(config.get(42));
+	//		mpxAddresses[13].mpxAddressCombo.select(config.get(43));
+	//		mpxAddresses[14].mpxAddressCombo.select(config.get(44));
+	//		mpxAddresses[15].mpxAddressCombo.select(config.get(45));
+	//		setTelemetryLivedata(config.get(46)  & 0xFFF0);
+	//		try {
+	//			updateSubDevices(config.get(47));
+	//		}
+	//		catch (Exception e) {
+	//			//ignore, not relevant for this configuration
+	//		}
+	//		setLogMode(config.get(2)); //enable/disables lots of combos
+	//	}
+
+	/**
+	 * @param value
+	 */
+	private void setTelemetryLivedata(int value) {
+		enableMpxAddressSelection(false);
+		switch (value) {
+		case 0: //none
+			this.telemetryCombo.select(0);
+			break;
+		case 4: //FTDI live stream
+			this.telemetryCombo.select(4);
+			break;
+		//case 2: //Jeti
+		//	configuration.setTelemetryBaudrateType(0);
+		//	break;
+		case 3: //MPX
+			enableMpxAddressSelection(true);
+			break;
+		//case 4: //UniDisplay
+		//	configuration.setTelemetryBaudrateType(0);
+		//	break;
+		}
+	}
+
+	/**
+	 * @param isBrushless
+	 */
+	private void setIsBrushlessMotor(boolean isBrushless) {
+		this.brushLessButton.setSelection(isBrushless);
+		if (isBrushless) {
+			this.pulsPerRevolutionSensorCombo.setItems(this.motorPols);
+			this.pulsPerRevolutionSensorCombo.select(this.motorPolsCombo.getSelectionIndex());
+			this.rpmSensorLabel.setText(Messages.getString(MessageIds.GDE_MSGI2874));
+			this.rpmSensorLabel.setForeground(DataExplorer.COLOR_RED);
+		}
+		else {
+			this.pulsPerRevolutionSensorCombo.setItems(this.zeroTo127);
+			if (this.pulsPerRevolutionSensorCombo.getSelectionIndex() > 0) this.pulsPerRevolutionSensorCombo.select(1);
+			this.rpmSensorLabel.setText(Messages.getString(MessageIds.GDE_MSGI2875));
+			this.rpmSensorLabel.setForeground(DataExplorer.COLOR_BLACK);
+		}
+	}
+
+	/**
+	 * @param isMotor
+	 */
+	private void setIsMotorButton(boolean isMotor) {
+		this.motorButton.setSelection(isMotor);
+		if (isMotor) {
+			this.brushLessButton.setEnabled(true);
+		}
+		else {
+			this.brushLessButton.setEnabled(false);
+		}
+	}
+
+	/**
+	 * @param value
+	 */
+	private void setPulsPerRevolutionSensor(int value) {
+		this.pulsPerRevolutionSensorCombo.select(value);
+		if (this.pulsPerRevolutionSensorCombo.getSelectionIndex() < 1) {
+			this.motorButton.setEnabled(false);
+		}
+		else {
+			this.motorButton.setEnabled(true);
+		}
+	}
+
+	/**
+	 * @param value
+	 */
+	private void setTemperaturSensorType(int value) {
+		this.tempSensorTypeCombo.select(value);
+		switch (value) {
+		case 1:
+			enableExternTempeartureAll(false);
+			enableExternTempearture1(true);
+			break;
+		case 2:
+			enableExternTempeartureAll(true);
+			this.tempSensorTypeLabel.setForeground(DataExplorer.COLOR_RED);
+			break;
+		default:
+			enableExternTempeartureAll(false);
+			this.tempSensorTypeLabel.setForeground(DataExplorer.COLOR_BLACK);
+			break;
+		}
+	}
+
+	/**
+	 * @param value
+	 */
+	private void setLine1SignalType(int value) {
+		switch (value & 0xE0) {
+		default:
+		case 0: //switch
+			this.line1signalTypeCombo.select(0);
+			break;
+		case 32: //flash 
+			this.line1signalTypeCombo.select(1);
+			break;
+		case 64: //interval
+			this.line1signalTypeCombo.select(2);
+			break;
+		case 128: //Morse
+			this.line1signalTypeCombo.select(3);
+			break;
+		}
+	}
+
+	/**
+	 * @param config
+	 */
+	private void setGearRatio(Configuration config) {
+		if (config.get(4) == 1) {
+			this.directRatioButton.setSelection(false);
+			this.directGearRatioMajorCombo.setEnabled(false);
+			this.directGearRatioDecimalsCombo.setEnabled(false);
+			this.gearSelectionButton.setSelection(true);
+			this.gearPinionWheelCombo.setEnabled(true);
+			this.gearMainWheelCombo.setEnabled(true);
+			this.gearMainWheelDecimalsCombo.setEnabled(true);
+		}
+		else {
+			this.directRatioButton.setSelection(true);
+			this.directGearRatioMajorCombo.setEnabled(true);
+			this.directGearRatioDecimalsCombo.setEnabled(true);
+			this.gearSelectionButton.setSelection(false);
+			this.gearPinionWheelCombo.setEnabled(false);
+			this.gearMainWheelCombo.setEnabled(false);
+			this.gearMainWheelDecimalsCombo.setEnabled(false);
+		}
+		this.directGearRatioMajorCombo.select(config.get(5) - 1);
+		this.directGearRatioDecimalsCombo.select(config.get(6) > 0 ? config.get(6) : 0);
+		this.gearPinionWheelCombo.select(config.get(7) - 8);
+		this.gearMainWheelCombo.select(config.get(8) - 8);
+		this.gearMainWheelDecimalsCombo.select(config.get(9) > 0 ? config.get(9) : 0);
+	}
+
+	/**
+	 * @param value
+	 */
+	private void setMotorShuntCalibration(int value) {
+		if ((value & 0x80) == 0)
+			this.motorShuntCombo.select((value & 0x7E) / 2 + 15);
+		else
+			this.motorShuntCombo.select(15 - (value & 0x7E) / 2);
+	}
+
+	/**
+	 * set log mode combo according to configuration value
+	 * @param value
+	 */
+	private void setLogMode(int value) {
+		switch (value & 0x0B) {
+		case 0:
+		default:
+			this.logModeCombo.select(0);
+			break;
+		case 2:
+			this.logModeCombo.select(1);
+			enableAll(false);
+			break;
+		case 8:
+			this.logModeCombo.select(2);
+			break;
+		}
+	}
+
+	private void enableAll(boolean isEnabled) {
+		this.directRatioButton.setEnabled(isEnabled);
+		this.logStopButton.setEnabled(isEnabled);
+		this.highPulsWidthButton.setEnabled(isEnabled);
+		this.gearSelectionButton.setEnabled(isEnabled);
+		this.motorPolsCombo.setEnabled(isEnabled);
+		this.directGearRatioMajorCombo.setEnabled(isEnabled);
+		this.directGearRatioDecimalsCombo.setEnabled(isEnabled);
+		this.alarmsClearButton.setEnabled(isEnabled);
+		this.uBecDipDetectButton.setEnabled(isEnabled);
+		this.paTempMaxCombo.setEnabled(isEnabled);
+		this.voltageBatteryAlarmDecimalsCombo.setEnabled(isEnabled);
+		this.voltageBatteryAlarmCombo.setEnabled(isEnabled);
+		this.capacityAlarmCombo.setEnabled(isEnabled);
+		if (!isEnabled) {
+			this.extRpmButton.setEnabled(false);
+			enableExternTempeartureAll(false);
+			enableMpxAddressSelection(false);
+		}
+		this.sensorAdapterButton.setEnabled(isEnabled);
+		this.motorButton.setEnabled(isEnabled);
+		this.brushLessButton.setEnabled(isEnabled);
+		this.alarmLinesCombo.setEnabled(isEnabled);
+		this.telemetryCombo.setEnabled(isEnabled);
+		this.pulsPerRevolutionSensorCombo.setEnabled(isEnabled);
+		this.tempSensorTypeCombo.setEnabled(isEnabled);
+		this.subDevicesCombo.setEnabled(isEnabled);
+		this.line1signalTypeCombo.setEnabled(isEnabled);
+
+	}
+
+	/**
+	 * set baud rate combo according to configuration value
+	 * @param value of config[0]
+	 */
+	private void setBaudrate(int value) {
+		switch (value) {
+		case 2400:
+			this.baudrateCombo.select(1);
+			break;
+		case 4800:
+			this.baudrateCombo.select(2);
+			break;
+		case 9600: //JIVE
+			this.baudrateCombo.select(0);
+			//baudrateCombo.select(3);
+			break;
+		case 38400: //CMT
+			this.baudrateCombo.select(4);
+			//baudrateCombo.select(7);
+			break;
+		case 57600:
+			this.baudrateCombo.select(5);
+			break;
+		case 115200:
+			this.baudrateCombo.select(6);
+			break;
+		}
+	}
+
+	private void checkNumberAlarms() {
+		int numAlarms = 0;
+
+		if (this.uBecDipDetectButton.getSelection()) ++numAlarms;
+		if (this.capacityAlarmCombo.getSelectionIndex() > 0) ++numAlarms;
+		if (this.voltageBatteryAlarmCombo.getSelectionIndex() > 0) ++numAlarms;
+		if (this.voltageBatteryAlarmDecimalsCombo.getSelectionIndex() > 0) ++numAlarms;
+		if (this.paTempMaxCombo.getSelectionIndex() > 0) ++numAlarms;
+		if (this.extern1Combo.getSelectionIndex() > 0) ++numAlarms;
+		if (this.ext1smallerButton.getSelection()) ++numAlarms;
+		if (this.extern2Combo.getSelectionIndex() > 0) ++numAlarms;
+		if (this.ext2smallerButton.getSelection()) ++numAlarms;
+		if (this.extern3Combo.getSelectionIndex() > 0) ++numAlarms;
+		if (this.ext3smallerButton.getSelection()) ++numAlarms;
+		if (this.extern4Combo.getSelectionIndex() > 0) ++numAlarms;
+		if (this.ext4smallerButton.getSelection()) ++numAlarms;
+		if (this.extern5Combo.getSelectionIndex() > 0) ++numAlarms;
+		if (this.ext5smallerButton.getSelection()) ++numAlarms;
+
+		if (numAlarms == 1) {
+			if (this.alarmLinesCombo.getSelectionIndex() > 1) {
+				this.alarmLinesCombo.select(1);
+				this.configuration.setNumberAlarmLines(1);
+			}
+			this.alarmLinesCombo.setItems(this.oneAlarms);
+		}
+		else if (numAlarms > 1)
+			this.alarmLinesCombo.setItems(this.greaterOneAlarms);
+		else {
+			this.alarmLinesCombo.setItems(this.zeroAlarms);
+			this.alarmLinesCombo.select(0);
+			this.configuration.setNumberAlarmLines(0);
+			this.alarmLinesLabel.setForeground(DataExplorer.COLOR_BLACK);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+			this.sensorAdapterButton.setEnabled(false);
+		}
+	}
+
+	private void checkClearButtonState() {
+		if (this.uBecDipDetectButton.getSelection() || this.capacityAlarmCombo.getSelectionIndex() > 0 || this.voltageBatteryAlarmCombo.getSelectionIndex() > 0
+				|| this.voltageBatteryAlarmDecimalsCombo.getSelectionIndex() > 0 || this.paTempMaxCombo.getSelectionIndex() > 0 || this.extern1Combo.getSelectionIndex() > 0
+				|| this.ext1smallerButton.getSelection() || this.extern2Combo.getSelectionIndex() > 0 || this.ext2smallerButton.getSelection() || this.extern3Combo.getSelectionIndex() > 0
+				|| this.ext3smallerButton.getSelection() || this.extern4Combo.getSelectionIndex() > 0 || this.ext4smallerButton.getSelection() || this.extern5Combo.getSelectionIndex() > 0
+				|| this.ext5smallerButton.getSelection()) {
+			this.alarmsClearButton.setBackground(DataExplorer.COLOR_RED);
+			this.alarmsClearButton.setForeground(DataExplorer.COLOR_RED);
+			this.alarmsClearButton.setEnabled(true);
+		}
+		else {
+			this.alarmsClearButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+			this.alarmsClearButton.setForeground(DataExplorer.COLOR_LIGHT_GREY);
+			this.alarmsClearButton.setEnabled(false);
+		}
+		checkNumberAlarms();
+		checkAdapterRequired();
+	}
+
+	private void clearAlarms() {
+		//alarmsClearButton.setForeground(DataExplorer.COLOR_LIGHT_GREY);
+		this.uBecDipDetectButton.setSelection(false);
+		this.configuration.setBecDip(false);
+		this.capacityAlarmCombo.select(0);
+		this.configuration.setCapacityAlarm(0);
+		this.voltageBatteryAlarmDecimalsCombo.select(0);
+		this.configuration.setBatteryAlarmMajor("0"); //$NON-NLS-1$
+		this.voltageBatteryAlarmCombo.select(0);
+		this.configuration.setBatteryAlarmDecimals("0"); //$NON-NLS-1$
+		this.paTempMaxCombo.select(0);
+		this.configuration.setPaMaxTempAlarm("0"); //$NON-NLS-1$
+		this.extern1Combo.select(0);
+		this.ext1smallerButton.setSelection(false);
+		this.configuration.setExtTemp1("0"); //$NON-NLS-1$
+		this.configuration.setExtTemp1LowerThan(0);
+		this.configuration.setExtTemp2("0"); //$NON-NLS-1$
+		this.configuration.setExtTemp2LowerThan(0);
+		this.configuration.setExtTemp3("0"); //$NON-NLS-1$
+		this.configuration.setExtTemp3LowerThan(0);
+		this.configuration.setExtTemp4("0"); //$NON-NLS-1$
+		this.configuration.setExtTemp4LowerThan(0);
+		this.configuration.setExtTemp5("0"); //$NON-NLS-1$
+		this.configuration.setExtTemp5LowerThan(0);
+
+		this.alarmLinesLabel.setForeground(DataExplorer.COLOR_BLACK);
+		this.alarmLinesCombo.select(0);
+
+		checkClearButtonState();
+	}
+
 	private void enableExternTempearture1(boolean isEnabled) {
-		mpxAddresses[0].mpxAddressCombo.setEnabled(isEnabled);
+		this.extern1Combo.setEnabled(isEnabled);
+		this.ext1smallerButton.setEnabled(isEnabled);
+		this.configuration.setExtTemp1("0"); //$NON-NLS-1$
+		this.configuration.setExtTemp1LowerThan(0);
 	}
 
 	private void enableExternTempeartureAll(boolean isEnabled) {
-		for (MpxAddressComposite tmpMpxAddress : mpxAddresses) {
+		this.extern1Combo.setEnabled(isEnabled);
+		this.ext1smallerButton.setEnabled(isEnabled);
+		this.extern2Combo.setEnabled(isEnabled);
+		this.ext2smallerButton.setEnabled(isEnabled);
+		this.extern3Combo.setEnabled(isEnabled);
+		this.ext3smallerButton.setEnabled(isEnabled);
+		this.extern4Combo.setEnabled(isEnabled);
+		this.ext4smallerButton.setEnabled(isEnabled);
+		this.extern5Combo.setEnabled(isEnabled);
+		this.ext5smallerButton.setEnabled(isEnabled);
+		this.configuration.setExtTemp2("0"); //$NON-NLS-1$
+		this.configuration.setExtTemp2LowerThan(0);
+		this.configuration.setExtTemp3("0"); //$NON-NLS-1$
+		this.configuration.setExtTemp3LowerThan(0);
+		this.configuration.setExtTemp4("0"); //$NON-NLS-1$
+		this.configuration.setExtTemp4LowerThan(0);
+		this.configuration.setExtTemp5("0"); //$NON-NLS-1$
+		this.configuration.setExtTemp5LowerThan(0);
+	}
+
+	private void updateSubDevices(int value) {
+		this.subDevicesLabel.setForeground(DataExplorer.COLOR_BLACK);
+		this.subDevicesCombo.setText(Messages.getString(MessageIds.GDE_MSGT2865));
+		this.sensorAdapterButton.setEnabled(false);
+		this.sensorAdapterButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+		this.telemetryCombo.setEnabled(true);
+		this.telemetryCombo.setText(GDE.STRING_EMPTY);
+		this.telemetryCombo.select(0);
+		this.alarmLinesCombo.setEnabled(true);
+		this.line1signalTypeCombo.setEnabled(true);
+		this.alarmLinesLabel.setForeground(DataExplorer.COLOR_BLACK);
+		this.tempSensorTypeCombo.setEnabled(true);
+		this.pulsPerRevolutionSensorCombo.setEnabled(true);
+		this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGI2876));
+		this.temperaureLabel.setText("[°C]"); //$NON-NLS-1$
+		this.alarmLinesCombo.setItems(this.zeroAlarms);
+		this.hv2BecLabel.setVisible(false);
+		this.hv2BecCombo.setVisible(false);
+		this.speedSensorLabel.setVisible(false);
+		this.speedSensorButton.setVisible(false);
+
+		JLog2Configuration.log.log(java.util.logging.Level.FINE,
+				"telemetryCombo selection index = " + this.telemetryCombo.getSelectionIndex() + " jlogConfigurationCombo selection index = " + this.jlogConfigurationCombo.getSelectionIndex()); //$NON-NLS-1$ //$NON-NLS-2$
+		JLog2Configuration.log.log(java.util.logging.Level.FINE, StringHelper.printBinary((byte) (value & 0xFF), false));
+
+		//0=normal, 1=HSS, 2=HSSG2, 3=HSST, 4=BH, 5=BM, 6=BHSS, 7=BHSST, 8=G, 9=S 10=L, 
+		//11=T, 12=GT, 13=V, 14=VG, 15=VS, 16=BID, 17=BIDG, 18=BIDS, 19=A, 20=AV, 21=B, 22=BV, 23=P1, 24=P2, 25=AVP1, 26=AP2
+		switch (value) {
+		case 1: //V (V4T0)
+			this.jlogConfigurationCombo.select(13);
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			enableExternTempearture1(true);
+			this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGI2877));
+			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
+			break;
+		case 91: //P1 (Phase puls K4-1)
+			this.jlogConfigurationCombo.select(23);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			break;
+		case 2: //BID
+			this.jlogConfigurationCombo.select(16);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.subDevicesCombo.setText("BID"); //$NON-NLS-1$
+			this.alarmLinesCombo.setEnabled(false);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.tempSensorTypeCombo.setEnabled(false);
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			break;
+		case 92: //P2 (Phase puls K4-2)
+			this.jlogConfigurationCombo.select(24);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.subDevicesCombo.setText("BID"); //$NON-NLS-1$
+			this.alarmLinesCombo.setEnabled(false);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.tempSensorTypeCombo.setEnabled(false);
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			break;
+		case 3: //B (JTX base)
+			this.jlogConfigurationCombo.select(21);
+			this.alarmLinesCombo.setItems(this.greaterOneAlarms);
+			this.alarmLinesCombo.select(2);
+			this.alarmLinesCombo.setEnabled(false);
+			this.alarmLinesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.tempSensorTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.telemetryCombo.select(4);
+			enableExternTempeartureAll(true);
+			break;
+		case 4: //BV (JTX base V4T0)
+			this.jlogConfigurationCombo.select(22);
+			this.alarmLinesCombo.setItems(this.greaterOneAlarms);
+			this.alarmLinesCombo.select(2);
+			this.alarmLinesCombo.setEnabled(false);
+			this.alarmLinesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.tempSensorTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.telemetryCombo.select(4);
+			enableExternTempeartureAll(true);
+			this.ext1Label.setText("Spannung");
+			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
+			break;
+		case 5: //A (JTX Air)
+			this.jlogConfigurationCombo.select(23);
+			this.jlogConfigurationCombo.select(19);
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("JTX"); //$NON-NLS-1$
+			break;
+		case 6: //AV (JTX Air V4T0)
+			this.jlogConfigurationCombo.select(20);
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("JTX"); //$NON-NLS-1$
+			enableExternTempearture1(true);
+			this.ext1Label.setText("Spannung");
+			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
+			break;
+		case 10: //G (GPS single)
+			this.jlogConfigurationCombo.select(9);
+			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			break;
+		case 111: //GT (Prandtl probe + GPS)
+			this.jlogConfigurationCombo.select(12);
+			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			this.speedSensorLabel.setVisible(true);
+			this.speedSensorButton.setVisible(true);
+			break;
+		case 110: //T (Prandtl probe)
+			this.jlogConfigurationCombo.select(11);
+			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
+			this.speedSensorLabel.setVisible(true);
+			this.speedSensorButton.setVisible(true);
+			break;
+		case 23: //VG (V4T0 GPS single)
+			this.jlogConfigurationCombo.select(14);
+			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			enableExternTempearture1(true);
+			this.ext1Label.setText("Spannung");
+			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
+			break;
+		case 15: //S (GPS mpx)
+			this.jlogConfigurationCombo.select(9);
+			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MPX"); //$NON-NLS-1$
+			enableMpxAddressSelection(true);
+			break;
+		case 16: //VS (V4T0 GPS mpx)
+			this.jlogConfigurationCombo.select(15);
+			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MPX"); //$NON-NLS-1$
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			enableExternTempearture1(true);
+			this.ext1Label.setText("Spannung");
+			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
+			break;
+		case 20: //BIDG (GPS single)
+			this.jlogConfigurationCombo.select(17);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.subDevicesCombo.setText("BID"); //$NON-NLS-1$
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
+			this.alarmLinesCombo.setEnabled(false);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.tempSensorTypeCombo.setEnabled(false);
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			break;
+		case 25: //BIDS (GPS mpx)
+			this.jlogConfigurationCombo.select(18);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.subDevicesCombo.setText("BID"); //$NON-NLS-1$
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MPX"); //$NON-NLS-1$
+			this.alarmLinesCombo.setEnabled(false);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.tempSensorTypeCombo.setEnabled(false);
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			enableMpxAddressSelection(true);
+			break;
+		case 40: //L (GPS mpx LQI)
+			this.jlogConfigurationCombo.select(10);
+			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MPX"); //$NON-NLS-1$
+			break;
+		case 200: //HTS-SS (HiTec telemetry)
+			this.jlogConfigurationCombo.select(1);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.subDevicesCombo.setText("HTS-SS"); //$NON-NLS-1$
+			this.alarmLinesCombo.setEnabled(false);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.tempSensorTypeCombo.setEnabled(false);
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			break;
+		case 201: //HTS-SS + GPS-Logger (no HiTec telemetry)
+			this.jlogConfigurationCombo.select(2);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.subDevicesCombo.setText("HTS-SS"); //$NON-NLS-1$
+			this.alarmLinesCombo.setEnabled(false);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.tempSensorTypeCombo.setEnabled(false);
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			break;
+		case 202: //HTS-SS + temperature sensor (no HiTec telemetry)
+			this.jlogConfigurationCombo.select(3);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.subDevicesCombo.setText("HTS-SS"); //$NON-NLS-1$
+			this.alarmLinesCombo.setEnabled(false);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.tempSensorTypeCombo.setEnabled(false);
+			this.tempSensorTypeCombo.select(2);
+			this.tempSensorTypeCombo.notifyListeners(SWT.Selection, new Event());
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			break;
+		case 210: //BH (HV²BEC no MPX telemetry)
+			this.jlogConfigurationCombo.select(4);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.subDevicesCombo.setText("HV²BEC"); //$NON-NLS-1$
+			this.ext1Label.setText("HV²BEC Temp"); //$NON-NLS-1$
+			this.alarmLinesCombo.setEnabled(false);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.tempSensorTypeCombo.select(0);
+			this.tempSensorTypeCombo.setEnabled(false);
+			enableExternTempearture1(true);
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			this.hv2BecLabel.setVisible(true);
+			this.hv2BecCombo.setVisible(true);
+			break;
+		case 211: //BM (HV²BEC no HoTT telemetry)
+			this.jlogConfigurationCombo.select(5);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.subDevicesCombo.setText("HV²BEC"); //$NON-NLS-1$
+			this.ext1Label.setText("HV²BEC Temp"); //$NON-NLS-1$
+			this.alarmLinesCombo.setEnabled(false);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.tempSensorTypeCombo.select(0);
+			this.tempSensorTypeCombo.setEnabled(false);
+			enableExternTempearture1(true);
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			this.hv2BecLabel.setVisible(true);
+			this.hv2BecCombo.setVisible(true);
+			break;
+		case 212: //HV²BEC/HTSS (HiTec telemetry)
+			this.jlogConfigurationCombo.select(6);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.subDevicesCombo.setText("HV²BEC/HTSS"); //$NON-NLS-1$
+			this.ext1Label.setText("HV²BEC Temp"); //$NON-NLS-1$
+			this.alarmLinesCombo.setEnabled(false);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.tempSensorTypeCombo.select(0);
+			this.tempSensorTypeCombo.setEnabled(false);
+			enableExternTempearture1(true);
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			this.hv2BecLabel.setVisible(true);
+			this.hv2BecCombo.setVisible(true);
+			break;
+		case 213: //BHSST (HV²BEC + HiTec telemetry + digital temperature sensors at COM)
+			this.jlogConfigurationCombo.select(7);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			this.subDevicesCombo.setText("HV²BEC/HTSS"); //$NON-NLS-1$
+			this.ext1Label.setText("HV²BEC Temp"); //$NON-NLS-1$
+			this.alarmLinesCombo.setEnabled(false);
+			this.line1signalTypeCombo.setEnabled(false);
+			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.telemetryCombo.setEnabled(false);
+			this.tempSensorTypeCombo.select(0);
+			this.tempSensorTypeCombo.setEnabled(false);
+			enableExternTempearture1(true);
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			this.hv2BecLabel.setVisible(true);
+			this.hv2BecCombo.setVisible(true);
+			break;
+		}
+
+	}
+
+	private void enableMpxAddressSelection(boolean isEnabled) {
+		for (MpxAddressComposite tmpMpxAddress : this.mpxAddresses) {
 			tmpMpxAddress.mpxAddressCombo.setEnabled(isEnabled);
 		}
 	}
 
-	private void setAdapterRequired(boolean isRequired) {
-		if (isRequired)
-			sensorAdapterButton.setForeground(DataExplorer.COLOR_RED);
-		else
-			sensorAdapterButton.setForeground(DataExplorer.COLOR_GREY);
-
+	/**
+	 * 
+	 */
+	private void updateGearRatio() {
+		double gearRatio = Double.valueOf(this.gearMainWheelCombo.getText().trim() + GDE.STRING_DOT + this.gearMainWheelDecimalsCombo.getText().trim())
+				/ Double.valueOf(this.gearPinionWheelCombo.getText().trim());
+		this.directGearRatioMajorCombo.select((int) gearRatio - 1);
+		this.directGearRatioDecimalsCombo.select((int) (gearRatio % 1 * 100));
+		this.configuration.setGearRatioMinor(GDE.STRING_EMPTY + (int) gearRatio);
+		this.configuration.setGearRatioDecimals(GDE.STRING_EMPTY + (int) (gearRatio % 1 * 100));
 	}
 
-	private void setClearAlarms(boolean isEnabled) {
-		if (isEnabled)
-			alarmsClearButton.setForeground(DataExplorer.COLOR_RED);
-		else
-			alarmsClearButton.setForeground(DataExplorer.COLOR_GREY);
-
+	/**
+	 * 
+	 */
+	private void checkAdapterRequired() {
+		if (this.alarmLinesCombo.getSelectionIndex() > 1 || this.tempSensorTypeCombo.getSelectionIndex() == 2
+				|| (this.tempSensorTypeCombo.getSelectionIndex() >= 1 && this.pulsPerRevolutionSensorCombo.getSelectionIndex() > 0)) {
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			this.sensorAdapterButton.setForeground(DataExplorer.COLOR_RED);
+		}
+		else {
+			this.sensorAdapterButton.setEnabled(false);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+			this.sensorAdapterButton.setForeground(DataExplorer.COLOR_BLACK);
+		}
 	}
 
 }

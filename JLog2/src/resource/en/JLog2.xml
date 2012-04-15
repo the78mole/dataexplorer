@@ -25,8 +25,8 @@
         <timeStep>50.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format inputType="SERIAL_IO" formatType="BYTE" size="-180"/>
-        <format inputType="FILE_IO" formatType="VALUE" size="-40"/>
+        <format size="-200" formatType="BYTE" inputType="SERIAL_IO"/>
+        <format size="-40" formatType="VALUE" inputType="FILE_IO"/>
         <timeUnit>sec</timeUnit>
         <separator>semicolon</separator>
         <leader>$</leader>
@@ -37,7 +37,7 @@
         <property description="" type="Integer" value="01" name="Record"/>
     </State>
     <Channels lastUseOrdinal="0">
-        <Channel type="TYPE_CONFIG" name="Config_1">
+        <Channel type="TYPE_CONFIG" name="Normal">
 			<Measurement>
 				<name>Voltage BEC</name>
 				<symbol>U</symbol>
@@ -284,7 +284,7 @@
                 <unit>1/min</unit>
                 <active>true</active>
                 <statistics comment="current trigger related" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Speed GPS</name>

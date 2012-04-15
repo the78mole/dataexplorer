@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
+    Copyright (c) 2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
@@ -53,7 +53,7 @@ public class JLog2SerialPort extends DeviceCommPort {
 	 * @throws IOException
 	 */
 	public synchronized byte[] getData() throws Exception {
-		final String $METHOD_NAME = "getData";
+		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
 		byte[] data = new byte[] {0x00};
 		byte[] tmpData = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO))];
 		byte[] answer = new byte[] {0x00};

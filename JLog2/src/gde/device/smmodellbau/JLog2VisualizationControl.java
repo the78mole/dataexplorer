@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2010,2011,2012 Winfried Bruegmann
+    Copyright (c) 2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
@@ -45,29 +45,29 @@ import org.eclipse.swt.widgets.Widget;
  * @author Winfried Brügmann
  */
 public class JLog2VisualizationControl extends Composite {
-	final static Logger					log									= Logger.getLogger(JLog2VisualizationControl.class.getName());
+	final static Logger		log									= Logger.getLogger(JLog2VisualizationControl.class.getName());
 
-	Composite										measurementComposite;
-	Button											measurement;
-	Button											inputFileButton;
-	Composite										buttonComposite;
-	Label												measurementUnitLabel;
-	Label												measurementSymbolLabel;
-	Label												tabItemLabel;
-	Composite										mainTabComposite;
+	Composite							measurementComposite;
+	Button								measurement;
+	Button								inputFileButton;
+	Composite							buttonComposite;
+	Label									measurementUnitLabel;
+	Label									measurementSymbolLabel;
+	Label									tabItemLabel;
+	Composite							mainTabComposite;
 
-	boolean											isVisibilityChanged	= false;
+	boolean								isVisibilityChanged	= false;
 
-	final Widget								parent;
-	final IDevice								device;																																								// get device specific things, get serial port, ...
-	final DataExplorer					application;																																					// interaction with application instance
-	final Channels							channels;																																							// interaction with channels, source of all records
-	final JLog2Dialog				dialog;
-	final int										channelConfigNumber;
-	final String								typeName;
-	final int										measurementCount;
-	final int										measurementOffset;
-	final List<Composite>				measurementTypes		= new ArrayList<Composite>();
+	final Widget					parent;
+	final IDevice					device;																																						// get device specific things, get serial port, ...
+	final DataExplorer		application;																																				// interaction with application instance
+	final Channels				channels;																																					// interaction with channels, source of all records
+	final JLog2Dialog			dialog;
+	final int							channelConfigNumber;
+	final String					typeName;
+	final int							measurementCount;
+	final int							measurementOffset;
+	final List<Composite>	measurementTypes		= new ArrayList<Composite>();
 
 	public JLog2VisualizationControl(Composite parentComposite, FormData useLayoutData, JLog2Dialog parentDialog, int useChannelConfigNumber, IDevice useDevice, String useName,
 			int useMeasurementOffset, int useMeasurementCount) {
@@ -109,16 +109,11 @@ public class JLog2VisualizationControl extends Composite {
 			mainTabCompositeLayout.makeColumnsEqualWidth = true;
 			mainTabCompositeLayout.numColumns = 2;
 			this.mainTabComposite.setLayout(mainTabCompositeLayout);
-			
+
 			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) {
-				//0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
-//				if (i > 24) {
-					this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i),
-							this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), ""));
-//				}
-//				else {
-//					this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1));
-//				}
+				//allow all measurement names, symbols and units to be correctable
+				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i,
+						this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), GDE.STRING_EMPTY));
 			}
 		}
 	}

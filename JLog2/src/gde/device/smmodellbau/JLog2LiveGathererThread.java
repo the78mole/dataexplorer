@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
+    Copyright (c) 2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
@@ -61,7 +61,7 @@ public class JLog2LiveGathererThread extends Thread {
 	 */
 	public JLog2LiveGathererThread(DataExplorer currentApplication, JLog2 useDevice, JLog2SerialPort useSerialPort, int channelConfigNumber)
 			throws ApplicationConfigurationException {
-		super("dataGatherer");
+		super("dataGatherer"); //$NON-NLS-1$
 		this.application = currentApplication;
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
@@ -179,7 +179,7 @@ public class JLog2LiveGathererThread extends Thread {
 			this.application.updateDataTable(this.recordSetKey, false);
 			
 			this.device.setAverageTimeStep_ms(tmpRecordSet.getAverageTimeStep_ms());
-			log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms());
+			log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms()); //$NON-NLS-1$
 		}
 	}
 

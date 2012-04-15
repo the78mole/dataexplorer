@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2010,2011,2012 Winfried Bruegmann
+    Copyright (c) 2012 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
@@ -60,9 +60,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	final static Logger		log								= Logger.getLogger(JLog2.class.getName());
 
 	//TODO
-	final static String		SM_GPS_LOGGER_INI				= "SM GPS-Logger.ini";													//$NON-NLS-1$
-	final static String		SM_GPS_LOGGER_INI_DIR		= "SM GPS-Logger setup";												//$NON-NLS-1$
-	final static String		SM_GPS_LOGGER_DIR_STUB	= "SM GPS-Logger";															//$NON-NLS-1$
+	final static String		SM_JLOG2_CONFIG_TXT				= "CONFIG.txt";													//$NON-NLS-1$
 
 	final DataExplorer		application;
 	final Channels				channels;
@@ -546,7 +544,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 		
 		this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 
-		Thread reader = new Thread("reader") {
+		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
 			public void run() {
 				for (String tmpFileName : fd.getFileNames()) {
@@ -573,14 +571,6 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 			}
 		};
 		reader.start();
-	}
-	
-	String getConfigurationFileDirecotry() {
-		String searchPath = this.getDataBlockPreferredDataLocation();
-		if (searchPath.contains(JLog2.SM_GPS_LOGGER_DIR_STUB)) {
-			searchPath = searchPath.substring(0, searchPath.indexOf(JLog2.SM_GPS_LOGGER_DIR_STUB)) + JLog2.SM_GPS_LOGGER_INI_DIR;
-		}
-		return searchPath;
 	}
 	
 	/**
