@@ -483,7 +483,7 @@ public class Record extends Vector<Integer> {
 		if (this.isCurrentRecord && super.size() > 5 ) {
 			int index = super.size();
 			//check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
-			if (point < 50 && (point << 2) < this.maxValue && this.maxValue > 200) {
+			if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
 				if (this.dropStartIndex == 0) {
 					this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
 				}
@@ -928,24 +928,26 @@ public class Record extends Vector<Integer> {
 	 */
 	@Override
 	public synchronized Integer get(int index) {
-		int size = elementCount;
 		if (this.parent.isZoomMode) {
 			index = index + this.zoomOffset;
-			index = index > (size - 1) ? (size - 1) : index;
+			index = index > (elementCount - 1) ? (elementCount - 1) : index;
 			index = index < 0 ? 0 : index;
 		}
 		else if (this.parent.isScopeMode) {
 			index = index + this.parent.scopeModeOffset;
-			index = index > (size - 1) ? (size - 1) : index;
+			index = index > (elementCount - 1) ? (elementCount - 1) : index;
 			index = index < 0 ? 0 : index;
 		}
 		else {
-			index = index > (size - 1) ? (size - 1) : index;
+			index = index > (elementCount - 1) ? (elementCount - 1) : index;
 			index = index < 0 ? 0 : index;
 		}
 		//log.log(Level.INFO, "index=" + index);
-		if (size != 0) {
-			if (!this.parent.isCompareSet && this.parent.isSmoothAtCurrentDrop) {
+		if (elementCount != 0) {
+			if (this.device.isFilterEnabled()){
+				this.device.getFilteredPoint(this.parent.parent.number, this, index);
+			}
+			else if (!this.parent.isCompareSet && this.parent.isSmoothAtCurrentDrop) {
 				for (Integer[] dropArea :  this.parent.currentDropShadow) {
 					if (dropArea[0] <= index && dropArea[1] >= index) {
 						int dropStartValue = super.get(dropArea[0]);
@@ -955,6 +957,7 @@ public class Record extends Vector<Integer> {
 					}
 				}
 			}
+
 			return super.get(index);
 		}
 		return 0;

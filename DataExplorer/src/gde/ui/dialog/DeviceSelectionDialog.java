@@ -1243,7 +1243,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								});
 							}
 						}
-						//WaitTimer.delay(1000);
+						WaitTimer.delay(200);
 					}
 				}
 				catch (Throwable t) {
