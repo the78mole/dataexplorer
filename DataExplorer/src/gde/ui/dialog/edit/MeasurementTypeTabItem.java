@@ -657,6 +657,18 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 				tmpPropertyType.setDescription(Messages.getString(MessageIds.GDE_MSGT0610));
 				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.INTEGER.value() }, true);
 				break;
+			case FILTER_FACTOR:
+				tmpPropertyType.setType(DataTypes.DOUBLE);
+				tmpPropertyType.setValue(50.0);
+				tmpPropertyType.setDescription(Messages.getString(MessageIds.GDE_MSGT0602));
+				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.DOUBLE.value() }, true);
+				break;
+			case TOLERATE_SIGN_CHANGE:
+				tmpPropertyType.setType(DataTypes.BOOLEAN);
+				tmpPropertyType.setValue(true);
+				tmpPropertyType.setDescription(Messages.getString(MessageIds.GDE_MSGT0603));
+				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.BOOLEAN.value() }, true);
+				break;
 			case NONE_SPECIFIED:
 				tmpPropertyType.setType(DataTypes.DOUBLE);
 				tmpPropertyType.setValue(1.0);

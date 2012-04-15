@@ -45,6 +45,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="google_earth_lower_limit_color"/>
  *     &lt;enumeration value="google_earth_upper_limit_color"/>
  *     &lt;enumeration value="filter_factor"/>
+ *     &lt;enumeration value="tolerate_sign_change"/>
  *     &lt;enumeration value="none_specified"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
@@ -99,6 +100,8 @@ public enum MeasurementPropertyTypes {
     GOOGLE_EARTH_UPPER_LIMIT_COLOR("google_earth_upper_limit_color"),
     @XmlEnumValue("filter_factor")
     FILTER_FACTOR("filter_factor"),
+    @XmlEnumValue("tolerate_sign_change")
+    TOLERATE_SIGN_CHANGE("tolerate_sign_change"),
     @XmlEnumValue("none_specified")
     NONE_SPECIFIED("none_specified");
     private final String value;

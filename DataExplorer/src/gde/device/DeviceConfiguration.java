@@ -21,6 +21,7 @@ package gde.device;
 import gde.GDE;
 import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
+import gde.data.Record;
 import gde.data.RecordSet;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -2156,8 +2157,8 @@ public class DeviceConfiguration {
 	}
 	
 	/**
-	 * query the channel properties if there are any
-	 * @return property type if exist or null if not exist
+	 * query the channel property of specified type
+	 * @return property if exist or null if not exist
 	 */
 	public ChannelPropertyType getChannelProperty(ChannelPropertyTypes key) {
 		if (getChannelProperties() != null) {
@@ -2166,6 +2167,20 @@ public class DeviceConfiguration {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * query the channel property of type getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER)
+	 * @return true if curve point should be filtered, default implementation returns false
+	 */
+	public boolean isFilterEnabled() {
+		return false;
+	}
+	/**
+	 * get the curve point device individual filtered if required
+	 */
+	public Integer getFilteredPoint(@SuppressWarnings("unused") int channelNumber, Record record, int index) {
+		return record.realGet(index);
 	}
 
 	/**

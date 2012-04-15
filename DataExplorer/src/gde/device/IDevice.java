@@ -905,4 +905,15 @@ public interface IDevice {
 	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
 	 */
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet);
+	
+	/**
+	 * query the channel property of type getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER)
+	 * @return true if curve point should be filtered
+	 */
+	public boolean isFilterEnabled();
+	
+	/**
+	 * get the curve point device individual filtered if required
+	 */
+	public Integer getFilteredPoint(int channelNumber, Record record, int index);
 }

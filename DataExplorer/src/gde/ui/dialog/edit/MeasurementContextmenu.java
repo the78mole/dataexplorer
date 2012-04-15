@@ -56,6 +56,7 @@ public class MeasurementContextmenu {
 	MenuItem											numberMotorPropertyMenuItem, revolutionFactorPropertyMenuItem, prop100WPropertyMenuItem;
 	MenuItem											numberCellsPropertyMenuItem, invertCurrentPropertyMenuItem;
 	MenuItem 											scaleSyncRefOrdinal, googleEarthVelocityAvgLimitFactor, googleEarthVelocityLowerLimit, googleEarthVelocityUpperLimit;
+	MenuItem 											filterFactor, tolerateSignChange;
 
 
 	public MeasurementContextmenu(Menu useMenu, MeasurementTypeTabItem parent, CTabFolder useChannelConfigMeasurementPropertiesTabFolder) {
@@ -117,6 +118,8 @@ public class MeasurementContextmenu {
 				MeasurementContextmenu.this.googleEarthVelocityAvgLimitFactor.setEnabled(true);
 				MeasurementContextmenu.this.googleEarthVelocityLowerLimit.setEnabled(true);
 				MeasurementContextmenu.this.googleEarthVelocityUpperLimit.setEnabled(true);
+				MeasurementContextmenu.this.filterFactor.setEnabled(true);
+				MeasurementContextmenu.this.tolerateSignChange.setEnabled(true);
 				MeasurementContextmenu.this.defaultPropertyMenuItem.setEnabled(true);
 				if (MeasurementContextmenu.this.measurementPropertiesTabFolder != null) {
 					for (CTabItem tabItem : MeasurementContextmenu.this.measurementPropertiesTabFolder.getItems()) {
@@ -175,6 +178,12 @@ public class MeasurementContextmenu {
 						case GOOGLE_EARTH_VELOCITY_UPPER_LIMIT:
 							MeasurementContextmenu.this.googleEarthVelocityAvgLimitFactor.setEnabled(false);
 							MeasurementContextmenu.this.googleEarthVelocityUpperLimit.setEnabled(false);
+							break;
+						case FILTER_FACTOR:
+							MeasurementContextmenu.this.filterFactor.setEnabled(false);
+							break;
+						case TOLERATE_SIGN_CHANGE:
+							MeasurementContextmenu.this.tolerateSignChange.setEnabled(false);
 							break;
 						case NONE_SPECIFIED:
 							MessageBox mb = new MessageBox(MeasurementContextmenu.this.menu.getShell(), SWT.OK);
@@ -324,6 +333,22 @@ public class MeasurementContextmenu {
 			public void handleEvent(Event e) {
 				log.log(java.util.logging.Level.FINEST, "googleEarthVelocityUpperLimit action performed! " + e); //$NON-NLS-1$
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.GOOGLE_EARTH_VELOCITY_UPPER_LIMIT.value());
+			}
+		});	
+		this.filterFactor = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
+		this.filterFactor.setText(MeasurementPropertyTypes.FILTER_FACTOR.value());
+		this.filterFactor.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event e) {
+				log.log(java.util.logging.Level.FINEST, "filterFactor action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.FILTER_FACTOR.value());
+			}
+		});	
+		this.tolerateSignChange = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
+		this.tolerateSignChange.setText(MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value());
+		this.tolerateSignChange.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event e) {
+				log.log(java.util.logging.Level.FINEST, "tolerateSignChange action performed! " + e); //$NON-NLS-1$
+				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value());
 			}
 		});	
 		this.defaultPropertyMenuItem = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
