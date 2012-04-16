@@ -53,19 +53,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * this class provides capability to read, update and create JLog2 configuration and manifest it in CONFIG.txt file
+ */
 public class JLog2Configuration extends Composite {
 	final static Logger						log									= Logger.getLogger(JLog2Configuration.class.getName());
 
@@ -163,6 +153,10 @@ public class JLog2Configuration extends Composite {
 	final String[]								oneAlarms						= new String[] { "0", "1" };																																																																									//$NON-NLS-1$
 	final String[]								greaterOneAlarms		= new String[] { "0", "1", "2" };																																																																						//$NON-NLS-1$
 
+	/**
+	 * this inner class holds the configuration and contains all logic to insert and update entries
+	 * missing part is the sub device section since there are only the special configurations which contains the required bitmasks
+	 */
 	public class Configuration {
 
 		String[]	config;
@@ -528,6 +522,9 @@ public class JLog2Configuration extends Composite {
 		}
 	}
 
+	/**
+	 * this UI composite encapsulate Multiplex address configuration drop down configuration
+	 */
 	public class MpxAddressComposite extends Composite {
 
 		private CCombo	mpxAddressCombo;
@@ -1606,7 +1603,6 @@ public class JLog2Configuration extends Composite {
 					RALData.width = 8;
 					RALData.height = 20;
 					this.dotLabel.setLayoutData(RALData);
-					this.dotLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 				}
 				{
 					this.voltageBatteryAlarmDecimalsCombo = new CCombo(this.alarmGroup, SWT.BORDER);
@@ -1614,6 +1610,7 @@ public class JLog2Configuration extends Composite {
 					voltagebatteryAlarmMaxCombo2LData.width = GDE.IS_LINUX ? 45 : 35;
 					voltagebatteryAlarmMaxCombo2LData.height = 17;
 					this.voltageBatteryAlarmDecimalsCombo.setLayoutData(voltagebatteryAlarmMaxCombo2LData);
+					this.voltageBatteryAlarmDecimalsCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageBatteryAlarmDecimalsCombo.setItems(this.zeroTo9);
 					this.voltageBatteryAlarmDecimalsCombo.select(0);
 					this.voltageBatteryAlarmDecimalsCombo.addSelectionListener(new SelectionAdapter() {
@@ -2904,12 +2901,10 @@ public class JLog2Configuration extends Composite {
 				|| this.ext3smallerButton.getSelection() || this.extern4Combo.getSelectionIndex() > 0 || this.ext4smallerButton.getSelection() || this.extern5Combo.getSelectionIndex() > 0
 				|| this.ext5smallerButton.getSelection()) {
 			this.alarmsClearButton.setBackground(DataExplorer.COLOR_RED);
-			this.alarmsClearButton.setForeground(DataExplorer.COLOR_RED);
 			this.alarmsClearButton.setEnabled(true);
 		}
 		else {
 			this.alarmsClearButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-			this.alarmsClearButton.setForeground(DataExplorer.COLOR_LIGHT_GREY);
 			this.alarmsClearButton.setEnabled(false);
 		}
 		checkNumberAlarms();
@@ -2917,7 +2912,6 @@ public class JLog2Configuration extends Composite {
 	}
 
 	private void clearAlarms() {
-		//alarmsClearButton.setForeground(DataExplorer.COLOR_LIGHT_GREY);
 		this.uBecDipDetectButton.setSelection(false);
 		this.configuration.setBecDip(false);
 		this.capacityAlarmCombo.select(0);
@@ -3297,12 +3291,10 @@ public class JLog2Configuration extends Composite {
 				|| (this.tempSensorTypeCombo.getSelectionIndex() >= 1 && this.pulsPerRevolutionSensorCombo.getSelectionIndex() > 0)) {
 			this.sensorAdapterButton.setEnabled(true);
 			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
-			this.sensorAdapterButton.setForeground(DataExplorer.COLOR_RED);
 		}
 		else {
 			this.sensorAdapterButton.setEnabled(false);
 			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-			this.sensorAdapterButton.setForeground(DataExplorer.COLOR_BLACK);
 		}
 	}
 

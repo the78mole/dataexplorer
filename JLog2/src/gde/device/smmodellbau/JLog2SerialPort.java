@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
- * eStation serial port implementation
+ * JLog serial port implementation
  * @author Winfried Brügmann
  */
 public class JLog2SerialPort extends DeviceCommPort {
