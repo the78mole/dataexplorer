@@ -127,7 +127,6 @@ public class JLog2Dialog extends DeviceDialog {
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addDisposeListener(new DisposeListener() {
-					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						JLog2Dialog.log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (JLog2Dialog.this.device.isChangePropery()) {
@@ -142,14 +141,12 @@ public class JLog2Dialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
-					@Override
 					public void helpRequested(HelpEvent evt) {
 						JLog2Dialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						JLog2Dialog.this.application.openHelpDialog(JLog2Dialog.this.device.getName(), "HelpInfo.html"); //$NON-NLS-1$
 					}
 				});
 				this.dialogShell.addPaintListener(new PaintListener() {
-					@Override
 					public void paintControl(PaintEvent paintevent) {
 						if (JLog2Dialog.log.isLoggable(java.util.logging.Level.FINEST)) JLog2Dialog.log.log(java.util.logging.Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
 						RecordSet activeRecordSet = JLog2Dialog.this.application.getActiveRecordSet();
@@ -183,7 +180,6 @@ public class JLog2Dialog extends DeviceDialog {
 					this.tabFolder.setLayoutData(tabFolderLData);
 					this.tabFolder.setSelection(0);
 					this.tabFolder.addListener(SWT.Selection, new Listener() {
-						@Override
 						public void handleEvent(Event event) {
 							if (JLog2Dialog.this.tabFolder.getSelectionIndex() == JLog2Dialog.this.tabFolder.getItemCount() - 1) {
 								loadSetup();

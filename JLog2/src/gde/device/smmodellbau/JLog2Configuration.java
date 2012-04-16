@@ -782,7 +782,6 @@ public class JLog2Configuration extends Composite {
 					this.jlogVersionCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
 					this.jlogVersionCombo.setLayoutData(new RowData(60, 17));
 					this.jlogVersionCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "jlogVersionCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2824));
@@ -802,7 +801,6 @@ public class JLog2Configuration extends Composite {
 					this.jlogFirmwareCombo.setLayoutData(jlogConfigurationComboLData);
 					this.jlogFirmwareCombo.setEditable(false);
 					this.jlogFirmwareCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "cCombo1.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2825));
@@ -821,7 +819,6 @@ public class JLog2Configuration extends Composite {
 					this.jlogConfigurationCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
 					this.jlogConfigurationCombo.setEditable(false);
 					this.jlogConfigurationCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "jlogConfigurationCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2826));
@@ -953,7 +950,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.baudrateCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "baudrateCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2827));
@@ -988,7 +984,6 @@ public class JLog2Configuration extends Composite {
 					this.sysModeCombo.setItems(this.sysModes);
 					this.sysModeCombo.select(0);
 					this.sysModeCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "sysModeCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2828));
@@ -1016,7 +1011,6 @@ public class JLog2Configuration extends Composite {
 					this.directRatioButton.setText(Messages.getString(MessageIds.GDE_MSGT2841));
 					this.directRatioButton.setSelection(true);
 					this.directRatioButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "directRatioButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2829));
@@ -1055,7 +1049,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.directGearRatioMajorCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "directRatioCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2830));
@@ -1081,7 +1074,6 @@ public class JLog2Configuration extends Composite {
 					this.directGearRatioDecimalsCombo.setItems(this.zeroTo99);
 					this.directGearRatioDecimalsCombo.select(0);
 					this.directGearRatioDecimalsCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "gearRatioMinorCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2831));
@@ -1097,7 +1089,7 @@ public class JLog2Configuration extends Composite {
 					});
 				}
 				{
-					new Label(this.mainConfigGroup, SWT.NONE).setLayoutData(new RowData(GDE.IS_LINUX ? 190 : 120, 19));
+					new Label(this.mainConfigGroup, SWT.NONE).setLayoutData(new RowData(GDE.IS_LINUX ? 190 : 150, 19));
 				}
 				{
 					this.logModeLabel = new CLabel(this.mainConfigGroup, SWT.NONE);
@@ -1133,7 +1125,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.logModeCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "logModeCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2832));
@@ -1153,7 +1144,6 @@ public class JLog2Configuration extends Composite {
 					this.gearSelectionButton.setText(Messages.getString(MessageIds.GDE_MSGT2848));
 					this.gearSelectionButton.setSelection(false);
 					this.gearSelectionButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "gearSelectionButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2833));
@@ -1195,7 +1185,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.gearPinionWheelCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "pinionCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2834));
@@ -1222,7 +1211,6 @@ public class JLog2Configuration extends Composite {
 					this.gearMainWheelCombo.setLayoutData(mainGearComboLData);
 					this.gearMainWheelCombo.setEnabled(false);
 					this.gearMainWheelCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "mainGearCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2835));
@@ -1264,7 +1252,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.gearMainWheelDecimalsCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "secondgearCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2836));
@@ -1293,7 +1280,6 @@ public class JLog2Configuration extends Composite {
 					this.motorPolsCombo.setItems(this.motorPols);
 					this.motorPolsCombo.select(6);
 					this.motorPolsCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "motorPolsCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2837));
@@ -1335,7 +1321,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.motorShuntCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "motorShuntCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2839));
@@ -1378,7 +1363,6 @@ public class JLog2Configuration extends Composite {
 					this.resetButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 					this.resetButton.setForeground(SWTResourceManager.getColor(255, 0, 0));
 					this.resetButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "rstButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2802));
@@ -1410,7 +1394,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.highPulsWidthButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "hpwButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2803));
@@ -1434,7 +1417,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.logStopButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "logStopButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2804));
@@ -1459,7 +1441,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.extRpmButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extRpmButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2805));
@@ -1497,7 +1478,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.alarmsClearButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "alarmsClearButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2806));
@@ -1522,7 +1502,6 @@ public class JLog2Configuration extends Composite {
 					this.uBecDipDetectButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.uBecDipDetectButton.setText("< 500 [mV]"); //$NON-NLS-1$
 					this.uBecDipDetectButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "uBecDipDetectButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2807));
@@ -1568,7 +1547,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.capacityAlarmCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "capacityAlarmCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2808));
@@ -1604,7 +1582,6 @@ public class JLog2Configuration extends Composite {
 					this.voltageBatteryAlarmCombo.select(0);
 					this.voltageBatteryAlarmCombo.setVisibleItemCount(20);
 					this.voltageBatteryAlarmCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "voltagebatteryMinCombo1.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2809));
@@ -1650,7 +1627,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.voltageBatteryAlarmDecimalsCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "voltagebatteryAlarmMaxCombo2.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2810));
@@ -1685,7 +1661,6 @@ public class JLog2Configuration extends Composite {
 					this.paTempMaxCombo.setItems(this.zeroTo127);
 					this.paTempMaxCombo.select(0);
 					this.paTempMaxCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "paTempMaxCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2811));
@@ -1745,7 +1720,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.extern1Combo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern1Combo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
@@ -1779,7 +1753,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.ext1smallerButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext1smallerButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
@@ -1820,7 +1793,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.extern2Combo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern2Combo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
@@ -1853,7 +1825,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.ext2smallerButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext2smallerButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
@@ -1880,7 +1851,6 @@ public class JLog2Configuration extends Composite {
 					this.extern3Combo.select(0);
 					this.extern3Combo.setEnabled(false);
 					this.extern3Combo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern3Combo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
@@ -1927,7 +1897,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.ext3smallerButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext3smallerButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
@@ -1954,7 +1923,6 @@ public class JLog2Configuration extends Composite {
 					this.extern4Combo.select(0);
 					this.extern4Combo.setEnabled(false);
 					this.extern4Combo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern4Combo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
@@ -1991,7 +1959,6 @@ public class JLog2Configuration extends Composite {
 					this.ext4smallerButton.setText(" <"); //$NON-NLS-1$
 					this.ext4smallerButton.setEnabled(false);
 					this.ext4smallerButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext4smallerButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
@@ -2042,7 +2009,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.extern5Combo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "extern5Combo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
@@ -2065,7 +2031,6 @@ public class JLog2Configuration extends Composite {
 					this.ext5smallerButton.setText(" <"); //$NON-NLS-1$
 					this.ext5smallerButton.setEnabled(false);
 					this.ext5smallerButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "ext5smallerButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2812));
@@ -2129,7 +2094,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.alarmLinesCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "alarmLinesCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2813));
@@ -2176,7 +2140,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.line1signalTypeCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "line1signalCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2814));
@@ -2223,7 +2186,6 @@ public class JLog2Configuration extends Composite {
 					this.tempSensorTypeCombo.setItems(new String[] { " --- ", "analog", "digital" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					this.tempSensorTypeCombo.select(0);
 					this.tempSensorTypeCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "tempSensorTypeCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2815));
@@ -2281,7 +2243,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.pulsPerRevolutionSensorCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "rpmSensorCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							if (JLog2Configuration.this.brushLessButton.getSelection())
@@ -2304,7 +2265,6 @@ public class JLog2Configuration extends Composite {
 					this.motorButton.setText(Messages.getString(MessageIds.GDE_MSGT2888));
 					this.motorButton.setEnabled(false);
 					this.motorButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "motorButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2818));
@@ -2357,7 +2317,6 @@ public class JLog2Configuration extends Composite {
 						}
 					});
 					this.brushLessButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "brushLessButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2819));
@@ -2383,7 +2342,6 @@ public class JLog2Configuration extends Composite {
 					this.telemetryCombo.setItems(new String[] { " ----------- ", "FTDI livestream", "JETI", "MPX", "Unidisplay" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 					this.telemetryCombo.select(0);
 					this.telemetryCombo.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "telemetryCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2820));
@@ -2425,14 +2383,12 @@ public class JLog2Configuration extends Composite {
 					this.sensorAdapterButton.setText(Messages.getString(MessageIds.GDE_MSGT2893));
 					this.sensorAdapterButton.setEnabled(false);
 					this.sensorAdapterButton.addMouseMoveListener(new MouseMoveListener() {
-						@Override
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "sensorAdapterButton.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2821));
 						}
 					});
 					this.sensorAdapterButton.addHelpListener(new HelpListener() {
-						@Override
 						public void helpRequested(HelpEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.application.openHelpDialog(JLog2Configuration.this.device.getName(), "HelpInfo.html"); //$NON-NLS-1$
@@ -2461,7 +2417,6 @@ public class JLog2Configuration extends Composite {
 						this.hv2BecCombo.setLayoutData(new RowData((GDE.IS_LINUX ? 70 : 60), 17));
 						this.hv2BecCombo.setVisible(false);
 						this.hv2BecCombo.addMouseWheelListener(new MouseWheelListener() {
-							@Override
 							public void mouseScrolled(MouseEvent evt) {
 								JLog2Configuration.log.log(java.util.logging.Level.FINEST, "hv2BecCombo.mouseScrolled, event=" + evt); //$NON-NLS-1$
 								JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2822));
@@ -2494,7 +2449,6 @@ public class JLog2Configuration extends Composite {
 						this.speedSensorButton.setText(Messages.getString(MessageIds.GDE_MSGT2896));
 						this.speedSensorButton.setVisible(false);
 						this.speedSensorButton.addMouseMoveListener(new MouseMoveListener() {
-							@Override
 							public void mouseMove(MouseEvent evt) {
 								JLog2Configuration.log.log(java.util.logging.Level.FINEST, "speedSensorButton.mouseMove, event=" + evt); //$NON-NLS-1$
 								JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2823));
