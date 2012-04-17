@@ -48,11 +48,11 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
 /**
  * this class provides capability to read, update and create JLog2 configuration and manifest it in CONFIG.txt file
  */
@@ -228,6 +228,16 @@ public class JLog2Configuration extends Composite {
 			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
+		/**
+		 * generic setter
+		 * @param index
+		 * @param value
+		 */
+		public void set(int index, int value) {
+			this.config[index] = GDE.STRING_EMPTY + value;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
 		public void setSysMode(int sysMode) { //0=NEWLOG; 1=SEQLOG
 			this.config[1] = GDE.STRING_EMPTY + sysMode;
 			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
@@ -398,6 +408,16 @@ public class JLog2Configuration extends Composite {
 			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
+		public void setXYType(int type) {
+			this.config[25] = GDE.STRING_EMPTY + (type > 1 ? type - 1 : 0);
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
+		public void setTelemetryType(int type) {
+			this.config[26] = GDE.STRING_EMPTY + (type > 1 ? type - 1 : 0);
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
 		public void setPulsePerRevolution(int rpmSensorPulsePerRevolution) {
 			this.config[27] = rpmSensorPulsePerRevolution >= 1 ? "1" : "0"; //$NON-NLS-1$ //$NON-NLS-2$
 			this.config[28] = rpmSensorPulsePerRevolution >= 1 ? GDE.STRING_EMPTY + rpmSensorPulsePerRevolution : "0"; //$NON-NLS-1$
@@ -510,14 +530,14 @@ public class JLog2Configuration extends Composite {
 		}
 
 		public void setHV2BecVoltage(int slectionIndex) {
-			if (this.config.length < 48) {
-				String[] tmpConfig = new String[48];
+			if (this.config.length < 49) {
+				String[] tmpConfig = new String[49];
 				for (int i = 0; i < this.config.length; i++) {
 					tmpConfig[i] = this.config[i];
 				}
 				this.config = tmpConfig;
 			}
-			this.config[47] = GDE.STRING_EMPTY + slectionIndex;
+			this.config[48] = GDE.STRING_EMPTY + slectionIndex;
 			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 	}
@@ -2349,6 +2369,7 @@ public class JLog2Configuration extends Composite {
 						public void widgetSelected(SelectionEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "telemetryCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							enableMpxAddressSelection(false);
+							JLog2Configuration.this.configuration.setTelemetryType(JLog2Configuration.this.telemetryCombo.getSelectionIndex());
 							switch (JLog2Configuration.this.telemetryCombo.getSelectionIndex()) {
 							case 0: //none
 								JLog2Configuration.this.configuration.setTelemetryBaudrateType(0);
@@ -2528,6 +2549,7 @@ public class JLog2Configuration extends Composite {
 		if (config.get(23) > 0) this.alarmLinesLabel.setForeground(DataExplorer.COLOR_RED);
 		setLine1SignalType(config.get(46));
 		setTemperaturSensorType(config.get(24));
+		this.telemetryCombo.select(config.get(26) <= 3 ? config.get(26) + 1 : 0); // 0=none 1=FTDI 2=JETI 3=MPX 4=Unidisplay 
 		this.pulsPerRevolutionSensorCombo.select(config.get(27));
 		if (this.pulsPerRevolutionSensorCombo.getSelectionIndex() > 0) this.extRpmButton.setEnabled(true);
 		setPulsPerRevolutionSensor(config.get(28));
@@ -2550,7 +2572,7 @@ public class JLog2Configuration extends Composite {
 		this.mpxAddresses[13].mpxAddressCombo.select(config.get(43));
 		this.mpxAddresses[14].mpxAddressCombo.select(config.get(44));
 		this.mpxAddresses[15].mpxAddressCombo.select(config.get(45));
-		setTelemetryLivedata(config.get(46) & 0xFFF0);
+		//setTelemetryLivedata(config.get(46) & 0xFFF0);
 		if (isInitialLoad) {
 			setLogMode(config.get(2)); //enable/disables lots of combos
 		}
@@ -2559,94 +2581,6 @@ public class JLog2Configuration extends Composite {
 		}
 		catch (Exception e) {
 			//ignore, not relevant for this configuration
-		}
-	}
-
-	//private void updateGUI(Configuration config) {
-	//		//initMainCongigSection
-	////		setBaudrate(config.get(0));	
-	////		sysModeCombo.select(config.get(1) & 0x01);
-	////		setMotorShuntCalibration(config.get(1));
-	////		motorPolsCombo.select(config.get(3) > 0 ? (config.get(3)/2 - 1) : 0);
-	////		setGearRatio(config);
-	////		
-	////		resetButton.setSelection(config.get(11) == 1);
-	////		logStopButton.setSelection((config.get(10) & 0x01) == 1);
-	////		highPulsWidthButton.setSelection((config.get(10) & 0x02) == 2);
-	////		extRpmButton.setSelection((config.get(10) & 0x04) == 4);
-	////		
-	////		uBecDipDetectButton.setSelection((config.get(16) & 0x01) == 1);
-	////		capacityAlarmCombo.select(config.get(12));
-	////		voltageBatteryAlarmCombo.select(config.get(13));
-	////		voltageBatteryAlarmDecimalsCombo.select(config.get(14));
-	////		paTempMaxCombo.select(config.get(15));
-	//		extern1Combo.select(config.get(17));
-	//		extern2Combo.select(config.get(18));
-	//		extern3Combo.select(config.get(19));
-	//		extern4Combo.select(config.get(20));
-	//		extern5Combo.select(config.get(21));
-	//		ext1smallerButton.setSelection((config.get(22) & 0x0001) != 0);
-	//		ext2smallerButton.setSelection((config.get(22) & 0x0002) != 0);
-	//		ext3smallerButton.setSelection((config.get(22) & 0x0004) != 0);
-	//		ext4smallerButton.setSelection((config.get(22) & 0x0008) != 0);
-	//		ext5smallerButton.setSelection((config.get(22) & 0x0010) != 0);
-	//		
-	//		alarmLinesCombo.select(config.get(23));
-	//		if (config.get(23) > 0) alarmLinesLabel.setForeground(DataExplorer.COLOR_RED);
-	//		setLine1SignalType(config.get(46));
-	//		setTemperaturSensorType(config.get(24));
-	//		pulsPerRevolutionSensorCombo.select(config.get(27));
-	//		if (pulsPerRevolutionSensorCombo.getSelectionIndex() > 0) extRpmButton.setEnabled(true);
-	//		setPulsPerRevolutionSensor(config.get(28));
-	//		setIsMotorButton((config.get(29) & 0x0004) > 0);
-	//		setIsBrushlessMotor((config.get(29) & 0x0080) > 0);
-	//		mpxAddresses[0].mpxAddressCombo.select(config.get(30));
-	//		mpxAddresses[1].mpxAddressCombo.select(config.get(31));
-	//		mpxAddresses[2].mpxAddressCombo.select(config.get(32));
-	//		mpxAddresses[3].mpxAddressCombo.select(config.get(33));
-	//		mpxAddresses[4].mpxAddressCombo.select(config.get(34));
-	//		mpxAddresses[5].mpxAddressCombo.select(config.get(35));
-	//		mpxAddresses[6].mpxAddressCombo.select(config.get(36));
-	//		mpxAddresses[7].mpxAddressCombo.select(config.get(37));
-	//		mpxAddresses[8].mpxAddressCombo.select(config.get(38));
-	//		mpxAddresses[9].mpxAddressCombo.select(config.get(39));
-	//		mpxAddresses[10].mpxAddressCombo.select(config.get(40));
-	//		mpxAddresses[11].mpxAddressCombo.select(config.get(41));
-	//		mpxAddresses[12].mpxAddressCombo.select(config.get(42));
-	//		mpxAddresses[13].mpxAddressCombo.select(config.get(43));
-	//		mpxAddresses[14].mpxAddressCombo.select(config.get(44));
-	//		mpxAddresses[15].mpxAddressCombo.select(config.get(45));
-	//		setTelemetryLivedata(config.get(46)  & 0xFFF0);
-	//		try {
-	//			updateSubDevices(config.get(47));
-	//		}
-	//		catch (Exception e) {
-	//			//ignore, not relevant for this configuration
-	//		}
-	//		setLogMode(config.get(2)); //enable/disables lots of combos
-	//	}
-
-	/**
-	 * @param value
-	 */
-	private void setTelemetryLivedata(int value) {
-		enableMpxAddressSelection(false);
-		switch (value) {
-		case 0: //none
-			this.telemetryCombo.select(0);
-			break;
-		case 4: //FTDI live stream
-			this.telemetryCombo.select(4);
-			break;
-		//case 2: //Jeti
-		//	configuration.setTelemetryBaudrateType(0);
-		//	break;
-		case 3: //MPX
-			enableMpxAddressSelection(true);
-			break;
-		//case 4: //UniDisplay
-		//	configuration.setTelemetryBaudrateType(0);
-		//	break;
 		}
 	}
 
@@ -2975,8 +2909,6 @@ public class JLog2Configuration extends Composite {
 		this.sensorAdapterButton.setEnabled(false);
 		this.sensorAdapterButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 		this.telemetryCombo.setEnabled(true);
-		this.telemetryCombo.setText(GDE.STRING_EMPTY);
-		this.telemetryCombo.select(0);
 		this.alarmLinesCombo.setEnabled(true);
 		this.line1signalTypeCombo.setEnabled(true);
 		this.alarmLinesLabel.setForeground(DataExplorer.COLOR_BLACK);
@@ -3188,11 +3120,10 @@ public class JLog2Configuration extends Composite {
 			this.alarmLinesCombo.setEnabled(false);
 			this.line1signalTypeCombo.setEnabled(false);
 			this.pulsPerRevolutionSensorCombo.setEnabled(false);
+			this.tempSensorTypeCombo.select(0);
 			this.tempSensorTypeCombo.setEnabled(false);
-			this.tempSensorTypeCombo.select(2);
-			this.tempSensorTypeCombo.notifyListeners(SWT.Selection, new Event());
 			this.telemetryCombo.setEnabled(false);
-			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
+			this.telemetryCombo.setText("digital COM"); //$NON-NLS-1$
 			this.sensorAdapterButton.setEnabled(true);
 			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
 			break;
@@ -3253,9 +3184,10 @@ public class JLog2Configuration extends Composite {
 			this.line1signalTypeCombo.setEnabled(false);
 			this.pulsPerRevolutionSensorCombo.setEnabled(false);
 			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("digital COM"); //$NON-NLS-1$
 			this.tempSensorTypeCombo.select(0);
 			this.tempSensorTypeCombo.setEnabled(false);
-			enableExternTempearture1(true);
+			this.enableExternTempearture1(true);
 			this.sensorAdapterButton.setEnabled(true);
 			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
 			this.hv2BecLabel.setVisible(true);
