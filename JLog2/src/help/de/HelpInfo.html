@@ -33,7 +33,7 @@
 	<H2><FONT FACE="Arial"><FONT SIZE=4><I>JLog2 von SM-Modellbau</I></FONT></FONT></H2>
 </DIV>
 <P>Der gezeigte Ger&auml;tedialog dient zur Konfiguration der Anzeige der ausgelesenen Daten.
-Namen der Messwerte k&ouml;nnen hier ge&auml;ndert werden, sowie Symbol und Einheit.
+Namen der Messwerte k&ouml;nnen hier ge&auml;ndert werden, sowie Symbol und Einheit. Sie sollten eindeutig sein.
 Nicht selektierte Messgr&ouml;&szlig;en erscheinen dadurch nicht in der grafischen Anzeige. 
 Kurven die keine sinnvollen Daten enthalten werden ebenfalls automatisch ausgeblendet.
 Dadurch wird die &Uuml;bersichtlichkeit stark erh&ouml;ht, da keine Kurven ohne Aussage angezeigt werden. 
@@ -57,18 +57,20 @@ Durch Skalensynchronisation wird die verf&uuml;gbare Anzeigefl&auml;che vergr&ou
 <IMG SRC="HelpInfo_Bild_3.png" NAME="HelpInfo_Bild_3" ALT="HelpInfo_Bild_3">
 </P>
 <P>
-Bei Anschluss nicht vorgesehener Sensoren, z.B. für Temperatur 1-5, kann es erfordelich sein einen Faktor oder Offset zu ändern, bzw. ein zu führen, um den Angeschlossenen Sensor anzupassen.
-Hierzu ist ebenfalls der Ger&auml;teeigenschfteneditor zu bemühnen.
+Bei Anschluss nicht vorgesehener Sensoren, z.B. für Temperatur 1-5, kann es erforderlich sein einen Faktor oder Offset zu ändern, bzw. ein zu f&uuml;hren, um den Angeschlossenen Sensor anzupassen.
+Hierzu ist ebenfalls der Ger&auml;teeigenschafteneditor zu bemühen.
 </P>
 <P><B>Hinweis: </B>Werden Messwertnamen ge&auml;ndert f&uuml;hrt das in der Ger&auml;tekonfigurationsdatei zu einer &Auml;nderung.
 &Auml;ndert sich in einer sp&auml;teren DataExplorer Version das Ger&auml;tekonfigurationsdateischema (DeviceProperties_Vxy.xsd), 
-wird eine Sichereung aller vorhandenen Ger&auml;tekonfigurationsdateien angelegt (Devices_Vxy-1.xsd) und geht nicht verloren.
+wird eine Sichererung aller vorhandenen Ger&auml;tekonfigurationsdateien angelegt (Devices_Vxy-1) und geht nicht verloren.
 Die veraltete Ger&auml;tekonfigurationsdatei kann dann als Vorlage f&uuml;r die neue verwendet werden.
+Wenn einen Ger&auml;tekonfigurationsdatei 'kaputt' erscheint kann diese einfach im Devices-Verzeichnis gel&ouml;scht werden.
+Sie wird dann beim nächsten Start des DataExplorers wieder hergestellt.
 </P>
 <H3><FONT FACE="Arial"><FONT SIZE=4><I>JLog2 Livedatenaufnahme</I></FONT></FONT></H3>
 <P>
 M&ouml;chte man Daten direkt beim erzeugen aufnehmen muss ein serieller Port f&uuml;r den JLog2 im Programm konfiguriert sein.
-Ist das bereits geschehen kann nach Anschluss des USB Interface adapters am System f&uuml;r dei serielle Kommunikation mit dem JLog2 dei Datenaufnahme &uuml;ber "starte Livedaten" beginnen.
+Ist das bereits geschehen kann nach Anschluss des USB Interface adapters am System f&uuml;r die serielle Kommunikation mit dem JLog2 die Datenaufnahme &uuml;ber "starte Livedaten" beginnen.
 Das Programm wartet solange bis Daten verf&uuml;gbar sind und zeigt diese dann sofort an. 
 Wichtig ist, dass der JLog2 und der verbundene Jive Motorsteller auch wirklich angeschlossen sind und ein Motor angetrieben wird.
 Sonst startet der JLog2 sein eigenes Log nicht. Das Schreiben einer Logdatei auf der SD-Karte kann dabei nicht unterdr&uuml;ckt werden.
@@ -97,23 +99,25 @@ Dann werden entsprechend der Beschreibung des JLog Telemetriedaten an den Sender
 <P ALIGN=CENTER><IMG SRC="../JLog2_Telemetry.png" NAME="JLog2_Telemetry" ALT="JLog2_Telemetry"></P>
 <H4><FONT FACE="Arial"><FONT SIZE=4><I>JLog2 mit HiTec Telemetrie</I></FONT></FONT></H4>
 <P>
-Zur Verwendung mit HiTec Telemetrie ist der JLog entsprechend mit dem Emp&auml;nger zu verbinden. 
-Dabei auf die pull-up Widerst&auml;nde achten, sonst erkennt der Em&auml;nger die Telemetriedaten nicht auf den Bus.
+Zur Verwendung mit HiTec Telemetrie ist der JLog entsprechend mit dem Empf&auml;nger zu verbinden. 
+Dabei auf die pull-up Widerst&auml;nde achten, sonst erkennt der Empf&auml;nger die Telemetriedaten nicht auf den Bus.
 <P ALIGN=CENTER><IMG SRC="../JLog2_HiTec_Telemetry.png" NAME="JLog2_HiTec_Telemetry" ALT="JLog2_HiTec_Telemetry"></P>
 <P><B>Hinweis: </B>Es k&ouml;nnen keine weiteren analogen Sensoren angeschlossen werden, der Anschluss von digitalen Sensoren an die COM Schnittstelle ist m&ouml;lich!</P>
 <H4><FONT FACE="Arial"><FONT SIZE=4><I>JLog2 mit HiTec Telemetrie und digitalen Temperatursensoren an COM</I></FONT></FONT></H4>
 <P ALIGN=CENTER><IMG SRC="../JLog2_HiTec_Telemetry_Temperature.png" NAME="JLog2_HiTec_Telemetry_Temperature" ALT="JLog2_HiTec_Telemetry_Temperature"></P>
 <H4><FONT FACE="Arial"><FONT SIZE=4><I>JLog2 mit HV2BEC, HiTec Telemetrie und digitalen Temperatursensoren an COM</I></FONT></FONT></H4>
 <P ALIGN=CENTER><IMG SRC="../JLog2_HiTec_Telemetry_Temperature_HV2BEC.png" NAME="JLog2_HiTec_Telemetry_Temperature_HV2BEC" ALT="JLog2_HiTec_Telemetry_Temperature_HV2BEC"></P>
+<P><B>Hinweis: </B>Ist ein HV2BEC konfiguriert und angeschlossen &auml;ndert sich die externe Temperatur 1 auf die HV2BEC Temperatur, 
+externe Temperatur 2 auf externe Temperatur 1 .... externe Temperatur 5 auf externe Temperatur 4!</P>
 <H4><FONT FACE="Arial"><FONT SIZE=4><I>JLog2 mit GPS-Logger</I></FONT></FONT></H4>
 <P>
 Soll der GPS-Logger als Unterger&auml;t angeschlossen werden m&uuml;ssen Mutiplex Adresssen konfiguriert werden, damit der GPS-Logger seine Daten, wie vom JLog2 erwartet, bereitstellt.
 <UL>
 <LI>Keine Telemetrie: Speed auf Adresse 14 und Höhe auf Adresse 15
 <LI>HiTec Telemetrie: Speed auf Adresse 14 und Höhe auf Adresse 15, Vario auf 13, Entfernung auf 12, Strecke auf 11 und Richtung auf 10
-<LI>Multiplex Telemetrie: Nicht die Adressen 2 und 3 seitens JLog als Sensor verwenden! Der Multiplex Empf&auml;ger sollte Spannung und LQI nicht auf den BUS senden. 
+<LI>Multiplex Telemetrie: Nicht die Adressen 2 und 3 seitens JLog als Sensor verwenden! Der Multiplex Empf&auml;nger sollte Spannung und LQI nicht auf den BUS senden. 
 Den GPS-Logger so konfigurieren, dass er Speed auf Adresse 2 und Höhe auf Adresse 3 gibt.
-<LI>Multiplex Telemetrie mit LQI: Nicht die Adresse 1 seitens JLog verwenden. Daf&uuml;r aber den Multiplex Emp&auml;nger auf LQI Adresse 1 setzen. 
+<LI>Multiplex Telemetrie mit LQI: Nicht die Adresse 1 seitens JLog verwenden. Daf&uuml;r aber den Multiplex Empf&auml;nger auf LQI Adresse 1 setzen. 
 Bei der Empf&auml;ngerkonfiguration ist darauf zu achten, dass kein Adresskonflikt mit der Spannung entsteht, die aber &uuml;bergeben werden sollte.
 </UL>
 </P>

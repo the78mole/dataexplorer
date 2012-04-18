@@ -2406,10 +2406,11 @@ public class JLog2Configuration extends Composite {
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2821));
 						}
 					});
-					this.sensorAdapterButton.addHelpListener(new HelpListener() {
-						public void helpRequested(HelpEvent evt) {
-							JLog2Configuration.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-							JLog2Configuration.this.application.openHelpDialog(JLog2Configuration.this.device.getName(), "HelpInfo.html"); //$NON-NLS-1$
+					this.sensorAdapterButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "sensorAdapterButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.application.openHelpDialog(JLog2Configuration.this.device.getName(), "HelpInfo.html", true); //$NON-NLS-1$
 						}
 					});
 				}

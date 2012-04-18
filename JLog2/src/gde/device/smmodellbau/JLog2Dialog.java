@@ -143,7 +143,7 @@ public class JLog2Dialog extends DeviceDialog {
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						JLog2Dialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						JLog2Dialog.this.application.openHelpDialog(JLog2Dialog.this.device.getName(), "HelpInfo.html"); //$NON-NLS-1$
+						JLog2Dialog.this.application.openHelpDialog(JLog2Dialog.this.device.getName(), "HelpInfo.html", true); //$NON-NLS-1$
 					}
 				});
 				this.dialogShell.addPaintListener(new PaintListener() {
@@ -256,7 +256,7 @@ public class JLog2Dialog extends DeviceDialog {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							JLog2Dialog.log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							JLog2Dialog.this.application.openHelpDialog(JLog2Dialog.this.device.getName(), "HelpInfo.html"); //$NON-NLS-1$
+							JLog2Dialog.this.application.openHelpDialog(JLog2Dialog.this.device.getName(), "HelpInfo.html", true); //$NON-NLS-1$
 						}
 					});
 				}
