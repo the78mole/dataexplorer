@@ -130,6 +130,7 @@ public class HelpInfoDialog extends Dialog {
 			this.dialogShell.open();
 		}
 		else {
+			this.textBrowser = new Browser(this.dialogShell, style);
 			openURL(deviceName, fileName, extractBase);
 			
 			int width = this.primaryMonitorBounds.width / 4 * 3;
