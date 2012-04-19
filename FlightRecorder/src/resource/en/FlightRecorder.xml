@@ -15,7 +15,7 @@
         <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format inputType="FILE_IO" formatType="VALUE" size="-24"/>
+        <format size="-24" formatType="VALUE" inputType="FILE_IO"/>
         <timeUnit>sec</timeUnit>
         <separator>comma</separator>
         <leader>$</leader>
@@ -54,141 +54,141 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>4????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>5????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>6????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>7????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>8????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>9????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>10????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>11????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>12????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>13????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>14????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>15????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>16????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>17????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>18????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>19????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>20????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>21????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>22????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>23????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
@@ -208,7 +208,7 @@
 				<active>true</active>
 			</Measurement>
 			<Measurement>
-				<name>GPS-Altitude</name>
+				<name>Altitude (GPS)</name>
 				<symbol>h</symbol>
 				<unit>m</unit>
 				<active>true</active>
@@ -222,141 +222,141 @@
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>4????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>5????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>6????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>7????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>8????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>9????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>10????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>11????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>12????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>13????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>14????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>15????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>16????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>17????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>18????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>19????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>20????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>21????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>22????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>?</name>
-                <symbol></symbol>
+                <name>23????</name>
+                <symbol>-</symbol>
                 <unit></unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>

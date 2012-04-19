@@ -29,7 +29,11 @@
 <DIV TYPE=HEADER>
 	<H2><A NAME="Introduction"></A><FONT FACE="Arial"><FONT SIZE=4><I>Multiplex FlightRecorder Dialog</I></FONT></FONT></H2>
 </DIV>
-<P>The below device dialog should be used to configure the visualization of measurements.
+<P>
+The below device dialog should be used to configure the visualization of measurements.
+It is possible to update measurement names and symbols. 
+Even if the measurement units are editable it makes less sense to do without adding a measurement factor in respect to the change.
+The units are contained within the log data and get overwritten while reading.
 Unchecked measurement will not be displayed. 
 This will lead to a more clear representation, curves which are hard to be interpreted in two dimensional way, may be blanked out.
 It is possible to import data files using the 'import data' button as well.
@@ -42,8 +46,6 @@ This files can be exported using the file menu or directly launched to an instal
 How to do so, refer to <A HREF="../../../help/en/HelpInfo_36.html">Toolbar -> Google Earth</A>.
 </P>
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Image_1.png" NAME="HelpInfo_Image_1" ALT="HelpInfo_Image_1"></P>
-<P><B>Hint: </B>The visualization configuration will be applied as well as it is closed in cases where the tool bar button is used to import the data.
-</P>
 <P>
 Multiplex sensors are to be configured by addresses, the configured address is displayed as measurement symbol, the units are overtaken.
 The dialog allows changing the symbols, but this is not required and the symbols are overwritten with the next data import.
