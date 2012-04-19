@@ -101,6 +101,49 @@ public class HelpInfoDialog extends Dialog {
 			if (!display.readAndDispatch()) display.sleep();
 		}
 	}
+	
+	/**
+	 * opens a fileURL of help HTML of the given device and pageName, 
+	 * preferred style is SWT.MOZILLA which supports xulrunner on all platforms 
+	 * @param deviceName
+	 * @param fileName
+	 * @param style
+	 */
+	public void open(String deviceName, String fileName, int style, boolean extractBase) {
+		log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+		if (this.dialogShell == null || this.dialogShell.isDisposed()) {
+			this.dialogShell = new Shell(new Shell(Display.getDefault()), SWT.SHELL_TRIM);
+			FillLayout dialogShellLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
+			this.dialogShell.setLayout(dialogShellLayout);
+			this.dialogShell.setText(GDE.NAME_LONG + Messages.getString(MessageIds.GDE_MSGT0192));
+			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.png")); //$NON-NLS-1$
+
+			this.textBrowser = new Browser(this.dialogShell, style);
+			openURL(deviceName, fileName, extractBase);
+
+			this.dialogShell.layout();
+			this.dialogShell.pack();
+			int width = this.primaryMonitorBounds.width / 4 * 3;
+			this.dialogShell.setSize(width, (this.primaryMonitorBounds.height * 95 / 100));
+			this.dialogShell.setLocation(this.primaryMonitorBounds.width - width, 0);
+
+			this.dialogShell.open();
+		}
+		else {
+			openURL(deviceName, fileName, extractBase);
+			
+			int width = this.primaryMonitorBounds.width / 4 * 3;
+			this.dialogShell.setSize(width, (this.primaryMonitorBounds.height * 95 / 100));
+			this.dialogShell.setLocation(this.primaryMonitorBounds.width - width, 0);
+			this.dialogShell.setMinimized(false);
+			this.dialogShell.setVisible(true);
+			this.dialogShell.forceActive();
+		}
+		Display display = this.dialogShell.getDisplay();
+		while (!this.dialogShell.isDisposed()) {
+			if (!display.readAndDispatch()) display.sleep();
+		}
+	}
 
 	/**
 	 * @param deviceName
@@ -132,6 +175,48 @@ public class HelpInfoDialog extends Dialog {
 		
 		
 			String stringUrl = targetDir + helpDir + fileName;
+			log.log(Level.FINE, "stringUrl = " + "file:///" + stringUrl); //$NON-NLS-1$ //$NON-NLS-2$
+			
+			this.textBrowser.setUrl("file:///" + stringUrl); //$NON-NLS-1$
+		}
+		catch (IOException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+			DataExplorer.getInstance().openMessageDialog(this.dialogShell, 
+					Messages.getString(MessageIds.GDE_MSGE0018, new Object[] { e.getLocalizedMessage() } )); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * @param deviceName
+	 * @param fileName
+	 */
+	private void openURL(String deviceName, String fileName, boolean extractBase) {
+		String jarBasePath = FileUtils.getJarBasePath() + GDE.FILE_SEPARATOR_UNIX;
+		String jarName = GDE.NAME_LONG + GDE.FILE_ENDING_DOT_JAR;
+		String helpDir = extractBase ? "help" + GDE.FILE_SEPARATOR : "help" + GDE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + GDE.FILE_SEPARATOR;
+		String helpFileDir = "help" + GDE.FILE_SEPARATOR + this.settings.getLocale().getLanguage() + GDE.FILE_SEPARATOR;
+		String targetDir = GDE.JAVA_IO_TMPDIR + (GDE.IS_WINDOWS ? "" : GDE.FILE_SEPARATOR_UNIX) + "GDE" + GDE.FILE_SEPARATOR_UNIX;
+		
+		try {
+			if (!(new File(targetDir)).exists()) {
+				log.log(Level.FINE, "jarBasePath = " + jarBasePath + " jarName = " + jarName + " helpDir = " + helpDir); //$NON-NLS-1$
+				//extract DataExplorer base help content each time if needed to allow references
+				FileUtils.extractDir(new JarFile(jarBasePath + jarName), helpDir, targetDir, "555");
+			}
+			
+			if (deviceName.length() >= 1) { // devices/<deviceName>.jar
+				jarBasePath = jarBasePath + "devices" + GDE.FILE_SEPARATOR_UNIX;
+				jarName = deviceName + GDE.FILE_ENDING_DOT_JAR;
+				targetDir = targetDir + deviceName + GDE.FILE_SEPARATOR_UNIX;
+
+				if (!(new File(targetDir)).exists()) {
+					log.log(Level.FINE, "jarBasePath = " + jarBasePath + " jarName = " + jarName + " helpDir = " + helpDir); //$NON-NLS-1$
+					FileUtils.extractDir(new JarFile(jarBasePath + jarName), helpDir, targetDir, "555");
+				}
+			}
+		
+		
+			String stringUrl = targetDir + helpFileDir + fileName;
 			log.log(Level.FINE, "stringUrl = " + "file:///" + stringUrl); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			this.textBrowser.setUrl("file:///" + stringUrl); //$NON-NLS-1$

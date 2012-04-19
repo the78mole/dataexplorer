@@ -165,7 +165,7 @@ public class MeasurementControlConfigurable extends Composite {
 			this.measurementSymbol.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyReleased(KeyEvent evt) {
-					MeasurementControlConfigurable.this.measurementType.setSymbol(MeasurementControlConfigurable.this.measurementSymbol.getText());
+					updateSymbol(MeasurementControlConfigurable.this.measurementSymbol.getText());
 					MeasurementControlConfigurable.this.dialog.enableSaveButton(true);
 				}
 			});
@@ -181,7 +181,7 @@ public class MeasurementControlConfigurable extends Composite {
 			this.measurementUnit.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyReleased(KeyEvent evt) {
-					MeasurementControlConfigurable.this.measurementType.setUnit(MeasurementControlConfigurable.this.measurementUnit.getText());
+					updateUnit(MeasurementControlConfigurable.this.measurementUnit.getText());
 					MeasurementControlConfigurable.this.dialog.enableSaveButton(true);
 				}
 			});
@@ -215,7 +215,7 @@ public class MeasurementControlConfigurable extends Composite {
 	}
 
 	/**
-	 * set anew name to a measurement and active record
+	 * set a new name to a measurement and active record
 	 * @param newName
 	 */
 	void updateName(String newName) {
@@ -229,6 +229,47 @@ public class MeasurementControlConfigurable extends Composite {
 		RecordSet activeRecordSet = this.application.getActiveRecordSet();
 		if (activeRecordSet != null) {
 			activeRecordSet.get(this.ordinal).setName(newName + this.filterExtend);
+		}
+	}
+
+	/**
+	 * set a new symbol to a measurement and active record
+	 * @param newSymbol
+	 */
+	void updateSymbol(String newSymbol) {
+		for (int i = this.filterExtend.length(); i > 0; i--) {
+			if (newSymbol.endsWith(this.filterExtend.substring(0, i))) {
+				newSymbol = newSymbol.substring(0, newSymbol.length() - this.filterExtend.length());
+				break;
+			}
+		}
+		this.measurementType.setSymbol(newSymbol + this.filterExtend);
+		RecordSet activeRecordSet = this.application.getActiveRecordSet();
+		if (activeRecordSet != null) {
+			activeRecordSet.get(this.ordinal).setSymbol(newSymbol + this.filterExtend);
+		}
+	}
+
+	/**
+	 * set a new symbol to a measurement and active record
+	 * @param newUnit
+	 */
+	void updateUnit(String newUnit) {
+		if (newUnit.contains(GDE.STRING_LEFT_BRACKET) || newUnit.contains(GDE.STRING_RIGHT_BRACKET)) {
+			newUnit = newUnit.trim();
+			newUnit = newUnit.startsWith(GDE.STRING_LEFT_BRACKET) ? newUnit.substring(1) : newUnit;
+			newUnit = newUnit.endsWith(GDE.STRING_RIGHT_BRACKET) ? newUnit.substring(0, newUnit.length()-1) : newUnit;
+		}
+		for (int i = this.filterExtend.length(); i > 0; i--) {
+			if (newUnit.endsWith(this.filterExtend.substring(0, i))) {
+				newUnit = newUnit.substring(0, newUnit.length() - this.filterExtend.length());
+				break;
+			}
+		}
+		this.measurementType.setUnit(newUnit + this.filterExtend);
+		RecordSet activeRecordSet = this.application.getActiveRecordSet();
+		if (activeRecordSet != null) {
+			activeRecordSet.get(this.ordinal).setUnit(newUnit + this.filterExtend);
 		}
 	}
 
