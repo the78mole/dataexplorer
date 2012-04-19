@@ -2188,15 +2188,7 @@ public class DataExplorer extends Composite {
 			if (this.helpDialog == null || this.helpDialog.isDisposed()) {
 				this.helpDialog = new HelpInfoDialog(GDE.shell, SWT.NONE);
 			}
-			if (GDE.IS_WINDOWS || GDE.IS_MAC) { //$NON-NLS-1$
-				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using syle SWT.NONE (windows IE)"); //$NON-NLS-1$
-				//this.helpDialog.dispose();
-				this.helpDialog.open(deviceName, fileName, SWT.NONE, extractBase);
-			}
-			else {
-				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using syle SWT.MOZILLA (xulrunner)"); //$NON-NLS-1$
-				this.helpDialog.open(deviceName, fileName, SWT.MOZILLA, extractBase);
-			}
+			this.helpDialog.open(deviceName, fileName, SWT.NONE, extractBase);
 		}
 		catch (Error e) {
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using OS registered web browser"); //$NON-NLS-1$
