@@ -2157,7 +2157,7 @@ public class DataExplorer extends Composite {
 			if (this.helpDialog == null || this.helpDialog.isDisposed()) {
 				this.helpDialog = new HelpInfoDialog(GDE.shell, SWT.NONE);
 			}
-			this.helpDialog.open(deviceName, fileName, SWT.NONE);
+			this.helpDialog.open(deviceName, fileName, SWT.NONE, false);
 		}
 		catch (Error e) {
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using OS registered web browser"); //$NON-NLS-1$
