@@ -104,61 +104,58 @@ public class JLog2Configuration extends Composite {
 																										//"AVP1 (JTX telemetry, \"JLog Air\" module + volt 0..12.8V for temp0 + ppulse for VBar Gov on K4-1  -  Slow update rate: 100ms!)", 
 																										//"AP2 (JTX telemetry, \"JLog Air\" module + outputs a phase pulse for VBar Gov on K4-2  -  Slow update rate: 100ms! Yet untested!)", 
 																										};
-	final String									normal							= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,2,3,4,5,6,7,8,12,13,16,16,16,14,9,10,11,36,0";																													//$NON-NLS-1$
-	final String									HSS									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,9,0,0,6,2,3,4,5,6,7,8,12,13,16,16,16,14,9,10,11,36,200";																											//$NON-NLS-1$
-	final String									HSSG2								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,201";																							//$NON-NLS-1$
-	final String									HSST								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,202";																							//$NON-NLS-1$
-	final String									BH									= "9600,0,128,6,2,1,0,10,10,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,210,0";																						//$NON-NLS-1$
-	final String									BM									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,211,0";																						//$NON-NLS-1$
-	final String									BHSS								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,212,0";																						//$NON-NLS-1$
-	final String									BHSST								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,213,0";																						//$NON-NLS-1$
-	final String									G										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,10";																								//$NON-NLS-1$
-	final String									S										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,15";																											//$NON-NLS-1$
-	final String									L										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,2,3,4,5,6,7,8,16,16,16,16,16,12,9,10,11,36,40";																												//$NON-NLS-1$
-	final String									T										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,9,0,0,6,2,3,4,5,6,7,8,16,16,16,16,16,12,9,10,11,36,110";																												//$NON-NLS-1$
-	final String									GT									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,111";																								//$NON-NLS-1$
-	final String									V										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,1";																									//$NON-NLS-1$
-	final String									VG									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,23";																								//$NON-NLS-1$
-	final String									VS									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,4,5,6,7,8,9,10,16,14,16,16,16,16,11,12,13,36,16";																											//$NON-NLS-1$
-	final String									BID									= "9600,0,192,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,4,5,6,7,8,9,10,16,14,16,16,16,16,11,12,13,36,2";																												//$NON-NLS-1$
-	final String									BIDG								= "9600,0,192,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,20";																								//$NON-NLS-1$
-	final String									BIDS								= "9600,0,192,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,25";																											//$NON-NLS-1$
-	final String									A										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,5";																												//$NON-NLS-1$
-	final String									AV									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,6";																												//$NON-NLS-1$
-	final String									B										= "0,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,3,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,132,3";																													//$NON-NLS-1$
-	final String									BV									= "0,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,3,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,132,4";																													//$NON-NLS-1$
-	final String									P1									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,91";																											//$NON-NLS-1$
-	final String									P2									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,92";																											//$NON-NLS-1$
-	final String									AVP1								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,180";																											//$NON-NLS-1$
-	final String									AP2									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,170";																											//$NON-NLS-1$
+	final static String	normal							= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,2,3,4,5,6,7,8,12,13,16,16,16,14,9,10,11,36,0";																													//$NON-NLS-1$
+	final String				HSS									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,9,0,0,6,2,3,4,5,6,7,8,12,13,16,16,16,14,9,10,11,36,200";																											//$NON-NLS-1$
+	final String				HSSG2								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,201";																							//$NON-NLS-1$
+	final String				HSST								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,202";																							//$NON-NLS-1$
+	final String				BH									= "9600,0,128,6,2,1,0,10,10,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,210,0";																						//$NON-NLS-1$
+	final String				BM									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,211,0";																						//$NON-NLS-1$
+	final String				BHSS								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,212,0";																						//$NON-NLS-1$
+	final String				BHSST								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,213,0";																						//$NON-NLS-1$
+	final String				G										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,10";																								//$NON-NLS-1$
+	final String				S										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,15";																											//$NON-NLS-1$
+	final String				L										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,2,3,4,5,6,7,8,16,16,16,16,16,12,9,10,11,36,40";																												//$NON-NLS-1$
+	final String				T										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,9,0,0,6,2,3,4,5,6,7,8,16,16,16,16,16,12,9,10,11,36,110";																												//$NON-NLS-1$
+	final String				GT									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,111";																								//$NON-NLS-1$
+	final String				V										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,1";																									//$NON-NLS-1$
+	final String				VG									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,23";																								//$NON-NLS-1$
+	final String				VS									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,4,5,6,7,8,9,10,16,14,16,16,16,16,11,12,13,36,16";																											//$NON-NLS-1$
+	final String				BID									= "9600,0,192,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,4,5,6,7,8,9,10,16,14,16,16,16,16,11,12,13,36,2";																												//$NON-NLS-1$
+	final String				BIDG								= "9600,0,192,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,36,20";																								//$NON-NLS-1$
+	final String				BIDS								= "9600,0,192,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,25";																											//$NON-NLS-1$
+	final String				A										= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,5";																												//$NON-NLS-1$
+	final String				AV									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,6";																												//$NON-NLS-1$
+	final String				B										= "0,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,3,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,132,3";																													//$NON-NLS-1$
+	final String				BV									= "0,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,3,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,132,4";																													//$NON-NLS-1$
+	final String				P1									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,91";																											//$NON-NLS-1$
+	final String				P2									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,92";																											//$NON-NLS-1$
+	final String				AVP1								= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,180";																											//$NON-NLS-1$
+	final String				AP2									= "9600,0,128,6,2,1,0,10,10,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,6,4,5,6,7,8,9,10,16,16,16,16,16,14,11,12,13,36,170";																											//$NON-NLS-1$
 
-	final String[]								baudrates						= new String[] { "JIVE", "2400", "4800", "9600", "38400", "57600", "115200", "CMT" };																																												//$NON-NLS-1$
-	final String[]								sysModes						= new String[] { "NEWLOG", "SEQLOG" };																																																																				//$NON-NLS-1$ //$NON-NLS-2$
-	final String[]								logModes						= new String[] { "(0) OF/CSV", "(2) SER", "(8) JLV" };																																																												//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	final String[]								motorPols						= new String[] {
-			"2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24", "26", "38", "30", "32", "34", "36", "38", "40", "42", "44", "46", "48" };																																							//$NON-NLS-1$
-	final String[]								motorShuntAdjust		= new String[] {
-			"-15", "-14", "-13", "-12", "-11", "-10", " -9", " -8", " -7", " -6", " -5", " -4", " -3", " -2", " -1", "  0", "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15" };	//$NON-NLS-1$
-	final String[]								zeroTo9							= new String[10];																																																																															;
-	final String[]								zeroTo99						= new String[100];																																																																														;
-	final String[]								zeroTo50						= new String[51];
-	final String[]								oneTo50							= new String[50];
-	final String[]								eightTo30						= new String[23];
-	final String[]								eightTo255					= new String[248];
-	final String[]								zeroTo127						= new String[127];																																																																														;
-	final String[]								zeroTo25500					= new String[256];
-	final String[]								zeroAlarms					= new String[] { "0" };																																																																											//$NON-NLS-1$
-	final String[]								oneAlarms						= new String[] { "0", "1" };																																																																									//$NON-NLS-1$
-	final String[]								greaterOneAlarms		= new String[] { "0", "1", "2" };																																																																						//$NON-NLS-1$
+	final String[]			baudrates						= new String[] { "JIVE", "2400", "4800", "9600", "38400", "57600", "115200", "CMT" };																																												//$NON-NLS-1$
+	final String[]			sysModes						= new String[] { "NEWLOG", "SEQLOG" };																																																																				//$NON-NLS-1$ //$NON-NLS-2$
+	final String[]			logModes						= new String[] { "(0) OF/CSV", "(2) SER", "(8) JLV" };																																																												//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	final String[]			motorPols						= new String[] { "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24", "26", "38", "30", "32", "34", "36", "38", "40", "42", "44", "46", "48" };																																							//$NON-NLS-1$
+	final String[]			motorShuntAdjust		= new String[] { "-15", "-14", "-13", "-12", "-11", "-10", " -9", " -8", " -7", " -6", " -5", " -4", " -3", " -2", " -1", "  0", "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15" };	//$NON-NLS-1$
+	final String[]			zeroTo9							= new String[10];																																																																															;
+	final String[]			zeroTo99						= new String[100];																																																																														;
+	final String[]			zeroTo50						= new String[51];
+	final String[]			oneTo50							= new String[50];
+	final String[]			eightTo30						= new String[23];
+	final String[]			eightTo255					= new String[248];
+	final String[]			zeroTo127						= new String[127];																																																																														;
+	final String[]			zeroTo25500					= new String[256];
+	final String[]			zeroAlarms					= new String[] { "0" };																																																																											//$NON-NLS-1$
+	final String[]			oneAlarms						= new String[] { "0", "1" };																																																																									//$NON-NLS-1$
+	final String[]			greaterOneAlarms		= new String[] { "0", "1", "2" };																																																																						//$NON-NLS-1$
 
 	/**
 	 * this inner class holds the configuration and contains all logic to insert and update entries
 	 * missing part is the sub device section since there are only the special configurations which contains the required bitmasks
 	 */
-	public class Configuration {
+	public static class Configuration {
 
 		String[]	config;
-		String		version	= "3.2.2";	//$NON-NLS-1$
 
 		Configuration(String newConfiguration) {
 			String[] tmpConfig = newConfiguration.split(GDE.STRING_COMMA);
@@ -175,16 +172,10 @@ public class JLog2Configuration extends Composite {
 				this.config[i] = tmpConfig[i];
 			}
 			JLog2Configuration.log.log(java.util.logging.Level.FINE, getConfiguration());
-			initialyzeGUI(this, false);
 		}
 
 		public int get(int index) {
 			return Integer.valueOf(this.config[index]);
-		}
-
-		public void setFirmwareVersion(String newVersion) {
-			this.version = newVersion;
-			this.config[46] = newVersion.equals("3.1") ? "4" : newVersion.startsWith("3.2") && newVersion.endsWith("3.2.1") ? "36" : "36"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		}
 
 		public String getConfiguration() {
@@ -406,8 +397,8 @@ public class JLog2Configuration extends Composite {
 			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void setXYType(int type) {
-			this.config[25] = GDE.STRING_EMPTY + (type > 1 ? type - 1 : 0);
+		public void set25Type(int type) { //TODO this is unclear, set only in combination with special configurations
+			this.config[25] = GDE.STRING_EMPTY + type;
 			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
@@ -527,6 +518,11 @@ public class JLog2Configuration extends Composite {
 			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
+		public void set47Type(int type) { //TODO this is unclear, set only in combination with special configurations
+			this.config[47] = GDE.STRING_EMPTY + type;
+			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
+		}
+
 		public void setHV2BecVoltage(int slectionIndex) {
 			if (this.config.length < 49) {
 				String[] tmpConfig = new String[49];
@@ -643,7 +639,11 @@ public class JLog2Configuration extends Composite {
 	final Configuration	configuration;
 
 	public void loadConfiuration(String configString) {
-		this.configuration.update(configString);
+		if (configString != null)
+			this.configuration.update(configString);
+		else
+			this.configuration.update(JLog2Configuration.normal);
+		
 		initialyzeGUI(this.configuration, true);
 	}
 
@@ -711,7 +711,7 @@ public class JLog2Configuration extends Composite {
 			this.zeroTo25500[i] = GDE.STRING_EMPTY + (i * 100);
 		}
 
-		this.configuration = new Configuration(this.normal);
+		this.configuration = new Configuration(JLog2Configuration.normal);
 		initGUI();
 	}
 
@@ -810,10 +810,7 @@ public class JLog2Configuration extends Composite {
 					//jlogFirmwareCombo.setItems(jlogFirmware);
 					//jlogFirmwareCombo.select(2);
 					this.jlogFirmwareCombo.setBackground(SWTResourceManager.getColor(255, 128, 0));
-					RowData jlogConfigurationComboLData = new RowData();
-					jlogConfigurationComboLData.width = 60;
-					jlogConfigurationComboLData.height = 17;
-					this.jlogFirmwareCombo.setLayoutData(jlogConfigurationComboLData);
+					this.jlogFirmwareCombo.setLayoutData( new RowData(60, 17));
 					this.jlogFirmwareCombo.setEditable(false);
 					this.jlogFirmwareCombo.addMouseMoveListener(new MouseMoveListener() {
 						public void mouseMove(MouseEvent evt) {
@@ -824,10 +821,7 @@ public class JLog2Configuration extends Composite {
 				}
 				{
 					this.jlogConfigurationCombo = new CCombo(this.mainConfigGroup, SWT.BORDER);
-					RowData jlogConfigurationComboLData = new RowData();
-					jlogConfigurationComboLData.width = 420;
-					jlogConfigurationComboLData.height = 17;
-					this.jlogConfigurationCombo.setLayoutData(jlogConfigurationComboLData);
+					this.jlogConfigurationCombo.setLayoutData(new RowData(420, 17));
 					this.jlogConfigurationCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.jlogConfigurationCombo.setItems(this.jlogConfigurations);
 					this.jlogConfigurationCombo.select(0);
@@ -848,7 +842,7 @@ public class JLog2Configuration extends Composite {
 							switch (JLog2Configuration.this.jlogConfigurationCombo.getSelectionIndex()) {
 							default:
 							case 0:
-								JLog2Configuration.this.configuration.update(JLog2Configuration.this.normal);
+								JLog2Configuration.this.configuration.update(JLog2Configuration.normal);
 								break;
 							case 1:
 								JLog2Configuration.this.configuration.update(JLog2Configuration.this.HSS);
@@ -931,6 +925,7 @@ public class JLog2Configuration extends Composite {
 								JLog2Configuration.this.configuration.update(JLog2Configuration.this.AP2);
 								break;
 							}
+							JLog2Configuration.this.initialyzeGUI(JLog2Configuration.this.configuration, false);
 							enableSaveSettings();
 						}
 					});
@@ -2913,17 +2908,17 @@ public class JLog2Configuration extends Composite {
 		this.alarmLinesLabel.setForeground(DataExplorer.COLOR_BLACK);
 		this.tempSensorTypeCombo.setEnabled(true);
 		this.pulsPerRevolutionSensorCombo.setEnabled(true);
-		this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGI2876));
-		this.temperaureLabel.setText("[°C]"); //$NON-NLS-1$
+		this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGT2874));
+		this.temperaure1Label.setText("[°C]"); //$NON-NLS-1$
 		this.alarmLinesCombo.setItems(this.zeroAlarms);
 		this.hv2BecLabel.setVisible(false);
 		this.hv2BecCombo.setVisible(false);
 		this.speedSensorLabel.setVisible(false);
 		this.speedSensorButton.setVisible(false);
 
-		JLog2Configuration.log.log(java.util.logging.Level.FINE,
+		JLog2Configuration.log.log(java.util.logging.Level.OFF,
 				"telemetryCombo selection index = " + this.telemetryCombo.getSelectionIndex() + " jlogConfigurationCombo selection index = " + this.jlogConfigurationCombo.getSelectionIndex()); //$NON-NLS-1$ //$NON-NLS-2$
-		JLog2Configuration.log.log(java.util.logging.Level.FINE, StringHelper.printBinary((byte) (value & 0xFF), false));
+		JLog2Configuration.log.log(java.util.logging.Level.FINER, StringHelper.printBinary((byte) (value & 0xFF), false));
 
 		//0=normal, 1=HSS, 2=HSSG2, 3=HSST, 4=BH, 5=BM, 6=BHSS, 7=BHSST, 8=G, 9=S 10=L, 
 		//11=T, 12=GT, 13=V, 14=VG, 15=VS, 16=BID, 17=BIDG, 18=BIDS, 19=A, 20=AV, 21=B, 22=BV, 23=P1, 24=P2, 25=AVP1, 26=AP2
@@ -2989,7 +2984,6 @@ public class JLog2Configuration extends Composite {
 			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
 			break;
 		case 5: //A (JTX Air)
-			this.jlogConfigurationCombo.select(23);
 			this.jlogConfigurationCombo.select(19);
 			this.telemetryCombo.setEnabled(false);
 			this.telemetryCombo.setText("JTX"); //$NON-NLS-1$
@@ -3003,7 +2997,7 @@ public class JLog2Configuration extends Composite {
 			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
 			break;
 		case 10: //G (GPS single)
-			this.jlogConfigurationCombo.select(9);
+			this.jlogConfigurationCombo.select(8);
 			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
 			this.telemetryCombo.setEnabled(false);
 			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$

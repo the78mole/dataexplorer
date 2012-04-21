@@ -39,19 +39,18 @@ import java.util.logging.Logger;
  * @author Winfied Brügmann
  */
 public class JLog2LiveGathererThread extends Thread {
-	final static String				$CLASS_NAME									= JLog2LiveGathererThread.class.getName();
-	final static Logger				log													= Logger.getLogger(JLog2LiveGathererThread.class.getName());
-	final static int					WAIT_TIME_RETRYS						= 36;
+	final static String		$CLASS_NAME				= JLog2LiveGathererThread.class.getName();
+	final static Logger		log								= Logger.getLogger(JLog2LiveGathererThread.class.getName());
+	final static int			WAIT_TIME_RETRYS	= 36;
 
-
-	final DataExplorer application;
+	final DataExplorer		application;
 	final JLog2SerialPort	serialPort;
 	final JLog2						device;
-	final Channels						channels;
-	final Channel							channel;
-	final int									channelNumber;
-	
-	String										recordSetKey								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
+	final Channels				channels;
+	final Channel					channel;
+	final int							channelNumber;
+
+	String								recordSetKey			= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 
 	/**
 	 * data gatherer thread definition 
@@ -59,8 +58,7 @@ public class JLog2LiveGathererThread extends Thread {
 	 * @throws ApplicationConfigurationException 
 	 * @throws Exception 
 	 */
-	public JLog2LiveGathererThread(DataExplorer currentApplication, JLog2 useDevice, JLog2SerialPort useSerialPort, int channelConfigNumber)
-			throws ApplicationConfigurationException {
+	public JLog2LiveGathererThread(DataExplorer currentApplication, JLog2 useDevice, JLog2SerialPort useSerialPort, int channelConfigNumber) throws ApplicationConfigurationException {
 		super("dataGatherer"); //$NON-NLS-1$
 		this.application = currentApplication;
 		this.device = useDevice;
@@ -81,7 +79,7 @@ public class JLog2LiveGathererThread extends Thread {
 		byte[] dataBuffer = null;
 
 		this.serialPort.isInterruptedByUser = false;
-		log.logp(Level.FINE, JLog2LiveGathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
+		JLog2LiveGathererThread.log.logp(java.util.logging.Level.FINE, JLog2LiveGathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
 		try {
 			if (!this.serialPort.isConnected()) {
@@ -93,9 +91,9 @@ public class JLog2LiveGathererThread extends Thread {
 				WaitTimer.delay(1000);
 		}
 		catch (Exception e) {
-			log.logp(Level.SEVERE, JLog2LiveGathererThread.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			JLog2LiveGathererThread.log.logp(java.util.logging.Level.SEVERE, JLog2LiveGathererThread.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 		}
-		
+
 		try {
 			while (!this.serialPort.isInterruptedByUser) {
 				try {
@@ -104,12 +102,12 @@ public class JLog2LiveGathererThread extends Thread {
 
 					// else wait for 180 seconds max. for actions
 					String processName = this.device.getProcessName(dataBuffer);
-					
+
 					if (this.channel.size() == 0 || recordSet == null || !this.recordSetKey.endsWith(" " + processName)) { //$NON-NLS-1$
 						this.application.setStatusMessage(""); //$NON-NLS-1$
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") " + processName; //$NON-NLS-1$
-						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
-						log.logp(Level.FINE, JLog2LiveGathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
+						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), this.channel.getNumber(), true, false));
+						JLog2LiveGathererThread.log.logp(java.util.logging.Level.FINE, JLog2LiveGathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
 						recordSet = this.channel.get(this.recordSetKey);
 						this.channel.applyTemplateBasics(this.recordSetKey);
@@ -123,39 +121,37 @@ public class JLog2LiveGathererThread extends Thread {
 
 					// prepare the data for adding to record set
 					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
-					
+
 					if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 						JLog2LiveGathererThread.this.application.updateAllTabs(false);
 					}
 					++measurementCount;
-					
-					if (measurementCount > 0 && measurementCount%10 == 0) {
+
+					if (measurementCount > 0 && measurementCount % 10 == 0) {
 						this.device.updateVisibilityStatus(recordSet, true);
 					}
 				}
 				catch (DataInconsitsentException e) {
-					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}); 
+					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME });
 					cleanup(message);
 				}
 				catch (Throwable e) {
-						log.log(Level.FINE, "JLog2 program end detected"); //$NON-NLS-1$
-						finalizeRecordSet();
+					JLog2LiveGathererThread.log.log(java.util.logging.Level.FINE, "JLog2 program end detected"); //$NON-NLS-1$
+					finalizeRecordSet();
 				}
 			}
 		}
-		finally  {
-			if (this.serialPort != null && this.serialPort.isConnected())
-				this.serialPort.close();
+		finally {
+			if (this.serialPort.isConnected()) this.serialPort.close();
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					JLog2LiveGathererThread.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2804), Messages.getString(MessageIds.GDE_MSGT2804));
 				}
 			});
 			this.application.setStatusMessage(""); //$NON-NLS-1$
-			log.logp(Level.FINE, JLog2LiveGathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+			JLog2LiveGathererThread.log.logp(java.util.logging.Level.FINE, JLog2LiveGathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 		}
 	}
-
 
 	/**
 	 * stop data gathering
@@ -177,9 +173,9 @@ public class JLog2LiveGathererThread extends Thread {
 			this.device.makeInActiveDisplayable(tmpRecordSet);
 			this.application.updateStatisticsData();
 			this.application.updateDataTable(this.recordSetKey, false);
-			
+
 			this.device.setAverageTimeStep_ms(tmpRecordSet.getAverageTimeStep_ms());
-			log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms()); //$NON-NLS-1$
+			JLog2LiveGathererThread.log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms()); //$NON-NLS-1$
 		}
 	}
 
@@ -202,6 +198,7 @@ public class JLog2LiveGathererThread extends Thread {
 			else {
 				final String useRecordSetKey = this.recordSetKey;
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						JLog2LiveGathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						JLog2LiveGathererThread.this.application.updateStatisticsData();

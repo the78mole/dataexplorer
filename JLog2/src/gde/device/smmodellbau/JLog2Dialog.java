@@ -419,6 +419,7 @@ public class JLog2Dialog extends DeviceDialog {
 			}
 			catch (Exception e) {
 				JLog2Dialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+				((JLog2Configuration) this.configurationTabItem.getControl()).loadConfiuration(JLog2Configuration.normal);
 			}
 		}
 	}
