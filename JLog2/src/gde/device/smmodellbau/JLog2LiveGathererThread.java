@@ -198,7 +198,6 @@ public class JLog2LiveGathererThread extends Thread {
 			else {
 				final String useRecordSetKey = this.recordSetKey;
 				GDE.display.asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						JLog2LiveGathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						JLog2LiveGathererThread.this.application.updateStatisticsData();
