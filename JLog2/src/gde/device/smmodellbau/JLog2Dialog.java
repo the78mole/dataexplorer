@@ -274,7 +274,7 @@ public class JLog2Dialog extends DeviceDialog {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (JLog2Dialog.log.isLoggable(java.util.logging.Level.FINE)) JLog2Dialog.log.log(java.util.logging.Level.FINE, "liveGathererButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (!JLog2Dialog.this.configurationTabItem.isShowing()) {
+							if (!JLog2Dialog.this.configurationTabItem.getControl().isVisible()) {
 								if (JLog2Dialog.this.liveThread == null || !JLog2Dialog.this.serialPort.isConnected()) {
 									try {
 										JLog2Dialog.this.liveThread = new JLog2LiveGathererThread(JLog2Dialog.this.application, JLog2Dialog.this.device, JLog2Dialog.this.serialPort, JLog2Dialog.this.application
@@ -408,7 +408,7 @@ public class JLog2Dialog extends DeviceDialog {
 		JLog2Dialog.log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + this.selectedSetupFile); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {
-			if (this.device.getDataBlockPreferredDataLocation().equals(fd.getFilterPath())) {
+			if (!this.device.getDataBlockPreferredDataLocation().equals(fd.getFilterPath())) {
 				this.device.setDataBlockPreferredDataLocation(fd.getFilterPath());
 			}
 			try {
@@ -430,6 +430,9 @@ public class JLog2Dialog extends DeviceDialog {
 		JLog2Dialog.log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
 		String setupFilePath = fileDialog.open();
 		if (setupFilePath != null && setupFilePath.length() > 4) {
+			if (!this.device.getDataBlockPreferredDataLocation().equals(fileDialog.getFilterPath())) {
+				this.device.setDataBlockPreferredDataLocation(fileDialog.getFilterPath());
+			}
 			try {
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(setupFilePath), "ISO-8859-1")); //$NON-NLS-1$
 				writer.write(((JLog2Configuration) this.configurationTabItem.getControl()).configuration.getConfiguration());
