@@ -147,7 +147,7 @@ public class GDE {
 
 	public static final String		STRING_WINDOWS_APP_OPEN					= "rundll32.exe";																																																										//$NON-NLS-1$
 	public static final String		STRING_WINDOWS_EXTERN_DEF_DIR		= "G:\\";																																																										//$NON-NLS-1$
-	public static final String		STRING_WINDOWS_EXTERN_MEDIA_DIR	= ":\\";																																																										//$NON-NLS-1$
+	public static final String		STRING_WINDOWS_EXTERN_MEDIA_DIR	= ":";																																																										//$NON-NLS-1$
 
 	public static final String		STRING_LINUX_APP_OPEN						= "xdg-open";																																																										//$NON-NLS-1$
 	public static final String		STRING_LINUX_EXTERN_MEDIA_DIR		= "/media";																																																										//$NON-NLS-1$
