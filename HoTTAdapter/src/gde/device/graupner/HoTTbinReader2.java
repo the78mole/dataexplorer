@@ -21,8 +21,6 @@ package gde.device.graupner;
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.RecordSet;
-import gde.device.ChannelPropertyTypes;
-import gde.device.MeasurementPropertyTypes;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
 import gde.log.Level;
@@ -91,9 +89,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		boolean isSensorData = false;
 		boolean isSensorDataPart = false;
 		HoTTbinReader2.recordSet = null; 
-		HoTTAdapter.isFilterEnabled = device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null ? Boolean.parseBoolean(device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
-		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 90.0;
-		HoTTAdapter.longitudeTolranceFactor = device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 25.0;
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -137,10 +132,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			//read all the data blocks from the file and parse
 			for (int i = 0; i < numberDatablocks; i++) {
 				data_in.read(HoTTbinReader2.buf);
-				if (HoTTbinReader2.logger.isLoggable(Level.FINER) && i % 10 == 0) {
+				if (HoTTbinReader2.logger.isLoggable(Level.FINE) && i % 10 == 0) 
 					HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader2.buf.length));
-				}
-				HoTTbinReader2.logger.logp(Level.FINER, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader2.buf, HoTTbinReader2.buf.length));
+				
+				if (HoTTbinReader.log.isLoggable(Level.FINER))
+					HoTTbinReader2.logger.logp(Level.FINER, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader2.buf, HoTTbinReader2.buf.length));
 				
 				//fill receiver data
 				if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0 && HoTTbinReader2.timeStep_ms % 10 == 0) {
@@ -364,9 +360,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		boolean isElectricData = false;
 		boolean isInitialSwitched = false;
 		HoTTbinReader2.recordSet = null; 
-		HoTTAdapter.isFilterEnabled = device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null ? Boolean.parseBoolean(device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
-		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 90.0;
-		HoTTAdapter.longitudeTolranceFactor = device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 25.0;
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -417,8 +410,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				data_in.read(HoTTbinReader2.buf);
 				if (HoTTbinReader2.logger.isLoggable(Level.FINEST) && i % 10 == 0) {
 					HoTTbinReader2.logger.logp(Level.FINEST, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader2.buf.length));
+					HoTTbinReader2.logger.logp(Level.FINEST, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader2.buf, HoTTbinReader2.buf.length));
 				}
-				HoTTbinReader2.logger.logp(Level.FINEST, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader2.buf, HoTTbinReader2.buf.length));
 
 				if (HoTTbinReader2.buf[33] >= 0 && HoTTbinReader2.buf[33] <= 4 && HoTTbinReader2.buf[3] != 0 && HoTTbinReader2.buf[4] != 0) { //skip empty block - package loss
 					//create and fill sensor specific data record sets 
@@ -490,7 +483,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 									break;
 								}
 								
-								logger.log(Level.FINE, "isReceiverData " + isReceiverData + " isVarioData " + isVarioData + " isGPSData " + isGPSData + " isGeneralData " + isGeneralData + " isElectricData " + isElectricData);
+								if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+									HoTTbinReader2.logger.log(Level.FINE, "isReceiverData " + isReceiverData + " isVarioData " + isVarioData + " isGPSData " + isGPSData + " isGeneralData " + isGeneralData + " isElectricData " + isElectricData);
 
 								//skip last log count - 6 logs for speed up right after sensor switch
 								int skipCount = 0;
@@ -499,25 +493,29 @@ public class HoTTbinReader2 extends HoTTbinReader {
 								case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 									skipCount = lastLogCountVario - 3;
 									logCountVario = skipCount;
-									HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountVario = " + lastLogCountVario);
+									if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+										HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountVario = " + lastLogCountVario);
 									break;
 								case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 								case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 									skipCount = lastLogCountGPS - 4;
 									logCountGPS = skipCount;
-									HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountGPS = " + lastLogCountGPS);
+									if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+										HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountGPS = " + lastLogCountGPS);
 									break;
 								case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 								case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 									skipCount = lastLogCountGeneral - 5;
 									logCountGeneral = skipCount;
-									HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountGeneral = " + lastLogCountGeneral);
+									if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+										HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountGeneral = " + lastLogCountGeneral);
 									break;
 								case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 								case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 									skipCount = lastLogCountElectric - 5;
 									logCountElectric = skipCount;
-									HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountElectric = " + lastLogCountElectric);
+									if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+										HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountElectric = " + lastLogCountElectric);
 									break;
 								}
 								if (skipCount > 0) {
@@ -544,7 +542,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 								lastLogCountElectric = logCountElectric;
 								break;
 							}
-							HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS + " logCountGeneral = " + logCountGeneral + " logCountElectric = " + logCountElectric);
+							if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+								HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS + " logCountGeneral = " + logCountGeneral + " logCountElectric = " + logCountElectric);
 							lastSensor = actualSensor;
 							logCountVario = logCountGPS = logCountGeneral = logCountElectric = 0;
 						}
@@ -764,7 +763,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			_points[14] = DataParser.parse2Short(_buf1, 4) * 1000;
 			
 			tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
-			tmpLatitude = _buf1[6] == 1 ? -1 * tmpLatitude : tmpLatitude;
+			if (!HoTTAdapter.isTolerateSignChangeLatitude) tmpLatitude = _buf1[6] == 1 ? -1 * tmpLatitude : tmpLatitude;
 			tmpLatitudeDelta = Math.abs(tmpLatitude -_points[12]);
 			latitudeTolerance = (_points[14] / 1000.0)  * (HoTTbinReader2.timeStep_ms - lastLatitudeTimeStep) / HoTTAdapter.latitudeTolranceFactor;
 			latitudeTolerance = latitudeTolerance > 0 ? latitudeTolerance : 5;
@@ -778,7 +777,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			}
 			
 			tmpLongitude = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
-			tmpLongitude = _buf2[1] == 1 ? -1 * tmpLongitude : tmpLongitude;
+			if (!HoTTAdapter.isTolerateSignChangeLongitude) tmpLongitude = _buf2[1] == 1 ? -1 * tmpLongitude : tmpLongitude;
 			tmpLongitudeDelta = Math.abs(tmpLongitude -_points[13]);
 			longitudeTolerance = (_points[14] / 1000.0)  * (HoTTbinReader2.timeStep_ms - lastLongitudeTimeStep) / HoTTAdapter.longitudeTolranceFactor;
 			longitudeTolerance = longitudeTolerance > 0 ? longitudeTolerance : 5;

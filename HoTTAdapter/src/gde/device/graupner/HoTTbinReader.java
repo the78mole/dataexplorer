@@ -22,8 +22,6 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
-import gde.device.ChannelPropertyTypes;
-import gde.device.MeasurementPropertyTypes;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
 import gde.log.Level;
@@ -224,9 +222,6 @@ public class HoTTbinReader {
 		String recordSetNameExtend = getRecordSetExtend(file);	
 		Channel channel = null;
 		boolean isInitialSwitched = false;
-		HoTTAdapter.isFilterEnabled = device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null ? Boolean.parseBoolean(device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
-		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 90.0;
-		HoTTAdapter.longitudeTolranceFactor = device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 25.0;
 		HoTTbinReader.recordSetReceiver = null; //0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader.recordSetGeneral = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
@@ -277,10 +272,11 @@ public class HoTTbinReader {
 			//read all the data blocks from the file and parse
 			for (int i = 0; i < numberDatablocks; i++) {
 				data_in.read(HoTTbinReader.buf);
-				if (HoTTbinReader.log.isLoggable(Level.FINER) && i % 10 == 0) {
+				if (HoTTbinReader.log.isLoggable(Level.FINE) && i % 10 == 0)
 					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
-				}
-				HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
+			
+				if (HoTTbinReader.log.isLoggable(Level.FINER))
+					HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 
 				if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //skip empty block - package loss
 					//create and fill sensor specific data record sets 
@@ -593,9 +589,6 @@ public class HoTTbinReader {
 		String recordSetNameExtend = getRecordSetExtend(file);	
 		Channel channel = null;
 		boolean isInitialSwitched = false;
-		HoTTAdapter.isFilterEnabled = device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null ? Boolean.parseBoolean(device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
-		HoTTAdapter.latitudeTolranceFactor = device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 90.0;
-		HoTTAdapter.longitudeTolranceFactor = device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 25.0;
 		HoTTbinReader.recordSetReceiver = null; //0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		HoTTbinReader.recordSetGeneral = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
@@ -649,8 +642,8 @@ public class HoTTbinReader {
 				data_in.read(HoTTbinReader.buf);
 				if (HoTTbinReader.log.isLoggable(Level.FINEST) && i % 10 == 0) {
 					HoTTbinReader.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
+					HoTTbinReader.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
-				HoTTbinReader.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 
 				if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //skip empty block - package loss
 					//create and fill sensor specific data record sets 
@@ -994,7 +987,8 @@ public class HoTTbinReader {
 	protected static int getSdLogVerion(byte[] _buf1, byte[] _buf2) {
 		//printByteValues(1, _buf1);
 		//printByteValues(2, _buf2);
-		log.log(Level.FINER, "version = " + (((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3));
+		if (HoTTbinReader.log.isLoggable(Level.FINER))
+			log.log(Level.FINER, "version = " + (((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3));
 		return ((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3;
 	}
 
@@ -1018,7 +1012,7 @@ public class HoTTbinReader {
 			_pointsGPS[6] = DataParser.parse2Short(_buf1, 4) * 1000;
 			
 			tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
-			tmpLatitude = _buf1[6] == 1 ? -1 * tmpLatitude : tmpLatitude;
+			if (!HoTTAdapter.isTolerateSignChangeLatitude) tmpLatitude = _buf1[6] == 1 ? -1 * tmpLatitude : tmpLatitude;
 			tmpLatitudeDelta = Math.abs(tmpLatitude -_pointsGPS[1]);
 			latitudeTolerance = _pointsGPS[6] / 1000.0  * (_timeStep_ms - lastLatitudeTimeStep) / HoTTAdapter.latitudeTolranceFactor;
 			latitudeTolerance = latitudeTolerance > 0 ? latitudeTolerance : 5;
@@ -1032,7 +1026,7 @@ public class HoTTbinReader {
 			}
 			
 			tmpLongitude = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
-			tmpLongitude = _buf2[1] == 1 ? -1 * tmpLongitude : tmpLongitude;
+			if (!HoTTAdapter.isTolerateSignChangeLongitude) tmpLongitude = _buf2[1] == 1 ? -1 * tmpLongitude : tmpLongitude;
 			tmpLongitudeDelta = Math.abs(tmpLongitude -_pointsGPS[2]);
 			longitudeTolerance = _pointsGPS[6] / 1000.0  * (_timeStep_ms - lastLongitudeTimeStep) / HoTTAdapter.longitudeTolranceFactor;
 			longitudeTolerance = longitudeTolerance > 0 ? longitudeTolerance : 5;
