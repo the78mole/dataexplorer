@@ -57,40 +57,41 @@ public class JLog2SerialPort extends DeviceCommPort {
 		byte[] data = new byte[] {0x00};
 		byte[] tmpData = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO))];
 		byte[] answer = new byte[] {0x00};
-		byte[] tmpByte = new byte[0];
+		byte[] tmpByte = new byte[1];
 		byte lastByte = 0x00;
 
 		try {
-			
 			answer = new byte[tmpData.length];
-			answer = this.read(answer, 1000, 5);
+			answer = this.read(answer, 1000, 3);
 
 			// synchronize received data to begin of sent data 
 			while (answer[0] != '$') {
-				this.isInSync = false;
-				for (int i = 1; i < answer.length; i++) {
-					if (answer[i] == '$') {
-						System.arraycopy(answer, i, tmpData, 0, answer.length - i);
+//				this.isInSync = false;
+//				for (int i = 1; i < answer.length; i++) {
+//					if (answer[i] == '$') {
+//						System.arraycopy(answer, i, tmpData, 0, answer.length - i);
+//
+//						//check if ending is contained in answer already
+//						int arrayLength = getArrayLengthByCheckEnding(answer);
+//						if (arrayLength < i + 15) {
+//							//answer is incomplete 
+//							while ((this.read(tmpByte, 100)).length > 0) {
+//								tmpData[++i] = tmpByte[0];
+//								if (tmpByte[0] == 0x0A && lastByte == 0x0D) break;
+//								lastByte = tmpByte[0];
+//							}
+//						}
+//
+//						this.isInSync = true;
+//						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+//						break; //sync
+//					}
+//				}
+//				if (this.isInSync) break;
 
-						//check if ending is contained in answer already
-						int arrayLength = getArrayLengthByCheckEnding(answer);
-						if (arrayLength < i + 15) {
-							//answer is incomplete 
-							while ((this.read(tmpByte, 100)).length > 0) {
-								tmpData[++i] = tmpByte[0];
-								if (tmpByte[0] == 0x0A && lastByte == 0x0D) break;
-								lastByte = tmpByte[0];
-							}
-						}
-
-						this.isInSync = true;
-						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
-						break; //sync
-					}
-				}
-				if (this.isInSync) break;
-
+				if (this.isInterruptedByUser) return tmpData;
 				//re-read data
+				this.cleanInputStream();
 				tmpData = getData();
 			}
 			if (answer[0] == '$') System.arraycopy(answer, 0, tmpData, 0, answer.length);
