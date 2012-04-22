@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 2.97 - xx yyy 2012
+Version 3.00 - 23 Apr 2012
 reduce scan depth while searching files and directories
 update CSV data parser
 UniLog2 - fix error restart live gathering not possible if stopped while dialog is closed

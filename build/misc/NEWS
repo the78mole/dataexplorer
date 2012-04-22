@@ -1,15 +1,23 @@
-GNU DataExplorer - News - comes with version 2.96
+GNU DataExplorer - News - comes with version 3.00
 
-1) VC8x0 - add warning message while error limit is reached. 
-2) VC8x0 - refine timeout error handling
-3) HottAdapter - General-Air-Sensor 115200 protocol, fix several errors in value display
-4) HottAdapter - correct sign of dBm gauge values
-5) HottAdapter - refine sensor detection while slave modus
-6) HottAdapter - refine binary log version detection
-7) HoTTAdapter2 - have all possible sensor values on identical time line
-8) UniLog2 - make live data gathering more robust
-9) update Linux cp210x kernel module for kernel 3.0.0.16 
-10)Documentation update
+1) reduce scan depth while searching files and directories, OutOfMemory with recursive created directories by Wine
+2) update CSV data parser
+3) UniLog2 - fix error restart live gathering not possible if stopped while dialog is closed
+4) HottAdapter2 - fix GPS data detection to enable Google Earth visualization
+5) HottAdapter(2) - fix Receiver detection and add data error correction 
+6) HottAdapter(2) - add filter to filter Latitude/Longitude spikes, adjustable through device configuration filter_factor
+7) UniLog2 - live data gathering keep already gathered data in case of an error
+8) UniLog2 - live data gathering enable loop to reset live gathering
+9) Multiplex FlightRecorder support
+10)SM Modellbau JLog2 support
+11)fix error cut curves with constant time step
+12)fix error open help dialog Linux
+13)update device properties schema to enable extended configuration
+14)update device properties editor to reflect schema updates
+15)UltraDuoPlus 50 - fix error to enable curve recording
+16)UltraDuoPlus 50 - enable dialog to manage battery memory and retrieve battery history 
+17)SWT update to 7.2.2 final
+18)update documentation
 
 
 
