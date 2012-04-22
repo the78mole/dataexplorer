@@ -175,7 +175,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Tolerance factor - as higher the value as higher the filter effect" type="Double" value="90.0" name="filter_factor"/>
+                <property description="Filter factor - as higher the value as higher the filter effect" type="Double" value="90.0" name="filter_factor"/>
             </Measurement>
             <Measurement>
                 <name>Longitude</name>
@@ -183,7 +183,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Tolerance factor - as higher the value as higher the filter effect" type="Double" value="25.0" name="filter_factor"/>
+                <property description="Filter factor - as higher the value as higher the filter effect" type="Double" value="25.0" name="filter_factor"/>
             </Measurement>
             <Measurement>
                 <name>Height</name>

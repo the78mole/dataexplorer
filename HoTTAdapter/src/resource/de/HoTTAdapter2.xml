@@ -584,7 +584,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Toleranzfaktor - höherer Wert, stärkerer Filter" type="Double" value="90.0" name="factor"/>
+                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="90.0" name="filter_factor"/>
             </Measurement>
             <Measurement>
                 <name>Längengrad</name>
@@ -592,7 +592,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Toleranzfaktor - höherer Wert, stärkerer Filter" type="Double" value="25.0" name="factor"/>
+                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="25.0" name="filter_factor"/>
             </Measurement>
             <Measurement>
                 <name>Geschwindigkeit</name>
@@ -1035,7 +1035,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Toleranzfaktor - höherer Wert, stärkerer Filter" type="Double" value="90.0" name="factor"/>
+                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="90.0" name="filter_factor"/>
             </Measurement>
             <Measurement>
                 <name>Längengrad</name>
@@ -1043,7 +1043,7 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Toleranzfaktor - höherer Wert, stärkerer Filter" type="Double" value="25.0" name="factor"/>
+                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="25.0" name="filter_factor"/>
             </Measurement>
             <Measurement>
                 <name>Geschwindigkeit</name>
