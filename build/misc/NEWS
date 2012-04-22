@@ -17,7 +17,8 @@ GNU DataExplorer - News - comes with version 3.00
 15)UltraDuoPlus 50 - fix error to enable curve recording
 16)UltraDuoPlus 50 - enable dialog to manage battery memory and retrieve battery history 
 17)SWT update to 7.2.2 final
-18)update documentation
+18)update Linux cp210x kernel module for kernel 3.0.0.17
+19)update documentation
 
 
 
