@@ -132,6 +132,13 @@ public class DeviceCommPort implements IDeviceCommPort {
 	}
 
 	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceCommPort#read(byte[], int, int)
+	 */
+	public byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex, int minCountBytes) throws IOException, TimeOutException {
+		return this.port.read(readBuffer, timeout_msec, stableIndex, minCountBytes);
+	}
+
+	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#read(byte[], int, java.util.Vector)
 	 */
 	public byte[] read(byte[] readBuffer, int timeout_msec, Vector<Long> waitTimes) throws IOException, TimeOutException {
@@ -178,6 +185,13 @@ public class DeviceCommPort implements IDeviceCommPort {
 	 */
 	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex) throws InterruptedException, TimeOutException, IOException {
 		return this.port.waitForStableReceiveBuffer(expectedBytes, timeout_msec, stableIndex);
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.serial.IDeviceCommPort#waitForStableReceiveBuffer(int, int, int)
+	 */
+	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex, int minCount) throws InterruptedException, TimeOutException, IOException {
+		return this.port.waitForStableReceiveBuffer(expectedBytes, timeout_msec, stableIndex, minCount);
 	}
 
 	/* (non-Javadoc)

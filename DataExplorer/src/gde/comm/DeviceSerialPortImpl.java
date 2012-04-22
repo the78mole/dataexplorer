@@ -672,7 +672,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 
 	/**
 	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
-	 * if the readBuffer kan not be filled a stable counter will be active where a number of retries can be specified
+	 * if the readBuffer can not be filled a stable counter will be active where a number of retries can be specified
 	 * @param readBuffer with the size expected bytes
 	 * @param timeout_msec
 	 * @param stableIndex a number of cycles to treat as telegram transmission finished
@@ -694,6 +694,74 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			if (this.application != null) this.application.setSerialRxOn();
 
 			expectedBytes = waitForStableReceiveBuffer(expectedBytes, timeout_msec, stableIndex);
+
+			while (readBytes < expectedBytes && timeOutCounter-- > 0) {
+				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, expectedBytes - readBytes);
+
+				if (expectedBytes != readBytes) {
+					WaitTimer.delay(sleepTime);
+				}
+			}
+			//this.dataAvailable = false;
+			if (timeOutCounter <= 0) {
+				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { expectedBytes, timeout_msec }));
+				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
+				throw e;
+			}
+
+			// resize the data buffer to real red data 
+			if (readBytes < readBuffer.length) {
+				byte[] tmpBuffer = new byte[readBytes];
+				System.arraycopy(readBuffer, 0, tmpBuffer, 0, readBytes);
+				readBuffer = tmpBuffer;
+			}
+
+			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
+
+		}
+		catch (IndexOutOfBoundsException e) {
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			throw e;
+		}
+		catch (IOException e) {
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			throw e;
+		}
+		catch (InterruptedException e) {
+			log.logp(Level.WARNING, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+		}
+		finally {
+			if (this.application != null) this.application.setSerialRxOff();
+		}
+		return readBuffer;
+	}
+
+	/**
+	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
+	 * if the readBuffer can not be filled a stable counter will be active where a number of retries can be specified
+	 * @param readBuffer with the size expected bytes
+	 * @param timeout_msec
+	 * @param stableIndex a number of cycles to treat as telegram transmission finished
+	 * @param minCountBytes minimum count of bytes to be received, even if stable
+	 * @return the reference of the given byte array, byte array might be adapted to received size
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex, int minCountBytes) throws IOException, TimeOutException {
+		final String $METHOD_NAME = "read"; //$NON-NLS-1$
+		int sleepTime = 4; // ms
+		int expectedBytes = readBuffer.length;
+		int readBytes = 0;
+		int timeOutCounter = timeout_msec / sleepTime;
+		if (stableIndex >= timeOutCounter) {
+			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGE0013));
+		}
+
+		try {
+			if (this.application != null) this.application.setSerialRxOn();
+
+			expectedBytes = waitForStableReceiveBuffer(expectedBytes, timeout_msec, stableIndex, minCountBytes);
 
 			while (readBytes < expectedBytes && timeOutCounter-- > 0) {
 				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, expectedBytes - readBytes);
@@ -761,6 +829,54 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			WaitTimer.delay(sleepTime);
 
 			if (byteCounter == (numBytesAvailable = this.inputStream.available()) && byteCounter > 0) {
+				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "stableCounter = " + stableCounter + " byteCounter = " + byteCounter); //$NON-NLS-1$ //$NON-NLS-2$
+				--stableCounter;
+			}
+			else 
+				stableCounter = stableIndex;
+
+			if (stableCounter == 0) isStable = true;
+
+			byteCounter = numBytesAvailable;
+
+			--timeOutCounter;
+
+			if (timeOutCounter == 0) {
+				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { expectedBytes, timeout_msec }));
+				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				throw e;
+			}
+
+		} // end while
+		log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "byteCounter = " + byteCounter + " timeOutCounter = " + timeOutCounter); //$NON-NLS-1$ //$NON-NLS-2$
+		return byteCounter;
+	}
+
+	/**
+	 * waits until receive buffer is filled with number of expected bytes or does not change anymore in stableIndex cycles * 10 msec
+	 * @param expectedBytes
+	 * @param timeout_msec in milli seconds, this is the maximum time this process will wait for stable byte count or maxBytes
+	 * @param stableIndex cycle count times 10 msec to be treat as stable
+	 * @param minCount minimum number of bytes, even if stable
+	 * @return number of bytes in receive buffer
+	 * @throws InterruptedException 
+	 * @throws TimeOutException 
+	 * @throws IOException 
+	 */
+	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex, int minCount) throws InterruptedException, TimeOutException, IOException {
+		final String $METHOD_NAME = "waitForStableReceiveBuffer"; //$NON-NLS-1$
+		int sleepTime = 1; // ms
+		int timeOutCounter = timeout_msec / sleepTime;
+		int stableCounter = stableIndex;
+		boolean isStable = false;
+		boolean isTimedOut = false;
+
+		// availableBytes are updated by event handler
+		int byteCounter = 0, numBytesAvailable = 0;
+		while (byteCounter < expectedBytes && !isStable && !isTimedOut) {
+			WaitTimer.delay(sleepTime);
+
+			if (byteCounter == (numBytesAvailable = this.inputStream.available()) && byteCounter > minCount) {
 				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "stableCounter = " + stableCounter + " byteCounter = " + byteCounter); //$NON-NLS-1$ //$NON-NLS-2$
 				--stableCounter;
 			}

@@ -81,6 +81,19 @@ public interface IDeviceCommPort {
 
 	/**
 	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
+	 * if the readBuffer can not be filled a stable counter will be active where a number of retries can be specified
+	 * @param readBuffer with the size expected bytes
+	 * @param timeout_msec
+	 * @param stableIndex a number of cycles to treat as telegram transmission finished
+	 * @param minCountBytes minimum count of bytes to be received, even if stable
+	 * @return the reference of the given byte array, byte array might be adapted to received size
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex, int minCountBytes) throws IOException, TimeOutException;
+
+	/**
+	 * read number of given bytes by the length of the referenced read buffer in a given time frame defined by time out value
 	 * the reference to the wait time vector will add the actual wait time to have the read buffer ready to read the given number of bytes
 	 * @param readBuffer
 	 * @param timeout_msec
@@ -145,6 +158,19 @@ public interface IDeviceCommPort {
 	 * @throws IOException 
 	 */
 	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex) throws InterruptedException, TimeOutException, IOException;
+
+	/**
+	 * waits until receive buffer is filled with number of expected bytes or does not change anymore in stableIndex cycles * 10 msec
+	 * @param expectedBytes
+	 * @param timeout_msec in milli seconds, this is the maximum time this process will wait for stable byte count or maxBytes
+	 * @param stableIndex cycle count times 10 msec to be treat as stable
+	 * @param minCount minimum number of bytes, even if stable
+	 * @return number of bytes in receive buffer
+	 * @throws InterruptedException 
+	 * @throws TimeOutException 
+	 * @throws IOException 
+	 */
+	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex, int minCount) throws InterruptedException, TimeOutException, IOException;
 
 	/**
 	 * query if the port is already open

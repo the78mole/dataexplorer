@@ -567,4 +567,16 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		log.log(Level.TIME, "sleepTime : " + sleepTime + " ms");
 		return sleepTime;
 	}
+
+	@Override
+	public byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex, int minCountBytes) throws IOException, TimeOutException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex, int minCount) throws InterruptedException, TimeOutException, IOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
