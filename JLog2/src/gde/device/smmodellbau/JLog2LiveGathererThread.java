@@ -49,6 +49,7 @@ public class JLog2LiveGathererThread extends Thread {
 	final Channels				channels;
 	final Channel					channel;
 	final int							channelNumber;
+	final JLog2Dialog			dialog;
 
 	String								recordSetKey			= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 
@@ -58,7 +59,7 @@ public class JLog2LiveGathererThread extends Thread {
 	 * @throws ApplicationConfigurationException 
 	 * @throws Exception 
 	 */
-	public JLog2LiveGathererThread(DataExplorer currentApplication, JLog2 useDevice, JLog2SerialPort useSerialPort, int channelConfigNumber) throws ApplicationConfigurationException {
+	public JLog2LiveGathererThread(DataExplorer currentApplication, JLog2 useDevice, JLog2SerialPort useSerialPort, int channelConfigNumber, JLog2Dialog useDialog) throws ApplicationConfigurationException {
 		super("dataGatherer"); //$NON-NLS-1$
 		this.application = currentApplication;
 		this.device = useDevice;
@@ -66,6 +67,7 @@ public class JLog2LiveGathererThread extends Thread {
 		this.channels = Channels.getInstance();
 		this.channelNumber = channelConfigNumber;
 		this.channel = this.channels.get(this.channelNumber);
+		this.dialog = useDialog;
 
 		this.setPriority(Thread.MAX_PRIORITY);
 	}
@@ -146,6 +148,9 @@ public class JLog2LiveGathererThread extends Thread {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					JLog2LiveGathererThread.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2804), Messages.getString(MessageIds.GDE_MSGT2804));
+					if (JLog2LiveGathererThread.this.dialog != null && !JLog2LiveGathererThread.this.dialog.isDisposed()) {
+						JLog2LiveGathererThread.this.dialog.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2805));
+					}
 				}
 			});
 			this.application.setStatusMessage(""); //$NON-NLS-1$

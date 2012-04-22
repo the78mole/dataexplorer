@@ -62,7 +62,7 @@ public class JLog2SerialPort extends DeviceCommPort {
 
 		try {
 			answer = new byte[tmpData.length];
-			answer = this.read(answer, 1000, 5);
+			answer = this.read(answer, 1000, 10, tmpData.length/3);
 
 			// synchronize received data to begin of sent data 
 			while (answer[0] != '$') {

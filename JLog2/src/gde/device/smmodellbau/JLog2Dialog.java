@@ -278,7 +278,7 @@ public class JLog2Dialog extends DeviceDialog {
 								if (JLog2Dialog.this.liveThread == null || !JLog2Dialog.this.serialPort.isConnected()) {
 									try {
 										JLog2Dialog.this.liveThread = new JLog2LiveGathererThread(JLog2Dialog.this.application, JLog2Dialog.this.device, JLog2Dialog.this.serialPort, JLog2Dialog.this.application
-												.getActiveChannelNumber());
+												.getActiveChannelNumber(), JLog2Dialog.this);
 										try {
 											JLog2Dialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2806), Messages.getString(MessageIds.GDE_MSGT2806));
 											JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2806));
