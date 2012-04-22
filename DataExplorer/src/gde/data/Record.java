@@ -944,10 +944,7 @@ public class Record extends Vector<Integer> {
 		}
 		//log.log(Level.INFO, "index=" + index);
 		if (elementCount != 0) {
-			if (this.device.isFilterEnabled()){
-				this.device.getFilteredPoint(this.parent.parent.number, this, index);
-			}
-			else if (!this.parent.isCompareSet && this.parent.isSmoothAtCurrentDrop) {
+			if (!this.parent.isCompareSet && this.parent.isSmoothAtCurrentDrop) {
 				for (Integer[] dropArea :  this.parent.currentDropShadow) {
 					if (dropArea[0] <= index && dropArea[1] >= index) {
 						int dropStartValue = super.get(dropArea[0]);
