@@ -62,7 +62,7 @@ public class JLog2SerialPort extends DeviceCommPort {
 
 		try {
 			answer = new byte[tmpData.length];
-			answer = this.read(answer, 1000, 3);
+			answer = this.read(answer, 1000, 5);
 
 			// synchronize received data to begin of sent data 
 			while (answer[0] != '$') {
@@ -94,7 +94,8 @@ public class JLog2SerialPort extends DeviceCommPort {
 				this.cleanInputStream();
 				tmpData = getData();
 			}
-			if (answer[0] == '$') System.arraycopy(answer, 0, tmpData, 0, answer.length);
+			//data in sync now
+			System.arraycopy(answer, 0, tmpData, 0, answer.length);
 			data = new byte[getArrayLengthByCheckEnding(tmpData)];
 			System.arraycopy(tmpData, 0, data, 0, data.length);
 
