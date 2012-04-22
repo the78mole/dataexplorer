@@ -41,7 +41,7 @@ public class GPSHelper {
 	 * @param recordOrdinalLongitude
 	 * @return
 	 */
-	public static int getStartIndexGPS(RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude) {
+	public static synchronized int getStartIndexGPS(RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude) {
 		int startIndexGPS = -1;
 		//input records
 		Record recordLatitude = recordSet.get(recordOrdinalLatitude);
@@ -77,7 +77,7 @@ public class GPSHelper {
 	 * @param recordOrdinalAzimuth - output, depends on input latitude, longitude (will be smoothed to make somehow interpretable)
 	 * @param recordOrdinalDirectionStart - output, depends on input latitude, longitude 
 	 */
-	public static void calculateValues(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude, int recordOrdinalAltitude, int startAltitude,
+	public static synchronized void calculateValues(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude, int recordOrdinalAltitude, int startAltitude,
 			int recordOrdinalTripLength, int recordOrdinalDistance, int recordOrdinalAzimuth, int recordOrdinalDirectionStart) {
 		double lastTripLength = 0;
 		long startTime = new Date().getTime();
@@ -222,7 +222,7 @@ public class GPSHelper {
 	 * @param recordOrdinalDistance - input, needed to start of movement 
 	 * @param recordOrdinalTripLength - output, depends on input latitude, longitude and altitude
 	 */
-	public static void calculateTripLength(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude, int recordOrdinalAltitude, int startAltitude,
+	public static synchronized void calculateTripLength(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude, int recordOrdinalAltitude, int startAltitude,
 			int recordOrdinalDistance, int recordOrdinalTripLength) {
 		double lastTripLength = 0;
 		long startTime = new Date().getTime();
@@ -328,7 +328,7 @@ public class GPSHelper {
 	 * @param recordOrdinalAltitude
 	 * @return
 	 */
-	public static Vector<Integer> calculateAzimuth(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude, int recordOrdinalAltitude ) {
+	public static synchronized Vector<Integer> calculateAzimuth(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude, int recordOrdinalAltitude ) {
 		Vector<Integer> recordAzimuth = new Vector<Integer>();
 		long startTime = new Date().getTime();
 		

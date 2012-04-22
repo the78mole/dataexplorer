@@ -1054,9 +1054,11 @@ public class CurveSelectorContextMenu {
 										+ compareSet.getFirstRecordName() }));
 								return;
 							}
-							// while adding a new curve to compare set - reset the zoom mode
-							CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
-
+							if (compareSet.size() > 0) {
+								// while adding a new curve to compare set - reset the zoom mode
+								CurveSelectorContextMenu.this.application.setCompareWindowGraphicsMode(GraphicsComposite.MODE_RESET, false);
+							}
+							
 							String newRecordkey = copyFromRecordKey + GDE.STRING_UNDER_BAR + compareSet.size();
 							Record newRecord = compareSet.put(newRecordkey, copyFromRecord.clone()); // will delete channelConfigKey
 							newRecord.setDescription(copyFromRecordSet.getRecordSetDescription());
