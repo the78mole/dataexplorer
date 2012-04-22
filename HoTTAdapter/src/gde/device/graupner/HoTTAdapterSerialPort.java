@@ -64,7 +64,6 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static int			xferErrorLimit							= 1000;
 	boolean								isQueryRetry								= false;
 
-	boolean								isInterruptedByUser					= false;
 	HoTTAdapter.Protocol	protocolType								= HoTTAdapter.Protocol.TYPE_19200_V4;
 
 	/**

@@ -25,8 +25,10 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.device.ChannelPropertyTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
@@ -139,9 +141,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final HoTTAdapterDialog			dialog;
 	final HoTTAdapterSerialPort	serialPort;
 
-	static boolean							isFilterEnabled					= true;
-	static double								latitudeTolranceFactor	= 90.0;
-	static double								longitudeTolranceFactor	= 25.0;
+	static boolean							isFilterEnabled								= true;
+	static boolean							isTolerateSignChangeLatitude	= false;
+	static boolean							isTolerateSignChangeLongitude	= false;
+	static double								latitudeTolranceFactor				= 90.0;
+	static double								longitudeTolranceFactor				= 25.0;
 	
 	/**
 	 * constructor using properties file
@@ -162,6 +166,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
+		
+		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
+		HoTTAdapter.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
+		HoTTAdapter.latitudeTolranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 90.0;
+		HoTTAdapter.longitudeTolranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 25.0;
 	}
 
 	/**
@@ -182,6 +192,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
+		
+		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
+		HoTTAdapter.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
+		HoTTAdapter.latitudeTolranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 90.0;
+		HoTTAdapter.longitudeTolranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.name()).toString()) : 25.0;
 	}
 
 	/**
@@ -1094,4 +1110,22 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		return 6;
 	}
+	
+	/**
+	 * get the curve point device individual filtered if required
+	 */
+	@Override
+	public Integer getFilteredPoint(int channelNumber, Record record, int index) {
+		switch (channelNumber) {
+		case 3: //GPS
+			 switch (record.getOrdinal()) {
+			 case 1: //Latitude
+				 return record.realGet(index);
+			 case 2: //Longitude
+				 return record.realGet(index);
+			 }			
+		}
+		return record.realGet(index);
+	}
+
 }
