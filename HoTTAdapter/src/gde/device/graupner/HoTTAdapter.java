@@ -1111,6 +1111,16 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		return 6;
 	}
 	
+	
+	/**
+	 * query the channel property of type getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER)
+	 * @return true if curve point should be filtered
+	 */
+	@Override
+	public boolean isFilterEnabled() {
+		return HoTTAdapter.isFilterEnabled;
+	}
+
 	/**
 	 * get the curve point device individual filtered if required
 	 */

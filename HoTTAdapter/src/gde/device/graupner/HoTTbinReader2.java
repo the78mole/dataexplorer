@@ -379,7 +379,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader2.buf3 = new byte[30];
 		HoTTbinReader2.buf4 = new byte[30];
 		byte actualSensor = -1, lastSensor = -1;
-		int lastLogCountVario = 0, lastLogCountGPS = 0, lastLogCountGeneral = 0, lastLogCountElectric = 0, logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0;
+//		int lastLogCountVario = 0, lastLogCountGPS = 0, lastLogCountGeneral = 0, lastLogCountElectric = 0;
+		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader2.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -419,161 +420,156 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						HoTTbinReader2.logger.logp(Level.FINEST, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader2.buf[7] }, 1)
 								+ GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader2.buf[7], false));
 
-					if (HoTTbinReader2.buf[38] != 0) { //receiver RF_RXSQ
-						//fill receiver data
-						if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0 && HoTTbinReader2.timeStep_ms % 10 == 0) {
-							parseReceiver(HoTTbinReader2.recordSet, HoTTbinReader2.points, HoTTbinReader2.buf);
-							isReceiverData = true;
-						}
+					//fill receiver data
+					if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0 && HoTTbinReader2.timeStep_ms % 10 == 0) {
+						parseReceiver(HoTTbinReader2.recordSet, HoTTbinReader2.points, HoTTbinReader2.buf);
+						isReceiverData = true;
+					}
 
-						if (actualSensor == -1)
-							lastSensor = actualSensor = (byte) (HoTTbinReader2.buf[7] & 0xFF);
-						else
-							actualSensor = (byte) (HoTTbinReader2.buf[7] & 0xFF);
+					if (actualSensor == -1)
+						lastSensor = actualSensor = (byte) (HoTTbinReader2.buf[7] & 0xFF);
+					else
+						actualSensor = (byte) (HoTTbinReader2.buf[7] & 0xFF);
 
-						if (actualSensor != lastSensor) {
-							if (logCountVario > 3 || logCountGPS > 4 || logCountGeneral > 5 || logCountElectric > 5) {
-								switch (lastSensor) {
-								case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
-								case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-									++logCountVario;
-									if (isVarioData && isReceiverData) {
-										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
-										//System.out.println("isVarioData i = " + i);
-										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
-									}
-									parseVario(HoTTbinReader2.recordSet, HoTTbinReader2.pointsVario, 1, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
-									isVarioData = true;
-									break;
-
-								case HoTTAdapter.SENSOR_TYPE_GPS_115200:
-								case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-									++logCountGPS;
-									if (isGPSData && isReceiverData) {
-										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
-										//System.out.println("isGPSData i = " + i);
-										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
-									}
-									parseGPS(HoTTbinReader2.recordSet, HoTTbinReader2.pointsGPS, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3);
-									isGPSData = true;
-									break;
-
-								case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
-								case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-									++logCountGeneral;
-									if (isGeneralData && isReceiverData) {
-										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
-										//System.out.println("isGeneralData i = " + i);
-										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
-									}
-									parseGeneral(HoTTbinReader2.recordSet, HoTTbinReader2.pointsGeneral, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
-									isGeneralData = true;
-									break;
-
-								case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
-								case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-									++logCountElectric;
-									if (isElectricData && isReceiverData) {
-										migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
-										//System.out.println("isElectricData i = " + i);
-										isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
-									}
-									parseElectric(HoTTbinReader2.recordSet, HoTTbinReader2.pointsElectric, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
-									isElectricData = true;
-									break;
-								}
-								
-								if (HoTTbinReader2.logger.isLoggable(Level.FINE))
-									HoTTbinReader2.logger.log(Level.FINE, "isReceiverData " + isReceiverData + " isVarioData " + isVarioData + " isGPSData " + isGPSData + " isGeneralData " + isGeneralData + " isElectricData " + isElectricData);
-
-								//skip last log count - 6 logs for speed up right after sensor switch
-								int skipCount = 0;
-								switch (actualSensor) {
-								case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
-								case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-									skipCount = lastLogCountVario - 3;
-									logCountVario = skipCount;
-									if (HoTTbinReader2.logger.isLoggable(Level.FINE))
-										HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountVario = " + lastLogCountVario);
-									break;
-								case HoTTAdapter.SENSOR_TYPE_GPS_115200:
-								case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-									skipCount = lastLogCountGPS - 4;
-									logCountGPS = skipCount;
-									if (HoTTbinReader2.logger.isLoggable(Level.FINE))
-										HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountGPS = " + lastLogCountGPS);
-									break;
-								case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
-								case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-									skipCount = lastLogCountGeneral - 5;
-									logCountGeneral = skipCount;
-									if (HoTTbinReader2.logger.isLoggable(Level.FINE))
-										HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountGeneral = " + lastLogCountGeneral);
-									break;
-								case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
-								case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-									skipCount = lastLogCountElectric - 5;
-									logCountElectric = skipCount;
-									if (HoTTbinReader2.logger.isLoggable(Level.FINE))
-										HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountElectric = " + lastLogCountElectric);
-									break;
-								}
-								if (skipCount > 0) {
-									data_in.skip(HoTTbinReader2.dataBlockSize * skipCount);
-									i += skipCount;
-									HoTTbinReader2.timeStep_ms = HoTTbinReader2.timeStep_ms += (skipCount * 10);
-								}
-							}
+					if (actualSensor != lastSensor) {
+						if (logCountVario >= 3 || logCountGPS >= 4 || logCountGeneral >= 5 || logCountElectric >= 5) {
 							switch (lastSensor) {
 							case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 							case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-								lastLogCountVario = logCountVario;
+								if (isVarioData && isReceiverData) {
+									migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
+									//System.out.println("isVarioData i = " + i);
+									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
+								}
+								parseVario(HoTTbinReader2.recordSet, HoTTbinReader2.pointsVario, 1, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
+								isVarioData = true;
 								break;
+
 							case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 							case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-								lastLogCountGPS = logCountGPS;
+								if (isGPSData && isReceiverData) {
+									migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
+									//System.out.println("isGPSData i = " + i);
+									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
+								}
+								parseGPS(HoTTbinReader2.recordSet, HoTTbinReader2.pointsGPS, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3);
+								isGPSData = true;
 								break;
+
 							case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 							case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-								lastLogCountGeneral = logCountGeneral;
+								if (isGeneralData && isReceiverData) {
+									migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
+									//System.out.println("isGeneralData i = " + i);
+									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
+								}
+								parseGeneral(HoTTbinReader2.recordSet, HoTTbinReader2.pointsGeneral, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
+								isGeneralData = true;
 								break;
+
 							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-								lastLogCountElectric = logCountElectric;
+								if (isElectricData && isReceiverData) {
+									migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, HoTTbinReader2.timeStep_ms);
+									//System.out.println("isElectricData i = " + i);
+									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
+								}
+								parseElectric(HoTTbinReader2.recordSet, HoTTbinReader2.pointsElectric, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
+								isElectricData = true;
 								break;
 							}
+							
 							if (HoTTbinReader2.logger.isLoggable(Level.FINE))
-								HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS + " logCountGeneral = " + logCountGeneral + " logCountElectric = " + logCountElectric);
-							lastSensor = actualSensor;
-							logCountVario = logCountGPS = logCountGeneral = logCountElectric = 0;
+								HoTTbinReader2.logger.log(Level.FINE, "isReceiverData " + isReceiverData + " isVarioData " + isVarioData + " isGPSData " + isGPSData + " isGeneralData " + isGeneralData + " isElectricData " + isElectricData);
+
+//							//skip last log count - 6 logs for speed up right after sensor switch
+//							int skipCount = 0;
+//							switch (actualSensor) {
+//							case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
+//							case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+//								skipCount = lastLogCountVario - 3;
+//								logCountVario = skipCount;
+//								if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+//									HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountVario = " + lastLogCountVario);
+//								break;
+//							case HoTTAdapter.SENSOR_TYPE_GPS_115200:
+//							case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+//								skipCount = lastLogCountGPS - 4;
+//								logCountGPS = skipCount;
+//								if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+//									HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountGPS = " + lastLogCountGPS);
+//								break;
+//							case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
+//							case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+//								skipCount = lastLogCountGeneral - 5;
+//								logCountGeneral = skipCount;
+//								if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+//									HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountGeneral = " + lastLogCountGeneral);
+//								break;
+//							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
+//							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+//								skipCount = lastLogCountElectric - 5;
+//								logCountElectric = skipCount;
+//								if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+//									HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "lastLogCountElectric = " + lastLogCountElectric);
+//								break;
+//							}
+//							if (skipCount > 0) {
+//								data_in.skip(HoTTbinReader2.dataBlockSize * skipCount);
+//								i += skipCount;
+//								HoTTbinReader2.timeStep_ms = HoTTbinReader2.timeStep_ms += (skipCount * 10);
+//							}
 						}
-						else {
-							switch (lastSensor) {
-							case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
-							case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-								++logCountVario;
-								break;
-							case HoTTAdapter.SENSOR_TYPE_GPS_115200:
-							case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-								++logCountGPS;
-								break;
-							case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
-							case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-								++logCountGeneral;
-								break;
-							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
-							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-								++logCountElectric;
-								break;
-							}
-						}
-						
-						if (isReceiverData && (logCountVario > 0 || logCountGPS > 0 || logCountGeneral > 0 || logCountElectric > 0)) {
-							recordSet.addPoints(points, HoTTbinReader2.timeStep_ms);
-							//System.out.println("isReceiverData i = " + i);
-							isReceiverData = false;
+//						switch (lastSensor) {
+//						case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
+//						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+//							lastLogCountVario = logCountVario;
+//							break;
+//						case HoTTAdapter.SENSOR_TYPE_GPS_115200:
+//						case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+//							lastLogCountGPS = logCountGPS;
+//							break;
+//						case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
+//						case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+//							lastLogCountGeneral = logCountGeneral;
+//							break;
+//						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
+//						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+//							lastLogCountElectric = logCountElectric;
+//							break;
+//						}
+						if (HoTTbinReader2.logger.isLoggable(Level.FINE))
+							HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS + " logCountGeneral = " + logCountGeneral + " logCountElectric = " + logCountElectric);
+						lastSensor = actualSensor;
+						logCountVario = logCountGPS = logCountGeneral = logCountElectric = 0;
+					}
+					else {
+						switch (lastSensor) {
+						case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
+						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+							++logCountVario;
+							break;
+						case HoTTAdapter.SENSOR_TYPE_GPS_115200:
+						case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+							++logCountGPS;
+							break;
+						case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
+						case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+							++logCountGeneral;
+							break;
+						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
+						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+							++logCountElectric;
+							break;
 						}
 					}
+					
+					if (isReceiverData && (logCountVario > 0 || logCountGPS > 0 || logCountGeneral > 0 || logCountElectric > 0)) {
+						recordSet.addPoints(points, HoTTbinReader2.timeStep_ms);
+						//System.out.println("isReceiverData i = " + i);
+						isReceiverData = false;
+					}
+
 					//fill data block 0 to 4
 					if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 0) != 0) {
 						System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf0, 0, HoTTbinReader2.buf0.length);
