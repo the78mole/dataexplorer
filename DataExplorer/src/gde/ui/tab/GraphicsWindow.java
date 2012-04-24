@@ -287,21 +287,22 @@ public class GraphicsWindow extends CTabItem {
 		return tabContentImage;
 	}
 	
-  ImageData flipHorizontal(ImageData srcData) {
-    int bytesPerPixel = srcData.bytesPerLine / srcData.width;
-    int destBytesPerLine = srcData.width * bytesPerPixel;
-    byte[] newData = new byte[srcData.data.length];
-    for (int srcY = 0; srcY < srcData.height; srcY++) {
-      for (int srcX = 0; srcX < srcData.width; srcX++) {
-        int destX = 0, destY = 0, destIndex = 0, srcIndex = 0;
-        destX = srcX;
-        destY = srcData.height - srcY - 1;       
-        destIndex = (destY * destBytesPerLine) + (destX * bytesPerPixel);
-        srcIndex = (srcY * srcData.bytesPerLine) + (srcX * bytesPerPixel);
-        System.arraycopy(srcData.data, srcIndex, newData, destIndex,  bytesPerPixel);
+  ImageData flipHorizontal(ImageData inputImageData) {
+    int bytesPerPixel = inputImageData.bytesPerLine / inputImageData.width;
+    int destBytesPerLine = inputImageData.width * bytesPerPixel;
+    byte[] outDataBytes = new byte[inputImageData.data.length];
+    int outX = 0, outY = 0, inIndex = 0, outIndex = 0;
+    
+    for (int y = 0; y < inputImageData.height; y++) {
+      for (int x = 0; x < inputImageData.width; x++) {
+        outX = x;
+        outY = inputImageData.height - y - 1;       
+        inIndex = (y * inputImageData.bytesPerLine) + (x * bytesPerPixel);
+        outIndex = (outY * destBytesPerLine) + (outX * bytesPerPixel);
+        System.arraycopy(inputImageData.data, inIndex, outDataBytes, outIndex,  bytesPerPixel);
       }
     }
-    return new ImageData(srcData.width, srcData.height, srcData.depth, srcData.palette, destBytesPerLine, newData);
+    return new ImageData(inputImageData.width, inputImageData.height, inputImageData.depth, inputImageData.palette, destBytesPerLine, outDataBytes);
   }
 
 	
