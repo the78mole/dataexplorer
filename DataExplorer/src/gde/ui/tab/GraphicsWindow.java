@@ -276,8 +276,8 @@ public class GraphicsWindow extends CTabItem {
 		Rectangle bounds = this.graphicSashForm.getClientArea();
 		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
+		this.graphicSashForm.print(imageGC);
 		if (GDE.IS_MAC) {
-			this.graphicSashForm.print(imageGC);
 			Image graphics = this.graphicsComposite.getGraphicsPrintImage();
 			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(this.graphicsComposite.getGraphicsPrintImage().getImageData())), 
 					bounds.width - graphics.getBounds().width, 0);
