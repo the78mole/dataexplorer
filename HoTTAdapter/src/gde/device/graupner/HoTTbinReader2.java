@@ -648,6 +648,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	public static void migrateAddPoints(boolean isVarioData, boolean isGPSData, boolean isGeneralData, boolean isElectricData, long _timeStep_ms) throws DataInconsitsentException {
+		//receiver data gets integrated each cycle 0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
+		//8=Height, 9=Climb 1, 10=Climb 3
+		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 		if (isElectricData) {
 			for (int j = 8; j < 11; j++) {
 				points[j] = pointsElectric[j];
@@ -656,6 +659,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				points[k] = pointsElectric[k];
 			}
 		}
+		//8=Height, 9=Climb 1, 10=Climb 3
+		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
 		if (isGeneralData) {
 			for (int j = 8; j < 11; j++) {
 				points[j] = pointsGeneral[j];
@@ -664,6 +669,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				points[k] = pointsGeneral[k];
 			}
 		}
+		//8=Height, 9=Climb 1, 10=Climb 3
+		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
 		if (isGPSData) {
 			for (int j = 8; j < 11; j++) {
 				points[j] = pointsGPS[j];
@@ -672,7 +679,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				points[k] = pointsGPS[k];
 			}
 		}
-		if (isVarioData) {
+		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+		if (isVarioData && (pointsVario[8] != 0 || pointsVario[9] != 0 || pointsVario[10] != 0 || pointsVario[11] != 0)) {
 			for (int j = 8; j < 12; j++) {
 				points[j] = pointsVario[j];
 			}
