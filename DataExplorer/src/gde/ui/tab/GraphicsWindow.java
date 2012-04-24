@@ -289,7 +289,7 @@ public class GraphicsWindow extends CTabItem {
 	
   ImageData flipHorizontal(ImageData inputImageData) {
     int bytesPerPixel = inputImageData.bytesPerLine / inputImageData.width;
-    int destBytesPerLine = inputImageData.width * bytesPerPixel;
+    int outBytesPerLine = inputImageData.width * bytesPerPixel;
     byte[] outDataBytes = new byte[inputImageData.data.length];
     int outX = 0, outY = 0, inIndex = 0, outIndex = 0;
     
@@ -298,11 +298,11 @@ public class GraphicsWindow extends CTabItem {
         outX = x;
         outY = inputImageData.height - y - 1;       
         inIndex = (y * inputImageData.bytesPerLine) + (x * bytesPerPixel);
-        outIndex = (outY * destBytesPerLine) + (outX * bytesPerPixel);
+        outIndex = (outY * outBytesPerLine) + (outX * bytesPerPixel);
         System.arraycopy(inputImageData.data, inIndex, outDataBytes, outIndex,  bytesPerPixel);
       }
     }
-    return new ImageData(inputImageData.width, inputImageData.height, inputImageData.depth, inputImageData.palette, destBytesPerLine, outDataBytes);
+    return new ImageData(inputImageData.width, inputImageData.height, inputImageData.depth, inputImageData.palette, outBytesPerLine, outDataBytes);
   }
 
 	
