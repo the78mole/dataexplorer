@@ -37,6 +37,7 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 
 /**
@@ -275,13 +276,34 @@ public class GraphicsWindow extends CTabItem {
 		Rectangle bounds = this.graphicSashForm.getClientArea();
 		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
-		this.graphicSashForm.print(imageGC);
-		Image graphics = this.graphicsComposite.getGraphicsPrintImage();
-		imageGC.drawImage(graphics, bounds.width-graphics.getBounds().width, 0);
+		if (GDE.IS_MAC) {
+			this.graphicSashForm.print(imageGC);
+			Image graphics = this.graphicsComposite.getGraphicsPrintImage();
+			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(this.graphicsComposite.getGraphicsPrintImage().getImageData())), 
+					bounds.width - graphics.getBounds().width, 0);
+		}
 		imageGC.dispose();
 
 		return tabContentImage;
 	}
+	
+  ImageData flipHorizontal(ImageData srcData) {
+    int bytesPerPixel = srcData.bytesPerLine / srcData.width;
+    int destBytesPerLine = srcData.width * bytesPerPixel;
+    byte[] newData = new byte[srcData.data.length];
+    for (int srcY = 0; srcY < srcData.height; srcY++) {
+      for (int srcX = 0; srcX < srcData.width; srcX++) {
+        int destX = 0, destY = 0, destIndex = 0, srcIndex = 0;
+        destX = srcX;
+        destY = srcData.height - srcY - 1;       
+        destIndex = (destY * destBytesPerLine) + (destX * bytesPerPixel);
+        srcIndex = (srcY * srcData.bytesPerLine) + (srcX * bytesPerPixel);
+        System.arraycopy(srcData.data, srcIndex, newData, destIndex,  bytesPerPixel);
+      }
+    }
+    return new ImageData(srcData.width, srcData.height, srcData.depth, srcData.palette, destBytesPerLine, newData);
+  }
+
 	
 	/**
 	 * set the curve graphics background color
