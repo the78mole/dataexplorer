@@ -56,10 +56,9 @@ public class CalculationThread extends Thread {
 		log.log(Level.FINE, "start data calculation for record = " + this.recordKey); //$NON-NLS-1$
 		Record record = this.recordSet.get(this.recordKey);
 		// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
-		String[] recordNames = this.recordSet.getRecordNames();
-		if (this.recordKey.equals(recordNames[3])) { // 3=Leistung P[W]=U[V]*I[A]
-			Record recordVoltage = this.recordSet.get(recordNames[0]); // 0=Spannung
-			Record recordCurrent = this.recordSet.get(recordNames[1]); // 1=Strom
+		if (this.recordKey.equals(3)) { // 3=Leistung P[W]=U[V]*I[A]
+			Record recordVoltage = this.recordSet.get(0); // 0=Spannung
+			Record recordCurrent = this.recordSet.get(1); // 1=Strom
 			record.clear();
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(Double.valueOf((recordVoltage.get(i) / 1000.0) * (recordCurrent.get(i) / 1000.0) * 1000).intValue());
@@ -67,9 +66,9 @@ public class CalculationThread extends Thread {
 			}
 			record.setDisplayable(true);
 		}
-		else if (this.recordKey.equals(recordNames[4])) { // 4=Energie E[Wh]=U[V]*I[A]*t[h]=U[V]*C[Ah]
-			Record recordVoltage = this.recordSet.get(recordNames[0]); // 0=Spannung
-			Record recordCharge = this.recordSet.get(recordNames[2]);  // 2=Ladung
+		else if (this.recordKey.equals(4)) { // 4=Energie E[Wh]=U[V]*I[A]*t[h]=U[V]*C[Ah]
+			Record recordVoltage = this.recordSet.get(0); // 0=Spannung
+			Record recordCharge = this.recordSet.get(2);  // 2=Ladung
 			record.clear();
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(Double.valueOf((recordVoltage.get(i) / 1000.0) * (recordCharge.get(i) / 1000.0)).intValue());
@@ -78,7 +77,7 @@ public class CalculationThread extends Thread {
 			record.setDisplayable(true);
 		}
 		else
-			log.log(Level.WARNING, "only supported records are " + recordNames[3] + ", " + recordNames[4]); //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.WARNING, "only supported records are " + this.recordSet.get(3).getName() + ", " + this.recordSet.get(4).getName()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//recordSet.updateDataTable();
 		if (record.isVisible()) this.application.updateGraphicsWindow();

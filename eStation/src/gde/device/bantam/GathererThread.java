@@ -163,9 +163,8 @@ public class GathererThread extends Thread {
 					log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
 					
 					this.numberBatteryCells = 0; //this.device.getNumberOfLithiumXCells(dataBuffer);
-					String[] recordKeys = recordSet.getRecordNames();
 					for (int i = posCells; i < recordSet.size(); i++) {
-						Record record = recordSet.get(recordKeys[i]);
+						Record record = recordSet.get(i);
 						if (record.getRealMinValue() != 0 && record.getRealMaxValue() != 0) {
 							this.numberBatteryCells++;
 							log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -178,7 +177,7 @@ public class GathererThread extends Thread {
 					
 					//switch off single cell voltage lines if no cell voltages is available
 					for (int i = posCells + this.numberBatteryCells - 1; !isConfigUpdated && i < points.length; i++) {
-						Record tmpRecord = recordSet.get(recordKeys[i]);
+						Record tmpRecord = recordSet.get(i);
 						tmpRecord.setActive(false);
 						tmpRecord.setDisplayable(false);
 						tmpRecord.setVisible(false);

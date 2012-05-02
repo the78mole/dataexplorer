@@ -214,7 +214,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-				
+		
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
 		points[0] = Integer.valueOf((((dataBuffer[35] & 0xFF)-0x80)*100 + ((dataBuffer[36] & 0xFF)-0x80))*10);  //35,36   feed-back voltage
 		points[1] = Integer.valueOf((((dataBuffer[33] & 0xFF)-0x80)*100 + ((dataBuffer[34] & 0xFF)-0x80))*10);  //33,34   feed-back current : 0=0.0A,900=9.00A
@@ -358,7 +358,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.getRecordNames().length];
+		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
@@ -424,9 +424,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames(); 
-			for (int j = 0; j < recordNames.length; j++) {
-				Record record = recordSet.get(recordNames[j]);
+			for (int j = 0; j < recordSet.size(); j++) {
+				Record record = recordSet.get(j);
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				if(j > 5 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
@@ -482,7 +481,6 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
-		String[] recordKeys = recordSet.getRecordNames();
 
 		//BC6 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg. 6=Balance
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
@@ -490,16 +488,16 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
 			recordSet.get(recordKey).setActive(true);
 		}
-		for (int i=6; i<recordKeys.length; ++i) {
-				Record record = recordSet.get(recordKeys[i]);
+		for (int i=6; i<recordSet.size(); ++i) {
+				Record record = recordSet.get(i);
 				record.setDisplayable(record.hasReasonableData());
-				log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + record.hasReasonableData());
+				if (log.isLoggable(Level.FINER))
+					log.log(Level.FINER, record.getName() + " setDisplayable=" + record.hasReasonableData());
 		}
 		
 		if (log.isLoggable(Level.FINE)) {
-			for (String recordKey : recordKeys) {
-				Record record = recordSet.get(recordKey);
-				log.log(Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable());
+			for (Record record : recordSet.values()) {
+				log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable());
 			}
 		}
 	}
@@ -517,12 +515,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			try {
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg. 6=Balance (BC6, P6, ..)
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
-				String[] recordNames = recordSet.getRecordNames();
 				int displayableCounter = 0;
 
 				
 				// check if measurements isActive == false and set to isDisplayable == false
-				for (String measurementKey : recordNames) {
+				for (String measurementKey : recordSet.keySet()) {
 					Record record = recordSet.get(measurementKey);
 					
 					if (record.isActive() && (record.getOrdinal() <= 6 || record.hasReasonableData())) {
@@ -530,12 +527,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 					}
 				}
 				
-				String recordKey = recordNames[3]; //3=Leistung
-				Record record = recordSet.get(recordKey);
+				Record record = recordSet.get(3);//3=Leistung
 				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
-					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+					this.calculationThreads.put(record.getName(), new CalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
 					try {
-						this.calculationThreads.get(recordKey).start();
+						this.calculationThreads.get(record.getName()).start();
 					}
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, e.getMessage(), e);
@@ -543,12 +539,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				}
 				++displayableCounter;
 				
-				recordKey = recordNames[4]; //4=Energie
-				record = recordSet.get(recordKey);
+				record = recordSet.get(4);//4=Energie
 				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
-					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+					this.calculationThreads.put(record.getName(), new CalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
 					try {
-						this.calculationThreads.get(recordKey).start();
+						this.calculationThreads.get(record.getName()).start();
 					}
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, e.getMessage(), e);

@@ -28,6 +28,7 @@ import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.exception.DataInconsitsentException;
 import gde.log.Level;
+import gde.utils.StringHelper;
 
 /**
  * eStation BC6 device class
@@ -73,6 +74,8 @@ public class eStationBC6 extends eStation {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
 		
+		log.log(Level.OFF, StringHelper.byte2FourDigitsIntegerString(dataBuffer, (byte)0x80, 1, dataBuffer.length-2));
+		
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg. 6=Balance
 		points[0] = Integer.valueOf((((dataBuffer[35] & 0xFF)-0x80)*100 + ((dataBuffer[36] & 0xFF)-0x80))*10);  //35,36   feed-back voltage
 		points[1] = Integer.valueOf((((dataBuffer[33] & 0xFF)-0x80)*100 + ((dataBuffer[34] & 0xFF)-0x80))*10);  //33,34   feed-back current : 0=0.0A,900=9.00A
@@ -111,7 +114,7 @@ public class eStationBC6 extends eStation {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.getRecordNames().length];
+		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
