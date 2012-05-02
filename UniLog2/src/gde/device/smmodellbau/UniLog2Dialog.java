@@ -525,7 +525,7 @@ public class UniLog2Dialog extends DeviceDialog {
 										if (UniLog2Dialog.this.channels.getActiveChannel() != null) {
 											RecordSet recordSet = UniLog2Dialog.this.channels.getActiveChannel().getActiveRecordSet();
 											if (recordSet != null) {
-												Record record = recordSet.get(recordSet.getRecordNames()[14]);
+												Record record = recordSet.get(14); //14=Efficiency
 												PropertyType property = record.getProperty(UniLog2Dialog.PROP_n100W);
 												if (property != null) {
 													property.setValue(propeller_n100W_Value);

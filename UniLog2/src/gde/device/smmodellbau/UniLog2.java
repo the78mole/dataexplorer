@@ -204,7 +204,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		}
 		catch (Exception e) {
 			String msg = e.getMessage() + Messages.getString(gde.messages.MessageIds.GDE_MSGW0543);
-			log.log(java.util.logging.Level.WARNING, msg, e);
+			log.log(Level.WARNING, msg, e);
 			this.application.openMessageDialog(msg);
 			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);
 		}
@@ -355,10 +355,10 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 						+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
 			}
 		}
-		log.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
+		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
 
 		for (int i = 0; i < recordDataSize; i++) {
-			log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
+			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 
 			//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
@@ -386,9 +386,8 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames();
-			for (int j = 0; j < recordNames.length; j++) {
-				Record record = recordSet.get(recordNames[j]);
+			for (int j = 0; j < recordSet.size(); j++) {
+				Record record = recordSet.get(j);
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
@@ -417,7 +416,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -456,7 +455,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 
 		double newValue = (value - reduction) * factor + offset;
 
-		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -494,7 +493,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 
 		double newValue = (value - offset) / factor + reduction;
 
-		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -516,32 +515,31 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
 		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
-		String[] recordNames = recordSet.getRecordNames();
 		// check if measurements isActive == false and set to isDisplayable == false
-		for (int i = 0; i < recordNames.length; ++i) {
+		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
-			record = recordSet.get(recordNames[i]);
+			record = recordSet.get(i);
 			measurement = this.getMeasurement(channelConfigNumber, i);
-			log.log(java.util.logging.Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
+			log.log(Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
 			if (record.isActive() != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
-				log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-				log.log(java.util.logging.Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ 
+				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
-				log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
-		log.log(java.util.logging.Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		log.log(Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 	}
 
@@ -554,24 +552,20 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//do not forget to make record displayable -> record.setDisplayable(true);
 		// calculate the values required
-		Record record;
-		String recordKey;
 		//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
 		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 		//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
 		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-		String[] measurements = recordSet.getRecordNames();
 		
-		recordKey = measurements[14]; // 14=efficiency
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "start data calculation for record = " + recordKey); //$NON-NLS-1$
-		record = recordSet.get(recordKey);
-		Record recordRevolution = recordSet.get(measurements[13]); // 13=revolution
-		Record recordPower = recordSet.get(measurements[4]); // 4=Power [w]
+		Record record = recordSet.get(14); // 14=efficiency
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "start data calculation for record = " + record.getName()); //$NON-NLS-1$
+		Record recordRevolution = recordSet.get(13); // 13=revolution
+		Record recordPower = recordSet.get(4); // 4=Power [w]
 		PropertyType property = record.getProperty(MeasurementPropertyTypes.PROP_N_100_W.value());
 		int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
 		property = recordRevolution.getProperty(MeasurementPropertyTypes.NUMBER_MOTOR.value());
 		double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
-		Record recordCurrent = recordSet.get(measurements[2]); // 2=Current
+		Record recordCurrent = recordSet.get(2); // 2=Current
 		for (int i = 0; i < recordRevolution.size(); i++) {
 			if (i > 1 && recordRevolution.get(i)> 100000 && recordCurrent.get(i) > 3000) { //100 1/min && 3A
 				double motorPower = Math.pow(((recordRevolution.get(i) / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
@@ -647,7 +641,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 						}
 						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_TXT;
 					}
-					log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+					log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 					if (fd.getFileName().length() > 4) {
 						Integer channelConfigNumber = UniLog2.this.application.getActiveChannelNumber();
@@ -657,7 +651,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 							NMEAReaderWriter.read(selectedImportFile, UniLog2.this, recordNameExtend, channelConfigNumber);
 						}
 						catch (Exception e) {
-							log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+							log.log(Level.WARNING, e.getMessage(), e);
 						}
 					}
 				}
@@ -692,7 +686,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2550));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					log.log(Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					open_closeCommPort();
 				}
 			});
