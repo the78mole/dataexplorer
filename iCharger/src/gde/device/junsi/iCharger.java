@@ -194,9 +194,8 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 		//0=VersorgungsSpg. 1=Spannung 2=Strom 3=Ladung 4=Leistung 5=Energie 6=Temp.intern 7=Temp.extern 8=Balance
 		//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10
 		try {
-			String[] recordNames = recordSet.getRecordNames(); 
-			for (int j = 0; j < recordNames.length; j++) {
-				Record record = recordSet.get(recordNames[j]);
+			for (int j = 0; j < recordSet.size(); j++) {
+				Record record = recordSet.get(j);
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				if(j > 9 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
@@ -252,21 +251,20 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
-		String[] recordKeys = recordSet.getRecordNames();
 
 		//0=VersorgungsSpg. 1=Spannung 2=Strom 3=Ladung 4=Leistung 5=Energie 6=Temp.intern 7=Temp.extern 8=Balance
 		//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10
 		recordSet.setAllDisplayable();
-		for (int i=7; i<recordKeys.length; ++i) {
-				Record record = recordSet.get(recordKeys[i]);
+		for (int i=7; i<recordSet.size(); ++i) {
+				Record record = recordSet.get(i);
 				record.setDisplayable(record.hasReasonableData());
-				log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + record.hasReasonableData());
+				if (log.isLoggable(Level.FINER))
+					log.log(Level.FINER, record.getName() + " setDisplayable=" + record.hasReasonableData());
 		}
 		
 		if (log.isLoggable(Level.FINE)) {
-			for (String recordKey : recordKeys) {
-				Record record = recordSet.get(recordKey);
-				log.log(Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable());
+			for (Record record : recordSet.values()) {
+				log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable());
 			}
 		}
 	}
@@ -284,14 +282,11 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 			try {
 				//0=VersorgungsSpg. 1=Spannung 2=Strom 3=Ladung 4=Leistung 5=Energie 6=Temp.intern 7=Temp.extern 8=Balance
 				//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10
-				String[] recordNames = recordSet.getRecordNames();
 				int displayableCounter = 0;
 
 				
 				// check if measurements isActive == false and set to isDisplayable == false
-				for (String measurementKey : recordNames) {
-					Record record = recordSet.get(measurementKey);
-					
+				for (Record record : recordSet.values()) {
 					if (record.isActive() && record.hasReasonableData()) {
 						++displayableCounter;
 					}

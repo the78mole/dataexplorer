@@ -155,9 +155,8 @@ public class GathererThread extends Thread {
 					log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
 					
 					this.numberBatteryCells = this.device.getNumberOfLithiumCells();
-					String[] recordKeys = recordSet.getRecordNames();
 					for (int i = posCells; i < recordSet.size(); i++) {
-						Record record = recordSet.get(recordKeys[i]);
+						Record record = recordSet.get(i);
 						if (record.hasReasonableData()) {
 							this.numberBatteryCells++;
 							log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
