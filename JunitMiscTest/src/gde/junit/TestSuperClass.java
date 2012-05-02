@@ -253,8 +253,7 @@ public class TestSuperClass extends TestCase {
 		//calculate number of curve scales, left and right side
 		int numberCurvesRight = 0;
 		int numberCurvesLeft = 0;
-		for (String recordKey : recordSet.getRecordNames()) {
-			Record tmpRecord = recordSet.getRecord(recordKey);
+		for (Record tmpRecord : recordSet.values()) {
 			if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
 				//System.out.println("==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				if (tmpRecord.isPositionLeft())
@@ -332,26 +331,15 @@ public class TestSuperClass extends TestCase {
 
 		// check for activated horizontal grid
 		boolean isCurveGridEnabled = recordSet.getHorizontalGridType() > 0;
-		String curveGridRecordName = recordSet.getHorizontalGridRecordName();
-		String[] recordNames = recordSet.getRecordNames().clone();
-		// sort the record set names to get the one which makes the grid lines drawn first
-		for (int i = 0; i < recordNames.length; i++) {
-			if (recordNames[i].equals(curveGridRecordName)) {
-				recordNames[i] = recordNames[0]; // exchange with record set at index 0
-				recordNames[0] = curveGridRecordName; // replace with the one which makes the grid lines
-				break;
-			}
-		}
 
 		// draw each record using sorted record set names
 		recordSet.updateSyncRecordScale();
-		for (String record : recordNames) {
-			Record actualRecord = recordSet.getRecord(record);
+		for (Record actualRecord : recordSet.getRecordsSortedForDisplay()) {
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable() && actualRecord.realSize() > 0;
 			if (actualRecord.isScaleVisible()) 
 				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
 
-			if (isCurveGridEnabled && record.equals(curveGridRecordName)) // check for activated horizontal grid
+			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
 				drawCurveGrid(recordSet, this.curveAreaGC, this.offSetY, width, this.settings.getGridDashStyle());
 
 			if (isActualRecordEnabled) {
