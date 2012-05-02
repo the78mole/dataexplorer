@@ -220,8 +220,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 	 */
 	private void updateActiveState(RecordSet recordSet) {
 		// check if measurements isActive == false and set to isDisplayable == false
-		for (String element : recordSet.getRecordNames()) {
-			Record record = recordSet.get(element);
+		for (Record record : recordSet.values()) {
 			if (!record.isActive()) {
 				record.setDisplayable(false);
 				record.setVisible(false);

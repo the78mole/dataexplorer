@@ -260,7 +260,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.getRecordNames().length];
+		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
@@ -301,11 +301,10 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames(); 
 			double offset = 0.0;
 			double factor = 1.0;
-			for (int j = 0; j < recordNames.length; j++) {
-				Record record = recordSet.get(recordNames[j]);
+			for (int j = 0; j < recordSet.size(); j++) {
+				Record record = recordSet.get(j);
 				switch (j) {
 				case 3: //3=temperature analog outlet
 					offset = record.getOffset(); // != 0 if curve has an defined offset
@@ -392,24 +391,24 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 */
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
-		String[] recordKeys = recordSet.getRecordNames();
 		int displayableCounter = 0;
 
-		for (int i = 0; i < recordKeys.length; ++i) {
-			Record record = recordSet.get(recordKeys[i]);
+		for (int i = 0; i < recordSet.size(); ++i) {
+			Record record = recordSet.get(i);
 			boolean hasReasonableData = record.hasReasonableData();
 			//record.setVisible(record.isActive() && hasReasonableData);
 			//if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + ".setVisible = " + hasReasonableData);
 			record.setDisplayable(hasReasonableData);
 			if (hasReasonableData) ++displayableCounter;
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordKeys[i] + " setDisplayable=" + hasReasonableData); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINER)) 
+				log.log(Level.FINER, record.getName() + " setDisplayable=" + hasReasonableData); //$NON-NLS-1$
 		}
 		recordSet.setConfiguredDisplayable(displayableCounter);
 
 		if (LiPoWatch.log.isLoggable(Level.FINE)) {
-			for (String recordKey : recordKeys) {
-				Record record = recordSet.get(recordKey);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			for (Record record : recordSet.values()) {
+				if (log.isLoggable(Level.FINE)) 
+					log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
 	}
@@ -421,17 +420,18 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		String[] recordKeys = recordSet.getRecordNames();
 		int displayableCounter = 0;
 
-		for (int i = 0; i < recordKeys.length; ++i) {
-			Record record = recordSet.get(recordKeys[i]);
+		for (int i = 0; i < recordSet.size(); ++i) {
+			Record record = recordSet.get(i);
 			if (record.isActive() && record.isDisplayable()) {
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) 
+					log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) 
+			log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 	}
 
