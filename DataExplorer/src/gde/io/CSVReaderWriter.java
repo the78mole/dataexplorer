@@ -372,20 +372,19 @@ public class CSVReaderWriter {
 			sb = new StringBuffer();
 			sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; //$NON-NLS-1$
 			// write the measurements signature
-			String[] recordNames = recordSet.getRecordNames();
-			for (int i = 0; i < recordNames.length; i++) {
+			for (int i = 0; i < recordSet.size(); i++) {
 				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), i);
-				Record record = recordSet.get(recordNames[i]);
-				log.log(Level.FINEST, "append " + recordNames[i]); //$NON-NLS-1$
+				Record record = recordSet.get(i);
+				log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 				if (isRaw) {
 					if (!measurement.isCalculation()) {	// only use active records for writing raw data 
-						sb.append(recordNames[i]).append(" [---]").append(separator);	 //$NON-NLS-1$
-						log.log(Level.FINEST, "append " + recordNames[i]); //$NON-NLS-1$
+						sb.append(record.getName()).append(" [---]").append(separator);	 //$NON-NLS-1$
+						log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 					}
 				}
 				else {
-					sb.append(recordNames[i]).append(" [").append(record.getUnit()).append(']').append(separator);	 //$NON-NLS-1$
-					log.log(Level.FINEST, "append " + recordNames[i]); //$NON-NLS-1$
+					sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator);	 //$NON-NLS-1$
+					log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 				}
 			}
 			sb.deleteCharAt(sb.length() - 1).append(lineSep);
@@ -404,7 +403,7 @@ public class CSVReaderWriter {
 				// add time entry
 				sb.append(row[0].replace('.', decimalSeparator)).append(separator).append(GDE.STRING_BLANK);
 				// add data entries
-				for (int j = 0; j < recordNames.length; j++) {
+				for (int j = 0; j < recordSet.size(); j++) {
 					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), j);
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation())

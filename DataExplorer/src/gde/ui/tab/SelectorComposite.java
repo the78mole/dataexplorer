@@ -213,11 +213,10 @@ public class SelectorComposite extends Composite {
 		if (recordSet != null && recordSet.size() > 0) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSet.getName());
 				this.curveSelectorTable.removeAll();
-				String[] recordKeys = recordSet.getRecordNames();
 				int checkBoxWidth = 20;
 				int textSize = 10;
-				for (String recordKey : recordKeys) {
-					Record record = recordSet.getRecord(recordKey);
+				for (int i=0; i<recordSet.size(); ++i) {
+					Record record = recordSet.get(i);
 					if (record != null) {
 						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName());
 						textSize = record.getName().length() * 8;

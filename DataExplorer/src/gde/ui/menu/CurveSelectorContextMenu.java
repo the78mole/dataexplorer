@@ -846,7 +846,8 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					log.log(Level.FINEST, "horizontalGridMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						CurveSelectorContextMenu.this.horizontalGridRecordName.setText(Messages.getString(MessageIds.GDE_MSGT0118) + CurveSelectorContextMenu.this.recordSet.getHorizontalGridRecordName());
+						CurveSelectorContextMenu.this.horizontalGridRecordName.setText(Messages.getString(MessageIds.GDE_MSGT0118) 
+								+ CurveSelectorContextMenu.this.recordSet.get(CurveSelectorContextMenu.this.recordSet.getHorizontalGridRecordOrdinal()).getName());
 						int gridType = CurveSelectorContextMenu.this.recordSet.getHorizontalGridType();
 						switch (gridType) {
 						case RecordSet.HORIZONTAL_GRID_EVERY:
@@ -1113,10 +1114,10 @@ public class CurveSelectorContextMenu {
 							double oldMinValue = compareSet.getMinValue();
 							double oldMaxValue = compareSet.getMaxValue();
 							log.log(Level.FINE, String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue)); //$NON-NLS-1$
-							for (String recordKey : compareSet.getRecordNames()) {
-								double newMinValue = compareSet.get(recordKey).getMinScaleValue();
-								double newMaxValue = compareSet.get(recordKey).getMaxScaleValue();
-								log.log(Level.FINE, String.format("scale values from record (" + recordKey + ") to be checked min=%.3f max=%.3f", newMinValue, newMaxValue)); //$NON-NLS-1$ //$NON-NLS-2$
+							for (Record record : compareSet.values()) {
+								double newMinValue = record.getMinScaleValue();
+								double newMaxValue = record.getMaxScaleValue();
+								log.log(Level.FINE, String.format("scale values from record (" + record.getName() + ") to be checked min=%.3f max=%.3f", newMinValue, newMaxValue)); //$NON-NLS-1$ //$NON-NLS-2$
 
 								if (newMinValue < oldMinValue) {
 									compareSet.setMinValue(newMinValue); // store new min value into record set

@@ -101,6 +101,7 @@ public class LogViewReader {
 		deviceMap.put("e-station bc8", "eStationBC8"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("pichler p6", "PichlerP6"); //$NON-NLS-1$ //$NON-NLS-2$		
 		deviceMap.put("pichler p60", "PichlerP60"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("pichler p60 80w 220v", "PichlerP60W80"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech datavario", "DataVario"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech datavario duo", "DataVarioDuo"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("wstech linkvario", "LinkaVario"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -229,9 +230,8 @@ public class LogViewReader {
 				//recordSet.setObjectKey(recordSetInfo.get(GDE.OBJECT_KEY));
 
 				//apply record sets records properties
-				String [] recordKeys = recordSet.getRecordNames();
 				for (int i = 0; i < recordsProperties.length; ++i) {
-					Record record = recordSet.get(recordKeys[i]);
+					Record record = recordSet.get(i);
 					record.setSerializedProperties(recordsProperties[i]); //name, unit, symbol, active, ...
 					record.setSerializedDeviceSpecificProperties(recordsProperties[i]); // factor, offset, ...
 				}

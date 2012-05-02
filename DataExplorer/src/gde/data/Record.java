@@ -855,7 +855,7 @@ public class Record extends Vector<Integer> {
 	public int getMaxValueTriggered(int referencedMeasurementOrdinal) {
 		synchronized (this) {
 			if (this.tmpTriggerRange == null || this.triggerRanges == null) {
-				this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+				this.triggerRanges = this.parent.get(referencedMeasurementOrdinal).getTriggerRanges();
 			}
 			if (this.maxValueTriggered == Integer.MIN_VALUE) this.setMinMaxValueTriggered();
 			return this.maxValueTriggered;
@@ -870,7 +870,7 @@ public class Record extends Vector<Integer> {
 	public int getMinValueTriggered(int referencedMeasurementOrdinal) {
 		synchronized (this) {
 			if (this.tmpTriggerRange == null || this.triggerRanges == null) {
-				this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+				this.triggerRanges = this.parent.get(referencedMeasurementOrdinal).getTriggerRanges();
 			}
 			if (this.minValueTriggered == Integer.MAX_VALUE) this.setMinMaxValueTriggered();
 			return this.minValueTriggered;
@@ -1355,7 +1355,7 @@ public class Record extends Vector<Integer> {
 	 * @return point time, value
 	 */
 	public Point getDisplayPoint(int measurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
-		//log.log(Level.INFO, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - this.minDisplayValue) * this.displayScaleFactorValue).intValue()) + ")");
+		//log.log(Level.OFF, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - this.minDisplayValue) * this.displayScaleFactorValue).intValue()) + ")");
 		return new Point(
 				xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), 
 				yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - this.minDisplayValue) * this.displayScaleFactorValue).intValue());
@@ -1818,15 +1818,6 @@ public class Record extends Vector<Integer> {
 	}
 
 	/**
-	 * calls parent getRecordNames for all records of normal record sets, 
-	 * if record set isCompareSet it returns the recordSetNames of the source record set 
-	 * @return the getRecordSetNames
-	 */
-	public String[] getRecordSetNames() {
-		return this.getParent().getRecordNames();
-	}
-
-	/**
 	 * @return the numberScaleTicks
 	 */
 	public int getNumberScaleTicks() {
@@ -1870,7 +1861,7 @@ public class Record extends Vector<Integer> {
 	public int getAvgValueTriggered(int referencedMeasurementOrdinal) {
 		synchronized (this) {
 			if (this.triggerRanges == null) {
-				this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+				this.triggerRanges = this.parent.get(referencedMeasurementOrdinal).getTriggerRanges();
 			}
 			this.setAvgValueTriggered();
 			return this.avgValueTriggered;
@@ -1951,7 +1942,7 @@ public class Record extends Vector<Integer> {
 	public int getSigmaValueTriggered(int referencedMeasurementOrdinal) {
 		synchronized (this) {
 			if (this.triggerRanges == null) {
-				this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+				this.triggerRanges = this.parent.get(referencedMeasurementOrdinal).getTriggerRanges();
 			}
 			if (this.sigmaValueTriggered == Integer.MIN_VALUE) this.setSigmaValueTriggered();
 			return this.sigmaValueTriggered;
@@ -2012,7 +2003,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public synchronized int getSumTriggeredRange(int referencedMeasurementOrdinal) {
 		if (this.triggerRanges == null)  {
-			this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+			this.triggerRanges = this.parent.get(referencedMeasurementOrdinal).getTriggerRanges();
 		}
 		return this.calculateSum();
 	}
@@ -2063,7 +2054,7 @@ public class Record extends Vector<Integer> {
 	public String getTimeSumTriggeredRange(int referencedMeasurementOrdinal) {
 		synchronized (this) {
 			if (this.triggerRanges == null) {
-				this.triggerRanges = this.parent.getRecord(this.parent.getRecordNames()[referencedMeasurementOrdinal]).getTriggerRanges();
+				this.triggerRanges = this.parent.get(referencedMeasurementOrdinal).getTriggerRanges();
 			}
 			return this.calculateTimeSum();
 		}

@@ -300,8 +300,8 @@ public class Channel extends HashMap<String, RecordSet> {
 		final RecordSet recordSet = this.getActiveRecordSet();
 
 		if (recordSet != null) {
-			for (int i=0; i<recordSet.getRecordNames().length; ++i) {
-				Record record = recordSet.get(recordSet.getRecordNames()[i]);
+			for (int i=0; i<recordSet.size(); ++i) {
+				Record record = recordSet.get(i);
 				this.template.setProperty(i + Record.IS_VISIBLE, Boolean.valueOf(record.isVisible()).toString());
 				this.template.setProperty(i + Record.IS_POSITION_LEFT, Boolean.valueOf(record.isPositionLeft()).toString());
 				Color color = record.getColor();
@@ -330,8 +330,8 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_COLOR, rgb);
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, Integer.valueOf(recordSet.getHorizontalGridLineStyle()).toString());
 				this.template.setProperty(RecordSet.HORIZONTAL_GRID_TYPE, Integer.valueOf(recordSet.getHorizontalGridType()).toString());
-				if (recordSet.get(recordSet.getHorizontalGridRecordName()) != null) {
-					this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, Integer.valueOf(recordSet.get(recordSet.getHorizontalGridRecordName()).ordinal).toString());
+				if (recordSet.get(recordSet.getHorizontalGridRecordOrdinal()) != null) {
+					this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, GDE.STRING_EMPTY + recordSet.getHorizontalGridRecordOrdinal());
 				}
 			}
 			this.template.store();
@@ -439,8 +439,8 @@ public class Channel extends HashMap<String, RecordSet> {
 		if (recordSet != null) {
 			if (this.template != null) this.template.load();
 			if (this.template != null && this.template.isAvailable()) {
-				for (int i = 0; i < recordSet.getRecordNames().length; ++i) {
-					Record record = recordSet.get(recordSet.getRecordNames()[i]);
+				for (int i = 0; i < recordSet.size(); ++i) {
+					Record record = recordSet.get(i);
 					record.setVisible(Boolean.valueOf(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
 					record.setPositionLeft(Boolean.valueOf(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"))); //$NON-NLS-1$
 					int r, g, b;

@@ -359,7 +359,7 @@ public class StatisticsWindow extends CTabItem {
 								// append ratio text + ratio value
 								if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
 									sb.append(measurementStatistics.getRatioText()).append(" = "); //$NON-NLS-1$
-									Record referencedRecord = activeRecordSet.get(activeRecordSet.getRecordNames()[measurementStatistics.getRatioRefOrdinal()]);
+									Record referencedRecord = activeRecordSet.get(measurementStatistics.getRatioRefOrdinal());
 									StatisticsType referencedStatistics = device.getMeasurementStatistic(activeChannel.getNumber(), measurementStatistics.getRatioRefOrdinal());
 
 									if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
@@ -443,7 +443,7 @@ public class StatisticsWindow extends CTabItem {
 		int triggerRefOrdinal = -1;
 		if (measurementStatistics.getTriggerRefOrdinal() != null && recordSet != null) {
 			int tmpOrdinal = measurementStatistics.getTriggerRefOrdinal().intValue();
-			Record record = recordSet.getRecord(recordSet.getRecordNames()[tmpOrdinal]);
+			Record record = recordSet.get(tmpOrdinal);
 			if (record != null && record.isDisplayable()) {
 				triggerRefOrdinal = tmpOrdinal;
 			}

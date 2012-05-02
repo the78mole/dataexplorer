@@ -466,10 +466,9 @@ public class GraphicsComposite extends Composite {
 		//calculate number of curve scales, left and right side
 		int numberCurvesRight = 0;
 		int numberCurvesLeft = 0;
-		for (String recordKey : recordSet.getRecordNames()) {
-			Record tmpRecord = recordSet.getRecord(recordKey);
+		for (Record tmpRecord : recordSet.values()) {
 			if (tmpRecord != null && tmpRecord.isScaleVisible()) {
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "==>> " + recordKey + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$ 
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "==>> " + tmpRecord.getName() + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$ 
 				if (tmpRecord.isPositionLeft())
 					numberCurvesLeft++;
 				else
@@ -545,28 +544,18 @@ public class GraphicsComposite extends Composite {
 
 		// check for activated horizontal grid
 		boolean isCurveGridEnabled = recordSet.getHorizontalGridType() > 0;
-		String curveGridRecordName = recordSet.getHorizontalGridRecordName();
-		String[] recordNames = recordSet.getRecordNames().clone();
-		// sort the record set names to get the one which makes the grid lines drawn first
-		for (int i = 0; i < recordNames.length; i++) {
-			if (recordNames[i].equals(curveGridRecordName)) {
-				recordNames[i] = recordNames[0]; // exchange with record set at index 0
-				recordNames[0] = curveGridRecordName; // replace with the one which makes the grid lines
-				break;
-			}
-		}
 
 		// draw each record using sorted record set names
 		long startTime = new Date().getTime();
 		recordSet.updateSyncRecordScale();
-		for (String record : recordNames) {
-			Record actualRecord = recordSet.getRecord(record);
+		for (Record actualRecord : recordSet.getRecordsSortedForDisplay()) {
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (log.isLoggable(Level.FINE) && isActualRecordEnabled) 
+				log.log(Level.FINE, "drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (actualRecord.isScaleVisible()) 
 				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
 
-			if (isCurveGridEnabled && record.equals(curveGridRecordName)) // check for activated horizontal grid
+			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
 				drawCurveGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
 
 			if (isActualRecordEnabled) {
@@ -1470,8 +1459,8 @@ public class GraphicsComposite extends Composite {
 		// decide if normal graphics window or compare window should be copied
 		if (this.windowType == GraphicsWindow.TYPE_COMPARE) {
 			RecordSet compareRecordSet = DataExplorer.getInstance().getCompareSet();
-			String[] compareSetNames = compareRecordSet.getRecordNames();
-			graphicsHeight = 30+this.canvasBounds.height+10+compareSetNames.length*20;
+			int numberCompareSetRecords = compareRecordSet.size();
+			graphicsHeight = 30+this.canvasBounds.height+10+numberCompareSetRecords*20;
 			graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
 			GC graphicsGC = new GC(graphicsImage);
 			graphicsGC.setBackground(this.surroundingBackground);
@@ -1480,8 +1469,8 @@ public class GraphicsComposite extends Composite {
 			graphicsGC.setFont(this.graphicsHeader.getFont());
 			GraphicsUtils.drawTextCentered(Messages.getString(MessageIds.GDE_MSGT0144), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
 			graphicsGC.setFont(this.recordSetComment.getFont());
-			for (int i=0,yPos=30+this.canvasBounds.height+5; i<compareSetNames.length; ++i, yPos+=20) {
-				Record compareRecord = compareRecordSet.get(compareSetNames[i]);
+			for (int i=0,yPos=30+this.canvasBounds.height+5; i<numberCompareSetRecords; ++i, yPos+=20) {
+				Record compareRecord = compareRecordSet.get(i);
 				if (compareRecord != null) {
 					graphicsGC.setForeground(compareRecord.getColor());
 					String recordName = "--- " + compareRecord.getName(); //$NON-NLS-1$

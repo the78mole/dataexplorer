@@ -330,7 +330,7 @@ public class RecordSet extends HashMap<String, Record> {
 		this.channels = recordSet.channels;
 		this.parent = recordSet.parent;
 
-		this.recordNames = recordSet.getRecordNames().clone(); // copy record names without possible syncableName
+		this.recordNames = recordSet.recordNames.clone(); // copy record names without possible syncableName
 
 		// update child records
 		for (String recordKey : this.recordNames) {
@@ -417,7 +417,7 @@ public class RecordSet extends HashMap<String, Record> {
 			log.log(Level.FINER, recordKey + " isDiplayable = " + this.getRecord(recordKey).isDisplayable()); //$NON-NLS-1$
 		}
 
-		int targetDisplayable = this.configuredDisplayable == 0 ? this.getRecordNames().length : this.configuredDisplayable;
+		int targetDisplayable = this.configuredDisplayable == 0 ? this.size() : this.configuredDisplayable;
 		log.log(Level.FINE, "targetDisplayable = " + targetDisplayable + " - displayableRecordEntries = " + displayableRecordEntries); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return displayableRecordEntries >= targetDisplayable;
@@ -582,12 +582,38 @@ public class RecordSet extends HashMap<String, Record> {
 	}
 
 	/**
-	 * method to get the sorted record names as array
+	 * method to get the sorted record names as array, use it for logging or debugging purpose only
 	 * sorted according list in the device configuration (XML) file
 	 * @return String[] containing record names 
 	 */
 	public String[] getRecordNames() {
 		return this.recordNames.clone();
+	}
+
+	/**
+	 * method to get the sorted record names as array for display purpose
+	 * sorted according display requirement, grid record first, syncMasterRecords second, all remaining
+	 * @return Record[] containing records
+	 */
+	public Record[] getRecordsSortedForDisplay() {
+		Vector<Record> displayRecords = new Vector<Record>();
+		//add the record with horizontal grid
+		for (Record record : this.values()) {
+			if (record.ordinal == this.horizontalGridRecordOrdinal)
+				displayRecords.add(record);
+		}
+		//add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
+		for (Record record : this.values()) {
+			if (record.ordinal != this.horizontalGridRecordOrdinal && record.isScaleSyncMaster())
+				displayRecords.add(record);
+		}
+		//add all others
+		for (Record record : this.values()) {
+			if (record.ordinal != this.horizontalGridRecordOrdinal && !record.isScaleSyncMaster())
+				displayRecords.add(record);
+		}
+		
+		return displayRecords.toArray(new Record[0]);
 	}
 
 	/**
@@ -1516,6 +1542,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 * get the record name to decide for horizontal grid lines 
 	 * @return the horizontalGridRecord
 	 */
+	@Deprecated
 	public String getHorizontalGridRecordName() {
 		String gridRecordName = this.horizontalGridRecordOrdinal == -1 || this.horizontalGridRecordOrdinal > this.getRecordNames().length-1
 		? GDE.STRING_DASH : this.getRecordNames()[this.horizontalGridRecordOrdinal];
@@ -1561,7 +1588,7 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void setRecalculationRequired() {
 		this.isRecalculation = true;
-		for (int i = 0; i < this.device.getMeasurementNames(this.parent.number).length && i < this.getRecordNames().length; ++i) {
+		for (int i = 0; i < this.device.getMeasurementNames(this.parent.number).length && i < this.size(); ++i) {
 			if (this.device.getMeasurement(this.parent.number, i).isCalculation()) {
 				this.get(i).resetMinMax();
 			}
@@ -1819,16 +1846,20 @@ public class RecordSet extends HashMap<String, Record> {
 	 */
 	public void updateSyncRecordScale() {
 		for (int syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
+			boolean isAffected = false;
 			int tmpSyncMin = Integer.MAX_VALUE; 
 			int tmpSyncMax = Integer.MIN_VALUE;
-			log.log(Level.FINE, this.get(syncRecordOrdinal).name + " syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, this.get(syncRecordOrdinal).name + " syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 				synchronized (tmpRecord) {
 					if (tmpRecord.isVisible && tmpRecord.isDisplayable) {
+						isAffected = true;
 						int tmpMin = tmpRecord.getMinValue();
 						int tmpMax = tmpRecord.getMaxValue();
 						if (tmpMin != 0 || tmpMax != 0) {
-							log.log(Level.FINE, tmpRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+							if (log.isLoggable(Level.FINE))
+								log.log(Level.FINE, tmpRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 							if (tmpMin < tmpSyncMin) tmpSyncMin = tmpMin;
 							if (tmpMax > tmpSyncMax) tmpSyncMax = tmpMax;
 						}
@@ -1847,7 +1878,8 @@ public class RecordSet extends HashMap<String, Record> {
 					}
 				}
 			}
-			log.log(Level.FINE, this.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+			if (isAffected && log.isLoggable(Level.FINE))
+				log.log(Level.FINE, this.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

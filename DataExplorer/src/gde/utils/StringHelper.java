@@ -531,6 +531,19 @@ public class StringHelper {
 	}
 
 	/**
+	 * convert a byte array into a decimal string representation
+	 * @param bytes
+	 * @return string with converted characters
+	 */
+	public static String byte2FourDigitsIntegerString(byte[] bytes, byte subtract, int offset, int length) {
+		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%3d", bytes.length)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
+		for (int i = offset; i < length; i++) {
+			sb.append(String.format("%4d", ((bytes[i]&0xFF) + subtract))); //$NON-NLS-1$
+		}
+		return sb.toString();
+	}
+
+	/**
 	 * convert a integer array to a 4 hex character string representation
 	 * @param values
 	 * @return
