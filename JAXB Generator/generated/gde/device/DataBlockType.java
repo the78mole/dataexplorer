@@ -242,7 +242,7 @@ public class DataBlockType {
      *     
      */
     public void setTrailer(byte[] value) {
-        this.trailer = ((byte[]) value);
+        this.trailer = value;
     }
 
     /**
@@ -332,9 +332,8 @@ public class DataBlockType {
         public FormatTypes getFormat() {
             if (format == null) {
                 return FormatTypes.BINARY;
-            } else {
-                return format;
-            }
+            } 
+            return format;
         }
 
         /**
@@ -360,9 +359,8 @@ public class DataBlockType {
         public CheckSumTypes getType() {
             if (type == null) {
                 return CheckSumTypes.XOR;
-            } else {
-                return type;
-            }
+            } 
+            return type;
         }
 
         /**
