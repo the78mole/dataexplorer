@@ -102,7 +102,6 @@
                 <active>true</active>
                 <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
-                <property type="Integer" value="8" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Drehzahl</name>
@@ -111,6 +110,7 @@
                 <active>true</active>
                 <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Kapazität</name>

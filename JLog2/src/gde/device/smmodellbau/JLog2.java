@@ -186,7 +186,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 				// ignore
 			}
 			deltaTime = lastDateTime == 0 ? 0 : (dateTime - lastDateTime);
-			log.log(java.util.logging.Level.FINE, String.format("%d; %4.1fd ms - %d : %s", i, deltaTime, dateTime, new String(timeBuffer).trim())); //$NON-NLS-1$
+			log.log(Level.FINE, String.format("%d; %4.1fd ms - %d : %s", i, deltaTime, dateTime, new String(timeBuffer).trim())); //$NON-NLS-1$
 			sumTimeDelta += deltaTime;
 			lastDateTime = dateTime;
 
@@ -272,7 +272,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.getRecordNames().length];
+		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
@@ -287,11 +287,11 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8)
 						+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
 			}
-			log.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
+			log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
 		}
 
 		for (int i = 0; i < recordDataSize; i++) {
-			log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
+			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 			//0=Spannung BEC, 1=Strom BEC, 2=Spannung, 3=Strom, 4=Strom intern, 5=Leerlauf, 6=PWM, 7=Drehzahl Uni, 8=Drehzahl, 9=Kapazität, 
 			//10=Temperatur PA, 11=Temperatur BEC, 12=Leistung, 13=Leistung intern, 14=Strom BEC max, 15=Strom Motor max, 
@@ -320,7 +320,6 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames(); 
 			Record record;
 			double offset = 0; // != 0 if curve has an defined offset
 			double reduction = 0;
@@ -331,8 +330,8 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 			//20=ALARM: Temp ext 1, 21=ALARM: Temp ext 2, 22=ALARM: Temp ext 3, 23=ALARM: Temp ext 4, 24=ALARM: Temp ext 5, 
 			//25=Temperatur ext 1, 26=Temperatur ext 2, 27=Temperatur ext 3, 28=Temperatur ext 4, 29=Temperatur ext 5, 
 			//30=Drehzahl ext, 31=Speed GPS, 32=Höhe GPS, 33=Speed, 34=BID:Zellentype, 35=BID:Zellennummer, 36=BID:Kapazität, 37=BID:Ladung, 38=BID:Entladung, 39=BID:MaxDis]
-			for (int j = 0; j < recordNames.length; j++) {
-				record = recordSet.get(recordNames[j]);
+			for (int j = 0; j < recordSet.size(); j++) {
+				record = recordSet.get(j);
 				offset = record.getOffset(); // != 0 if curve has an defined offset
 				reduction = record.getReduction();
 				factor = record.getFactor(); // != 1 if a unit translation is required
@@ -341,7 +340,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -380,7 +379,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 		//30=Drehzahl ext, 31=Speed GPS, 32=Höhe GPS, 33=Speed, 34=BID:Zellentype, 35=BID:Zellennummer, 36=BID:Kapazität, 37=BID:Ladung, 38=BID:Entladung, 39=BID:MaxDis]
 		double newValue = (value - reduction) * factor + offset;
 		
-		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -418,7 +417,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 		//30=Drehzahl ext, 31=Speed GPS, 32=Höhe GPS, 33=Speed, 34=BID:Zellentype, 35=BID:Zellennummer, 36=BID:Kapazität, 37=BID:Ladung, 38=BID:Entladung, 39=BID:MaxDis]
 		double newValue = (value - offset) / factor + reduction;
 		
-		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -435,7 +434,6 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 		int displayableCounter = 0;
 		Record record;
 		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
-		String[] recordNames = recordSet.getRecordNames();
 		//0=Spannung BEC, 1=Strom BEC, 2=Spannung, 3=Strom, 4=Strom intern, 5=Leerlauf, 6=PWM, 7=Drehzahl Uni, 8=Drehzahl, 9=Kapazität, 
 		//10=Temperatur PA, 11=Temperatur BEC, 12=Leistung, 13=Leistung intern, 14=Strom BEC max, 15=Strom Motor max, 
 		//16=ALARM: Kapazität, 17=ALARM: Spannung, 18=ALARM: Temp PA, 19=ALARM: Spg BEC drop, 
@@ -443,22 +441,26 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 		//25=Temperatur ext 1, 26=Temperatur ext 2, 27=Temperatur ext 3, 28=Temperatur ext 4, 29=Temperatur ext 5, 
 		//30=Drehzahl ext, 31=Speed GPS, 32=Höhe GPS, 33=Speed, 34=BID:Zellentype, 35=BID:Zellennummer, 36=BID:Kapazität, 37=BID:Ladung, 38=BID:Entladung, 39=BID:MaxDis]
 		// check if measurements isActive == false and set to isDisplayable == false
-		for (int i = 0; i < recordNames.length; ++i) {
+		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
-			record = recordSet.get(recordNames[i]);
-			log.log(java.util.logging.Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
+			record = recordSet.get(i);
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
 
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
-				log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ 
+				if (log.isLoggable(Level.FINE))
+					log.log(Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
-				log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
+				if (log.isLoggable(Level.FINE))
+					log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 			}
 		}
-		log.log(Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 	}
 
@@ -587,7 +589,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2808));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					log.log(Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					open_closeCommPort();
 				}
 			});
