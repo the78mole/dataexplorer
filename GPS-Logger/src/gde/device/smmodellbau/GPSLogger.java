@@ -227,7 +227,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.getRecordNames().length];
+		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
@@ -274,9 +274,8 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames(); 
-			for (int j = 0; j < recordNames.length; j++) {
-				Record record = recordSet.get(recordNames[j]);
+			for (int j = 0; j < recordSet.size(); j++) {
+				Record record = recordSet.get(j);
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
@@ -412,13 +411,12 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
 		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
-		String[] recordNames = recordSet.getRecordNames();
 		// check if measurements isActive == false and set to isDisplayable == false
-		for (int i = 0; i < recordNames.length; ++i) {
+		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
-			record = recordSet.get(recordNames[i]);
+			record = recordSet.get(i);
 			measurement = this.getMeasurement(channelConfigNumber, i);
-			log.log(java.util.logging.Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
+			log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
 			if (record.isActive() != measurement.isActive()) {
