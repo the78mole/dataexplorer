@@ -365,20 +365,18 @@ public class UltraDuoPlus60 extends Ultramat {
 	 */
 	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
-		String[] recordKeys = recordSet.getRecordNames();
 
 		recordSet.setAllDisplayable();
 		int numCells = recordSet.getChannelConfigNumber() < 3 ? 7 : 14;
-		for (int i = recordKeys.length - numCells - 1; i < recordKeys.length; ++i) {
-			Record record = recordSet.get(recordKeys[i]);
+		for (int i = recordSet.size() - numCells - 1; i < recordSet.size(); ++i) {
+			Record record = recordSet.get(i);
 			record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
-			log.log(java.util.logging.Level.FINER, recordKeys[i] + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData())); //$NON-NLS-1$
+			log.log(java.util.logging.Level.FINER, record.getName() + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData())); //$NON-NLS-1$
 		}
 
-		if (log.isLoggable(java.util.logging.Level.FINE)) {
-			for (String recordKey : recordKeys) {
-				Record record = recordSet.get(recordKey);
-				log.log(java.util.logging.Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (logger.isLoggable(Level.FINE)) {
+			for (Record record : recordSet.values()) {
+				logger.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
 	}

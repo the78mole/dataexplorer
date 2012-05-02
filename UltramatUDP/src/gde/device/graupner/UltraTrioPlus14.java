@@ -199,7 +199,7 @@ public class UltraTrioPlus14 extends Ultramat {
 		for (int i = 0; i < recordDataSize; i++) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
-			logger.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
+			logger.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 7=SpannungZelle1 8=SpannungZelle2....
 			points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
@@ -241,20 +241,18 @@ public class UltraTrioPlus14 extends Ultramat {
 	 */
 	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
-		String[] recordKeys = recordSet.getRecordNames();
 
 		recordSet.setAllDisplayable();
 		int numCells = recordSet.size() - 6; //voltage, current, capacity, power, energy, balance
-		for (int i = recordKeys.length - numCells - 1; i < recordKeys.length; ++i) {
-			Record record = recordSet.get(recordKeys[i]);
+		for (int i = recordSet.size() - numCells - 1; i < recordSet.size(); ++i) {
+			Record record = recordSet.get(i);
 			record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
-			log.log(java.util.logging.Level.FINER, recordKeys[i] + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData())); //$NON-NLS-1$
+			log.log(Level.FINER, record.getName() + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData())); //$NON-NLS-1$
 		}
 
-		if (log.isLoggable(java.util.logging.Level.FINE)) {
-			for (String recordKey : recordKeys) {
-				Record record = recordSet.get(recordKey);
-				log.log(java.util.logging.Level.FINE, recordKey + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE)) {
+			for (Record record : recordSet.values()) {
+				log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
 	}
@@ -289,8 +287,8 @@ public class UltraTrioPlus14 extends Ultramat {
 		if (outletNum == 1) {
 			try {
 				int operationMode1 = getProcessingMode(dataBuffer);
-				if (log.isLoggable(java.util.logging.Level.FINE)) {
-					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode1);
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE,	"operationMode1 = " + operationMode1);
 				}
 				//0=no processing 1=charge 2=discharge 3=pause 4=finished 5=error 6=balance 11=store charge 12=store discharge
 				return (operationMode1 > 0 && operationMode1 < 4) || operationMode1 == 6 || operationMode1 == 11 || operationMode1 == 12; 
@@ -303,8 +301,8 @@ public class UltraTrioPlus14 extends Ultramat {
 		else if (outletNum == 2) {
 			try {
 				int operationMode2 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[49], (char) dataBuffer[50]), 16);
-				if (log.isLoggable(java.util.logging.Level.FINE)) {
-					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode2);
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE,	"operationMode1 = " + operationMode2);
 				}
 				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error 6=balance 11=store charge 12=store discharge
 				return (operationMode2 > 0 && operationMode2 < 4) || operationMode2 == 6 || operationMode2 == 11 || operationMode2 == 12; 
@@ -317,8 +315,8 @@ public class UltraTrioPlus14 extends Ultramat {
 		else if (outletNum == 3) {
 			try {
 				int operationMode3 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[75], (char) dataBuffer[76]), 16);
-				if (log.isLoggable(java.util.logging.Level.FINE)) {
-					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode3);
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE,	"operationMode1 = " + operationMode3);
 				}
 				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error 6=balance 11=store charge 12=store discharge
 				return (operationMode3 > 0 && operationMode3 < 4) || operationMode3 == 6 || operationMode3 == 11 || operationMode3 == 12; 

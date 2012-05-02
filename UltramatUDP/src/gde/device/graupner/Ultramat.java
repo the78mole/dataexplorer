@@ -198,11 +198,10 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames();
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BAtterietemperatur 6=VersorgungsSpg 7=Balance 
-			for (int j = 0; j < recordNames.length; j++) {
-				Record record = recordSet.get(recordNames[j]);
+			for (int j = 0; j < recordSet.size(); j++) {
+				Record record = recordSet.get(j);
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				dataTableRow[j + 1] = record.getDecimalFormat().format(((record.get(rowIndex) / 1000.0) * factor));
 			}
@@ -275,12 +274,11 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 			try {
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
-				String[] recordNames = recordSet.getRecordNames();
 				int displayableCounter = 0;
 
 				
 				// check if measurements isActive == false and set to isDisplayable == false
-				for (String measurementKey : recordNames) {
+				for (String measurementKey : recordSet.keySet()) {
 					Record record = recordSet.get(measurementKey);
 					
 					if (record.isActive() && (record.getOrdinal() <= 5 || record.hasReasonableData())) {
@@ -288,12 +286,11 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 					}
 				}
 				
-				String recordKey = recordNames[3]; //3=Leistung
-				Record record = recordSet.get(recordKey);
+				Record record = recordSet.get(3);//3=Leistung
 				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
-					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+					this.calculationThreads.put(record.getName(), new CalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
 					try {
-						this.calculationThreads.get(recordKey).start();
+						this.calculationThreads.get(record.getName()).start();
 					}
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, e.getMessage(), e);
@@ -301,12 +298,11 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 				}
 				++displayableCounter;
 				
-				recordKey = recordNames[4]; //4=Energie
-				record = recordSet.get(recordKey);
+				record = recordSet.get(4);//4=Energie
 				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
-					this.calculationThreads.put(recordKey, new CalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+					this.calculationThreads.put(record.getName(), new CalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
 					try {
-						this.calculationThreads.get(recordKey).start();
+						this.calculationThreads.get(record.getName()).start();
 					}
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, e.getMessage(), e);
