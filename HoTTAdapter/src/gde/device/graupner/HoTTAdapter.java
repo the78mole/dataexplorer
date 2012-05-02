@@ -34,6 +34,7 @@ import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
 import gde.io.FileHandler;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.dialog.IgcExportDialog;
@@ -683,7 +684,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.getRecordNames().length];
+		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 1;
 		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
@@ -699,10 +700,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 						+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
 			}
 		}
-		HoTTAdapter.log.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
+		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
 
 		for (int i = 0; i < recordDataSize; i++) {
-			HoTTAdapter.log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
+			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 
 			for (int j = 0; j < points.length; j++) {
@@ -726,9 +727,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames();
-			for (int j = 0; j < recordNames.length; j++) {
-				Record record = recordSet.get(recordNames[j]);
+			for (int j = 0; j < recordSet.size(); j++) {
+				Record record = recordSet.get(j);
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
@@ -748,7 +748,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			HoTTAdapter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -774,7 +774,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			newValue = (value - reduction) * factor + offset;
 		}
 
-		HoTTAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -799,7 +799,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			newValue = (value - offset) / factor + reduction;
 		}
 
-		HoTTAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -818,12 +818,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		Record record;
 
 		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
-		String[] recordNames = recordSet.getRecordNames();
 		// check if measurements isActive == false and set to isDisplayable == false
-		for (int i = 0; i < recordNames.length; ++i) {
+		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
-			record = recordSet.get(recordNames[i]);
-			HoTTAdapter.log.log(java.util.logging.Level.FINE, recordNames[i] + " = " + measurementNames[i]); //$NON-NLS-1$
+			record = recordSet.get(i);
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
 
 			// update active state and displayable state if configuration switched with other names
 			MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
@@ -831,19 +831,23 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
-				HoTTAdapter.log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(Level.FINE))
+					log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-				HoTTAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
+				if (log.isLoggable(Level.FINE))
+					log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
-				HoTTAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
+				if (log.isLoggable(Level.FINE))
+					log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 			}
 		}
-		HoTTAdapter.log.log(java.util.logging.Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE))
+			log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 		this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
 	}
@@ -944,7 +948,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 							}
 							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_BIN;
 						}
-						HoTTAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
@@ -955,7 +959,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 								WaitTimer.delay(500);
 							}
 							catch (Exception e) {
-								HoTTAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+								log.log(Level.WARNING, e.getMessage(), e);
 							}
 						}
 					}
@@ -984,7 +988,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2405));
 			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
+					log.log(Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
 				}
 			});
@@ -993,7 +997,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2406));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					log.log(Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
 				}
 			});
@@ -1002,7 +1006,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2407));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					log.log(Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 				}
 			});
@@ -1013,7 +1017,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
 			convertIGCItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
+					log.log(Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
 					new IgcExportDialog().open(2, 1, 3);
 				}
 			});
@@ -1034,7 +1038,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2416));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					HoTTAdapter.log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					log.log(Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					importDeviceData();
 				}
 			});
