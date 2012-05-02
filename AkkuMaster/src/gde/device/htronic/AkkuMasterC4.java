@@ -203,7 +203,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.getRecordNames().length];
+		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
@@ -231,9 +231,8 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames(); 
-			for (int j = 0; j < recordNames.length; j++) {
-				Record record = recordSet.get(recordNames[j]);
+			for (int j = 0; j < recordSet.size(); j++) {
+				Record record = recordSet.get(j);
 				dataTableRow[j + 1] = record.getDecimalFormat().format(record.get(rowIndex) / 1000.0);
 			}
 		}
@@ -287,25 +286,21 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 			// calculate the values required
 			try {
 				// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
-				String[] recordNames = recordSet.getRecordNames();
-				
-				String recordKey = recordNames[3]; //3=Leistung/Power
-				Record record = recordSet.get(recordKey);
+				Record record = recordSet.get(3);//3=Leistung/Power
 				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
-					this.calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+					this.calculationThreads.put(record.getName(), new AkkuMasterCalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
 					try {
-						this.calculationThreads.get(recordKey).start();
+						this.calculationThreads.get(record.getName()).start();
 					}
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, e.getMessage(), e);
 					}
 				}
-				recordKey = recordNames[4]; //4=Energie/Energy
-				record = recordSet.get(recordKey);
+				record = recordSet.get(4);//4=Energie/Energy
 				if (record != null && (record.size() == 0 || (record.getRealMinValue() == 0 && record.getRealMaxValue() == 0))) {
-					this.calculationThreads.put(recordKey, new AkkuMasterCalculationThread(recordKey, this.channels.getActiveChannel().getActiveRecordSet()));
+					this.calculationThreads.put(record.getName(), new AkkuMasterCalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
 					try {
-						this.calculationThreads.get(recordKey).start();
+						this.calculationThreads.get(record.getName()).start();
 					}
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, e.getMessage(), e);
