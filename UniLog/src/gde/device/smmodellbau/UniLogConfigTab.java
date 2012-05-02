@@ -194,8 +194,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 								if (activeRecordSet != null) {
 									// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-									activeRecordSet.get(activeRecordSet.getRecordNames()[0]).setActive(UniLogConfigTab.this.isActiveUe);
-									activeRecordSet.get(activeRecordSet.getRecordNames()[0]).setDisplayable(UniLogConfigTab.this.reveiverVoltageButton.getSelection());
+									activeRecordSet.get(0).setActive(UniLogConfigTab.this.isActiveUe);
+									activeRecordSet.get(0).setDisplayable(UniLogConfigTab.this.reveiverVoltageButton.getSelection());
 									UniLogConfigTab.this.application.updateGraphicsWindow();
 								}
 							}
@@ -229,8 +229,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 								if (activeRecordSet != null) {
 									// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-									activeRecordSet.get(activeRecordSet.getRecordNames()[1]).setActive(UniLogConfigTab.this.voltageButton.getSelection());
-									activeRecordSet.get(activeRecordSet.getRecordNames()[1]).setDisplayable(UniLogConfigTab.this.voltageButton.getSelection());
+									activeRecordSet.get(1).setActive(UniLogConfigTab.this.voltageButton.getSelection());
+									activeRecordSet.get(1).setDisplayable(UniLogConfigTab.this.voltageButton.getSelection());
 									UniLogConfigTab.this.application.updateGraphicsWindow();
 								}
 							}
@@ -264,8 +264,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 								if (activeRecordSet != null) {
 									// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-									activeRecordSet.get(activeRecordSet.getRecordNames()[2]).setActive(UniLogConfigTab.this.currentButton.getSelection());
-									activeRecordSet.get(activeRecordSet.getRecordNames()[2]).setDisplayable(UniLogConfigTab.this.currentButton.getSelection());
+									activeRecordSet.get(2).setActive(UniLogConfigTab.this.currentButton.getSelection());
+									activeRecordSet.get(2).setDisplayable(UniLogConfigTab.this.currentButton.getSelection());
 									UniLogConfigTab.this.application.updateGraphicsWindow();
 								}
 							}
@@ -296,8 +296,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							Channel activeChannel = UniLogConfigTab.this.channels.getActiveChannel();
 							if (activeChannel != null && activeChannel.getActiveRecordSet() != null) {
 								RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-								String[] recordKeys = activeRecordSet.getRecordNames();
-								Record currentRecord = activeRecordSet.get(recordKeys[2]);
+								Record currentRecord = activeRecordSet.get(2);
 								UniLogConfigTab.this.device.invertRecordData(currentRecord);
 								UniLogConfigTab.this.application.updateAllTabs(true);
 							}
@@ -415,7 +414,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
 										RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 										if (recordSet != null) {
-											Record record = recordSet.get(recordSet.getRecordNames()[6]);
+											Record record = recordSet.get(6);
 											PropertyType property = record.getProperty(UniLog.NUMBER_CELLS);
 											if (property != null) {
 												property.setValue(UniLogConfigTab.this.numCellValue);
@@ -424,7 +423,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 												record.createProperty(UniLog.NUMBER_CELLS, DataTypes.INTEGER, UniLogConfigTab.this.numCellValue);
 											}
 											// update propeller n100W value too, if user has changed, but not hit enter 
-											record = recordSet.get(recordSet.getRecordNames()[8]);
+											record = recordSet.get(8);
 											property = record.getProperty(UniLog.PROP_N_100_W);
 											if (property != null) {
 												property.setValue(UniLogConfigTab.this.prop100WValue);
@@ -463,8 +462,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 								if (activeRecordSet != null) {
 									// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-									activeRecordSet.get(activeRecordSet.getRecordNames()[7]).setActive(UniLogConfigTab.this.revolutionButton.getSelection());
-									activeRecordSet.get(activeRecordSet.getRecordNames()[7]).setDisplayable(UniLogConfigTab.this.revolutionButton.getSelection());
+									activeRecordSet.get(7).setActive(UniLogConfigTab.this.revolutionButton.getSelection());
+									activeRecordSet.get(7).setDisplayable(UniLogConfigTab.this.revolutionButton.getSelection());
 									UniLogConfigTab.this.application.updateGraphicsWindow();
 								}
 							}
@@ -508,7 +507,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
 										RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 										if (recordSet != null) {
-											Record record = recordSet.get(recordSet.getRecordNames()[8]);
+											Record record = recordSet.get(8);
 											PropertyType property = record.getProperty(UniLog.PROP_N_100_W);
 											if (property != null) {
 												property.setValue(UniLogConfigTab.this.prop100WValue);
@@ -517,7 +516,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 												record.createProperty(UniLog.PROP_N_100_W, DataTypes.INTEGER, UniLogConfigTab.this.prop100WValue);
 											}
 											// update number cells too, if user has changed, but not hit enter 
-											record = recordSet.get(recordSet.getRecordNames()[6]);
+											record = recordSet.get(6);
 											property = record.getProperty(UniLog.NUMBER_CELLS);
 											if (property != null) {
 												property.setValue(UniLogConfigTab.this.numCellValue);
@@ -576,8 +575,8 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 								RecordSet activeRecordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
 								if (activeRecordSet != null) {
 									// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-									activeRecordSet.get(activeRecordSet.getRecordNames()[9]).setActive(UniLogConfigTab.this.heightButton.getSelection());
-									activeRecordSet.get(activeRecordSet.getRecordNames()[9]).setDisplayable(UniLogConfigTab.this.heightButton.getSelection());
+									activeRecordSet.get(9).setActive(UniLogConfigTab.this.heightButton.getSelection());
+									activeRecordSet.get(9).setDisplayable(UniLogConfigTab.this.heightButton.getSelection());
 									UniLogConfigTab.this.application.updateGraphicsWindow();
 								}
 							}
@@ -633,7 +632,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 
 							RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 							if (recordSet != null) {
-								Record record = recordSet.get(recordSet.getRecordNames()[10]);
+								Record record = recordSet.get(10);
 								PropertyType property = record.getProperty(CalculationThread.REGRESSION_TYPE);
 								if (property != null) {
 									property.setValue(UniLogConfigTab.this.slopeTypeSelection);
@@ -665,7 +664,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							UniLogConfigTab.this.slopeTimeSelection = UniLogConfigTab.this.regressionTime.getSelectionIndex() + 1;
 							RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 							if (recordSet != null) {
-								Record record = recordSet.get(recordSet.getRecordNames()[10]);
+								Record record = recordSet.get(10);
 								PropertyType property = record.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 								if (property != null) {
 									property.setValue(UniLogConfigTab.this.slopeTimeSelection);
@@ -992,7 +991,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-				activeRecordSet.get(activeRecordSet.getRecordNames()[8]).setDisplayable(enabled);
+				activeRecordSet.get(8).setDisplayable(enabled);
 				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}
 		}
@@ -1029,7 +1028,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-				activeRecordSet.get(activeRecordSet.getRecordNames()[10]).setDisplayable(enabled);
+				activeRecordSet.get(10).setDisplayable(enabled);
 				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}
 		}
@@ -1063,7 +1062,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-				activeRecordSet.get(activeRecordSet.getRecordNames()[3]).setDisplayable(enabled);
+				activeRecordSet.get(3).setDisplayable(enabled);
 				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}
 		}
@@ -1091,9 +1090,9 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			RecordSet activeRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
 			if (activeRecordSet != null) {
 				// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-				activeRecordSet.get(activeRecordSet.getRecordNames()[4]).setDisplayable(enabled);
-				activeRecordSet.get(activeRecordSet.getRecordNames()[5]).setDisplayable(enabled);
-				activeRecordSet.get(activeRecordSet.getRecordNames()[6]).setDisplayable(enabled);
+				activeRecordSet.get(4).setDisplayable(enabled);
+				activeRecordSet.get(5).setDisplayable(enabled);
+				activeRecordSet.get(6).setDisplayable(enabled);
 				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 			}
 		}
@@ -1219,44 +1218,43 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		Record record = null;
 		RecordSet recordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) { // load all data from record set
-			String[] recordKeys = recordSet.getRecordNames();
 			
-			this.isActiveUe = recordSet.get(recordKeys[0]).isActive();
-			this.isActiveU = recordSet.get(recordKeys[1]).isActive();
-			this.isActiveI = recordSet.get(recordKeys[2]).isActive();
+			this.isActiveUe = recordSet.get(0).isActive();
+			this.isActiveU = recordSet.get(1).isActive();
+			this.isActiveI = recordSet.get(2).isActive();
 			
-			this.offsetCurrent = recordSet.get(recordKeys[2]).getOffset();
+			this.offsetCurrent = recordSet.get(2).getOffset();
 			
-			property = recordSet.get(recordKeys[6]).getProperty(UniLog.NUMBER_CELLS);
+			property = recordSet.get(6).getProperty(UniLog.NUMBER_CELLS);
 			this.numCellValue = property != null ? new Integer(property.getValue().trim()) : 4;
 			
-			this.isActiveRPM = recordSet.get(recordKeys[7]).isActive();
+			this.isActiveRPM = recordSet.get(7).isActive();
 			
-			property = recordSet.get(recordKeys[8]).getProperty(UniLog.PROP_N_100_W);
+			property = recordSet.get(8).getProperty(UniLog.PROP_N_100_W);
 			this.prop100WValue = property != null ? new Integer(property.getValue().trim()) : 10000;
 			
-			this.isActiveHeight = recordSet.get(recordKeys[9]).isActive();
+			this.isActiveHeight = recordSet.get(9).isActive();
 
-			property = recordSet.get(recordKeys[10]).getProperty(CalculationThread.REGRESSION_TYPE);
+			property = recordSet.get(10).getProperty(CalculationThread.REGRESSION_TYPE);
 			this.slopeTypeSelection = property != null ? property.getValue() : CalculationThread.REGRESSION_TYPE_CURVE;
-			property = recordSet.get(recordKeys[10]).getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
+			property = recordSet.get(10).getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 			this.slopeTimeSelection = property != null ? new Integer(property.getValue().trim()) : 10;
 
-			record = recordSet.get(recordKeys[11]);
+			record = recordSet.get(11);
 			this.isActiveA1 = record.isActive();
 			this.nameA1 = record.getName();
 			this.unitA1 = record.getUnit();
 			this.offsetA1 = record.getOffset();
 			this.factorA1 = record.getFactor();
 
-			record = recordSet.get(recordKeys[12]);
+			record = recordSet.get(12);
 			this.isActiveA2 = record.isActive();
 			this.nameA2 = record.getName();
 			this.unitA2 = record.getUnit();
 			this.offsetA2 = record.getOffset();
 			this.factorA2 = record.getFactor();
 
-			record = recordSet.get(recordKeys[13]);
+			record = recordSet.get(13);
 			this.isActiveA3 = record.isActive();
 			this.nameA3 = record.getName();
 			this.unitA3 = record.getUnit();
@@ -1333,33 +1331,33 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 					if (activeRecordSet != null) {
 						// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 						// 2=current
-						activeRecordSet.get(activeRecordSet.getRecordNames()[2]).setOffset(Double.valueOf(UniLogConfigTab.this.currentOffset.getText().trim().replace(',', '.')));
+						activeRecordSet.get(2).setOffset(Double.valueOf(UniLogConfigTab.this.currentOffset.getText().trim().replace(',', '.')));
 
 						// 11=a1Value
-						activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setActive(UniLogConfigTab.this.a1Button.getSelection());
-						//activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setVisible(this.a1Button.getSelection());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(UniLogConfigTab.this.a1Button.getSelection());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setName(UniLogConfigTab.this.a1Text.getText().trim());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setUnit(UniLogConfigTab.this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setOffset(Double.valueOf(UniLogConfigTab.this.a1Offset.getText().trim().replace(',', '.')));
-						activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(Double.valueOf(UniLogConfigTab.this.a1Factor.getText().trim().replace(',', '.')));
+						activeRecordSet.get(11).setActive(UniLogConfigTab.this.a1Button.getSelection());
+						//activeRecordSet.get(11).setVisible(this.a1Button.getSelection());
+						activeRecordSet.get(11).setDisplayable(UniLogConfigTab.this.a1Button.getSelection());
+						activeRecordSet.get(11).setName(UniLogConfigTab.this.a1Text.getText().trim());
+						activeRecordSet.get(11).setUnit(UniLogConfigTab.this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
+						activeRecordSet.get(11).setOffset(Double.valueOf(UniLogConfigTab.this.a1Offset.getText().trim().replace(',', '.')));
+						activeRecordSet.get(11).setFactor(Double.valueOf(UniLogConfigTab.this.a1Factor.getText().trim().replace(',', '.')));
 						// 12=a2Value
-						activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setActive(UniLogConfigTab.this.a2Button.getSelection());
-						//activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setVisible(this.a2Button.getSelection());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setDisplayable(UniLogConfigTab.this.a2Button.getSelection());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setName(UniLogConfigTab.this.a2Text.getText().trim());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setUnit(UniLogConfigTab.this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setOffset(Double.valueOf(UniLogConfigTab.this.a2Offset.getText().trim().replace(',', '.')));
-						activeRecordSet.get(activeRecordSet.getRecordNames()[12]).setFactor(Double.valueOf(UniLogConfigTab.this.a2Factor.getText().trim().replace(',', '.')));
+						activeRecordSet.get(12).setActive(UniLogConfigTab.this.a2Button.getSelection());
+						//activeRecordSet.get(12).setVisible(this.a2Button.getSelection());
+						activeRecordSet.get(12).setDisplayable(UniLogConfigTab.this.a2Button.getSelection());
+						activeRecordSet.get(12).setName(UniLogConfigTab.this.a2Text.getText().trim());
+						activeRecordSet.get(12).setUnit(UniLogConfigTab.this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
+						activeRecordSet.get(12).setOffset(Double.valueOf(UniLogConfigTab.this.a2Offset.getText().trim().replace(',', '.')));
+						activeRecordSet.get(12).setFactor(Double.valueOf(UniLogConfigTab.this.a2Factor.getText().trim().replace(',', '.')));
 						// 13=a3Value
-						activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setActive(UniLogConfigTab.this.a3Button.getSelection());
-						//activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setVisible(this.a3Button.getSelection());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setDisplayable(UniLogConfigTab.this.a3Button.getSelection());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setName(UniLogConfigTab.this.a3Text.getText().trim());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setUnit(UniLogConfigTab.this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-						activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setOffset(Double.valueOf(UniLogConfigTab.this.a3Offset.getText().trim().replace(',', '.')));
-						activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setFactor(Double.valueOf(UniLogConfigTab.this.a3Factor.getText().trim().replace(',', '.')));
-						activeRecordSet.get(activeRecordSet.getRecordNames()[13]).setName(UniLogConfigTab.this.a3Text.getText().trim());
+						activeRecordSet.get(13).setActive(UniLogConfigTab.this.a3Button.getSelection());
+						//activeRecordSet.get(13).setVisible(this.a3Button.getSelection());
+						activeRecordSet.get(13).setDisplayable(UniLogConfigTab.this.a3Button.getSelection());
+						activeRecordSet.get(13).setName(UniLogConfigTab.this.a3Text.getText().trim());
+						activeRecordSet.get(13).setUnit(UniLogConfigTab.this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
+						activeRecordSet.get(13).setOffset(Double.valueOf(UniLogConfigTab.this.a3Offset.getText().trim().replace(',', '.')));
+						activeRecordSet.get(13).setFactor(Double.valueOf(UniLogConfigTab.this.a3Factor.getText().trim().replace(',', '.')));
+						activeRecordSet.get(13).setName(UniLogConfigTab.this.a3Text.getText().trim());
 
 						UniLogConfigTab.this.application.updateGraphicsWindow();
 						activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
