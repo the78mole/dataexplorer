@@ -193,7 +193,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.getRecordNames().length];
+		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
@@ -217,9 +217,8 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	 */
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			String[] recordNames = recordSet.getRecordNames(); 
-			for (int j = 0; j < recordNames.length; j++) {
-				Record record = recordSet.get(recordNames[j]);
+			for (int j = 0; j < recordSet.size(); j++) {
+				Record record = recordSet.get(j);
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
@@ -244,7 +243,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 					}
 					break;
 				case 2: //Steigung/Slope
-					factor = recordSet.get(recordNames[1]).getFactor(); // 1=height
+					factor = recordSet.get(1).getFactor(); // 1=height
 					break;
 				default:
 					log.log(Level.WARNING, "exceed known record names"); //$NON-NLS-1$
@@ -375,17 +374,17 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
 		if (recordSet.isRaw() && recordSet.isRecalculation()) {
-			String[] measurements = recordSet.getRecordNames(); // 0=Spannung, 1=Höhe, 2=Steigrate
+			// 0=Spannung, 1=Höhe, 2=Steigrate
 			// calculate the values required		
-			Record slopeRecord = recordSet.get(measurements[2]);
+			Record slopeRecord = recordSet.get(2);//2=Steigrate
 			slopeRecord.setDisplayable(false);
 			PropertyType property = slopeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 			int regressionInterval = property != null ? new Integer(property.getValue()) : 10;
 			property = slopeRecord.getProperty(CalculationThread.REGRESSION_TYPE);
 			if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
-				this.calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
+				this.calculationThread = new QuasiLinearRegression(recordSet, recordSet.get(1).getName(), slopeRecord.getName(), regressionInterval);
 			else
-				this.calculationThread = new LinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
+				this.calculationThread = new LinearRegression(recordSet, recordSet.get(1).getName(), slopeRecord.getName(), regressionInterval);
 
 			try {
 				this.calculationThread.start();

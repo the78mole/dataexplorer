@@ -240,8 +240,7 @@ public class PicolarioConfigTab extends Composite {
 								if (activeChannel != null) {
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null) {
-										String measurementKey = activeRecordSet.getRecordNames()[1]; // height
-										Record activeRecord = activeRecordSet.get(measurementKey);
+										Record activeRecord = activeRecordSet.get(1);// height
 										activeRecord.setOffset(PicolarioConfigTab.this.heightOffsetValue);
 										PicolarioConfigTab.this.application.updateGraphicsWindow();
 										activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
@@ -264,8 +263,7 @@ public class PicolarioConfigTab extends Composite {
 										if (activeChannel != null) {
 											RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 											if (activeRecordSet != null) {
-												String measurementKey = activeRecordSet.getRecordNames()[1]; // height
-												Record activeRecord = activeRecordSet.get(measurementKey);
+												Record activeRecord = activeRecordSet.get(1);// height
 												activeRecord.setOffset(PicolarioConfigTab.this.heightOffsetValue);
 												PicolarioConfigTab.this.application.updateGraphicsWindow();
 												activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
@@ -331,8 +329,7 @@ public class PicolarioConfigTab extends Composite {
 								if (activeChannel != null) {
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null && activeRecordSet.isRaw()) {
-										String measurementKey = activeRecordSet.getRecordNames()[2]; // slope
-										Record activeRecord = activeRecordSet.get(measurementKey);
+										Record activeRecord = activeRecordSet.get(2);// slope
 										activeRecord.getProperty(CalculationThread.REGRESSION_TYPE).setValue(PicolarioConfigTab.this.slopeTypeSelection);
 										activeRecord.setDisplayable(false);
 										activeRecordSet.setRecalculationRequired();
@@ -364,8 +361,7 @@ public class PicolarioConfigTab extends Composite {
 								if (activeChannel != null) {
 									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 									if (activeRecordSet != null && activeRecordSet.isRaw()) {
-										String measurementKey = activeRecordSet.getRecordNames()[2]; // slope
-										Record activeRecord = activeRecordSet.get(measurementKey);
+										Record activeRecord = activeRecordSet.get(2);// slope
 										activeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC).setValue("" + PicolarioConfigTab.this.slopeTimeSelection); //$NON-NLS-1$
 										activeRecord.setDisplayable(false);
 										activeRecordSet.setRecalculationRequired();
