@@ -18,7 +18,6 @@
 ****************************************************************************************/
 package gde.device.wb;
 
-
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -151,7 +150,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				lineBuffer = new byte[startLength[1]];
 				System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
 				//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=Steigen 11=ServoImpuls
-				data.parse(new String(lineBuffer));
+				data.parse(new String(lineBuffer), i);
 
 				recordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms());
 
@@ -267,7 +266,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 			}
 		}
 		catch (RuntimeException e) {
