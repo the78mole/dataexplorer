@@ -273,11 +273,11 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 				//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 				if (j > 1) {
-					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
 				else {
 					//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
-					double value = (record.get(rowIndex) / 1000000.0);
+					double value = (record.realGet(rowIndex) / 1000000.0);
 					int grad = (int)value;
 					double minuten = (value - grad) * 100;
 					dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
