@@ -584,7 +584,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					break;
 				}
 				
-				dataTableRow[j+1] = record.getDecimalFormat().format((offset + (((record.get(rowIndex)/1000.0 + currentOffset) * rpmFactor / numberMotor) - reduction) * factor));				
+				dataTableRow[j+1] = record.getDecimalFormat().format((offset + (((record.realGet(rowIndex)/1000.0 + currentOffset) * rpmFactor / numberMotor) - reduction) * factor));				
 			}
 		}
 		catch (RuntimeException e) {
