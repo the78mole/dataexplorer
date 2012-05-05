@@ -250,7 +250,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 					break;
 				}
 				
-				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 			}
 		}
 		catch (RuntimeException e) {
