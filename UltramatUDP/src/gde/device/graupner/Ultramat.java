@@ -203,7 +203,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 			for (int j = 0; j < recordSet.size(); j++) {
 				Record record = recordSet.get(j);
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				dataTableRow[j + 1] = record.getDecimalFormat().format(((record.get(rowIndex) / 1000.0) * factor));
+				dataTableRow[j + 1] = record.getDecimalFormat().format(((record.realGet(rowIndex) / 1000.0) * factor));
 			}
 		}
 		catch (RuntimeException e) {
