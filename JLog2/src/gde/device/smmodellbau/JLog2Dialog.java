@@ -99,6 +99,7 @@ public class JLog2Dialog extends DeviceDialog {
 		this.serialPort = useDevice.getCommunicationPort();
 		this.settings = Settings.getInstance();
 		this.measurementsCount = Math.abs(this.device.getDataBlockSize(InputTypes.FILE_IO));
+		this.measurementsCount = 31; // reduce
 	}
 
 	@Override

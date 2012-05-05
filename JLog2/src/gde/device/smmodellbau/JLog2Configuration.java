@@ -148,6 +148,9 @@ public class JLog2Configuration extends Composite {
 	final String[]			zeroAlarms					= new String[] { "0" };																																																																											//$NON-NLS-1$
 	final String[]			oneAlarms						= new String[] { "0", "1" };																																																																									//$NON-NLS-1$
 	final String[]			greaterOneAlarms		= new String[] { "0", "1", "2" };																																																																						//$NON-NLS-1$
+	final String				comOutputString			= " ----------- , FTDI livestream, JETI, MPX, Unidisplay"; //$NON-NLS-1$
+	final StringBuilder comOutput						= new StringBuilder().append(comOutputString);
+	final String				hottOutput					= ", HoTT"; //$NON-NLS-1$
 
 	/**
 	 * this inner class holds the configuration and contains all logic to insert and update entries
@@ -518,7 +521,7 @@ public class JLog2Configuration extends Composite {
 			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
 
-		public void set47Type(int type) { //TODO this is unclear, set only in combination with special configurations
+		public void set47Type(int type) { //Duftmarke, set only in combination with special configurations
 			this.config[47] = GDE.STRING_EMPTY + type;
 			JLog2Configuration.log.log(java.util.logging.Level.FINER, getConfiguration());
 		}
@@ -568,7 +571,7 @@ public class JLog2Configuration extends Composite {
 				this.mpxAddressCombo = new CCombo(this, SWT.BORDER);
 				this.mpxAddressCombo.setLayoutData(mpxAddressComboLData);
 				this.mpxAddressCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.mpxAddressCombo.setItems(new String[] { " 0", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " 11", " 12", " 13", " 14", " 15", " --" }); //$NON-NLS-1$
+				this.mpxAddressCombo.setItems(new String[] { " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " 11", " 12", " 13", " 14", " --" }); //$NON-NLS-1$
 				this.mpxAddressCombo.select(16);
 				this.mpxAddressCombo.setVisibleItemCount(10);
 				this.mpxAddressCombo.setEnabled(false);
@@ -576,54 +579,61 @@ public class JLog2Configuration extends Composite {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						JLog2Configuration.log.log(java.util.logging.Level.FINEST, "mpxAddressCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+						int address = MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex() + 2;
+						address = address > 14 ? 16 : address;
+						for (int i = 30; i < 16; i++) {
+							if (i-30 != index && configuration.get(i) == address) {
+								JLog2Configuration.this.application.openMessageDialog("Address already in use, select different!");
+							}
+						}
 						switch (index) {
 						case 0:
-							configuration.setMpxSensorAddress0(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress0(address);
 							break;
 						case 1:
-							configuration.setMpxSensorAddress1(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress1(address);
 							break;
 						case 2:
-							configuration.setMpxSensorAddress2(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress2(address);
 							break;
 						case 3:
-							configuration.setMpxSensorAddress3(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress3(address);
 							break;
 						case 4:
-							configuration.setMpxSensorAddress4(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress4(address);
 							break;
 						case 5:
-							configuration.setMpxSensorAddress5(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress5(address);
 							break;
 						case 6:
-							configuration.setMpxSensorAddress6(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress6(address);
 							break;
 						case 7:
-							configuration.setMpxSensorAddress7(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress7(address);
 							break;
 						case 8:
-							configuration.setMpxSensorAddress8(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress8(address);
 							break;
 						case 9:
-							configuration.setMpxSensorAddress9(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress9(address);
 							break;
 						case 10:
-							configuration.setMpxSensorAddress10(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress10(address);
 							break;
 						case 11:
-							configuration.setMpxSensorAddress11(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress11(address);
 							break;
 						case 12:
-							configuration.setMpxSensorAddress12(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress12(address);
 							break;
 						case 13:
-							configuration.setMpxSensorAddress13(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress13(address);
 							break;
 						case 14:
-							configuration.setMpxSensorAddress14(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress14(address);
 							break;
 						case 15:
-							configuration.setMpxSensorAddress15(MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex());
+							configuration.setMpxSensorAddress15(address);
 							break;
 						}
 						enableSaveSettings();
@@ -2368,7 +2378,7 @@ public class JLog2Configuration extends Composite {
 					telemetryComboLData.height = 17;
 					this.telemetryCombo.setLayoutData(telemetryComboLData);
 					this.telemetryCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.telemetryCombo.setItems(new String[] { " ----------- ", "FTDI livestream", "JETI", "MPX", "Unidisplay" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					this.telemetryCombo.setItems(comOutputString.split(GDE.STRING_COMMA));
 					this.telemetryCombo.select(0);
 					this.telemetryCombo.addMouseMoveListener(new MouseMoveListener() {
 						public void mouseMove(MouseEvent evt) {
@@ -2934,6 +2944,9 @@ public class JLog2Configuration extends Composite {
 		this.hv2BecCombo.setVisible(false);
 		this.speedSensorLabel.setVisible(false);
 		this.speedSensorButton.setVisible(false);
+		if (comOutput.lastIndexOf(hottOutput) > 0) 
+			comOutput.substring(0, comOutput.lastIndexOf(hottOutput));
+		this.telemetryCombo.setItems(comOutputString.split(GDE.STRING_COMMA));
 
 		JLog2Configuration.log.log(java.util.logging.Level.OFF,
 				"telemetryCombo selection index = " + this.telemetryCombo.getSelectionIndex() + " jlogConfigurationCombo selection index = " + this.jlogConfigurationCombo.getSelectionIndex()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -2949,10 +2962,6 @@ public class JLog2Configuration extends Composite {
 			enableExternTempearture1(true);
 			this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGI2877));
 			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
-			break;
-		case 91: //P1 (Phase puls K4-1)
-			this.jlogConfigurationCombo.select(23);
-			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
 			break;
 		case 2: //BID
 			this.jlogConfigurationCombo.select(16);
@@ -3023,32 +3032,11 @@ public class JLog2Configuration extends Composite {
 			this.sensorAdapterButton.setEnabled(true);
 			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
 			break;
-		case 111: //GT (Prandtl probe + GPS)
-			this.jlogConfigurationCombo.select(12);
+		case 11: //HoTT
+			//this.jlogConfigurationCombo.select(10); // no special configuration or firmaware required
 			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
-			this.telemetryCombo.setEnabled(false);
-			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
-			this.sensorAdapterButton.setEnabled(true);
-			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
-			this.speedSensorLabel.setVisible(true);
-			this.speedSensorButton.setVisible(true);
-			break;
-		case 110: //T (Prandtl probe)
-			this.jlogConfigurationCombo.select(11);
-			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
-			this.speedSensorLabel.setVisible(true);
-			this.speedSensorButton.setVisible(true);
-			break;
-		case 23: //VG (V4T0 GPS single)
-			this.jlogConfigurationCombo.select(14);
-			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
-			this.telemetryCombo.setEnabled(false);
-			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
-			this.sensorAdapterButton.setEnabled(true);
-			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
-			enableExternTempearture1(true);
-			this.ext1Label.setText("Spannung");
-			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
+			this.telemetryCombo.setItems(comOutput.append(hottOutput).toString().split(GDE.STRING_COMMA));
+			this.telemetryCombo.select(5);
 			break;
 		case 15: //S (GPS mpx)
 			this.jlogConfigurationCombo.select(9);
@@ -3081,6 +3069,17 @@ public class JLog2Configuration extends Composite {
 			this.sensorAdapterButton.setEnabled(true);
 			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
 			break;
+		case 23: //VG (V4T0 GPS single)
+			this.jlogConfigurationCombo.select(14);
+			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			enableExternTempearture1(true);
+			this.ext1Label.setText("Spannung");
+			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
+			break;
 		case 25: //BIDS (GPS mpx)
 			this.jlogConfigurationCombo.select(18);
 			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
@@ -3100,6 +3099,26 @@ public class JLog2Configuration extends Composite {
 			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
 			this.telemetryCombo.setEnabled(false);
 			this.telemetryCombo.setText("MPX"); //$NON-NLS-1$
+			break;
+		case 91: //P1 (Phase puls K4-1)
+			this.jlogConfigurationCombo.select(23);
+			this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+			break;
+		case 110: //T (Prandtl probe)
+			this.jlogConfigurationCombo.select(11);
+			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
+			this.speedSensorLabel.setVisible(true);
+			this.speedSensorButton.setVisible(true);
+			break;
+		case 111: //GT (Prandtl probe + GPS)
+			this.jlogConfigurationCombo.select(12);
+			this.subDevicesCombo.setText("none"); //$NON-NLS-1$
+			this.telemetryCombo.setEnabled(false);
+			this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
+			this.sensorAdapterButton.setEnabled(true);
+			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			this.speedSensorLabel.setVisible(true);
+			this.speedSensorButton.setVisible(true);
 			break;
 		case 200: //HTS-SS (HiTec telemetry)
 			this.jlogConfigurationCombo.select(1);

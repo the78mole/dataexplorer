@@ -239,7 +239,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 			setDataLineStartAndLength(dataBuffer, startLength);
 			lineBuffer = new byte[startLength[1]];
 			System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
-			data.parse(new String(lineBuffer));
+			data.parse(new String(lineBuffer), 0);
 			int[] values = data.getValues();
 			
 			//0=Spannung BEC, 1=Strom BEC, 2=Spannung, 3=Strom, 4=Strom intern, 5=Leerlauf, 6=PWM, 7=Drehzahl Uni, 8=Drehzahl, 9=Kapazität, 
@@ -336,7 +336,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 				reduction = record.getReduction();
 				factor = record.getFactor(); // != 1 if a unit translation is required
 
-				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 			}
 		}
 		catch (RuntimeException e) {
