@@ -253,7 +253,7 @@ public class TestSuperClass extends TestCase {
 		//calculate number of curve scales, left and right side
 		int numberCurvesRight = 0;
 		int numberCurvesLeft = 0;
-		for (Record tmpRecord : recordSet.values()) {
+		for (Record tmpRecord : recordSet.getRecordsSortedForDisplay()) {
 			if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
 				//System.out.println("==>> " + recordKey + " isVisible = " + tmpRecord.isVisible() + " isDisplayable = " + tmpRecord.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				if (tmpRecord.isPositionLeft())
