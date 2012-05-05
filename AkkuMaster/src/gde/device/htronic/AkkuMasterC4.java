@@ -233,7 +233,7 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 		try {
 			for (int j = 0; j < recordSet.size(); j++) {
 				Record record = recordSet.get(j);
-				dataTableRow[j + 1] = record.getDecimalFormat().format(record.get(rowIndex) / 1000.0);
+				dataTableRow[j + 1] = record.getDecimalFormat().format(record.realGet(rowIndex) / 1000.0);
 			}
 		}
 		catch (RuntimeException e) {
