@@ -309,18 +309,18 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 				case 3: //3=temperature analog outlet
 					offset = record.getOffset(); // != 0 if curve has an defined offset
 					factor = record.getFactor(); // != 1 if a unit translation is required
-					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + record.get(rowIndex) / 1000.0) * factor);
+					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + record.realGet(rowIndex) / 1000.0) * factor);
 					break;
 				case 4: //4=Balance [mV]
 					offset = record.getOffset();
 					factor = record.getFactor();
-					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + record.get(rowIndex) / 1000.0) * factor);
+					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + record.realGet(rowIndex) / 1000.0) * factor);
 					break;
 				default:
 					if(j > 4 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
-						dataTableRow[j + 1] = String.format("%.3f", (record.get(rowIndex) / 1000.0));
+						dataTableRow[j + 1] = String.format("%.3f", (record.realGet(rowIndex) / 1000.0));
 					else
-						dataTableRow[j + 1] = record.getDecimalFormat().format(record.get(rowIndex) / 1000.0);
+						dataTableRow[j + 1] = record.getDecimalFormat().format(record.realGet(rowIndex) / 1000.0);
 					break;
 				}
 			}
