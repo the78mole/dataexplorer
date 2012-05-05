@@ -199,9 +199,9 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				if(j > 9 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
-					dataTableRow[j + 1] = String.format("%.3f", (((record.get(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[j + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				else
-					dataTableRow[j + 1] = record.getDecimalFormat().format((((record.get(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[j + 1] = record.getDecimalFormat().format((((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 			}
 		}
 		catch (RuntimeException e) {

@@ -141,7 +141,7 @@ public class iCharger208B extends iCharger {
 			setDataLineStartAndLength(dataBuffer, startLength);
 			lineBuffer = new byte[startLength[1]];
 			System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
-			data.parse(new String(lineBuffer));
+			data.parse(new String(lineBuffer), 1);
 			int[] values = data.getValues();
 			
 			//0=VersorgungsSpg. 1=Spannung 2=Strom  
