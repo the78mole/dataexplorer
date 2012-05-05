@@ -412,7 +412,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 						log.log(Level.SEVERE, record.getParent().getName() + " " + record.getName() + " " + e.getMessage());
 					}
 				}
-				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+				dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 			}
 		}
 		catch (RuntimeException e) {
