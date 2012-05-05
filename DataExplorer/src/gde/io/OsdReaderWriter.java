@@ -412,8 +412,8 @@ public class OsdReaderWriter {
 								.append(GDE.RECORD_SET_COMMENT).append(recordSet.getRecordSetDescription()).append(GDE.DATA_DELIMITER)
 								.append(GDE.RECORD_SET_PROPERTIES).append(recordSet.getSerializeProperties()).append(GDE.DATA_DELIMITER);
 							// serialized recordSet configuration data (record names, unit, symbol, isActive, ....) size data points , pointer data start or file name
-							for (Record record : recordSet.values()) {
-								sbs[i].append(GDE.RECORDS_PROPERTIES).append(record.getSerializeProperties());
+							for (String recordKey : recordSet.getRecordNames()) {
+								sbs[i].append(GDE.RECORDS_PROPERTIES).append(recordSet.get(recordKey).getSerializeProperties());
 							}
 							sbs[i].append(GDE.DATA_DELIMITER).append(GDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize(true))).append(GDE.DATA_DELIMITER); //$NON-NLS-1$
 							filePointer += GDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length; //$NON-NLS-1$
@@ -424,8 +424,8 @@ public class OsdReaderWriter {
 
 							if (log.isLoggable(Level.FINE)) {
 								StringBuilder sb1 = new StringBuilder().append(recordSet.getName()).append(GDE.STRING_MESSAGE_CONCAT);
-								for (Record record : recordSet.values()) {
-									sb1.append(record.getName()).append(GDE.STRING_COMMA);
+								for (String recordKey : recordSet.getRecordNames()) {
+									sb1.append(recordKey).append(GDE.STRING_COMMA);
 								}
 								log.log(Level.FINE, sb1.toString());
 							}

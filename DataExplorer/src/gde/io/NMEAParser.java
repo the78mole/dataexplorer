@@ -114,7 +114,7 @@ public class NMEAParser {
 			for (; indexRMC < inputLines.size(); ++indexRMC) {
 				if (inputLines.elementAt(indexRMC).indexOf("RMC", 1) > -1) { //$NON-NLS-1$
 					this.lineNumber = lastLineNumber - inputLines.size() + indexRMC + 1;
-					parse(inputLines.elementAt(indexRMC));
+					parse(inputLines.elementAt(indexRMC), this.lineNumber);
 					inputLines.remove(indexRMC);
 					break;
 				}
@@ -123,7 +123,7 @@ public class NMEAParser {
 			for (int i = 0; i < inputLines.size(); ++i) {
 				String inputLine = inputLines.elementAt(i);
 				this.lineNumber = lastLineNumber - inputLines.size() + (i<indexRMC ? i : i+1);
-				parse(inputLine);
+				parse(inputLine, this.lineNumber);
 			}
 		}
 		catch (NumberFormatException e) {
@@ -142,12 +142,12 @@ public class NMEAParser {
 	 * @throws DevicePropertiesInconsistenceException
 	 * @throws Exception
 	 */
-	public void parse(String inputLine) throws DevicePropertiesInconsistenceException, Exception {
+	public void parse(String inputLine, int lineNum) throws DevicePropertiesInconsistenceException, Exception {
 		final String $METHOD_NAME = "parse()"; //$NON-NLS-1$
 		log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
 		
 		if (!inputLine.startsWith(this.leader)) 
-			throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0046, new Object[] { this.leader, this.lineNumber }));
+			throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0046, new Object[] { this.leader, lineNum }));
 
 		//add special for MPX FlightRecorder
 		if (inputLine.startsWith("$SETUP1;") || inputLine.startsWith("$SETUP2;") || inputLine.startsWith("$D;")) {

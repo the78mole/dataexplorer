@@ -43,6 +43,7 @@ import gde.utils.TimeLine;
 import java.text.DecimalFormat;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -57,7 +58,7 @@ import org.eclipse.swt.graphics.Rectangle;
  * RecordSet class holds all the data records for the configured measurement of a device
  * @author Winfried Brügmann
  */
-public class RecordSet extends HashMap<String, Record> {
+public class RecordSet extends LinkedHashMap<String, Record> {
 	final static String						$CLASS_NAME 									= RecordSet.class.getName();
 	final static long							serialVersionUID							= 26031957;
 	final static Logger						log														= Logger.getLogger(RecordSet.class.getName());

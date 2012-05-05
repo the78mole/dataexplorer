@@ -92,7 +92,7 @@ public class CSVReaderWriter {
 				if (i == 0) header.put(GDE.DEVICE_NAME, headerData[i].split("\\r")[0].trim());
 				if (i == 1) header.put(GDE.CHANNEL_CONFIG_NAME, headerData[i].split(" ")[0].split("\\r")[0].trim());
 			}
-			while (!((line = reader.readLine()) != null && line.contains("[") && line.contains("]"))) {
+			while (((line = reader.readLine()) != null) && !(line.contains("[") && line.contains("]"))) {
 				// read until Zeit [sec];Spannung [---];Höhe [---]
 				// 						Zeit [s];Spannung [V];Strom [A];Ladung [mAh];Leistung [W];Energie [Wh]
 			}
@@ -419,7 +419,7 @@ public class CSVReaderWriter {
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
 				writer.write(sb.toString());
 				if (application.getStatusBar() != null && i % 50 == 0) application.setProgress(((++progressCycle*5000)/recordEntries), sThreadId);
-				log.log(Level.FINE, "data line = " + sb.toString()); //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "data line = " + sb.toString()); //$NON-NLS-1$
 			}
 			sb = null;
 			log.log(Level.TIME, "CSV file = " + filePath + " erfolgreich geschieben"  //$NON-NLS-1$ //$NON-NLS-2$

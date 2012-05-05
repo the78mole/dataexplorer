@@ -142,11 +142,11 @@ public class CSVSerialDataReaderWriter {
 				while ((line = reader.readLine()) != null) {
 					++lineNumber;
 					if (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPGGA.name())) {
-						data.parse(line);
+						data.parse(line, lineNumber);
 						continue;
 					}
 					
-					data.parse(line);
+					data.parse(line, lineNumber);
 
 					if (device.getStateType() == null) 
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] {device.getPropertiesFileName()})); 

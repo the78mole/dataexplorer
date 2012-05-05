@@ -120,7 +120,7 @@ public class QuasiLinearRegression extends CalculationThread {
 					--modCounter;
 				}
 				// pad the rest of the curve to make equal size
-				for (int i = record.realSize(); i < numberDataPoints - 1; i++) {
+				for (int i = record.realSize(); i < numberDataPoints; i++) {
 					record.add(0);
 				}
 				log.log(Level.FINE, "counter = " + startPosition + " modCounter = " + modCounter); //$NON-NLS-1$ //$NON-NLS-2$

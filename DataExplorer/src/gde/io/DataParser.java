@@ -88,7 +88,7 @@ public class DataParser extends NMEAParser {
 	}
 
 	@Override
-	public void parse(String inputLine) throws DevicePropertiesInconsistenceException, Exception {
+	public void parse(String inputLine, int lineNum) throws DevicePropertiesInconsistenceException, Exception {
 		try {			
 			String[] strValues = inputLine.split(this.separator); // {$1, 1, 0, 14780, 0,598, 1,000, 8,838, 22}
 			try {
@@ -103,7 +103,7 @@ public class DataParser extends NMEAParser {
 			}
 			catch (Exception e) {
 				//Multiplex FlightRecorder
-				super.parse(inputLine);
+				super.parse(inputLine, lineNum);
 			}
 		}
 		catch (NumberFormatException e) {

@@ -319,12 +319,12 @@ public class Record extends Vector<Integer> {
 		
 		if (isFromBegin) { 
 			for (int i = dataIndex; i < record.realSize(); i++) {
-				this.add(record.get(i).intValue());
+				this.add(record.realGet(i).intValue());
 			}
 		}
 		else {
 			for (int i = 0; i < dataIndex; i++) {
-				this.add(record.get(i).intValue());
+				this.add(record.realGet(i).intValue());
 			}
 		}
 		

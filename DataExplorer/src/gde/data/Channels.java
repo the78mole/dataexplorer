@@ -18,15 +18,15 @@
 ****************************************************************************************/
 package gde.data;
 
-import java.util.HashMap;
-import gde.log.Level;
-import java.util.logging.Logger;
-
 import gde.GDE;
 import gde.device.ChannelTypes;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+
+import java.util.HashMap;
+import java.util.logging.Logger;
 
 /**
  * Channels class is a map where all possible channels of a device are collected, this is a application singleton
