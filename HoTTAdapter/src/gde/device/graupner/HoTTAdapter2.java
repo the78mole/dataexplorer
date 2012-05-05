@@ -574,15 +574,15 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 
 				if (j == 12 || j == 13) { //12=Latitude, 13=Longitude 
-					int grad = record.get(rowIndex) / 1000000;
-					double minuten = record.get(rowIndex) % 1000000 / 10000.0;
+					int grad = record.realGet(rowIndex) / 1000000;
+					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
 					dataTableRow[j + 1] = String.format("%d %.4f", grad, minuten); //$NON-NLS-1$
 				}
 				else if (j >= 0 && j <= 5){
-					dataTableRow[j + 1] = String.format("%.0f",(record.get(rowIndex) / 1000.0));
+					dataTableRow[j + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0));
 				}
 				else {
-					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
 			}
 		}

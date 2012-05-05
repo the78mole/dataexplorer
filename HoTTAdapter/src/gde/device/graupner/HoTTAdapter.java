@@ -734,16 +734,16 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
 				if ((j == 1 || j == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  
-					int grad = record.get(rowIndex) / 1000000;
-					double minuten = record.get(rowIndex) % 1000000 / 10000.0;
+					int grad = record.realGet(rowIndex) / 1000000;
+					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
 					dataTableRow[j + 1] = String.format("%d %.4f", grad, minuten); //$NON-NLS-1$
 				}
 				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
 				else if (j >= 0 && j <= 5 && record.getParent().getChannelConfigNumber() == 1){ //Receiver
-					dataTableRow[j + 1] = String.format("%.0f",(record.get(rowIndex) / 1000.0));
+					dataTableRow[j + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0));
 				}
 				else {
-					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.get(rowIndex) / 1000.0) - reduction) * factor));
+					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
 			}
 		}
