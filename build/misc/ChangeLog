@@ -1,6 +1,9 @@
 Development history / change log, please read from bottom up
 
+Version 3.01 - xx yyy 2012
 fix scale synchronization problem while change zoom
+fix problem zoomed graphics versus table view with lazy update
+fix record length created by regression calculation
 
 Version 3.00 - 23 Apr 2012
 reduce scan depth while searching files and directories
