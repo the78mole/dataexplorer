@@ -69,9 +69,9 @@ public class JLog2Configuration extends Composite {
 	private Text									mainExplanationText;
 
 	private Group									alarmGroup;
-	private CLabel								uBecDipDetectLabel, paTempMaxLabel, voltageLabel, mAhLabel, uBatMinAlarmLabel, capacityAlarmLabel;
+	private CLabel								uBecDipDetectLabel, fetTempMaxLabel, voltageLabel, mAhLabel, uBatMinAlarmLabel, capacityAlarmLabel;
 	private CLabel								temperaureLabel, temperaure1Label;
-	private CCombo								paTempMaxCombo, voltageBatteryAlarmDecimalsCombo, voltageBatteryAlarmCombo, capacityAlarmCombo;
+	private CCombo								fetTempMaxCombo, voltageBatteryAlarmDecimalsCombo, voltageBatteryAlarmCombo, capacityAlarmCombo;
 	private Button								alarmsClearButton, uBecDipDetectButton, ext1smallerButton, ext2smallerButton, ext3smallerButton, ext4smallerButton, ext5smallerButton;
 	private Button								speedSensorButton;
 	private CLabel								speedSensorLabel;
@@ -134,7 +134,7 @@ public class JLog2Configuration extends Composite {
 
 	final String[]			baudrates						= new String[] { "JIVE", "2400", "4800", "9600", "38400", "57600", "115200", "CMT" };																																												//$NON-NLS-1$
 	final String[]			sysModes						= new String[] { "NEWLOG", "SEQLOG" };																																																																				//$NON-NLS-1$ //$NON-NLS-2$
-	final String[]			logModes						= new String[] { "(0) OF/CSV", "(2) SER", "(8) JLV" };																																																												//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	final String[]			logModes						= new String[] { "(0) OF/LV", "(2) SER", "(8) JLV" };																																																												//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	final String[]			motorPols						= new String[] { "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24", "26", "38", "30", "32", "34", "36", "38", "40", "42", "44", "46", "48" };																																							//$NON-NLS-1$
 	final String[]			motorShuntAdjust		= new String[] { "-15", "-14", "-13", "-12", "-11", "-10", " -9", " -8", " -7", " -6", " -5", " -4", " -3", " -2", " -1", "  0", "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15" };	//$NON-NLS-1$
 	final String[]			zeroTo9							= new String[10];																																																																															;
@@ -571,7 +571,7 @@ public class JLog2Configuration extends Composite {
 				this.mpxAddressCombo = new CCombo(this, SWT.BORDER);
 				this.mpxAddressCombo.setLayoutData(mpxAddressComboLData);
 				this.mpxAddressCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.mpxAddressCombo.setItems(new String[] { " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " 11", " 12", " 13", " 14", " --" }); //$NON-NLS-1$
+				this.mpxAddressCombo.setItems(new String[] { " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " 11", " 12", " 13", " 14", " 15", " --" }); //$NON-NLS-1$
 				this.mpxAddressCombo.select(16);
 				this.mpxAddressCombo.setVisibleItemCount(10);
 				this.mpxAddressCombo.setEnabled(false);
@@ -581,9 +581,12 @@ public class JLog2Configuration extends Composite {
 						JLog2Configuration.log.log(java.util.logging.Level.FINEST, "mpxAddressCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						int address = MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex() + 2;
 						address = address > 14 ? 16 : address;
-						for (int i = 30; i < 16; i++) {
-							if (i-30 != index && configuration.get(i) == address) {
-								JLog2Configuration.this.application.openMessageDialog("Address already in use, select different!");
+						for (int i = 0; i < MpxAddressComposite.this.mpxAddressCombo.getItemCount()-1; i++) {
+							if (i != index && configuration.get(i+30) == address) {
+								JLog2Configuration.this.application.openMessageDialog(JLog2Configuration.this.dialog.getDialogShell(), "Address already in use, select different!");
+								MpxAddressComposite.this.mpxAddressCombo.select(14);
+								address = 16;
+								break;
 							}
 						}
 						switch (index) {
@@ -849,6 +852,8 @@ public class JLog2Configuration extends Composite {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "jlogConfigurationCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (JLog2Configuration.this.jlogConfigurationCombo.getSelectionIndex() > 0)
+								JLog2Configuration.this.application.openMessageDialogAsync(JLog2Configuration.this.dialog.getDialogShell(),Messages.getString(MessageIds.GDE_MSGI2826));
 							//0=normal, 1=HSS, 2=HSSG2, 3=HSST, 4=BH, 5=BM, 6=BHSS, 7=BHSST, 8=G, 9=S 10=L, 
 							//11=T, 12=GT, 13=V, 14=VG, 15=VS, 16=BID, 17=BIDG, 18=BIDS, 19=A, 20=AV, 21=B, 22=BV, 23=P1, 24=P2, 25=AVP1, 26=AP2
 							switch (JLog2Configuration.this.jlogConfigurationCombo.getSelectionIndex()) {
@@ -1675,35 +1680,35 @@ public class JLog2Configuration extends Composite {
 					this.voltageLabel.setText("[V]"); //$NON-NLS-1$
 				}
 				{
-					this.paTempMaxLabel = new CLabel(this.alarmGroup, SWT.NONE);
+					this.fetTempMaxLabel = new CLabel(this.alarmGroup, SWT.NONE);
 					RowData paTempMaxLabelLData = new RowData();
 					paTempMaxLabelLData.width = 106;
 					paTempMaxLabelLData.height = 20;
-					this.paTempMaxLabel.setLayoutData(paTempMaxLabelLData);
-					this.paTempMaxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.paTempMaxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2873));
+					this.fetTempMaxLabel.setLayoutData(paTempMaxLabelLData);
+					this.fetTempMaxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.fetTempMaxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2873));
 				}
 				{
-					this.paTempMaxCombo = new CCombo(this.alarmGroup, SWT.BORDER);
+					this.fetTempMaxCombo = new CCombo(this.alarmGroup, SWT.BORDER);
 					RowData paTempMaxComboLData = new RowData();
 					paTempMaxComboLData.width = GDE.IS_LINUX ? 55 : 45;
 					paTempMaxComboLData.height = 17;
-					this.paTempMaxCombo.setLayoutData(paTempMaxComboLData);
-					this.paTempMaxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.paTempMaxCombo.setItems(this.zeroTo127);
-					this.paTempMaxCombo.select(0);
-					this.paTempMaxCombo.setVisibleItemCount(10);
-					this.paTempMaxCombo.addMouseMoveListener(new MouseMoveListener() {
+					this.fetTempMaxCombo.setLayoutData(paTempMaxComboLData);
+					this.fetTempMaxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.fetTempMaxCombo.setItems(this.zeroTo127);
+					this.fetTempMaxCombo.select(0);
+					this.fetTempMaxCombo.setVisibleItemCount(10);
+					this.fetTempMaxCombo.addMouseMoveListener(new MouseMoveListener() {
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "paTempMaxCombo.mouseMove, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.mainExplanationText.setText(Messages.getString(MessageIds.GDE_MSGI2811));
 						}
 					});
-					this.paTempMaxCombo.addSelectionListener(new SelectionAdapter() {
+					this.fetTempMaxCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "paTempMaxCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							JLog2Configuration.this.configuration.setPaMaxTempAlarm(JLog2Configuration.this.paTempMaxCombo.getText().trim());
+							JLog2Configuration.this.configuration.setPaMaxTempAlarm(JLog2Configuration.this.fetTempMaxCombo.getText().trim());
 							checkNumberAlarms();
 							checkClearButtonState();
 							enableSaveSettings();
@@ -2235,6 +2240,7 @@ public class JLog2Configuration extends Composite {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "tempSensorTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							setTemperaturSensorType(JLog2Configuration.this.tempSensorTypeCombo.getSelectionIndex());
 							JLog2Configuration.this.configuration.setTemperaturSensorType(JLog2Configuration.this.tempSensorTypeCombo.getSelectionIndex());
+							checkNumberAlarms();
 							checkAdapterRequired();
 							enableSaveSettings();
 						}
@@ -2390,6 +2396,7 @@ public class JLog2Configuration extends Composite {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "telemetryCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Configuration.this.application.openMessageDialogAsync(JLog2Configuration.this.dialog.getDialogShell(),Messages.getString(MessageIds.GDE_MSGI2820));
 							enableMpxAddressSelection(false);
 							JLog2Configuration.this.configuration.setTelemetryType(JLog2Configuration.this.telemetryCombo.getSelectionIndex());
 							switch (JLog2Configuration.this.telemetryCombo.getSelectionIndex()) {
@@ -2555,7 +2562,7 @@ public class JLog2Configuration extends Composite {
 			this.capacityAlarmCombo.select(config.get(12));
 			this.voltageBatteryAlarmCombo.select(config.get(13));
 			this.voltageBatteryAlarmDecimalsCombo.select(config.get(14));
-			this.paTempMaxCombo.select(config.get(15));
+			this.fetTempMaxCombo.select(config.get(15));
 		}
 		this.extern1Combo.select(config.get(17));
 		this.extern2Combo.select(config.get(18));
@@ -2579,22 +2586,22 @@ public class JLog2Configuration extends Composite {
 		setIsMotorButton((config.get(29) & 0x0004) > 0 && config.get(28) > 0);
 		this.extRpmButton.setEnabled((config.get(29) & 0x0004) > 0 && config.get(28) > 0);
 		setIsBrushlessMotor((config.get(29) & 0x0080) > 0 && (config.get(29) & 0x0004) > 0 && config.get(28) > 0);
-		this.mpxAddresses[0].mpxAddressCombo.select(config.get(30));
-		this.mpxAddresses[1].mpxAddressCombo.select(config.get(31));
-		this.mpxAddresses[2].mpxAddressCombo.select(config.get(32));
-		this.mpxAddresses[3].mpxAddressCombo.select(config.get(33));
-		this.mpxAddresses[4].mpxAddressCombo.select(config.get(34));
-		this.mpxAddresses[5].mpxAddressCombo.select(config.get(35));
-		this.mpxAddresses[6].mpxAddressCombo.select(config.get(36));
-		this.mpxAddresses[7].mpxAddressCombo.select(config.get(37));
-		this.mpxAddresses[8].mpxAddressCombo.select(config.get(38));
-		this.mpxAddresses[9].mpxAddressCombo.select(config.get(39));
-		this.mpxAddresses[10].mpxAddressCombo.select(config.get(40));
-		this.mpxAddresses[11].mpxAddressCombo.select(config.get(41));
-		this.mpxAddresses[12].mpxAddressCombo.select(config.get(42));
-		this.mpxAddresses[13].mpxAddressCombo.select(config.get(43));
-		this.mpxAddresses[14].mpxAddressCombo.select(config.get(44));
-		this.mpxAddresses[15].mpxAddressCombo.select(config.get(45));
+		this.mpxAddresses[0].mpxAddressCombo.select(config.get(30)-2);
+		this.mpxAddresses[1].mpxAddressCombo.select(config.get(31)-2);
+		this.mpxAddresses[2].mpxAddressCombo.select(config.get(32)-2);
+		this.mpxAddresses[3].mpxAddressCombo.select(config.get(33)-2);
+		this.mpxAddresses[4].mpxAddressCombo.select(config.get(34)-2);
+		this.mpxAddresses[5].mpxAddressCombo.select(config.get(35)-2);
+		this.mpxAddresses[6].mpxAddressCombo.select(config.get(36)-2);
+		this.mpxAddresses[7].mpxAddressCombo.select(config.get(37)-2);
+		this.mpxAddresses[8].mpxAddressCombo.select(config.get(38)-2);
+		this.mpxAddresses[9].mpxAddressCombo.select(config.get(39)-2);
+		this.mpxAddresses[10].mpxAddressCombo.select(config.get(40)-2);
+		this.mpxAddresses[11].mpxAddressCombo.select(config.get(41)-2);
+		this.mpxAddresses[12].mpxAddressCombo.select(config.get(42)-2);
+		this.mpxAddresses[13].mpxAddressCombo.select(config.get(43)-2);
+		this.mpxAddresses[14].mpxAddressCombo.select(config.get(44)-2);
+		this.mpxAddresses[15].mpxAddressCombo.select(config.get(45)-2);
 		//setTelemetryLivedata(config.get(46) & 0xFFF0);
 		if (isInitialLoad) {
 			setLogMode(config.get(2)); //enable/disables lots of combos
@@ -2605,6 +2612,7 @@ public class JLog2Configuration extends Composite {
 		catch (Exception e) {
 			//ignore, not relevant for this configuration
 		}
+		checkClearButtonState();
 	}
 
 	/**
@@ -2763,7 +2771,7 @@ public class JLog2Configuration extends Composite {
 		this.directGearRatioDecimalsCombo.setEnabled(isEnabled);
 		this.alarmsClearButton.setEnabled(isEnabled);
 		this.uBecDipDetectButton.setEnabled(isEnabled);
-		this.paTempMaxCombo.setEnabled(isEnabled);
+		this.fetTempMaxCombo.setEnabled(isEnabled);
 		this.voltageBatteryAlarmDecimalsCombo.setEnabled(isEnabled);
 		this.voltageBatteryAlarmCombo.setEnabled(isEnabled);
 		this.capacityAlarmCombo.setEnabled(isEnabled);
@@ -2815,12 +2823,13 @@ public class JLog2Configuration extends Composite {
 
 	private void checkNumberAlarms() {
 		int numAlarms = 0;
+		boolean isTemperatureSensorType = this.tempSensorTypeCombo.getSelectionIndex() > 0;
 
 		if (this.uBecDipDetectButton.getSelection()) ++numAlarms;
 		if (this.capacityAlarmCombo.getSelectionIndex() > 0) ++numAlarms;
 		if (this.voltageBatteryAlarmCombo.getSelectionIndex() > 0) ++numAlarms;
 		if (this.voltageBatteryAlarmDecimalsCombo.getSelectionIndex() > 0) ++numAlarms;
-		if (this.paTempMaxCombo.getSelectionIndex() > 0) ++numAlarms;
+		if (this.fetTempMaxCombo.getSelectionIndex() > 0) ++numAlarms;
 		if (this.extern1Combo.getSelectionIndex() > 0) ++numAlarms;
 		if (this.ext1smallerButton.getSelection()) ++numAlarms;
 		if (this.extern2Combo.getSelectionIndex() > 0) ++numAlarms;
@@ -2839,6 +2848,13 @@ public class JLog2Configuration extends Composite {
 			}
 			this.alarmLinesCombo.setItems(this.oneAlarms);
 		}
+		else if (isTemperatureSensorType && numAlarms > 1) {
+				if (this.alarmLinesCombo.getSelectionIndex() > 1)  {
+					this.alarmLinesCombo.select(1);
+					this.configuration.setNumberAlarmLines(1);
+				}
+				this.alarmLinesCombo.setItems(this.oneAlarms);
+		}
 		else if (numAlarms > 1)
 			this.alarmLinesCombo.setItems(this.greaterOneAlarms);
 		else {
@@ -2853,7 +2869,7 @@ public class JLog2Configuration extends Composite {
 
 	private void checkClearButtonState() {
 		if (this.uBecDipDetectButton.getSelection() || this.capacityAlarmCombo.getSelectionIndex() > 0 || this.voltageBatteryAlarmCombo.getSelectionIndex() > 0
-				|| this.voltageBatteryAlarmDecimalsCombo.getSelectionIndex() > 0 || this.paTempMaxCombo.getSelectionIndex() > 0 || this.extern1Combo.getSelectionIndex() > 0
+				|| this.voltageBatteryAlarmDecimalsCombo.getSelectionIndex() > 0 || this.fetTempMaxCombo.getSelectionIndex() > 0 || this.extern1Combo.getSelectionIndex() > 0
 				|| this.ext1smallerButton.getSelection() || this.extern2Combo.getSelectionIndex() > 0 || this.ext2smallerButton.getSelection() || this.extern3Combo.getSelectionIndex() > 0
 				|| this.ext3smallerButton.getSelection() || this.extern4Combo.getSelectionIndex() > 0 || this.ext4smallerButton.getSelection() || this.extern5Combo.getSelectionIndex() > 0
 				|| this.ext5smallerButton.getSelection()) {
@@ -2877,7 +2893,7 @@ public class JLog2Configuration extends Composite {
 		this.configuration.setBatteryAlarmMajor("0"); //$NON-NLS-1$
 		this.voltageBatteryAlarmCombo.select(0);
 		this.configuration.setBatteryAlarmDecimals("0"); //$NON-NLS-1$
-		this.paTempMaxCombo.select(0);
+		this.fetTempMaxCombo.select(0);
 		this.configuration.setPaMaxTempAlarm("0"); //$NON-NLS-1$
 		this.extern1Combo.select(0);
 		this.ext1smallerButton.setSelection(false);

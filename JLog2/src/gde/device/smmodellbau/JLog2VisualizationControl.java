@@ -108,9 +108,11 @@ public class JLog2VisualizationControl extends Composite {
 			GridLayout mainTabCompositeLayout = new GridLayout();
 			mainTabCompositeLayout.makeColumnsEqualWidth = true;
 			mainTabCompositeLayout.numColumns = 2;
+			mainTabCompositeLayout.verticalSpacing = (this.measurementCount - 31 + 1) / 2 * 23 / (this.measurementCount - 31 + 1); //adapt while changing measurementCount, actual only 31
+			mainTabCompositeLayout.verticalSpacing = mainTabCompositeLayout.verticalSpacing < 0 ? 0 : mainTabCompositeLayout.verticalSpacing;
 			this.mainTabComposite.setLayout(mainTabCompositeLayout);
 
-			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) {
+			for (int i = this.measurementOffset; i < this.measurementOffset + 31; i++) { // display actual only the native 31 measurements of JLog2
 				//allow all measurement names, symbols and units to be correctable
 				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i,
 						this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), GDE.STRING_EMPTY));

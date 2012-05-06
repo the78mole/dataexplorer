@@ -122,14 +122,14 @@
             <Measurement>
                 <name>Temperatur FET</name>
                 <symbol>T</symbol>
-                <unit>°C</unit>
+                <unit>Â°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Temperatur BEC</name>
                 <symbol>T</symbol>
-                <unit>°C</unit>
+                <unit>Â°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property type="Integer" value="10" name="scale_sync_ref_ordinal"/>
@@ -168,7 +168,7 @@
                 <property type="Integer" value="3" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>ALARM:Kapazität</name>
+                <name>ALARM:KapazitÃ¤t</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
@@ -242,14 +242,14 @@
             <Measurement>
                 <name>Temperatur_ext 1</name>
                 <symbol>T</symbol>
-                <unit>°C</unit>
+                <unit>Â°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Temperatur_ext 2</name>
                 <symbol>T</symbol>
-                <unit>°C</unit>
+                <unit>Â°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
@@ -257,7 +257,7 @@
             <Measurement>
                 <name>Temperatur_ext 3</name>
                 <symbol>T</symbol>
-                <unit>°C</unit>
+                <unit>Â°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
@@ -265,7 +265,7 @@
             <Measurement>
                 <name>Temperatur_ext 4</name>
                 <symbol>T</symbol>
-                <unit>°C</unit>
+                <unit>Â°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
@@ -273,7 +273,7 @@
             <Measurement>
                 <name>Temperatur_ext 5</name>
                 <symbol>T</symbol>
-                <unit>°C</unit>
+                <unit>Â°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property type="Integer" value="27" name="scale_sync_ref_ordinal"/>
