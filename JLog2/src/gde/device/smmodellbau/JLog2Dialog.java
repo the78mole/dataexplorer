@@ -85,6 +85,7 @@ public class JLog2Dialog extends DeviceDialog {
 
 	RecordSet								lastActiveRecordSet	= null;
 	boolean									isVisibilityChanged	= false;
+	boolean									isConfigChanged 		= false;
 	int											measurementsCount		= 0;
 	final List<CTabItem>		configurations			= new ArrayList<CTabItem>();
 
@@ -188,6 +189,12 @@ public class JLog2Dialog extends DeviceDialog {
 								JLog2Dialog.this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2815));
 							}
 							else {
+								if (JLog2Dialog.this.isConfigChanged) {
+									if (SWT.YES == JLog2Dialog.this.application.openYesNoMessageDialog(JLog2Dialog.this.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW2802))) {
+										saveSetup();
+									}
+									JLog2Dialog.this.isConfigChanged = false;
+								}
 								JLog2Dialog.this.liveGathererButton.setEnabled(true);
 								JLog2Dialog.this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2805));
 								JLog2Dialog.this.liveGathererButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2807));
@@ -438,6 +445,7 @@ public class JLog2Dialog extends DeviceDialog {
 				writer.write(((JLog2Configuration) this.configurationTabItem.getControl()).configuration.getConfiguration());
 				writer.close();
 				this.liveGathererButton.setEnabled(false);
+				this.isConfigChanged = false;
 			}
 			catch (Exception e) {
 				JLog2Dialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);

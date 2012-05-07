@@ -20,6 +20,7 @@ package gde.device.smmodellbau;
 
 import gde.GDE;
 import gde.device.smmodellbau.jlog2.MessageIds;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
@@ -581,9 +582,10 @@ public class JLog2Configuration extends Composite {
 						JLog2Configuration.log.log(java.util.logging.Level.FINEST, "mpxAddressCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						int address = MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex() + 2;
 						address = address > 14 ? 16 : address;
-						for (int i = 0; i < MpxAddressComposite.this.mpxAddressCombo.getItemCount()-1; i++) {
+						for (int i = 0; i < 16; i++) {
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, i + " != " + index + "; " + configuration.get(i+30) + " == " + address);
 							if (i != index && configuration.get(i+30) == address) {
-								JLog2Configuration.this.application.openMessageDialog(JLog2Configuration.this.dialog.getDialogShell(), "Address already in use, select different!");
+								JLog2Configuration.this.application.openMessageDialog(JLog2Configuration.this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW2803));
 								MpxAddressComposite.this.mpxAddressCombo.select(14);
 								address = 16;
 								break;
@@ -730,11 +732,13 @@ public class JLog2Configuration extends Composite {
 	}
 
 	public void enableSaveSettings() {
+		this.dialog.isConfigChanged = true;
 		this.dialog.liveGathererButton.setEnabled(true);
 	}
 
 	private void initGUI() {
 		try {
+			this.dialog.isConfigChanged = false;
 			this.setLayout(new FormLayout());
 			this.setSize(675, 600);
 			{
@@ -1535,7 +1539,7 @@ public class JLog2Configuration extends Composite {
 					uBecDipDetectButtonLData.height = 20;
 					this.uBecDipDetectButton.setLayoutData(uBecDipDetectButtonLData);
 					this.uBecDipDetectButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.uBecDipDetectButton.setText("< 500 [mV]"); //$NON-NLS-1$
+					this.uBecDipDetectButton.setText("> 500 [mV]"); //$NON-NLS-1$
 					this.uBecDipDetectButton.addMouseMoveListener(new MouseMoveListener() {
 						public void mouseMove(MouseEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "uBecDipDetectButton.mouseMove, event=" + evt); //$NON-NLS-1$
@@ -2241,7 +2245,6 @@ public class JLog2Configuration extends Composite {
 							setTemperaturSensorType(JLog2Configuration.this.tempSensorTypeCombo.getSelectionIndex());
 							JLog2Configuration.this.configuration.setTemperaturSensorType(JLog2Configuration.this.tempSensorTypeCombo.getSelectionIndex());
 							checkNumberAlarms();
-							checkAdapterRequired();
 							enableSaveSettings();
 						}
 					});
@@ -2865,6 +2868,7 @@ public class JLog2Configuration extends Composite {
 			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 			this.sensorAdapterButton.setEnabled(false);
 		}
+		checkAdapterRequired();
 	}
 
 	private void checkClearButtonState() {
@@ -2881,7 +2885,6 @@ public class JLog2Configuration extends Composite {
 			this.alarmsClearButton.setEnabled(false);
 		}
 		checkNumberAlarms();
-		checkAdapterRequired();
 	}
 
 	private void clearAlarms() {
@@ -2964,7 +2967,7 @@ public class JLog2Configuration extends Composite {
 			comOutput.substring(0, comOutput.lastIndexOf(hottOutput));
 		this.telemetryCombo.setItems(comOutputString.split(GDE.STRING_COMMA));
 
-		JLog2Configuration.log.log(java.util.logging.Level.OFF,
+		JLog2Configuration.log.log(java.util.logging.Level.FINE,
 				"telemetryCombo selection index = " + this.telemetryCombo.getSelectionIndex() + " jlogConfigurationCombo selection index = " + this.jlogConfigurationCombo.getSelectionIndex()); //$NON-NLS-1$ //$NON-NLS-2$
 		JLog2Configuration.log.log(java.util.logging.Level.FINER, StringHelper.printBinary((byte) (value & 0xFF), false));
 
@@ -3024,7 +3027,7 @@ public class JLog2Configuration extends Composite {
 			this.pulsPerRevolutionSensorCombo.setEnabled(false);
 			this.telemetryCombo.select(4);
 			enableExternTempeartureAll(true);
-			this.ext1Label.setText("Spannung");
+			this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGI2877));
 			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
 			break;
 		case 5: //A (JTX Air)
@@ -3037,7 +3040,7 @@ public class JLog2Configuration extends Composite {
 			this.telemetryCombo.setEnabled(false);
 			this.telemetryCombo.setText("JTX"); //$NON-NLS-1$
 			enableExternTempearture1(true);
-			this.ext1Label.setText("Spannung");
+			this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGI2877));
 			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
 			break;
 		case 10: //G (GPS single)
@@ -3069,7 +3072,7 @@ public class JLog2Configuration extends Composite {
 			this.sensorAdapterButton.setEnabled(true);
 			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
 			enableExternTempearture1(true);
-			this.ext1Label.setText("Spannung");
+			this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGI2877));
 			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
 			break;
 		case 20: //BIDG (GPS single)
@@ -3093,7 +3096,7 @@ public class JLog2Configuration extends Composite {
 			this.sensorAdapterButton.setEnabled(true);
 			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
 			enableExternTempearture1(true);
-			this.ext1Label.setText("Spannung");
+			this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGI2877));
 			this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
 			break;
 		case 25: //BIDS (GPS mpx)
