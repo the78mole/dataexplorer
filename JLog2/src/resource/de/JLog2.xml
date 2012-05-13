@@ -68,7 +68,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics sumTriggerTimeText="Motorlaufzeit" sigma="true" avg="true" max="true" min="true">
-                    <trigger comment="Trigger 2 A &gt; 10 sec" minTimeSec="10" isGreater="true" level="2500"/>
+                    <trigger comment="Trigger 2 A &gt; 5 sec" minTimeSec="5" isGreater="true" level="2000"/>
                 </statistics>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
