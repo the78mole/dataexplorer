@@ -918,6 +918,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 		if (this.isCompareSet || this.isUtilitySet) {
 			this.addRecordName(key);
 			newRecord.name = key;
+			newRecord.ordinal = this.size()-1;
 			
 			if (this.realSize() > 1) { 
 				// keep the color of first added record
@@ -1255,8 +1256,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			this.resetMeasurement();
 			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
 				// iterate children and reset min/max values
-				for (Entry<String, Record> recordEntry : this.entrySet()) {
-					Record record = recordEntry.getValue();
+				for (Record record : this.values()) {
 					record.zoomOffset = 0;
 					record.zoomTimeOffset = 0.0;
 					record.drawTimeWidth = record.getMaxTime_ms();
@@ -1268,8 +1268,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			}
 		}
 		else {
-			for (java.util.Map.Entry<String, Record> element : this.entrySet()) {
-				Record record = element.getValue();
+			for (Record record : this.values()) {
 				record.minZoomScaleValue = record.minScaleValue;
 				record.maxZoomScaleValue = record.maxScaleValue;
 			}
@@ -1850,14 +1849,12 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			boolean isAffected = false;
 			int tmpSyncMin = Integer.MAX_VALUE; 
 			int tmpSyncMax = Integer.MIN_VALUE;
-			if (log.isLoggable(Level.FINE))
-				log.log(Level.FINE, this.get(syncRecordOrdinal).name + " syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 				synchronized (tmpRecord) {
 					if (tmpRecord.isVisible && tmpRecord.isDisplayable) {
 						isAffected = true;
-						int tmpMin = tmpRecord.getMinValue();
-						int tmpMax = tmpRecord.getMaxValue();
+						int tmpMin = (int) (tmpRecord.getMinValue() * tmpRecord.syncMasterFactor);
+						int tmpMax = (int) (tmpRecord.getMaxValue() * tmpRecord.syncMasterFactor);
 						if (tmpMin != 0 || tmpMax != 0) {
 							if (log.isLoggable(Level.FINE))
 								log.log(Level.FINE, tmpRecord.name + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$

@@ -62,7 +62,7 @@ public class Record extends Vector<Integer> {
 	String							keyName;
 	TimeSteps						timeStep_ms           = null; // timeStep_ms for each measurement point in compare set, where time step of measurement points might be individual
 	IDevice							device;
-	final int						ordinal;	// ordinal is referencing the source position of the record relative to the initial 
+	int									ordinal;	// ordinal is referencing the source position of the record relative to the initial 
 																// device measurement configuration and used to find specific properties
 
 	RecordSet						parent;
@@ -157,6 +157,7 @@ public class Record extends Vector<Integer> {
 	// display the record
 	double							displayScaleFactorTime;
 	double							displayScaleFactorValue;
+	double							syncMasterFactor			= 1.0;			// synchronized scale and different measurement factors
 	double							minDisplayValue;									// min value in device units, correspond to draw area
 	double							maxDisplayValue;									// max value in device units, correspond to draw area
 
@@ -1357,8 +1358,8 @@ public class Record extends Vector<Integer> {
 	public Point getDisplayPoint(int measurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
 		//log.log(Level.OFF, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - this.minDisplayValue) * this.displayScaleFactorValue).intValue()) + ")");
 		return new Point(
-				xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), 
-				yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - this.minDisplayValue) * this.displayScaleFactorValue).intValue());
+			xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), 
+			yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
 	}
 	
 	/**
@@ -1554,6 +1555,10 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
+		if (this.parent.isOneOfSyncableRecord(this) && this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor() != 1) {
+			this.syncMasterFactor = this.getFactor() / this.parent.get(this.parent.getSyncMasterRecordOrdinal(this)).getFactor();
+			this.displayScaleFactorValue = this.displayScaleFactorValue * syncMasterFactor;			
+		}
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", drawAreaHeight, this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue))); //$NON-NLS-1$
 
 	}
