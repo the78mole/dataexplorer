@@ -67,7 +67,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics sumTriggerTimeText="Motorlaufzeit" sigma="true" avg="true" max="true" min="true">
+                <statistics sumTriggerTimeText="Motorlaufzeit" countTriggerText="Anzahl Steigflüge" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
                     <trigger comment="Trigger 2 A &gt; 5 sec" minTimeSec="5" isGreater="true" level="2000"/>
                 </statistics>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
@@ -86,21 +86,21 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>PWM</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Drehzahl Uni</name>
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -117,7 +117,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="" sumTriggerText="Bezogen auf Stromtrigger" sumByTriggerRefOrdinal="3" sigma="false" avg="false" max="true" min="false"/>
             </Measurement>
             <Measurement>
                 <name>Temperatur FET</name>
@@ -139,14 +139,14 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Leistung integriert</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="12" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -283,7 +283,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
