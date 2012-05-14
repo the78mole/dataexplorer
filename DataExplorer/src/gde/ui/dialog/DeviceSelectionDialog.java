@@ -156,6 +156,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		//add this two renamed device plug-ins to the list of legacy devices
 		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
 		this.legacyDeviceNames.put("QuadroControl", "QC-Copter");
+		this.legacyDeviceNames.put("PichlerP60", "PichlerP60 50W");
 
 		try {
 			initialize();

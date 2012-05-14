@@ -549,7 +549,7 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "deleteObject.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuToolBar.this.objectSelectCombo.getSelectionIndex() != 0) {
+							if (MenuToolBar.this.objectSelectCombo.getSelectionIndex() > 0) {
 								Vector<String> tmpObjects = new Vector<String>();
 								for (String tmpObject : MenuToolBar.this.objectSelectCombo.getItems()) {
 									tmpObjects.add(tmpObject);
@@ -585,7 +585,7 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "editObject.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuToolBar.this.objectSelectCombo.getSelectionIndex() != 0) {
+							if (MenuToolBar.this.objectSelectCombo.getSelectionIndex() > 0) {
 								MenuToolBar.this.oldObjectKey = MenuToolBar.this.objectSelectCombo.getItems()[MenuToolBar.this.objectSelectCombo.getSelectionIndex()];
 								MenuToolBar.this.objectSelectCombo.setEditable(true);
 								MenuToolBar.this.objectSelectCombo.setFocus();
