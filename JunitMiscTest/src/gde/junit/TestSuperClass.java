@@ -122,6 +122,7 @@ public class TestSuperClass extends TestCase {
 		//add this two renamed device plug-ins to the list of legacy devices
 		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
 		this.legacyDeviceNames.put("QuadroControl", "QC-Copter");
+		this.legacyDeviceNames.put("PichlerP60", "PichlerP60 50W");
 
 		Canvas canvas = new Canvas(new Composite(Display.getDefault().getShells()[0], SWT.NONE), SWT.NONE);
 		this.canvasGC = SWTResourceManager.getGC(canvas, "curveArea_" + 0); //$NON-NLS-1$
