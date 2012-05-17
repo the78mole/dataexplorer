@@ -31,7 +31,7 @@
         <timeUnit>msec</timeUnit>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredDataLocation>G:\LogData</preferredDataLocation>
+        <preferredDataLocation></preferredDataLocation>
         <preferredFileExtention>*.bin</preferredFileExtention>
     </DataBlock>
     <State>
@@ -135,7 +135,8 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="90.0" name="filter_factor"/>
+                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="100.0" name="filter_factor"/>
+                <property type="Boolean" value="true" name="tolerate_sign_change"/>
             </Measurement>
             <Measurement>
                 <name>Längengrad</name>
@@ -144,6 +145,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="25.0" name="filter_factor"/>
+                <property type="Boolean" value="true" name="tolerate_sign_change"/>
             </Measurement>
             <Measurement>
                 <name>Geschwindigkeit</name>
@@ -584,7 +586,8 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="90.0" name="filter_factor"/>
+                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="100.0" name="filter_factor"/>
+                <property type="Boolean" value="true" name="tolerate_sign_change"/>
             </Measurement>
             <Measurement>
                 <name>Längengrad</name>
@@ -593,6 +596,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="25.0" name="filter_factor"/>
+                <property type="Boolean" value="true" name="tolerate_sign_change"/>
             </Measurement>
             <Measurement>
                 <name>Geschwindigkeit</name>
@@ -1035,7 +1039,8 @@
                 <unit>° '</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="90.0" name="filter_factor"/>
+                <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="100.0" name="filter_factor"/>
+                <property type="Boolean" value="true" name="tolerate_sign_change"/>
             </Measurement>
             <Measurement>
                 <name>Längengrad</name>
@@ -1044,6 +1049,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Filterfaktor - höherer Wert, stärkerer Filter" type="Double" value="25.0" name="filter_factor"/>
+                <property type="Boolean" value="true" name="tolerate_sign_change"/>
             </Measurement>
             <Measurement>
                 <name>Geschwindigkeit</name>
