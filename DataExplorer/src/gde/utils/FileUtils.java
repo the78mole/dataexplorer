@@ -209,7 +209,7 @@ public class FileUtils {
 			try {
 				for (File file : FileUtils.getFileListing(dir, 5)) {
 					if (file.canWrite()) {
-						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, file.getAbsolutePath() + " deletion " + file.delete());
+						log.log(Level.FINE, file.getAbsolutePath() + " deletion " + file.delete());
 					}
 					else {
 						log.log(Level.WARNING, "no delete permission on " + file.getAbsolutePath()); //$NON-NLS-1$
