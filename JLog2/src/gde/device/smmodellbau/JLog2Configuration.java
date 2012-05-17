@@ -572,7 +572,7 @@ public class JLog2Configuration extends Composite {
 				this.mpxAddressCombo = new CCombo(this, SWT.BORDER);
 				this.mpxAddressCombo.setLayoutData(mpxAddressComboLData);
 				this.mpxAddressCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.mpxAddressCombo.setItems(new String[] { " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " 11", " 12", " 13", " 14", " 15", " --" }); //$NON-NLS-1$
+				this.mpxAddressCombo.setItems(new String[] { " 0", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " 11", " 12", " 13", " 14", " 15", " --" }); //$NON-NLS-1$
 				this.mpxAddressCombo.select(16);
 				this.mpxAddressCombo.setVisibleItemCount(10);
 				this.mpxAddressCombo.setEnabled(false);
@@ -580,13 +580,12 @@ public class JLog2Configuration extends Composite {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						JLog2Configuration.log.log(java.util.logging.Level.FINEST, "mpxAddressCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-						int address = MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex() + 2;
-						address = address > 14 ? 16 : address;
+						int address = MpxAddressComposite.this.mpxAddressCombo.getSelectionIndex();
 						for (int i = 0; i < 16; i++) {
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, i + " != " + index + "; " + configuration.get(i+30) + " == " + address);
 							if (i != index && configuration.get(i+30) == address) {
 								JLog2Configuration.this.application.openMessageDialog(JLog2Configuration.this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW2803));
-								MpxAddressComposite.this.mpxAddressCombo.select(14);
+								MpxAddressComposite.this.mpxAddressCombo.select(16);
 								address = 16;
 								break;
 							}
@@ -2589,22 +2588,22 @@ public class JLog2Configuration extends Composite {
 		setIsMotorButton((config.get(29) & 0x0004) > 0 && config.get(28) > 0);
 		this.extRpmButton.setEnabled((config.get(29) & 0x0004) > 0 && config.get(28) > 0);
 		setIsBrushlessMotor((config.get(29) & 0x0080) > 0 && (config.get(29) & 0x0004) > 0 && config.get(28) > 0);
-		this.mpxAddresses[0].mpxAddressCombo.select(config.get(30)-2);
-		this.mpxAddresses[1].mpxAddressCombo.select(config.get(31)-2);
-		this.mpxAddresses[2].mpxAddressCombo.select(config.get(32)-2);
-		this.mpxAddresses[3].mpxAddressCombo.select(config.get(33)-2);
-		this.mpxAddresses[4].mpxAddressCombo.select(config.get(34)-2);
-		this.mpxAddresses[5].mpxAddressCombo.select(config.get(35)-2);
-		this.mpxAddresses[6].mpxAddressCombo.select(config.get(36)-2);
-		this.mpxAddresses[7].mpxAddressCombo.select(config.get(37)-2);
-		this.mpxAddresses[8].mpxAddressCombo.select(config.get(38)-2);
-		this.mpxAddresses[9].mpxAddressCombo.select(config.get(39)-2);
-		this.mpxAddresses[10].mpxAddressCombo.select(config.get(40)-2);
-		this.mpxAddresses[11].mpxAddressCombo.select(config.get(41)-2);
-		this.mpxAddresses[12].mpxAddressCombo.select(config.get(42)-2);
-		this.mpxAddresses[13].mpxAddressCombo.select(config.get(43)-2);
-		this.mpxAddresses[14].mpxAddressCombo.select(config.get(44)-2);
-		this.mpxAddresses[15].mpxAddressCombo.select(config.get(45)-2);
+		this.mpxAddresses[0].mpxAddressCombo.select(config.get(30));
+		this.mpxAddresses[1].mpxAddressCombo.select(config.get(31));
+		this.mpxAddresses[2].mpxAddressCombo.select(config.get(32));
+		this.mpxAddresses[3].mpxAddressCombo.select(config.get(33));
+		this.mpxAddresses[4].mpxAddressCombo.select(config.get(34));
+		this.mpxAddresses[5].mpxAddressCombo.select(config.get(35));
+		this.mpxAddresses[6].mpxAddressCombo.select(config.get(36));
+		this.mpxAddresses[7].mpxAddressCombo.select(config.get(37));
+		this.mpxAddresses[8].mpxAddressCombo.select(config.get(38));
+		this.mpxAddresses[9].mpxAddressCombo.select(config.get(39));
+		this.mpxAddresses[10].mpxAddressCombo.select(config.get(40));
+		this.mpxAddresses[11].mpxAddressCombo.select(config.get(41));
+		this.mpxAddresses[12].mpxAddressCombo.select(config.get(42));
+		this.mpxAddresses[13].mpxAddressCombo.select(config.get(43));
+		this.mpxAddresses[14].mpxAddressCombo.select(config.get(44));
+		this.mpxAddresses[15].mpxAddressCombo.select(config.get(45));
 		//setTelemetryLivedata(config.get(46) & 0xFFF0);
 		if (isInitialLoad) {
 			setLogMode(config.get(2)); //enable/disables lots of combos

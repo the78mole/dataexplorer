@@ -405,7 +405,7 @@ public class JLog2Dialog extends DeviceDialog {
 	 * @return the tabFolder selection index
 	 */
 	public Integer getTabFolderSelectionIndex() {
-		return this.tabFolder.getSelectionIndex();
+		return this.tabFolder.getItemCount() == this.tabFolder.getSelectionIndex()+1 ? this.tabFolder.getSelectionIndex()-1 : this.tabFolder.getSelectionIndex();
 	}
 
 	void loadSetup() {
