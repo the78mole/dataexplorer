@@ -8,6 +8,7 @@ fix problem synchronizing record scales for records with different measurement f
 JLog2 - correct measurement names, and units
 Jlog2 - fix configuration 
 HoTTAdapter(2) - enable GPS data filter access in device dialog
+HoTTAdapter - add channel configuration to display channel data
 
 
 Version 3.00 - 23 Apr 2012
