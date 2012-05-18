@@ -93,7 +93,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static boolean								isSensorType[]								= { false, false, false, false, false };		//isReceiver, isVario, isGPS, isGeneral, isElectric
 
 	public enum Sensor {
-		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GENRAL("General-Air"), ELECTRIC("Electric-Air");
+		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GENRAL("General-Air"), ELECTRIC("Electric-Air"), CHANNEL("Channel");
 		private final String	value;
 
 		private Sensor(String v) {
