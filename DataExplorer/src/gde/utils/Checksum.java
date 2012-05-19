@@ -316,7 +316,7 @@ public class Checksum {
 	 */
 	public static long ADD(int[] a, int offset, int length) {
 		long value = a[offset];
-		for (int i = offset+1; i <= length; i++) {
+		for (int i = offset+1; i < length; i++) {
 			value = value  + a[i];
 		}
 		return value;

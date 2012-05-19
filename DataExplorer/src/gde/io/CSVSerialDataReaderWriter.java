@@ -138,6 +138,7 @@ public class CSVSerialDataReaderWriter {
 				binReader.close();
 				if (!lineEndingOcurred) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0042, new Object[] {chars, filePath}));
 
+				long lastTimeStamp = 0;
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$			
 				while ((line = reader.readLine()) != null) {
 					++lineNumber;
@@ -168,12 +169,16 @@ public class CSVSerialDataReaderWriter {
 							//check reasonable size of data points
 							if (recordSet.get(0).realSize() < 3) {
 								activeChannel.remove(recordSetName);
-								log.log(Level.WARNING, filePath + " - remove record set with < 3 data points"); //$NON-NLS-1$
+								log.log(Level.WARNING, filePath + " - remove record set with < 3 data points, last lin number = " + (lineNumber-1)); //$NON-NLS-1$
 								//application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0040));
 
 							}
 							else {
 								recordSet.checkAllDisplayable(); // raw import needs calculation of passive records
+								activeChannel.setActiveRecordSet(recordSetName);
+								activeChannel.applyTemplate(recordSetName, true);
+								device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
+
 								if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 							}
 						}
@@ -199,13 +204,17 @@ public class CSVSerialDataReaderWriter {
 						}
 						//recordSet.setTimeStep_ms(device.getTimeStep_ms()); // set -1 for none constant time step between measurement points
 						activeChannel.put(recordSetName, recordSet);
+						lastTimeStamp = 0;
 					}
-
-					if (isRaw)
-						recordSet.addNoneCalculationRecordsPoints(data.values, data.time_ms);
-					else
-						recordSet.addPoints(data.values, data.time_ms);
-					
+					//add data only if 
+					if (data.time_ms - lastTimeStamp >= 0) {
+						if (isRaw)
+							recordSet.addNoneCalculationRecordsPoints(data.values, data.time_ms);
+						else
+							recordSet.addPoints(data.values, data.time_ms);
+						data.setTimeResetEnabled(true);
+						lastTimeStamp = data.time_ms;
+					}
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
 					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
 					if (application.getStatusBar() != null && progress % 5 == 0) 	application.setProgress(progress, sThreadId);

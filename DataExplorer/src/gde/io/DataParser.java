@@ -43,6 +43,8 @@ public class DataParser extends NMEAParser {
 	int									recordNumber;
 	int									start_time_ms = Integer.MIN_VALUE;
 	int									valueSize;
+	int									timeResetCounter	= 0;
+	boolean							isTimeResetEnabled				= false;
 	
 	final int						timeFactor;
 	final FormatTypes		checkSumFormatType;
@@ -129,7 +131,7 @@ public class DataParser extends NMEAParser {
 		strValue = strValues[2].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT);
 		strValue = strValue.length() > 0 ? strValue : "0";
 		if (start_time_ms == Integer.MIN_VALUE)	start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
-		else																					time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - start_time_ms; // Seconds * 1000 = msec
+		else																					time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - start_time_ms; // Seconds * 1000 = msec			
 		
 		for (int i = 0; i < this.valueSize; i++) { 
 			strValue = strValues[i+3].trim();
@@ -148,6 +150,12 @@ public class DataParser extends NMEAParser {
 			catch (NumberFormatException e) {
 				this.values[i] = 0;
 			}
+		}
+		
+		//check time reset to force a new data set creation
+		if (this.device.getTimeStep_ms() < 0 && time_ms <= 0 && this.isTimeResetEnabled) {
+				this.recordNumber += ++this.timeResetCounter;
+				this.isTimeResetEnabled = false;
 		}
 
 		if (checkSumType != null) {
@@ -274,5 +282,12 @@ public class DataParser extends NMEAParser {
 	 */
 	public static int parse2UnsignedShort(byte low, byte high) {
 		return ((high & 0xFF) << 8) | (low & 0xFF);
+	}
+
+	/**
+	 * @param isTimeResetPrepared the isTimeResetPrepared to set
+	 */
+	public synchronized void setTimeResetEnabled(boolean isTimeResetPrepared) {
+		this.isTimeResetEnabled = isTimeResetPrepared;
 	}
 }
