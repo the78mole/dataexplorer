@@ -7,6 +7,7 @@ fix record length created by regression calculation
 fix problem synchronizing record scales for records with different measurement factors
 JLog2 - correct measurement names, and units
 Jlog2 - fix configuration 
+Jlog2 - fix time step error
 HoTTAdapter(2) - enable GPS data filter access in device dialog
 HoTTAdapter - add channel configuration to display channel data
 
