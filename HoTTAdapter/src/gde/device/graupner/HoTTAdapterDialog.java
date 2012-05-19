@@ -104,7 +104,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	@Override
 	public void open() {
 		try {
-			this.isHoTTAdapter = this.device != null && this.device.getName().equals("HoTTAdapter");
+			this.isHoTTAdapter = this.device != null && this.device.getName().equals("HoTTAdapter"); //$NON-NLS-1$
 
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
@@ -235,8 +235,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
 					this.enableFilter.setLayoutData(enableFilterLData);
 					this.enableFilter.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.enableFilter.setText("Filter (generell)");
-					this.enableFilter.setToolTipText("durch Auswahl wird generelles Filtern ein/ausgeschaltet");
+					this.enableFilter.setText(Messages.getString(MessageIds.GDE_MSGT2417));
+					this.enableFilter.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2418));
 					this.enableFilter.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -258,8 +258,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
 					this.filterFactorLatitudeLabel.setLayoutData(enableFilterLData);
 					this.filterFactorLatitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.filterFactorLatitudeLabel.setText("Breitengradfilter");
-					this.filterFactorLatitudeLabel.setToolTipText("In Abhängigkeit des aktuellen Breitengrades kann es nötig sein den Filterfaktor zu verändern. Ein größerer Wert filter stärker!");
+					this.filterFactorLatitudeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2419));
+					this.filterFactorLatitudeLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2420));
 				}
 				{
 					this.filterFactorLatitudeCombo = new CCombo(this.dialogShell, SWT.BORDER);
@@ -271,7 +271,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.filterFactorLatitudeCombo.setLayoutData(enableFilterLData);
 					this.filterFactorLatitudeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.filterFactorLatitudeCombo.setItems(filterItems);
-					this.filterFactorLatitudeCombo.setToolTipText("In Abhängigkeit des aktuellen Breitengrades kann es nötig sein den Filterfaktor zu verändern. Ein größerer Wert filter stärker!");
+					this.filterFactorLatitudeCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2420));
 					this.filterFactorLatitudeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -293,8 +293,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
 					this.tolrateSignLatitude.setLayoutData(enableFilterLData);
 					this.tolrateSignLatitude.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
-					this.tolrateSignLatitude.setText("+/-");
-					this.tolrateSignLatitude.setToolTipText("ignore sign change if selected");
+					this.tolrateSignLatitude.setText("+/-"); //$NON-NLS-1$
+					this.tolrateSignLatitude.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2421));
 					this.tolrateSignLatitude.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -316,8 +316,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
 					this.filterFactorLongitudeLabel.setLayoutData(enableFilterLData);
 					this.filterFactorLongitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.filterFactorLongitudeLabel.setText("Längengradfilter");
-					this.filterFactorLongitudeLabel.setToolTipText("In Abhängigkeit des aktuellen Längengrades kann es nötig sein den Filterfaktor zu verändern. Ein größerer Wert filter stärker!");
+					this.filterFactorLongitudeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2422));
+					this.filterFactorLongitudeLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2423));
 				}
 				{
 					this.filterFactorLongitudeCombo = new CCombo(this.dialogShell, SWT.BORDER);
@@ -329,7 +329,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.filterFactorLongitudeCombo.setLayoutData(enableFilterLData);
 					this.filterFactorLongitudeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.filterFactorLongitudeCombo.setItems(filterItems);
-					this.filterFactorLongitudeCombo.setToolTipText("In Abhängigkeit des aktuellen Längengrades kann es nötig sein den Filterfaktor zu verändern. Ein größerer Wert filter stärker!");
+					this.filterFactorLongitudeCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2423));
 					this.filterFactorLongitudeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -351,8 +351,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
 					this.tolerateSignLongitude.setLayoutData(enableFilterLData);
 					this.tolerateSignLongitude.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
-					this.tolerateSignLongitude.setText("+/-");
-					this.tolerateSignLongitude.setToolTipText("ignore sign change if selected");
+					this.tolerateSignLongitude.setText("+/-"); //$NON-NLS-1$
+					this.tolerateSignLongitude.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2422));
 					this.tolerateSignLongitude.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -382,7 +382,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 							try {
 								HoTTAdapterDialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
 								HoTTAdapterDialog.this.lifeGatherer = 
-										(HoTTAdapterDialog.this.device != null && HoTTAdapterDialog.this.device.getName().equals("HoTTAdapter")) 
+										(HoTTAdapterDialog.this.device != null && HoTTAdapterDialog.this.device.getName().equals("HoTTAdapter"))  //$NON-NLS-1$
 										? new HoTTAdapterLiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this)
 												: new HoTTAdapter2LiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this);
 								HoTTAdapterDialog.this.lifeGatherer.start();
