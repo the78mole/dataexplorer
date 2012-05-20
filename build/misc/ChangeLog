@@ -10,6 +10,7 @@ Jlog2 - fix configuration
 Jlog2 - fix time step error
 HoTTAdapter(2) - enable GPS data filter access in device dialog
 HoTTAdapter - add channel configuration to display channel data
+update Linux cp210x kernel module for kernel 3.2.0.24
 documentation update
 
 
