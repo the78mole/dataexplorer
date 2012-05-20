@@ -2277,9 +2277,14 @@ public class JLog2Configuration extends Composite {
 							else {
 								JLog2Configuration.this.configuration.setPulsePerRevolution(JLog2Configuration.this.pulsPerRevolutionSensorCombo.getSelectionIndex());
 							}
-							if (JLog2Configuration.this.pulsPerRevolutionSensorCombo.getSelectionIndex() < 1) {
+							if (JLog2Configuration.this.pulsPerRevolutionSensorCombo.getSelectionIndex() < 1 && !JLog2Configuration.this.brushLessButton.getSelection()) {
+								JLog2Configuration.this.motorButton.setSelection(false);
+								JLog2Configuration.this.configuration.setIsMotor(false);
 								JLog2Configuration.this.motorButton.setEnabled(false);
 								JLog2Configuration.this.extRpmButton.setEnabled(false);
+							}
+							else if (JLog2Configuration.this.motorButton.getSelection() && Integer.parseInt(JLog2Configuration.this.pulsPerRevolutionSensorCombo.getText().trim()) >= 2) {
+								JLog2Configuration.this.brushLessButton.setEnabled(true);
 							}
 							else {
 								JLog2Configuration.this.motorButton.setEnabled(true);
@@ -2322,7 +2327,7 @@ public class JLog2Configuration extends Composite {
 						public void widgetSelected(SelectionEvent evt) {
 							JLog2Configuration.log.log(java.util.logging.Level.FINEST, "motorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							JLog2Configuration.this.configuration.setIsMotor(JLog2Configuration.this.motorButton.getSelection());
-							if (JLog2Configuration.this.motorButton.getSelection()) {
+							if (JLog2Configuration.this.motorButton.getSelection() && Integer.parseInt(JLog2Configuration.this.pulsPerRevolutionSensorCombo.getText().trim()) >= 2) {
 								JLog2Configuration.this.brushLessButton.setEnabled(true);
 							}
 							else {
