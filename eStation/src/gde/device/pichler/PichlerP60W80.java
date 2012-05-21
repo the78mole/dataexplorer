@@ -147,7 +147,7 @@ public class PichlerP60W80 extends eStationBC6 {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
 				
-		log.log(Level.OFF, StringHelper.byte2FourDigitsIntegerString(dataBuffer, (byte)0x80, 1, dataBuffer.length-2));
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2FourDigitsIntegerString(dataBuffer, (byte)0x80, 1, dataBuffer.length-2));
 		
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=VersorgungsSpg. 7=Balance
 		points[0] = Integer.valueOf((((dataBuffer[15] & 0xFF)-0x80)*100 + ((dataBuffer[16] & 0xFF)-0x80))*10);  //15,16   feed-back voltage
