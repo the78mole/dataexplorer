@@ -789,6 +789,38 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Measurement>
+                <name>Ch 13</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Ch 14</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Ch 15</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Ch 16</name>
+                <symbol></symbol>
+                <unit>msec</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
+            </Measurement>
         </Channel>
         <property type="Boolean" value="true" name="enable_filter"/>
     </Channels>

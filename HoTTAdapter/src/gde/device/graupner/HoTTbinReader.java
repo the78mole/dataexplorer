@@ -192,14 +192,14 @@ public class HoTTbinReader {
 		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 		HoTTbinReader.recordSetVario = null; //0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 		HoTTbinReader.recordSetGPS = null; //0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-		HoTTbinReader.recordSetChannel = null; //0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 14=Ch 12
+		HoTTbinReader.recordSetChannel = null; //0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		HoTTbinReader.pointsReceiver = new int[8];
 		HoTTbinReader.pointsGeneral = new int[21];
 		HoTTbinReader.pointsElectric = new int[27];
 		HoTTbinReader.pointsVario = new int[7];
 		HoTTbinReader.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[12];
-		HoTTbinReader.pointsChannel = new int[15];
+		HoTTbinReader.pointsChannel = new int[19];
 		HoTTbinReader.timeStep_ms = 0;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		HoTTbinReader.buf0 = null;
@@ -270,8 +270,8 @@ public class HoTTbinReader {
 					//fill receiver data
 					if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 40) != 0 && HoTTbinReader.timeStep_ms % 10 == 0) {
 						parseAddReceiver(HoTTbinReader.recordSetReceiver, HoTTbinReader.pointsReceiver, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
-						parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
 					}
+					parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
 
 					switch ((byte) (HoTTbinReader.buf[7] & 0xFF)) {
 					case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
@@ -578,14 +578,14 @@ public class HoTTbinReader {
 		HoTTbinReader.recordSetElectric = null; //0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 		HoTTbinReader.recordSetVario = null; //0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 		HoTTbinReader.recordSetGPS = null; //0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-		HoTTbinReader.recordSetChannel = null; //0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 14=Ch 12
+		HoTTbinReader.recordSetChannel = null; //0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		HoTTbinReader.pointsReceiver = new int[8];
 		HoTTbinReader.pointsGeneral = new int[21];
 		HoTTbinReader.pointsElectric = new int[27];
 		HoTTbinReader.pointsVario = new int[7];
 		HoTTbinReader.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[12];
-		HoTTbinReader.pointsChannel = new int[15];
+		HoTTbinReader.pointsChannel = new int[19];
 		HoTTbinReader.timeStep_ms = 0;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		HoTTbinReader.buf0 = new byte[30];
@@ -657,8 +657,8 @@ public class HoTTbinReader {
 					//fill receiver data
 					if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 40) != 0 && HoTTbinReader.timeStep_ms % 10 == 0) {
 						parseAddReceiver(HoTTbinReader.recordSetReceiver, HoTTbinReader.pointsReceiver, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
-						parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
 					}
+					parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
 					
 					//detect sensor switch
 					if (actualSensor == -1)
@@ -932,7 +932,7 @@ public class HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseAddChannel(RecordSet _recordSetChannel, int[] _pointsChannel, byte[] _buf, long _timeStep_ms) throws DataInconsitsentException {
-		//0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 19=Ch 16
+		//0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		_pointsChannel[0]  = (_buf[1] & 0xFF) * 1000;
 		_pointsChannel[1]  = (_buf[3] & 0xFF) * -1000;
 		_pointsChannel[2]  = (_buf[4] & 0xFF) * -1000;
@@ -944,10 +944,29 @@ public class HoTTbinReader {
 		_pointsChannel[8]  = (DataParser.parse2UnsignedShort(_buf, 18)/2) * 1000;
 		_pointsChannel[9]  = (DataParser.parse2UnsignedShort(_buf, 20)/2) * 1000;
 		_pointsChannel[10] = (DataParser.parse2UnsignedShort(_buf, 22)/2) * 1000;
-		_pointsChannel[11] = (DataParser.parse2UnsignedShort(_buf, 24)/2) * 1000;
-		_pointsChannel[12] = (DataParser.parse2UnsignedShort(_buf, 26)/2) * 1000;
-		_pointsChannel[13] = (DataParser.parse2UnsignedShort(_buf, 28)/2) * 1000;
-		_pointsChannel[14] = (DataParser.parse2UnsignedShort(_buf, 30)/2) * 1000;
+		if (_buf[5] == 0x00) { //channel 9-12
+			_pointsChannel[11] = (DataParser.parse2UnsignedShort(_buf, 24)/2) * 1000;
+			_pointsChannel[12] = (DataParser.parse2UnsignedShort(_buf, 26)/2) * 1000;
+			_pointsChannel[13] = (DataParser.parse2UnsignedShort(_buf, 28)/2) * 1000;
+			_pointsChannel[14] = (DataParser.parse2UnsignedShort(_buf, 30)/2) * 1000;
+			if (_pointsChannel[15] == 0) {
+				_pointsChannel[15] = 1500 * 1000;
+				_pointsChannel[16] = 1500 * 1000;
+				_pointsChannel[17] = 1500 * 1000;
+				_pointsChannel[18] = 1500 * 1000;
+			}
+		} else { //channel 13-16
+			_pointsChannel[15] = (DataParser.parse2UnsignedShort(_buf, 24)/2) * 1000;
+			_pointsChannel[16] = (DataParser.parse2UnsignedShort(_buf, 26)/2) * 1000;
+			_pointsChannel[17] = (DataParser.parse2UnsignedShort(_buf, 28)/2) * 1000;
+			_pointsChannel[18] = (DataParser.parse2UnsignedShort(_buf, 30)/2) * 1000;
+			if (_pointsChannel[11] == 0) {
+				_pointsChannel[11] = 1500 * 1000;
+				_pointsChannel[12] = 1500 * 1000;
+				_pointsChannel[13] = 1500 * 1000;
+				_pointsChannel[14] = 1500 * 1000;
+			}
+		}
 
 		//printByteValues(_timeStep_ms, _buf);
 
