@@ -108,7 +108,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 						tmpSensorType[i] = false;
 					}
 				}
-				HoTTAdapterLiveGatherer.log.log(Level.OFF, sb.toString() + ", detecting sensor type takes " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sb.toString() + ", detecting sensor type takes " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 
 				//no sensor type detected, seams only receiver is connected
 				if (HoTTAdapter2.isSensorType[1] == false && HoTTAdapter2.isSensorType[2] == false && HoTTAdapter2.isSensorType[3] == false && HoTTAdapter2.isSensorType[4] == false) {
