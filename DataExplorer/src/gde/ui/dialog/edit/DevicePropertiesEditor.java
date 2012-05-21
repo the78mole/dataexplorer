@@ -868,7 +868,7 @@ public class DevicePropertiesEditor extends Composite {
 							this.channelConfigInnerTabFolder.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									log.log(java.util.logging.Level.OFF, "channelConfigInnerTabFolder selected, event=" + evt); //$NON-NLS-1$
+									log.log(java.util.logging.Level.FINE, "channelConfigInnerTabFolder selected, event=" + evt); //$NON-NLS-1$
 									for (CTabItem item : DevicePropertiesEditor.this.channelConfigInnerTabFolder.getItems()) {
 										((ChannelTypeTabItem)item).cleanMeasurementitems();
 									}
