@@ -97,6 +97,7 @@ public class JLog2LiveGathererThread extends Thread {
 		}
 
 		try {
+			long startTime = System.nanoTime() / 1000000;
 			while (!this.serialPort.isInterruptedByUser) {
 				try {
 					// get data from device
@@ -122,7 +123,7 @@ public class JLog2LiveGathererThread extends Thread {
 					}
 
 					// prepare the data for adding to record set
-					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
+					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), System.nanoTime() / 1000000 - startTime);
 
 					if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 						JLog2LiveGathererThread.this.application.updateAllTabs(false);
