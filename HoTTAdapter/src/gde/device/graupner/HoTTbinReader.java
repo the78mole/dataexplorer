@@ -270,8 +270,8 @@ public class HoTTbinReader {
 					//fill receiver data
 					if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 40) != 0 && HoTTbinReader.timeStep_ms % 10 == 0) {
 						parseAddReceiver(HoTTbinReader.recordSetReceiver, HoTTbinReader.pointsReceiver, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
+						parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
 					}
-					parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
 
 					switch ((byte) (HoTTbinReader.buf[7] & 0xFF)) {
 					case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
@@ -657,8 +657,8 @@ public class HoTTbinReader {
 					//fill receiver data
 					if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 40) != 0 && HoTTbinReader.timeStep_ms % 10 == 0) {
 						parseAddReceiver(HoTTbinReader.recordSetReceiver, HoTTbinReader.pointsReceiver, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
+						parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
 					}
-					parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
 					
 					//detect sensor switch
 					if (actualSensor == -1)
