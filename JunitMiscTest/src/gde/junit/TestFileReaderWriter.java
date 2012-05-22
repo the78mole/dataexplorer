@@ -681,7 +681,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 
 		try {
 			this.setDataPath(); //set the dataPath variable
-			List<File> files = FileUtils.getFileListing(new File(this.dataPath.getAbsolutePath() + "/Jlog2/"), 1);
+			List<File> files = FileUtils.getFileListing(new File(this.dataPath.getAbsolutePath() + "/JLog2/"), 1);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".txt") && !file.getAbsolutePath().toLowerCase().contains("config")) {
