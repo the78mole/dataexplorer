@@ -1,24 +1,16 @@
-GNU DataExplorer - News - comes with version 3.00
+GNU DataExplorer - News - comes with version 3.01
 
-1) reduce scan depth while searching files and directories, OutOfMemory with recursive created directories by Wine
-2) update CSV data parser
-3) UniLog2 - fix error restart live gathering not possible if stopped while dialog is closed
-4) HottAdapter2 - fix GPS data detection to enable Google Earth visualization
-5) HottAdapter(2) - fix Receiver detection and add data error correction 
-6) HottAdapter(2) - add filter to filter Latitude/Longitude spikes, adjustable through device configuration filter_factor
-7) UniLog2 - live data gathering keep already gathered data in case of an error
-8) UniLog2 - live data gathering enable loop to reset live gathering
-9) Multiplex FlightRecorder support
-10)SM Modellbau JLog2 support
-11)fix error cut curves with constant time step
-12)fix error open help dialog Linux
-13)update device properties schema to enable extended configuration
-14)update device properties editor to reflect schema updates
-15)UltraDuoPlus 50 - fix error to enable curve recording
-16)UltraDuoPlus 50 - enable dialog to manage battery memory and retrieve battery history 
-17)SWT update to 7.2.2 final
-18)update Linux cp210x kernel module for kernel 3.0.0.17
-19)update documentation
+1)	fix scale synchronization problem while change zoom
+2)	fix problem zoomed graphics versus table view with lazy update
+3)	fix record length created by regression calculation
+4)	fix problem synchronizing record scales for records with different measurement factors
+5)	JLog2 - correct measurement names, and units
+6)	Jlog2 - fix configuration 
+7)	Jlog2 - fix time step error
+8)	HoTTAdapter(2) - enable GPS data filter access in device dialog
+9)	HoTTAdapter - add channel configuration to display channel data
+10)	update Linux cp210x kernel module for kernel 3.2.0.24
+11)	documentation update
 
 
 

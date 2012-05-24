@@ -180,3 +180,7 @@ QC-Copter/src/help/en/HelpInfo_Image_1.png HelpInfo_Image_2.png
 NMEA-Adapter/src/reseource/NMEA-Adapter.png
 NMEA-Adapter/src/help/de/HelpInfo_Bild_1.png
 NMEA-Adapter/src/help/en/HelpInfo_Image_1.png
+
+
+The following pictures are provided by extern company and does not underlay GPL3
+FlightRecorder/src/resoiurce/FlightRecorder.png provided by MULTIPLEX Modellsport GmbH & Co. KG
