@@ -480,7 +480,15 @@ public class StringHelper {
 		}
 		return sb.toString();
 	}
-	
+
+	public static int byte2hex2int(byte[] bytes, int start, int size) {
+		StringBuffer sb = new StringBuffer();
+		for (int i = start; i < size + start; i++) {
+			sb.append(String.format("%c", (char)bytes[i])); //$NON-NLS-1$
+		}
+		return Integer.parseInt(sb.toString(), 16);
+	}
+
 	public static String fourDigitsRunningNumber(int size) {
 		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%3d", size)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 		for (int i = 0; i < size; i++) {

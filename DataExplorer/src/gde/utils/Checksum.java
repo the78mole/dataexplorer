@@ -64,12 +64,6 @@ public class Checksum {
 		System.out.println("ADD      	= " + Integer.toHexString(0xFF & Checksum.ADD(HOTT_19200_N_MASTER_2, 2, HOTT_19200_N_MASTER_2.length-2)) + " - " + Integer.toHexString(0xFF & HOTT_19200_N_MASTER_2[HOTT_19200_N_MASTER_2.length-1])); //$NON-NLS-1$
 		System.out.println("ADD      	= " + Integer.toHexString(0xFF & Checksum.ADD(HOTT_19200_N_SLAVE, 2, HOTT_19200_N_SLAVE.length-2)) + " - " + Integer.toHexString(0xFF & HOTT_19200_N_SLAVE[HOTT_19200_N_SLAVE.length-1])); //$NON-NLS-1$
 	}
-
-	/**
-	 * generator polynomial
-	 */
-	private static final int	poly			= 0x1021;			/* x16 + x12 + x5 + 1 generator polynomial */
-	/* 0x8408 used in European X.25 */
 	
 	/**
 	 * calculate CRC16
@@ -90,6 +84,12 @@ public class Checksum {
 		return (short) (crc &= 0xffff);
 	}
 
+
+	/**
+	 * generator polynomial
+	 */
+	private static final int	poly			= 0x1021;			/* x16 + x12 + x5 + 1 generator polynomial */
+	/* 0x8408 used in European X.25 */
 	private static int[] crcTable	= new int[256];
 	static {
 		// initialize lookup table
@@ -118,6 +118,32 @@ public class Checksum {
 	public static short CRC16CCITT(byte[] b, int initValue) {
 		int crc = initValue;
 		for (int i = 0; i < b.length; i++) {
+			crc = (crcTable[(b[i] ^ (crc >>> 8)) & 0xff] ^ (crc << 8)) & 0xffff;
+		}
+		return (short) crc;
+	}
+
+	/**
+	 * calculate CRC16 with CCITT method.
+	 * @param c char array to compute CRC on
+	 * @return 16-bit CRC, unsigned
+	 */
+	public static short CRC16CCITT(char[] c) {
+		int crc = 0;
+		for (int i = 0; i < c.length; i++) {
+			crc = (crcTable[(c[i] ^ (crc >>> 8)) & 0xff] ^ (crc << 8)) & 0xffff;
+		}
+		return (short) crc;
+	}
+
+	/**
+	 * calculate CRC16 with CCITT method.
+	 * @param b byte array to compute CRC on
+	 * @return 16-bit CRC, unsigned
+	 */
+	public static short CRC16CCITT(byte[] b, int startIndex, int length) {
+		int crc = 0;
+		for (int i = startIndex; i < length+startIndex; i++) {
 			crc = (crcTable[(b[i] ^ (crc >>> 8)) & 0xff] ^ (crc << 8)) & 0xffff;
 		}
 		return (short) crc;
@@ -302,7 +328,7 @@ public class Checksum {
 	 */
 	public static int ADD(byte[] b, int start, int len) {
 		int value = b[start] & 0xFF;
-		for (int i = start+1; i <= len; i++) {
+		for (int i = start+1; i < len; i++) {
 			value = value  + (b[i] & 0xFF);
 		}
 		return value;

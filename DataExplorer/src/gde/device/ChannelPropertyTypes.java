@@ -32,8 +32,10 @@ import javax.xml.bind.annotation.XmlType;
 @XmlEnum
 public enum ChannelPropertyTypes {
 
-    @XmlEnumValue("enable_filter")
-    ENABLE_FILTER("enable_filter"),
+	  @XmlEnumValue("enable_filter")
+	  ENABLE_FILTER("enable_filter"),
+	  @XmlEnumValue("enable_channel")
+	  ENABLE_CHANNEL("enable_channel"),
     @XmlEnumValue("none_specified")
     NONE_SPECIFIED("none_specified");
     private final String value;

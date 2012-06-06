@@ -2166,7 +2166,9 @@ public class DeviceConfiguration {
 				if (property.name.equals(key)) return property;
 			}
 		}
-		return null;
+		ChannelPropertyType channelProperty = new ObjectFactory().createChannelPropertyType();
+		channelProperty.setName(key);
+		return channelProperty;
 	}
 	
 	/**
