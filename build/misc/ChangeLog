@@ -2,7 +2,9 @@ Development history / change log, please read from bottom up
 
 Version 3.02 - xx yyy 2012
 HoTTAdapter - enable serial file transfer
-
+JLog2 - refine default import path handling
+DeviceProperties_V17 -> DeviceProperties_V18 due to HoTTAdapter
+HoTTAdapter - toggle import of channel deflection via device dialog
 
 Version 3.01 - 21 May 2012
 fix scale synchronization problem while change zoom
