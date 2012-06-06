@@ -543,32 +543,38 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
 		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, searchDirectory, null, SWT.MULTI);
-		
-		this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+		if (this.getDeviceConfiguration().getDataBlockPreferredDataLocation() != fd.getFilterPath())
+			this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
 			public void run() {
-				for (String tmpFileName : fd.getFileNames()) {
-					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-					if (!selectedImportFile.toLowerCase().endsWith(dotFileEnding)) {
-						if (selectedImportFile.contains(GDE.STRING_DOT)) {
-							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+				try {
+				JLog2.this.application.setPortConnected(true);
+					for (String tmpFileName : fd.getFileNames()) {
+						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						if (!selectedImportFile.toLowerCase().endsWith(dotFileEnding)) {
+							if (selectedImportFile.contains(GDE.STRING_DOT)) {
+								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+							}
+							selectedImportFile = selectedImportFile + dotFileEnding;
 						}
-						selectedImportFile = selectedImportFile + dotFileEnding;
+						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+						
+						if (fd.getFileName().length() > 4) {
+							try {
+								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
+								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								CSVSerialDataReaderWriter.read(selectedImportFile, JLog2.this, recordNameExtend, channelConfigNumber, true);
+							}
+							catch (Throwable e) {
+								log.log(Level.WARNING, e.getMessage(), e);
+							}
+						}
 					}
-					log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-					
-					if (fd.getFileName().length() > 4) {
-						try {
-							Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-							String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-							CSVSerialDataReaderWriter.read(selectedImportFile, JLog2.this, recordNameExtend, channelConfigNumber, true);
-						}
-						catch (Throwable e) {
-							log.log(Level.WARNING, e.getMessage(), e);
-						}
-					}
+				}
+				finally {
+					JLog2.this.application.setPortConnected(true);
 				}
 			}
 		};
