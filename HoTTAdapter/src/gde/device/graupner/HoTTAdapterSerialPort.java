@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.device.graupner;
 
+import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.device.DeviceConfiguration;
 import gde.exception.FailedQueryException;
@@ -27,11 +28,19 @@ import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.Checksum;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Logger;
+
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.widgets.ProgressBar;
 
 /**
  * HoTTAdapter serial port implementation
@@ -65,6 +74,9 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	boolean								isQueryRetry								= false;
 
 	HoTTAdapter.Protocol	protocolType								= HoTTAdapter.Protocol.TYPE_19200_V4;
+		
+	private static byte[] root = new byte[5];
+
 
 	/**
 	 * constructor of default implementation
@@ -370,5 +382,307 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	public synchronized void setProtocolType(HoTTAdapter.Protocol newProtocolType) {
 		HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "protocolTypeOrdinal = " + newProtocolType.value());
 		this.protocolType = newProtocolType;
+	}
+
+	static byte cntUp = 0x00;
+	static byte cntDown = (byte) 0xFF;
+	final static byte[]	PREPARE_FILE_TRANSFER			= { 0x03, 0x30 };
+	final static byte[]	SELECT_SD_CARD						= { 0x06, 0x30 };
+	final static byte[]	CHANGE_DIR								= { 0x06, 0x3D };
+	final static byte[]	LIST_DIR									= { 0x06, 0x3C };
+	final static byte[]	FILE_INFO									= { 0x06, 0x3F };
+	final static byte[]	QUERY_SD_SIZES						= { 0x06, 0x33 };
+	final static byte[]	XFER_INIT									= { 0x06, 0x35 };
+	final static byte[]	XFER_CLOSE								= { 0x06, 0x36 };
+	final static byte[]	UPLOAD										= { 0x06, 0x38 };
+	final static byte[]	DOWNLOAD									= { 0x06, 0x3A };
+
+//
+//  cDeleteFileDir =    #$06+#$39; // Param: Filename absolut - Antwort: 06 01 (OK)  -  06 02 (FAIL)
+//  cMakeDir =          #$06+#$3E;
+//
+//  cGetVersion =       #$00+#$11;
+//  cListOverView =     #$05+#$32;
+//  cReadMemory =       #$05+#$33;
+//
+//  cLockScreen =       #$00+#$23;
+//  cClearScreen =      #$00+#$22;
+//  cWriteScreen =      #$00+#$21;  // 1. Byte: Zeile, 21 byte Ascii
+//  cResetScreen  =     #$00+#$24;
+
+	private byte[] prepareCmdBytes(byte[] cmd) {
+		return prepareCmdBytes(cmd, GDE.STRING_EMPTY);
+	}
+	private byte[] prepareCmdBytes(byte[] cmd, String body) {
+		byte[] b = new byte[body.length() == 0 ? body.length()+9 : body.length()+10];
+		b[0]=0x00;
+		if (cntUp == 0xFF || cntDown == 0x00) {
+			cntUp = 0x00;
+			cntDown = (byte) 0xFF;
+		}
+		b[1]=cntUp+=0x01;
+		b[2]=cntDown-=0x01;
+		b[3]=(byte) (body.length() == 0 ? (body.length() & 0xFF) : ((body.length()+1) & 0xFF));
+		b[4]=0x00;
+		b[5]=cmd[0];
+		b[6]=cmd[1];
+		int i = 7;
+		for (; i < body.getBytes().length+7; ++i) {
+			b[i]= body.getBytes()[i-7];
+		}
+		if (body.length() > 0)
+			b[i++]=0x00;
+		short crc16 = Checksum.CRC16CCITT(b, 3, (body.length() == 0 ? body.length()+4 : body.length()+5));
+		b[i++]=(byte) (crc16 & 0x00FF);
+		b[i++]=(byte) ((crc16 & 0xFF00) >> 8);
+
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINER, StringHelper.byte2Hex2CharString(b, b.length));
+		return b;
+	}
+	
+	private void sendCmd(byte[] cmd) throws IOException {
+		byte[] cmdAll = prepareCmdBytes(cmd);
+		byte[] cmd1 = new byte[7];
+		System.arraycopy(cmdAll, 0, cmd1, 0, 7);
+		this.write(cmd1);
+		WaitTimer.delay(10);
+		byte[] cmd2 = new byte[cmdAll.length - 7];
+		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
+		this.write(cmd2);
+	}
+	
+	private void sendCmd(byte[] cmd, String body) throws IOException {
+		byte[] cmdAll = prepareCmdBytes(cmd, body);
+		byte[] cmd1 = new byte[7];
+		System.arraycopy(cmdAll, 0, cmd1, 0, 7);
+		this.write(cmd1);
+		WaitTimer.delay(10);
+		byte[] cmd2 = new byte[cmdAll.length - 7];
+		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
+		this.write(cmd2);
+	}
+
+	public synchronized long[] prepareSdCard() throws Exception {
+		//prepare transmitter for data interaction
+		sendCmd(PREPARE_FILE_TRANSFER);
+		this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		
+		sendCmd(SELECT_SD_CARD);
+		this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		
+		sendCmd(QUERY_SD_SIZES);
+		this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "SD size info : " + StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "SD size info : " + StringHelper.byte2hex2int(this.ANSWER_DATA, 9, 8) + " KBytes total - " + StringHelper.byte2hex2int(this.ANSWER_DATA, 21, 8) + " KBytes free");
+
+		return new long[] {StringHelper.byte2hex2int(this.ANSWER_DATA, 9, 8), StringHelper.byte2hex2int(this.ANSWER_DATA, 21, 8)};
+	}
+	
+	public synchronized String[] querySdDirs() throws Exception {
+		//change to root directory and query sub folders
+		sendCmd(CHANGE_DIR, GDE.FILE_SEPARATOR_UNIX);
+		root = this.read(new byte[50], 2000, 5);
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2Hex2CharString(root, root.length));
+		
+		StringBuilder sb = new StringBuilder();
+		while (this.ANSWER_DATA[7] != root[7] && this.ANSWER_DATA[8] != root[8]) { //06 01 87 BA
+			sendCmd(LIST_DIR);
+			this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			for (int i = 19; i < this.ANSWER_DATA.length-2; i++) {
+				sb.append(String.format("%c", this.ANSWER_DATA[i]));
+			}
+			sb.append(GDE.STRING_SEMICOLON);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sb.toString());
+		}
+		return sb.toString().split(GDE.STRING_SEMICOLON);
+	}
+	
+	public HashMap<String, String[]> queryListDir(String dirPath) throws Exception {
+		StringBuilder folders = new StringBuilder();
+		StringBuilder files = new StringBuilder();
+		HashMap<String, String[]> result = new HashMap<String, String[]>();
+		int fileIndex = 0;
+		sendCmd(CHANGE_DIR, dirPath);
+		root = this.read(new byte[50], 1000, 5);
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(root, root.length));
+
+		try {
+			this.ANSWER_DATA[3] = 0x01;
+			while (this.ANSWER_DATA[3] != 0x00) {
+				sendCmd(LIST_DIR);
+				this.ANSWER_DATA = this.read(new byte[50], 1000, 5);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				StringBuilder content = new StringBuilder();
+				for (int i = 19; i < this.ANSWER_DATA.length - 2; i++) {
+					content.append(String.format("%c", this.ANSWER_DATA[i]));
+				}
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "content : " + content.toString());
+				if (content.indexOf(GDE.STRING_DOT) > 0) {//.bin
+					files.append(fileIndex++).append(GDE.STRING_COMMA).append(content).append(GDE.STRING_COMMA);
+					files.append("20").append(String.format("%c%c-%c%c-%c%c", this.ANSWER_DATA[9], this.ANSWER_DATA[10], this.ANSWER_DATA[11], this.ANSWER_DATA[12], this.ANSWER_DATA[13], this.ANSWER_DATA[14])).append(GDE.STRING_COMMA);
+					files.append(String.format("%c%c:%c%c", this.ANSWER_DATA[15], this.ANSWER_DATA[16], this.ANSWER_DATA[17], this.ANSWER_DATA[18])).append(GDE.STRING_SEMICOLON);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "files : " + files.toString());
+				}
+				else {
+					folders.append(content).append(GDE.STRING_SEMICOLON);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "folders : " + folders.toString());
+				}
+			}
+		}
+		catch (Exception e) {
+			// ignore and list folders or files already red
+		}		
+		
+		result.put("FOLDER", folders.toString().split(GDE.STRING_SEMICOLON));
+		if (files.toString().length() > 0)
+			result.put("FILES", queryFilesInfo(dirPath+GDE.FILE_SEPARATOR_UNIX, files.toString().split(GDE.STRING_SEMICOLON)));
+		return result;
+	}
+	
+	public String[] queryFilesInfo(String dirPath, String[] files) throws Exception {
+		StringBuilder filesInfo = new StringBuilder();
+		try {
+			for (String file : files) {
+				sendCmd(FILE_INFO, dirPath+file.split(GDE.STRING_COMMA)[1]);
+				this.ANSWER_DATA = this.read(new byte[100], 5000, 5);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, ""+StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "File size = " + Integer.parseInt(String.format("%02x%02x%02x%02x", this.ANSWER_DATA[10], this.ANSWER_DATA[9], this.ANSWER_DATA[8], this.ANSWER_DATA[7]), 16));
+				filesInfo.append(file).append(GDE.STRING_COMMA).append(Integer.parseInt(String.format("%02x%02x%02x%02x", this.ANSWER_DATA[10], this.ANSWER_DATA[9], this.ANSWER_DATA[8], this.ANSWER_DATA[7]), 16)).append(GDE.STRING_SEMICOLON);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, filesInfo.toString());
+			}
+		}
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+			// ignore and enable listing
+		}
+		
+		return filesInfo.toString().split(GDE.STRING_SEMICOLON);
+	}
+	
+	public void upLoadFiles(String sourceDirPath, String targetDirPath, String[] filesInfo, final long[] sizeProgress, final ProgressBar transferProgressBar, final CLabel transferProgressLabel) throws Exception {
+		final long totalSize = sizeProgress[0];
+		for (String fileInfo : filesInfo) {
+			//fileInfo index,name,size
+			String[] file = fileInfo.split(GDE.STRING_COMMA);			
+			String fileQueryAnswer = this.queryFilesInfo(sourceDirPath, new String[] { fileInfo })[0];
+			int remainingFileSize = Integer.parseInt(fileQueryAnswer.split(GDE.STRING_COMMA)[2]);
+
+			sendCmd(XFER_INIT, String.format("0x01 %s%s", sourceDirPath, file[1]));
+			this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+			DataOutputStream data_out = new DataOutputStream(new FileOutputStream(new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1])));
+			do {
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "remainingFileSize = " + remainingFileSize);
+				sendCmd(UPLOAD, "0x0800");
+				this.ANSWER_DATA = this.read(new byte[7], 500);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) {
+					this.ANSWER_DATA = this.read(new byte[0x0802], 5000); //2048+2
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+					data_out.write(this.ANSWER_DATA, 0, 0x0800);
+				}
+				else
+					continue;
+				sizeProgress[0] -= 0x0800;
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "sizeProgress = " + sizeProgress[0] + " - " + ((totalSize-sizeProgress[0])*100/totalSize) + " %");
+				
+				if (((totalSize-sizeProgress[0])*100/totalSize) % 5 == 0) {
+					GDE.display.asyncExec(new Runnable() {
+						public void run() {
+							transferProgressBar.setSelection((int) ((totalSize - sizeProgress[0]) * 100 / totalSize));
+							transferProgressLabel.setText("file transfer : " + (totalSize - sizeProgress[0]) + " of " + totalSize + " bytes");
+						}
+					});
+				}
+			}
+			while ((remainingFileSize -= 0x0800) > 0x0800);
+
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "remainingFileSize = " + remainingFileSize);
+			sendCmd(UPLOAD, String.format("0x%04x", remainingFileSize));
+			this.ANSWER_DATA = this.read(new byte[7], 500);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			this.ANSWER_DATA = this.read(new byte[remainingFileSize + 2], 5000); //rest+2
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			data_out.write(this.ANSWER_DATA, 0, remainingFileSize);
+			data_out.close();
+			sizeProgress[0] -= remainingFileSize;
+			
+			GDE.display.asyncExec(new Runnable() {
+				public void run() {
+					transferProgressBar.setSelection((int) ((totalSize - sizeProgress[0]) * 100 / totalSize));
+					transferProgressLabel.setText("file transfer : " + (totalSize - sizeProgress[0]) + " of " + totalSize + " bytes");
+				}
+			});
+
+			sendCmd(XFER_CLOSE);
+			this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		}
+	}
+	
+	public void downLoadFiles(String sourceDirPath, String targetDirPath, String[] filesInfo, final long[] sizeProgress, final ProgressBar transferProgressBar, final CLabel transferProgressLabel) throws Exception {
+		final long totalSize = sizeProgress[0];
+		for (String fileInfo : filesInfo) {
+			//fileInfo index,name,size
+			String[] file = fileInfo.split(GDE.STRING_COMMA);			
+			String fileQueryAnswer = this.queryFilesInfo(sourceDirPath, new String[] { fileInfo })[0];
+			int remainingFileSize = Integer.parseInt(fileQueryAnswer.split(GDE.STRING_COMMA)[2]);
+
+			sendCmd(XFER_INIT, String.format("0x01 %s%s", sourceDirPath, file[1]));
+			this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+			DataOutputStream data_out = new DataOutputStream(new FileOutputStream(new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1])));
+			do {
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "remainingFileSize = " + remainingFileSize);
+				sendCmd(UPLOAD, "0x0800");
+				this.ANSWER_DATA = this.read(new byte[7], 500);
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) {
+					this.ANSWER_DATA = this.read(new byte[0x0802], 5000); //2048+2
+					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+					data_out.write(this.ANSWER_DATA, 0, 0x0800);
+				}
+				else
+					continue;
+				sizeProgress[0] -= 0x0800;
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "sizeProgress = " + sizeProgress[0] + " - " + ((totalSize-sizeProgress[0])*100/totalSize) + " %");
+				
+				if (((totalSize-sizeProgress[0])*100/totalSize) % 2 == 0) {
+					GDE.display.asyncExec(new Runnable() {
+						public void run() {
+							transferProgressBar.setSelection((int) ((totalSize - sizeProgress[0]) * 100 / totalSize));
+							transferProgressLabel.setText("file transfer : " + (totalSize - sizeProgress[0]) + " of " + totalSize + " bytes");
+						}
+					});
+				}
+			}
+			while ((remainingFileSize -= 0x0800) > 0x0800);
+
+			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "remainingFileSize = " + remainingFileSize);
+			sendCmd(UPLOAD, String.format("0x%04x", remainingFileSize));
+			this.ANSWER_DATA = this.read(new byte[7], 500);
+			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			this.ANSWER_DATA = this.read(new byte[remainingFileSize + 2], 5000); //rest+2
+			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			data_out.write(this.ANSWER_DATA, 0, remainingFileSize);
+			data_out.close();
+			sizeProgress[0] -= remainingFileSize;
+			
+			GDE.display.asyncExec(new Runnable() {
+				public void run() {
+					transferProgressBar.setSelection((int) ((totalSize - sizeProgress[0]) * 100 / totalSize));
+					transferProgressLabel.setText("file transfer : " + (totalSize - sizeProgress[0]) + " of " + totalSize + " bytes");
+				}
+			});
+
+			sendCmd(XFER_CLOSE);
+			this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		}
 	}
 }

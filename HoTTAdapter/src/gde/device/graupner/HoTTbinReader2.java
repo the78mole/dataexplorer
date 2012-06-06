@@ -769,7 +769,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
 			if (!HoTTAdapter.isTolerateSignChangeLatitude) tmpLatitude = _buf1[6] == 1 ? -1 * tmpLatitude : tmpLatitude;
 			tmpLatitudeDelta = Math.abs(tmpLatitude -_points[12]);
-			latitudeTolerance = (_points[14] / 1000.0)  * (HoTTbinReader2.timeStep_ms - lastLatitudeTimeStep) / HoTTAdapter.latitudeTolranceFactor;
+			latitudeTolerance = (_points[14] / 1000.0)  * (HoTTbinReader2.timeStep_ms - lastLatitudeTimeStep) / HoTTAdapter.latitudeToleranceFactor;
 			latitudeTolerance = latitudeTolerance > 0 ? latitudeTolerance : 5;
 
 			if (!HoTTAdapter.isFilterEnabled || _points[12] == 0 	|| tmpLatitudeDelta <= latitudeTolerance) {
@@ -783,7 +783,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			tmpLongitude = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
 			if (!HoTTAdapter.isTolerateSignChangeLongitude) tmpLongitude = _buf2[1] == 1 ? -1 * tmpLongitude : tmpLongitude;
 			tmpLongitudeDelta = Math.abs(tmpLongitude -_points[13]);
-			longitudeTolerance = (_points[14] / 1000.0)  * (HoTTbinReader2.timeStep_ms - lastLongitudeTimeStep) / HoTTAdapter.longitudeTolranceFactor;
+			longitudeTolerance = (_points[14] / 1000.0)  * (HoTTbinReader2.timeStep_ms - lastLongitudeTimeStep) / HoTTAdapter.longitudeToleranceFactor;
 			longitudeTolerance = longitudeTolerance > 0 ? longitudeTolerance : 5;
 
 			if (!HoTTAdapter.isFilterEnabled || _points[13] == 0 	|| tmpLongitudeDelta <= longitudeTolerance) {

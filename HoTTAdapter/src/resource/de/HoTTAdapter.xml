@@ -830,6 +830,6 @@
         <property value="true" name="analog_tab"/>
         <property value="false" name="voltage_per_cell_tab"/>
         <property description="UTILITY_GRAPHICS_TAB" value="false" name="utility_garphics_tab"/>
-        <property description="UTILITY_DEVICE_TAB" value="false" name="utility_device_tab"/>
+        <property description="UTILITY_DEVICE_TAB" value="true" name="utility_device_tab"/>
     </Desktop>
 </DeviceProperties>

@@ -213,7 +213,7 @@ public class HoTTbinReader {
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
-		RecordSet tmpRecordSet;
+		RecordSet tmpRecordSet, receiverRecordSet;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		if (menuToolBar != null) HoTTbinReader.application.setProgress(0, sThreadId);
@@ -228,7 +228,7 @@ public class HoTTbinReader {
 			HoTTbinReader.recordSetReceiver = RecordSet.createRecordSet(recordSetName, device, 1, true, true);
 			channel.put(recordSetName, HoTTbinReader.recordSetReceiver);
 			HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.RECEIVER.value(), HoTTbinReader.recordSetReceiver);
-			tmpRecordSet = channel.get(recordSetName);
+			receiverRecordSet = tmpRecordSet = channel.get(recordSetName);
 			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 			tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 			if (HoTTbinReader.application.getMenuToolBar() != null) {
@@ -236,21 +236,25 @@ public class HoTTbinReader {
 			}
 			//recordSetReceiver initialized and ready to add data
 			
-			//channel data are always contained
-			//check if recordSetChannel initialized, transmitter and receiver data always present, but not in the same data rate and signals
-			channel = HoTTbinReader.channels.get(6);
-			channel.setFileDescription(application.isObjectoriented() ? date + GDE.STRING_BLANK + application.getObjectKey() : date);
-			recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.CHANNEL.value() + recordSetNameExtend;
-			HoTTbinReader.recordSetChannel = RecordSet.createRecordSet(recordSetName, device, 6, true, true);
-			channel.put(recordSetName, HoTTbinReader.recordSetChannel);
-			HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.CHANNEL.value(), HoTTbinReader.recordSetChannel);
-			tmpRecordSet = channel.get(recordSetName);
-			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
-			tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
-			if (HoTTbinReader.application.getMenuToolBar() != null) {
-				channel.applyTemplate(recordSetName, true);
+			if (HoTTAdapter.isChannelsChannelEnabled) {
+				//channel data are always contained
+				//check if recordSetChannel initialized, transmitter and receiver data always present, but not in the same data rate and signals
+				channel = HoTTbinReader.channels.get(6);
+				channel.setFileDescription(application.isObjectoriented() ? date + GDE.STRING_BLANK + application.getObjectKey() : date);
+				recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.CHANNEL.value() + recordSetNameExtend;
+				HoTTbinReader.recordSetChannel = RecordSet.createRecordSet(recordSetName, device, 6, true, true);
+				channel.put(recordSetName, HoTTbinReader.recordSetChannel);
+				HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.CHANNEL.value(), HoTTbinReader.recordSetChannel);
+				tmpRecordSet = channel.get(recordSetName);
+				tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+				tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
+				if (HoTTbinReader.application.getMenuToolBar() != null) {
+					channel.applyTemplate(recordSetName, true);
+				}
+				//recordSetChannel initialized and ready to add data
 			}
-			//recordSetChannel initialized and ready to add data
+			//switch back to receiver channel to be displayed if no other sensor is connected
+			tmpRecordSet = receiverRecordSet;
 
 			//read all the data blocks from the file and parse
 			for (int i = 0; i < numberDatablocks; i++) {
@@ -270,7 +274,9 @@ public class HoTTbinReader {
 					//fill receiver data
 					if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 40) != 0 && HoTTbinReader.timeStep_ms % 10 == 0) {
 						parseAddReceiver(HoTTbinReader.recordSetReceiver, HoTTbinReader.pointsReceiver, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
-						parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
+						if (HoTTAdapter.isChannelsChannelEnabled) {
+							parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
+						}
 					}
 
 					switch ((byte) (HoTTbinReader.buf[7] & 0xFF)) {
@@ -1063,7 +1069,7 @@ public class HoTTbinReader {
 			tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
 			if (!HoTTAdapter.isTolerateSignChangeLatitude) tmpLatitude = _buf1[6] == 1 ? -1 * tmpLatitude : tmpLatitude;
 			tmpLatitudeDelta = Math.abs(tmpLatitude -_pointsGPS[1]);
-			latitudeTolerance = _pointsGPS[6] / 1000.0  * (_timeStep_ms - lastLatitudeTimeStep) / HoTTAdapter.latitudeTolranceFactor;
+			latitudeTolerance = _pointsGPS[6] / 1000.0  * (_timeStep_ms - lastLatitudeTimeStep) / HoTTAdapter.latitudeToleranceFactor;
 			latitudeTolerance = latitudeTolerance > 0 ? latitudeTolerance : 5;
 
 			if (!HoTTAdapter.isFilterEnabled || _pointsGPS[1] == 0 	|| tmpLatitudeDelta <= latitudeTolerance) {
@@ -1077,7 +1083,7 @@ public class HoTTbinReader {
 			tmpLongitude = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
 			if (!HoTTAdapter.isTolerateSignChangeLongitude) tmpLongitude = _buf2[1] == 1 ? -1 * tmpLongitude : tmpLongitude;
 			tmpLongitudeDelta = Math.abs(tmpLongitude -_pointsGPS[2]);
-			longitudeTolerance = _pointsGPS[6] / 1000.0  * (_timeStep_ms - lastLongitudeTimeStep) / HoTTAdapter.longitudeTolranceFactor;
+			longitudeTolerance = _pointsGPS[6] / 1000.0  * (_timeStep_ms - lastLongitudeTimeStep) / HoTTAdapter.longitudeToleranceFactor;
 			longitudeTolerance = longitudeTolerance > 0 ? longitudeTolerance : 5;
 
 			if (!HoTTAdapter.isFilterEnabled || _pointsGPS[2] == 0 	|| tmpLongitudeDelta <= longitudeTolerance) {

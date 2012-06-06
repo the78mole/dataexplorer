@@ -51,6 +51,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
@@ -142,11 +143,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final HoTTAdapterDialog			dialog;
 	final HoTTAdapterSerialPort	serialPort;
 
+	static boolean							isChannelsChannelEnabled 			= false;
 	static boolean							isFilterEnabled								= true;
 	static boolean							isTolerateSignChangeLatitude	= false;
 	static boolean							isTolerateSignChangeLongitude	= false;
-	static double								latitudeTolranceFactor				= 90.0;
-	static double								longitudeTolranceFactor				= 25.0;
+	static double								latitudeToleranceFactor				= 90.0;
+	static double								longitudeToleranceFactor			= 25.0;
 	
 	/**
 	 * constructor using properties file
@@ -168,11 +170,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 		
-		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : false;
+		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" 
+				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
 		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
 		HoTTAdapter.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
-		HoTTAdapter.latitudeTolranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
-		HoTTAdapter.longitudeTolranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 25.0;
+		HoTTAdapter.latitudeToleranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
+		HoTTAdapter.longitudeToleranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 25.0;
 	}
 
 	/**
@@ -194,11 +198,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 		
-		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
+		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" ? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : false;
+		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" 
+				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
 		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
 		HoTTAdapter.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
-		HoTTAdapter.latitudeTolranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
-		HoTTAdapter.longitudeTolranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 25.0;
+		HoTTAdapter.latitudeToleranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
+		HoTTAdapter.longitudeToleranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0 ? Double.parseDouble(this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 25.0;
 	}
 
 	/**
@@ -1122,7 +1128,24 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		HoTTAdapter.isFilterEnabled = isFilterEnabled;
 		HoTTAdapter.isTolerateSignChangeLatitude	= isTolerateSignChangeLatitude;
 		HoTTAdapter.isTolerateSignChangeLongitude	= isTolerateSignChangeLongitude;
-		HoTTAdapter.latitudeTolranceFactor				= latitudeTolranceFactor;
-		HoTTAdapter.longitudeTolranceFactor				= longitudeTolranceFactor;
+		HoTTAdapter.latitudeToleranceFactor				= latitudeTolranceFactor;
+		HoTTAdapter.longitudeToleranceFactor				= longitudeTolranceFactor;
+	}
+
+	/**
+	 * @param isChannelEnabled the isChannelEnabled to set
+	 */
+	public static synchronized void setChannelEnabledProperty(boolean isChannelEnabled) {
+		HoTTAdapter.isChannelsChannelEnabled = isChannelEnabled;
+	}
+	
+	/**
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * specific curve calculated from point combinations or other specific dialog
+	 * As default the function should return null which stands for no device custom tab item.  
+	 */
+	@Override
+	public CTabItem getUtilityDeviceTabItem() {
+		return new FileTransferTabItem(this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount(), this, this.serialPort);
 	}
 }
