@@ -328,7 +328,7 @@ public class Checksum {
 	 */
 	public static int ADD(byte[] b, int start, int len) {
 		int value = b[start] & 0xFF;
-		for (int i = start+1; i < len; i++) {
+		for (int i = start+1; i <= len; i++) {
 			value = value  + (b[i] & 0xFF);
 		}
 		return value;
