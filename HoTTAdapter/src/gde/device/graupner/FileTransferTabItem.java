@@ -13,6 +13,7 @@ import gde.utils.StringHelper;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -51,7 +52,7 @@ public class FileTransferTabItem extends CTabItem {
 	private ProgressBar transferProgressBar;
 	private CLabel transferProgressLabel;
 	private Button deleteFileButton;
-	private Composite spacerComposite;
+	private Composite tranferProgressComposite;
 	private Button downLoadButton;
 	private Button upLoadButton;
 	private TreeItem sdRootDirectoryTreeItem;
@@ -61,16 +62,16 @@ public class FileTransferTabItem extends CTabItem {
 	private Composite sdCardSizeComposite;
 	private Button disconnectButton;
 	private Button connectButton;
-	private Group transmitterSourceGroup;
-	private Table targetDirectoryTable, sourceDirectoryTable;
+	private Group sdCardActionGroup;
+	private Table targetDirectoryTable, sdCardFoldersTable;
 	private TableColumn indexColumn, fileNameColum, fileDateColum, fileTimeColum, fileSizeColum;
 	private Composite filler;
-	private Button computerBaseFolderButton;
-	private CLabel computerBaseFolderSelectionLabel;
-	private TreeItem computerRootTreeItem;
-	private Tree computerFolderTree;
-	private Composite composite2;
-	private Group pcGroup;
+	private Button pcBaseFolderButton;
+	private CLabel pcBaseFolderSelectionLabel;
+	private TreeItem pcRootTreeItem;
+	private Tree pcFolderTree;
+	private Composite sdCardActionComposite;
+	private Group pcFolderGroup;
 	private Composite innerComposite, outherComposite;
 	private ScrolledComposite scrolledComposite;
 
@@ -84,7 +85,7 @@ public class FileTransferTabItem extends CTabItem {
 	StringBuilder selectedSdFolder;
 	StringBuilder selectedPcBaseFolder = new StringBuilder().append(settings.getDataFilePath());
 	StringBuilder selectedPcFolder = new StringBuilder();
-	TreeItem lastSelectedPcTreeItem;
+	TreeItem lastSelectedSdTreeItem, lastSelectedPcTreeItem;
 	
 	public FileTransferTabItem(CTabFolder parent, int style, int position, HoTTAdapter useDevice, HoTTAdapterSerialPort useSerialPort) {
 		super(parent, style, position);
@@ -104,23 +105,28 @@ public class FileTransferTabItem extends CTabItem {
 			{
 				outherComposite = new Composite(scrolledComposite, SWT.NONE);
 				outherComposite.setBounds(0,0,1100, 550);
+				outherComposite.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
 				
 				innerComposite = new Composite(outherComposite, SWT.NONE);
+				innerComposite.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
 				innerComposite.setSize(1100, 550);
 				innerComposite.setLocation(0, 0);
 				RowLayout innerCompositeLayout = new RowLayout(org.eclipse.swt.SWT.VERTICAL);
 				innerComposite.setLayout(innerCompositeLayout);
 				{
-					pcGroup = new Group(innerComposite, SWT.NONE);
+					pcFolderGroup = new Group(innerComposite, SWT.NONE);
+					pcFolderGroup.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
 					RowLayout pcGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-					pcGroup.setLayout(pcGroupLayout);
+					pcFolderGroup.setLayout(pcGroupLayout);
 					RowData pcGroupLData = new RowData();
 					pcGroupLData.width = 1090;
 					pcGroupLData.height = 250;
-					pcGroup.setLayoutData(pcGroupLData);
-					pcGroup.setText("Computer Target Directories");
+					pcFolderGroup.setLayoutData(pcGroupLData);
+					pcFolderGroup.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+					pcFolderGroup.setText("Computer Target Directories");
 					{
-						filler = new Composite(pcGroup, SWT.NONE);
+						filler = new Composite(pcFolderGroup, SWT.NONE);
+						filler.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
 						GridLayout composite1Layout = new GridLayout();
 						composite1Layout.makeColumnsEqualWidth = true;
 						RowData composite1LData = new RowData();
@@ -130,39 +136,38 @@ public class FileTransferTabItem extends CTabItem {
 						filler.setLayout(composite1Layout);
 					}
 					{
-						computerBaseFolderButton = new Button(pcGroup, SWT.PUSH | SWT.CENTER);
-						computerBaseFolderButton.setText("Select base folder");
-						computerBaseFolderButton.addSelectionListener(new SelectionAdapter() {
+						pcBaseFolderButton = new Button(pcFolderGroup, SWT.PUSH | SWT.CENTER);
+						RowData pcBaseFolderButtonLData = new RowData();
+						pcBaseFolderButtonLData.width = 153;
+						pcBaseFolderButtonLData.height = 30;
+						pcBaseFolderButton.setLayoutData(pcBaseFolderButtonLData);
+						pcBaseFolderButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						pcBaseFolderButton.setText("Select base folder");
+						pcBaseFolderButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "deleteFileButton.widgetSelected, event="+evt);
-								String baseFolderName = application.openDirFileDialog("Select computer base folder", selectedPcBaseFolder.toString());
-								computerBaseFolderSelectionLabel.setText(baseFolderName);
-								updateComputerFolder();
+								String baseFolderName = application.openDirFileDialog("Select pc base folder", selectedPcBaseFolder.toString());
+								if (baseFolderName != null && baseFolderName.length() > 0) {
+									pcBaseFolderSelectionLabel.setText(baseFolderName);
+									updatePcBaseFolder();
+								}
 							}
 						});
 					}
 					{
-						computerBaseFolderSelectionLabel = new CLabel(pcGroup, SWT.BORDER);
-						computerBaseFolderSelectionLabel.setText(selectedPcBaseFolder.toString());
-						RowData computerBaseFolderSelectionLabelLData = new RowData();
-						computerBaseFolderSelectionLabelLData.width = 578;
-						computerBaseFolderSelectionLabelLData.height = 25;
-						computerBaseFolderSelectionLabel.setLayoutData(computerBaseFolderSelectionLabelLData);
-						computerBaseFolderSelectionLabel.setBackground(SWTResourceManager.getColor(255, 255, 255));
+						pcBaseFolderSelectionLabel = new CLabel(pcFolderGroup, SWT.NONE);
+						pcBaseFolderSelectionLabel.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
+						pcBaseFolderSelectionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						pcBaseFolderSelectionLabel.setText(selectedPcBaseFolder.toString());
+						RowData pcBaseFolderSelectionLabelLData = new RowData();
+						pcBaseFolderSelectionLabelLData.width = 580+337;
+						pcBaseFolderSelectionLabelLData.height = 26;
+						pcBaseFolderSelectionLabel.setLayoutData(pcBaseFolderSelectionLabelLData);
 					}
 					{
-						filler = new Composite(pcGroup, SWT.NONE);
-						GridLayout compositeLayout = new GridLayout();
-						compositeLayout.makeColumnsEqualWidth = true;
-						RowData compositeLData = new RowData();
-						compositeLData.width = 370;
-						compositeLData.height = 21;
-						filler.setLayoutData(compositeLData);
-						filler.setLayout(compositeLayout);
-					}
-					{
-						filler = new Composite(pcGroup, SWT.NONE);
+						filler = new Composite(pcFolderGroup, SWT.NONE);
+						filler.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
 						GridLayout compositeLayout = new GridLayout();
 						compositeLayout.makeColumnsEqualWidth = true;
 						RowData compositeLData = new RowData();
@@ -172,74 +177,30 @@ public class FileTransferTabItem extends CTabItem {
 						filler.setLayout(compositeLayout);
 					}
 					{
-						RowData computerFolderTreeLData = new RowData();
-						computerFolderTreeLData.width = 425;
-						computerFolderTreeLData.height = 185;
-						computerFolderTree = new Tree(pcGroup, SWT.BORDER);
-						computerFolderTree.setLayoutData(computerFolderTreeLData);
-						computerFolderTree.addSelectionListener(new SelectionAdapter() {
+						RowData pcFolderTreeLData = new RowData();
+						pcFolderTreeLData.width = 425;
+						pcFolderTreeLData.height = 185;
+						pcFolderTree = new Tree(pcFolderGroup, SWT.BORDER);
+						pcFolderTree.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						pcFolderTree.setLayoutData(pcFolderTreeLData);
+						pcFolderTree.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								log.log(Level.FINEST, "computerFolderTree.widgetSelected, event="+evt);
+								log.log(Level.FINEST, "pcFolderTree.widgetSelected, event="+evt);
 								TreeItem evtItem = (TreeItem) evt.item;
-								log.log(Level.FINEST, "computerFolderTree.widgetSelected, tree item = "+ evtItem.getText());
-								try {
-									TreeItem parentItem, tmpItem;
-									setTableHeader(targetDirectoryTable);
-
-									for (TreeItem item : evtItem.getItems()) {
-										item.dispose();
-									}
-									//apply close d folder icon to previous selected tree item
-									if (lastSelectedPcTreeItem != null && !lastSelectedPcTreeItem.isDisposed()) {
-										lastSelectedPcTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
-										while (!computerRootTreeItem.getText().equals((parentItem = lastSelectedPcTreeItem.getParentItem()).getText())) {
-											parentItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
-											lastSelectedPcTreeItem = parentItem;
-										}
-									}
-
-									//build path traversing tree items, apply open folder icon
-									selectedPcFolder = new StringBuilder().append(GDE.FILE_SEPARATOR_UNIX).append(evtItem.getText());
-									tmpItem = evtItem;
-									while (!computerRootTreeItem.getText().equals((parentItem = tmpItem.getParentItem()).getText())) {
-										selectedPcFolder.insert(0, parentItem.getText());
-										selectedPcFolder.insert(0, GDE.FILE_SEPARATOR_UNIX );
-										parentItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif"));
-										tmpItem = parentItem;
-									}
-									selectedPcFolder.insert(0, selectedPcBaseFolder);
-									
-									//update with new folder and file information
-									List<File> files = FileUtils.getFileListing(new File(selectedPcFolder.toString()), 1);
-									int index = 0;
-									for (File file : files) {
-										new TableItem(targetDirectoryTable, SWT.NONE).setText(new String[] { GDE.STRING_EMPTY + index++, file.getName(), StringHelper.getFormatedTime("yyyy-MM-dd", file.lastModified()),
-												StringHelper.getFormatedTime("HH:mm", file.lastModified()), GDE.STRING_EMPTY + file.length() });
-									}
-									List<File> folders = FileUtils.getDirListing(new File(selectedPcFolder.toString()));
-									for (File folder : folders) {
-											TreeItem tmpTreeItem = new TreeItem(evtItem, SWT.NONE);
-											tmpTreeItem.setText(folder.getName());
-											tmpTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
-									}							
-									evtItem.setExpanded(true);
-									evtItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif"));
-									lastSelectedPcTreeItem = evtItem;
-								}
-								catch (Exception e) {
-									log.log(Level.SEVERE, e.getMessage(), e);
-								}
+								log.log(Level.FINEST, "pcFolderTree.widgetSelected, tree item = "+ evtItem.getText());
+								updateSelectedPcFolder(evtItem);
 							}
 						});
 						{
-							computerRootTreeItem = new TreeItem(computerFolderTree, SWT.NONE);
-							computerRootTreeItem.setText(selectedPcBaseFolder.substring(selectedPcBaseFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
-							updateComputerFolder();
+							pcRootTreeItem = new TreeItem(pcFolderTree, SWT.NONE);
+							pcRootTreeItem.setText(selectedPcBaseFolder.substring(selectedPcBaseFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
+							updatePcBaseFolder();
 						}
 					}
 					{
-						filler = new Composite(pcGroup, SWT.NONE);
+						filler = new Composite(pcFolderGroup, SWT.NONE);
+						filler.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
 						GridLayout composite1Layout = new GridLayout();
 						composite1Layout.makeColumnsEqualWidth = true;
 						RowData composite1LData = new RowData();
@@ -249,7 +210,7 @@ public class FileTransferTabItem extends CTabItem {
 						filler.setLayout(composite1Layout);
 					}
 					{
-						targetDirectoryTable = new Table(pcGroup, SWT.VIRTUAL | SWT.BORDER);
+						targetDirectoryTable = new Table(pcFolderGroup, SWT.FULL_SELECTION | SWT.BORDER | SWT.MULTI);
 						RowData targetDirectoryTableLData = new RowData();
 						targetDirectoryTableLData.width = 580;
 						targetDirectoryTableLData.height = 185;
@@ -258,32 +219,32 @@ public class FileTransferTabItem extends CTabItem {
 						targetDirectoryTable.setHeaderVisible(true);
 						targetDirectoryTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						setTableHeader(targetDirectoryTable);
-						targetDirectoryTable.addListener(SWT.SetData, new Listener() {
+						targetDirectoryTable.addListener(SWT.Selection, new Listener() {
 							public void handleEvent(Event event) {
-//								Channel activeChannel = channels.getActiveChannel();
-//								if (activeChannel != null) {
-//									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-//									if (activeRecordSet != null && activeRecordSet.getRecordDataSize(true) > 0) {
-//										TableItem item = (TableItem) event.item;
-//										int index = DataTableWindow.this.dataTable.indexOf(item);
-//										item.setText(activeRecordSet.getDataTableRow(index, DataTableWindow.this.isAbsoluteDateTime));
-//									}
-//								}
+										TableItem item = (TableItem) event.item;
+										log.log(Level.FINE, "Selection={" + item.getText(1) + "}");			
+										TableItem[] selection = targetDirectoryTable.getSelection();
+										String string = "";
+										for (int i=0; i<selection.length; i++) string += selection [i] + " ";
+										log.log(Level.FINE, "Selection={" + string + "}");
 							}
 						});
 					}
 				}
 				{
-					transmitterSourceGroup = new Group(innerComposite, SWT.NONE);
+					sdCardActionGroup = new Group(innerComposite, SWT.NONE);
+					sdCardActionGroup.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
 					RowLayout TransmitterSourceGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
-					transmitterSourceGroup.setLayout(TransmitterSourceGroupLayout);
+					sdCardActionGroup.setLayout(TransmitterSourceGroupLayout);
 					RowData transmitterSourceGroupLData = new RowData();
 					transmitterSourceGroupLData.width = 1090;
 					transmitterSourceGroupLData.height = 250;
-					transmitterSourceGroup.setLayoutData(transmitterSourceGroupLData);
-					transmitterSourceGroup.setText("Transmitter Source Control");
+					sdCardActionGroup.setLayoutData(transmitterSourceGroupLData);
+					sdCardActionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					sdCardActionGroup.setText("Transmitter Source Control");
 					{
-						sdCardSizeComposite = new Composite(transmitterSourceGroup, SWT.NONE);
+						sdCardSizeComposite = new Composite(sdCardActionGroup, SWT.NONE);
+						sdCardSizeComposite.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
 						RowLayout sdCardSizeCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData sdCardSizeCompositeLData = new RowData();
 						sdCardSizeCompositeLData.width = 923;
@@ -292,10 +253,12 @@ public class FileTransferTabItem extends CTabItem {
 						sdCardSizeComposite.setLayout(sdCardSizeCompositeLayout);
 						{
 							sdCardSpaceinfoLabel = new CLabel(sdCardSizeComposite, SWT.NONE);
+							sdCardSpaceinfoLabel.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
 							RowData sdCardSpaceinfoLabelLData = new RowData();
 							sdCardSpaceinfoLabelLData.width = 869;
 							sdCardSpaceinfoLabelLData.height = 18;
 							sdCardSpaceinfoLabel.setLayoutData(sdCardSpaceinfoLabelLData);
+							sdCardSpaceinfoLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							sdCardSpaceinfoLabel.setText("Disk Space - Total : Mbytes - Free : MBytes");
 						}
 						{
@@ -309,20 +272,22 @@ public class FileTransferTabItem extends CTabItem {
 						}
 					}
 					{
+						sdCardActionComposite = new Composite(sdCardActionGroup, SWT.NONE);
+						sdCardActionComposite.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
+						GridLayout composite2Layout = new GridLayout();
+						composite2Layout.makeColumnsEqualWidth = true;
+						sdCardActionComposite.setLayout(composite2Layout);
 						RowData composite2LData = new RowData();
 						composite2LData.width = 203;
 						composite2LData.height = 150;
-						composite2 = new Composite(transmitterSourceGroup, SWT.NONE);
-						GridLayout composite2Layout = new GridLayout();
-						composite2Layout.makeColumnsEqualWidth = true;
-						composite2.setLayout(composite2Layout);
-						composite2.setLayoutData(composite2LData);
+						sdCardActionComposite.setLayoutData(composite2LData);
 						{
-							connectButton = new Button(composite2, SWT.PUSH | SWT.CENTER);
+							connectButton = new Button(sdCardActionComposite, SWT.PUSH | SWT.CENTER);
 							GridData connectButtonLData = new GridData();
 							connectButtonLData.widthHint = 153;
 							connectButtonLData.heightHint = 31;
 							connectButton.setLayoutData(connectButtonLData);
+							connectButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							connectButton.setText("Connect");
 							connectButton.addSelectionListener(new SelectionAdapter() {
 								@Override
@@ -332,27 +297,10 @@ public class FileTransferTabItem extends CTabItem {
 										if (!serialPort.isConnected()) {
 											serialPort.open();
 										}
-										setTableHeader(sourceDirectoryTable);
-										for (TreeItem item : sdRootDirectoryTreeItem.getItems()) {
-											for (TreeItem subItem : item.getItems()) { 
-												log.log(Level.FINER,  "dispose " + subItem.getText());
-												subItem.dispose();
-											}
-											log.log(Level.FINER,  "dispose " + item.getText());
-											item.dispose();
-										}
-										long[] sdSizes = serialPort.prepareSdCard();
-										if (sdSizes != null && sdSizes.length == 2 && sdSizes[0]  > 1000 && sdSizes[1] > 1000) {
-											sdCardSpaceinfoLabel.setText("Disk Space - Total : " + sdSizes[0] + " KBytes - Free : " + sdSizes[1] + " KBytes");
-											sdCardSpaceProgressBar.setSelection((int) ((sdSizes[0]-sdSizes[1])*100/sdSizes[0]));
-										}
-										for (String folder : serialPort.querySdDirs()) {
-											TreeItem tmpTreeItem = new TreeItem(sdRootDirectoryTreeItem, SWT.NONE);
-											tmpTreeItem.setText(folder);
-											tmpTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
-										}
-										sdRootDirectoryTreeItem.setExpanded(true);
-										sdRootDirectoryTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif"));
+										serialPort.prepareSdCard();
+										
+										updateSdCardSizes(serialPort.querySdCardSizes());
+										listSdCardBaseDirs();
 									}
 									catch (SerialPortException e) {
 										log.log(Level.SEVERE, e.getMessage(), e);
@@ -373,17 +321,18 @@ public class FileTransferTabItem extends CTabItem {
 							});
 						}
 						{
-							upLoadButton = new Button(composite2, SWT.PUSH | SWT.CENTER);
+							upLoadButton = new Button(sdCardActionComposite, SWT.PUSH | SWT.CENTER);
 							GridData upLoadButtonLData = new GridData();
 							upLoadButtonLData.widthHint = 153;
 							upLoadButtonLData.heightHint = 31;
 							upLoadButton.setLayoutData(upLoadButtonLData);
+							upLoadButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							upLoadButton.setText("SD -> PC");
 							upLoadButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(Level.FINEST, "upLoadButton.widgetSelected, event="+evt);
-									TableItem[] selection = sourceDirectoryTable.getSelection();
+									TableItem[] selection = sdCardFoldersTable.getSelection();
 									
 									if (selection == null || selection.length < 1 || selectedSdFolder == null || selectedSdFolder.length() < 5 || selectedSdFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) < 0) {
 										application.openMessageDialog("There is no source file selected, select file and re-start transfer.");
@@ -397,19 +346,22 @@ public class FileTransferTabItem extends CTabItem {
 									final StringBuilder filesInfo = new StringBuilder();
 									long tmpTotalSize = 0;
 									for (int i=0; i<selection.length; i++) {
-										filesInfo.append(selection[i].getText(0)).append(GDE.STRING_COMMA).append(selection[i].getText(1)).append(GDE.STRING_SEMICOLON);
+										String[] date = selection[i].getText(2).split(GDE.STRING_DASH);
+										String[] time = selection[i].getText(3).split(GDE.STRING_COLON);
+										GregorianCalendar calendar = new GregorianCalendar(Integer.parseInt(date[0]),Integer.parseInt(date[1])-1,Integer.parseInt(date[2]), Integer.parseInt(time[0]),Integer.parseInt(time[1]));
+										long timeStamp = calendar.getTimeInMillis();
+										filesInfo.append(selection[i].getText(0)).append(GDE.STRING_COMMA).append(selection[i].getText(1)).append(GDE.STRING_COMMA).append(timeStamp).append(GDE.STRING_SEMICOLON);
 										tmpTotalSize += Long.parseLong(selection[i].getText(4));
 									}
-									System.out.println ("Selection={" + filesInfo + "}");
+									log.log(Level.FINE, "Selection={" + filesInfo + "}");
 									
 									final long totalSize = tmpTotalSize;
-									final long[] remainigSize = new long[] { totalSize };
-									new Thread("Download") {
+									new Thread("Upload") {
 										@Override
 										public void run() {
 											try {
-												serialPort.upLoadFiles(selectedSdFolder.toString()+GDE.FILE_SEPARATOR_UNIX, selectedPcFolder.toString(), filesInfo.toString().split(GDE.STRING_SEMICOLON), remainigSize, 
-														transferProgressBar, transferProgressLabel);
+												serialPort.upLoadFiles(selectedSdFolder.toString()+GDE.FILE_SEPARATOR_UNIX, selectedPcFolder.toString(), filesInfo.toString().split(GDE.STRING_SEMICOLON), totalSize, 
+														FileTransferTabItem.this);
 											}
 											catch (Exception e) {
 												log.log(Level.SEVERE, e.getMessage(), e);
@@ -420,34 +372,66 @@ public class FileTransferTabItem extends CTabItem {
 							});
 						}
 						{
-							downLoadButton = new Button(composite2, SWT.PUSH | SWT.CENTER);
+							downLoadButton = new Button(sdCardActionComposite, SWT.PUSH | SWT.CENTER);
 							GridData downLoadButtonLData = new GridData();
 							downLoadButtonLData.widthHint = 153;
 							downLoadButtonLData.heightHint = 31;
 							downLoadButton.setLayoutData(downLoadButtonLData);
+							downLoadButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							downLoadButton.setText("PC -> SD");
 							downLoadButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(Level.FINEST, "downLoadButton.widgetSelected, event="+evt);
-									//TODO add your code for downLoadButton.widgetSelected
-									//TableItem[] selection = table.getSelection();
+									TableItem[] selection = targetDirectoryTable.getSelection();
+									
+									if (selection == null || selection.length < 1 || selectedSdFolder == null || selectedSdFolder.length() < 5 || selectedSdFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) < 0) {
+										application.openMessageDialog("There is no source file selected, select file and re-start transfer.");
+										return;
+									}
+									else if (selectedSdFolder == null || selectedPcFolder.length() == 0) {
+										application.openMessageDialog("There is no PC target folder selected, select target folder and re-start transfer.");
+										return;
+									}
+									
+									final StringBuilder filesInfo = new StringBuilder();
+									long tmpTotalSize = 0;
+									for (int i=0; i<selection.length; i++) {
+										filesInfo.append(selection[i].getText(0)).append(GDE.STRING_COMMA).append(selection[i].getText(1)).append(GDE.STRING_SEMICOLON);
+										tmpTotalSize += Long.parseLong(selection[i].getText(4));
+									}
+									log.log(Level.FINE, "Selection={" + filesInfo + "}");
+									
+									final long totalSize = tmpTotalSize;
+									new Thread("Download") {
+										@Override
+										public void run() {
+											try {
+												serialPort.downLoadFiles(selectedSdFolder.toString()+GDE.FILE_SEPARATOR_UNIX, selectedPcFolder.toString(), filesInfo.toString().split(GDE.STRING_SEMICOLON), totalSize, 
+														FileTransferTabItem.this);
+											}
+											catch (Exception e) {
+												log.log(Level.SEVERE, e.getMessage(), e);
+											}
+										}
+									}.start();
 								}
 							});
 						}
 						{
-							disconnectButton = new Button(composite2, SWT.PUSH | SWT.CENTER);
+							disconnectButton = new Button(sdCardActionComposite, SWT.PUSH | SWT.CENTER);
 							GridData disconnectButtonLData = new GridData();
 							disconnectButtonLData.widthHint = 153;
 							disconnectButtonLData.heightHint = 31;
 							disconnectButton.setLayoutData(disconnectButtonLData);
+							disconnectButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							disconnectButton.setText("Disconnect");
 							disconnectButton.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(Level.FINEST, "disconnectButton.widgetSelected, event="+evt);
 									serialPort.close();
-									setTableHeader(sourceDirectoryTable);
+									setTableHeader(sdCardFoldersTable);
 									for (TreeItem item : sdRootDirectoryTreeItem.getItems()) {
 										for (TreeItem subItem : item.getItems()) { 
 											log.log(Level.FINER,  "dispose " + subItem.getText());
@@ -464,43 +448,17 @@ public class FileTransferTabItem extends CTabItem {
 						RowData sourceFolderTreeLData = new RowData();
 						sourceFolderTreeLData.width = 250;
 						sourceFolderTreeLData.height = 130;
-						sdFolderTree = new Tree(transmitterSourceGroup, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+						sdFolderTree = new Tree(sdCardActionGroup, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+						sdFolderTree.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						sdFolderTree.setLayoutData(sourceFolderTreeLData);
 						sdFolderTree.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "sourceFolderTree.widgetSelected, event="+evt);
-								TreeItem ti = (TreeItem) evt.item;
-								log.log(Level.FINEST, "sourceFolderTree.widgetSelected, tree item = "+ ti.getText());
-								if (serialPort.isConnected() && !ti.getText().equals(GDE.FILE_SEPARATOR_UNIX)) {
-									try {
-										setTableHeader(sourceDirectoryTable);
-
-										for (TreeItem item : ti.getItems()) {
-											item.dispose();
-										}
-										selectedSdFolder = new StringBuilder().append(GDE.FILE_SEPARATOR_UNIX ).append(ti.getText());
-										TreeItem parentItem;
-										while (!(parentItem = ti.getParentItem()).getText().equals(GDE.FILE_SEPARATOR_UNIX)) {
-											selectedSdFolder.insert(0, parentItem.getText());
-											selectedSdFolder.insert(0, GDE.FILE_SEPARATOR_UNIX );
-											ti = parentItem;
-										}
-										sdFoldersAndFiles = serialPort.queryListDir(selectedSdFolder.toString());
-										for (String folder : sdFoldersAndFiles.get("FOLDER")) {
-											if (folder.length() > 3) {
-												TreeItem tmpTreeItem = new TreeItem(ti, SWT.NONE);
-												tmpTreeItem.setText(folder);
-												tmpTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
-											}
-										}
-										ti.setExpanded(true);
-										ti.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
-										updateSdDataTable();
-									}
-									catch (Exception e) {
-										log.log(Level.SEVERE, e.getMessage(), e);
-									}
+								TreeItem evtTreeitem = (TreeItem) evt.item;
+								log.log(Level.FINEST, "sourceFolderTree.widgetSelected, tree item = "+ evtTreeitem.getText());
+								if (serialPort.isConnected() && !evtTreeitem.getText().equals(GDE.FILE_SEPARATOR_UNIX)) {
+									updateSelectedSdFolder(evtTreeitem);
 								}
 							}
 						});
@@ -511,76 +469,93 @@ public class FileTransferTabItem extends CTabItem {
 						}
 					}
 					{
-						sourceDirectoryTable = new Table(transmitterSourceGroup, SWT.VIRTUAL | SWT.BORDER | SWT.MULTI);
+						sdCardFoldersTable = new Table(sdCardActionGroup, SWT.FULL_SELECTION | SWT.BORDER | SWT.MULTI);
 						RowData sourceDirectoryTableLData = new RowData();
 						sourceDirectoryTableLData.width = 580;
 						sourceDirectoryTableLData.height = 130;
-						sourceDirectoryTable.setLayoutData(sourceDirectoryTableLData);
-						sourceDirectoryTable.setLinesVisible(true);
-						sourceDirectoryTable.setHeaderVisible(true);
-						//targetDirectoryTable.setItemCount(3);
-						sourceDirectoryTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						setTableHeader(sourceDirectoryTable);
-						sourceDirectoryTable.addListener(SWT.SetData, new Listener() {
+						sdCardFoldersTable.setLayoutData(sourceDirectoryTableLData);
+						sdCardFoldersTable.setLinesVisible(true);
+						sdCardFoldersTable.setHeaderVisible(true);
+						sdCardFoldersTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						setTableHeader(sdCardFoldersTable);
+						sdCardFoldersTable.addListener(SWT.Selection, new Listener() {
 							public void handleEvent(Event event) {
 										TableItem item = (TableItem) event.item;
-										item.setText(getDataTableRow(sourceDirectoryTable.indexOf(item)));
-							}
-						});
-						sourceDirectoryTable.addListener(SWT.Selection, new Listener() {
-							public void handleEvent(Event event) {
-										TableItem item = (TableItem) event.item;
-										System.out.println ("Selection={" + item.getText(1) + "}");			
-										TableItem[] selection = sourceDirectoryTable.getSelection();
+										log.log(Level.FINE, "Selection={" + item.getText(1) + "}");			
+										TableItem[] selection = sdCardFoldersTable.getSelection();
 										String string = "";
 										for (int i=0; i<selection.length; i++) string += selection [i] + " ";
-										System.out.println ("Selection={" + string + "}");
+										log.log(Level.FINE, "Selection={" + string + "}");
 							}
 						});
 					}
 					{
-						spacerComposite = new Composite(transmitterSourceGroup, SWT.NONE);
+						tranferProgressComposite = new Composite(sdCardActionGroup, SWT.NONE);
+						tranferProgressComposite.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
 						RowLayout spacerCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData spacerCompositeLData = new RowData();
 						spacerCompositeLData.width = 925;
 						spacerCompositeLData.height = 35;
-						spacerComposite.setLayoutData(spacerCompositeLData);
-						spacerComposite.setLayout(spacerCompositeLayout);
+						tranferProgressComposite.setLayoutData(spacerCompositeLData);
+						tranferProgressComposite.setLayout(spacerCompositeLayout);
 						{
-							transferProgressLabel = new CLabel(spacerComposite, SWT.NONE);
+							transferProgressLabel = new CLabel(tranferProgressComposite, SWT.NONE);
+							transferProgressLabel.setBackground(SWTResourceManager.getColor(settings.getUtilitySurroundingBackground()));
 							RowData transferProgressLabelLData = new RowData();
 							transferProgressLabelLData.width = 869;
 							transferProgressLabelLData.height = 18;
 							transferProgressLabel.setLayoutData(transferProgressLabelLData);
+							transferProgressLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							transferProgressLabel.setText("file transfer : " + 0 + " of " + 0 + " bytes");
 						}
 						{
 							RowData transferProgressBarLData = new RowData();
 							transferProgressBarLData.width = 869;
 							transferProgressBarLData.height = 10;
-							transferProgressBar = new ProgressBar(spacerComposite, SWT.NONE);
+							transferProgressBar = new ProgressBar(tranferProgressComposite, SWT.NONE);
 							transferProgressBar.setLayoutData(transferProgressBarLData);
 							transferProgressBar.setMinimum(0);
 							transferProgressBar.setMaximum(100);
 						}
 					}
 					{
-						deleteFileButton = new Button(transmitterSourceGroup, SWT.PUSH | SWT.CENTER);
+						deleteFileButton = new Button(sdCardActionGroup, SWT.PUSH | SWT.CENTER);
 						RowData deleteFileButtonLData = new RowData();
-						deleteFileButtonLData.width = 147;
-						deleteFileButtonLData.height = 33;
+						deleteFileButtonLData.width = 150;
+						deleteFileButtonLData.height = 31;
 						deleteFileButton.setLayoutData(deleteFileButtonLData);
+						deleteFileButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						deleteFileButton.setText("delete selected file");
 						deleteFileButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "deleteFileButton.widgetSelected, event="+evt);
-								//TODO add your code for deleteFileButton.widgetSelected
+								TableItem[] selection = sdCardFoldersTable.getSelection();
+								
+								if (selection == null || selection.length < 1 || selectedSdFolder == null || selectedSdFolder.length() < 5 || selectedSdFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) < 0) {
+									application.openMessageDialog("There is no source file selected, select file and re-start transfer.");
+									return;
+								}
+								
+								final StringBuilder filesInfo = new StringBuilder();
+								for (int i=0; i<selection.length; i++) {
+									filesInfo.append(selection[i].getText(1)).append(GDE.STRING_SEMICOLON);
+								}
+								log.log(Level.FINE, "Selection={" + filesInfo + "}");
+
+								try {
+									serialPort.deleteFiles(selectedSdFolder.toString()+GDE.FILE_SEPARATOR_UNIX, filesInfo.toString().split(GDE.STRING_SEMICOLON));
+									updateSelectedSdFolder(lastSelectedSdTreeItem);
+								}
+								catch (Exception e) {
+									log.log(Level.SEVERE, e.getMessage(), e);
+								}
 							}
 						});
 					}
 				}
 				innerComposite.layout();
+				System.out.println(pcFolderGroup.getClientArea().width);
 			}
 			scrolledComposite.setContent(outherComposite);
 			scrolledComposite.addControlListener(new ControlAdapter() {
@@ -615,28 +590,28 @@ public class FileTransferTabItem extends CTabItem {
 	/**
 	 * 
 	 */
-	private void updateComputerFolder() {
-		for (TreeItem item : computerRootTreeItem.getItems()) {
+	private void updatePcBaseFolder() {
+		for (TreeItem item : pcRootTreeItem.getItems()) {
 			item.dispose();
 		}
-		selectedPcBaseFolder = new StringBuilder().append(computerBaseFolderSelectionLabel.getText().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
-		computerRootTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
+		selectedPcBaseFolder = new StringBuilder().append(pcBaseFolderSelectionLabel.getText().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
+		pcRootTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
 		String baseFolderName = selectedPcBaseFolder.length() > selectedPcBaseFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1 ? selectedPcBaseFolder.substring(selectedPcBaseFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1) 
 				: GDE.IS_WINDOWS ? selectedPcBaseFolder.substring(0, selectedPcBaseFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)) : selectedPcBaseFolder.substring(selectedPcBaseFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
-		computerRootTreeItem.setText(baseFolderName);
+		pcRootTreeItem.setText(baseFolderName);
 		try {
 			//getDirListing gets only direct child folders, no sub child folders
 			List<File> folderList = FileUtils.getDirListing(new File(selectedPcBaseFolder.toString()));
 			for (File folder : folderList) {
-					TreeItem tmpTreeItem = new TreeItem(computerRootTreeItem, SWT.NONE);
+					TreeItem tmpTreeItem = new TreeItem(pcRootTreeItem, SWT.NONE);
 					tmpTreeItem.setText(folder.getName());
 					tmpTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
 			}
 			
 			//display opened folder icon and expand the tree if there are child nodes
-			if (computerRootTreeItem.getItemCount() > 1) {
-				computerRootTreeItem.setExpanded(true);
-				computerRootTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif"));
+			if (pcRootTreeItem.getItemCount() > 1) {
+				pcRootTreeItem.setExpanded(true);
+				pcRootTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif"));
 			}
 		}
 		catch (FileNotFoundException e) {
@@ -670,16 +645,159 @@ public class FileTransferTabItem extends CTabItem {
 		fileSizeColum.setText("size [Byte]         "); //2012-05-28
 	}
 
-	private String[] getDataTableRow(int index) {
-		String[] files = sdFoldersAndFiles.get("FILES");
-		return files != null ? files[index].split(GDE.STRING_COMMA) : new String[6];
-	}
-	
 	private synchronized void updateSdDataTable() {
 		if (sdFoldersAndFiles.get("FILES") != null) {
 			for (String fileItem : sdFoldersAndFiles.get("FILES")) {
-				new TableItem(sourceDirectoryTable, SWT.NONE).setText(fileItem.split(GDE.STRING_COMMA));
+				new TableItem(sdCardFoldersTable, SWT.NONE).setText(fileItem.split(GDE.STRING_COMMA));
 			}
 		}
+	}
+
+	/**
+	 * @param sdSizes
+	 */
+	private void updateSdCardSizes(long[] sdSizes) {
+		if (sdSizes != null && sdSizes.length == 2 && sdSizes[0]  > 1000 && sdSizes[1] > 1000) {
+			sdCardSpaceinfoLabel.setText("Disk Space - Total : " + sdSizes[0] + " KBytes - Free : " + sdSizes[1] + " KBytes");
+			sdCardSpaceProgressBar.setSelection((int) ((sdSizes[0]-sdSizes[1])*100/sdSizes[0]));
+		}
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private void listSdCardBaseDirs() throws Exception {
+		setTableHeader(sdCardFoldersTable);
+		for (TreeItem item : sdRootDirectoryTreeItem.getItems()) {
+			for (TreeItem subItem : item.getItems()) { 
+				log.log(Level.FINER,  "dispose " + subItem.getText());
+				subItem.dispose();
+			}
+			log.log(Level.FINER,  "dispose " + item.getText());
+			item.dispose();
+		}
+		for (String folder : serialPort.querySdDirs()) {
+			TreeItem tmpTreeItem = new TreeItem(sdRootDirectoryTreeItem, SWT.NONE);
+			tmpTreeItem.setText(folder);
+			tmpTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
+		}
+		sdRootDirectoryTreeItem.setExpanded(true);
+		sdRootDirectoryTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif"));
+	}
+
+	/**
+	 * @param evtItem
+	 */
+	private void updateSelectedPcFolder(TreeItem evtItem) {
+		try {
+			TreeItem parentItem, tmpItem;
+			setTableHeader(targetDirectoryTable);
+
+			for (TreeItem item : evtItem.getItems()) {
+				item.dispose();
+			}
+			//apply close d folder icon to previous selected tree item
+			if (lastSelectedPcTreeItem != null && !lastSelectedPcTreeItem.isDisposed()) {
+				lastSelectedPcTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
+				while (!pcRootTreeItem.getText().equals((parentItem = lastSelectedPcTreeItem.getParentItem()).getText())) {
+					parentItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
+					lastSelectedPcTreeItem = parentItem;
+				}
+			}
+
+			//build path traversing tree items, apply open folder icon
+			selectedPcFolder = new StringBuilder().append(GDE.FILE_SEPARATOR_UNIX).append(evtItem.getText());
+			tmpItem = evtItem;
+			while (!pcRootTreeItem.getText().equals((parentItem = tmpItem.getParentItem()).getText())) {
+				selectedPcFolder.insert(0, parentItem.getText());
+				selectedPcFolder.insert(0, GDE.FILE_SEPARATOR_UNIX );
+				parentItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif"));
+				tmpItem = parentItem;
+			}
+			selectedPcFolder.insert(0, selectedPcBaseFolder);
+			
+			//update with new folder and file information
+			List<File> files = FileUtils.getFileListing(new File(selectedPcFolder.toString()), 1);
+			int index = 0;
+			for (File file : files) {
+				new TableItem(targetDirectoryTable, SWT.NONE).setText(new String[] { GDE.STRING_EMPTY + index++, file.getName(), StringHelper.getFormatedTime("yyyy-MM-dd", file.lastModified()),
+						StringHelper.getFormatedTime("HH:mm", file.lastModified()), GDE.STRING_EMPTY + file.length() });
+			}
+			List<File> folders = FileUtils.getDirListing(new File(selectedPcFolder.toString()));
+			for (File folder : folders) {
+					TreeItem tmpTreeItem = new TreeItem(evtItem, SWT.NONE);
+					tmpTreeItem.setText(folder.getName());
+					tmpTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
+			}							
+			evtItem.setExpanded(true);
+			evtItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif"));
+			lastSelectedPcTreeItem = evtItem;
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * @param evtTreeitem
+	 */
+	private void updateSelectedSdFolder(TreeItem evtTreeitem) {
+		try {
+			setTableHeader(sdCardFoldersTable);
+
+			for (TreeItem item : evtTreeitem.getItems()) {
+				item.dispose();
+			}
+			selectedSdFolder = new StringBuilder().append(GDE.FILE_SEPARATOR_UNIX ).append(evtTreeitem.getText());
+			TreeItem parentItem;
+			while (!(parentItem = evtTreeitem.getParentItem()).getText().equals(GDE.FILE_SEPARATOR_UNIX)) {
+				selectedSdFolder.insert(0, parentItem.getText());
+				selectedSdFolder.insert(0, GDE.FILE_SEPARATOR_UNIX );
+				evtTreeitem = parentItem;
+			}
+			sdFoldersAndFiles = serialPort.queryListDir(selectedSdFolder.toString());
+			for (String folder : sdFoldersAndFiles.get("FOLDER")) {
+				if (folder.length() > 3) {
+					TreeItem tmpTreeItem = new TreeItem(evtTreeitem, SWT.NONE);
+					tmpTreeItem.setText(folder);
+					tmpTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
+				}
+			}
+			evtTreeitem.setExpanded(true);
+			evtTreeitem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif"));
+			updateSdDataTable();
+			lastSelectedSdTreeItem = evtTreeitem;
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+	
+	public void updateFileTransferProgress(final long totalSize, final long remainingSize) {
+		GDE.display.asyncExec(new Runnable() {
+			public void run() {
+				transferProgressBar.setSelection((int) ((totalSize - remainingSize) * 100 / totalSize));
+				transferProgressLabel.setText("file transfer : " + (totalSize - remainingSize) + " of " + totalSize + " bytes");
+			}
+		});
+	}
+	
+	public void updatePcFolder() {
+		final TreeItem treeItem = lastSelectedPcTreeItem;
+		GDE.display.asyncExec(new Runnable() {
+			public void run() {
+				updateSelectedPcFolder(treeItem);
+			}
+		});
+	}
+	
+	public void updateSdFolder(final long[] sdSizes) {
+		final TreeItem treeItem = lastSelectedSdTreeItem;
+		GDE.display.asyncExec(new Runnable() {
+			public void run() {
+				updateSdCardSizes(sdSizes);
+				updateSelectedSdFolder(treeItem);
+			}
+		});
 	}
 }

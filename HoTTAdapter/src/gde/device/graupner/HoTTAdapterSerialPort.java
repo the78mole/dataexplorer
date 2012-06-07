@@ -32,15 +32,14 @@ import gde.utils.Checksum;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Logger;
-
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.widgets.ProgressBar;
 
 /**
  * HoTTAdapter serial port implementation
@@ -384,27 +383,24 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		this.protocolType = newProtocolType;
 	}
 
-	static byte cntUp = 0x00;
-	static byte cntDown = (byte) 0xFF;
-	final static byte[]	PREPARE_FILE_TRANSFER			= { 0x03, 0x30 };
-	final static byte[]	SELECT_SD_CARD						= { 0x06, 0x30 };
-	final static byte[]	CHANGE_DIR								= { 0x06, 0x3D };
-	final static byte[]	LIST_DIR									= { 0x06, 0x3C };
-	final static byte[]	FILE_INFO									= { 0x06, 0x3F };
-	final static byte[]	QUERY_SD_SIZES						= { 0x06, 0x33 };
-	final static byte[]	XFER_INIT									= { 0x06, 0x35 };
-	final static byte[]	XFER_CLOSE								= { 0x06, 0x36 };
-	final static byte[]	UPLOAD										= { 0x06, 0x38 };
-	final static byte[]	DOWNLOAD									= { 0x06, 0x3A };
+	static byte					cntUp									= 0x00;
+	static byte					cntDown								= (byte) 0xFF;
+	final static byte[]	PREPARE_FILE_TRANSFER	= { 0x03, 0x30 };
+	final static byte[]	SELECT_SD_CARD				= { 0x06, 0x30 };
+	final static byte[]	QUERY_SD_SIZES				= { 0x06, 0x33 };
+	final static byte[]	FILE_XFER_INIT				= { 0x06, 0x35 };
+	final static byte[]	FILE_XFER_CLOSE				= { 0x06, 0x36 };
+	final static byte[]	FILE_UPLOAD						= { 0x06, 0x38 };
+	final static byte[]	FILE_DELETE						= { 0x06, 0x39 };
+	final static byte[]	FILE_DOWNLOAD					= { 0x06, 0x3A };
+	final static byte[]	LIST_DIR							= { 0x06, 0x3C };
+	final static byte[]	CHANGE_DIR						= { 0x06, 0x3D };
+	final static byte[]	FILE_INFO							= { 0x06, 0x3F };
 
-//
-//  cDeleteFileDir =    #$06+#$39; // Param: Filename absolut - Antwort: 06 01 (OK)  -  06 02 (FAIL)
 //  cMakeDir =          #$06+#$3E;
-//
 //  cGetVersion =       #$00+#$11;
 //  cListOverView =     #$05+#$32;
 //  cReadMemory =       #$05+#$33;
-//
 //  cLockScreen =       #$00+#$23;
 //  cClearScreen =      #$00+#$22;
 //  cWriteScreen =      #$00+#$21;  // 1. Byte: Zeile, 21 byte Ascii
@@ -445,7 +441,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		byte[] cmd1 = new byte[7];
 		System.arraycopy(cmdAll, 0, cmd1, 0, 7);
 		this.write(cmd1);
-		WaitTimer.delay(10);
+		WaitTimer.delay(3);
 		byte[] cmd2 = new byte[cmdAll.length - 7];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
 		this.write(cmd2);
@@ -456,13 +452,41 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		byte[] cmd1 = new byte[7];
 		System.arraycopy(cmdAll, 0, cmd1, 0, 7);
 		this.write(cmd1);
-		WaitTimer.delay(10);
+		WaitTimer.delay(3);
 		byte[] cmd2 = new byte[cmdAll.length - 7];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
 		this.write(cmd2);
 	}
+	
+	private void sendCmd(byte[] cmd, byte[] data) throws IOException {
+		byte[] cmd1 = new byte[7];
+		cmd1[0]=0x00;
+		if (cntUp == 0xFF || cntDown == 0x00) {
+			cntUp = 0x00;
+			cntDown = (byte) 0xFF;
+		}
+		cmd1[1]=cntUp+=0x01;
+		cmd1[2]=cntDown-=0x01;
+		cmd1[3]=(byte) ((data.length + 8) & 0x00FF);
+		cmd1[4]=(byte)(((data.length + 8) & 0xFF00) >> 8);
+		cmd1[5]=cmd[0];
+		cmd1[6]=cmd[1];
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, StringHelper.byte2Hex2CharString(cmd1,cmd1.length));
+		this.write(cmd1);
+		
+		WaitTimer.delay(3);
+		
+		byte[] cmd2 = new byte[data.length+8+2];
+		System.arraycopy(String.format("0x%04x 0", data.length).getBytes(), 0, cmd2, 0, 8);
+		System.arraycopy(data, 0, cmd2, 8, data.length);
+		short crc16 = Checksum.CRC16CCITT(cmd2, 0, cmd2.length - 2);
+		cmd2[data.length-2]=(byte) (crc16 & 0x00FF);
+		cmd2[data.length-1]=(byte) ((crc16 & 0xFF00) >> 8);
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, StringHelper.byte2Hex2CharString(cmd1,cmd1.length));
+		this.write(cmd2);
+	}
 
-	public synchronized long[] prepareSdCard() throws Exception {
+	public synchronized void prepareSdCard() throws Exception {
 		//prepare transmitter for data interaction
 		sendCmd(PREPARE_FILE_TRANSFER);
 		this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
@@ -471,7 +495,14 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		sendCmd(SELECT_SD_CARD);
 		this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-		
+	}
+
+	/**
+	 * @return
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public synchronized long[] querySdCardSizes() throws IOException, TimeOutException {
 		sendCmd(QUERY_SD_SIZES);
 		this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "SD size info : " + StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
@@ -480,6 +511,14 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		return new long[] {StringHelper.byte2hex2int(this.ANSWER_DATA, 9, 8), StringHelper.byte2hex2int(this.ANSWER_DATA, 21, 8)};
 	}
 	
+	public synchronized void deleteFiles(String dirPath, String[] files) throws IOException, TimeOutException {
+		for (String file : files) {
+			sendCmd(FILE_DELETE, dirPath + file);
+			this.ANSWER_DATA = this.read(new byte[9], 500);
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		}
+	}
+
 	public synchronized String[] querySdDirs() throws Exception {
 		//change to root directory and query sub folders
 		sendCmd(CHANGE_DIR, GDE.FILE_SEPARATOR_UNIX);
@@ -562,127 +601,143 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		return filesInfo.toString().split(GDE.STRING_SEMICOLON);
 	}
 	
-	public void upLoadFiles(String sourceDirPath, String targetDirPath, String[] filesInfo, final long[] sizeProgress, final ProgressBar transferProgressBar, final CLabel transferProgressLabel) throws Exception {
-		final long totalSize = sizeProgress[0];
-		for (String fileInfo : filesInfo) {
-			//fileInfo index,name,size
-			String[] file = fileInfo.split(GDE.STRING_COMMA);			
-			String fileQueryAnswer = this.queryFilesInfo(sourceDirPath, new String[] { fileInfo })[0];
-			int remainingFileSize = Integer.parseInt(fileQueryAnswer.split(GDE.STRING_COMMA)[2]);
+	public void upLoadFiles(String sourceDirPath, String targetDirPath, String[] filesInfo, final long totalSize, final FileTransferTabItem parent) throws Exception {
+		long remainingSize = totalSize;
+		DataOutputStream data_out = null;
+		
+		try {
+			for (String fileInfo : filesInfo) {
+				//fileInfo index,name,timeStamp,size
+				String[] file = fileInfo.split(GDE.STRING_COMMA);			
+				String fileQueryAnswer = this.queryFilesInfo(sourceDirPath, new String[] { fileInfo })[0];
+				long remainingFileSize = Long.parseLong(fileQueryAnswer.split(GDE.STRING_COMMA)[3]);
 
-			sendCmd(XFER_INIT, String.format("0x01 %s%s", sourceDirPath, file[1]));
-			this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				File xferFile = new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1]);
+				data_out = new DataOutputStream(new FileOutputStream(xferFile));
 
-			DataOutputStream data_out = new DataOutputStream(new FileOutputStream(new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1])));
-			do {
+				sendCmd(FILE_XFER_INIT, String.format("0x01 %s%s", sourceDirPath, file[1]));
+				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			
+				while (remainingFileSize > 0x0800) {
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "remainingFileSize = " + remainingFileSize);
+					sendCmd(FILE_UPLOAD, "0x0800");
+					this.ANSWER_DATA = this.read(new byte[7], 500);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+					if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) {
+						this.ANSWER_DATA = this.read(new byte[0x0802], 5000); //2048+2
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+						data_out.write(this.ANSWER_DATA, 0, 0x0800);
+					}
+					else //error 06 02 -> endless loop TODO
+						continue;
+					
+					remainingSize -= 0x0800;
+					remainingFileSize -= 0x0800;
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sizeProgress = " + remainingSize + " - " + ((totalSize-remainingSize)*100/totalSize) + " %");
+					
+					if (((totalSize-remainingSize)*100/totalSize) % 1 == 0) {
+						parent.updateFileTransferProgress(totalSize, remainingSize);
+					}
+				}
+
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "remainingFileSize = " + remainingFileSize);
-				sendCmd(UPLOAD, "0x0800");
+				sendCmd(FILE_UPLOAD, String.format("0x%04x", remainingFileSize));
 				this.ANSWER_DATA = this.read(new byte[7], 500);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) {
-					this.ANSWER_DATA = this.read(new byte[0x0802], 5000); //2048+2
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-					data_out.write(this.ANSWER_DATA, 0, 0x0800);
-				}
-				else
-					continue;
-				sizeProgress[0] -= 0x0800;
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "sizeProgress = " + sizeProgress[0] + " - " + ((totalSize-sizeProgress[0])*100/totalSize) + " %");
+				this.ANSWER_DATA = this.read(new byte[(int) (remainingFileSize + 2)], 5000); //rest+2
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				data_out.write(this.ANSWER_DATA, 0, (int) remainingFileSize);
+				data_out.close();
+				data_out = null;
+				remainingSize -= remainingFileSize;
 				
-				if (((totalSize-sizeProgress[0])*100/totalSize) % 5 == 0) {
-					GDE.display.asyncExec(new Runnable() {
-						public void run() {
-							transferProgressBar.setSelection((int) ((totalSize - sizeProgress[0]) * 100 / totalSize));
-							transferProgressLabel.setText("file transfer : " + (totalSize - sizeProgress[0]) + " of " + totalSize + " bytes");
-						}
-					});
-				}
+				xferFile.setLastModified(Long.parseLong(file[2])); //timeStamp
+				parent.updateFileTransferProgress(totalSize, remainingSize);
+				
+				sendCmd(FILE_XFER_CLOSE);
+				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 			}
-			while ((remainingFileSize -= 0x0800) > 0x0800);
-
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "remainingFileSize = " + remainingFileSize);
-			sendCmd(UPLOAD, String.format("0x%04x", remainingFileSize));
-			this.ANSWER_DATA = this.read(new byte[7], 500);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-			this.ANSWER_DATA = this.read(new byte[remainingFileSize + 2], 5000); //rest+2
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-			data_out.write(this.ANSWER_DATA, 0, remainingFileSize);
-			data_out.close();
-			sizeProgress[0] -= remainingFileSize;
-			
-			GDE.display.asyncExec(new Runnable() {
-				public void run() {
-					transferProgressBar.setSelection((int) ((totalSize - sizeProgress[0]) * 100 / totalSize));
-					transferProgressLabel.setText("file transfer : " + (totalSize - sizeProgress[0]) + " of " + totalSize + " bytes");
-				}
-			});
-
-			sendCmd(XFER_CLOSE);
-			this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		}
+		finally {
+			if (data_out != null) data_out.close();
 		}
 	}
 	
-	public void downLoadFiles(String sourceDirPath, String targetDirPath, String[] filesInfo, final long[] sizeProgress, final ProgressBar transferProgressBar, final CLabel transferProgressLabel) throws Exception {
-		final long totalSize = sizeProgress[0];
-		for (String fileInfo : filesInfo) {
-			//fileInfo index,name,size
-			String[] file = fileInfo.split(GDE.STRING_COMMA);			
-			String fileQueryAnswer = this.queryFilesInfo(sourceDirPath, new String[] { fileInfo })[0];
-			int remainingFileSize = Integer.parseInt(fileQueryAnswer.split(GDE.STRING_COMMA)[2]);
+	public void downLoadFiles(String sourceDirPath, String targetDirPath, String[] filesInfo, final long totalSize, final FileTransferTabItem parent) throws Exception {
+		long remainingSize = totalSize;
+		DataInputStream data_in = null;
+		int xferDataSize = 0x0800;
+		byte[] XFER_DATA = new byte[xferDataSize];
+		byte[] xferSize = new byte[4];
+		
+		try {
+			for (String fileInfo : filesInfo) {
+				//fileInfo index,name,size
+				String[] file = fileInfo.split(GDE.STRING_COMMA);			
+				File xferFile = new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1]);
+				data_in = new DataInputStream(new FileInputStream(xferFile));
+				long remainingFileSize = xferFile.length();
 
-			sendCmd(XFER_INIT, String.format("0x01 %s%s", sourceDirPath, file[1]));
-			this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
-			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-
-			DataOutputStream data_out = new DataOutputStream(new FileOutputStream(new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1])));
-			do {
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "remainingFileSize = " + remainingFileSize);
-				sendCmd(UPLOAD, "0x0800");
-				this.ANSWER_DATA = this.read(new byte[7], 500);
+				//create target file
+				sendCmd(FILE_XFER_INIT, String.format("0x0b %s%s", sourceDirPath, file[1]));
+				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
 				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) {
-					this.ANSWER_DATA = this.read(new byte[0x0802], 5000); //2048+2
-					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-					data_out.write(this.ANSWER_DATA, 0, 0x0800);
-				}
-				else
-					continue;
-				sizeProgress[0] -= 0x0800;
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "sizeProgress = " + sizeProgress[0] + " - " + ((totalSize-sizeProgress[0])*100/totalSize) + " %");
+				sendCmd(FILE_XFER_CLOSE);
+				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 				
-				if (((totalSize-sizeProgress[0])*100/totalSize) % 2 == 0) {
-					GDE.display.asyncExec(new Runnable() {
-						public void run() {
-							transferProgressBar.setSelection((int) ((totalSize - sizeProgress[0]) * 100 / totalSize));
-							transferProgressLabel.setText("file transfer : " + (totalSize - sizeProgress[0]) + " of " + totalSize + " bytes");
-						}
-					});
+				sendCmd(FILE_XFER_INIT, String.format("0x02 %s%s", sourceDirPath, file[1]));
+				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				
+				while (remainingFileSize > 0x0800) {
+					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "remainingFileSize = " + remainingFileSize);
+					data_in.read(XFER_DATA);
+					sendCmd(FILE_DOWNLOAD, XFER_DATA);
+					this.ANSWER_DATA = this.read(new byte[15], 500);			
+					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+					
+					if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) { //00 17 E8 06 00 06 01 30 78 30 38 30 30 19 08
+						System.arraycopy(this.ANSWER_DATA, 9, xferSize, 0, 4);
+						xferDataSize = Integer.parseInt(new String(xferSize), 16);
+						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "xferDataSize = 0x" + new String(xferSize));
+					}
+					else //error 06 02 -> re-try ?? endless loop //TODO
+						continue;
+					
+					remainingSize -= xferDataSize;
+					remainingFileSize -= xferDataSize;
+					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "sizeProgress = " + remainingSize + " - " + ((totalSize-remainingSize)*100/totalSize) + " %");
+					
+					if (((totalSize-remainingSize)*100/totalSize) % 1 == 0) {
+						parent.updateFileTransferProgress(totalSize, remainingSize);
+					}
+					xferDataSize = 0x0800; //target transfer size
 				}
+
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "remainingFileSize = " + remainingFileSize);
+				XFER_DATA = new byte[(int) remainingFileSize];
+				data_in.read(XFER_DATA);
+				sendCmd(FILE_DOWNLOAD, XFER_DATA);
+				this.ANSWER_DATA = this.read(new byte[15], 500);			
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				
+				data_in.close();
+				data_in = null;
+				
+				remainingSize -= remainingFileSize;
+				
+				parent.updateFileTransferProgress(totalSize, remainingSize);
+				
+				sendCmd(FILE_XFER_CLOSE);
+				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 			}
-			while ((remainingFileSize -= 0x0800) > 0x0800);
-
-			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "remainingFileSize = " + remainingFileSize);
-			sendCmd(UPLOAD, String.format("0x%04x", remainingFileSize));
-			this.ANSWER_DATA = this.read(new byte[7], 500);
-			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-			this.ANSWER_DATA = this.read(new byte[remainingFileSize + 2], 5000); //rest+2
-			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-			data_out.write(this.ANSWER_DATA, 0, remainingFileSize);
-			data_out.close();
-			sizeProgress[0] -= remainingFileSize;
-			
-			GDE.display.asyncExec(new Runnable() {
-				public void run() {
-					transferProgressBar.setSelection((int) ((totalSize - sizeProgress[0]) * 100 / totalSize));
-					transferProgressLabel.setText("file transfer : " + (totalSize - sizeProgress[0]) + " of " + totalSize + " bytes");
-				}
-			});
-
-			sendCmd(XFER_CLOSE);
-			this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
-			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		}
+		finally {
+			if (data_in != null) data_in.close();
 		}
 	}
 }
