@@ -482,6 +482,16 @@ public class SWTResourceManager {
 		return color;
 	}
 
+	public static Color getColor(Color inColor) {
+		String name = "COLOR:" + inColor.getRed() + GDE.STRING_COMMA + inColor.getGreen() + GDE.STRING_COMMA + inColor.getBlue();
+		if (resources.containsKey(name))
+			return (Color) resources.get(name);
+		Color color = new Color(Display.getDefault(), inColor.getRed(), inColor.getGreen(), inColor.getBlue());
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new color created = " + name); //$NON-NLS-1$
+		resources.put(name, color);
+		return color;
+	}
+
 	public static Pattern getPattern(float x1, float y1, float x2, float y2, int swtColor1, int alpha1, int swtColor2, int alpha2) {
 		String name = "PATTERN:" + x1 + GDE.STRING_COMMA + y1 + GDE.STRING_COMMA + x2 + GDE.STRING_COMMA + y2 + swtColor1 + GDE.STRING_COMMA + alpha1 + GDE.STRING_COMMA + swtColor2 + GDE.STRING_COMMA + alpha2; //$NON-NLS-1$
 		if (resources.containsKey(name))
