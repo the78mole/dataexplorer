@@ -4,9 +4,6 @@ import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.device.graupner.hott.MessageIds;
-import gde.exception.ApplicationConfigurationException;
-import gde.exception.SerialPortException;
-import gde.exception.TimeOutException;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
@@ -15,7 +12,6 @@ import gde.utils.StringHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
