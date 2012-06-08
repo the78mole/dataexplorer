@@ -398,26 +398,27 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "startLifeDataCapturing.widgetSelected, event=" + evt); //$NON-NLS-1$
-							try {
-								HoTTAdapterDialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
-								HoTTAdapterDialog.this.lifeGatherer = 
-										(HoTTAdapterDialog.this.device != null && HoTTAdapterDialog.this.device.getName().equals("HoTTAdapter"))  //$NON-NLS-1$
-										? new HoTTAdapterLiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this)
-												: new HoTTAdapter2LiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this);
-								HoTTAdapterDialog.this.lifeGatherer.start();
-								HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(false);
-								HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(true);
-								HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(false);
-								HoTTAdapterDialog.this.inputFileButton.setEnabled(false);
-							}
-							catch (Exception e) {
-								log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-								HoTTAdapterDialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
-								HoTTAdapterDialog.this.serialPort.close();
-								HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
-								HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
-								HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(true);
-								HoTTAdapterDialog.this.inputFileButton.setEnabled(true);
+							if (HoTTAdapterDialog.this.device != null) {
+								try {
+									HoTTAdapterDialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
+									HoTTAdapterDialog.this.lifeGatherer = HoTTAdapterDialog.this.device.getName().equals("HoTTAdapter") //$NON-NLS-1$
+									? new HoTTAdapterLiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this)
+											: new HoTTAdapter2LiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this);
+									HoTTAdapterDialog.this.lifeGatherer.start();
+									HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(false);
+									HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(true);
+									HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(false);
+									HoTTAdapterDialog.this.inputFileButton.setEnabled(false);
+								}
+								catch (Exception e) {
+									log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+									HoTTAdapterDialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
+									HoTTAdapterDialog.this.serialPort.close();
+									HoTTAdapterDialog.this.startLifeDataCapturing.setEnabled(true);
+									HoTTAdapterDialog.this.stopLifeDataCapturing.setEnabled(false);
+									HoTTAdapterDialog.this.protocolTypesCombo.setEnabled(true);
+									HoTTAdapterDialog.this.inputFileButton.setEnabled(true);
+								}
 							}
 						}
 					});

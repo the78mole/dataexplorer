@@ -24,7 +24,6 @@ import gde.device.DeviceConfiguration;
 import gde.exception.FailedQueryException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
-import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -66,6 +65,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static byte[]		answerRx										= new byte[21];																																	//byte array to cache receiver answer data
 
 	byte[]								ANSWER_DATA									= new byte[50];
+	byte[]								cmd1												= new byte[7];
 	int										DATA_LENGTH									= 50;
 	byte[]								SENSOR_TYPE									= new byte[] { HoTTAdapter.SENSOR_TYPE_RECEIVER_19200 };
 	byte[]								QUERY_SENSOR_TYPE;
@@ -73,9 +73,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	boolean								isQueryRetry								= false;
 
 	HoTTAdapter.Protocol	protocolType								= HoTTAdapter.Protocol.TYPE_19200_V4;
-		
-	private static byte[] root = new byte[5];
 
+	private static byte[]	root												= new byte[5];
 
 	/**
 	 * constructor of default implementation
@@ -155,7 +154,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				this.isQueryRetry = false;
 				WaitTimer.delay(HoTTAdapterSerialPort.READ_TIMEOUT_MS);
 				TimeOutException te = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { this.ANSWER_DATA.length, HoTTAdapterSerialPort.READ_TIMEOUT_MS }));
-				log.log(Level.SEVERE, te.getMessage(), te);
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.SEVERE, te.getMessage(), te);
 				throw te;
 			}
 		}
@@ -241,13 +240,13 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				++HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[1];
 				--HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2];
 				this.write(HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM);
-				this.read(answerDBM, HoTTAdapterSerialPort.READ_TIMEOUT_MS*2, true);
+				this.read(answerDBM, HoTTAdapterSerialPort.READ_TIMEOUT_MS * 2, true);
 
 				if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) {
 					HoTTAdapterSerialPort.log.logp(java.util.logging.Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(answerDBM));
 					HoTTAdapterSerialPort.log.logp(java.util.logging.Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answerDBM, answerDBM.length));
 				}
-				if (HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2] == 0xFE) {
+				if ((HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2] & 0xFF) == 0xFE) {
 					HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[1] = 0;
 					HoTTAdapterSerialPort.QUERY_SENSOR_DATA_DBM[2] = (byte) 0xFF;
 				}
@@ -275,7 +274,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			else {
 				this.isQueryRetry = false;
 				TimeOutException te = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { this.ANSWER_DATA.length, HoTTAdapterSerialPort.READ_TIMEOUT_MS }));
-				log.log(Level.SEVERE, te.getMessage(), te);
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.SEVERE, te.getMessage(), te);
 				throw te;
 			}
 		}
@@ -397,104 +396,111 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static byte[]	CHANGE_DIR						= { 0x06, 0x3D };
 	final static byte[]	FILE_INFO							= { 0x06, 0x3F };
 
-//  cMakeDir =          #$06+#$3E;
-//  cGetVersion =       #$00+#$11;
-//  cListOverView =     #$05+#$32;
-//  cReadMemory =       #$05+#$33;
-//  cLockScreen =       #$00+#$23;
-//  cClearScreen =      #$00+#$22;
-//  cWriteScreen =      #$00+#$21;  // 1. Byte: Zeile, 21 byte Ascii
-//  cResetScreen  =     #$00+#$24;
+	//  cMakeDir =          #$06+#$3E;
+	//  cGetVersion =       #$00+#$11;
+	//  cListOverView =     #$05+#$32;
+	//  cReadMemory =       #$05+#$33;
+	//  cLockScreen =       #$00+#$23;
+	//  cClearScreen =      #$00+#$22;
+	//  cWriteScreen =      #$00+#$21;  // 1. Byte: Zeile, 21 byte Ascii
+	//  cResetScreen  =     #$00+#$24;
 
 	private byte[] prepareCmdBytes(byte[] cmd) {
 		return prepareCmdBytes(cmd, GDE.STRING_EMPTY);
 	}
-	private byte[] prepareCmdBytes(byte[] cmd, String body) {
-		byte[] b = new byte[body.length() == 0 ? body.length()+9 : body.length()+10];
-		b[0]=0x00;
-		if (cntUp == 0xFF || cntDown == 0x00) {
-			cntUp = 0x00;
-			cntDown = (byte) 0xFF;
-		}
-		b[1]=cntUp+=0x01;
-		b[2]=cntDown-=0x01;
-		b[3]=(byte) (body.length() == 0 ? (body.length() & 0xFF) : ((body.length()+1) & 0xFF));
-		b[4]=0x00;
-		b[5]=cmd[0];
-		b[6]=cmd[1];
-		int i = 7;
-		for (; i < body.getBytes().length+7; ++i) {
-			b[i]= body.getBytes()[i-7];
-		}
-		if (body.length() > 0)
-			b[i++]=0x00;
-		short crc16 = Checksum.CRC16CCITT(b, 3, (body.length() == 0 ? body.length()+4 : body.length()+5));
-		b[i++]=(byte) (crc16 & 0x00FF);
-		b[i++]=(byte) ((crc16 & 0xFF00) >> 8);
 
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINER, StringHelper.byte2Hex2CharString(b, b.length));
+	private byte[] prepareCmdBytes(byte[] cmd, String body) {
+		byte[] b = new byte[body.length() == 0 ? body.length() + 9 : body.length() + 10];
+		b[0] = 0x00;
+		if (HoTTAdapterSerialPort.cntUp == 0xFF || HoTTAdapterSerialPort.cntDown == 0x00) {
+			HoTTAdapterSerialPort.cntUp = 0x00;
+			HoTTAdapterSerialPort.cntDown = (byte) 0xFF;
+		}
+		b[1] = HoTTAdapterSerialPort.cntUp += 0x01;
+		b[2] = HoTTAdapterSerialPort.cntDown -= 0x01;
+		b[3] = (byte) (body.length() == 0 ? (body.length() & 0xFF) : ((body.length() + 1) & 0xFF));
+		b[4] = 0x00;
+		b[5] = cmd[0];
+		b[6] = cmd[1];
+		int i = 7;
+		for (; i < body.getBytes().length + 7; ++i) {
+			b[i] = body.getBytes()[i - 7];
+		}
+		if (body.length() > 0) b[i++] = 0x00;
+		short crc16 = Checksum.CRC16CCITT(b, 3, (body.length() == 0 ? body.length() + 4 : body.length() + 5));
+		b[i++] = (byte) (crc16 & 0x00FF);
+		b[i++] = (byte) ((crc16 & 0xFF00) >> 8);
+
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINER, StringHelper.byte2Hex2CharString(b, b.length));
 		return b;
 	}
-	
+
 	private void sendCmd(byte[] cmd) throws IOException {
 		byte[] cmdAll = prepareCmdBytes(cmd);
-		byte[] cmd1 = new byte[7];
-		System.arraycopy(cmdAll, 0, cmd1, 0, 7);
-		this.write(cmd1);
+		System.arraycopy(cmdAll, 0, this.cmd1, 0, 7);
+		this.write(this.cmd1);
 		WaitTimer.delay(3);
 		byte[] cmd2 = new byte[cmdAll.length - 7];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
 		this.write(cmd2);
 	}
-	
+
 	private void sendCmd(byte[] cmd, String body) throws IOException {
 		byte[] cmdAll = prepareCmdBytes(cmd, body);
-		byte[] cmd1 = new byte[7];
-		System.arraycopy(cmdAll, 0, cmd1, 0, 7);
-		this.write(cmd1);
+		System.arraycopy(cmdAll, 0, this.cmd1, 0, 7);
+		this.write(this.cmd1);
 		WaitTimer.delay(3);
 		byte[] cmd2 = new byte[cmdAll.length - 7];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
 		this.write(cmd2);
 	}
-	
+
 	private void sendCmd(byte[] cmd, byte[] data) throws IOException {
-		byte[] cmd1 = new byte[7];
-		cmd1[0]=0x00;
-		if (cntUp == 0xFF || cntDown == 0x00) {
-			cntUp = 0x00;
-			cntDown = (byte) 0xFF;
+		byte[] cmdAll = new byte[data.length + 8 + 2 + 7];
+
+		//cmd1 part
+		cmdAll[0] = 0x00;
+		if (HoTTAdapterSerialPort.cntUp == 0xFF || HoTTAdapterSerialPort.cntDown == 0x00) {
+			HoTTAdapterSerialPort.cntUp = 0x00;
+			HoTTAdapterSerialPort.cntDown = (byte) 0xFF;
 		}
-		cmd1[1]=cntUp+=0x01;
-		cmd1[2]=cntDown-=0x01;
-		cmd1[3]=(byte) ((data.length + 8) & 0x00FF);
-		cmd1[4]=(byte)(((data.length + 8) & 0xFF00) >> 8);
-		cmd1[5]=cmd[0];
-		cmd1[6]=cmd[1];
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, StringHelper.byte2Hex2CharString(cmd1,cmd1.length));
-		this.write(cmd1);
-		
+		cmdAll[1] = HoTTAdapterSerialPort.cntUp += 0x01;
+		cmdAll[2] = HoTTAdapterSerialPort.cntDown -= 0x01;
+		cmdAll[3] = (byte) ((data.length + 8) & 0x00FF);
+		cmdAll[4] = (byte) (((data.length + 8) & 0xFF00) >> 8);
+		cmdAll[5] = cmd[0];
+		cmdAll[6] = cmd[1];
+
+		System.arraycopy(String.format("0x%04x ", data.length).getBytes(), 0, cmdAll, 7, 7);
+		System.arraycopy(data, 0, cmdAll, 15, data.length);
+		short crc16 = Checksum.CRC16CCITT(cmdAll, 3, cmdAll.length - 5);
+		cmdAll[cmdAll.length - 2] = (byte) (crc16 & 0x00FF);
+		cmdAll[cmdAll.length - 1] = (byte) ((crc16 & 0xFF00) >> 8);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex2CharString(cmdAll, cmdAll.length));
+
+		System.arraycopy(cmdAll, 0, this.cmd1, 0, 7);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(this.cmd1, this.cmd1.length));
+		this.write(this.cmd1);
+
 		WaitTimer.delay(3);
-		
-		byte[] cmd2 = new byte[data.length+8+2];
-		System.arraycopy(String.format("0x%04x 0", data.length).getBytes(), 0, cmd2, 0, 8);
-		System.arraycopy(data, 0, cmd2, 8, data.length);
-		short crc16 = Checksum.CRC16CCITT(cmd2, 0, cmd2.length - 2);
-		cmd2[data.length-2]=(byte) (crc16 & 0x00FF);
-		cmd2[data.length-1]=(byte) ((crc16 & 0xFF00) >> 8);
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, StringHelper.byte2Hex2CharString(cmd1,cmd1.length));
+
+		byte[] cmd2 = new byte[data.length + 8 + 2];
+		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(cmd2, cmd2.length));
 		this.write(cmd2);
 	}
 
 	public synchronized void prepareSdCard() throws Exception {
 		//prepare transmitter for data interaction
-		sendCmd(PREPARE_FILE_TRANSFER);
+		sendCmd(HoTTAdapterSerialPort.PREPARE_FILE_TRANSFER);
 		this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-		
-		sendCmd(SELECT_SD_CARD);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+		sendCmd(HoTTAdapterSerialPort.SELECT_SD_CARD);
 		this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 	}
 
 	/**
@@ -503,237 +509,275 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	 * @throws TimeOutException
 	 */
 	public synchronized long[] querySdCardSizes() throws IOException, TimeOutException {
-		sendCmd(QUERY_SD_SIZES);
+		sendCmd(HoTTAdapterSerialPort.QUERY_SD_SIZES);
 		this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "SD size info : " + StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "SD size info : " + StringHelper.byte2hex2int(this.ANSWER_DATA, 9, 8) + " KBytes total - " + StringHelper.byte2hex2int(this.ANSWER_DATA, 21, 8) + " KBytes free");
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "SD size info : " + StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE,
+					"SD size info : " + StringHelper.byte2hex2int(this.ANSWER_DATA, 9, 8) + " KBytes total - " + StringHelper.byte2hex2int(this.ANSWER_DATA, 21, 8) + " KBytes free");
 
-		return new long[] {StringHelper.byte2hex2int(this.ANSWER_DATA, 9, 8), StringHelper.byte2hex2int(this.ANSWER_DATA, 21, 8)};
+		return new long[] { StringHelper.byte2hex2int(this.ANSWER_DATA, 9, 8), StringHelper.byte2hex2int(this.ANSWER_DATA, 21, 8) };
 	}
-	
+
 	public synchronized void deleteFiles(String dirPath, String[] files) throws IOException, TimeOutException {
 		for (String file : files) {
-			sendCmd(FILE_DELETE, dirPath + file);
+			sendCmd(HoTTAdapterSerialPort.FILE_DELETE, dirPath + file);
 			this.ANSWER_DATA = this.read(new byte[9], 500);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 		}
 	}
 
 	public synchronized String[] querySdDirs() throws Exception {
 		//change to root directory and query sub folders
-		sendCmd(CHANGE_DIR, GDE.FILE_SEPARATOR_UNIX);
-		root = this.read(new byte[50], 2000, 5);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2Hex2CharString(root, root.length));
-		
+		sendCmd(HoTTAdapterSerialPort.CHANGE_DIR, GDE.FILE_SEPARATOR_UNIX);
+		HoTTAdapterSerialPort.root = this.read(new byte[50], 2000, 5);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(HoTTAdapterSerialPort.root, HoTTAdapterSerialPort.root.length));
+
 		StringBuilder sb = new StringBuilder();
-		while (this.ANSWER_DATA[7] != root[7] && this.ANSWER_DATA[8] != root[8]) { //06 01 87 BA
-			sendCmd(LIST_DIR);
+		while (this.ANSWER_DATA[7] != HoTTAdapterSerialPort.root[7] && this.ANSWER_DATA[8] != HoTTAdapterSerialPort.root[8]) { //06 01 87 BA
+			sendCmd(HoTTAdapterSerialPort.LIST_DIR);
 			this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-			for (int i = 19; i < this.ANSWER_DATA.length-2; i++) {
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			for (int i = 19; i < this.ANSWER_DATA.length - 2; i++) {
 				sb.append(String.format("%c", this.ANSWER_DATA[i]));
 			}
 			sb.append(GDE.STRING_SEMICOLON);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sb.toString());
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, sb.toString());
 		}
 		return sb.toString().split(GDE.STRING_SEMICOLON);
 	}
-	
+
 	public HashMap<String, String[]> queryListDir(String dirPath) throws Exception {
 		StringBuilder folders = new StringBuilder();
 		StringBuilder files = new StringBuilder();
 		HashMap<String, String[]> result = new HashMap<String, String[]>();
 		int fileIndex = 0;
-		sendCmd(CHANGE_DIR, dirPath);
-		root = this.read(new byte[50], 1000, 5);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(root, root.length));
+		sendCmd(HoTTAdapterSerialPort.CHANGE_DIR, dirPath);
+		HoTTAdapterSerialPort.root = this.read(new byte[50], 1000, 5);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(HoTTAdapterSerialPort.root, HoTTAdapterSerialPort.root.length));
 
 		try {
 			this.ANSWER_DATA[3] = 0x01;
 			while (this.ANSWER_DATA[3] != 0x00) {
-				sendCmd(LIST_DIR);
+				sendCmd(HoTTAdapterSerialPort.LIST_DIR);
 				this.ANSWER_DATA = this.read(new byte[50], 1000, 5);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+					HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 				StringBuilder content = new StringBuilder();
 				for (int i = 19; i < this.ANSWER_DATA.length - 2; i++) {
 					content.append(String.format("%c", this.ANSWER_DATA[i]));
 				}
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "content : " + content.toString());
+				if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "content : " + content.toString());
 				if (content.indexOf(GDE.STRING_DOT) > 0) {//.bin
 					files.append(fileIndex++).append(GDE.STRING_COMMA).append(content).append(GDE.STRING_COMMA);
-					files.append("20").append(String.format("%c%c-%c%c-%c%c", this.ANSWER_DATA[9], this.ANSWER_DATA[10], this.ANSWER_DATA[11], this.ANSWER_DATA[12], this.ANSWER_DATA[13], this.ANSWER_DATA[14])).append(GDE.STRING_COMMA);
+					files.append("20").append(String.format("%c%c-%c%c-%c%c", this.ANSWER_DATA[9], this.ANSWER_DATA[10], this.ANSWER_DATA[11], this.ANSWER_DATA[12], this.ANSWER_DATA[13], this.ANSWER_DATA[14]))
+							.append(GDE.STRING_COMMA);
 					files.append(String.format("%c%c:%c%c", this.ANSWER_DATA[15], this.ANSWER_DATA[16], this.ANSWER_DATA[17], this.ANSWER_DATA[18])).append(GDE.STRING_SEMICOLON);
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "files : " + files.toString());
+					if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "files : " + files.toString());
 				}
 				else {
 					folders.append(content).append(GDE.STRING_SEMICOLON);
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "folders : " + folders.toString());
+					if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "folders : " + folders.toString());
 				}
 			}
 		}
-		catch (Exception e) {
+		catch (RuntimeException e) {
 			// ignore and list folders or files already red
-		}		
-		
+		}
+
 		result.put("FOLDER", folders.toString().split(GDE.STRING_SEMICOLON));
-		if (files.toString().length() > 0)
-			result.put("FILES", queryFilesInfo(dirPath+GDE.FILE_SEPARATOR_UNIX, files.toString().split(GDE.STRING_SEMICOLON)));
+		if (files.toString().length() > 0) result.put("FILES", queryFilesInfo(dirPath + GDE.FILE_SEPARATOR_UNIX, files.toString().split(GDE.STRING_SEMICOLON)));
 		return result;
 	}
-	
+
 	public String[] queryFilesInfo(String dirPath, String[] files) throws Exception {
 		StringBuilder filesInfo = new StringBuilder();
 		try {
 			for (String file : files) {
-				sendCmd(FILE_INFO, dirPath+file.split(GDE.STRING_COMMA)[1]);
+				sendCmd(HoTTAdapterSerialPort.FILE_INFO, dirPath + file.split(GDE.STRING_COMMA)[1]);
 				this.ANSWER_DATA = this.read(new byte[100], 5000, 5);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, ""+StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "File size = " + Integer.parseInt(String.format("%02x%02x%02x%02x", this.ANSWER_DATA[10], this.ANSWER_DATA[9], this.ANSWER_DATA[8], this.ANSWER_DATA[7]), 16));
-				filesInfo.append(file).append(GDE.STRING_COMMA).append(Integer.parseInt(String.format("%02x%02x%02x%02x", this.ANSWER_DATA[10], this.ANSWER_DATA[9], this.ANSWER_DATA[8], this.ANSWER_DATA[7]), 16)).append(GDE.STRING_SEMICOLON);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, filesInfo.toString());
+				if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+					HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+					HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE,
+							"File size = " + Integer.parseInt(String.format("%02x%02x%02x%02x", this.ANSWER_DATA[10], this.ANSWER_DATA[9], this.ANSWER_DATA[8], this.ANSWER_DATA[7]), 16));
+				filesInfo.append(file).append(GDE.STRING_COMMA)
+						.append(Integer.parseInt(String.format("%02x%02x%02x%02x", this.ANSWER_DATA[10], this.ANSWER_DATA[9], this.ANSWER_DATA[8], this.ANSWER_DATA[7]), 16)).append(GDE.STRING_SEMICOLON);
+				if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, filesInfo.toString());
 			}
 		}
-		catch (Exception e) {
-			log.log(Level.WARNING, e.getMessage(), e);
+		catch (RuntimeException e) {
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 			// ignore and enable listing
 		}
-		
+
 		return filesInfo.toString().split(GDE.STRING_SEMICOLON);
 	}
-	
+
 	public void upLoadFiles(String sourceDirPath, String targetDirPath, String[] filesInfo, final long totalSize, final FileTransferTabItem parent) throws Exception {
 		long remainingSize = totalSize;
 		DataOutputStream data_out = null;
-		
+
 		try {
-			for (String fileInfo : filesInfo) {
-				//fileInfo index,name,timeStamp,size
-				String[] file = fileInfo.split(GDE.STRING_COMMA);			
-				String fileQueryAnswer = this.queryFilesInfo(sourceDirPath, new String[] { fileInfo })[0];
-				long remainingFileSize = Long.parseLong(fileQueryAnswer.split(GDE.STRING_COMMA)[3]);
+			if (!this.isInterruptedByUser) {
+				for (String fileInfo : filesInfo) {
+					//fileInfo index,name,timeStamp,size
+					String[] file = fileInfo.split(GDE.STRING_COMMA);
+					String fileQueryAnswer = this.queryFilesInfo(sourceDirPath, new String[] { fileInfo })[0];
+					long remainingFileSize = Long.parseLong(fileQueryAnswer.split(GDE.STRING_COMMA)[3]);
 
-				File xferFile = new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1]);
-				data_out = new DataOutputStream(new FileOutputStream(xferFile));
+					File xferFile = new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1]);
+					data_out = new DataOutputStream(new FileOutputStream(xferFile));
 
-				sendCmd(FILE_XFER_INIT, String.format("0x01 %s%s", sourceDirPath, file[1]));
-				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-			
-				while (remainingFileSize > 0x0800) {
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "remainingFileSize = " + remainingFileSize);
-					sendCmd(FILE_UPLOAD, "0x0800");
-					this.ANSWER_DATA = this.read(new byte[7], 500);
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-					if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) {
-						this.ANSWER_DATA = this.read(new byte[0x0802], 5000); //2048+2
-						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-						data_out.write(this.ANSWER_DATA, 0, 0x0800);
+					sendCmd(HoTTAdapterSerialPort.FILE_XFER_INIT, String.format("0x01 %s%s", sourceDirPath, file[1]));
+					this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+					if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+						HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+					while (!this.isInterruptedByUser && remainingFileSize > 0x0800) {
+						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "remainingFileSize = " + remainingFileSize);
+						sendCmd(HoTTAdapterSerialPort.FILE_UPLOAD, "0x0800");
+						this.ANSWER_DATA = this.read(new byte[7], 500);
+						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+						if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) {
+							this.ANSWER_DATA = this.read(new byte[0x0802], 5000); //2048+2
+							if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+								HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+							data_out.write(this.ANSWER_DATA, 0, 0x0800);
+						}
+						else
+							//error 06 02 -> endless loop TODO
+							continue;
+
+						remainingSize -= 0x0800;
+						remainingFileSize -= 0x0800;
+						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "sizeProgress = " + remainingSize + " - " + ((totalSize - remainingSize) * 100 / totalSize) + " %");
+
+						if (((totalSize - remainingSize) * 100 / totalSize) % 1 == 0) {
+							parent.updateFileTransferProgress(totalSize, remainingSize);
+						}
 					}
-					else //error 06 02 -> endless loop TODO
-						continue;
-					
-					remainingSize -= 0x0800;
-					remainingFileSize -= 0x0800;
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sizeProgress = " + remainingSize + " - " + ((totalSize-remainingSize)*100/totalSize) + " %");
-					
-					if (((totalSize-remainingSize)*100/totalSize) % 1 == 0) {
-						parent.updateFileTransferProgress(totalSize, remainingSize);
+
+					if (!this.isInterruptedByUser) {
+						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "remainingFileSize = " + remainingFileSize);
+						sendCmd(HoTTAdapterSerialPort.FILE_UPLOAD, String.format("0x%04x", remainingFileSize));
+						this.ANSWER_DATA = this.read(new byte[7], 500);
+						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+						this.ANSWER_DATA = this.read(new byte[(int) (remainingFileSize + 2)], 5000); //rest+2
+						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+						data_out.write(this.ANSWER_DATA, 0, (int) remainingFileSize);
+						remainingSize -= remainingFileSize;
 					}
+
+					data_out.close();
+					data_out = null;
+
+					sendCmd(HoTTAdapterSerialPort.FILE_XFER_CLOSE);
+					this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+					if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+						HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+					xferFile.setLastModified(Long.parseLong(file[2])); //timeStamp
+					parent.updateFileTransferProgress(totalSize, remainingSize);
+					parent.updatePcFolder();
 				}
-
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "remainingFileSize = " + remainingFileSize);
-				sendCmd(FILE_UPLOAD, String.format("0x%04x", remainingFileSize));
-				this.ANSWER_DATA = this.read(new byte[7], 500);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				this.ANSWER_DATA = this.read(new byte[(int) (remainingFileSize + 2)], 5000); //rest+2
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				data_out.write(this.ANSWER_DATA, 0, (int) remainingFileSize);
-				data_out.close();
-				data_out = null;
-				remainingSize -= remainingFileSize;
-				
-				xferFile.setLastModified(Long.parseLong(file[2])); //timeStamp
-				parent.updateFileTransferProgress(totalSize, remainingSize);
-				
-				sendCmd(FILE_XFER_CLOSE);
-				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 			}
 		}
 		finally {
 			if (data_out != null) data_out.close();
 		}
 	}
-	
+
 	public void downLoadFiles(String sourceDirPath, String targetDirPath, String[] filesInfo, final long totalSize, final FileTransferTabItem parent) throws Exception {
 		long remainingSize = totalSize;
 		DataInputStream data_in = null;
 		int xferDataSize = 0x0800;
 		byte[] XFER_DATA = new byte[xferDataSize];
 		byte[] xferSize = new byte[4];
-		
+
 		try {
-			for (String fileInfo : filesInfo) {
-				//fileInfo index,name,size
-				String[] file = fileInfo.split(GDE.STRING_COMMA);			
-				File xferFile = new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1]);
-				data_in = new DataInputStream(new FileInputStream(xferFile));
-				long remainingFileSize = xferFile.length();
+			if (!this.isInterruptedByUser) {
+				for (String fileInfo : filesInfo) {
+					//fileInfo index,name,size
+					String[] file = fileInfo.split(GDE.STRING_COMMA);
+					File xferFile = new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1]);
+					data_in = new DataInputStream(new FileInputStream(xferFile));
+					long remainingFileSize = xferFile.length();
 
-				//create target file
-				sendCmd(FILE_XFER_INIT, String.format("0x0b %s%s", sourceDirPath, file[1]));
-				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				sendCmd(FILE_XFER_CLOSE);
-				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				
-				sendCmd(FILE_XFER_INIT, String.format("0x02 %s%s", sourceDirPath, file[1]));
-				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				
-				while (remainingFileSize > 0x0800) {
-					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "remainingFileSize = " + remainingFileSize);
-					data_in.read(XFER_DATA);
-					sendCmd(FILE_DOWNLOAD, XFER_DATA);
-					this.ANSWER_DATA = this.read(new byte[15], 500);			
-					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-					
-					if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) { //00 17 E8 06 00 06 01 30 78 30 38 30 30 19 08
-						System.arraycopy(this.ANSWER_DATA, 9, xferSize, 0, 4);
-						xferDataSize = Integer.parseInt(new String(xferSize), 16);
-						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "xferDataSize = 0x" + new String(xferSize));
+					//create target file
+					sendCmd(HoTTAdapterSerialPort.FILE_XFER_INIT, String.format("0x0b %s%s", sourceDirPath, file[1]));
+					this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+					if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+						HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+					sendCmd(HoTTAdapterSerialPort.FILE_XFER_CLOSE);
+					this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+					if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+						HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+					sendCmd(HoTTAdapterSerialPort.FILE_XFER_INIT, String.format("0x02 %s%s", sourceDirPath, file[1]));
+					this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+					if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+						HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+					while (!this.isInterruptedByUser && remainingFileSize > 0x0800) {
+						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "remainingFileSize = " + remainingFileSize);
+						data_in.read(XFER_DATA);
+						sendCmd(HoTTAdapterSerialPort.FILE_DOWNLOAD, XFER_DATA);
+						this.ANSWER_DATA = this.read(new byte[15], 500);
+						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+						if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) { //00 17 E8 06 00 06 01 30 78 30 38 30 30 19 08
+							System.arraycopy(this.ANSWER_DATA, 9, xferSize, 0, 4);
+							xferDataSize = Integer.parseInt(new String(xferSize), 16);
+							if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "xferDataSize = 0x" + new String(xferSize));
+						}
+						else
+							//error 06 02 -> re-try ?? endless loop //TODO
+							continue;
+
+						remainingSize -= xferDataSize;
+						remainingFileSize -= xferDataSize;
+						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "sizeProgress = " + remainingSize + " - " + ((totalSize - remainingSize) * 100 / totalSize) + " %");
+
+						if (((totalSize - remainingSize) * 100 / totalSize) % 1 == 0) {
+							parent.updateFileTransferProgress(totalSize, remainingSize);
+						}
+						xferDataSize = 0x0800; //target transfer size
 					}
-					else //error 06 02 -> re-try ?? endless loop //TODO
-						continue;
-					
-					remainingSize -= xferDataSize;
-					remainingFileSize -= xferDataSize;
-					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "sizeProgress = " + remainingSize + " - " + ((totalSize-remainingSize)*100/totalSize) + " %");
-					
-					if (((totalSize-remainingSize)*100/totalSize) % 1 == 0) {
-						parent.updateFileTransferProgress(totalSize, remainingSize);
+
+					if (!this.isInterruptedByUser) {
+						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "remainingFileSize = " + remainingFileSize);
+						XFER_DATA = new byte[(int) remainingFileSize];
+						data_in.read(XFER_DATA);
+						sendCmd(HoTTAdapterSerialPort.FILE_DOWNLOAD, XFER_DATA);
+						this.ANSWER_DATA = this.read(new byte[15], 500);
+						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+						remainingSize -= remainingFileSize;
 					}
-					xferDataSize = 0x0800; //target transfer size
+
+					data_in.close();
+					data_in = null;
+
+					sendCmd(HoTTAdapterSerialPort.FILE_XFER_CLOSE);
+					this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
+					if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+						HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+					parent.updateFileTransferProgress(totalSize, remainingSize);
+					parent.updateSdFolder(this.querySdCardSizes());
 				}
-
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "remainingFileSize = " + remainingFileSize);
-				XFER_DATA = new byte[(int) remainingFileSize];
-				data_in.read(XFER_DATA);
-				sendCmd(FILE_DOWNLOAD, XFER_DATA);
-				this.ANSWER_DATA = this.read(new byte[15], 500);			
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-				
-				data_in.close();
-				data_in = null;
-				
-				remainingSize -= remainingFileSize;
-				
-				parent.updateFileTransferProgress(totalSize, remainingSize);
-				
-				sendCmd(FILE_XFER_CLOSE);
-				this.ANSWER_DATA = this.read(new byte[20], 1000, 5);
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 			}
 		}
 		finally {
