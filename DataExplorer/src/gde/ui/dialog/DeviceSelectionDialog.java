@@ -459,13 +459,13 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									this.portDescription = new Label(this.serialPortSelectionGroup, SWT.NONE);
 									this.portDescription.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.portDescription.setText(Messages.getString(MessageIds.GDE_MSGT0164));
-									this.portDescription.setBounds(20, GDE.IS_MAC_COCOA ? 12 : 29, 100, 18);
+									this.portDescription.setBounds(10, GDE.IS_MAC_COCOA ? 12 : 29, 70, 18);
 									this.portDescription.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0165));
 								}
 								{
 									this.portSelectCombo = new CCombo(this.serialPortSelectionGroup, SWT.FLAT | SWT.BORDER);
 									this.portSelectCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.portSelectCombo.setBounds(125, GDE.IS_MAC_COCOA ? 10 : 27, 380, GDE.IS_LINUX ? 22 : 20);
+									this.portSelectCombo.setBounds(80, GDE.IS_MAC_COCOA ? 10 : 27, 435, GDE.IS_LINUX ? 22 : 20);
 									this.portSelectCombo.setEditable(false);
 									this.portSelectCombo.setText(Messages.getString(MessageIds.GDE_MSGT0199));
 									this.portSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0165));
