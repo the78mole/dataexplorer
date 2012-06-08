@@ -646,7 +646,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
 							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 						if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) {
-							this.ANSWER_DATA = this.read(new byte[0x0802], 10000); //2048+2
+							this.ANSWER_DATA = this.read(new byte[0x0802], 12000); //2048+2
 							if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
 								HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 							data_out.write(this.ANSWER_DATA, 0, 0x0800);
@@ -671,7 +671,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 						this.ANSWER_DATA = this.read(new byte[7], 500);
 						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
 							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-						this.ANSWER_DATA = this.read(new byte[(int) (remainingFileSize + 2)], 10000); //rest+2
+						this.ANSWER_DATA = this.read(new byte[(int) (remainingFileSize + 2)], 12000); //rest+2
 						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
 							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 						data_out.write(this.ANSWER_DATA, 0, (int) remainingFileSize);

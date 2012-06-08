@@ -308,20 +308,10 @@ public class FileTransferTabItem extends CTabItem {
 										updateSdCardSizes(FileTransferTabItem.this.serialPort.querySdCardSizes());
 										listSdCardBaseDirs();
 									}
-									catch (SerialPortException e) {
-										FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
-									}
-									catch (ApplicationConfigurationException e) {
-										FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
-									}
-									catch (IOException e) {
-										FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
-									}
-									catch (TimeOutException e) {
-										FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
-									}
 									catch (Exception e) {
 										FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
+										enableStopButton(false);
+										FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
 									}
 								}
 							});
@@ -375,6 +365,8 @@ public class FileTransferTabItem extends CTabItem {
 											}
 											catch (Exception e) {
 												FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
+												enableStopButton(false);
+												FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
 											}
 										}
 									}.start();
@@ -443,6 +435,9 @@ public class FileTransferTabItem extends CTabItem {
 											}
 											catch (Exception e) {
 												FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
+												FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
+												enableStopButton(false);
+												FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
 											}
 										}
 									}.start();
