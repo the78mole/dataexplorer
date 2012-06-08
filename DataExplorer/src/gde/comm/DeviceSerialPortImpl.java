@@ -291,8 +291,8 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			this.serialPort.setSerialPortParams(this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits().ordinal() + 5, this.deviceConfig.getStopBits().ordinal() + 1, this.deviceConfig.getParity()
 					.ordinal());
 			this.serialPort.setFlowControlMode(this.deviceConfig.getFlowCtrlMode());
-			this.serialPort.setInputBufferSize(1024);
-			this.serialPort.setOutputBufferSize(512);
+			this.serialPort.setInputBufferSize(2064);
+			this.serialPort.setOutputBufferSize(2064);
 			this.serialPort.setRTS(this.deviceConfig.isRTS());
 			this.serialPort.setDTR(this.deviceConfig.isDTR());
 
