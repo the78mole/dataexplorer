@@ -381,21 +381,22 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		this.protocolType = newProtocolType;
 	}
 
-	final static int					FILE_TRANSFER_SIZE		= 0x0400;
-	byte[]										cmd1									= new byte[7];
-	byte											cntUp									= 0x00;
-	byte											cntDown								= (byte) 0xFF;
-	final static byte[]				PREPARE_FILE_TRANSFER	= { 0x03, 0x30 };
-	final static byte[]				SELECT_SD_CARD				= { 0x06, 0x30 };
-	final static byte[]				QUERY_SD_SIZES				= { 0x06, 0x33 };
-	final static byte[]				FILE_XFER_INIT				= { 0x06, 0x35 };
-	final static byte[]				FILE_XFER_CLOSE				= { 0x06, 0x36 };
-	final static byte[]				FILE_UPLOAD						= { 0x06, 0x38 };
-	final static byte[]				FILE_DELETE						= { 0x06, 0x39 };
-	final static byte[]				FILE_DOWNLOAD					= { 0x06, 0x3A };
-	final static byte[]				LIST_DIR							= { 0x06, 0x3C };
-	final static byte[]				CHANGE_DIR						= { 0x06, 0x3D };
-	final static byte[]				FILE_INFO							= { 0x06, 0x3F };
+	final static int		CMD_GAP_MS						= 5;
+	final static int		FILE_TRANSFER_SIZE		= 0x0800;
+	final static byte[]	cmd1									= new byte[7];
+	byte								cntUp									= 0x00;
+	byte								cntDown								= (byte) 0xFF;
+	final static byte[]	PREPARE_FILE_TRANSFER	= { 0x03, 0x30 };
+	final static byte[]	SELECT_SD_CARD				= { 0x06, 0x30 };
+	final static byte[]	QUERY_SD_SIZES				= { 0x06, 0x33 };
+	final static byte[]	FILE_XFER_INIT				= { 0x06, 0x35 };
+	final static byte[]	FILE_XFER_CLOSE				= { 0x06, 0x36 };
+	final static byte[]	FILE_UPLOAD						= { 0x06, 0x38 };
+	final static byte[]	FILE_DELETE						= { 0x06, 0x39 };
+	final static byte[]	FILE_DOWNLOAD					= { 0x06, 0x3A };
+	final static byte[]	LIST_DIR							= { 0x06, 0x3C };
+	final static byte[]	CHANGE_DIR						= { 0x06, 0x3D };
+	final static byte[]	FILE_INFO							= { 0x06, 0x3F };
 
 	//  cMakeDir =          #$06+#$3E;
 	//  cGetVersion =       #$00+#$11;
@@ -438,9 +439,11 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 
 	private void sendCmd(byte[] cmd) throws IOException {
 		byte[] cmdAll = prepareCmdBytes(cmd);
-		System.arraycopy(cmdAll, 0, this.cmd1, 0, 7);
-		this.write(this.cmd1);
-		WaitTimer.delay(3);
+		System.arraycopy(cmdAll, 0, HoTTAdapterSerialPort.cmd1, 0, 7);
+		this.write(HoTTAdapterSerialPort.cmd1);
+
+		WaitTimer.delay(HoTTAdapterSerialPort.CMD_GAP_MS);
+
 		byte[] cmd2 = new byte[cmdAll.length - 7];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
 		this.write(cmd2);
@@ -448,9 +451,11 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 
 	private void sendCmd(byte[] cmd, String body) throws IOException {
 		byte[] cmdAll = prepareCmdBytes(cmd, body);
-		System.arraycopy(cmdAll, 0, this.cmd1, 0, 7);
-		this.write(this.cmd1);
-		WaitTimer.delay(3);
+		System.arraycopy(cmdAll, 0, HoTTAdapterSerialPort.cmd1, 0, 7);
+		this.write(HoTTAdapterSerialPort.cmd1);
+
+		WaitTimer.delay(HoTTAdapterSerialPort.CMD_GAP_MS);
+
 		byte[] cmd2 = new byte[cmdAll.length - 7];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
 		this.write(cmd2);
@@ -479,11 +484,12 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		cmdAll[cmdAll.length - 1] = (byte) ((crc16 & 0xFF00) >> 8);
 		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex2CharString(cmdAll, cmdAll.length));
 
-		System.arraycopy(cmdAll, 0, this.cmd1, 0, 7);
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(this.cmd1, this.cmd1.length));
-		this.write(this.cmd1);
+		System.arraycopy(cmdAll, 0, HoTTAdapterSerialPort.cmd1, 0, 7);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(HoTTAdapterSerialPort.cmd1, HoTTAdapterSerialPort.cmd1.length));
+		this.write(HoTTAdapterSerialPort.cmd1);
 
-		WaitTimer.delay(3);
+		WaitTimer.delay(HoTTAdapterSerialPort.CMD_GAP_MS);
 
 		byte[] cmd2 = new byte[data.length + 8 + 2];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
@@ -625,8 +631,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		DataOutputStream data_out = null;
 
 		try {
-			if (!this.isInterruptedByUser) {
-				for (String fileInfo : filesInfo) {
+			for (String fileInfo : filesInfo) {
+				if (!this.isInterruptedByUser) {
 					//fileInfo index,name,timeStamp,size
 					String[] file = fileInfo.split(GDE.STRING_COMMA);
 					String fileQueryAnswer = this.queryFilesInfo(sourceDirPath, new String[] { fileInfo })[0];
@@ -661,9 +667,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
 							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "sizeProgress = " + remainingSize + " - " + ((totalSize - remainingSize) * 100 / totalSize) + " %");
 
-						if (((totalSize - remainingSize) * 100 / totalSize) % 2 == 0) {
-							parent.updateFileTransferProgress(totalSize, remainingSize);
-						}
+						parent.updateFileTransferProgress(totalSize, remainingSize);
 					}
 
 					if (!this.isInterruptedByUser) {
@@ -706,8 +710,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		byte[] xferSize = new byte[4];
 
 		try {
-			if (!this.isInterruptedByUser) {
-				for (String fileInfo : filesInfo) {
+			for (String fileInfo : filesInfo) {
+				if (!this.isInterruptedByUser) {
 					//fileInfo index,name,size
 					String[] file = fileInfo.split(GDE.STRING_COMMA);
 					File xferFile = new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1]);
@@ -751,9 +755,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 						if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
 							HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "sizeProgress = " + remainingSize + " - " + ((totalSize - remainingSize) * 100 / totalSize) + " %");
 
-						if (((totalSize - remainingSize) * 100 / totalSize) % 1 == 0) {
-							parent.updateFileTransferProgress(totalSize, remainingSize);
-						}
+						parent.updateFileTransferProgress(totalSize, remainingSize);
 						xferDataSize = HoTTAdapterSerialPort.FILE_TRANSFER_SIZE; //target transfer size
 					}
 
