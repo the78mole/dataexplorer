@@ -180,7 +180,7 @@ public class FileTransferTabItem extends CTabItem {
 					{
 						RowData pcFolderTreeLData = new RowData();
 						pcFolderTreeLData.width = 425;
-						pcFolderTreeLData.height = 185;
+						pcFolderTreeLData.height = 175;
 						this.pcFolderTree = new Tree(this.pcFolderGroup, SWT.BORDER);
 						this.pcFolderTree.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.pcFolderTree.setLayoutData(pcFolderTreeLData);
@@ -214,7 +214,7 @@ public class FileTransferTabItem extends CTabItem {
 						this.pcFoldersTable = new Table(this.pcFolderGroup, SWT.FULL_SELECTION | SWT.BORDER | SWT.MULTI);
 						RowData targetDirectoryTableLData = new RowData();
 						targetDirectoryTableLData.width = 580;
-						targetDirectoryTableLData.height = 185;
+						targetDirectoryTableLData.height = 175;
 						this.pcFoldersTable.setLayoutData(targetDirectoryTableLData);
 						this.pcFoldersTable.setLinesVisible(true);
 						this.pcFoldersTable.setHeaderVisible(true);
