@@ -536,7 +536,7 @@ public class FileTransferTabItem extends CTabItem {
 						this.tranferProgressComposite.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						RowLayout spacerCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData spacerCompositeLData = new RowData();
-						spacerCompositeLData.width = 925;
+						spacerCompositeLData.width = 915;
 						spacerCompositeLData.height = 35;
 						this.tranferProgressComposite.setLayoutData(spacerCompositeLData);
 						this.tranferProgressComposite.setLayout(spacerCompositeLayout);
@@ -544,7 +544,7 @@ public class FileTransferTabItem extends CTabItem {
 							this.transferProgressLabel = new CLabel(this.tranferProgressComposite, SWT.NONE);
 							this.transferProgressLabel.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 							RowData transferProgressLabelLData = new RowData();
-							transferProgressLabelLData.width = 869;
+							transferProgressLabelLData.width = 870;
 							transferProgressLabelLData.height = 18;
 							this.transferProgressLabel.setLayoutData(transferProgressLabelLData);
 							this.transferProgressLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -552,7 +552,7 @@ public class FileTransferTabItem extends CTabItem {
 						}
 						{
 							RowData transferProgressBarLData = new RowData();
-							transferProgressBarLData.width = 869;
+							transferProgressBarLData.width = 870;
 							transferProgressBarLData.height = 10;
 							this.transferProgressBar = new ProgressBar(this.tranferProgressComposite, SWT.NONE);
 							this.transferProgressBar.setLayoutData(transferProgressBarLData);
