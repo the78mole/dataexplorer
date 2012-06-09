@@ -307,6 +307,8 @@ public class FileTransferTabItem extends CTabItem {
 									catch (Exception e) {
 										FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
 										enableStopButton(false);
+										FileTransferTabItem.this.serialPort.close();
+										FileTransferTabItem.this.disconnectButton.setEnabled(false);
 										FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
 									}
 								}
