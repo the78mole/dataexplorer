@@ -290,7 +290,7 @@ public class FileUtils {
 		if (FileUtils.checkFileExist(fullQualifiedFilePath) || FileUtils.checkDirectoryExist(fullQualifiedFilePath)) {
 			File fileToBeDeleted = new File(fullQualifiedFilePath);
 			if (!fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite()) {
-				if (fileToBeDeleted.delete())
+				if (!fileToBeDeleted.delete())
 					log.log(Level.WARNING, "failed to delete " + fullQualifiedFilePath);
 			}
 			else if (fileToBeDeleted.isDirectory() && fileToBeDeleted.canWrite()) {
