@@ -383,7 +383,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	}
 
 	final static int		CMD_GAP_MS						= 5;
-	final static int		FILE_TRANSFER_SIZE		= 0x0800;
+	final static int		FILE_TRANSFER_SIZE		= 0x0400;
 	final static byte[]	cmd1									= new byte[7];
 	byte								cntUp									= 0x00;
 	byte								cntDown								= (byte) 0xFF;
