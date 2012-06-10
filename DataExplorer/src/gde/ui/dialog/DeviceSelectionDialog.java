@@ -491,35 +491,37 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								this.portSettingsGroup.addPaintListener(new PaintListener() {
 									public void paintControl(PaintEvent evt) {
 										log.log(java.util.logging.Level.FINEST, "portSettingsGroup.paintControl, event=" + evt); //$NON-NLS-1$
-										if (DeviceSelectionDialog.this.portSettingsGroup.getEnabled()) {
-											DeviceSelectionDialog.this.baudeDescription.setEnabled(true);
-											DeviceSelectionDialog.this.baudeDescription.setEnabled(true);
-											DeviceSelectionDialog.this.dataBitsDescription.setEnabled(true);
-											DeviceSelectionDialog.this.stopbitsDescription.setEnabled(true);
-											DeviceSelectionDialog.this.parityDescription.setEnabled(true);
-											DeviceSelectionDialog.this.flowcontrolDescription.setEnabled(true);
-											DeviceSelectionDialog.this.dtrDescription.setEnabled(true);
-											DeviceSelectionDialog.this.rtsDescription.setEnabled(true);
-											DeviceSelectionDialog.this.baudeSelectLabel.setEnabled(true);
-											DeviceSelectionDialog.this.dataBitsSelectLabel.setEnabled(true);
-											DeviceSelectionDialog.this.stopBitsSelectLabel.setEnabled(true);
-											DeviceSelectionDialog.this.paritySelectLabel.setEnabled(true);
-											DeviceSelectionDialog.this.flowControlSelectLabel.setEnabled(true);
-										}
-										else {
-											DeviceSelectionDialog.this.baudeDescription.setEnabled(false);
-											DeviceSelectionDialog.this.baudeDescription.setEnabled(false);
-											DeviceSelectionDialog.this.dataBitsDescription.setEnabled(false);
-											DeviceSelectionDialog.this.stopbitsDescription.setEnabled(false);
-											DeviceSelectionDialog.this.parityDescription.setEnabled(false);
-											DeviceSelectionDialog.this.flowcontrolDescription.setEnabled(false);
-											DeviceSelectionDialog.this.dtrDescription.setEnabled(false);
-											DeviceSelectionDialog.this.rtsDescription.setEnabled(false);
-											DeviceSelectionDialog.this.baudeSelectLabel.setEnabled(false);
-											DeviceSelectionDialog.this.dataBitsSelectLabel.setEnabled(false);
-											DeviceSelectionDialog.this.stopBitsSelectLabel.setEnabled(false);
-											DeviceSelectionDialog.this.paritySelectLabel.setEnabled(false);
-											DeviceSelectionDialog.this.flowControlSelectLabel.setEnabled(false);
+										if (!DeviceSelectionDialog.this.portSettingsGroup.isDisposed()) {
+											if (DeviceSelectionDialog.this.portSettingsGroup.getEnabled()) {
+												DeviceSelectionDialog.this.baudeDescription.setEnabled(true);
+												DeviceSelectionDialog.this.baudeDescription.setEnabled(true);
+												DeviceSelectionDialog.this.dataBitsDescription.setEnabled(true);
+												DeviceSelectionDialog.this.stopbitsDescription.setEnabled(true);
+												DeviceSelectionDialog.this.parityDescription.setEnabled(true);
+												DeviceSelectionDialog.this.flowcontrolDescription.setEnabled(true);
+												DeviceSelectionDialog.this.dtrDescription.setEnabled(true);
+												DeviceSelectionDialog.this.rtsDescription.setEnabled(true);
+												DeviceSelectionDialog.this.baudeSelectLabel.setEnabled(true);
+												DeviceSelectionDialog.this.dataBitsSelectLabel.setEnabled(true);
+												DeviceSelectionDialog.this.stopBitsSelectLabel.setEnabled(true);
+												DeviceSelectionDialog.this.paritySelectLabel.setEnabled(true);
+												DeviceSelectionDialog.this.flowControlSelectLabel.setEnabled(true);
+											}
+											else {
+												DeviceSelectionDialog.this.baudeDescription.setEnabled(false);
+												DeviceSelectionDialog.this.baudeDescription.setEnabled(false);
+												DeviceSelectionDialog.this.dataBitsDescription.setEnabled(false);
+												DeviceSelectionDialog.this.stopbitsDescription.setEnabled(false);
+												DeviceSelectionDialog.this.parityDescription.setEnabled(false);
+												DeviceSelectionDialog.this.flowcontrolDescription.setEnabled(false);
+												DeviceSelectionDialog.this.dtrDescription.setEnabled(false);
+												DeviceSelectionDialog.this.rtsDescription.setEnabled(false);
+												DeviceSelectionDialog.this.baudeSelectLabel.setEnabled(false);
+												DeviceSelectionDialog.this.dataBitsSelectLabel.setEnabled(false);
+												DeviceSelectionDialog.this.stopBitsSelectLabel.setEnabled(false);
+												DeviceSelectionDialog.this.paritySelectLabel.setEnabled(false);
+												DeviceSelectionDialog.this.flowControlSelectLabel.setEnabled(false);
+											}
 										}
 									}
 								});
@@ -1244,7 +1246,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								});
 							}
 						}
-						WaitTimer.delay(200);
+						WaitTimer.delay(500);
 					}
 				}
 				catch (Throwable t) {
