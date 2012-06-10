@@ -83,6 +83,18 @@ public class FileTransferTabItem extends CTabItem {
 	StringBuilder								selectedPcBaseFolder		= new StringBuilder().append(this.settings.getDataFilePath());
 	StringBuilder								selectedPcFolder				= new StringBuilder();
 	TreeItem										lastSelectedSdTreeItem, lastSelectedPcTreeItem;
+	
+	private SelectionAdapter sdTreeSelectionListener = new SelectionAdapter() {
+		@Override
+		public void widgetSelected(SelectionEvent evt) {
+			FileTransferTabItem.log.log(Level.FINEST, "sourceFolderTree.widgetSelected, event=" + evt); //$NON-NLS-1$
+			TreeItem evtTreeitem = (TreeItem) evt.item;
+			FileTransferTabItem.log.log(Level.FINEST, "sourceFolderTree.widgetSelected, tree item = " + evtTreeitem.getText()); //$NON-NLS-1$
+			if (FileTransferTabItem.this.serialPort.isConnected() && !evtTreeitem.getText().equals(GDE.FILE_SEPARATOR_UNIX)) {
+				updateSelectedSdFolder(evtTreeitem);
+			}
+		}
+	};
 
 	public FileTransferTabItem(CTabFolder parent, int style, int position, HoTTAdapter useDevice, HoTTAdapterSerialPort useSerialPort) {
 		super(parent, style, position);
@@ -297,8 +309,8 @@ public class FileTransferTabItem extends CTabItem {
 											FileTransferTabItem.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2404),
 													Messages.getString(MessageIds.GDE_MSGT2404));
 											FileTransferTabItem.this.serialPort.open();
-											FileTransferTabItem.this.disconnectButton.setEnabled(true);
 										}
+										enableSerialButtons(true);
 										FileTransferTabItem.this.serialPort.prepareSdCard();
 
 										updateSdCardSizes(FileTransferTabItem.this.serialPort.querySdCardSizes());
@@ -306,9 +318,8 @@ public class FileTransferTabItem extends CTabItem {
 									}
 									catch (Exception e) {
 										FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
-										enableStopButton(false);
+										enableSerialButtons(false);
 										FileTransferTabItem.this.serialPort.close();
-										FileTransferTabItem.this.disconnectButton.setEnabled(false);
 										FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
 									}
 								}
@@ -320,6 +331,7 @@ public class FileTransferTabItem extends CTabItem {
 							upLoadButtonLData.widthHint = 155;
 							upLoadButtonLData.heightHint = 30;
 							this.upLoadButton.setLayoutData(upLoadButtonLData);
+							this.upLoadButton.setEnabled(false);
 							this.upLoadButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.upLoadButton.setText(Messages.getString(MessageIds.GDE_MSGT2430));
 							this.upLoadButton.addSelectionListener(new SelectionAdapter() {
@@ -350,25 +362,26 @@ public class FileTransferTabItem extends CTabItem {
 										tmpTotalSize += Long.parseLong(element.getText(4));
 									}
 									FileTransferTabItem.log.log(Level.FINE, "Selection={" + filesInfo + "}"); //$NON-NLS-1$ //$NON-NLS-2$
-
+									
 									final long totalSize = tmpTotalSize;
 									new Thread("Upload") { //$NON-NLS-1$
 										@Override
 										public void run() {
 											try {
+												enableActionButtons(true);
 												FileTransferTabItem.this.serialPort.setInterruptedByUser(false);
 												FileTransferTabItem.this.serialPort.upLoadFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.FILE_SEPARATOR_UNIX,
 														FileTransferTabItem.this.selectedPcFolder.toString(), filesInfo.toString().split(GDE.STRING_SEMICOLON), totalSize, FileTransferTabItem.this);
-												enableStopButton(false);
 											}
 											catch (Exception e) {
 												FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
-												enableStopButton(false);
 												FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
+											}
+											finally {
+												enableActionButtons(false);
 											}
 										}
 									}.start();
-									FileTransferTabItem.this.stopButton.setEnabled(true);
 								}
 							});
 						}
@@ -395,6 +408,7 @@ public class FileTransferTabItem extends CTabItem {
 							downLoadButtonLData.widthHint = 155;
 							downLoadButtonLData.heightHint = 30;
 							this.downLoadButton.setLayoutData(downLoadButtonLData);
+							this.downLoadButton.setEnabled(false);
 							this.downLoadButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.downLoadButton.setText(Messages.getString(MessageIds.GDE_MSGT2436));
 							this.downLoadButton.addSelectionListener(new SelectionAdapter() {
@@ -426,20 +440,20 @@ public class FileTransferTabItem extends CTabItem {
 										@Override
 										public void run() {
 											try {
+												enableActionButtons(true);
 												FileTransferTabItem.this.serialPort.setInterruptedByUser(false);
 												FileTransferTabItem.this.serialPort.downLoadFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.FILE_SEPARATOR_UNIX,
 														FileTransferTabItem.this.selectedPcFolder.toString(), filesInfo.toString().split(GDE.STRING_SEMICOLON), totalSize, FileTransferTabItem.this);
-												enableStopButton(false);
 											}
 											catch (Exception e) {
 												FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
-												FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
-												enableStopButton(false);
 												FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
+											}
+											finally {
+												enableActionButtons(false);
 											}
 										}
 									}.start();
-									FileTransferTabItem.this.stopButton.setEnabled(true);
 								}
 							});
 						}
@@ -467,8 +481,8 @@ public class FileTransferTabItem extends CTabItem {
 										FileTransferTabItem.log.log(Level.FINER, "dispose " + item.getText()); //$NON-NLS-1$
 										item.dispose();
 									}
-									FileTransferTabItem.this.stopButton.setEnabled(false);
-									FileTransferTabItem.this.disconnectButton.setEnabled(false);
+									enableActionButtons(false);
+									enableSerialButtons(false);
 									FileTransferTabItem.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404),
 											Messages.getString(MessageIds.GDE_MSGT2404));
 								}
@@ -482,17 +496,7 @@ public class FileTransferTabItem extends CTabItem {
 						this.sdFolderTree = new Tree(this.sdCardActionGroup, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 						this.sdFolderTree.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.sdFolderTree.setLayoutData(sourceFolderTreeLData);
-						this.sdFolderTree.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent evt) {
-								FileTransferTabItem.log.log(Level.FINEST, "sourceFolderTree.widgetSelected, event=" + evt); //$NON-NLS-1$
-								TreeItem evtTreeitem = (TreeItem) evt.item;
-								FileTransferTabItem.log.log(Level.FINEST, "sourceFolderTree.widgetSelected, tree item = " + evtTreeitem.getText()); //$NON-NLS-1$
-								if (FileTransferTabItem.this.serialPort.isConnected() && !evtTreeitem.getText().equals(GDE.FILE_SEPARATOR_UNIX)) {
-									updateSelectedSdFolder(evtTreeitem);
-								}
-							}
-						});
+						this.sdFolderTree.addSelectionListener(sdTreeSelectionListener);
 						{
 							this.sdRootDirectoryTreeItem = new TreeItem(this.sdFolderTree, SWT.NONE);
 							this.sdRootDirectoryTreeItem.setText(GDE.FILE_SEPARATOR_UNIX);
@@ -589,11 +593,15 @@ public class FileTransferTabItem extends CTabItem {
 								FileTransferTabItem.log.log(Level.FINE, "Selection={" + filesInfo + "}"); //$NON-NLS-1$ //$NON-NLS-2$
 
 								try {
+									enableActionButtons(true);
 									FileTransferTabItem.this.serialPort.deleteFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.FILE_SEPARATOR_UNIX, filesInfo.toString().split(GDE.STRING_SEMICOLON));
 									updateSelectedSdFolder(FileTransferTabItem.this.lastSelectedSdTreeItem);
 								}
 								catch (Exception e) {
 									FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
+								}
+								finally {
+									enableActionButtons(false);
 								}
 							}
 						});
@@ -742,7 +750,8 @@ public class FileTransferTabItem extends CTabItem {
 				item.dispose();
 			}
 			//apply close d folder icon to previous selected tree item
-			if (this.lastSelectedPcTreeItem != null && !this.lastSelectedPcTreeItem.isDisposed()) {
+			
+			if (this.lastSelectedPcTreeItem != null && !this.lastSelectedPcTreeItem.isDisposed() && this.lastSelectedPcTreeItem.getParentItem() != null) {
 				this.lastSelectedPcTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif")); //$NON-NLS-1$
 				while (!this.pcRootTreeItem.getText().equals((parentItem = this.lastSelectedPcTreeItem.getParentItem()).getText())) {
 					parentItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif")); //$NON-NLS-1$
@@ -753,16 +762,21 @@ public class FileTransferTabItem extends CTabItem {
 			//build path traversing tree items, apply open folder icon
 			this.selectedPcFolder = new StringBuilder().append(GDE.FILE_SEPARATOR_UNIX).append(evtItem.getText());
 			tmpItem = evtItem;
-			while (!this.pcRootTreeItem.getText().equals((parentItem = tmpItem.getParentItem()).getText())) {
-				this.selectedPcFolder.insert(0, parentItem.getText());
-				this.selectedPcFolder.insert(0, GDE.FILE_SEPARATOR_UNIX);
-				parentItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif")); //$NON-NLS-1$
-				tmpItem = parentItem;
+			parentItem = tmpItem.getParentItem();
+			if (parentItem != null) {
+				while (!this.pcRootTreeItem.getText().equals((parentItem = tmpItem.getParentItem()).getText())) {
+					this.selectedPcFolder.insert(0, parentItem.getText());
+					this.selectedPcFolder.insert(0, GDE.FILE_SEPARATOR_UNIX);
+					parentItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif")); //$NON-NLS-1$
+					tmpItem = parentItem;
+				}
+				this.selectedPcFolder.insert(0, this.selectedPcBaseFolder);
 			}
-			this.selectedPcFolder.insert(0, this.selectedPcBaseFolder);
-
+			else {
+				this.selectedPcFolder = new StringBuilder().append(selectedPcBaseFolder);
+			}
 			//update with new folder and file information
-			List<File> files = FileUtils.getFileListing(new File(this.selectedPcFolder.toString()), 1);
+			List<File> files = FileUtils.getFileListing(new File(this.selectedPcFolder.toString()), 0);
 			int index = 0;
 			for (File file : files) {
 				new TableItem(this.pcFoldersTable, SWT.NONE).setText(new String[] { GDE.STRING_EMPTY + index++, file.getName(), StringHelper.getFormatedTime("yyyy-MM-dd", file.lastModified()), //$NON-NLS-1$
@@ -849,11 +863,32 @@ public class FileTransferTabItem extends CTabItem {
 		});
 	}
 
-	public void enableStopButton(final boolean enable) {
+	public void enableActionButtons(final boolean enableConnectStop) {
 		GDE.display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				FileTransferTabItem.this.stopButton.setEnabled(enable);
+				FileTransferTabItem.this.connectButton.setEnabled(!enableConnectStop);
+				FileTransferTabItem.this.stopButton.setEnabled(enableConnectStop);
+				FileTransferTabItem.this.downLoadButton.setEnabled(!enableConnectStop);
+				FileTransferTabItem.this.upLoadButton.setEnabled(!enableConnectStop);
+				FileTransferTabItem.this.deleteFileButton.setEnabled(!enableConnectStop);
+				FileTransferTabItem.this.sdFolderTree.setEnabled(!enableConnectStop);
+				
+				if (enableConnectStop)
+					FileTransferTabItem.this.sdFolderTree.removeSelectionListener(sdTreeSelectionListener);
+				else
+					FileTransferTabItem.this.sdFolderTree.addSelectionListener(sdTreeSelectionListener);
+			}
+		});
+	}
+
+	public void enableSerialButtons(final boolean enable) {
+		GDE.display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				FileTransferTabItem.this.upLoadButton.setEnabled(enable);
+				FileTransferTabItem.this.downLoadButton.setEnabled(enable);
+				FileTransferTabItem.this.disconnectButton.setEnabled(enable);
 			}
 		});
 	}

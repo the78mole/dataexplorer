@@ -483,7 +483,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		short crc16 = Checksum.CRC16CCITT(cmdAll, 3, cmdAll.length - 5);
 		cmdAll[cmdAll.length - 2] = (byte) (crc16 & 0x00FF);
 		cmdAll[cmdAll.length - 1] = (byte) ((crc16 & 0xFF00) >> 8);
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex2CharString(cmdAll, cmdAll.length));
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(cmdAll, cmdAll.length));
 
 		System.arraycopy(cmdAll, 0, HoTTAdapterSerialPort.cmd1, 0, 7);
 		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
@@ -547,7 +547,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		StringBuilder sb = new StringBuilder();
 		while (this.ANSWER_DATA[7] != HoTTAdapterSerialPort.root[7] && this.ANSWER_DATA[8] != HoTTAdapterSerialPort.root[8]) { //06 01 87 BA
 			sendCmd(HoTTAdapterSerialPort.LIST_DIR);
-			this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
+			this.ANSWER_DATA = this.read(new byte[256], 2000, 5);
 			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
 				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 			for (int i = 19; i < this.ANSWER_DATA.length - 2; i++) {
@@ -573,7 +573,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			this.ANSWER_DATA[3] = 0x01;
 			while (this.ANSWER_DATA[3] != 0x00) {
 				sendCmd(HoTTAdapterSerialPort.LIST_DIR);
-				this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
+				this.ANSWER_DATA = this.read(new byte[256], 2000, 5);
 				if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
 					HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 				StringBuilder content = new StringBuilder();
