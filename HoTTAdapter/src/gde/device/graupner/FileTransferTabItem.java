@@ -84,18 +84,6 @@ public class FileTransferTabItem extends CTabItem {
 	StringBuilder								selectedPcFolder				= new StringBuilder();
 	TreeItem										lastSelectedSdTreeItem, lastSelectedPcTreeItem;
 	
-	private SelectionAdapter sdTreeSelectionListener = new SelectionAdapter() {
-		@Override
-		public void widgetSelected(SelectionEvent evt) {
-			FileTransferTabItem.log.log(Level.FINEST, "sourceFolderTree.widgetSelected, event=" + evt); //$NON-NLS-1$
-			TreeItem evtTreeitem = (TreeItem) evt.item;
-			FileTransferTabItem.log.log(Level.FINEST, "sourceFolderTree.widgetSelected, tree item = " + evtTreeitem.getText()); //$NON-NLS-1$
-			if (FileTransferTabItem.this.serialPort.isConnected() && !evtTreeitem.getText().equals(GDE.FILE_SEPARATOR_UNIX)) {
-				updateSelectedSdFolder(evtTreeitem);
-			}
-		}
-	};
-
 	public FileTransferTabItem(CTabFolder parent, int style, int position, HoTTAdapter useDevice, HoTTAdapterSerialPort useSerialPort) {
 		super(parent, style, position);
 		this.tabFolder = parent;
@@ -229,7 +217,6 @@ public class FileTransferTabItem extends CTabItem {
 						this.pcFoldersTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						setTableHeader(this.pcFoldersTable);
 						this.pcFoldersTable.addListener(SWT.Selection, new Listener() {
-							@Override
 							public void handleEvent(Event event) {
 								TableItem item = (TableItem) event.item;
 								FileTransferTabItem.log.log(Level.FINE, "Selection={" + item.getText(1) + "}"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -318,7 +305,6 @@ public class FileTransferTabItem extends CTabItem {
 									}
 									catch (Exception e) {
 										FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
-										enableSerialButtons(false);
 										FileTransferTabItem.this.serialPort.close();
 										FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
 									}
@@ -496,7 +482,17 @@ public class FileTransferTabItem extends CTabItem {
 						this.sdFolderTree = new Tree(this.sdCardActionGroup, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 						this.sdFolderTree.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.sdFolderTree.setLayoutData(sourceFolderTreeLData);
-						this.sdFolderTree.addSelectionListener(sdTreeSelectionListener);
+						this.sdFolderTree.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								FileTransferTabItem.log.log(Level.FINEST, "sourceFolderTree.widgetSelected, event=" + evt); //$NON-NLS-1$
+								TreeItem evtTreeitem = (TreeItem) evt.item;
+								FileTransferTabItem.log.log(Level.FINEST, "sourceFolderTree.widgetSelected, tree item = " + evtTreeitem.getText()); //$NON-NLS-1$
+								if (FileTransferTabItem.this.serialPort.isConnected() && !evtTreeitem.getText().equals(GDE.FILE_SEPARATOR_UNIX)) {
+									updateSelectedSdFolder(evtTreeitem);
+								}
+							}
+						});
 						{
 							this.sdRootDirectoryTreeItem = new TreeItem(this.sdFolderTree, SWT.NONE);
 							this.sdRootDirectoryTreeItem.setText(GDE.FILE_SEPARATOR_UNIX);
@@ -525,7 +521,6 @@ public class FileTransferTabItem extends CTabItem {
 						this.sdCardFoldersTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						setTableHeader(this.sdCardFoldersTable);
 						this.sdCardFoldersTable.addListener(SWT.Selection, new Listener() {
-							@Override
 							public void handleEvent(Event event) {
 								TableItem item = (TableItem) event.item;
 								FileTransferTabItem.log.log(Level.FINE, "Selection={" + item.getText(1) + "}"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -834,7 +829,6 @@ public class FileTransferTabItem extends CTabItem {
 
 	public void updateFileTransferProgress(final long totalSize, final long remainingSize) {
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				FileTransferTabItem.this.transferProgressBar.setSelection((int) ((totalSize - remainingSize) * 100 / totalSize));
 				FileTransferTabItem.this.transferProgressLabel.setText(Messages.getString(MessageIds.GDE_MSGT2443, new Object[] { (totalSize - remainingSize), totalSize }));
@@ -845,7 +839,6 @@ public class FileTransferTabItem extends CTabItem {
 	public void updatePcFolder() {
 		final TreeItem treeItem = this.lastSelectedPcTreeItem;
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				updateSelectedPcFolder(treeItem);
 			}
@@ -855,7 +848,6 @@ public class FileTransferTabItem extends CTabItem {
 	public void updateSdFolder(final long[] sdSizes) {
 		final TreeItem treeItem = this.lastSelectedSdTreeItem;
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				updateSdCardSizes(sdSizes);
 				updateSelectedSdFolder(treeItem);
@@ -865,7 +857,6 @@ public class FileTransferTabItem extends CTabItem {
 
 	public void enableActionButtons(final boolean enableConnectStop) {
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				FileTransferTabItem.this.connectButton.setEnabled(!enableConnectStop);
 				FileTransferTabItem.this.stopButton.setEnabled(enableConnectStop);
@@ -873,18 +864,12 @@ public class FileTransferTabItem extends CTabItem {
 				FileTransferTabItem.this.upLoadButton.setEnabled(!enableConnectStop);
 				FileTransferTabItem.this.deleteFileButton.setEnabled(!enableConnectStop);
 				FileTransferTabItem.this.sdFolderTree.setEnabled(!enableConnectStop);
-				
-				if (enableConnectStop)
-					FileTransferTabItem.this.sdFolderTree.removeSelectionListener(sdTreeSelectionListener);
-				else
-					FileTransferTabItem.this.sdFolderTree.addSelectionListener(sdTreeSelectionListener);
 			}
 		});
 	}
 
 	public void enableSerialButtons(final boolean enable) {
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				FileTransferTabItem.this.upLoadButton.setEnabled(enable);
 				FileTransferTabItem.this.downLoadButton.setEnabled(enable);
