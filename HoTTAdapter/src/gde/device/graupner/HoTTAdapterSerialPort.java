@@ -683,7 +683,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 										break;
 									}
 								}
-								log.log(Level.WARNING, "write only " + returnedDataSize + " bytes instead of " + HoTTAdapterSerialPort.FILE_TRANSFER_SIZE);
+								log.log(Level.WARNING, file[1] + ": write only " + returnedDataSize + " bytes instead of " + HoTTAdapterSerialPort.FILE_TRANSFER_SIZE);
 								data_out.write(this.ANSWER_DATA, 0, returnedDataSize);
 								remainingSize -= HoTTAdapterSerialPort.FILE_TRANSFER_SIZE;
 								remainingFileSize -= HoTTAdapterSerialPort.FILE_TRANSFER_SIZE;
