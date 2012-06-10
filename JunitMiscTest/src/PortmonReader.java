@@ -22,7 +22,7 @@ public class PortmonReader {
 	public static void main(String[] args) {
 		try {
 			//BufferedReader br = new BufferedReader( new InputStreamReader( new FileInputStream("c:\\Programs\\Sysinternals\\HoTTManager_Connect_LogData_cappuccino_files.LOG")));
-			BufferedReader br = new BufferedReader( new InputStreamReader( new FileInputStream("c:\\Programs\\Sysinternals\\Radio_GrStudio_transfer_file.LOG")));
+			BufferedReader br = new BufferedReader( new InputStreamReader( new FileInputStream("c:\\Programs\\Sysinternals\\Radio_GrStudio_download_file.LOG")));
 			String line;
 			StringBuilder sb = new StringBuilder();
 			while ((line = br.readLine()) != null) {
@@ -34,12 +34,12 @@ public class PortmonReader {
 					for (String hex : hexBytes) {
 						sb.append(hex).append(" ");
 					}
-//					sb.append("\n");
-//					if (line.contains("IRP_MJ_WRITE")) sb.append("write : ");
-//					else sb.append("read  : ");
-//					for (String hex : hexBytes) {
-//						sb.append(String.format("%c",Integer.parseInt(hex, 16))).append(" ");
-//					}
+					sb.append("\n");
+					if (line.contains("IRP_MJ_WRITE")) sb.append("write : ");
+					else sb.append("read  : ");
+					for (String hex : hexBytes) {
+						sb.append(String.format("%c",Integer.parseInt(hex, 16))).append(" ");
+					}
 					System.out.println(sb.toString());
 //					if (hexBytes.length > 10 && line.contains("IRP_MJ_WRITE")) {
 //						byte[] bytes = new byte[hexBytes.length-5]; //0x00, cntUp, cntDwn, CRC1, CRC2
