@@ -54,7 +54,7 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Strenght</name>
+                <name>Strength</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>

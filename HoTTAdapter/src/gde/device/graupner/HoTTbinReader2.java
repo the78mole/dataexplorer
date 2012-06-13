@@ -696,9 +696,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 */
 	private static void parseReceiver(RecordSet _recordSet, int[] _points, byte[] _buf) {
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
-		_points[0] = (_buf[37] & 0xFF) * 1000;
+		_points[0] = _buf[37] * 1000;
 		_points[1] = (_buf[38] & 0xFF) * 1000;
-		_points[2] = (convertRFRXSQ2Strength(_buf[37] & 0xFF)) * 1000;
+		_points[2] = (convertRxDbm2Strength(_buf[4] & 0xFF)) * 1000;
 		_points[3] = DataParser.parse2Short(_buf, 40) * 1000;
 		_points[4] = (_buf[3] & 0xFF) * -1000;
 		_points[5] = (_buf[4] & 0xFF) * -1000;

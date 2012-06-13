@@ -131,16 +131,17 @@ public class HoTTbinReader {
 			if (data_in != null) data_in.close();
 		}
 		return fileInfo;
-	}
+	}	
 
-	//0=RF_RXSQ to Strength lookup table
-	static int[] lookup = new int[] {100, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 85, 85, 85, 85, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 30, 25, 25, 20, 20, 20, 15, 15, 10, 10, 5, 5, 5, 5, 0};
+	//0=Rx dbm to Strength lookup table
+	//static int[] lookup = new int[] {100, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 85, 85, 85, 85, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 30, 25, 25, 20, 20, 20, 15, 15, 10, 10, 5, 5, 5, 5, 0};
+	static int[] lookup = new int[] {95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 85, 85, 85, 85, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 30, 25, 25, 20, 20, 20, 15, 15, 10, 10, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0};
 	/**
 	 * convert from RF_RXSQ to strength using lookup table
 	 * @param inValue
 	 * @return
 	 */
-	static int convertRFRXSQ2Strength(int inValue) {
+	static int convertRxDbm2Strength(int inValue) {
 		// RF_RXSQ_to_Strength(72-ShortInt(buf[0].data_3_1[3]) DIV 2)
 		if (inValue >= 40 && inValue < lookup.length+40) {
 			return lookup[inValue - 40];
@@ -213,7 +214,7 @@ public class HoTTbinReader {
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
-		RecordSet tmpRecordSet, receiverRecordSet;
+		RecordSet tmpRecordSet;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		if (menuToolBar != null) HoTTbinReader.application.setProgress(0, sThreadId);
@@ -228,7 +229,7 @@ public class HoTTbinReader {
 			HoTTbinReader.recordSetReceiver = RecordSet.createRecordSet(recordSetName, device, 1, true, true);
 			channel.put(recordSetName, HoTTbinReader.recordSetReceiver);
 			HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.RECEIVER.value(), HoTTbinReader.recordSetReceiver);
-			receiverRecordSet = tmpRecordSet = channel.get(recordSetName);
+			tmpRecordSet = channel.get(recordSetName);
 			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 			tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 			if (HoTTbinReader.application.getMenuToolBar() != null) {
@@ -253,8 +254,6 @@ public class HoTTbinReader {
 				}
 				//recordSetChannel initialized and ready to add data
 			}
-			//switch back to receiver channel to be displayed if no other sensor is connected
-			tmpRecordSet = receiverRecordSet;
 
 			//read all the data blocks from the file and parse
 			for (int i = 0; i < numberDatablocks; i++) {
@@ -316,11 +315,11 @@ public class HoTTbinReader {
 						if (HoTTbinReader.buf0 != null && HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null) {
 							version = parseAddVario(HoTTbinReader.recordSetVario, HoTTbinReader.pointsVario, version, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.timeStep_ms);
 							HoTTbinReader.buf0 = HoTTbinReader.buf1 = HoTTbinReader.buf2 = null;
-							if (numberDatablocks > 30000) { //5 minutes
-								data_in.skip(HoTTbinReader.dataBlockSize * 50); //take from data points only each half second 
-								i += 50;
-								HoTTbinReader.timeStep_ms = HoTTbinReader.timeStep_ms += 500;
-							}
+//							if (numberDatablocks > 30000) { //5 minutes
+//								data_in.skip(HoTTbinReader.dataBlockSize * 25); //take from data points only each half second 
+//								i += 25;
+//								HoTTbinReader.timeStep_ms = HoTTbinReader.timeStep_ms += 250;
+//							}
 						}
 						break;
 
@@ -364,11 +363,11 @@ public class HoTTbinReader {
 						if (HoTTbinReader.buf0 != null && HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null) {
 							parseAddGPS(HoTTbinReader.recordSetGPS, HoTTbinReader.pointsGPS, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.timeStep_ms);
 							HoTTbinReader.buf0 = HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = null;
-							if (numberDatablocks > 30000) { //5 minutes
-								data_in.skip(HoTTbinReader.dataBlockSize * 50); //take from data points only each half second 
-								i += 50;
-								HoTTbinReader.timeStep_ms = HoTTbinReader.timeStep_ms += 500;
-							}
+//							if (numberDatablocks > 30000) { //5 minutes
+//								data_in.skip(HoTTbinReader.dataBlockSize * 25); //take from data points only each half second 
+//								i += 25;
+//								HoTTbinReader.timeStep_ms = HoTTbinReader.timeStep_ms += 250;
+//							}
 						}
 						break;
 
@@ -416,11 +415,11 @@ public class HoTTbinReader {
 							parseAddGeneral(HoTTbinReader.recordSetGeneral, HoTTbinReader.pointsGeneral, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4,
 									HoTTbinReader.timeStep_ms);
 							HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
-							if (numberDatablocks > 30000) { //5 minutes
-								data_in.skip(HoTTbinReader.dataBlockSize * 50); //take from data points only each half second 
-								i += 50;
-								HoTTbinReader.timeStep_ms = HoTTbinReader.timeStep_ms += 500;
-							}
+//							if (numberDatablocks > 30000) { //5 minutes
+//								data_in.skip(HoTTbinReader.dataBlockSize * 25); //take from data points only each half second 
+//								i += 25;
+//								HoTTbinReader.timeStep_ms = HoTTbinReader.timeStep_ms += 250;
+//							}
 						}
 						break;
 
@@ -468,11 +467,11 @@ public class HoTTbinReader {
 							parseAddElectric(HoTTbinReader.recordSetElectric, HoTTbinReader.pointsElectric, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4,
 									HoTTbinReader.timeStep_ms);
 							HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
-							if (numberDatablocks > 30000) { //5 minutes
-								data_in.skip(HoTTbinReader.dataBlockSize * 50); //take from data points only each half second 
-								i += 50;
-								HoTTbinReader.timeStep_ms = HoTTbinReader.timeStep_ms += 500;
-							}
+//							if (numberDatablocks > 30000) { //5 minutes
+//								data_in.skip(HoTTbinReader.dataBlockSize * 25); //take from data points only each half second 
+//								i += 25;
+//								HoTTbinReader.timeStep_ms = HoTTbinReader.timeStep_ms += 250;
+//							}
 						}
 						break;
 					}
@@ -631,20 +630,22 @@ public class HoTTbinReader {
 			//recordSetReceiver initialized and ready to add data
 			
 			//channel data are always contained
-			//check if recordSetChannel initialized, transmitter and receiver data always present, but not in the same data rate and signals
-			channel = HoTTbinReader.channels.get(6);
-			channel.setFileDescription(application.isObjectoriented() ? date + GDE.STRING_BLANK + application.getObjectKey() : date);
-			recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.CHANNEL.value() + recordSetNameExtend;
-			HoTTbinReader.recordSetChannel = RecordSet.createRecordSet(recordSetName, device, 6, true, true);
-			channel.put(recordSetName, HoTTbinReader.recordSetChannel);
-			HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.CHANNEL.value(), HoTTbinReader.recordSetChannel);
-			tmpRecordSet = channel.get(recordSetName);
-			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
-			tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
-			if (HoTTbinReader.application.getMenuToolBar() != null) {
-				channel.applyTemplate(recordSetName, true);
+			if (HoTTAdapter.isChannelsChannelEnabled) {
+				//check if recordSetChannel initialized, transmitter and receiver data always present, but not in the same data rate and signals
+				channel = HoTTbinReader.channels.get(6);
+				channel.setFileDescription(application.isObjectoriented() ? date + GDE.STRING_BLANK + application.getObjectKey() : date);
+				recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.CHANNEL.value() + recordSetNameExtend;
+				HoTTbinReader.recordSetChannel = RecordSet.createRecordSet(recordSetName, device, 6, true, true);
+				channel.put(recordSetName, HoTTbinReader.recordSetChannel);
+				HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.CHANNEL.value(), HoTTbinReader.recordSetChannel);
+				tmpRecordSet = channel.get(recordSetName);
+				tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+				tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
+				if (HoTTbinReader.application.getMenuToolBar() != null) {
+					channel.applyTemplate(recordSetName, true);
+				}
+				//recordSetChannel initialized and ready to add data
 			}
-			//recordSetChannel initialized and ready to add data
 
 			//read all the data blocks from the file and parse
 			for (int i = 0; i < numberDatablocks; i++) {
@@ -663,7 +664,9 @@ public class HoTTbinReader {
 					//fill receiver data
 					if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 40) != 0 && HoTTbinReader.timeStep_ms % 10 == 0) {
 						parseAddReceiver(HoTTbinReader.recordSetReceiver, HoTTbinReader.pointsReceiver, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
-						parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
+						if (HoTTAdapter.isChannelsChannelEnabled) {
+							parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
+						}
 					}
 					
 					//detect sensor switch
@@ -915,9 +918,9 @@ public class HoTTbinReader {
 	 */
 	private static void parseAddReceiver(RecordSet _recordSetReceiver, int[] _pointsReceiver, byte[] _buf, long _timeStep_ms) throws DataInconsitsentException {
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
-		_pointsReceiver[0] = (_buf[37] & 0xFF) * 1000;
+		_pointsReceiver[0] = _buf[37] * 1000;
 		_pointsReceiver[1] = (_buf[38] & 0xFF) * 1000;
-		_pointsReceiver[2] = (convertRFRXSQ2Strength(_buf[37] & 0xFF)) * 1000;
+		_pointsReceiver[2] = (convertRxDbm2Strength(_buf[4] & 0xFF)) * 1000;
 		_pointsReceiver[3] = DataParser.parse2Short(_buf, 40) * 1000;
 		_pointsReceiver[4] = (_buf[3] & 0xFF) * -1000;
 		_pointsReceiver[5] = (_buf[4] & 0xFF) * -1000;
