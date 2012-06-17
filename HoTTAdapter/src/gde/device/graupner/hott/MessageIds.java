@@ -25,6 +25,7 @@ package gde.device.graupner.hott;
 public class MessageIds { 
 
 	public final static String	GDE_MSGW2400 = "GDE_MSGW2400";
+	public final static String	GDE_MSGW2401 = "GDE_MSGW2401";
 	public final static String	GDE_MSGI2400 = "GDE_MSGI2400";
 	public final static String	GDE_MSGT2400 = "GDE_MSGT2400";
 	public final static String	GDE_MSGT2401 = "GDE_MSGT2401";
@@ -59,8 +60,10 @@ public class MessageIds {
 	public final static String	GDE_MSGT2431 = "GDE_MSGT2431";
 	public final static String	GDE_MSGT2432 = "GDE_MSGT2432";
 	public final static String	GDE_MSGT2433 = "GDE_MSGT2433";
+	public final static String	GDE_MSGT2434 = "GDE_MSGT2434";
 	public final static String	GDE_MSGT2435 = "GDE_MSGT2435";
 	public final static String	GDE_MSGT2436 = "GDE_MSGT2436";
+	public final static String	GDE_MSGT2437 = "GDE_MSGT2437";
 	public final static String	GDE_MSGT2441 = "GDE_MSGT2441";
 	public final static String	GDE_MSGT2443 = "GDE_MSGT2443";
 	public final static String	GDE_MSGT2444 = "GDE_MSGT2444";

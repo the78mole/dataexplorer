@@ -28,6 +28,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
+import gde.utils.FileUtils;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
@@ -38,6 +39,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -387,7 +389,17 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static byte[]	cmd1									= new byte[7];
 	byte								cntUp									= 0x00;
 	byte								cntDown								= (byte) 0xFF;
+
+	final static byte[]	QUERY_TX_INFO					= { 0x00, 0x11 };
+	final static byte[]	WRITE_SCREEN					= { 0x00, 0x21 };	// 1. byte: row, 21 byte text 
+	final static byte[]	RESET_SCREEN					= { 0x00, 0x22 };
+	final static byte[]	CLEAR_SCREEN					= { 0x00, 0x23 };
+
 	final static byte[]	PREPARE_FILE_TRANSFER	= { 0x03, 0x30 };
+
+	final static byte[]	PREPARE_LIST_MDL			= { 0x05, 0x32 };
+	final static byte[]	QUERY_MDL_NAMES				= { 0x05, 0x33 };
+
 	final static byte[]	SELECT_SD_CARD				= { 0x06, 0x30 };
 	final static byte[]	QUERY_SD_SIZES				= { 0x06, 0x33 };
 	final static byte[]	FILE_XFER_INIT				= { 0x06, 0x35 };
@@ -397,16 +409,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static byte[]	FILE_DOWNLOAD					= { 0x06, 0x3A };
 	final static byte[]	LIST_DIR							= { 0x06, 0x3C };
 	final static byte[]	CHANGE_DIR						= { 0x06, 0x3D };
+	final static byte[]	MK_DIR								= { 0x06, 0x3E };
 	final static byte[]	FILE_INFO							= { 0x06, 0x3F };
-
-	//  cMakeDir =          #$06+#$3E;
-	//  cGetVersion =       #$00+#$11;
-	//  cListOverView =     #$05+#$32;
-	//  cReadMemory =       #$05+#$33;
-	//  cLockScreen =       #$00+#$23;
-	//  cClearScreen =      #$00+#$22;
-	//  cWriteScreen =      #$00+#$21;  // 1. Byte: Zeile, 21 byte Ascii
-	//  cResetScreen  =     #$00+#$24;
 
 	private byte[] prepareCmdBytes(byte[] cmd) {
 		return prepareCmdBytes(cmd, GDE.STRING_EMPTY);
@@ -426,8 +430,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		b[5] = cmd[0];
 		b[6] = cmd[1];
 		int i = 7;
-		for (; i < body.getBytes().length + 7; ++i) {
-			b[i] = body.getBytes()[i - 7];
+		for (; i < body.length() + 7; ++i) {
+			b[i] = (byte) (body.getBytes()[i - 7] & 0xFF);
 		}
 		if (body.length() > 0) b[i++] = 0x00;
 		short crc16 = Checksum.CRC16CCITT(b, 3, (body.length() == 0 ? body.length() + 4 : body.length() + 5));
@@ -498,17 +502,60 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		this.write(cmd2);
 	}
 
-	public synchronized void prepareSdCard() throws Exception {
-		//prepare transmitter for data interaction
-		sendCmd(HoTTAdapterSerialPort.PREPARE_FILE_TRANSFER);
-		this.ANSWER_DATA = this.read(new byte[9], READ_TIMEOUT_MS);
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+	private void sendMdlCmd(byte[] data) throws IOException {
+		byte[] cmdAll = new byte[data.length + 2 + 7];
 
-		sendCmd(HoTTAdapterSerialPort.SELECT_SD_CARD);
-		this.ANSWER_DATA = this.read(new byte[10], READ_TIMEOUT_MS);
+		//cmd1 part
+		cmdAll[0] = 0x00;
+		if (this.cntUp == 0xFF || this.cntDown == 0x00) {
+			this.cntUp = 0x00;
+			this.cntDown = (byte) 0xFF;
+		}
+		cmdAll[1] = this.cntUp += 0x01;
+		cmdAll[2] = this.cntDown -= 0x01;
+		cmdAll[3] = (byte) (data.length & 0x00FF);
+		cmdAll[4] = (byte) ((data.length & 0xFF00) >> 8);
+		cmdAll[5] = QUERY_MDL_NAMES[0];
+		cmdAll[6] = QUERY_MDL_NAMES[1];
+
+		System.arraycopy(data, 0, cmdAll, 7, data.length);
+		short crc16 = Checksum.CRC16CCITT(cmdAll, 3, data.length + 4);
+		cmdAll[cmdAll.length - 2] = (byte) (crc16 & 0x00FF);
+		cmdAll[cmdAll.length - 1] = (byte) ((crc16 & 0xFF00) >> 8);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(cmdAll, cmdAll.length));
+
+		System.arraycopy(cmdAll, 0, HoTTAdapterSerialPort.cmd1, 0, 7);
 		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(HoTTAdapterSerialPort.cmd1, HoTTAdapterSerialPort.cmd1.length));
+		this.write(HoTTAdapterSerialPort.cmd1);
+
+		WaitTimer.delay(HoTTAdapterSerialPort.CMD_GAP_MS);
+
+		byte[] cmd2 = new byte[data.length + 2];
+		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(cmd2, cmd2.length));
+		this.write(cmd2);
+	}
+
+	public synchronized void prepareSdCard(int retryCount) throws Exception {
+		try {
+			//prepare transmitter for data interaction
+			sendCmd(HoTTAdapterSerialPort.PREPARE_FILE_TRANSFER);
+			this.ANSWER_DATA = this.read(new byte[9], READ_TIMEOUT_MS);
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+			sendCmd(HoTTAdapterSerialPort.SELECT_SD_CARD);
+			this.ANSWER_DATA = this.read(new byte[10], READ_TIMEOUT_MS);
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		}
+		catch (Exception e) {
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			if (retryCount < 2)
+				prepareSdCard(++retryCount);
+			throw e;
+		}
 	}
 
 	/**
@@ -516,16 +563,35 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	public synchronized long[] querySdCardSizes() throws IOException, TimeOutException {
-		sendCmd(HoTTAdapterSerialPort.QUERY_SD_SIZES);
-		this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "SD size info : " + StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE,
-					"SD size info : " + StringHelper.byte2hex2int(this.ANSWER_DATA, 9, 8) + " KBytes total - " + StringHelper.byte2hex2int(this.ANSWER_DATA, 21, 8) + " KBytes free");
+	public synchronized long[] querySdCardSizes(int retryCount) throws Exception {
+		long[] ret = new long[2];
+		try {
+			sendCmd(HoTTAdapterSerialPort.QUERY_SD_SIZES);
+			this.ANSWER_DATA = this.read(new byte[50], 2000, 5);
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "SD size info : " + StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE,
+						"SD size info : " + StringHelper.byte2hex2int(this.ANSWER_DATA, 9, 8) + " KBytes total - " + StringHelper.byte2hex2int(this.ANSWER_DATA, 21, 8) + " KBytes free");
 
-		return new long[] { StringHelper.byte2hex2int(this.ANSWER_DATA, 9, 8), StringHelper.byte2hex2int(this.ANSWER_DATA, 21, 8) };
+			if (this.ANSWER_DATA[6] == 0x02 && retryCount < 2) {
+				log.log(Level.WARNING, "querySdCardSizes failed, check SD card");
+				this.ANSWER_DATA = new byte[50];
+				for (int i = 0; i < this.ANSWER_DATA.length; i++) {
+					this.ANSWER_DATA[i] = 0x30;
+				}
+			}
+			
+			ret = new long[] { StringHelper.byte2hex2int(this.ANSWER_DATA, 9, 8), StringHelper.byte2hex2int(this.ANSWER_DATA, 21, 8) };
+		}
+		catch (Exception e) {
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			if (retryCount < 2)
+				ret = querySdCardSizes(++retryCount);
+			throw e;
+		}
+
+		return ret;
 	}
 
 	public synchronized void deleteFiles(String dirPath, String[] files) throws IOException, TimeOutException {
@@ -537,35 +603,43 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		}
 	}
 
-	public synchronized String[] querySdDirs() throws Exception {
-		//change to root directory and query sub folders
-		sendCmd(HoTTAdapterSerialPort.CHANGE_DIR, GDE.FILE_SEPARATOR_UNIX);
-		HoTTAdapterSerialPort.root = this.read(new byte[50], 2000, 5);
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(HoTTAdapterSerialPort.root, HoTTAdapterSerialPort.root.length));
-
+	public synchronized String[] querySdDirs(int retryCount) throws Exception {
 		StringBuilder sb = new StringBuilder();
-		while (this.ANSWER_DATA[7] != HoTTAdapterSerialPort.root[7] && this.ANSWER_DATA[8] != HoTTAdapterSerialPort.root[8]) { //06 01 87 BA
-			sendCmd(HoTTAdapterSerialPort.LIST_DIR);
-			this.ANSWER_DATA = this.read(new byte[256], 2000, 5);
+		try {
+			//change to root directory and query sub folders
+			sendCmd(HoTTAdapterSerialPort.CHANGE_DIR, GDE.FILE_SEPARATOR_UNIX);
+			HoTTAdapterSerialPort.root = this.read(new byte[50], READ_TIMEOUT_MS, 5);
 			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
-				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-			for (int i = 19; i < this.ANSWER_DATA.length - 2; i++) {
-				sb.append(String.format("%c", this.ANSWER_DATA[i]));
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2Hex2CharString(HoTTAdapterSerialPort.root, HoTTAdapterSerialPort.root.length));
+
+			while (this.ANSWER_DATA[7] != HoTTAdapterSerialPort.root[7] && this.ANSWER_DATA[8] != HoTTAdapterSerialPort.root[8]) { //06 01 87 BA
+				sendCmd(HoTTAdapterSerialPort.LIST_DIR);
+				this.ANSWER_DATA = this.read(new byte[256], READ_TIMEOUT_MS, 5);
+				if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
+					HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				for (int i = 19; i < this.ANSWER_DATA.length - 2; i++) {
+					sb.append(String.format("%c", this.ANSWER_DATA[i]));
+				}
+				sb.append(GDE.STRING_SEMICOLON);
+				if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, sb.toString());
 			}
-			sb.append(GDE.STRING_SEMICOLON);
-			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, sb.toString());
+		}
+		catch (Exception e) {
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			if (retryCount < 2)
+				return querySdDirs(++retryCount);
+			//else return result if any
 		}
 		return sb.toString().split(GDE.STRING_SEMICOLON);
 	}
 
-	public HashMap<String, String[]> queryListDir(String dirPath) throws Exception {
+	public HashMap<String, String[]> queryListDir(String dirPath, int retryCount) throws Exception {
 		StringBuilder folders = new StringBuilder();
 		StringBuilder files = new StringBuilder();
 		HashMap<String, String[]> result = new HashMap<String, String[]>();
 		int fileIndex = 0;
 		sendCmd(HoTTAdapterSerialPort.CHANGE_DIR, dirPath);
-		HoTTAdapterSerialPort.root = this.read(new byte[50], 2000, 5);
+		HoTTAdapterSerialPort.root = this.read(new byte[50], READ_TIMEOUT_MS, 5);
 		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
 			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(HoTTAdapterSerialPort.root, HoTTAdapterSerialPort.root.length));
 
@@ -573,7 +647,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			this.ANSWER_DATA[3] = 0x01;
 			while (this.ANSWER_DATA[3] != 0x00) {
 				sendCmd(HoTTAdapterSerialPort.LIST_DIR);
-				this.ANSWER_DATA = this.read(new byte[256], 2000, 5);
+				this.ANSWER_DATA = this.read(new byte[256], READ_TIMEOUT_MS, 5);
 				if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
 					HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 				StringBuilder content = new StringBuilder();
@@ -593,17 +667,21 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 					if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "folders : " + folders.toString());
 				}
 			}
+
+			result.put("FOLDER", folders.toString().split(GDE.STRING_SEMICOLON));
+			if (files.toString().length() > 0) result.put("FILES", queryFilesInfo(dirPath + GDE.FILE_SEPARATOR_UNIX, files.toString().split(GDE.STRING_SEMICOLON), 0));
 		}
 		catch (RuntimeException e) {
-			// ignore and list folders or files already red
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			if (retryCount < 2)
+				result = queryListDir(dirPath, ++retryCount);
+			//else return result if any
 		}
-
-		result.put("FOLDER", folders.toString().split(GDE.STRING_SEMICOLON));
-		if (files.toString().length() > 0) result.put("FILES", queryFilesInfo(dirPath + GDE.FILE_SEPARATOR_UNIX, files.toString().split(GDE.STRING_SEMICOLON)));
 		return result;
 	}
 
-	public String[] queryFilesInfo(String dirPath, String[] files) throws Exception {
+	public String[] queryFilesInfo(String dirPath, String[] files, int retryCount) throws Exception {
+
 		StringBuilder filesInfo = new StringBuilder();
 		try {
 			for (String file : files) {
@@ -617,11 +695,14 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				filesInfo.append(file).append(GDE.STRING_COMMA)
 						.append(Integer.parseInt(String.format("%02x%02x%02x%02x", this.ANSWER_DATA[10], this.ANSWER_DATA[9], this.ANSWER_DATA[8], this.ANSWER_DATA[7]), 16)).append(GDE.STRING_SEMICOLON);
 				if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, filesInfo.toString());
+				WaitTimer.delay(HoTTAdapterSerialPort.CMD_GAP_MS);
 			}
 		}
 		catch (RuntimeException e) {
 			HoTTAdapterSerialPort.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-			// ignore and enable listing
+			if (retryCount < 2)
+				return queryFilesInfo(dirPath, files, ++retryCount);
+			throw e;
 		}
 
 		return filesInfo.toString().split(GDE.STRING_SEMICOLON);
@@ -636,7 +717,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				if (!this.isInterruptedByUser) {
 					//fileInfo index,name,timeStamp,size
 					String[] file = fileInfo.split(GDE.STRING_COMMA);
-					String fileQueryAnswer = this.queryFilesInfo(sourceDirPath, new String[] { fileInfo })[0];
+					String fileQueryAnswer = this.queryFilesInfo(sourceDirPath, new String[] { fileInfo }, 0)[0];
 					long remainingFileSize = Long.parseLong(fileQueryAnswer.split(GDE.STRING_COMMA)[3]);
 
 					File xferFile = new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1]);
@@ -652,7 +733,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 						try {
 							if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "remainingFileSize = " + remainingFileSize);
 							sendCmd(HoTTAdapterSerialPort.FILE_UPLOAD, String.format("0x%04x", HoTTAdapterSerialPort.FILE_TRANSFER_SIZE));
-							this.ANSWER_DATA = this.read(this.ANSWER_DATA = new byte[7], 2000, false);
+							this.ANSWER_DATA = this.read(this.ANSWER_DATA = new byte[7], READ_TIMEOUT_MS, false);
 							if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE))
 								HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 							if (this.ANSWER_DATA[5] == 0x06 && this.ANSWER_DATA[6] == 0x01) {
@@ -805,13 +886,121 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 						HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 
 					parent.updateFileTransferProgress(totalSize, remainingSize);
-					parent.updateSdFolder(this.querySdCardSizes());
+					//WaitTimer.delay(READ_TIMEOUT_MS);
+					//parent.updateSdFolder(this.querySdCardSizes(0));
 					XFER_DATA = new byte[HoTTAdapterSerialPort.FILE_TRANSFER_SIZE];
 				}
 			}
+			parent.updateSdFolder(this.querySdCardSizes(0));
 		}
 		finally {
 			if (data_in != null) data_in.close();
 		}
+	}
+	
+	public void loadModelData(String selectedPcFolder) throws IOException, TimeOutException {
+		StringBuilder sb = new StringBuilder();
+		sendCmd(HoTTAdapterSerialPort.QUERY_TX_INFO);
+		this.ANSWER_DATA = this.read(new byte[100], 2000, 5);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF))
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		sendCmd(HoTTAdapterSerialPort.QUERY_TX_INFO);
+		this.ANSWER_DATA = this.read(new byte[100], 2000, 5);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF))
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+		for (int i = 23; i < 28; i++) {
+			sb.append(String.format("%c", this.ANSWER_DATA[i]));
+		}
+		sb.append(GDE.STRING_SEMICOLON);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, sb.toString());
+
+		sendCmd(HoTTAdapterSerialPort.PREPARE_LIST_MDL);
+		this.ANSWER_DATA = this.read(new byte[1000], 3000, 5);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINER)) {
+			//HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.fourDigitsRunningNumber(this.ANSWER_DATA.length));
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2FourDigitsIntegerString(this.ANSWER_DATA));
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+		}
+		
+		//number of mdl configurations
+		sb.append(this.ANSWER_DATA[7]).append(GDE.STRING_SEMICOLON);
+		
+		int startIndex = 50;
+		byte[] endMdls = new byte[] {0x00, 0x00, 0x00, 0x76, 0x00, (byte) 0xD8};
+		for (; startIndex < this.ANSWER_DATA.length - 6; ++startIndex) {
+			if (this.ANSWER_DATA[startIndex] == endMdls[0] && this.ANSWER_DATA[startIndex+1] == endMdls[1] && this.ANSWER_DATA[startIndex+2] == endMdls[2] && this.ANSWER_DATA[startIndex+3] == endMdls[3] && this.ANSWER_DATA[startIndex+4] == endMdls[4] && this.ANSWER_DATA[startIndex+5] == endMdls[5])
+				break;
+		}
+		startIndex -= this.ANSWER_DATA[7] * 2 - 1;
+		
+		for (int j=1; startIndex < this.ANSWER_DATA.length -2; startIndex+=2,j++) {
+			if (this.ANSWER_DATA[startIndex] == 1) sb.append(j);
+			else 
+				if (this.ANSWER_DATA[startIndex] == -1) sb.append(-1*j);
+			else 
+				break;
+			sb.append(GDE.STRING_SEMICOLON);
+		}
+		sendCmd(HoTTAdapterSerialPort.QUERY_MDL_NAMES, new String(new byte[]{0x00, 0x08, 0x00, 0x00, 0x0D, 0x20, 0x00}));
+		this.ANSWER_DATA = this.read(new byte[2057], 5000);
+//		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF))
+//			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
+		int modelNameLength = 9;//mx-20 i=178 j%10
+		startIndex = 177;
+		if (sb.indexOf("MC-32") >= 0) {
+			modelNameLength = 12;//mc-32 i=86 j%13
+			startIndex = 86;
+		}
+		for (int j=0; startIndex < this.ANSWER_DATA.length - 2; startIndex++,j++) {
+			if (j%(modelNameLength+1) != 0) {
+				sb.append(String.format("%c", (char)this.ANSWER_DATA[startIndex]));
+			}
+			else if (j != 0) sb.append(GDE.STRING_SEMICOLON);
+		}
+		sb.append(GDE.STRING_SEMICOLON);
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, sb.toString());
+		
+		Vector<String> vModels = new Vector<String>();
+		String[] sModels = sb.toString().split(GDE.STRING_SEMICOLON);
+		int numMdls = Integer.parseInt(sModels[1]);
+		for (int i = 2; i < numMdls; i++) {
+			if (Integer.parseInt(sModels[i].trim()) > 0)
+				vModels.add(sModels[i + numMdls].trim());
+		}
+		log.log(Level.OFF, vModels.size() + " - " + vModels.toString());
+		String dirName = selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + "backup_" + sModels[0].toLowerCase();
+		FileUtils.checkDirectoryAndCreate(dirName);
+
+		byte[] queryModels = new byte[]{0x00, 0x08, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00};
+		for (String modelName : vModels) {
+			String outputFile = dirName + GDE.FILE_SEPARATOR_UNIX + "a" + modelName + ".mdl";
+			DataOutputStream out = new DataOutputStream( new FileOutputStream(outputFile));
+			log.log(Level.OFF, "writing " + outputFile);
+			for (int i = 0; i < 4; i++) {
+				sendMdlCmd(queryModels);
+				this.ANSWER_DATA = this.read(new byte[2057], 5000);
+				out.write(this.ANSWER_DATA, 0, 2048);
+				queryModels[5] = (byte) (((queryModels[5]&0xFF) + 8) & 0xFF);
+			}
+			switch (Transmitter.fromValue(sModels[0].toLowerCase())) {
+			case MC_32:
+			case MC_20:
+			case MX_20:
+				for (int i=0; i < 4096; i++) {
+					out.write(0xFF);
+				}
+				break;
+			}			
+			out.close();
+			out = null;
+		}
+
+		sendCmd(HoTTAdapterSerialPort.QUERY_MDL_NAMES, new String(new byte[]{0x10, 0x01, 0x00, 0x00, 0x0D, 0x28, 0x00}));
+		this.ANSWER_DATA = this.read(new byte[300], 2000, 5);
+//		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF))
+//			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 	}
 }

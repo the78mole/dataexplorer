@@ -268,7 +268,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-		int tmpVoltageRx, tmpHeight, tmpClimb3, tmpClimb10, tmpCapacity, tmpVoltage, tmpCellVoltage, tmpVoltage1, tmpVoltage2, tmpLatitude, tmpLongitude;
+		int tmpHeight, tmpClimb3, tmpClimb10, tmpCapacity, tmpVoltage, tmpCellVoltage, tmpVoltage1, tmpVoltage2, tmpLatitude, tmpLongitude;
 
 		switch (this.serialPort.protocolType) {
 		case TYPE_19200_V3:
@@ -276,17 +276,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				if (dataBuffer.length == 17) {
 					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
-					tmpVoltageRx = (dataBuffer[6] & 0xFF);
-					if (tmpVoltageRx > 0 && tmpVoltageRx < 100) {
-						points[0] = 0; // seams not part of live data ?? (dataBuffer[15] & 0xFF) * 1000;
-						points[1] = (dataBuffer[9] & 0xFF) * 1000;
-						points[2] = (dataBuffer[5] & 0xFF) * 1000;
-						points[3] = DataParser.parse2Short(dataBuffer, 11) * 1000;
-						points[4] = (dataBuffer[13] & 0xFF) * -1000;
-						points[5] = (dataBuffer[9] & 0xFF) * -1000;
-						points[6] = tmpVoltageRx * 1000;
-						points[7] = (dataBuffer[7] & 0xFF) * 1000;
-					}
+					points[0] = 0; // seams not part of live data ?? (dataBuffer[15] & 0xFF) * 1000;
+					points[1] = (dataBuffer[9] & 0xFF) * 1000;
+					points[2] = (dataBuffer[5] & 0xFF) * 1000;
+					points[3] = DataParser.parse2Short(dataBuffer, 11) * 1000;
+					points[4] = (dataBuffer[13] & 0xFF) * -1000;
+					points[5] = (dataBuffer[9] & 0xFF) * -1000;
+					points[6] = (dataBuffer[6] & 0xFF) * 1000;
+					points[7] = (dataBuffer[7] & 0xFF) * 1000;
 				}
 				break;
 
@@ -388,17 +385,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
 				if (dataBuffer.length == 17) {
 					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
-					tmpVoltageRx = (dataBuffer[6] & 0xFF);
-					if (tmpVoltageRx > 0 && tmpVoltageRx < 10) {
-						points[0] = 0; // seams not part of live data ?? (dataBuffer[15] & 0xFF) * 1000;
-						points[1] = (dataBuffer[9] & 0xFF) * 1000;
-						points[2] = (dataBuffer[5] & 0xFF) * 1000;
-						points[3] = DataParser.parse2Short(dataBuffer, 11) * 1000;
-						points[4] = (dataBuffer[13] & 0xFF) * 1000;
-						points[5] = (dataBuffer[8] & 0xFF) * 1000;
-						points[6] = tmpVoltageRx * 1000;
-						points[7] = (dataBuffer[7] & 0xFF) * 1000;
-					}
+					points[0] = 0; // seams not part of live data ?? (dataBuffer[15] & 0xFF) * 1000;
+					points[1] = (dataBuffer[9] & 0xFF) * 1000;
+					points[2] = (dataBuffer[5] & 0xFF) * 1000;
+					points[3] = DataParser.parse2Short(dataBuffer, 11) * 1000;
+					points[4] = (dataBuffer[13] & 0xFF) * 1000;
+					points[5] = (dataBuffer[8] & 0xFF) * 1000;
+					points[6] = (dataBuffer[6] & 0xFF) * 1000;
+					points[7] = (dataBuffer[7] & 0xFF) * 1000;
 				}
 				break;
 
@@ -533,17 +527,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_115200:
 				if (dataBuffer.length == 21) {
 					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
-					tmpVoltageRx = (dataBuffer[15] & 0xFF);
-					if (tmpVoltageRx > 0 && tmpVoltageRx < 10) {
-						points[0] = (dataBuffer[16] & 0xFF) * 1000;
-						points[1] = (dataBuffer[17] & 0xFF) * 1000;
-						points[2] = (dataBuffer[14] & 0xFF) * 1000;
-						points[3] = DataParser.parse2Short(dataBuffer, 12) * 1000;
-						points[4] = (dataBuffer[5] & 0xFF) * 1000;
-						points[5] = (dataBuffer[4] & 0xFF) * 1000;
-						points[6] = tmpVoltageRx * 1000;
-						points[7] = (DataParser.parse2Short(dataBuffer, 10) + 20) * 1000;
-					}
+					points[0] = (dataBuffer[16] & 0xFF) * 1000;
+					points[1] = (dataBuffer[17] & 0xFF) * 1000;
+					points[2] = (dataBuffer[14] & 0xFF) * 1000;
+					points[3] = DataParser.parse2Short(dataBuffer, 12) * 1000;
+					points[4] = (dataBuffer[5] & 0xFF) * 1000;
+					points[5] = (dataBuffer[4] & 0xFF) * 1000;
+					points[6] = (dataBuffer[15] & 0xFF) * 1000;
+					points[7] = (DataParser.parse2Short(dataBuffer, 10) + 20) * 1000;
 				}
 				break;
 
