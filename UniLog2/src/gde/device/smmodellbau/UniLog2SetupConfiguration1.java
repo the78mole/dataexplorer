@@ -71,7 +71,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 	CCombo													a1ModusCombo, a2ModusCombo, a3ModusCombo;
 	Button													autoStartCurrentButton, autoStartRxButton, autoStartTimeButton;
 
-	final String[]									dataRateValues				= { " 50 Hz", " 20 Hz", " 10 Hz", "  5 Hz", "  2 Hz", "  1 Hz" };
+	final String[]									dataRateValues				= { " 20 Hz", " 10 Hz", "  5 Hz", "  2 Hz", "  1 Hz" };
 	final String[]									currentSensorTypes		= { "  20 A", " 40/80 A", " 150 A", " 400 A" };
 	final String[]									analogModi						= Messages.getString(MessageIds.GDE_MSGT2549).split(GDE.STRING_COMMA);
 	final String[]									numberProbMotorPoles	= { " 1 / 2", " 2 / 4", " 3 / 6", " 4 / 8", " 5 / 10", " 6 / 12", " 7 / 14" };
@@ -153,7 +153,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 		this.serialNumberText.setText(GDE.STRING_EMPTY + this.configuration.serialNumber);
 		this.firmwareText.setText(String.format(" %.2f", this.configuration.firmwareVersion / 100.0)); //$NON-NLS-1$
 
-		this.dataRateCombo.select(this.configuration.dataRate);
+		this.dataRateCombo.select(this.configuration.dataRate - 1); //remove 50 Hz
 		this.currentSensorCombo.select(this.configuration.currentSensorType);
 		this.a1ModusCombo.select(this.configuration.modusA1);
 		this.a2ModusCombo.select(this.configuration.modusA2);
@@ -435,7 +435,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "dataRateCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							UniLog2SetupConfiguration1.this.configuration.dataRate = (short) UniLog2SetupConfiguration1.this.dataRateCombo.getSelectionIndex();
+							UniLog2SetupConfiguration1.this.configuration.dataRate = (short) (UniLog2SetupConfiguration1.this.dataRateCombo.getSelectionIndex() + 1); //remove 50 Hz
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});

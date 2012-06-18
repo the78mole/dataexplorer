@@ -628,7 +628,8 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2500), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
 				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
 		
-		this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+		if (!searchDirectory.equals(fd.getFilterPath()))
+			this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
