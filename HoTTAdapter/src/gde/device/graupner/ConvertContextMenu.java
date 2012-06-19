@@ -45,22 +45,6 @@ import org.eclipse.swt.widgets.MenuItem;
 public class ConvertContextMenu {
 	final static Logger						log	= Logger.getLogger(ConvertContextMenu.class.getName());
 	
-	
-	public final static byte[] mc_32_PROD_CODE =  new byte[] {0x04, 0x34, (byte) 0xf4, 0x00, 0x05, 0x04, 0x00, 0x00};
-	public final static byte[] mc_20_PROD_CODE =  new byte[] {(byte) 0xcc, 0x34, (byte) 0xf4, 0x00, (byte) 0xe8, 0x03, 0x00, 0x00};
-	public final static byte[] mx_20_PROD_CODE =  new byte[] {0x74, 0x32, (byte) 0xf4, 0x00, 0x5f, 0x04, 0x00, 0x00};
-	public final static byte[] mx_16_PROD_CODE =  new byte[] {(byte) 0xe4, 0x30, (byte) 0xf4, 0x00, (byte) 0xb3, 0x06, 0x00, 0x00};
-	public final static byte[] mx_12_PROD_CODE =  new byte[] {0x10, 0x32, (byte) 0xf4, 0x00, 0x73, 0x06, 0x00, 0x00};
-
-	public final static byte[] mc_32_TxRFID =  new byte[] {0x74,0x47,0x00,0x00,0x30,0x38,0x00,0x00};
-	public final static byte[] mc_20_TxRFID =  new byte[] {0x2a,0x00,0x00,(byte) 0x80,0x7f,0x38,0x00,0x00};
-	public final static byte[] mx_20_TxRFID =  new byte[] {(byte) 0xf6,0x0b,0x00,0x00,0x30,0x38,0x00,0x00};
-	public final static byte[] mx_16_TxRFID =  new byte[] {0x03,0x00,0x00,(byte) 0x81,0x7f,0x38,0x00,0x00};
-	public final static byte[] mx_12_TxRFID =  new byte[] {(byte) 0x9e,0x0d,0x00,0x00,0x30,0x38,0x00,0x00};
-
-	public final static byte[] mc_32_info =  new byte[] {(byte) 0xFF,(byte) 0xFF,(byte) 0xFF};
-	public final static byte[] mc_20_info =  new byte[] {(byte) 0x20,(byte) 0x20,(byte) 0x20};
-
 	MenuItem											convert2mc32;
 	MenuItem											convert2mc20;
 	MenuItem											convert2mx20;
@@ -187,36 +171,36 @@ public class ConvertContextMenu {
 			in.read(bytes);
 			switch (target) {
 			case MC_32:
+				System.arraycopy(Transmitter.mc_32_PROD_CODE, 0, bytes, 0x00, Transmitter.mc_32_PROD_CODE.length);
 				bytes[0x08] = (byte) 0xE8;
-				System.arraycopy(mc_32_PROD_CODE, 0, bytes, 0x00, 2);
 				//System.arraycopy(mc_32_TxRFID, 0, bytes, 0x100, mc_32_TxRFID.length);
 				bytes[0x108] = (byte) 0xE8;
-				System.arraycopy(mc_32_info, 0, bytes, 0x140, mc_32_info.length);
+				System.arraycopy(Transmitter.mc_32_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_32_MEM_INFO.length);
 				bytes[0x160] = (byte) 0xFF;
 				break;
 			case MC_20:
+				System.arraycopy(Transmitter.mc_20_PROD_CODE, 0, bytes, 0x00, Transmitter.mc_20_PROD_CODE.length);
 				bytes[0x08] = (byte) 0xEA;
-				System.arraycopy(mc_20_PROD_CODE, 0, bytes, 0x00, 2);
 				//System.arraycopy(mc_20_TxRFID, 0, bytes, 0x100, mc_20_TxRFID.length);
 				bytes[0x108] = (byte) 0xEA;
-				System.arraycopy(mc_20_info, 0, bytes, 0x140, mc_20_info.length);
+				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
 				bytes[0x160] = (byte) 0x05;
 				break;
 			case MX_20:
+				System.arraycopy(Transmitter.mx_20_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_20_PROD_CODE.length);
 				bytes[0x08] = (byte) 0xEA;
-				System.arraycopy(mx_20_PROD_CODE, 0, bytes, 0x00, 2);
 				//System.arraycopy(mx_20_TxRFID, 0, bytes, 0x100, mx_20_TxRFID.length);
 				bytes[0x108] = (byte) 0xEA;
-				System.arraycopy(mc_20_info, 0, bytes, 0x140, mc_20_info.length);
+				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
 				break;
 			case MX_16:
-				System.arraycopy(mx_16_PROD_CODE, 0, bytes, 0x00, 2);
+				System.arraycopy(Transmitter.mx_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_16_PROD_CODE.length);
 				bytes[0x08] = (byte) 0xE9;
 				//System.arraycopy(mx_16_TxRFID, 0, bytes, 0x100, mx_16_TxRFID.length);
 				bytes[0x108] = (byte) 0xE9;
 				break;
 			case MX_12:
-				System.arraycopy(mx_12_PROD_CODE, 0, bytes, 0x00, 2);
+				System.arraycopy(Transmitter.mx_12_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_12_PROD_CODE.length);
 				bytes[0x08] = (byte) 0xE9;
 				//System.arraycopy(mx_12_TxRFID, 0, bytes, 0x100, mx_12_TxRFID.length);
 				bytes[0x108] = (byte) 0xE9;

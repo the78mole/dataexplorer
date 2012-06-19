@@ -22,18 +22,14 @@ import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.device.graupner.hott.MessageIds;
-import gde.exception.TimeOutException;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.FileUtils;
 import gde.utils.StringHelper;
 
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +43,8 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
@@ -359,7 +357,7 @@ public class FileTransferTabItem extends CTabItem {
 										sb.append(element).append(GDE.STRING_BLANK);
 									FileTransferTabItem.log.log(Level.FINE, "Selection={" + sb.toString() + "}"); //$NON-NLS-1$ //$NON-NLS-2$
 								}
-								FileTransferTabItem.this.contextMenu.createMenu(FileTransferTabItem.this.popupmenu, detectTransmitter(item.getText(1)), selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + item.getText(1));
+								FileTransferTabItem.this.contextMenu.createMenu(FileTransferTabItem.this.popupmenu, Transmitter.detectTransmitter(item.getText(1), selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + item.getText(1)), selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + item.getText(1));
 							}
 						});
 						this.pcFoldersTable.setMenu(this.popupmenu);
@@ -376,6 +374,25 @@ public class FileTransferTabItem extends CTabItem {
 					this.sdCardActionGroup.setLayoutData(transmitterSourceGroupLData);
 					this.sdCardActionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 2, SWT.NORMAL));
 					this.sdCardActionGroup.setText(Messages.getString(MessageIds.GDE_MSGT2428));
+					this.sdCardActionGroup.addPaintListener(new PaintListener() {
+						@Override
+						public void paintControl(PaintEvent evt) {
+							FileTransferTabItem.log.log(Level.FINER, "sdCardActionGroup.paintControl, event=" + evt); //$NON-NLS-1$
+							
+							if (FileTransferTabItem.this.device.getBaudeRate() == 115200) {
+								FileTransferTabItem.this.sdCardActionGroup.setEnabled(true);
+								FileTransferTabItem.this.connectButton.setEnabled(true);
+								if (!FileTransferTabItem.this.sdCardActionGroup.getText().equals(Messages.getString(MessageIds.GDE_MSGT2428)))
+										FileTransferTabItem.this.sdCardActionGroup.setText(Messages.getString(MessageIds.GDE_MSGT2428));
+							}
+							else {
+								FileTransferTabItem.this.sdCardActionGroup.setEnabled(false);
+								FileTransferTabItem.this.connectButton.setEnabled(false);
+								if (!FileTransferTabItem.this.sdCardActionGroup.getText().equals(Messages.getString(MessageIds.GDE_MSGW2402)))
+									FileTransferTabItem.this.sdCardActionGroup.setText(Messages.getString(MessageIds.GDE_MSGW2402));
+							}
+						}
+					});
 					{
 						this.sdCardSizeComposite = new Composite(this.sdCardActionGroup, SWT.NONE);
 						this.sdCardSizeComposite.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
@@ -495,18 +512,19 @@ public class FileTransferTabItem extends CTabItem {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									FileTransferTabItem.log.log(Level.FINEST, "downLoadButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-									try {
-										FileTransferTabItem.this.serialPort.loadModelData(selectedPcFolder.toString());
-										FileTransferTabItem.this.updatePcFolder();
-									}
-									catch (IOException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-									catch (TimeOutException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
+									new Thread("BackupModels") {
+										@Override
+										public void run() {
+											try {
+												FileTransferTabItem.this.serialPort.loadModelData(selectedPcFolder.toString(), FileTransferTabItem.this);
+												FileTransferTabItem.this.updatePcFolder();
+											}
+											catch (Exception e) {
+												FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
+												FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
+											}
+										}
+									}.start();
 								}
 							});
 						}
@@ -744,7 +762,7 @@ public class FileTransferTabItem extends CTabItem {
 	}
 
 	/**
-	 * 
+	 * set the table header number, file name, date, time, size
 	 */
 	private void setTableHeader(Table table) {
 		table.removeAll();
@@ -769,6 +787,9 @@ public class FileTransferTabItem extends CTabItem {
 		this.fileSizeColum.setText(Messages.getString(MessageIds.GDE_MSGT2449)); //2012-05-28
 	}
 
+	/**
+	 * update the file listing in the SD-card table
+	 */
 	private synchronized void updateSdDataTable() {
 		if (this.sdFoldersAndFiles.get("FILES") != null) { //$NON-NLS-1$
 			for (String fileItem : this.sdFoldersAndFiles.get("FILES")) { //$NON-NLS-1$
@@ -778,7 +799,8 @@ public class FileTransferTabItem extends CTabItem {
 	}
 
 	/**
-	 * @param sdSizes
+	 * update the SD--card sizes in respect of available and free storage space
+	 * @param sdSizes total, free
 	 */
 	private void updateSdCardSizes(long[] sdSizes) {
 		if (sdSizes != null && sdSizes.length == 2 && sdSizes[0] > 1000 && sdSizes[1] > 1000) {
@@ -788,6 +810,7 @@ public class FileTransferTabItem extends CTabItem {
 	}
 
 	/**
+	 * list the SD-card first level directories, base directories
 	 * @throws Exception
 	 */
 	private void listSdCardBaseDirs() throws Exception {
@@ -810,6 +833,7 @@ public class FileTransferTabItem extends CTabItem {
 	}
 
 	/**
+	 * update the tree item icons and file listing of the selected directory/folder
 	 * @param evtItem
 	 */
 	private void updateSelectedPcFolder(TreeItem evtItem) {
@@ -834,7 +858,7 @@ public class FileTransferTabItem extends CTabItem {
 			tmpItem = evtItem;
 			parentItem = tmpItem.getParentItem();
 			if (parentItem != null) {
-				while (!this.pcRootTreeItem.getText().equals((parentItem = tmpItem.getParentItem()).getText())) {
+				while (this.pcRootTreeItem != (parentItem = tmpItem.getParentItem())) {
 					this.selectedPcFolder.insert(0, parentItem.getText());
 					this.selectedPcFolder.insert(0, GDE.FILE_SEPARATOR_UNIX);
 					parentItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif")); //$NON-NLS-1$
@@ -868,6 +892,7 @@ public class FileTransferTabItem extends CTabItem {
 	}
 
 	/**
+	 * update the tree item icons and file listing of the selected directory/folder
 	 * @param evtTreeitem
 	 */
 	private void updateSelectedSdFolder(TreeItem evtTreeitem) {
@@ -912,6 +937,11 @@ public class FileTransferTabItem extends CTabItem {
 		}
 	}
 
+	/**
+	 * update text and progressbar information regarding the actual executing file transfer
+	 * @param totalSize
+	 * @param remainingSize
+	 */
 	public void updateFileTransferProgress(final long totalSize, final long remainingSize) {
 		GDE.display.asyncExec(new Runnable() {
 			public void run() {
@@ -921,6 +951,9 @@ public class FileTransferTabItem extends CTabItem {
 		});
 	}
 
+	/**
+	 * update PC directory/folder
+	 */
 	public void updatePcFolder() {
 		final TreeItem treeItem = this.lastSelectedPcTreeItem;
 		GDE.display.asyncExec(new Runnable() {
@@ -930,6 +963,9 @@ public class FileTransferTabItem extends CTabItem {
 		});
 	}
 
+	/**
+	 * update SD-card directory/folder
+	 */
 	public void updateSdFolder(final long[] sdSizes) {
 		final TreeItem treeItem = this.lastSelectedSdTreeItem;
 		GDE.display.asyncExec(new Runnable() {
@@ -940,6 +976,10 @@ public class FileTransferTabItem extends CTabItem {
 		});
 	}
 
+	/**
+	 * toggle enablement of serial activity related buttons
+	 * @param enableConnectStop
+	 */
 	public void enableActionButtons(final boolean enableConnectStop) {
 		GDE.display.asyncExec(new Runnable() {
 			public void run() {
@@ -953,6 +993,10 @@ public class FileTransferTabItem extends CTabItem {
 		});
 	}
 
+	/**
+	 * toggle enablement of connection status related action buttons
+	 * @param enable
+	 */
 	public void enableSerialButtons(final boolean enable) {
 		GDE.display.asyncExec(new Runnable() {
 			public void run() {
@@ -961,65 +1005,5 @@ public class FileTransferTabItem extends CTabItem {
 				FileTransferTabItem.this.disconnectButton.setEnabled(enable);
 			}
 		});
-	}
-
-	public Transmitter detectTransmitter(String fileName) {
-		Transmitter result = Transmitter.UNSPECIFIED;
-		byte[] inBytes = new byte[0x141];
-		DataInputStream in = null;
-		
-		try {
-			in = new DataInputStream( new FileInputStream(new File(selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + fileName)));
-			in.read(inBytes);
-			in.close();
-		}
-		catch (Exception e) {
-			log.log(Level.WARNING, e.getMessage(), e);
-		}
-		
-		log.log(Level.OFF, StringHelper.byte2Hex2CharString(inBytes, inBytes.length));
-		if ((inBytes[0x08]&0xFF) == 0xE8) {
-			boolean isMC32 = true;
-			for (int i = 0; i < 2; i++) {
-				if (inBytes[i] != ConvertContextMenu.mc_32_PROD_CODE[i]) {
-					isMC32 = false;
-					break;
-				}
-			}
-			result = isMC32 ? Transmitter.MC_32 : Transmitter.UNSPECIFIED;
-		}
-		else if ((inBytes[0x08]&0xFF) == 0xEA) {
-			boolean isMC20 = true, isMX20 = true;
-			for (int i = 0; i < 2; i++) {
-				if (inBytes[i] != ConvertContextMenu.mc_20_PROD_CODE[i]) {
-					isMC20 = false;
-					break;
-				}
-			}
-			for (int i = 0; i < 2; i++) {
-				if ((inBytes[0x00 + i]&0xFF) != ConvertContextMenu.mx_20_PROD_CODE[i]){
-					isMX20 = false;
-					break;
-				}
-			}
-			result = isMC20 ? Transmitter.MC_20 : isMX20 ? Transmitter.MX_20 : Transmitter.UNSPECIFIED;
-		}
-		else if ((inBytes[0x08]&0xFF) == 0xE9) {
-			boolean isMX16 = true, isMX12 = true;
-			for (int i = 0; i < 2; i++) {
-				if (inBytes[i] != ConvertContextMenu.mx_16_PROD_CODE[i]) {
-					isMX16 = false;
-					break;
-				}
-			}
-			for (int i = 0; i < 2; i++) {
-				if (inBytes[i] != ConvertContextMenu.mx_12_PROD_CODE[i]){
-					isMX12 = false;
-					break;
-				}
-			}
-			result = isMX16 ? Transmitter.MX_16 : isMX12 ? Transmitter.MX_12 : Transmitter.UNSPECIFIED;
-		}
-		return result;
 	}
 }

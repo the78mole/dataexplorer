@@ -384,6 +384,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		this.protocolType = newProtocolType;
 	}
 
+	//transmitter SD-Card to PC communication section
 	final static int		CMD_GAP_MS						= 5;
 	final static int		FILE_TRANSFER_SIZE		= 0x0400;
 	final static byte[]	cmd1									= new byte[7];
@@ -412,10 +413,21 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static byte[]	MK_DIR								= { 0x06, 0x3E };
 	final static byte[]	FILE_INFO							= { 0x06, 0x3F };
 
+	/**
+	 * prepare simple command for sending
+	 * @param cmd
+	 * @return
+	 */
 	private byte[] prepareCmdBytes(byte[] cmd) {
 		return prepareCmdBytes(cmd, GDE.STRING_EMPTY);
 	}
 
+	/**
+	 * prepare command with string parameter for sending
+	 * @param cmd
+	 * @param body
+	 * @return
+	 */
 	private byte[] prepareCmdBytes(byte[] cmd, String body) {
 		byte[] b = new byte[body.length() == 0 ? body.length() + 9 : body.length() + 10];
 		b[0] = 0x00;
@@ -442,6 +454,11 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		return b;
 	}
 
+	/**
+	 * send a simple command
+	 * @param cmd
+	 * @throws IOException
+	 */
 	private void sendCmd(byte[] cmd) throws IOException {
 		byte[] cmdAll = prepareCmdBytes(cmd);
 		System.arraycopy(cmdAll, 0, HoTTAdapterSerialPort.cmd1, 0, 7);
@@ -454,6 +471,12 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		this.write(cmd2);
 	}
 
+	/**
+	 * send a command with string parameter
+	 * @param cmd
+	 * @param body
+	 * @throws IOException
+	 */
 	private void sendCmd(byte[] cmd, String body) throws IOException {
 		byte[] cmdAll = prepareCmdBytes(cmd, body);
 		System.arraycopy(cmdAll, 0, HoTTAdapterSerialPort.cmd1, 0, 7);
@@ -466,6 +489,12 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		this.write(cmd2);
 	}
 
+	/**
+	 * send a command with byte data as parameter
+	 * @param cmd
+	 * @param data
+	 * @throws IOException
+	 */
 	private void sendCmd(byte[] cmd, byte[] data) throws IOException {
 		byte[] cmdAll = new byte[data.length + 8 + 2 + 7];
 
@@ -502,6 +531,11 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		this.write(cmd2);
 	}
 
+	/**
+	 * send command to query model data
+	 * @param data
+	 * @throws IOException
+	 */
 	private void sendMdlCmd(byte[] data) throws IOException {
 		byte[] cmdAll = new byte[data.length + 2 + 7];
 
@@ -537,6 +571,11 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		this.write(cmd2);
 	}
 
+	/**
+	 * prepare transmitter for SD-card related communication
+	 * @param retryCount
+	 * @throws Exception
+	 */
 	public synchronized void prepareSdCard(int retryCount) throws Exception {
 		try {
 			//prepare transmitter for data interaction
@@ -559,6 +598,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	}
 
 	/**
+	 * query SD-card sizes, available and free storage space
 	 * @return
 	 * @throws IOException
 	 * @throws TimeOutException
@@ -594,6 +634,13 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		return ret;
 	}
 
+	/**
+	 * delete files selected on SD-card
+	 * @param dirPath
+	 * @param files
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
 	public synchronized void deleteFiles(String dirPath, String[] files) throws IOException, TimeOutException {
 		for (String file : files) {
 			sendCmd(HoTTAdapterSerialPort.FILE_DELETE, dirPath + file);
@@ -603,6 +650,12 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		}
 	}
 
+	/**
+	 * query base folders of SD-Card
+	 * @param retryCount
+	 * @return
+	 * @throws Exception
+	 */
 	public synchronized String[] querySdDirs(int retryCount) throws Exception {
 		StringBuilder sb = new StringBuilder();
 		try {
@@ -633,6 +686,13 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		return sb.toString().split(GDE.STRING_SEMICOLON);
 	}
 
+	/**
+	 * query folders and files of a selected SD-Card directory
+	 * @param dirPath
+	 * @param retryCount
+	 * @return
+	 * @throws Exception
+	 */
 	public HashMap<String, String[]> queryListDir(String dirPath, int retryCount) throws Exception {
 		StringBuilder folders = new StringBuilder();
 		StringBuilder files = new StringBuilder();
@@ -680,6 +740,14 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		return result;
 	}
 
+	/**
+	 * query files info, date, time , size
+	 * @param dirPath
+	 * @param files
+	 * @param retryCount
+	 * @return
+	 * @throws Exception
+	 */
 	public String[] queryFilesInfo(String dirPath, String[] files, int retryCount) throws Exception {
 
 		StringBuilder filesInfo = new StringBuilder();
@@ -708,6 +776,15 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		return filesInfo.toString().split(GDE.STRING_SEMICOLON);
 	}
 
+	/**
+	 * upload selected files to PC selected folder
+	 * @param sourceDirPath
+	 * @param targetDirPath
+	 * @param filesInfo
+	 * @param totalSize
+	 * @param parent
+	 * @throws Exception
+	 */
 	public void upLoadFiles(String sourceDirPath, String targetDirPath, String[] filesInfo, final long totalSize, final FileTransferTabItem parent) throws Exception {
 		long remainingSize = totalSize;
 		DataOutputStream data_out = null;
@@ -808,6 +885,15 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		}
 	}
 
+	/**
+	 * download PC selected files to SD-card selected folder
+	 * @param sourceDirPath
+	 * @param targetDirPath
+	 * @param filesInfo
+	 * @param totalSize
+	 * @param parent
+	 * @throws Exception
+	 */
 	public void downLoadFiles(String sourceDirPath, String targetDirPath, String[] filesInfo, final long totalSize, final FileTransferTabItem parent) throws Exception {
 		long remainingSize = totalSize;
 		DataInputStream data_in = null;
@@ -886,8 +972,6 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 						HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, "" + StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 
 					parent.updateFileTransferProgress(totalSize, remainingSize);
-					//WaitTimer.delay(READ_TIMEOUT_MS);
-					//parent.updateSdFolder(this.querySdCardSizes(0));
 					XFER_DATA = new byte[HoTTAdapterSerialPort.FILE_TRANSFER_SIZE];
 				}
 			}
@@ -898,17 +982,34 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		}
 	}
 	
-	public void loadModelData(String selectedPcFolder) throws IOException, TimeOutException {
+	/**
+	 * load transmitter latest model data and save to selected folder backup directory
+	 * @param selectedPcFolder
+	 * @param parent
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	public void loadModelData(String selectedPcFolder, final FileTransferTabItem parent) throws IOException, TimeOutException {
+		//init header bytes
+		byte[] header = new byte[4096];
+		for (int i = 0; i < header.length; ++i) {
+			header[i] = (byte) 0xFF;
+		}
+		
 		StringBuilder sb = new StringBuilder();
 		sendCmd(HoTTAdapterSerialPort.QUERY_TX_INFO);
 		this.ANSWER_DATA = this.read(new byte[100], 2000, 5);
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF))
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+
 		sendCmd(HoTTAdapterSerialPort.QUERY_TX_INFO);
 		this.ANSWER_DATA = this.read(new byte[100], 2000, 5);
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF))
+		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) {
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-
+		}
+		System.arraycopy(this.ANSWER_DATA,  7, header, 0x0000, 8);
+		System.arraycopy(this.ANSWER_DATA, 56, header, 0x0008, 4);
+		System.arraycopy(this.ANSWER_DATA, 56, header, 0x0108, 4);
+		
 		for (int i = 23; i < 28; i++) {
 			sb.append(String.format("%c", this.ANSWER_DATA[i]));
 		}
@@ -919,9 +1020,9 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		this.ANSWER_DATA = this.read(new byte[1000], 3000, 5);
 		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINER)) {
 			//HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.fourDigitsRunningNumber(this.ANSWER_DATA.length));
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2FourDigitsIntegerString(this.ANSWER_DATA));
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINER, StringHelper.fourDigitsRunningNumber(this.ANSWER_DATA.length));
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINER, StringHelper.byte2FourDigitsIntegerString(this.ANSWER_DATA));
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINER, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 		}
 		
 		//number of mdl configurations
@@ -945,8 +1046,6 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		}
 		sendCmd(HoTTAdapterSerialPort.QUERY_MDL_NAMES, new String(new byte[]{0x00, 0x08, 0x00, 0x00, 0x0D, 0x20, 0x00}));
 		this.ANSWER_DATA = this.read(new byte[2057], 5000);
-//		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF))
-//			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 
 		int modelNameLength = 9;//mx-20 i=178 j%10
 		startIndex = 177;
@@ -974,33 +1073,65 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		String dirName = selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + "backup_" + sModels[0].toLowerCase();
 		FileUtils.checkDirectoryAndCreate(dirName);
 
+		long remainingSize = vModels.size() * 12288, totalSize = vModels.size() * 12288;
 		byte[] queryModels = new byte[]{0x00, 0x08, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00};
 		for (String modelName : vModels) {
 			String outputFile = dirName + GDE.FILE_SEPARATOR_UNIX + "a" + modelName + ".mdl";
 			DataOutputStream out = new DataOutputStream( new FileOutputStream(outputFile));
 			log.log(Level.OFF, "writing " + outputFile);
+			
+			switch (Transmitter.fromValue(sb.substring(0,5).toLowerCase())) {
+			case MC_32:
+				System.arraycopy(Transmitter.mc_32_APP_VERSION, 0, header, 0x08, Transmitter.mc_32_APP_VERSION.length);
+				System.arraycopy(Transmitter.mc_32_TxRFID, 0, header, 0x100, Transmitter.mc_32_TxRFID.length);
+				System.arraycopy(Transmitter.mc_32_APP_VERSION, 0, header, 0x108, Transmitter.mc_32_APP_VERSION.length);
+				System.arraycopy(Transmitter.mc_32_MEM_INFO, 0, header, 0x140, Transmitter.mc_32_MEM_INFO.length);
+				header[0x160] = Transmitter.mc_32_BIND_INFO;
+				break;
+			case MC_20:
+				System.arraycopy(Transmitter.mc_20_APP_VERSION, 0, header, 0x08, Transmitter.mc_20_APP_VERSION.length);
+				System.arraycopy(Transmitter.mc_20_TxRFID, 0, header, 0x100, Transmitter.mc_20_TxRFID.length);
+				System.arraycopy(Transmitter.mc_20_APP_VERSION, 0, header, 0x108, Transmitter.mc_20_APP_VERSION.length);
+				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, header, 0x140, Transmitter.mc_20_MEM_INFO.length);
+				header[0x160] = Transmitter.mc_20_BIND_INFO;
+				break;
+			case MX_20:
+				System.arraycopy(Transmitter.mx_20_APP_VERSION, 0, header, 0x08, Transmitter.mx_20_APP_VERSION.length);
+				System.arraycopy(Transmitter.mx_20_TxRFID, 0, header, 0x100, Transmitter.mx_20_TxRFID.length);
+				System.arraycopy(Transmitter.mx_20_APP_VERSION, 0, header, 0x108, Transmitter.mx_20_APP_VERSION.length);
+				System.arraycopy(Transmitter.mx_20_MEM_INFO, 0, header, 0x140, Transmitter.mx_20_MEM_INFO.length);
+				header[0x160] = Transmitter.mx_20_BIND_INFO;
+				break;
+			case MX_16:
+				System.arraycopy(Transmitter.mx_16_APP_VERSION, 0, header, 0x08, Transmitter.mx_16_APP_VERSION.length);
+				System.arraycopy(Transmitter.mx_16_TxRFID, 0, header, 0x100, Transmitter.mx_16_TxRFID.length);
+				System.arraycopy(Transmitter.mx_16_APP_VERSION, 0, header, 0x108, Transmitter.mx_16_APP_VERSION.length);
+				header[0x160] = Transmitter.mx_16_BIND_INFO;
+				break;
+			case MX_12:
+				System.arraycopy(Transmitter.mx_12_APP_VERSION, 0, header, 0x08, Transmitter.mx_12_APP_VERSION.length);
+				System.arraycopy(Transmitter.mx_12_TxRFID, 0, header, 0x100, Transmitter.mx_12_TxRFID.length);
+				System.arraycopy(Transmitter.mx_12_APP_VERSION, 0, header, 0x108, Transmitter.mx_12_APP_VERSION.length);
+				header[0x160] = Transmitter.mx_12_BIND_INFO;
+				break;
+			}
+			out.write(header);
+			
 			for (int i = 0; i < 4; i++) {
 				sendMdlCmd(queryModels);
 				this.ANSWER_DATA = this.read(new byte[2057], 5000);
-				out.write(this.ANSWER_DATA, 0, 2048);
+				out.write(this.ANSWER_DATA, 7, 2048);
 				queryModels[5] = (byte) (((queryModels[5]&0xFF) + 8) & 0xFF);
 			}
-			switch (Transmitter.fromValue(sModels[0].toLowerCase())) {
-			case MC_32:
-			case MC_20:
-			case MX_20:
-				for (int i=0; i < 4096; i++) {
-					out.write(0xFF);
-				}
-				break;
-			}			
+
 			out.close();
 			out = null;
+			
+			parent.updateFileTransferProgress(totalSize, remainingSize -= 12288);
+
 		}
 
 		sendCmd(HoTTAdapterSerialPort.QUERY_MDL_NAMES, new String(new byte[]{0x10, 0x01, 0x00, 0x00, 0x0D, 0x28, 0x00}));
 		this.ANSWER_DATA = this.read(new byte[300], 2000, 5);
-//		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF))
-//			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 	}
 }
