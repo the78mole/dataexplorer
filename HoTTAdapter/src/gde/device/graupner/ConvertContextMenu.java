@@ -18,16 +18,8 @@
 ****************************************************************************************/
 package gde.device.graupner;
 
-import gde.GDE;
 import gde.log.Level;
-import gde.utils.FileUtils;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -80,17 +72,17 @@ public class ConvertContextMenu {
 					ConvertContextMenu.this.convert2mx12.setEnabled(false);
 					break;
 				case MX_16:
-					ConvertContextMenu.this.convert2mc32.setEnabled(true);
-					ConvertContextMenu.this.convert2mc20.setEnabled(true);
-					ConvertContextMenu.this.convert2mx20.setEnabled(true);
+					ConvertContextMenu.this.convert2mc32.setEnabled(false);
+					ConvertContextMenu.this.convert2mc20.setEnabled(false);
+					ConvertContextMenu.this.convert2mx20.setEnabled(false);
 					ConvertContextMenu.this.convert2mx16.setEnabled(false);
-					ConvertContextMenu.this.convert2mx12.setEnabled(false);
+					ConvertContextMenu.this.convert2mx12.setEnabled(true);
 					break;
 				case MX_12:
-					ConvertContextMenu.this.convert2mc32.setEnabled(true);
-					ConvertContextMenu.this.convert2mc20.setEnabled(true);
-					ConvertContextMenu.this.convert2mx20.setEnabled(true);
-					ConvertContextMenu.this.convert2mx16.setEnabled(false);
+					ConvertContextMenu.this.convert2mc32.setEnabled(false);
+					ConvertContextMenu.this.convert2mc20.setEnabled(false);
+					ConvertContextMenu.this.convert2mx20.setEnabled(false);
+					ConvertContextMenu.this.convert2mx16.setEnabled(true);
 					ConvertContextMenu.this.convert2mx12.setEnabled(false);
 					break;
 				default:
@@ -113,7 +105,7 @@ public class ConvertContextMenu {
 			this.convert2mc32.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					ConvertContextMenu.log.log(Level.FINEST, "convert2mc32 action performed! " + e); //$NON-NLS-1$
-					convert2target(sourceFilePath, Transmitter.MC_32);
+					Transmitter.convert2target(sourceFilePath, Transmitter.MC_32);
 				}
 			});
 			this.convert2mc20 = new MenuItem(popupMenu, SWT.NONE);
@@ -121,7 +113,7 @@ public class ConvertContextMenu {
 			this.convert2mc20.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					ConvertContextMenu.log.log(Level.FINEST, "convert2mc20 action performed! " + e); //$NON-NLS-1$
-					convert2target(sourceFilePath, Transmitter.MC_20);
+					Transmitter.convert2target(sourceFilePath, Transmitter.MC_20);
 				}
 			});
 			this.convert2mx20 = new MenuItem(popupMenu, SWT.NONE);
@@ -129,7 +121,7 @@ public class ConvertContextMenu {
 			this.convert2mx20.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					ConvertContextMenu.log.log(Level.FINEST, "convert2mx20 action performed! " + e); //$NON-NLS-1$
-					convert2target(sourceFilePath, Transmitter.MX_20);
+					Transmitter.convert2target(sourceFilePath, Transmitter.MX_20);
 				}
 			});
 			this.convert2mx16 = new MenuItem(popupMenu, SWT.NONE);
@@ -137,7 +129,7 @@ public class ConvertContextMenu {
 			this.convert2mx16.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					ConvertContextMenu.log.log(Level.FINEST, "convert2mx16 action performed! " + e); //$NON-NLS-1$
-					convert2target(sourceFilePath, Transmitter.MX_16);
+					Transmitter.convert2target(sourceFilePath, Transmitter.MX_16);
 				}
 			});
 			this.convert2mx12 = new MenuItem(popupMenu, SWT.NONE);
@@ -145,104 +137,10 @@ public class ConvertContextMenu {
 			this.convert2mx12.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					ConvertContextMenu.log.log(Level.FINEST, "convert2mx12 action performed! " + e); //$NON-NLS-1$
-					convert2target(sourceFilePath, Transmitter.MX_12);
+					Transmitter.convert2target(sourceFilePath, Transmitter.MX_12);
 				}
 			});
 			isCreated = true;
 		}
-	}
-	
-	private void convert2target(String filepath, Transmitter target) {
-		DataInputStream in = null;
-		DataOutputStream out = null;
-		byte[] bytes = new byte[8192];
-
-		try {
-			filepath = filepath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-			File inputFile = new File(filepath);
-			in = new DataInputStream( new FileInputStream(inputFile));
-			String outFilePath = filepath.substring(0, filepath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
-			outFilePath = outFilePath.substring(0, outFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1) + target.value() + GDE.FILE_SEPARATOR_UNIX;
-			FileUtils.checkDirectoryAndCreate(outFilePath);
-			outFilePath = outFilePath+ inputFile.getName();
-			File outputFile = new File(outFilePath);
-			
-			out = new DataOutputStream( new FileOutputStream(outputFile));
-			in.read(bytes);
-			switch (target) {
-			case MC_32:
-				System.arraycopy(Transmitter.mc_32_PROD_CODE, 0, bytes, 0x00, Transmitter.mc_32_PROD_CODE.length);
-				bytes[0x08] = (byte) 0xE8;
-				//System.arraycopy(mc_32_TxRFID, 0, bytes, 0x100, mc_32_TxRFID.length);
-				bytes[0x108] = (byte) 0xE8;
-				System.arraycopy(Transmitter.mc_32_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_32_MEM_INFO.length);
-				bytes[0x160] = (byte) 0xFF;
-				break;
-			case MC_20:
-				System.arraycopy(Transmitter.mc_20_PROD_CODE, 0, bytes, 0x00, Transmitter.mc_20_PROD_CODE.length);
-				bytes[0x08] = (byte) 0xEA;
-				//System.arraycopy(mc_20_TxRFID, 0, bytes, 0x100, mc_20_TxRFID.length);
-				bytes[0x108] = (byte) 0xEA;
-				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
-				bytes[0x160] = (byte) 0x05;
-				break;
-			case MX_20:
-				System.arraycopy(Transmitter.mx_20_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_20_PROD_CODE.length);
-				bytes[0x08] = (byte) 0xEA;
-				//System.arraycopy(mx_20_TxRFID, 0, bytes, 0x100, mx_20_TxRFID.length);
-				bytes[0x108] = (byte) 0xEA;
-				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
-				break;
-			case MX_16:
-				System.arraycopy(Transmitter.mx_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_16_PROD_CODE.length);
-				bytes[0x08] = (byte) 0xE9;
-				//System.arraycopy(mx_16_TxRFID, 0, bytes, 0x100, mx_16_TxRFID.length);
-				bytes[0x108] = (byte) 0xE9;
-				break;
-			case MX_12:
-				System.arraycopy(Transmitter.mx_12_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_12_PROD_CODE.length);
-				bytes[0x08] = (byte) 0xE9;
-				//System.arraycopy(mx_12_TxRFID, 0, bytes, 0x100, mx_12_TxRFID.length);
-				bytes[0x108] = (byte) 0xE9;
-				break;
-			}
-			out.write(bytes);
-			byte[] rest = new byte[4096];
-			int count = in.read(rest);
-
-			//mc-32 conversion padding
-			switch (target) {
-			case MC_32:
-			case MC_20:
-			case MX_20:
-				if (count > 0) {
-					byte[] writable = new byte[count];
-					System.arraycopy(rest, 0, writable, 0, count);
-					out.write(writable);
-				}
-				int i = count >= 0 ? count : 0;
-				for (; i < 4096; i++) {
-					out.write(0xFF);
-				}
-				break;
-			}			
-			in.close();
-			in = null;
-			out.close();
-			out = null;
-		}
-		catch (Exception e) {
-			log.log(Level.WARNING, e.getMessage(), e);
-		}
-		finally {
-			try {
-				if (in != null) in.close();
-				if (out != null) out.close();
-			}
-			catch (IOException e) {
-				log.log(Level.WARNING, e.getMessage(), e);
-			}
-		}
-
 	}
 }

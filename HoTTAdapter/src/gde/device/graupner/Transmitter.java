@@ -18,11 +18,19 @@
 ****************************************************************************************/
 package gde.device.graupner;
 
+import gde.GDE;
+import gde.device.graupner.hott.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.FileUtils;
 import gde.utils.StringHelper;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -146,4 +154,105 @@ public enum Transmitter {
 		return result;
 	}
 
+	/**
+	 * simple model configuration convert function based on exchanged product code and application code
+	 * transmitter ID seams to be not required to replace and will be updated during use
+	 * @param filepath
+	 * @param target
+	 */
+	public static void convert2target(String filepath, Transmitter target) {
+		DataInputStream in = null;
+		DataOutputStream out = null;
+		byte[] bytes = new byte[8192];
+
+		try {
+			filepath = filepath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+			File inputFile = new File(filepath);
+			in = new DataInputStream( new FileInputStream(inputFile));
+			String outFilePath = filepath.substring(0, filepath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
+			outFilePath = outFilePath.substring(0, outFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1) + target.value() + GDE.FILE_SEPARATOR_UNIX;
+			FileUtils.checkDirectoryAndCreate(outFilePath);
+			outFilePath = outFilePath+ inputFile.getName();
+			File outputFile = new File(outFilePath);
+			
+			out = new DataOutputStream( new FileOutputStream(outputFile));
+			in.read(bytes);
+			switch (target) {
+			case MC_32:
+				System.arraycopy(Transmitter.mc_32_PROD_CODE, 0, bytes, 0x00, Transmitter.mc_32_PROD_CODE.length);
+				bytes[0x08] = (byte) 0xE8;
+				//System.arraycopy(mc_32_TxRFID, 0, bytes, 0x100, mc_32_TxRFID.length);
+				bytes[0x108] = (byte) 0xE8;
+				System.arraycopy(Transmitter.mc_32_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_32_MEM_INFO.length);
+				bytes[0x160] = (byte) 0xFF;
+				break;
+			case MC_20:
+				System.arraycopy(Transmitter.mc_20_PROD_CODE, 0, bytes, 0x00, Transmitter.mc_20_PROD_CODE.length);
+				bytes[0x08] = (byte) 0xEA;
+				//System.arraycopy(mc_20_TxRFID, 0, bytes, 0x100, mc_20_TxRFID.length);
+				bytes[0x108] = (byte) 0xEA;
+				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
+				bytes[0x160] = (byte) 0x05;
+				break;
+			case MX_20:
+				System.arraycopy(Transmitter.mx_20_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_20_PROD_CODE.length);
+				bytes[0x08] = (byte) 0xEA;
+				//System.arraycopy(mx_20_TxRFID, 0, bytes, 0x100, mx_20_TxRFID.length);
+				bytes[0x108] = (byte) 0xEA;
+				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, bytes, 0x140, Transmitter.mc_20_MEM_INFO.length);
+				break;
+			case MX_16:
+				System.arraycopy(Transmitter.mx_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_16_PROD_CODE.length);
+				bytes[0x08] = (byte) 0xE9;
+				//System.arraycopy(mx_16_TxRFID, 0, bytes, 0x100, mx_16_TxRFID.length);
+				bytes[0x108] = (byte) 0xE9;
+				break;
+			case MX_12:
+				System.arraycopy(Transmitter.mx_12_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_12_PROD_CODE.length);
+				bytes[0x08] = (byte) 0xE9;
+				//System.arraycopy(mx_12_TxRFID, 0, bytes, 0x100, mx_12_TxRFID.length);
+				bytes[0x108] = (byte) 0xE9;
+				break;
+			}
+			out.write(bytes);
+			byte[] rest = new byte[4096];
+			int count = in.read(rest);
+
+			//mc-32 conversion padding
+			switch (target) {
+			case MC_32:
+			case MC_20:
+			case MX_20:
+				if (count > 0) {
+					byte[] writable = new byte[count];
+					System.arraycopy(rest, 0, writable, 0, count);
+					out.write(writable);
+				}
+				int i = count >= 0 ? count : 0;
+				for (; i < 4096; i++) {
+					out.write(0xFF);
+				}
+				break;
+			}			
+			in.close();
+			in = null;
+			out.close();
+			out = null;
+			
+			if (DataExplorer.getInstance() != null)
+				DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI2401));
+		}
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
+		finally {
+			try {
+				if (in != null) in.close();
+				if (out != null) out.close();
+			}
+			catch (IOException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
+		}
+	}
 }
