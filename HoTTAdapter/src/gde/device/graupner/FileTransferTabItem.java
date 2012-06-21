@@ -375,7 +375,6 @@ public class FileTransferTabItem extends CTabItem {
 					this.sdCardActionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 2, SWT.NORMAL));
 					this.sdCardActionGroup.setText(Messages.getString(MessageIds.GDE_MSGT2428));
 					this.sdCardActionGroup.addPaintListener(new PaintListener() {
-						@Override
 						public void paintControl(PaintEvent evt) {
 							FileTransferTabItem.log.log(Level.FINER, "sdCardActionGroup.paintControl, event=" + evt); //$NON-NLS-1$
 							
