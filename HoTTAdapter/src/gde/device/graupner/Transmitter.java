@@ -64,11 +64,9 @@ public enum Transmitter {
 	public final static byte[] mc_20_MEM_INFO =  new byte[] {0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, (byte) 0x20,(byte) 0x20,(byte) 0x20};
 	public final static byte[] mx_20_MEM_INFO =  new byte[] {0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, (byte) 0x20,(byte) 0x20,(byte) 0x20};
 	
-	public final static byte   mc_32_BIND_INFO =  (byte) 0x05;
+	public final static byte   mc_32_BIND_INFO =  (byte) 0xff;
 	public final static byte   mc_20_BIND_INFO =  (byte) 0x05;
 	public final static byte   mx_20_BIND_INFO =  (byte) 0x05;
-	public final static byte   mx_16_BIND_INFO =  (byte) 0x00;
-	public final static byte   mx_12_BIND_INFO =  (byte) 0x00;
 
 	private final String	value;
 	
@@ -205,13 +203,21 @@ public enum Transmitter {
 				System.arraycopy(Transmitter.mx_16_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_16_PROD_CODE.length);
 				bytes[0x08] = (byte) 0xE9;
 				//System.arraycopy(mx_16_TxRFID, 0, bytes, 0x100, mx_16_TxRFID.length);
-				bytes[0x108] = (byte) 0xE9;
+				bytes[0x108]  = (byte) 0xE9;
+				//sensor
+				bytes[0x11db] = (byte) 0xfd;
+				bytes[0x11ef] = (byte) 0x82;
+				bytes[0x11f0] = (byte) 0x81; 
 				break;
 			case MX_12:
 				System.arraycopy(Transmitter.mx_12_PROD_CODE, 0, bytes, 0x00, Transmitter.mx_12_PROD_CODE.length);
 				bytes[0x08] = (byte) 0xE9;
 				//System.arraycopy(mx_12_TxRFID, 0, bytes, 0x100, mx_12_TxRFID.length);
-				bytes[0x108] = (byte) 0xE9;
+				bytes[0x108]  = (byte) 0xE9;
+				//sensor
+				bytes[0x11db] = (byte) 0xdd;
+				bytes[0x11ef] = (byte) 0x5d;
+				bytes[0x11f0] = (byte) 0x74; 
 				break;
 			}
 			out.write(bytes);

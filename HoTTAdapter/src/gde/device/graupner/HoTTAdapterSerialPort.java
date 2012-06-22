@@ -1086,33 +1086,28 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				System.arraycopy(Transmitter.mc_32_TxRFID, 0, header, 0x100, Transmitter.mc_32_TxRFID.length);
 				System.arraycopy(Transmitter.mc_32_APP_VERSION, 0, header, 0x108, Transmitter.mc_32_APP_VERSION.length);
 				System.arraycopy(Transmitter.mc_32_MEM_INFO, 0, header, 0x140, Transmitter.mc_32_MEM_INFO.length);
-				header[0x160] = Transmitter.mc_32_BIND_INFO;
 				break;
 			case MC_20:
 				System.arraycopy(Transmitter.mc_20_APP_VERSION, 0, header, 0x08, Transmitter.mc_20_APP_VERSION.length);
 				System.arraycopy(Transmitter.mc_20_TxRFID, 0, header, 0x100, Transmitter.mc_20_TxRFID.length);
 				System.arraycopy(Transmitter.mc_20_APP_VERSION, 0, header, 0x108, Transmitter.mc_20_APP_VERSION.length);
 				System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, header, 0x140, Transmitter.mc_20_MEM_INFO.length);
-				header[0x160] = Transmitter.mc_20_BIND_INFO;
 				break;
 			case MX_20:
 				System.arraycopy(Transmitter.mx_20_APP_VERSION, 0, header, 0x08, Transmitter.mx_20_APP_VERSION.length);
 				System.arraycopy(Transmitter.mx_20_TxRFID, 0, header, 0x100, Transmitter.mx_20_TxRFID.length);
 				System.arraycopy(Transmitter.mx_20_APP_VERSION, 0, header, 0x108, Transmitter.mx_20_APP_VERSION.length);
 				System.arraycopy(Transmitter.mx_20_MEM_INFO, 0, header, 0x140, Transmitter.mx_20_MEM_INFO.length);
-				header[0x160] = Transmitter.mx_20_BIND_INFO;
 				break;
 			case MX_16:
 				System.arraycopy(Transmitter.mx_16_APP_VERSION, 0, header, 0x08, Transmitter.mx_16_APP_VERSION.length);
 				System.arraycopy(Transmitter.mx_16_TxRFID, 0, header, 0x100, Transmitter.mx_16_TxRFID.length);
 				System.arraycopy(Transmitter.mx_16_APP_VERSION, 0, header, 0x108, Transmitter.mx_16_APP_VERSION.length);
-				header[0x160] = Transmitter.mx_16_BIND_INFO;
 				break;
 			case MX_12:
 				System.arraycopy(Transmitter.mx_12_APP_VERSION, 0, header, 0x08, Transmitter.mx_12_APP_VERSION.length);
 				System.arraycopy(Transmitter.mx_12_TxRFID, 0, header, 0x100, Transmitter.mx_12_TxRFID.length);
 				System.arraycopy(Transmitter.mx_12_APP_VERSION, 0, header, 0x108, Transmitter.mx_12_APP_VERSION.length);
-				header[0x160] = Transmitter.mx_12_BIND_INFO;
 				break;
 			}
 			out.write(header);
