@@ -1,12 +1,15 @@
 Development history / change log, please read from bottom up
 
 Version 3.02 - xx yyy 2012
+fix performance problem while in zoom mode and update statistics data
+UniLog2 - remove not supported 50Hz logging rate adjustment
 HoTTAdapter - enable serial file transfer
 JLog2 - refine default import path handling
 DeviceProperties_V17 -> DeviceProperties_V18 due to HoTTAdapter
 HoTTAdapter - toggle import of channel deflection via device dialog
-HoTTAdapter - correct signal strength calculation 
+HoTTAdapter(2) - correct signal strength calculation 
 HottAdapter(2) - add support for serial file transfer
+HoTTAdapter2 - add channel-configuration displaying all available data including channels
 
 Version 3.01 - 21 May 2012
 fix scale synchronization problem while change zoom
