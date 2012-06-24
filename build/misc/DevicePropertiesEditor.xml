@@ -22,8 +22,8 @@
     <minVersion>1.6.0</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>jreOnly</jdkPreference>
-    <initialHeapSize>10</initialHeapSize>
-    <maxHeapSize>56</maxHeapSize>
+    <initialHeapSize>32</initialHeapSize>
+    <maxHeapSize>256</maxHeapSize>
     <opt>-Dfile.encoding=UTF-8</opt>
   </jre>
   <messages>
