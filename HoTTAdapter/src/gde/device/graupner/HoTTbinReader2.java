@@ -94,7 +94,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
-		HoTTbinReader2.points = new int[58];
+		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReader2.points[2] = 100000;
 		HoTTbinReader2.timeStep_ms = 0;
 		HoTTbinReader2.buf = new byte[HoTTbinReader2.dataBlockSize];
@@ -140,9 +140,10 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				
 				//fill receiver data
 				if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0 && HoTTbinReader2.timeStep_ms % 10 == 0) {
-					parseReceiver(HoTTbinReader2.recordSet, HoTTbinReader2.points, HoTTbinReader2.buf);
+					parseReceiver(HoTTbinReader2.points, HoTTbinReader2.buf);
 					isReceiverData = true;
 				}
+				if (channelNumber == 4) parseChannel(HoTTbinReader2.points, HoTTbinReader2.buf); //Channels
 
 				if (HoTTbinReader2.buf[33] >= 0 && HoTTbinReader2.buf[33] <= 4 && HoTTbinReader2.buf[3] != 0 && HoTTbinReader2.buf[4] != 0) { //skip empty block - package loss
 					//create and fill sensor specific data record sets 
@@ -170,7 +171,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						}
 
 						if (HoTTbinReader2.buf0 != null && HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null) {
-							version = parseVario(HoTTbinReader2.recordSet, HoTTbinReader2.points, version, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
+							version = parseVario(HoTTbinReader2.points, version, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
 							HoTTbinReader2.buf0 = HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = null;
 							isSensorData = true;
 						}
@@ -199,7 +200,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						}
 
 						if (HoTTbinReader2.buf0 != null && HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null) {
-							parseGPS(HoTTbinReader2.recordSet, HoTTbinReader2.points, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3);
+							parseGPS(HoTTbinReader2.points, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3);
 							HoTTbinReader2.buf0 = HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = null;
 							isSensorData = true;				
 						}
@@ -231,7 +232,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						}
 
 						if (HoTTbinReader2.buf0 != null && HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null && HoTTbinReader2.buf4 != null) {
-							parseGeneral(HoTTbinReader2.recordSet, HoTTbinReader2.points, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
+							parseGeneral(HoTTbinReader2.points, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
 							HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
 							isSensorData = true;
 						}
@@ -263,7 +264,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						}
 
 						if (HoTTbinReader2.buf0 != null && HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null && HoTTbinReader2.buf4 != null) {
-							parseElectric(HoTTbinReader2.recordSet, HoTTbinReader2.points, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
+							parseElectric(HoTTbinReader2.points, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
 							HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
 							isSensorData = true;	
 						}
@@ -365,7 +366,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
-		HoTTbinReader2.points = new int[58];
+		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReader.pointsGeneral = new int[58];
 		HoTTbinReader.pointsElectric = new int[58];
 		HoTTbinReader.pointsVario = new int[58];
@@ -422,9 +423,10 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 					//fill receiver data
 					if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0 && HoTTbinReader2.timeStep_ms % 10 == 0) {
-						parseReceiver(HoTTbinReader2.recordSet, HoTTbinReader2.points, HoTTbinReader2.buf);
+						parseReceiver(HoTTbinReader2.points, HoTTbinReader2.buf);
 						isReceiverData = true;
 					}
+					if (channelNumber == 4) parseChannel(HoTTbinReader2.points, HoTTbinReader2.buf);
 
 					if (actualSensor == -1)
 						lastSensor = actualSensor = (byte) (HoTTbinReader2.buf[7] & 0xFF);
@@ -441,7 +443,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 									//System.out.println("isVarioData i = " + i);
 									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
 								}
-								parseVario(HoTTbinReader2.recordSet, HoTTbinReader2.pointsVario, 1, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
+								parseVario(HoTTbinReader2.pointsVario, 1, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2);
 								isVarioData = true;
 								break;
 
@@ -452,7 +454,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 									//System.out.println("isGPSData i = " + i);
 									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
 								}
-								parseGPS(HoTTbinReader2.recordSet, HoTTbinReader2.pointsGPS, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3);
+								parseGPS(HoTTbinReader2.pointsGPS, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3);
 								isGPSData = true;
 								break;
 
@@ -463,7 +465,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 									//System.out.println("isGeneralData i = " + i);
 									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
 								}
-								parseGeneral(HoTTbinReader2.recordSet, HoTTbinReader2.pointsGeneral, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
+								parseGeneral(HoTTbinReader2.pointsGeneral, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
 								isGeneralData = true;
 								break;
 
@@ -474,7 +476,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 									//System.out.println("isElectricData i = " + i);
 									isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = false;
 								}
-								parseElectric(HoTTbinReader2.recordSet, HoTTbinReader2.pointsElectric, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
+								parseElectric(HoTTbinReader2.pointsElectric, HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
 								isElectricData = true;
 								break;
 							}
@@ -694,7 +696,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _points
 	 * @param _buf
 	 */
-	private static void parseReceiver(RecordSet _recordSet, int[] _points, byte[] _buf) {
+	private static void parseReceiver(int[] _points, byte[] _buf) {
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		_points[0] = _buf[37] * 1000;
 		_points[1] = (_buf[38] & 0xFF) * 1000;
@@ -715,7 +717,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _buf1
 	 * @param _buf2
 	 */
-	private static int parseVario(RecordSet _recordSet, int[] _points, int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) {
+	private static int parseVario(int[] _points, int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) {
 		if (sdLogVersion == -1) sdLogVersion = getSdLogVerion(_buf1, _buf2);
 		switch (sdLogVersion) {
 		case 3:
@@ -757,7 +759,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _buf2
 	 * @param _buf3
 	 */
-	private static void parseGPS(RecordSet _recordSet, int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) {
+	private static void parseGPS(int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) {
 		tmpHeight = DataParser.parse2Short(_buf2, 8) - 500;
 		tmpClimb3 = (_buf3[2] & 0xFF) - 120;
 		if (tmpClimb3 > -50 && tmpHeight > -490 && tmpHeight < 5000) {
@@ -814,7 +816,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _buf3
 	 * @param _buf4
 	 */
-	private static void parseGeneral(RecordSet _recordSet, int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) {
+	private static void parseGeneral(int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) {
 		tmpHeight = DataParser.parse2Short(_buf3, 0) - 500;
 		tmpClimb3 = (_buf3[4] & 0xFF) - 120;
 		int tmpVoltage1 = DataParser.parse2Short(_buf1[9], _buf2[0]);
@@ -861,7 +863,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _buf4
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseElectric(RecordSet _recordSet, int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4)
+	private static void parseElectric(int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4)
 			throws DataInconsitsentException {
 		tmpHeight = DataParser.parse2Short(_buf3, 3) - 500;
 		tmpClimb3 = (_buf4[3] & 0xFF) - 120;
@@ -901,6 +903,47 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			_points[55] = tmpVoltage2 * 1000;
 			_points[56] = ((_buf3[1] & 0xFF) + 20) * 1000;
 			_points[57] = ((_buf3[2] & 0xFF) + 20) * 1000;
+		}
+	}
+
+	/**
+	 * parse the buffered data from buffer and add points to record set
+	 * @param _recordSet
+	 * @param _points
+	 * @param _buf
+	 */
+	private static void parseChannel(int[] _points, byte[] _buf) {
+		//58=Ch 1, 59=Ch 2 , 50=Ch 3 .. 73=Ch 16
+		_points[58]  = (DataParser.parse2UnsignedShort(_buf,  8)/2) * 1000; //1197
+		_points[59]  = (DataParser.parse2UnsignedShort(_buf, 10)/2) * 1000; //
+		_points[60]  = (DataParser.parse2UnsignedShort(_buf, 12)/2) * 1000;
+		_points[61]  = (DataParser.parse2UnsignedShort(_buf, 14)/2) * 1000;
+		_points[62]  = (DataParser.parse2UnsignedShort(_buf, 16)/2) * 1000;
+		_points[63]  = (DataParser.parse2UnsignedShort(_buf, 18)/2) * 1000;
+		_points[64]  = (DataParser.parse2UnsignedShort(_buf, 20)/2) * 1000;
+		_points[65] = (DataParser.parse2UnsignedShort(_buf, 22)/2) * 1000;
+		if (_buf[5] == 0x00) { //channel 9-12
+			_points[66] = (DataParser.parse2UnsignedShort(_buf, 24)/2) * 1000;
+			_points[67] = (DataParser.parse2UnsignedShort(_buf, 26)/2) * 1000;
+			_points[68] = (DataParser.parse2UnsignedShort(_buf, 28)/2) * 1000;
+			_points[69] = (DataParser.parse2UnsignedShort(_buf, 30)/2) * 1000;
+			if (_points[70] == 0) {
+				_points[70] = 1500 * 1000;
+				_points[71] = 1500 * 1000;
+				_points[72] = 1500 * 1000;
+				_points[73] = 1500 * 1000;
+			}
+		} else { //channel 13-16
+			_points[70] = (DataParser.parse2UnsignedShort(_buf, 24)/2) * 1000;
+			_points[71] = (DataParser.parse2UnsignedShort(_buf, 26)/2) * 1000;
+			_points[72] = (DataParser.parse2UnsignedShort(_buf, 28)/2) * 1000;
+			_points[73] = (DataParser.parse2UnsignedShort(_buf, 30)/2) * 1000;
+			if (_points[11] == 0) {
+				_points[66] = 1500 * 1000;
+				_points[67] = 1500 * 1000;
+				_points[68] = 1500 * 1000;
+				_points[69] = 1500 * 1000;
+			}
 		}
 	}
 }
