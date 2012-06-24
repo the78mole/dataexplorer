@@ -264,7 +264,7 @@ public class OsdReaderWriter {
 				// check if the file content fits measurements form device properties XML which was used to create the record set
 				for (int i = 0; i < recordKeys.length; ++i) {
 					Record record = recordSet.get(recordKeys[i]);
-					log.log(Level.FINER, "setSerializedProperties " + recordKeys[i]);
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " - setSerializedProperties " + recordKeys[i]);
 					record.setSerializedProperties(recordsProperties[i]);
 					record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
 				}
@@ -289,9 +289,9 @@ public class OsdReaderWriter {
 					firstRecordSet[1] = recordSetName;
 				}
 				recordDataSize = new Long(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
-				log.log(Level.FINE, "recordDataSize = " + recordDataSize);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordDataSize = " + recordDataSize);
 				recordSetDataPointer = new Long(recordSetInfo.get(GDE.RECORD_SET_DATA_POINTER)).longValue();
-				log.log(Level.FINE, "recordSetDataPointer = " + recordSetDataPointer);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordSetDataPointer = " + recordSetDataPointer);
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				recordSet = channel.get(recordSetName);
 				int numberRecordAndTimeStamp = recordSet.getNoneCalculationRecordNames().length + (recordSet.isTimeStepConstant() ? 0 : 1);
@@ -301,7 +301,7 @@ public class OsdReaderWriter {
 					byte[] buffer = new byte[recordSet.getFileDataBytesSize()];
 					data_in.readFully(buffer);
 					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, application.getStatusBar() != null);
-					log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (new Date().getTime() - startTime)));
+					if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (new Date().getTime() - startTime)));
 				}
 				// display the first record set data while reading the rest of the data
 				if (!isFirstRecordSetDisplayed && firstRecordSet[0] != null && firstRecordSet[1] != null && application.getMenuToolBar() != null) {
