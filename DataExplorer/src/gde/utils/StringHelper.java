@@ -504,7 +504,7 @@ public class StringHelper {
 	 * @return string with converted characters
 	 */
 	public static String byte2Hex4CharString(byte[] bytes, int size) {
-		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%3d", size)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
+		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%04d", size)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 		for (int i = 0; i < size; i++) {
 			sb.append(String.format("  %02X", bytes[i])); //$NON-NLS-1$
 		}
