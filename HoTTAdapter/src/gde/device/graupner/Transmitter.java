@@ -106,7 +106,8 @@ public enum Transmitter {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
 		
-		log.log(Level.OFF, StringHelper.byte2Hex2CharString(inBytes, inBytes.length));
+		if (log.isLoggable(Level.FINE)) 
+			log.log(Level.FINE, StringHelper.byte2Hex2CharString(inBytes, inBytes.length));
 		if ((inBytes[0x08]&0xFF) == 0xE8) {
 			boolean isMC32 = true;
 			for (int i = 0; i < 2; i++) {

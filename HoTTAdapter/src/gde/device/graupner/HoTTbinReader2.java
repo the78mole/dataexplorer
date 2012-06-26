@@ -73,7 +73,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	static void readSingle(File file) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readSingle";
 		long startTime = System.nanoTime() / 1000000;
-		long actualTime_ms = 0, drawTime_ms = startTime;
 		FileInputStream file_input = new FileInputStream(file);
 		DataInputStream data_in = new DataInputStream(file_input);
 		long fileSize = file.length();
@@ -132,14 +131,15 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			//read all the data blocks from the file and parse
 			for (int i = 0; i < numberDatablocks; i++) {
 				data_in.read(HoTTbinReader2.buf);
-				if (HoTTbinReader2.logger.isLoggable(Level.FINE) && i % 10 == 0) 
+				if (HoTTbinReader2.logger.isLoggable(Level.FINE) && i % 10 == 0) {
 					HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader2.buf.length));
-				
-				if (HoTTbinReader.log.isLoggable(Level.FINER))
-					HoTTbinReader2.logger.logp(Level.FINER, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader2.buf, HoTTbinReader2.buf.length));
+				}
+				if (HoTTbinReader2.logger.isLoggable(Level.FINE)) {
+					HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader2.buf, HoTTbinReader2.buf.length));
+				}
 				
 				//fill receiver data
-				if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0 && HoTTbinReader2.timeStep_ms % 10 == 0) {
+				if (HoTTbinReader2.buf[33] == 0 && (HoTTbinReader2.buf[38]&0x80) != 128 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0) {
 					parseReceiver(HoTTbinReader2.points, HoTTbinReader2.buf);
 					isReceiverData = true;
 				}
@@ -293,8 +293,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.timeStep_ms += 10;
 				}
 
-				actualTime_ms = System.nanoTime() / 1000000;
-				if (menuToolBar != null && (actualTime_ms - drawTime_ms) > 5000) {
+				if (menuToolBar != null &&  i % (numberDatablocks / 4) == 0) {
 					if (!isInitialSwitched) {
 						HoTTbinReader2.channels.switchChannel(channel.getName());
 						device.updateVisibilityStatus(channel.getActiveRecordSet(), true);
@@ -302,14 +301,14 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						isInitialSwitched = true;
 					}
 					else
-						HoTTbinReader2.application.updateGraphicsWindow();
+						HoTTbinReader.application.updateAllTabs(false);
 
-					drawTime_ms = actualTime_ms;
-					HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (actualTime_ms - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+					if (HoTTbinReader2.logger.isLoggable(Level.TIME))
+						HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 			HoTTbinReader2.logger.logp(Level.WARNING, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
-			HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (actualTime_ms - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (menuToolBar != null) {
 				if (!isInitialSwitched) {
@@ -324,7 +323,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
 
-				HoTTbinReader2.application.updateGraphicsWindow();
+				HoTTbinReader.application.updateAllTabs(false);
 				HoTTbinReader2.application.setProgress(100, sThreadId);
 			}
 		}
@@ -344,7 +343,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	static void readMultiple(File file) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readMultiple";
 		long startTime = System.nanoTime() / 1000000;
-		long actualTime_ms = 0, drawTime_ms = startTime;
 		FileInputStream file_input = new FileInputStream(file);
 		DataInputStream data_in = new DataInputStream(file_input);
 		long fileSize = file.length();
@@ -422,7 +420,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 								+ GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader2.buf[7], false));
 
 					//fill receiver data
-					if (HoTTbinReader2.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0 && HoTTbinReader2.timeStep_ms % 10 == 0) {
+					if (HoTTbinReader2.buf[33] == 0 && (HoTTbinReader2.buf[38]&0x80) != 128 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0) {
 						parseReceiver(HoTTbinReader2.points, HoTTbinReader2.buf);
 						isReceiverData = true;
 					}
@@ -599,8 +597,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.timeStep_ms += 10;
 				}
 
-				actualTime_ms = System.nanoTime() / 1000000;
-				if (menuToolBar != null && (actualTime_ms - drawTime_ms) > 5000) {
+				if (menuToolBar != null &&  i % (numberDatablocks / 4) == 0) {
 					if (!isInitialSwitched) {
 						HoTTbinReader2.channels.switchChannel(channel.getName());
 						device.updateVisibilityStatus(channel.getActiveRecordSet(), true);
@@ -608,14 +605,14 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						isInitialSwitched = true;
 					}
 					else
-						HoTTbinReader2.application.updateGraphicsWindow();
+						HoTTbinReader.application.updateAllTabs(false);
 
-					drawTime_ms = actualTime_ms;
-					HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (actualTime_ms - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+					if (HoTTbinReader2.logger.isLoggable(Level.TIME))
+						HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 			HoTTbinReader2.logger.logp(Level.WARNING, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
-			HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (actualTime_ms - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (menuToolBar != null) {
 				if (!isInitialSwitched) {
@@ -630,7 +627,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
 
-				HoTTbinReader2.application.updateGraphicsWindow();
+				HoTTbinReader.application.updateAllTabs(false);
 				HoTTbinReader2.application.setProgress(100, sThreadId);
 			}
 		}
