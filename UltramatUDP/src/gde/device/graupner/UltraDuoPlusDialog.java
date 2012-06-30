@@ -2091,7 +2091,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 * @param enable
 	 */
 	public void setBackupRetoreButtons(final boolean enable) {
-		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			if (!UltraDuoPlusDialog.this.dialogShell.isDisposed() && UltraDuoPlusDialog.this.restoreButton != null && UltraDuoPlusDialog.this.backupButton != null
 					&& !UltraDuoPlusDialog.this.restoreButton.isDisposed() && !UltraDuoPlusDialog.this.backupButton.isDisposed()) {
 				this.restoreButton.setEnabled(enable);
