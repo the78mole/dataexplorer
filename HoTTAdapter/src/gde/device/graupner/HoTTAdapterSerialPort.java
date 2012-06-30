@@ -1057,242 +1057,243 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	 * @throws TimeOutException
 	 */
 	public void loadModelData(String selectedPcFolder, final FileTransferTabItem parent) throws IOException, TimeOutException {
-		this.preModelRead();
-		
-		//init header bytes
-		byte[] header = new byte[4096];
-		for (int i = 0; i < header.length; ++i) {
-			header[i] = (byte) 0xFF;
-		}
-		
-		StringBuilder sb = new StringBuilder();
-		sendCmd(HoTTAdapterSerialPort.QUERY_TX_INFO);
-		this.ANSWER_DATA = this.read(new byte[100], 2000, 5);
+		try {
+			this.preModelRead();
+			
+			//init header bytes
+			byte[] header = new byte[4096];
+			for (int i = 0; i < header.length; ++i) {
+				header[i] = (byte) 0xFF;
+			}
+			
+			StringBuilder sb = new StringBuilder();
+			sendCmd(HoTTAdapterSerialPort.QUERY_TX_INFO);
+			this.ANSWER_DATA = this.read(new byte[100], 2000, 5);
 
-		sendCmd(HoTTAdapterSerialPort.QUERY_TX_INFO);
-		this.ANSWER_DATA = this.read(new byte[100], 2000, 5);
+			sendCmd(HoTTAdapterSerialPort.QUERY_TX_INFO);
+			this.ANSWER_DATA = this.read(new byte[100], 2000, 5);
 //		System.arraycopy(mx_20_AM_0011, 0, this.ANSWER_DATA, 0, mx_20_AM_0011.length);
 //		System.arraycopy(mx_20_RH_0011, 0, this.ANSWER_DATA, 0, mx_20_RH_0011.length);
 //		System.arraycopy(mc_32_RH_0011, 0, this.ANSWER_DATA, 0, mc_32_RH_0011.length);
 //		System.arraycopy(mx_16_RH_0011, 0, this.ANSWER_DATA, 0, mx_16_RH_0011.length);
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) {
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-		}
-		System.arraycopy(this.ANSWER_DATA,  7, header, 0x0000, 8);
-		System.arraycopy(this.ANSWER_DATA, 56, header, 0x0008, 4);
-		//System.arraycopy(this.ANSWER_DATA, 56, header, 0x0108, 4);
-		
-		for (int i = 23; i < 28; i++) {
-			sb.append(String.format("%c", this.ANSWER_DATA[i]));
-		}
-		sb.append(GDE.STRING_SEMICOLON);
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, sb.toString());
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) {
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			}
+			System.arraycopy(this.ANSWER_DATA,  7, header, 0x0000, 8);
+			System.arraycopy(this.ANSWER_DATA, 56, header, 0x0008, 4);
+			//System.arraycopy(this.ANSWER_DATA, 56, header, 0x0108, 4);
+			
+			for (int i = 23; i < 28; i++) {
+				sb.append(String.format("%c", this.ANSWER_DATA[i]));
+			}
+			sb.append(GDE.STRING_SEMICOLON);
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.FINE)) HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, sb.toString());
 
-		sendCmd(HoTTAdapterSerialPort.PREPARE_LIST_MDL);
-		this.ANSWER_DATA = this.read(new byte[1000], 3000, 5);
+			sendCmd(HoTTAdapterSerialPort.PREPARE_LIST_MDL);
+			this.ANSWER_DATA = this.read(new byte[1000], 3000, 5);
 //		System.arraycopy(mx_20_AM_0532, 0, this.ANSWER_DATA, 0, mx_20_AM_0532.length);
 //		System.arraycopy(mx_20_RH_0532, 0, this.ANSWER_DATA, 0, mx_20_RH_0532.length);
 //		System.arraycopy(mc_32_RH_0532, 0, this.ANSWER_DATA, 0, this.ANSWER_DATA.length);
 //		System.arraycopy(mx_16_RH_0532, 0, this.ANSWER_DATA, 0, mx_16_RH_0532.length);
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) {
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.fourDigitsRunningNumber(this.ANSWER_DATA.length));
-			//HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2FourDigitsIntegerString(this.ANSWER_DATA));
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-		}
-		
-		
-		int numMdls = this.ANSWER_DATA[7]; //number of mdl configurations
-		sb.append(numMdls).append(GDE.STRING_SEMICOLON);
-		
-		int startIndex = 60;
-		for (; startIndex < this.ANSWER_DATA.length - 4; ++startIndex) {
-			if (this.ANSWER_DATA[startIndex] == 0x00 && this.ANSWER_DATA[startIndex+1] == 0x00 && this.ANSWER_DATA[startIndex+2] == 0x00 && (this.ANSWER_DATA[startIndex+3] > 0x01 && this.ANSWER_DATA[startIndex+3] < 0xFF) && this.ANSWER_DATA[startIndex+4] == 0x00)
-				break;
-		}
-		startIndex -= numMdls * 2 - 1;
-		
-		for (int j=1; startIndex < this.ANSWER_DATA.length - 2 && j <= numMdls; startIndex+=2,j++) {
-			if (this.ANSWER_DATA[startIndex] == 1 || this.ANSWER_DATA[startIndex] == 0) sb.append(j);
-			else 
-				if (this.ANSWER_DATA[startIndex] == -1) sb.append(-1*j);
-			else 
-				break;
-			sb.append(GDE.STRING_SEMICOLON);
-		}
-		sendCmd(HoTTAdapterSerialPort.QUERY_MDL_NAMES, new String(new byte[]{0x00, 0x08, 0x00, 0x00, 0x0D, 0x20, 0x00}));
-		this.ANSWER_DATA = this.read(new byte[2057], 5000);
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) {
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.fourDigitsRunningNumber(this.ANSWER_DATA.length));
+				//HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2FourDigitsIntegerString(this.ANSWER_DATA));
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+			}
+			
+			
+			int numMdls = this.ANSWER_DATA[7]; //number of mdl configurations
+			sb.append(numMdls).append(GDE.STRING_SEMICOLON);
+			
+			int startIndex = 60;
+			for (; startIndex < this.ANSWER_DATA.length - 4; ++startIndex) {
+				if (this.ANSWER_DATA[startIndex] == 0x00 && this.ANSWER_DATA[startIndex+1] == 0x00 && this.ANSWER_DATA[startIndex+2] == 0x00 && (this.ANSWER_DATA[startIndex+3] > 0x01 && this.ANSWER_DATA[startIndex+3] < 0xFF) && this.ANSWER_DATA[startIndex+4] == 0x00)
+					break;
+			}
+			startIndex -= numMdls * 2 - 1;
+			
+			for (int j=1; startIndex < this.ANSWER_DATA.length - 2 && j <= numMdls; startIndex+=2,j++) {
+				if (this.ANSWER_DATA[startIndex] == 1 || this.ANSWER_DATA[startIndex] == 0) sb.append(j);
+				else 
+					if (this.ANSWER_DATA[startIndex] == -1) sb.append(-1*j);
+				else 
+					break;
+				sb.append(GDE.STRING_SEMICOLON);
+			}
+			sendCmd(HoTTAdapterSerialPort.QUERY_MDL_NAMES, new String(new byte[]{0x00, 0x08, 0x00, 0x00, 0x0D, 0x20, 0x00}));
+			this.ANSWER_DATA = this.read(new byte[2057], 5000);
 //		System.arraycopy(mx_20_AM_0533, 0, this.ANSWER_DATA, 0, mx_20_AM_0533.length);
 //		System.arraycopy(mx_20_RH_0533, 0, this.ANSWER_DATA, 0, mx_20_RH_0533.length);
 //		System.arraycopy(mc_32_RH_0533, 0, this.ANSWER_DATA, 0, mc_32_RH_0533.length);
 //		System.arraycopy(mx_16_RH_0533, 0, this.ANSWER_DATA, 0, mx_16_RH_0533.length);
-		if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) {
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
-		}
-
-		int modelNameLength = 10;//mx-20 i=178 j%10
-		switch (Transmitter.fromValue(sb.substring(0,5).toLowerCase())) {
-		case MC_32:
-			modelNameLength = 13;//mc-32 i=86 j%13
-			startIndex = 86;
-			break;
-		default:
-		case MC_20:
-		case MX_20:
-			modelNameLength = 10;
-			startIndex = 177;
-			break;
-		case MX_16:
-		case MX_12:
-			modelNameLength = 9;
-			startIndex = 53;
-			break;
-		}
-		
-		for (int j=0; startIndex < this.ANSWER_DATA.length - 2; startIndex++,j++) {
-			if (j%(modelNameLength) != 0) {
-				sb.append(String.format("%c", (char)this.ANSWER_DATA[startIndex]));
+			if (HoTTAdapterSerialPort.log.isLoggable(java.util.logging.Level.OFF)) {
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2Hex4CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, StringHelper.byte2CharString(this.ANSWER_DATA, this.ANSWER_DATA.length));
 			}
-			else if (j != 0) 
-				sb.append(String.format("%c", (char)this.ANSWER_DATA[startIndex])).append(GDE.STRING_SEMICOLON);
-		}
-		sb.append(GDE.STRING_SEMICOLON);
-		HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, sb.toString());
-		
-		Vector<String> vModels = new Vector<String>();
-		int numValidMdls = 0;
-		String[] sModels = sb.toString().split(GDE.STRING_SEMICOLON);
-		for (int i = 0; i < numMdls; i++) {
-			if (Integer.parseInt(sModels[i+2].trim()) > 0){
-				String mdlName = sModels[i+2+numMdls].trim();
-				if (mdlName.length() == 0) mdlName = (i+1)+"_NAME";
-				vModels.add(mdlName);
-				++numValidMdls;
+
+			int modelNameLength = 10;//mx-20 i=178 j%10
+			switch (Transmitter.fromValue(sb.substring(0,5).toLowerCase())) {
+			case MC_32:
+				modelNameLength = 13;//mc-32 i=86 j%13
+				startIndex = 86;
+				break;
+			default:
+			case MC_20:
+			case MX_20:
+				modelNameLength = 10;
+				startIndex = 177;
+				break;
+			case MX_16:
+			case MX_12:
+				modelNameLength = 9;
+				startIndex = 53;
+				break;
 			}
-			else vModels.add(GDE.STRING_DASH);
-		}
-		HoTTAdapterSerialPort.log.log(Level.OFF, vModels.size() + " - " + vModels.toString());
-		String dirName = selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + "backup_" + sModels[0].toLowerCase();
-		FileUtils.checkDirectoryAndCreate(dirName);
-
-		long remainingSize = 0, totalSize = 0;
-		switch (Transmitter.fromValue(sb.substring(0,5).toLowerCase())) {
-		default:
-		case MC_32:
-		case MC_20:
-		case MX_20:
-			remainingSize = numValidMdls * 12288;
-			totalSize = numValidMdls * 12288;
-			break;
-		case MX_16:
-		case MX_12:
-			remainingSize = numValidMdls * 8192;
-			totalSize = numValidMdls * 8192;
-			break;
-		}
-
-		byte[] queryModels = new byte[]{0x00, 0x08, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00};
-		int iQueryModels = 0x30;
-		for (String modelName : vModels) {
-			if (!modelName.equals(GDE.STRING_DASH)) {
-				String outputFile = dirName + GDE.FILE_SEPARATOR_UNIX + "a" + modelName + ".mdl";
-				DataOutputStream out = new DataOutputStream(new FileOutputStream(outputFile));
-				HoTTAdapterSerialPort.log.log(Level.FINE, "writing " + outputFile);
-
-				//			switch (Transmitter.fromValue(sb.substring(0,5).toLowerCase())) {
-				//			default:
-				//			case MC_32:
-				//				System.arraycopy(Transmitter.mc_32_APP_VERSION, 0, header, 0x08, Transmitter.mc_32_APP_VERSION.length);
-				//				//System.arraycopy(Transmitter.mc_32_TxRFID, 0, header, 0x100, Transmitter.mc_32_TxRFID.length);
-				//				//System.arraycopy(Transmitter.mc_32_APP_VERSION, 0, header, 0x108, Transmitter.mc_32_APP_VERSION.length);
-				//				//System.arraycopy(Transmitter.mc_32_MEM_INFO, 0, header, 0x140, Transmitter.mc_32_MEM_INFO.length);
-				//				break;
-				//			case MC_20:
-				//				System.arraycopy(Transmitter.mc_20_APP_VERSION, 0, header, 0x08, Transmitter.mc_20_APP_VERSION.length);
-				//				//System.arraycopy(Transmitter.mc_20_TxRFID, 0, header, 0x100, Transmitter.mc_20_TxRFID.length);
-				//				//System.arraycopy(Transmitter.mc_20_APP_VERSION, 0, header, 0x108, Transmitter.mc_20_APP_VERSION.length);
-				//				//System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, header, 0x140, Transmitter.mc_20_MEM_INFO.length);
-				//				break;
-				//			case MX_20:
-				//				System.arraycopy(Transmitter.mx_20_APP_VERSION, 0, header, 0x08, Transmitter.mx_20_APP_VERSION.length);
-				//				//System.arraycopy(Transmitter.mx_20_TxRFID, 0, header, 0x100, Transmitter.mx_20_TxRFID.length);
-				//				//System.arraycopy(Transmitter.mx_20_APP_VERSION, 0, header, 0x108, Transmitter.mx_20_APP_VERSION.length);
-				//				//System.arraycopy(Transmitter.mx_20_MEM_INFO, 0, header, 0x140, Transmitter.mx_20_MEM_INFO.length);
-				//				break;
-				//			case MX_16:
-				//				System.arraycopy(Transmitter.mx_16_APP_VERSION, 0, header, 0x08, Transmitter.mx_16_APP_VERSION.length);
-				//				//System.arraycopy(Transmitter.mx_16_TxRFID, 0, header, 0x100, Transmitter.mx_16_TxRFID.length);
-				//				//System.arraycopy(Transmitter.mx_16_APP_VERSION, 0, header, 0x108, Transmitter.mx_16_APP_VERSION.length);
-				//				break;
-				//			case MX_12:
-				//				System.arraycopy(Transmitter.mx_12_APP_VERSION, 0, header, 0x08, Transmitter.mx_12_APP_VERSION.length);
-				//				//System.arraycopy(Transmitter.mx_12_TxRFID, 0, header, 0x100, Transmitter.mx_12_TxRFID.length);
-				//				//System.arraycopy(Transmitter.mx_12_APP_VERSION, 0, header, 0x108, Transmitter.mx_12_APP_VERSION.length);
-				//				break;
-				//			}
-				out.write(header);
-
-				switch (Transmitter.fromValue(sb.substring(0, 5).toLowerCase())) {
-				default:
-				case MC_32:
-				case MC_20:
-				case MX_20:
-					for (int i = 0; i < 4; i++) {
-						sendMdlCmd(queryModels);
-						this.ANSWER_DATA = this.read(new byte[2057], 5000);
-						out.write(this.ANSWER_DATA, 7, 2048);
-						iQueryModels += 8;
-						queryModels[5] = (byte) ((iQueryModels & 0x00FF)       & 0xFF);
-						queryModels[6] = (byte)(((iQueryModels & 0xFF00) >> 8) & 0xFF);
-					}
-					break;
-				case MX_16:
-				case MX_12:
-					for (int i = 0; i < 2; i++) {
-						sendMdlCmd(queryModels);
-						this.ANSWER_DATA = this.read(new byte[2057], 5000);
-						iQueryModels += 8;
-						queryModels[5] = (byte) ((iQueryModels & 0x00FF)       & 0xFF);
-						queryModels[6] = (byte)(((iQueryModels & 0xFF00) >> 8) & 0xFF);
-					}
-					break;
+			
+			for (int j=0; startIndex < this.ANSWER_DATA.length - 2; startIndex++,j++) {
+				if (j%(modelNameLength) != 0) {
+					sb.append(String.format("%c", (char)this.ANSWER_DATA[startIndex]));
 				}
-
-				out.close();
-				out = null;
-
-				parent.updateFileTransferProgress(totalSize, remainingSize -= 12288);
+				else if (j != 0) 
+					sb.append(String.format("%c", (char)this.ANSWER_DATA[startIndex])).append(GDE.STRING_SEMICOLON);
 			}
-			else {
-				switch (Transmitter.fromValue(sb.substring(0, 5).toLowerCase())) {
-				default:
-				case MC_32:
-				case MC_20:
-				case MX_20:
-					for (int i = 0; i < 4; i++) {
-						iQueryModels += 8;
-						queryModels[5] = (byte) ((iQueryModels & 0x00FF)       & 0xFF);
-						queryModels[6] = (byte)(((iQueryModels & 0xFF00) >> 8) & 0xFF);
+			sb.append(GDE.STRING_SEMICOLON);
+			HoTTAdapterSerialPort.log.log(java.util.logging.Level.OFF, sb.toString());
+			
+			Vector<String> vModels = new Vector<String>();
+			int numValidMdls = 0;
+			String[] sModels = sb.toString().split(GDE.STRING_SEMICOLON);
+			for (int i = 0; i < numMdls; i++) {
+				if (Integer.parseInt(sModels[i+2].trim()) > 0){
+					String mdlName = sModels[i+2+numMdls].trim();
+					if (mdlName.length() == 0) mdlName = (i+1)+"_NAME";
+					vModels.add(mdlName);
+					++numValidMdls;
+				}
+				else vModels.add(GDE.STRING_DASH);
+			}
+			HoTTAdapterSerialPort.log.log(Level.OFF, vModels.size() + " - " + vModels.toString());
+			String dirName = selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + "backup_" + sModels[0].toLowerCase();
+			FileUtils.checkDirectoryAndCreate(dirName);
+
+			long remainingSize = 0, totalSize = 0;
+			switch (Transmitter.fromValue(sb.substring(0,5).toLowerCase())) {
+			default:
+			case MC_32:
+			case MC_20:
+			case MX_20:
+				remainingSize = numValidMdls * 12288;
+				totalSize = numValidMdls * 12288;
+				break;
+			case MX_16:
+			case MX_12:
+				remainingSize = numValidMdls * 8192;
+				totalSize = numValidMdls * 8192;
+				break;
+			}
+
+			byte[] queryModels = new byte[]{0x00, 0x08, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00};
+			int iQueryModels = 0x30;
+			for (String modelName : vModels) {
+				if (!modelName.equals(GDE.STRING_DASH)) {
+					String outputFile = dirName + GDE.FILE_SEPARATOR_UNIX + "a" + modelName + ".mdl";
+					DataOutputStream out = new DataOutputStream(new FileOutputStream(outputFile));
+					HoTTAdapterSerialPort.log.log(Level.FINE, "writing " + outputFile);
+
+					//			switch (Transmitter.fromValue(sb.substring(0,5).toLowerCase())) {
+					//			default:
+					//			case MC_32:
+					//				System.arraycopy(Transmitter.mc_32_APP_VERSION, 0, header, 0x08, Transmitter.mc_32_APP_VERSION.length);
+					//				//System.arraycopy(Transmitter.mc_32_TxRFID, 0, header, 0x100, Transmitter.mc_32_TxRFID.length);
+					//				//System.arraycopy(Transmitter.mc_32_APP_VERSION, 0, header, 0x108, Transmitter.mc_32_APP_VERSION.length);
+					//				//System.arraycopy(Transmitter.mc_32_MEM_INFO, 0, header, 0x140, Transmitter.mc_32_MEM_INFO.length);
+					//				break;
+					//			case MC_20:
+					//				System.arraycopy(Transmitter.mc_20_APP_VERSION, 0, header, 0x08, Transmitter.mc_20_APP_VERSION.length);
+					//				//System.arraycopy(Transmitter.mc_20_TxRFID, 0, header, 0x100, Transmitter.mc_20_TxRFID.length);
+					//				//System.arraycopy(Transmitter.mc_20_APP_VERSION, 0, header, 0x108, Transmitter.mc_20_APP_VERSION.length);
+					//				//System.arraycopy(Transmitter.mc_20_MEM_INFO, 0, header, 0x140, Transmitter.mc_20_MEM_INFO.length);
+					//				break;
+					//			case MX_20:
+					//				System.arraycopy(Transmitter.mx_20_APP_VERSION, 0, header, 0x08, Transmitter.mx_20_APP_VERSION.length);
+					//				//System.arraycopy(Transmitter.mx_20_TxRFID, 0, header, 0x100, Transmitter.mx_20_TxRFID.length);
+					//				//System.arraycopy(Transmitter.mx_20_APP_VERSION, 0, header, 0x108, Transmitter.mx_20_APP_VERSION.length);
+					//				//System.arraycopy(Transmitter.mx_20_MEM_INFO, 0, header, 0x140, Transmitter.mx_20_MEM_INFO.length);
+					//				break;
+					//			case MX_16:
+					//				System.arraycopy(Transmitter.mx_16_APP_VERSION, 0, header, 0x08, Transmitter.mx_16_APP_VERSION.length);
+					//				//System.arraycopy(Transmitter.mx_16_TxRFID, 0, header, 0x100, Transmitter.mx_16_TxRFID.length);
+					//				//System.arraycopy(Transmitter.mx_16_APP_VERSION, 0, header, 0x108, Transmitter.mx_16_APP_VERSION.length);
+					//				break;
+					//			case MX_12:
+					//				System.arraycopy(Transmitter.mx_12_APP_VERSION, 0, header, 0x08, Transmitter.mx_12_APP_VERSION.length);
+					//				//System.arraycopy(Transmitter.mx_12_TxRFID, 0, header, 0x100, Transmitter.mx_12_TxRFID.length);
+					//				//System.arraycopy(Transmitter.mx_12_APP_VERSION, 0, header, 0x108, Transmitter.mx_12_APP_VERSION.length);
+					//				break;
+					//			}
+					out.write(header);
+
+					switch (Transmitter.fromValue(sb.substring(0, 5).toLowerCase())) {
+					default:
+					case MC_32:
+					case MC_20:
+					case MX_20:
+						for (int i = 0; i < 4; i++) {
+							sendMdlCmd(queryModels);
+							this.ANSWER_DATA = this.read(new byte[2057], 5000);
+							out.write(this.ANSWER_DATA, 7, 2048);
+							iQueryModels += 8;
+							queryModels[5] = (byte) ((iQueryModels & 0x00FF)       & 0xFF);
+							queryModels[6] = (byte)(((iQueryModels & 0xFF00) >> 8) & 0xFF);
+						}
+						break;
+					case MX_16:
+					case MX_12:
+						for (int i = 0; i < 2; i++) {
+							sendMdlCmd(queryModels);
+							this.ANSWER_DATA = this.read(new byte[2057], 5000);
+							iQueryModels += 8;
+							queryModels[5] = (byte) ((iQueryModels & 0x00FF)       & 0xFF);
+							queryModels[6] = (byte)(((iQueryModels & 0xFF00) >> 8) & 0xFF);
+						}
+						break;
 					}
-					break;
-				case MX_16:
-				case MX_12:
-					for (int i = 0; i < 2; i++) {
-						iQueryModels += 8;
-						queryModels[5] = (byte) ((iQueryModels & 0x00FF)       & 0xFF);
-						queryModels[6] = (byte)(((iQueryModels & 0xFF00) >> 8) & 0xFF);
+
+					out.close();
+					out = null;
+
+					parent.updateFileTransferProgress(totalSize, remainingSize -= 12288);
+				}
+				else {
+					switch (Transmitter.fromValue(sb.substring(0, 5).toLowerCase())) {
+					default:
+					case MC_32:
+					case MC_20:
+					case MX_20:
+						for (int i = 0; i < 4; i++) {
+							iQueryModels += 8;
+							queryModels[5] = (byte) ((iQueryModels & 0x00FF)       & 0xFF);
+							queryModels[6] = (byte)(((iQueryModels & 0xFF00) >> 8) & 0xFF);
+						}
+						break;
+					case MX_16:
+					case MX_12:
+						for (int i = 0; i < 2; i++) {
+							iQueryModels += 8;
+							queryModels[5] = (byte) ((iQueryModels & 0x00FF)       & 0xFF);
+							queryModels[6] = (byte)(((iQueryModels & 0xFF00) >> 8) & 0xFF);
+						}
+						break;
 					}
-					break;
 				}
 			}
 		}
-
-//		sendCmd(HoTTAdapterSerialPort.QUERY_MDL_NAMES, new String(new byte[]{0x10, 0x01, 0x00, 0x00, 0x0D, 0x28, 0x00}));
-//		this.ANSWER_DATA = this.read(new byte[300], 2000, 5);
+		finally {
+			this.postModelRead();
+		}
 		
-		this.postModelRead();
 	}
 	
 	/**
