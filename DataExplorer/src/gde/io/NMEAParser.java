@@ -67,6 +67,7 @@ public class NMEAParser {
 	final String								leader;
 	final CheckSumTypes					checkSumType;
 	final IDevice								device;
+	final String								deviceName;
 	final int										channelConfigNumber;
 	
 	int lineNumber = 0;
@@ -97,6 +98,7 @@ public class NMEAParser {
 		this.dataBlockSize  = useDataBlockSize;
 		this.values = new int[Math.abs(this.dataBlockSize)];
 		this.device = useDevice;
+		this.deviceName = this.device.getName();
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.timeOffsetUTC = useTimeOffsetUTC;
 	}
@@ -178,7 +180,7 @@ public class NMEAParser {
 				parseGSA(strValues);
 				break;
 			case GPVTG: // Velocity made good (VTG)
-				parseVTG(strValues);
+				if(!deviceName.equals("GPS-Logger")) parseVTG(strValues);
 				break;
 			case GPGSV: // Satellites in view (GSV)
 				parseGSV(strValues);
@@ -231,7 +233,7 @@ public class NMEAParser {
 				break;
 			case UL2:
 				if (this.values.length >=25){
-					if (this.device.getName().equals("UniLog2")) {
+					if (this.deviceName.equals("UniLog2")) {
 						//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
 						//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 						//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
@@ -240,7 +242,7 @@ public class NMEAParser {
 						int[] in2out = { -1,  -1,  -1,  -1, 	1, 		2, 15,  16,   4,  13,   0,   3,   5,  18,  19,  20,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
 						parseUNILOG2(strValues, in2out, 6, true);
 					}
-					else if (this.device.getName().equals("GPS-Logger")) {
+					else if (this.deviceName.equals("GPS-Logger")) {
 						if (this.channelConfigNumber == 2) {
 							//UL2 4:voltage, 5:current, 6:height, 7:climb, 8:power, 9:revolution, 11:capacity, 12:energy, 13:valueA1, 14:valueA2, 15:valueA3, 
 							//UL2 16:cellvoltage1, 17:cellvoltage2, 18:cellvoltage3, 19:cellvoltage4, 20:cellvoltage5, 21:cellvoltage6, 23:temperature intern

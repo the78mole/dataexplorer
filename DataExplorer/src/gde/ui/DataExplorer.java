@@ -227,7 +227,7 @@ public class DataExplorer extends Composite {
 	/**
 	 * get the instance of singleton DataExplorer
 	 */
-	public static DataExplorer getInstance() {
+	public static synchronized DataExplorer getInstance() {
 		if (DataExplorer.application == null) {
 			application = new DataExplorer();
 		}

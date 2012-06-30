@@ -211,7 +211,7 @@ public class DataTableWindow extends CTabItem {
 	/**
 	 * @param isAbsoluteDateTime the isAbsoluteDateTime to set
 	 */
-	public synchronized void setAbsoluteDateTime(boolean isAbsoluteDateTime) {
+	public void setAbsoluteDateTime(boolean isAbsoluteDateTime) {
 		this.isAbsoluteDateTime = isAbsoluteDateTime;
 	}
 }

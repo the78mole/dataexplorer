@@ -1066,20 +1066,15 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				}
 				else { //receiver
 					while (true) {
-						try {
-							impl.wait4Bytes(1000);
-							int numBytes = 0, redBytes = 0;
-							while ((numBytes = impl.inputStream.available()) != 0) {
-								byte[] readBuffer = new byte[numBytes];
-								impl.read(readBuffer, 1000);
-								System.arraycopy(readBuffer, 0, buffer, redBytes, numBytes);
-								redBytes += numBytes;
-							}
-							System.out.println(StringHelper.byte2CharString(buffer, redBytes));
+						impl.wait4Bytes(1000);
+						int numBytes = 0, redBytes = 0;
+						while ((numBytes = impl.inputStream.available()) != 0) {
+							byte[] readBuffer = new byte[numBytes];
+							impl.read(readBuffer, 1000);
+							System.arraycopy(readBuffer, 0, buffer, redBytes, numBytes);
+							redBytes += numBytes;
 						}
-						catch (Exception e) {
-							// ignore
-						}
+						System.out.println(StringHelper.byte2CharString(buffer, redBytes));
 					}
 				}
 			}

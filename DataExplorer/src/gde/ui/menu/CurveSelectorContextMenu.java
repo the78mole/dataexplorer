@@ -1062,6 +1062,7 @@ public class CurveSelectorContextMenu {
 							
 							String newRecordkey = copyFromRecordKey + GDE.STRING_UNDER_BAR + compareSet.size();
 							Record newRecord = compareSet.put(newRecordkey, copyFromRecord.clone()); // will delete channelConfigKey
+							newRecord.setOrdinal(copyFromRecord.getOrdinal());
 							newRecord.setDescription(copyFromRecordSet.getRecordSetDescription());
 							newRecord.setVisible(true); // if a non visible record added
 

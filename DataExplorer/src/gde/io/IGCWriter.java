@@ -99,7 +99,7 @@ public class IGCWriter {
 			//recordSet.setSaved(true);
 			if (IGCWriter.application.getStatusBar() != null) IGCWriter.application.setProgress(100, sThreadId);
 		}
-		catch (Exception e) {
+		catch (RuntimeException e) {
 			IGCWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}

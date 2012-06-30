@@ -103,7 +103,7 @@ public class DataParser extends NMEAParser {
 				
 				parse(inputLine, strValues);
 			}
-			catch (Exception e) {
+			catch (RuntimeException e) {
 				//Multiplex FlightRecorder
 				super.parse(inputLine, lineNum);
 			}

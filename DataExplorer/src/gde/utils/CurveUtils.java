@@ -93,7 +93,7 @@ public class CurveUtils {
 				yMaxValueDisplay = device.translateValue(record, yMaxValue);
 			}
 
-			if (device != null && (record.isRoundOut() || yMaxValue == yMinValue)) { // equal value disturbs the scaling algorithm
+			if (device != null && (record.isRoundOut() || Math.abs(yMaxValue - yMinValue) < .0001)) { // equal value disturbs the scaling algorithm
 				double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
 				yMaxValueDisplay = MathUtils.roundUp(yMaxValueDisplay, deltaValueDisplay); // max
 				yMinValueDisplay = MathUtils.roundDown(yMinValueDisplay, deltaValueDisplay); // min

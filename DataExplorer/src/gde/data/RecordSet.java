@@ -1562,7 +1562,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @return the horizontalGridRecord ordinal
 	 */
 	public int getHorizontalGridRecordOrdinal() {
-		return this.horizontalGridRecordOrdinal;
+		return this.isCompareSet ? this.get(0).ordinal : this.horizontalGridRecordOrdinal;
 	}
 
 	/**
@@ -1648,7 +1648,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			tmpValue = recordSetProps.get(START_TIME_STAMP);
 			if (tmpValue != null && tmpValue.length() > 0) this.timeStep_ms.setStartTimeStamp(Long.parseLong(tmpValue));
 			else {
-				String recordSetDescription = new String(this.getRecordSetDescription());
+				String recordSetDescription = this.getRecordSetDescription();
 				Pattern datePattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
 				Matcher dateMatcher = datePattern.matcher(recordSetDescription);
 				Pattern timePattern = Pattern.compile("\\d{2}:\\d{2}:\\d{2}");
@@ -1712,7 +1712,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 						.split(GDE.STRING_COMMA)[2]));
 				
 			tmpValue = recordSetProps.get(SMOOTH_AT_CURRENT_DROP);
-			if (tmpValue != null && tmpValue.length() > 0) this.isSmoothAtCurrentDrop = new Boolean(tmpValue.trim()).booleanValue();
+			if (tmpValue != null && tmpValue.length() > 0) this.isSmoothAtCurrentDrop = Boolean.valueOf(tmpValue.trim()).booleanValue();
 
 			tmpValue = recordSetProps.get(VOLTAGE_LIMITS);
 			if (tmpValue != null && tmpValue.length() > 0) {

@@ -146,50 +146,45 @@ public class FileUtils {
 	 */
 	public static boolean checkDirectoryAndCreate(String directory, String versionFileName) {
 		boolean exist = true;
-		try {
-			int version = Integer.parseInt(versionFileName.substring(versionFileName.length()-6, versionFileName.length()-4));
-			File dir = new File(directory);
-			//initial case Device directory does ot exist
-			if (!dir.exists() && !dir.isDirectory()) {
-				exist = false;
-				if(!dir.mkdir())
-					log.log(Level.WARNING, "failed to create " + directory);
-			}
-			else {
-				File file = new File(directory + GDE.FILE_SEPARATOR_UNIX + versionFileName);
-				if (!file.exists()) {
-					try {
-						//find directory contained version file and rename directory, do not use actual version -1 to enable support for several installed GDE versions
-						for(File tmpFile : FileUtils.getFileListingNoSort(dir, 3)) {
-							if(tmpFile.getPath().endsWith(GDE.FILE_ENDING_DOT_XSD)) {
-								int oldVersion = Integer.parseInt(tmpFile.getPath().substring(tmpFile.getPath().length()-6, tmpFile.getPath().length()-4));
-								if(!dir.renameTo(new File(directory + "_V" + oldVersion))) {
-									log.log(Level.WARNING, "failed to rename " + directory);
-								}
-							}
-						}
-						//check if a directory ending with the actual version already exist to re-use if legacy GDE was started before and a newer version has renamed 
-						File versionDir = new File(directory + "_V" + version);
-						if (versionDir.exists()) {
-							if(!versionDir.renameTo(new File(directory))) {
+		int version = Integer.parseInt(versionFileName.substring(versionFileName.length()-6, versionFileName.length()-4));
+		File dir = new File(directory);
+		//initial case Device directory does ot exist
+		if (!dir.exists() && !dir.isDirectory()) {
+			exist = false;
+			if(!dir.mkdir())
+				log.log(Level.WARNING, "failed to create " + directory);
+		}
+		else {
+			File file = new File(directory + GDE.FILE_SEPARATOR_UNIX + versionFileName);
+			if (!file.exists()) {
+				try {
+					//find directory contained version file and rename directory, do not use actual version -1 to enable support for several installed GDE versions
+					for(File tmpFile : FileUtils.getFileListingNoSort(dir, 3)) {
+						if(tmpFile.getPath().endsWith(GDE.FILE_ENDING_DOT_XSD)) {
+							int oldVersion = Integer.parseInt(tmpFile.getPath().substring(tmpFile.getPath().length()-6, tmpFile.getPath().length()-4));
+							if(!dir.renameTo(new File(directory + "_V" + oldVersion))) {
 								log.log(Level.WARNING, "failed to rename " + directory);
 							}
 						}
-						else {
-							exist = false;
-							File newDir = new File(directory);
-							if (!newDir.mkdir())
-								log.log(Level.WARNING, "failed to create " + directory);						
+					}
+					//check if a directory ending with the actual version already exist to re-use if legacy GDE was started before and a newer version has renamed 
+					File versionDir = new File(directory + "_V" + version);
+					if (versionDir.exists()) {
+						if(!versionDir.renameTo(new File(directory))) {
+							log.log(Level.WARNING, "failed to rename " + directory);
 						}
 					}
-					catch (Exception e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
+					else {
+						exist = false;
+						File newDir = new File(directory);
+						if (!newDir.mkdir())
+							log.log(Level.WARNING, "failed to create " + directory);						
 					}
 				}
+				catch (Exception e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+				}
 			}
-		}
-		catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return exist;
 	}

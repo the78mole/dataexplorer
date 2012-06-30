@@ -527,6 +527,10 @@ public class Record extends Vector<Integer> {
 	public int getOrdinal() {
 		return this.ordinal;
 	}
+
+	public void setOrdinal(int newOrdinal) {
+		this.ordinal = newOrdinal;
+	}
 	
 	public String getName() {
 		return this.name;
