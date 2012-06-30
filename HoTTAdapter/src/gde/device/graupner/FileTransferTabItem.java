@@ -840,6 +840,7 @@ public class FileTransferTabItem extends CTabItem {
 			TreeItem parentItem, tmpItem;
 			setTableHeader(this.pcFoldersTable);
 
+			if (evtItem == null) evtItem = this.pcRootTreeItem;
 			for (TreeItem item : evtItem.getItems()) {
 				item.dispose();
 			}
