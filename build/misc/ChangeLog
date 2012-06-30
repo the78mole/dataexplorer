@@ -9,7 +9,10 @@ DeviceProperties_V17 -> DeviceProperties_V18 due to HoTTAdapter
 HoTTAdapter - toggle import of channel deflection via device dialog
 HoTTAdapter(2) - correct signal strength calculation 
 HottAdapter(2) - add support for serial file transfer
+HottAdapter(2) - add support for model data backup
+HottAdapter(2) - add support for simple model data conversion
 HoTTAdapter2 - add channel-configuration displaying all available data including channels
+GPS-Logger - use speed data from RMC sentence which contains height difference adapted speed values
 
 Version 3.01 - 21 May 2012
 fix scale synchronization problem while change zoom
