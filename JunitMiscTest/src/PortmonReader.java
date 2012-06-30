@@ -22,7 +22,7 @@ public class PortmonReader {
 	public static void main(String[] args) {
 		try {
 			//BufferedReader br = new BufferedReader( new InputStreamReader( new FileInputStream("c:\\Programs\\Sysinternals\\HoTTManager_Connect_LogData_cappuccino_files.LOG")));
-			BufferedReader br = new BufferedReader( new InputStreamReader( new FileInputStream("c:\\Programs\\Sysinternals\\GR_read_modellspeicher_2_1.LOG")));
+			BufferedReader br = new BufferedReader( new InputStreamReader( new FileInputStream("c:\\Programs\\Sysinternals\\Modelldatareadmx16.LOG")));
 			String line;
 			StringBuilder sb = new StringBuilder();
 			while ((line = br.readLine()) != null) {
