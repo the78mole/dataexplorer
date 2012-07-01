@@ -1,5 +1,3 @@
-import gde.utils.Checksum;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
