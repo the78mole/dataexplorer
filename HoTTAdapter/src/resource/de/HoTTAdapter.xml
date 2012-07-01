@@ -10,7 +10,7 @@
     </Device>
     <SerialPort>
         <port></port>
-        <baudeRate>19200</baudeRate>
+        <baudeRate>115200</baudeRate>
         <dataBits>DATABITS_8</dataBits>
         <stopBits>STOPBITS_1</stopBits>
         <parity>PARITY_NONE</parity>
@@ -43,22 +43,22 @@
                 <name>RF_RXSQ</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <active>false</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Strength</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Paketverlust</name>
@@ -72,14 +72,14 @@
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name> Rx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="4" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -87,7 +87,7 @@
                 <symbol>Urx</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
@@ -105,7 +105,7 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Höhe (relativ)</name>
@@ -149,7 +149,7 @@
                 <symbol>Urx</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
@@ -167,7 +167,7 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Breitengrad</name>
@@ -248,7 +248,7 @@
                 <symbol>Urx</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
@@ -266,7 +266,7 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Spannung</name>
@@ -367,7 +367,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf " triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -443,7 +443,7 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Spannung</name>
@@ -467,7 +467,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
+                <statistics comment="Bezogen auf " triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -684,14 +684,14 @@
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name> Rx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="1" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -769,7 +769,7 @@
                 <name>Ch 10</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -777,7 +777,7 @@
                 <name>Ch 11</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -785,7 +785,7 @@
                 <name>Ch 12</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -793,7 +793,7 @@
                 <name>Ch 13</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -801,7 +801,7 @@
                 <name>Ch 14</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -809,7 +809,7 @@
                 <name>Ch 15</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -817,7 +817,7 @@
                 <name>Ch 16</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="3" name="scale_sync_ref_ordinal"/>
             </Measurement>

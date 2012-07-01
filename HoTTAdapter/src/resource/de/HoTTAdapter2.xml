@@ -10,7 +10,7 @@
     </Device>
     <SerialPort>
         <port></port>
-        <baudeRate>19200</baudeRate>
+        <baudeRate>115200</baudeRate>
         <dataBits>DATABITS_8</dataBits>
         <stopBits>STOPBITS_1</stopBits>
         <parity>PARITY_NONE</parity>
@@ -43,7 +43,7 @@
                 <name>RF_RXSQ</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
@@ -500,7 +500,7 @@
                 <name>RF_RXSQ</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
@@ -958,7 +958,7 @@
                 <name>RF_RXSQ</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
@@ -1253,7 +1253,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="36" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="36" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -1415,7 +1415,7 @@
                 <name>RF_RXSQ</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
