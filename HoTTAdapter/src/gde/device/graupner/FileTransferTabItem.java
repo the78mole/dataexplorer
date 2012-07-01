@@ -346,7 +346,6 @@ public class FileTransferTabItem extends CTabItem {
 						this.pcFoldersTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						setTableHeader(this.pcFoldersTable);
 						this.pcFoldersTable.addListener(SWT.Selection, new Listener() {
-							@Override
 							public void handleEvent(Event event) {
 								TableItem item = (TableItem) event.item;
 								FileTransferTabItem.log.log(Level.FINE, "Selection={" + item.getText(1) + "}"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -383,7 +382,6 @@ public class FileTransferTabItem extends CTabItem {
 					this.sdCardActionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 2, SWT.NORMAL));
 					this.sdCardActionGroup.setText(Messages.getString(MessageIds.GDE_MSGT2428));
 					this.sdCardActionGroup.addPaintListener(new PaintListener() {
-						@Override
 						public void paintControl(PaintEvent evt) {
 							FileTransferTabItem.log.log(Level.FINER, "sdCardActionGroup.paintControl, event=" + evt); //$NON-NLS-1$
 
@@ -622,7 +620,6 @@ public class FileTransferTabItem extends CTabItem {
 						this.sdCardFoldersTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						setTableHeader(this.sdCardFoldersTable);
 						this.sdCardFoldersTable.addListener(SWT.Selection, new Listener() {
-							@Override
 							public void handleEvent(Event event) {
 								TableItem item = (TableItem) event.item;
 								FileTransferTabItem.log.log(Level.FINE, "Selection={" + item.getText(1) + "}"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -963,7 +960,6 @@ public class FileTransferTabItem extends CTabItem {
 	 */
 	public void updateFileTransferProgress(final long totalSize, final long remainingSize) {
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				FileTransferTabItem.this.transferProgressBar.setSelection((int) ((totalSize - remainingSize) * 100 / totalSize));
 				FileTransferTabItem.this.transferProgressLabel.setText(Messages.getString(MessageIds.GDE_MSGT2443, new Object[] { (totalSize - remainingSize), totalSize }));
@@ -977,7 +973,6 @@ public class FileTransferTabItem extends CTabItem {
 	public void updatePcFolder() {
 		final TreeItem treeItem = this.lastSelectedPcTreeItem;
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				updateSelectedPcFolder(treeItem);
 			}
@@ -990,7 +985,6 @@ public class FileTransferTabItem extends CTabItem {
 	public void updateSdFolder(final long[] sdSizes) {
 		final TreeItem treeItem = this.lastSelectedSdTreeItem;
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				updateSdCardSizes(sdSizes);
 				updateSelectedSdFolder(treeItem);
@@ -1004,7 +998,6 @@ public class FileTransferTabItem extends CTabItem {
 	 */
 	public void enableActionButtons(final boolean enableConnectStop) {
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				FileTransferTabItem.this.connectButton.setEnabled(!enableConnectStop);
 				FileTransferTabItem.this.stopButton.setEnabled(enableConnectStop);
@@ -1022,7 +1015,6 @@ public class FileTransferTabItem extends CTabItem {
 	 */
 	public void enableSerialButtons(final boolean enable) {
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				FileTransferTabItem.this.upDownLoadButton.setEnabled(enable);
 				FileTransferTabItem.this.modelLoadButton.setEnabled(enable);
