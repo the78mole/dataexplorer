@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.02 - xx yyy 2012
+Version 3.02 - 01 Jul 2012
 fix performance problem while in zoom mode and update statistics data
 UniLog2 - remove not supported 50Hz logging rate adjustment
 HoTTAdapter - enable serial file transfer
