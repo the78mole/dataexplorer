@@ -93,8 +93,8 @@ public class FileTransferTabItem extends CTabItem {
 	private ProgressBar					transferProgressBar;
 	private TableColumn					indexColumn, fileNameColum, fileDateColum, fileTimeColum, fileSizeColum;
 
-	final Menu										popupmenu;
-	final ConvertContextMenu							contextMenu;
+	final Menu									popupmenu;
+	final ConvertContextMenu		contextMenu;
 
 	final CTabFolder						tabFolder;
 	final HoTTAdapter						device;
@@ -107,7 +107,7 @@ public class FileTransferTabItem extends CTabItem {
 	StringBuilder								selectedPcBaseFolder		= new StringBuilder().append(this.settings.getDataFilePath());
 	StringBuilder								selectedPcFolder				= new StringBuilder();
 	TreeItem										lastSelectedSdTreeItem, lastSelectedPcTreeItem;
-	
+
 	public FileTransferTabItem(CTabFolder parent, int style, int position, HoTTAdapter useDevice, HoTTAdapterSerialPort useSerialPort) {
 		super(parent, style, position);
 		this.tabFolder = parent;
@@ -120,105 +120,110 @@ public class FileTransferTabItem extends CTabItem {
 		this.contextMenu = new ConvertContextMenu();
 		create();
 	}
-	
-	SelectionAdapter upLoadSelectionAdapter = new SelectionAdapter() {
-		@Override
-		public void widgetSelected(SelectionEvent evt) {
-			FileTransferTabItem.log.log(Level.FINEST, "upLoadButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-			TableItem[] selection = FileTransferTabItem.this.sdCardFoldersTable.getSelection();
 
-			if (selection == null || selection.length < 1 || FileTransferTabItem.this.selectedSdFolder == null || FileTransferTabItem.this.selectedSdFolder.length() < 5
-					|| FileTransferTabItem.this.selectedSdFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) < 0) {
-				FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2431));
-				return;
-			}
-			else if (FileTransferTabItem.this.selectedPcFolder == null || FileTransferTabItem.this.selectedPcFolder.length() == 0) {
-				FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2433));
-				return;
-			}
+	SelectionAdapter					upLoadSelectionAdapter		= new SelectionAdapter() {
+																												@Override
+																												public void widgetSelected(SelectionEvent evt) {
+																													FileTransferTabItem.log.log(Level.FINEST, "upLoadButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+																													TableItem[] selection = FileTransferTabItem.this.sdCardFoldersTable.getSelection();
 
-			final StringBuilder filesInfo = new StringBuilder();
-			long tmpTotalSize = 0;
-			for (TableItem element : selection) {
-				String[] date = element.getText(2).split(GDE.STRING_DASH);
-				String[] time = element.getText(3).split(GDE.STRING_COLON);
-				GregorianCalendar calendar = new GregorianCalendar(Integer.parseInt(date[0]), Integer.parseInt(date[1]) - 1, Integer.parseInt(date[2]), Integer.parseInt(time[0]), Integer
-						.parseInt(time[1]));
-				long timeStamp = calendar.getTimeInMillis();
-				filesInfo.append(element.getText(0)).append(GDE.STRING_COMMA).append(element.getText(1)).append(GDE.STRING_COMMA).append(timeStamp).append(GDE.STRING_SEMICOLON);
-				tmpTotalSize += Long.parseLong(element.getText(4));
-			}
-			FileTransferTabItem.log.log(Level.FINE, "Selection={" + filesInfo + "}"); //$NON-NLS-1$ //$NON-NLS-2$
-			
-			final long totalSize = tmpTotalSize;
-			new Thread("Upload") { //$NON-NLS-1$
-				@Override
-				public void run() {
-					try {
-						enableActionButtons(true);
-						FileTransferTabItem.this.serialPort.setInterruptedByUser(false);
-						FileTransferTabItem.this.serialPort.upLoadFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.FILE_SEPARATOR_UNIX,
-								FileTransferTabItem.this.selectedPcFolder.toString(), filesInfo.toString().split(GDE.STRING_SEMICOLON), totalSize, FileTransferTabItem.this);
-					}
-					catch (Exception e) {
-						FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
-						FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
-					}
-					finally {
-						enableActionButtons(false);
-					}
-				}
-			}.start();
-		}
-	};
+																													if (selection == null || selection.length < 1 || FileTransferTabItem.this.selectedSdFolder == null
+																															|| FileTransferTabItem.this.selectedSdFolder.length() < 5
+																															|| FileTransferTabItem.this.selectedSdFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) < 0) {
+																														FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2431));
+																														return;
+																													}
+																													else if (FileTransferTabItem.this.selectedPcFolder == null || FileTransferTabItem.this.selectedPcFolder.length() == 0) {
+																														FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2433));
+																														return;
+																													}
 
-	private SelectionAdapter downLoadSelectionAdapter = new SelectionAdapter() {
-		@Override
-		public void widgetSelected(SelectionEvent evt) {
-			FileTransferTabItem.log.log(Level.FINEST, "downLoadButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-			TableItem[] selection = FileTransferTabItem.this.pcFoldersTable.getSelection();
+																													final StringBuilder filesInfo = new StringBuilder();
+																													long tmpTotalSize = 0;
+																													for (TableItem element : selection) {
+																														String[] date = element.getText(2).split(GDE.STRING_DASH);
+																														String[] time = element.getText(3).split(GDE.STRING_COLON);
+																														GregorianCalendar calendar = new GregorianCalendar(Integer.parseInt(date[0]), Integer.parseInt(date[1]) - 1, Integer.parseInt(date[2]),
+																																Integer.parseInt(time[0]), Integer.parseInt(time[1]));
+																														long timeStamp = calendar.getTimeInMillis();
+																														filesInfo.append(element.getText(0)).append(GDE.STRING_COMMA).append(element.getText(1)).append(GDE.STRING_COMMA).append(timeStamp)
+																																.append(GDE.STRING_SEMICOLON);
+																														tmpTotalSize += Long.parseLong(element.getText(4));
+																													}
+																													FileTransferTabItem.log.log(Level.FINE, "Selection={" + filesInfo + "}"); //$NON-NLS-1$ //$NON-NLS-2$
 
-			if (selection == null || selection.length < 1 || FileTransferTabItem.this.selectedSdFolder == null || FileTransferTabItem.this.selectedSdFolder.length() < 5
-					|| FileTransferTabItem.this.selectedSdFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) < 0) {
-				FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2431));
-				return;
-			}
-			else if (FileTransferTabItem.this.selectedSdFolder == null || FileTransferTabItem.this.selectedPcFolder.length() == 0) {
-				FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2433));
-				return;
-			}
+																													final long totalSize = tmpTotalSize;
+																													new Thread("Upload") { //$NON-NLS-1$
+																														@Override
+																														public void run() {
+																															try {
+																																enableActionButtons(true);
+																																FileTransferTabItem.this.serialPort.setInterruptedByUser(false);
+																																FileTransferTabItem.this.serialPort.upLoadFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.FILE_SEPARATOR_UNIX,
+																																		FileTransferTabItem.this.selectedPcFolder.toString(), filesInfo.toString().split(GDE.STRING_SEMICOLON), totalSize,
+																																		FileTransferTabItem.this);
+																															}
+																															catch (Exception e) {
+																																FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
+																																FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
+																															}
+																															finally {
+																																enableActionButtons(false);
+																															}
+																														}
+																													}.start();
+																												}
+																											};
 
-			final StringBuilder filesInfo = new StringBuilder();
-			long tmpTotalSize = 0;
-			for (TableItem element : selection) {
-				filesInfo.append(element.getText(0)).append(GDE.STRING_COMMA).append(element.getText(1)).append(GDE.STRING_SEMICOLON);
-				tmpTotalSize += Long.parseLong(element.getText(4));
-			}
-			FileTransferTabItem.log.log(Level.FINE, "Selection={" + filesInfo + "}"); //$NON-NLS-1$ //$NON-NLS-2$
+	private SelectionAdapter	downLoadSelectionAdapter	= new SelectionAdapter() {
+																												@Override
+																												public void widgetSelected(SelectionEvent evt) {
+																													FileTransferTabItem.log.log(Level.FINEST, "downLoadButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+																													TableItem[] selection = FileTransferTabItem.this.pcFoldersTable.getSelection();
 
-			final long totalSize = tmpTotalSize;
-			Thread tmpThread = new Thread("Download") { //$NON-NLS-1$
-				@Override
-				public void run() {
-					try {
-						enableActionButtons(true);
-						FileTransferTabItem.this.serialPort.setInterruptedByUser(false);
-						FileTransferTabItem.this.serialPort.downLoadFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.FILE_SEPARATOR_UNIX,
-								FileTransferTabItem.this.selectedPcFolder.toString(), filesInfo.toString().split(GDE.STRING_SEMICOLON), totalSize, FileTransferTabItem.this);
-					}
-					catch (Exception e) {
-						FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
-						FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
-					}
-					finally {
-						enableActionButtons(false);
-					}
-				}
-			};
-			tmpThread.start();
-		}
-	};
-	
+																													if (selection == null || selection.length < 1 || FileTransferTabItem.this.selectedSdFolder == null
+																															|| FileTransferTabItem.this.selectedSdFolder.length() < 5
+																															|| FileTransferTabItem.this.selectedSdFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) < 0) {
+																														FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2431));
+																														return;
+																													}
+																													else if (FileTransferTabItem.this.selectedSdFolder == null || FileTransferTabItem.this.selectedPcFolder.length() == 0) {
+																														FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2433));
+																														return;
+																													}
+
+																													final StringBuilder filesInfo = new StringBuilder();
+																													long tmpTotalSize = 0;
+																													for (TableItem element : selection) {
+																														filesInfo.append(element.getText(0)).append(GDE.STRING_COMMA).append(element.getText(1)).append(GDE.STRING_SEMICOLON);
+																														tmpTotalSize += Long.parseLong(element.getText(4));
+																													}
+																													FileTransferTabItem.log.log(Level.FINE, "Selection={" + filesInfo + "}"); //$NON-NLS-1$ //$NON-NLS-2$
+
+																													final long totalSize = tmpTotalSize;
+																													Thread tmpThread = new Thread("Download") { //$NON-NLS-1$
+																														@Override
+																														public void run() {
+																															try {
+																																enableActionButtons(true);
+																																FileTransferTabItem.this.serialPort.setInterruptedByUser(false);
+																																FileTransferTabItem.this.serialPort.downLoadFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.FILE_SEPARATOR_UNIX,
+																																		FileTransferTabItem.this.selectedPcFolder.toString(), filesInfo.toString().split(GDE.STRING_SEMICOLON), totalSize,
+																																		FileTransferTabItem.this);
+																															}
+																															catch (Exception e) {
+																																FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
+																																FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
+																															}
+																															finally {
+																																enableActionButtons(false);
+																															}
+																														}
+																													};
+																													tmpThread.start();
+																												}
+																											};
+
 	private void create() {
 		try {
 			this.scrolledComposite = new ScrolledComposite(this.tabFolder, SWT.H_SCROLL | SWT.V_SCROLL);
@@ -341,15 +346,16 @@ public class FileTransferTabItem extends CTabItem {
 						this.pcFoldersTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						setTableHeader(this.pcFoldersTable);
 						this.pcFoldersTable.addListener(SWT.Selection, new Listener() {
+							@Override
 							public void handleEvent(Event event) {
 								TableItem item = (TableItem) event.item;
 								FileTransferTabItem.log.log(Level.FINE, "Selection={" + item.getText(1) + "}"); //$NON-NLS-1$ //$NON-NLS-2$
 								TableItem[] selection = FileTransferTabItem.this.pcFoldersTable.getSelection();
 								//enable download
 								FileTransferTabItem.this.upDownLoadButton.setText(Messages.getString(MessageIds.GDE_MSGT2436));
-								FileTransferTabItem.this.upDownLoadButton.removeSelectionListener(upLoadSelectionAdapter);
-								FileTransferTabItem.this.upDownLoadButton.removeSelectionListener(downLoadSelectionAdapter);
-								FileTransferTabItem.this.upDownLoadButton.addSelectionListener(downLoadSelectionAdapter);
+								FileTransferTabItem.this.upDownLoadButton.removeSelectionListener(FileTransferTabItem.this.upLoadSelectionAdapter);
+								FileTransferTabItem.this.upDownLoadButton.removeSelectionListener(FileTransferTabItem.this.downLoadSelectionAdapter);
+								FileTransferTabItem.this.upDownLoadButton.addSelectionListener(FileTransferTabItem.this.downLoadSelectionAdapter);
 
 								if (FileTransferTabItem.log.isLoggable(Level.FINE)) {
 									StringBuilder sb = new StringBuilder();
@@ -357,7 +363,9 @@ public class FileTransferTabItem extends CTabItem {
 										sb.append(element).append(GDE.STRING_BLANK);
 									FileTransferTabItem.log.log(Level.FINE, "Selection={" + sb.toString() + "}"); //$NON-NLS-1$ //$NON-NLS-2$
 								}
-								FileTransferTabItem.this.contextMenu.createMenu(FileTransferTabItem.this.popupmenu, Transmitter.detectTransmitter(item.getText(1), selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + item.getText(1)), selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + item.getText(1));
+								FileTransferTabItem.this.contextMenu.createMenu(FileTransferTabItem.this.popupmenu,
+										Transmitter.detectTransmitter(item.getText(1), FileTransferTabItem.this.selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + item.getText(1)), FileTransferTabItem.this.selectedPcFolder
+												+ GDE.FILE_SEPARATOR_UNIX + item.getText(1));
 							}
 						});
 						this.pcFoldersTable.setMenu(this.popupmenu);
@@ -375,14 +383,15 @@ public class FileTransferTabItem extends CTabItem {
 					this.sdCardActionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 2, SWT.NORMAL));
 					this.sdCardActionGroup.setText(Messages.getString(MessageIds.GDE_MSGT2428));
 					this.sdCardActionGroup.addPaintListener(new PaintListener() {
+						@Override
 						public void paintControl(PaintEvent evt) {
 							FileTransferTabItem.log.log(Level.FINER, "sdCardActionGroup.paintControl, event=" + evt); //$NON-NLS-1$
-							
+
 							if (FileTransferTabItem.this.device.getBaudeRate() == 115200) {
 								FileTransferTabItem.this.sdCardActionGroup.setEnabled(true);
 								FileTransferTabItem.this.connectButton.setEnabled(true);
 								if (!FileTransferTabItem.this.sdCardActionGroup.getText().equals(Messages.getString(MessageIds.GDE_MSGT2428)))
-										FileTransferTabItem.this.sdCardActionGroup.setText(Messages.getString(MessageIds.GDE_MSGT2428));
+									FileTransferTabItem.this.sdCardActionGroup.setText(Messages.getString(MessageIds.GDE_MSGT2428));
 							}
 							else {
 								FileTransferTabItem.this.sdCardActionGroup.setEnabled(false);
@@ -444,7 +453,7 @@ public class FileTransferTabItem extends CTabItem {
 								public void widgetSelected(SelectionEvent evt) {
 									FileTransferTabItem.log.log(Level.FINEST, "connectButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 									try {
-										if (SWT.NO == application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW2403))) {
+										if (SWT.NO == FileTransferTabItem.this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGW2403))) {
 											return;
 										}
 										if (!FileTransferTabItem.this.serialPort.isConnected()) {
@@ -461,7 +470,7 @@ public class FileTransferTabItem extends CTabItem {
 											return;
 										}
 										updateSdCardSizes(sdSizes);
-										
+
 										listSdCardBaseDirs();
 									}
 									catch (Exception e) {
@@ -518,7 +527,11 @@ public class FileTransferTabItem extends CTabItem {
 										@Override
 										public void run() {
 											try {
-												FileTransferTabItem.this.serialPort.loadModelData(selectedPcFolder.toString(), FileTransferTabItem.this);
+												if (FileTransferTabItem.this.selectedPcFolder.length() < 3) {
+													FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE2400));
+													return;
+												}
+												FileTransferTabItem.this.serialPort.loadModelData(FileTransferTabItem.this.selectedPcFolder.toString(), FileTransferTabItem.this);
 												FileTransferTabItem.this.updatePcFolder();
 											}
 											catch (Exception e) {
@@ -554,7 +567,7 @@ public class FileTransferTabItem extends CTabItem {
 										FileTransferTabItem.log.log(Level.FINER, "dispose " + item.getText()); //$NON-NLS-1$
 										item.dispose();
 									}
-									sdRootDirectoryTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif")); //$NON-NLS-1$
+									FileTransferTabItem.this.sdRootDirectoryTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif")); //$NON-NLS-1$
 									enableActionButtons(false);
 									enableSerialButtons(false);
 									FileTransferTabItem.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404),
@@ -609,16 +622,17 @@ public class FileTransferTabItem extends CTabItem {
 						this.sdCardFoldersTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						setTableHeader(this.sdCardFoldersTable);
 						this.sdCardFoldersTable.addListener(SWT.Selection, new Listener() {
+							@Override
 							public void handleEvent(Event event) {
 								TableItem item = (TableItem) event.item;
 								FileTransferTabItem.log.log(Level.FINE, "Selection={" + item.getText(1) + "}"); //$NON-NLS-1$ //$NON-NLS-2$
 								TableItem[] selection = FileTransferTabItem.this.sdCardFoldersTable.getSelection();
 								//enable upload
 								FileTransferTabItem.this.upDownLoadButton.setText(Messages.getString(MessageIds.GDE_MSGT2430));
-								FileTransferTabItem.this.upDownLoadButton.removeSelectionListener(downLoadSelectionAdapter);
-								FileTransferTabItem.this.upDownLoadButton.removeSelectionListener(upLoadSelectionAdapter);
-								FileTransferTabItem.this.upDownLoadButton.addSelectionListener(upLoadSelectionAdapter);
-								
+								FileTransferTabItem.this.upDownLoadButton.removeSelectionListener(FileTransferTabItem.this.downLoadSelectionAdapter);
+								FileTransferTabItem.this.upDownLoadButton.removeSelectionListener(FileTransferTabItem.this.upLoadSelectionAdapter);
+								FileTransferTabItem.this.upDownLoadButton.addSelectionListener(FileTransferTabItem.this.upLoadSelectionAdapter);
+
 								if (FileTransferTabItem.log.isLoggable(Level.FINE)) {
 									StringBuilder sb = new StringBuilder();
 									for (TableItem element : selection)
@@ -870,9 +884,10 @@ public class FileTransferTabItem extends CTabItem {
 				this.selectedPcFolder.insert(0, this.selectedPcBaseFolder);
 			}
 			else {
-				this.selectedPcFolder = new StringBuilder().append(selectedPcBaseFolder);
+				this.selectedPcFolder = new StringBuilder().append(this.selectedPcBaseFolder);
 			}
 			//update with new folder and file information
+			FileTransferTabItem.log.log(Level.OFF, "selectedPcFolder = " + this.selectedPcFolder.toString());
 			List<File> files = FileUtils.getFileListing(new File(this.selectedPcFolder.toString()), 0);
 			int index = 0;
 			for (File file : files) {
@@ -922,6 +937,7 @@ public class FileTransferTabItem extends CTabItem {
 				parentItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif")); //$NON-NLS-1$
 				tmpItem = parentItem;
 			}
+			FileTransferTabItem.log.log(Level.OFF, "selectedSdFolder = " + this.selectedSdFolder.toString());
 			this.sdFoldersAndFiles = this.serialPort.queryListDir(this.selectedSdFolder.toString(), 0);
 			for (String folder : this.sdFoldersAndFiles.get("FOLDER")) { //$NON-NLS-1$
 				if (folder.length() > 3) {
@@ -947,6 +963,7 @@ public class FileTransferTabItem extends CTabItem {
 	 */
 	public void updateFileTransferProgress(final long totalSize, final long remainingSize) {
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				FileTransferTabItem.this.transferProgressBar.setSelection((int) ((totalSize - remainingSize) * 100 / totalSize));
 				FileTransferTabItem.this.transferProgressLabel.setText(Messages.getString(MessageIds.GDE_MSGT2443, new Object[] { (totalSize - remainingSize), totalSize }));
@@ -960,6 +977,7 @@ public class FileTransferTabItem extends CTabItem {
 	public void updatePcFolder() {
 		final TreeItem treeItem = this.lastSelectedPcTreeItem;
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				updateSelectedPcFolder(treeItem);
 			}
@@ -972,6 +990,7 @@ public class FileTransferTabItem extends CTabItem {
 	public void updateSdFolder(final long[] sdSizes) {
 		final TreeItem treeItem = this.lastSelectedSdTreeItem;
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				updateSdCardSizes(sdSizes);
 				updateSelectedSdFolder(treeItem);
@@ -985,6 +1004,7 @@ public class FileTransferTabItem extends CTabItem {
 	 */
 	public void enableActionButtons(final boolean enableConnectStop) {
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				FileTransferTabItem.this.connectButton.setEnabled(!enableConnectStop);
 				FileTransferTabItem.this.stopButton.setEnabled(enableConnectStop);
@@ -1002,6 +1022,7 @@ public class FileTransferTabItem extends CTabItem {
 	 */
 	public void enableSerialButtons(final boolean enable) {
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				FileTransferTabItem.this.upDownLoadButton.setEnabled(enable);
 				FileTransferTabItem.this.modelLoadButton.setEnabled(enable);

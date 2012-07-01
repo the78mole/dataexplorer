@@ -1196,6 +1196,9 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			HoTTAdapterSerialPort.log.log(Level.OFF, vModels.size() + " - " + vModels.toString());
 			String dirName = selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + "backup_" + sModels[0].toLowerCase();
 			FileUtils.checkDirectoryAndCreate(dirName);
+			if (!FileUtils.checkDirectoryAndCreate(dirName)) {
+				throw new RuntimeException("Failed create directory " + dirName);
+			}
 
 			long remainingSize = 0, totalSize = 0;
 			switch (Transmitter.fromValue(sb.substring(0,5).toLowerCase())) {
