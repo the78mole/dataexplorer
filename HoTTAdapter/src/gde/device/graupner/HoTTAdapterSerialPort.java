@@ -1215,6 +1215,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				totalSize = numValidMdls * 8192;
 				break;
 			}
+			parent.updateFileTransferProgress(totalSize, remainingSize);
 
 			byte[] queryModels = new byte[]{0x00, 0x08, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00};
 			int iQueryModels = 0x30; //start address
