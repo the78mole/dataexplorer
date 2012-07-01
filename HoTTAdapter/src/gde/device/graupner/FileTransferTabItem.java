@@ -444,6 +444,9 @@ public class FileTransferTabItem extends CTabItem {
 								public void widgetSelected(SelectionEvent evt) {
 									FileTransferTabItem.log.log(Level.FINEST, "connectButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 									try {
+										if (SWT.NO == application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW2403))) {
+											return;
+										}
 										if (!FileTransferTabItem.this.serialPort.isConnected()) {
 											FileTransferTabItem.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2404),
 													Messages.getString(MessageIds.GDE_MSGT2404));
