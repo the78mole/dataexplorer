@@ -578,9 +578,13 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 
 				if (j == 12 || j == 13) { //12=Latitude, 13=Longitude 
-					int grad = record.realGet(rowIndex) / 1000000;
-					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-					dataTableRow[j + 1] = String.format("%d %.4f", grad, minuten); //$NON-NLS-1$
+					if (record.getUnit().indexOf('\'') > 0) {
+						int grad = record.realGet(rowIndex) / 1000000;
+						double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
+						dataTableRow[j + 1] = String.format("%d %.4f", grad, minuten); //$NON-NLS-1$
+					}
+					else
+						dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
 				}
 				else if (j >= 0 && j <= 5){
 					dataTableRow[j + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0));
@@ -616,9 +620,13 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 
 		if (record.getOrdinal() == 12 || record.getOrdinal() == 13) { //12=Latitude, 13=Longitude
-			int grad = ((int) (value / 1000));
-			double minuten = (value - (grad * 1000.0)) / 10.0;
-			newValue = grad + minuten / 60.0;
+			if (record.getUnit().indexOf('\'') > 0) {
+				int grad = ((int) (value / 1000));
+				double minuten = (value - (grad * 1000.0)) / 10.0;
+				newValue = grad + minuten / 60.0;
+			}
+			else 
+				newValue = value / 1000.0;
 		}
 		else {
 			newValue = (value - reduction) * factor + offset;
@@ -648,9 +656,13 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
 
 		if (record.getOrdinal() == 12 || record.getOrdinal() == 13) { // 12=Latitude, 13=Longitude
-			int grad = (int) value;
-			double minuten = (value - grad * 1.0) * 60.0;
-			newValue = (grad + minuten / 100.0) * 1000.0;
+			if (record.getUnit().indexOf('\'') > 0) {
+				int grad = (int) value;
+				double minuten = (value - grad * 1.0) * 60.0;
+				newValue = (grad + minuten / 100.0) * 1000.0;
+			}
+			else
+				newValue = value * 1000.0;
 		}
 		else {
 			newValue = (value - offset) / factor + reduction;

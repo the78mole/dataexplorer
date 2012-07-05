@@ -731,9 +731,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
 				if ((j == 1 || j == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  
-					int grad = record.realGet(rowIndex) / 1000000;
-					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-					dataTableRow[j + 1] = String.format("%d %.4f", grad, minuten); //$NON-NLS-1$
+					if (record.getUnit().indexOf('\'') > 0) {
+						int grad = record.realGet(rowIndex) / 1000000;
+						double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
+						dataTableRow[j + 1] = String.format("%d %.4f", grad, minuten); //$NON-NLS-1$
+					}
+					else
+						dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
 				}
 				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
 				else if (j >= 0 && j <= 5 && record.getParent().getChannelConfigNumber() == 1){ //Receiver
@@ -763,9 +767,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 		if (record.getParent().getChannelConfigNumber() == 3 && (record.getOrdinal() == 1 || record.getOrdinal() == 2)) { // 1=GPS-longitude 2=GPS-latitude 
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-			int grad = ((int) (value / 1000));
-			double minuten = (value - (grad * 1000.0)) / 10.0;
-			newValue = grad + minuten / 60.0;
+			if (record.getUnit().indexOf('\'') > 0) {
+				int grad = ((int) (value / 1000));
+				double minuten = (value - (grad * 1000.0)) / 10.0;
+				newValue = grad + minuten / 60.0;
+			}
+			else 
+				newValue = value / 1000.0;
 		}
 		else {
 			newValue = (value - reduction) * factor + offset;
@@ -788,9 +796,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 		if ((record.getOrdinal() == 1 || record.getOrdinal() == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  ) 
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-			int grad = (int) value;
-			double minuten = (value - grad * 1.0) * 60.0;
-			newValue = (grad + minuten / 100.0) * 1000.0;
+			if (record.getUnit().indexOf('\'') > 0) {
+				int grad = (int) value;
+				double minuten = (value - grad * 1.0) * 60.0;
+				newValue = (grad + minuten / 100.0) * 1000.0;
+			}
+			else
+				newValue = value * 1000.0;
 		}
 		else {
 			newValue = (value - offset) / factor + reduction;

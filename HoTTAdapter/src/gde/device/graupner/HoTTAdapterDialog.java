@@ -152,24 +152,24 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					}
 				});
 				// enable fade in/out alpha blending (do not fade-in on top)
-				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
-					@Override
-					public void mouseEnter(MouseEvent evt) {
-						log.log(java.util.logging.Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
-						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, 20, 25);
-					}
-
-					@Override
-					public void mouseHover(MouseEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
-					}
-
-					@Override
-					public void mouseExit(MouseEvent evt) {
-						log.log(java.util.logging.Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
-						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 25);
-					}
-				});
+//				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+//					@Override
+//					public void mouseEnter(MouseEvent evt) {
+//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
+//						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, 20, 25);
+//					}
+//
+//					@Override
+//					public void mouseHover(MouseEvent evt) {
+//						log.log(java.util.logging.Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
+//					}
+//
+//					@Override
+//					public void mouseExit(MouseEvent evt) {
+//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
+//						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 25);
+//					}
+//				});
 				{
 					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
 
