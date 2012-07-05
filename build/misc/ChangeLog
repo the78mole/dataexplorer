@@ -12,6 +12,7 @@ HottAdapter(2) - add support for serial file transfer
 HottAdapter(2) - add support for model data backup
 HottAdapter(2) - add support for simple model data conversion
 HoTTAdapter2 - add channel-configuration displaying all available data including channels
+HoTTAdapter(2) - adopt evaluation of incoming Latitude and Longitude by given unit
 GPS-Logger - use speed data from RMC sentence which contains height difference adapted speed values
 
 Version 3.01 - 21 May 2012
