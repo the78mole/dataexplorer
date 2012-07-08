@@ -449,7 +449,7 @@
                 <property type="Integer" value="3600" name="prop_n100W"/>
             </Measurement>
             <Measurement>
-                <name>Hight</name>
+                <name>Height</name>
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
