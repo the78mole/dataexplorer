@@ -1,5 +1,9 @@
 Development history / change log, please read from bottom up
 
+Version 3.03 - xx yyy 2012
+fix several reported minor bugs
+add HoTTAdapterM as HoTT device where GPS coordinates are logged as decimal degrees instead of degree and decimal minutes  
+
 Version 3.02 - 01 Jul 2012
 fix performance problem while in zoom mode and update statistics data
 UniLog2 - remove not supported 50Hz logging rate adjustment
