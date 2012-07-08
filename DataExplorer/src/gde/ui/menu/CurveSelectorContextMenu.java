@@ -101,7 +101,7 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					log.log(Level.FINEST, "popupmenu MenuListener.menuShown " + evt); //$NON-NLS-1$
 					CurveSelectorContextMenu.this.selectedItem = (TableItem) popupmenu.getData(DataExplorer.CURVE_SELECTION_ITEM);
-					if (CurveSelectorContextMenu.this.selectedItem != null) {
+					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						log.log(Level.FINER, CurveSelectorContextMenu.this.selectedItem.toString());
 						if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 							CurveSelectorContextMenu.this.recordNameKey = CurveSelectorContextMenu.this.selectedItem.getText();
@@ -174,6 +174,10 @@ public class CurveSelectorContextMenu {
 							else
 								setAllEnabled(false);
 						}
+					}
+					else {
+						CurveSelectorContextMenu.this.recordName.setText(">>>>  " + Messages.getString(MessageIds.GDE_MSGT0408) + "  <<<<"); //$NON-NLS-1$ //$NON-NLS-2$
+						setAllEnabled(false);
 					}
 				}
 
@@ -1163,6 +1167,7 @@ public class CurveSelectorContextMenu {
 		this.lineColor.setEnabled(enabled);
 		this.lineWidth.setEnabled(enabled);
 		this.lineType.setEnabled(enabled);
+		this.smoothAtCurrentDropItem.setEnabled(enabled); 
 		this.axisEndValues.setEnabled(enabled);
 		this.axisNumberFormat.setEnabled(enabled);
 		this.axisPosition.setEnabled(enabled);
