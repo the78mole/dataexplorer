@@ -60,12 +60,16 @@ public class SetupReaderWriter {
 	//$SETUP,192 Byte*
 	int									serialNumber								= 357;																									// 1
 	int									datarate										= 0;																										// 2 0 = 10Hz, 1 = 5Hz, 2 = 2Hz, 1 = 1Hz
-	int									startmodus									= 1;																										// 3 0 = „manuell“, 1 = „3D-Fix“, 2 = „ >20 m“, 3 = „>20 km/h“
+	int									startModus									= 1;																										// 3 0 = „manuell“, 1 = „3D-Fix“, 2 = „ >20 m“, 3 = „>20 km/h“
 	short								timeZone										= 2;																										// 4 -12 --> +12 step 1
 	int									units												= 0;																										// 5
-	int									varioThreshold							= 5;																										// 6  0 --> 50 step 1
+	int									varioThreshold							= 3;																										// 6  0 --> 50 step 1
 	int									varioTon										= 0;																										// 7
-	//short[] A = new short[10]; // 8-17
+	int									stopModus										= 0;																										// 8 0=OFF; 1=no motion
+	int									modusDistance								= 0;																										// 9 0=3D; 1=2D
+	int									varioThresholdSink					= 8;																										// 10 0 --> 50 step 1
+	int									daylightSavingModus					= 1;																										// 11 0=manual; 1=auto
+	//short[] A = new short[6]; // 12-17
 	int									telemetryAlarms							= 0x0013;																								// 18 
 	int									heightAlarm									= 200;																									// 19 10m --> 4000m step 50
 	int									speedAlarm									= 200;																									// 20 10km/h --> 1000km/h
@@ -89,7 +93,9 @@ public class SetupReaderWriter {
 	int									mLinkAddressCurrentUL				= 9;																										// 47
 	int									mLinkAddressRevolutionUL		= 10;																										// 48
 	int									mLinkAddressCapacityUL			= 11;																										// 49
-	//short[] C = short int[10]; // 44-53
+	int									mLinkAddressFlightDirection	= 12;																										// 50
+	int									mLinkAddressDirectionRel		= 13;																										// 51
+	//short[] C = short int[2]; // 52-53
 	int									firmwareVersion							= 103;																									// 54
 	int									modusIGC										= 1;																										// 55
 	//int[]								unused										= new int[192 - 55 * 2];
@@ -125,12 +131,16 @@ public class SetupReaderWriter {
 				}
 				this.serialNumber 					= (buffer[1] << 8) + (buffer[0] & 0x00FF);
 				this.datarate 							= (buffer[3] << 8) + (buffer[2] & 0x00FF);
-				this.startmodus 						= (buffer[5] << 8) + (buffer[4] & 0x00FF);
+				this.startModus 						= (buffer[5] << 8) + (buffer[4] & 0x00FF);
 				this.timeZone 							= (short) ((buffer[7] << 8) + (buffer[6] & 0x00FF));
 				//units
 				this.varioThreshold 				= (buffer[11] << 8) + (buffer[10] & 0x00FF);
 				this.varioTon 							= (buffer[13] << 8) + (buffer[12] & 0x00FF);
-				//A[10]
+				this.stopModus 							= (buffer[15] << 8) + (buffer[14] & 0x00FF);
+				this.modusDistance					= (buffer[17] << 8) + (buffer[16] & 0x00FF);
+				this.varioThresholdSink			= (buffer[19] << 8) + (buffer[18] & 0x00FF);
+				this.daylightSavingModus		= (buffer[21] << 8) + (buffer[20] & 0x00FF);
+				//A[6]
 				this.telemetryAlarms 				= (buffer[35] << 8) + (buffer[34] & 0x00FF);
 				this.heightAlarm 						= (buffer[37] << 8) + (buffer[36] & 0x00FF);
 				this.speedAlarm 						= (buffer[39] << 8) + (buffer[38] & 0x00FF);
@@ -154,7 +164,10 @@ public class SetupReaderWriter {
 				this.mLinkAddressCurrentUL		= (buffer[93] << 8) + (buffer[92] & 0x00FF);		// 47
 				this.mLinkAddressRevolutionUL	= (buffer[95] << 8) + (buffer[94] & 0x00FF);		// 48
 				this.mLinkAddressCapacityUL		= (buffer[97] << 8) + (buffer[96] & 0x00FF);		// 49
-				//C[10]
+				
+				this.mLinkAddressFlightDirection	= (buffer[99] << 8) + (buffer[98] & 0x00FF);		// 50
+				this.mLinkAddressDirectionRel			= (buffer[101] << 8) + (buffer[100] & 0x00FF);	// 51
+				//C[2]
 				this.firmwareVersion 		= (buffer[107] << 8) + (buffer[106] & 0x00FF);
 				this.modusIGC 					= (buffer[109] << 8) + (buffer[108] & 0x00FF);				//55
 				//unused
@@ -175,7 +188,7 @@ public class SetupReaderWriter {
 
 	void saveSetup() {
 		FileDialog fileDialog = this.application.prepareFileSaveDialog(this.parent, Messages.getString(MessageIds.GDE_MSGT2002), new String[] { GDE.FILE_ENDING_STAR_INI, GDE.FILE_ENDING_STAR },
-				this.device.getDataBlockPreferredDataLocation(), this.device.getDefaultConfigurationFileName());
+				this.device.getConfigurationFileDirecotry(), this.device.getDefaultConfigurationFileName());
 		log.log(Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
 		String setupFilePath = fileDialog.open();
 		if (setupFilePath != null && setupFilePath.length() > 4) {
@@ -188,8 +201,8 @@ public class SetupReaderWriter {
 				buffer[1] = (byte) ((this.serialNumber & 0xFF00) >> 8);
 				buffer[2] = (byte) (this.datarate & 0x00FF);
 				buffer[3] = (byte) ((this.datarate & 0xFF00) >> 8);
-				buffer[4] = (byte) (this.startmodus & 0x00FF);
-				buffer[5] = (byte) ((this.startmodus & 0xFF00) >> 8);
+				buffer[4] = (byte) (this.startModus & 0x00FF);
+				buffer[5] = (byte) ((this.startModus & 0xFF00) >> 8);
 				buffer[6] = (byte) (this.timeZone & 0x00FF);
 				buffer[7] = (byte) ((this.timeZone & 0xFF00) >> 8);
 				//units
@@ -197,7 +210,15 @@ public class SetupReaderWriter {
 				buffer[11] = (byte) ((this.varioThreshold & 0xFF00) >> 8);
 				buffer[12] = (byte) (this.varioTon & 0x00FF);
 				buffer[13] = (byte) ((this.varioTon & 0xFF00) >> 8);
-				//A 10
+				buffer[14] = (byte) (this.stopModus & 0x00FF);
+				buffer[15] = (byte) ((this.stopModus & 0xFF00) >> 8);
+				buffer[16] = (byte) (this.modusDistance & 0x00FF);
+				buffer[17] = (byte) ((this.modusDistance & 0xFF00) >> 8);
+				buffer[18] = (byte) (this.varioThresholdSink & 0x00FF);
+				buffer[19] = (byte) ((this.varioThresholdSink & 0xFF00) >> 8);
+				buffer[20] = (byte) (this.daylightSavingModus & 0x00FF);
+				buffer[21] = (byte) ((this.daylightSavingModus & 0xFF00) >> 8);
+				//A 6
 				buffer[34] = (byte) (this.telemetryAlarms & 0x00FF);
 				buffer[35] = (byte) ((this.telemetryAlarms & 0xFF00) >> 8);
 				buffer[36] = (byte) (this.heightAlarm & 0x00FF);
@@ -244,6 +265,10 @@ public class SetupReaderWriter {
 				buffer[95] = (byte) ((this.mLinkAddressRevolutionUL & 0xFF00) >> 8);// 48
 				buffer[96] = (byte) (this.mLinkAddressCapacityUL & 0x00FF);					// 49
 				buffer[97] = (byte) ((this.mLinkAddressCapacityUL & 0xFF00) >> 8);	// 49
+				buffer[98] = (byte) (this.mLinkAddressFlightDirection & 0x00FF);				// 50
+				buffer[99] = (byte) ((this.mLinkAddressFlightDirection & 0xFF00) >> 8);	// 50
+				buffer[100] = (byte) (this.mLinkAddressDirectionRel & 0x00FF);					// 51
+				buffer[101] = (byte) ((this.mLinkAddressDirectionRel & 0xFF00) >> 8);		// 51
 				//C 10
 				buffer[106] = (byte) (this.firmwareVersion & 0x00FF);
 				buffer[107] = (byte) ((this.firmwareVersion & 0xFF00) >> 8);

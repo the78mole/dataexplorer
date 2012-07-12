@@ -49,6 +49,10 @@ public class MessageIds {
 	public final static String	GDE_MSGT2023 = "GDE_MSGT2023";
 	public final static String	GDE_MSGT2024 = "GDE_MSGT2024";
 	public final static String	GDE_MSGT2025 = "GDE_MSGT2025";
+	public final static String	GDE_MSGT2026 = "GDE_MSGT2026";
+	public final static String	GDE_MSGT2027 = "GDE_MSGT2027";
+	public final static String	GDE_MSGT2028 = "GDE_MSGT2028";
+	public final static String	GDE_MSGT2029 = "GDE_MSGT2029";
 	public final static String	GDE_MSGT2030 = "GDE_MSGT2030";
 	public final static String	GDE_MSGT2031 = "GDE_MSGT2031";
 	public final static String	GDE_MSGT2032 = "GDE_MSGT2032";
@@ -89,5 +93,10 @@ public class MessageIds {
 	public final static String	GDE_MSGT2067 = "GDE_MSGT2067";
 	public final static String	GDE_MSGT2068 = "GDE_MSGT2068";
 	public final static String	GDE_MSGT2069 = "GDE_MSGT2069";
+	public final static String	GDE_MSGT2070 = "GDE_MSGT2070";
+	public final static String	GDE_MSGT2071 = "GDE_MSGT2071";
+	public final static String	GDE_MSGT2072 = "GDE_MSGT2072";
+	public final static String	GDE_MSGT2073 = "GDE_MSGT2073";
+	public final static String	GDE_MSGT2074 = "GDE_MSGT2074";
 
  }
