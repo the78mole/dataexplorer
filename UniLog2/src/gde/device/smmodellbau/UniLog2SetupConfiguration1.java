@@ -60,24 +60,19 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 	final UniLog2SetupReaderWriter	configuration;
 
 	Group														commonAdjustmentsGroup, logStartStopGroup;
-	CLabel													serialNumberLabel, firmwareLabel, dataRateLabel, currentSensorTypeLabel, propellerBladesLabel, motorPolsLabel, gearFactorLabel, varioTriggerLevelLabel,
-			varioToneLabel;
-	CLabel													limiterModusLabel, energyLimitLabel, autoStartCurrentUnitLabel, autoStartRxUnitLabel, autoStartTimeUnitLabel, a1ModusLabel, a2ModusLabel, a3ModusLabel, minMaxRxLabel,
-			autoStopLabel;
-	Text														serialNumberText, firmwareText, gearFactorText, varioTriggerLevelText, energyLimitText;
-	Slider													gearFactorSlider, varioTriggerLevelSlider, energyLimitSlider;
-	CCombo													dataRateCombo, currentSensorCombo, propBladesCombo, varioToneCombo, limiterModusCombo, minMaxRxCombo, autoStopCombo, autoStartCurrentCombo, autoStartRxCombo,
-			autoStartTimeCombo;
+	CLabel													serialNumberLabel, firmwareLabel, dataRateLabel, currentSensorTypeLabel, propellerBladesLabel, motorPolsLabel, gearFactorLabel, varioTriggerLevelLabel, varioTriggerSinkLevelLabel, varioToneLabel;
+	CLabel													limiterModusLabel, energyLimitLabel, autoStartCurrentUnitLabel, autoStartRxUnitLabel, autoStartTimeUnitLabel, a1ModusLabel, a2ModusLabel, a3ModusLabel, minMaxRxLabel, autoStopLabel;
+	Text														serialNumberText, firmwareText, gearFactorText, varioTriggerLevelText, varioTriggerSinkLevelText, energyLimitText;
+	Slider													gearFactorSlider, varioTriggerLevelSlider, varioTriggerSinkLevelSlider, energyLimitSlider;
+	CCombo													dataRateCombo, currentSensorCombo, propBladesCombo, varioToneCombo, limiterModusCombo, minMaxRxCombo, autoStopCombo, autoStartCurrentCombo, autoStartRxCombo,	autoStartTimeCombo;
 	CCombo													a1ModusCombo, a2ModusCombo, a3ModusCombo;
 	Button													autoStartCurrentButton, autoStartRxButton, autoStartTimeButton;
+	Composite												fillerComposite;
 
 	final String[]									dataRateValues				= { " 20 Hz", " 10 Hz", "  5 Hz", "  2 Hz", "  1 Hz" };
 	final String[]									currentSensorTypes		= { "  20 A", " 40/80 A", " 150 A", " 400 A" };
 	final String[]									analogModi						= Messages.getString(MessageIds.GDE_MSGT2549).split(GDE.STRING_COMMA);
 	final String[]									numberProbMotorPoles	= { " 1 / 2", " 2 / 4", " 3 / 6", " 4 / 8", " 5 / 10", " 6 / 12", " 7 / 14" };
-	final String[]									varioThresholds				= { " 0.0", " 0.1", " 0.2", " 0.3", " 0.4", " 0.5", " 0.6", " 0.7", " 0.8", " 0.9", " 1.0", " 1.1", " 1.2", " 1.3", " 1.4", " 1.5", " 1.6",
-			" 1.7", " 1.8", " 1.9", " 2.0", " 2.1", " 2.2", " 2.3", " 2.4", " 2.5", " 2.6", " 2.7", " 2.8", " 2.9", " 3.0", " 3.1", " 3.2", " 3.3", " 3.4", " 3.5", " 3.6", " 3.7", " 3.8", " 3.9", " 4.0",
-			" 4.1", " 4.2", " 4.3", " 4.4", " 4.5", " 4.6", " 4.7", " 4.8", " 4.9", " 5.0" };
 	final String[]									currentStartValues		= { "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10" };
 	final String[]									rxStartValues					= { "  1.1", "  1.2", "  1.3", "  1.4", "  1.5", "  1.6", "  1.7", "  1.8", "  1.9", Messages.getString(MessageIds.GDE_MSGT2508) };
 	final String[]									timeStartValues				= { "  5", " 10", " 15", " 20", " 25", " 30", " 35", " 40", " 45", " 50", " 55", " 60", " 65", " 70", " 75", " 80", " 85", " 90" };
@@ -162,7 +157,9 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 		this.gearFactorSlider.setSelection(this.configuration.gearFactor - 100);
 		this.gearFactorText.setText(String.format(Locale.ENGLISH, " %.2f", this.configuration.gearFactor / 100.0)); //$NON-NLS-1$
 		this.varioTriggerLevelSlider.setSelection(this.configuration.varioThreshold);
-		this.varioTriggerLevelText.setText(String.format(Locale.ENGLISH, " %.1f", this.configuration.varioThreshold / 10.0)); //$NON-NLS-1$
+		this.varioTriggerLevelText.setText(String.format(Locale.ENGLISH, "+%.1f", this.configuration.varioThreshold / 10.0)); //$NON-NLS-1$
+		this.varioTriggerSinkLevelSlider.setSelection(this.configuration.varioThresholdSink);
+		this.varioTriggerSinkLevelText.setText(String.format(Locale.ENGLISH, "-%.1f", this.configuration.varioThresholdSink / 10.0)); //$NON-NLS-1$
 		this.varioToneCombo.select(this.configuration.varioTon);
 		this.limiterModusCombo.select(this.configuration.limiterModus);
 		this.energyLimitSlider.setSelection(this.configuration.energyLimit);
@@ -189,12 +186,19 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				this.logStartStopGroup.setLayout(logStartStopGroupLayout);
 				FormData logStartStopGroupLData = new FormData();
 				logStartStopGroupLData.width = 290;
-				logStartStopGroupLData.height = 96;
+				logStartStopGroupLData.height = 110;
 				logStartStopGroupLData.left = new FormAttachment(0, 1000, 12);
-				logStartStopGroupLData.top = new FormAttachment(0, 1000, 340);
+				logStartStopGroupLData.top = new FormAttachment(0, 1000, 400);
 				this.logStartStopGroup.setLayoutData(logStartStopGroupLData);
 				this.logStartStopGroup.setText(Messages.getString(MessageIds.GDE_MSGT2526));
 				this.logStartStopGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				{
+					this.fillerComposite = new Composite(this.logStartStopGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = 280;
+					fillerCompositeRA1LData.height = 5;
+					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
 				{
 					this.autoStartCurrentButton = new Button(this.logStartStopGroup, SWT.CHECK);
 					RowData startByCurrentButtonLData = new RowData();
@@ -372,12 +376,19 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				this.commonAdjustmentsGroup.setLayout(commonAdjustmentsGroupLayout);
 				FormData commonAdjustmentsGroupLData = new FormData();
 				commonAdjustmentsGroupLData.width = 290;
-				commonAdjustmentsGroupLData.height = 307;
+				commonAdjustmentsGroupLData.height = 340;
 				commonAdjustmentsGroupLData.left = new FormAttachment(0, 1000, 12);
-				commonAdjustmentsGroupLData.top = new FormAttachment(0, 1000, 10);
+				commonAdjustmentsGroupLData.top = new FormAttachment(0, 1000, 5);
 				this.commonAdjustmentsGroup.setLayoutData(commonAdjustmentsGroupLData);
 				this.commonAdjustmentsGroup.setText(Messages.getString(MessageIds.GDE_MSGT2533));
 				this.commonAdjustmentsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				{
+					this.fillerComposite = new Composite(this.commonAdjustmentsGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = 280;
+					fillerCompositeRA1LData.height = 5;
+					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
 				{
 					this.serialNumberLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
 					RowData serialNumberLabelLData = new RowData();
@@ -488,6 +499,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "a1ModusCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration1.this.configuration.modusA1 = (short) UniLog2SetupConfiguration1.this.a1ModusCombo.getSelectionIndex();
+							UniLog2SetupConfiguration1.this.dialog.updateAnalogAlarmUnits();
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -514,6 +526,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "a2ModusCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration1.this.configuration.modusA2 = (short) UniLog2SetupConfiguration1.this.a2ModusCombo.getSelectionIndex();
+							UniLog2SetupConfiguration1.this.dialog.updateAnalogAlarmUnits();
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -540,6 +553,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "a3ModusCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration1.this.configuration.modusA3 = (short) UniLog2SetupConfiguration1.this.a3ModusCombo.getSelectionIndex();
+							UniLog2SetupConfiguration1.this.dialog.updateAnalogAlarmUnits();
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -603,7 +617,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.gearFactorSlider = new Slider(this.commonAdjustmentsGroup, SWT.NONE);
 					this.gearFactorSlider.setLayoutData(gearFactorSliderLData);
 					this.gearFactorSlider.setMinimum(0);
-					this.gearFactorSlider.setMaximum(910);
+					this.gearFactorSlider.setMaximum(1910);
 					this.gearFactorSlider.setIncrement(1);
 					this.gearFactorSlider.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -644,9 +658,45 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.varioTriggerLevelSlider.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "gearFactorSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINEST, "varioTriggerLevelSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration1.this.configuration.varioThreshold = (short) UniLog2SetupConfiguration1.this.varioTriggerLevelSlider.getSelection();
-							UniLog2SetupConfiguration1.this.varioTriggerLevelText.setText(UniLog2SetupConfiguration1.this.varioThresholds[UniLog2SetupConfiguration1.this.configuration.varioThreshold]);
+							UniLog2SetupConfiguration1.this.varioTriggerLevelText.setText(String.format(Locale.ENGLISH, "+%.1f", UniLog2SetupConfiguration1.this.configuration.varioThreshold / 10.0));
+							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.varioTriggerSinkLevelLabel = new CLabel(this.commonAdjustmentsGroup, SWT.NONE);
+					RowData varioTriggerSinkLevelLabelLData = new RowData();
+					varioTriggerSinkLevelLabelLData.width = 135;
+					varioTriggerSinkLevelLabelLData.height = 20;
+					this.varioTriggerSinkLevelLabel.setLayoutData(varioTriggerSinkLevelLabelLData);
+					this.varioTriggerSinkLevelLabel.setText(Messages.getString(MessageIds.GDE_MSGT2513));
+					this.varioTriggerSinkLevelLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.varioTriggerSinkLevelText = new Text(this.commonAdjustmentsGroup, SWT.CENTER | SWT.BORDER);
+					RowData varioTriggerSinkLevelTextLData = new RowData();
+					varioTriggerSinkLevelTextLData.width = GDE.IS_LINUX ? 30 : 35;
+					varioTriggerSinkLevelTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					this.varioTriggerSinkLevelText.setLayoutData(varioTriggerSinkLevelTextLData);
+					this.varioTriggerSinkLevelText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					RowData varioTriggerSinkLevelSliderLData = new RowData();
+					varioTriggerSinkLevelSliderLData.width = 101;
+					varioTriggerSinkLevelSliderLData.height = 18;
+					this.varioTriggerSinkLevelSlider = new Slider(this.commonAdjustmentsGroup, SWT.NONE);
+					this.varioTriggerSinkLevelSlider.setLayoutData(varioTriggerSinkLevelSliderLData);
+					this.varioTriggerSinkLevelSlider.setMinimum(0);
+					this.varioTriggerSinkLevelSlider.setMaximum(60);
+					this.varioTriggerSinkLevelSlider.setIncrement(1);
+					this.varioTriggerSinkLevelSlider.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "varioTriggerSinkLevelSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration1.this.configuration.varioThresholdSink = (short) UniLog2SetupConfiguration1.this.varioTriggerSinkLevelSlider.getSelection();
+							UniLog2SetupConfiguration1.this.varioTriggerSinkLevelText.setText(String.format(Locale.ENGLISH, "-%.1f", UniLog2SetupConfiguration1.this.configuration.varioThresholdSink / 10.0)); //$NON-NLS-1$);
 							UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});

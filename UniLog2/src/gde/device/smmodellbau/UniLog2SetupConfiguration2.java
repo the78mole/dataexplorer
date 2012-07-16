@@ -67,19 +67,19 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 	CLabel													addressLabel1UL, addressLabel2UL, addressLabel3UL, addressLabel4UL;
 	Text														addressText1UL, addressText2UL, addressText3UL, addressText4UL;
 	Slider													addressSlider1UL, addressSlider2UL, addressSlider3UL, addressSlider4UL;
-	Button													currentButton, voltageStartButton, voltageButton, capacityButton, heightButton, voltageRxButton, cellVoltageButton;
-	CCombo													currentCombo, voltageStartCombo, voltageCombo, capacityCombo, heightCombo, voltageRxCombo, cellVoltageCombo;
-	CLabel													currentLabel, voltageStartLabel, voltageLabel, capacityLabel, heightLabel, voltageRxLabel, cellVoltageLabel;
+	Button													currentButton, voltageStartButton, voltageButton, capacityButton, heightButton, voltageRxButton, cellVoltageButton, analogAlarm1Button, analogAlarm1DirectionButton, analogAlarm2Button, analogAlarm2DirectionButton, analogAlarm3Button, analogAlarm3DirectionButton;
+	CCombo													currentCombo, voltageStartCombo, voltageCombo, capacityCombo, heightCombo, voltageRxCombo, cellVoltageCombo, analogAlarm1Combo, analogAlarm2Combo, analogAlarm3Combo;
+	CLabel													currentLabel, voltageStartLabel, voltageLabel, capacityLabel, heightLabel, voltageRxLabel, cellVoltageLabel, analogAlarm1Label, analogAlarm2Label, analogAlarm3Label;
 	CLabel													a1Label, a2Label, a3Label, c1Label, c2Label, c3Label, c4Label, c5Label, c6Label;
 	CCombo													a1Combo, a2Combo, a3Combo, c1Combo, c2Combo, c3Combo, c4Combo, c5Combo, c6Combo;
 	final int												fillerWidth							= 15;
-	final int												buttonWidth							= 115;
-	final int												comboWidth							= 83;
+	final int												buttonWidth							= 112;
+	final int												comboWidth							= 84;
 
 	Group														mLinkAddressesGroup;
-	CLabel													addressVoltageLabel, addressCurrentLabel, addressRevolutionLabel, addressCapacityLabel, addressVarioLabel, addressHeightLabel;
-	Text														addressVoltageText, addressCurrentText, addressRevolutionText, addressCapacityText, addressVarioText, addressHeightText;
-	Slider													addressVoltageSlider, addressCurrentSlider, addressRevolutionSlider, addressCapacitySlider, addressVarioSlider, addressHeightSlider;
+	CLabel													addressVoltageLabel, addressCurrentLabel, addressRevolutionLabel, addressCapacityLabel, addressVarioLabel, addressHeightLabel, cellMinimumLabel;
+	Text														addressVoltageText, addressCurrentText, addressRevolutionText, addressCapacityText, addressVarioText, addressHeightText, cellMinimumText;
+	Slider													addressVoltageSlider, addressCurrentSlider, addressRevolutionSlider, addressCapacitySlider, addressVarioSlider, addressHeightSlider, cellMinimumSlider;
 	final int												labelWidth							= 115;
 	final int												textWidth								= 25;
 	final int												sliderWidth							= 125;
@@ -102,6 +102,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 	final String[]									voltageRxStartValues		= { "  3.00", "  3.25", "  3.50", "  3.75", "  4.00", "  4.25", "  4.50", "  4.75", "  4.80", "  4.85", "  4.90", "  4.95", "  5.00",
 			"  5.05", "  5.10", "  5.15", "  5.20", "  5.25", "  5.50", "  6.00", "  6.25", "  6.50", "  6.75", "  7.00", "  7.25", "  7.50", "  7.75", "  8.00" };
 	final String[]									cellVoltageStartValues	= new String[350];
+	final String[]									analogAlarmStartValues	= new String[3101];
+	final String[]									analogAlarmUnits				= new String[] {"[°C]", "[mV]", "[km/h]", "[km/h]", "[°C]"}; //0=Temperature, 1=MilliVolt, 2=SpeedSensor 250, 3=SpeedSensor 450, 4=Temperature PT1000
 	final UniLog2SetupReaderWriter	configuration;
 
 	/**
@@ -118,6 +120,9 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 		this.application = DataExplorer.getInstance();
 		for (int i = 0, value = 100; i < 350; i++) {
 			this.cellVoltageStartValues[i] = String.format("    %.2f", ((value += 1) / 100.0)); //$NON-NLS-1$
+		}
+		for (int i = 0, value = -100; i < 3101; i++) {
+			this.analogAlarmStartValues[i] = String.format("  %4d", (value++)); //$NON-NLS-1$
 		}
 		initGUI();
 	}
@@ -138,6 +143,20 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 		this.cellVoltageButton.setSelection((this.configuration.telemetryAlarms & UniLog2SetupReaderWriter.TEL_ALARM_VOLTAGE_CELL) > 0);
 		this.cellVoltageCombo.setText(String.format(Locale.ENGLISH, "  %5.2f", (this.configuration.cellVoltageAlarm / 100.0))); //$NON-NLS-1$
 
+		//0=Temperature, 1=MilliVolt, 2=SpeedSensor 250, 3=SpeedSensor 450, 4=Temperature PT1000
+		this.analogAlarm1Button.setSelection((this.configuration.telemetryAlarms & UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_1) > 0);
+		this.analogAlarm1DirectionButton.setSelection(this.configuration.analogAlarm1Direct == 1);
+		this.analogAlarm1Combo.select(this.configuration.analogAlarm1 + 100);
+		this.analogAlarm1Label.setText(analogAlarmUnits[this.configuration.modusA1]);
+		this.analogAlarm2Button.setSelection((this.configuration.telemetryAlarms & UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_2) > 0);
+		this.analogAlarm2DirectionButton.setSelection(this.configuration.analogAlarm2Direct == 1);
+		this.analogAlarm2Combo.select(this.configuration.analogAlarm2 + 100);
+		this.analogAlarm2Label.setText(analogAlarmUnits[this.configuration.modusA2]);
+		this.analogAlarm3Button.setSelection((this.configuration.telemetryAlarms & UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_3) > 0);
+		this.analogAlarm3DirectionButton.setSelection(this.configuration.analogAlarm3Direct == 1);
+		this.analogAlarm3Combo.select(this.configuration.analogAlarm3 + 100);
+		this.analogAlarm3Label.setText(analogAlarmUnits[this.configuration.modusA3]);
+
 		this.addressVoltageSlider.setSelection(this.configuration.mLinkAddressVoltage);
 		this.addressVoltageText.setText(this.sliderValues[this.configuration.mLinkAddressVoltage]);
 		this.addressCurrentSlider.setSelection(this.configuration.mLinkAddressCurrent);
@@ -150,6 +169,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 		this.addressVarioText.setText(this.sliderValues[this.configuration.mLinkAddressVario]);
 		this.addressHeightSlider.setSelection(this.configuration.mLinkAddressHeight);
 		this.addressHeightText.setText(this.sliderValues[this.configuration.mLinkAddressHeight]);
+		this.cellMinimumSlider.setSelection(this.configuration.mLinkAddressCellMinimum);
+		this.cellMinimumText.setText(this.sliderValues[this.configuration.mLinkAddressCellMinimum]);
 
 		this.a1Combo.select(this.configuration.mLinkAddressA1);
 		this.a2Combo.select(this.configuration.mLinkAddressA2);
@@ -161,6 +182,12 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 		this.c4Combo.select(this.configuration.mLinkAddressCell4);
 		this.c5Combo.select(this.configuration.mLinkAddressCell5);
 		this.c6Combo.select(this.configuration.mLinkAddressCell6);
+	}
+	
+	public void updateAnalogAlarmUnits() {
+		this.analogAlarm1Label.setText(analogAlarmUnits[this.configuration.modusA1]);
+		this.analogAlarm2Label.setText(analogAlarmUnits[this.configuration.modusA2]);
+		this.analogAlarm3Label.setText(analogAlarmUnits[this.configuration.modusA3]);	
 	}
 
 	void initGUI() {
@@ -177,10 +204,10 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				RowLayout unilogTelemtryAlarmsGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.unilogTelemtryAlarmsGroup.setLayout(unilogTelemtryAlarmsGroupLayout);
 				FormData unilogTelemtryAlarmsGroupLData = new FormData();
-				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 10);
+				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 5);
 				unilogTelemtryAlarmsGroupLData.left = new FormAttachment(0, 1000, 15);
 				unilogTelemtryAlarmsGroupLData.width = 290;
-				unilogTelemtryAlarmsGroupLData.height = 175;
+				unilogTelemtryAlarmsGroupLData.height = 235;
 				this.unilogTelemtryAlarmsGroup.setLayoutData(unilogTelemtryAlarmsGroupLData);
 				this.unilogTelemtryAlarmsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.unilogTelemtryAlarmsGroup.setText(Messages.getString(MessageIds.GDE_MSGT2565));
@@ -715,10 +742,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "cellVoltageCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.cellVoltageCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
-							UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm < 10 ? 10
-									: UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm;
+							UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.cellVoltageCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
+							UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm < 10 ? 10 : UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm;
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -732,16 +757,300 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.cellVoltageLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.cellVoltageLabel.setText(Messages.getString(MessageIds.GDE_MSGT2555));
 				}
+				{
+					this.fillerComposite = new Composite(this.unilogTelemtryAlarmsGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = this.fillerWidth;
+					fillerCompositeRA1LData.height = 20;
+					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					this.analogAlarm1Button = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1ButtonLData = new RowData();
+					analogAlarm1ButtonLData.width = this.buttonWidth/4*3-3;
+					analogAlarm1ButtonLData.height = 19;
+					this.analogAlarm1Button.setLayoutData(analogAlarm1ButtonLData);
+					this.analogAlarm1Button.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.analogAlarm1Button.setText("  A1"); //$NON-NLS-1$
+					this.analogAlarm1Button.setSelection((this.configuration.telemetryAlarms & UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_1) > 0);
+					this.analogAlarm1Button.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "analogAlarm1Button.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (UniLog2SetupConfiguration2.this.analogAlarm1Button.getSelection()) {
+								UniLog2SetupConfiguration2.this.configuration.telemetryAlarms = (short) (UniLog2SetupConfiguration2.this.configuration.telemetryAlarms | UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_1);
+							}
+							else {
+								UniLog2SetupConfiguration2.this.configuration.telemetryAlarms = (short) (UniLog2SetupConfiguration2.this.configuration.telemetryAlarms ^ UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_1);
+							}
+							UniLog2SetupConfiguration2.this.analogAlarm1Button.setSelection((UniLog2SetupConfiguration2.this.configuration.telemetryAlarms & UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_1) > 0);
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.analogAlarm1DirectionButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = this.buttonWidth/4;
+					analogAlarm1DirectionButtonLData.height = 19;
+					this.analogAlarm1DirectionButton.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.analogAlarm1DirectionButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.analogAlarm1DirectionButton.setText("<"); //$NON-NLS-1$
+					this.analogAlarm1DirectionButton.setSelection((this.configuration.telemetryAlarms & UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_1) > 0);
+					this.analogAlarm1DirectionButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "analogAlarm1DirectionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.analogAlarm1Direct = (short)(UniLog2SetupConfiguration2.this.analogAlarm1DirectionButton.getSelection() ? 1 : 0);
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.analogAlarm1Combo = new CCombo(this.unilogTelemtryAlarmsGroup, SWT.BORDER);
+					this.analogAlarm1Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData analogAlarm1CComboLData = new RowData();
+					analogAlarm1CComboLData.width = this.comboWidth;
+					analogAlarm1CComboLData.height = GDE.IS_MAC ? 18 : 14;
+					this.analogAlarm1Combo.setLayoutData(analogAlarm1CComboLData);
+					this.analogAlarm1Combo.setItems(this.analogAlarmStartValues);
+					this.analogAlarm1Combo.setText(String.format(Locale.ENGLISH, "  %4df", this.configuration.analogAlarm1)); //$NON-NLS-1$
+					this.analogAlarm1Combo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "analogAlarm1Combo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.analogAlarm1 = (short) (Integer.parseInt(UniLog2SetupConfiguration2.this.analogAlarm1Combo.getText().trim()));
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+					this.analogAlarm1Combo.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent verifyevent) {
+							log.log(Level.FINEST, "analogAlarm1Combo.verify, event=" + verifyevent); //$NON-NLS-1$
+							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
+						}
+					});
+					this.analogAlarm1Combo.addKeyListener(new KeyAdapter() {
+						@Override
+						public void keyReleased(KeyEvent keyevent) {
+							log.log(Level.FINEST, "analogAlarm1Combo.keyReleased, event=" + keyevent); //$NON-NLS-1$
+							try {
+								UniLog2SetupConfiguration2.this.configuration.analogAlarm1 = (short) (Integer.parseInt(UniLog2SetupConfiguration2.this.analogAlarm1Combo.getText().trim()));
+								UniLog2SetupConfiguration2.this.configuration.analogAlarm1 = UniLog2SetupConfiguration2.this.configuration.analogAlarm1 > 3000 ? 3000 :
+										UniLog2SetupConfiguration2.this.configuration.analogAlarm1 < -100 ? -100 : UniLog2SetupConfiguration2.this.configuration.analogAlarm1;
+								UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore for -
+							}
+						}
+					});
+				}
+				{
+					this.analogAlarm1Label = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
+					RowData analogAlarm1LabelLData = new RowData();
+					analogAlarm1LabelLData.width = 50;
+					analogAlarm1LabelLData.height = 19;
+					this.analogAlarm1Label.setLayoutData(analogAlarm1LabelLData);
+					this.analogAlarm1Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.fillerComposite = new Composite(this.unilogTelemtryAlarmsGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = this.fillerWidth;
+					fillerCompositeRA1LData.height = 20;
+					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					this.analogAlarm2Button = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm2ButtonLData = new RowData();
+					analogAlarm2ButtonLData.width = this.buttonWidth/4*3-3;
+					analogAlarm2ButtonLData.height = 19;
+					this.analogAlarm2Button.setLayoutData(analogAlarm2ButtonLData);
+					this.analogAlarm2Button.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.analogAlarm2Button.setText("  A2"); //$NON-NLS-1$
+					this.analogAlarm2Button.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "analogAlarm2Button.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (UniLog2SetupConfiguration2.this.analogAlarm2Button.getSelection()) {
+								UniLog2SetupConfiguration2.this.configuration.telemetryAlarms = (short) (UniLog2SetupConfiguration2.this.configuration.telemetryAlarms | UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_2);
+							}
+							else {
+								UniLog2SetupConfiguration2.this.configuration.telemetryAlarms = (short) (UniLog2SetupConfiguration2.this.configuration.telemetryAlarms ^ UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_2);
+							}
+							UniLog2SetupConfiguration2.this.analogAlarm2Button.setSelection((UniLog2SetupConfiguration2.this.configuration.telemetryAlarms & UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_2) > 0);
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.analogAlarm2DirectionButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm2DirectionButtonLData = new RowData();
+					analogAlarm2DirectionButtonLData.width = this.buttonWidth/4;
+					analogAlarm2DirectionButtonLData.height = 19;
+					this.analogAlarm2DirectionButton.setLayoutData(analogAlarm2DirectionButtonLData);
+					this.analogAlarm2DirectionButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.analogAlarm2DirectionButton.setText("<"); //$NON-NLS-1$
+					this.analogAlarm2DirectionButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "analogAlarm2DirectionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.analogAlarm2Direct = (short)(UniLog2SetupConfiguration2.this.analogAlarm2DirectionButton.getSelection() ? 1 : 0);
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.analogAlarm2Combo = new CCombo(this.unilogTelemtryAlarmsGroup, SWT.BORDER);
+					this.analogAlarm2Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData analogAlarm2CComboLData = new RowData();
+					analogAlarm2CComboLData.width = this.comboWidth;
+					analogAlarm2CComboLData.height = GDE.IS_MAC ? 18 : 14;
+					this.analogAlarm2Combo.setLayoutData(analogAlarm2CComboLData);
+					this.analogAlarm2Combo.setItems(this.analogAlarmStartValues);
+					this.analogAlarm2Combo.setText(String.format(Locale.ENGLISH, "  %4df", this.configuration.analogAlarm2)); //$NON-NLS-1$
+					this.analogAlarm2Combo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "analogAlarm2Combo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.analogAlarm2 = (short) (Integer.parseInt(UniLog2SetupConfiguration2.this.analogAlarm2Combo.getText().trim()));
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+					this.analogAlarm2Combo.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent verifyevent) {
+							log.log(Level.FINEST, "analogAlarm2Combo.verify, event=" + verifyevent); //$NON-NLS-1$
+							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
+						}
+					});
+					this.analogAlarm2Combo.addKeyListener(new KeyAdapter() {
+						@Override
+						public void keyReleased(KeyEvent keyevent) {
+							log.log(Level.FINEST, "analogAlarm2Combo.keyReleased, event=" + keyevent); //$NON-NLS-1$
+							try {
+								UniLog2SetupConfiguration2.this.configuration.analogAlarm2 = (short) (Integer.parseInt(UniLog2SetupConfiguration2.this.analogAlarm2Combo.getText().trim()));
+								UniLog2SetupConfiguration2.this.configuration.analogAlarm2 = UniLog2SetupConfiguration2.this.configuration.analogAlarm2 > 3000 ? 3000 :
+										UniLog2SetupConfiguration2.this.configuration.analogAlarm2 < -100 ? -100 : UniLog2SetupConfiguration2.this.configuration.analogAlarm2;
+								UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore for -
+							}
+						}
+					});
+				}
+				{
+					this.analogAlarm2Label = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
+					RowData analogAlarm2LabelLData = new RowData();
+					analogAlarm2LabelLData.width = 50;
+					analogAlarm2LabelLData.height = 19;
+					this.analogAlarm2Label.setLayoutData(analogAlarm2LabelLData);
+					this.analogAlarm2Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
+				{
+					this.fillerComposite = new Composite(this.unilogTelemtryAlarmsGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = this.fillerWidth;
+					fillerCompositeRA1LData.height = 20;
+					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					this.analogAlarm3Button = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm3ButtonLData = new RowData();
+					analogAlarm3ButtonLData.width = this.buttonWidth/4*3-3;
+					analogAlarm3ButtonLData.height = 19;
+					this.analogAlarm3Button.setLayoutData(analogAlarm3ButtonLData);
+					this.analogAlarm3Button.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.analogAlarm3Button.setText("  A3"); //$NON-NLS-1$
+					this.analogAlarm3Button.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "analogAlarm3Button.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (UniLog2SetupConfiguration2.this.analogAlarm3Button.getSelection()) {
+								UniLog2SetupConfiguration2.this.configuration.telemetryAlarms = (short) (UniLog2SetupConfiguration2.this.configuration.telemetryAlarms | UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_3);
+							}
+							else {
+								UniLog2SetupConfiguration2.this.configuration.telemetryAlarms = (short) (UniLog2SetupConfiguration2.this.configuration.telemetryAlarms ^ UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_3);
+							}
+							UniLog2SetupConfiguration2.this.analogAlarm3Button.setSelection((UniLog2SetupConfiguration2.this.configuration.telemetryAlarms & UniLog2SetupReaderWriter.TEL_ALARM_ANALOG_3) > 0);
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.analogAlarm3DirectionButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm3DirectionButtonLData = new RowData();
+					analogAlarm3DirectionButtonLData.width = this.buttonWidth/4;
+					analogAlarm3DirectionButtonLData.height = 19;
+					this.analogAlarm3DirectionButton.setLayoutData(analogAlarm3DirectionButtonLData);
+					this.analogAlarm3DirectionButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.analogAlarm3DirectionButton.setText("<"); //$NON-NLS-1$
+					this.analogAlarm3DirectionButton.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "analogAlarm3DirectionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.analogAlarm3Direct = (short)(UniLog2SetupConfiguration2.this.analogAlarm3DirectionButton.getSelection() ? 1 : 0);
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.analogAlarm3Combo = new CCombo(this.unilogTelemtryAlarmsGroup, SWT.BORDER);
+					this.analogAlarm3Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData analogAlarm3CComboLData = new RowData();
+					analogAlarm3CComboLData.width = this.comboWidth;
+					analogAlarm3CComboLData.height = GDE.IS_MAC ? 18 : 14;
+					this.analogAlarm3Combo.setLayoutData(analogAlarm3CComboLData);
+					this.analogAlarm3Combo.setItems(this.analogAlarmStartValues);
+					this.analogAlarm3Combo.setText(String.format(Locale.ENGLISH, "  %4df", this.configuration.analogAlarm3)); //$NON-NLS-1$
+					this.analogAlarm3Combo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "analogAlarm3Combo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.analogAlarm3 = (short) (Integer.parseInt(UniLog2SetupConfiguration2.this.analogAlarm3Combo.getText().trim()));
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+					this.analogAlarm3Combo.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent verifyevent) {
+							log.log(Level.FINEST, "analogAlarm3Combo.verify, event=" + verifyevent); //$NON-NLS-1$
+							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
+						}
+					});
+					this.analogAlarm3Combo.addKeyListener(new KeyAdapter() {
+						@Override
+						public void keyReleased(KeyEvent keyevent) {
+							log.log(Level.FINEST, "analogAlarm3Combo.keyReleased, event=" + keyevent); //$NON-NLS-1$
+							try {
+								UniLog2SetupConfiguration2.this.configuration.analogAlarm3 = (short) (Integer.parseInt(UniLog2SetupConfiguration2.this.analogAlarm3Combo.getText().trim()));
+								UniLog2SetupConfiguration2.this.configuration.analogAlarm3 = UniLog2SetupConfiguration2.this.configuration.analogAlarm3 > 3000 ? 3000
+										: UniLog2SetupConfiguration2.this.configuration.analogAlarm3 < -100 ? -100 : UniLog2SetupConfiguration2.this.configuration.analogAlarm3;
+							}
+							catch (NumberFormatException e) {
+								// ignore for -
+							}
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.analogAlarm3Label = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
+					RowData analogAlarm3LabelLData = new RowData();
+					analogAlarm3LabelLData.width = 50;
+					analogAlarm3LabelLData.height = 19;
+					this.analogAlarm3Label.setLayoutData(analogAlarm3LabelLData);
+					this.analogAlarm3Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				}
 			}
 			{
 				this.mLinkAddressesGroup = new Group(this, SWT.NONE);
 				RowLayout mLinkAddressesGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.mLinkAddressesGroup.setLayout(mLinkAddressesGroupLayout);
 				FormData mLinkAddressesGroupLData = new FormData();
-				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 210);
+				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 260);
 				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
 				mLinkAddressesGroupLData.width = 290;
-				mLinkAddressesGroupLData.height = 225;
+				mLinkAddressesGroupLData.height = 250;
 				this.mLinkAddressesGroup.setLayoutData(mLinkAddressesGroupLData);
 				this.mLinkAddressesGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.mLinkAddressesGroup.setText(Messages.getString(MessageIds.GDE_MSGT2558));
@@ -881,7 +1190,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					addressText3LData.width = this.textWidth;
 					addressText3LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressCapacityText.setLayoutData(addressText3LData);
-					this.addressCapacityText.setText(this.sliderValues[this.configuration.mLinkAddressHeight]);
+					this.addressCapacityText.setText(this.sliderValues[this.configuration.mLinkAddressCapacity]);
 				}
 				{
 					this.addressCapacitySlider = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -892,7 +1201,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					addressSlider3LData.width = this.sliderWidth;
 					addressSlider3LData.height = 17;
 					this.addressCapacitySlider.setLayoutData(addressSlider3LData);
-					this.addressCapacitySlider.setSelection(this.configuration.mLinkAddressHeight);
+					this.addressCapacitySlider.setSelection(this.configuration.mLinkAddressCapacity);
 					this.addressCapacitySlider.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -973,6 +1282,43 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 							log.log(Level.FINEST, "addressSlider3max.widgetSelected, event=" + evt); //$NON-NLS-1$
 							UniLog2SetupConfiguration2.this.configuration.mLinkAddressHeight = (byte) UniLog2SetupConfiguration2.this.addressHeightSlider.getSelection();
 							UniLog2SetupConfiguration2.this.addressHeightText.setText(UniLog2SetupConfiguration2.this.sliderValues[UniLog2SetupConfiguration2.this.configuration.mLinkAddressHeight]);
+							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.cellMinimumLabel = new CLabel(this.mLinkAddressesGroup, SWT.RIGHT);
+					this.cellMinimumLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressLabel3maxLData = new RowData();
+					addressLabel3maxLData.width = this.labelWidth;
+					addressLabel3maxLData.height = 21;
+					this.cellMinimumLabel.setLayoutData(addressLabel3maxLData);
+					this.cellMinimumLabel.setText(Messages.getString(MessageIds.GDE_MSGT2514));
+				}
+				{
+					this.cellMinimumText = new Text(this.mLinkAddressesGroup, SWT.CENTER | SWT.READ_ONLY | SWT.BORDER);
+					this.cellMinimumText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					RowData addressText3maxLData = new RowData();
+					addressText3maxLData.width = this.textWidth;
+					addressText3maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					this.cellMinimumText.setLayoutData(addressText3maxLData);
+				}
+				{
+					this.cellMinimumSlider = new Slider(this.mLinkAddressesGroup, SWT.NONE);
+					this.cellMinimumSlider.setMinimum(this.sliderMinimum);
+					this.cellMinimumSlider.setMaximum(this.sliderMaximum);
+					this.cellMinimumSlider.setIncrement(this.sliderIncrement);
+					RowData addressSlider3maxLData = new RowData();
+					addressSlider3maxLData.width = this.sliderWidth;
+					addressSlider3maxLData.height = 17;
+					this.cellMinimumSlider.setLayoutData(addressSlider3maxLData);
+					//this.addressSlider3max.setSelection(this.configuration.mLinkcellMinimumMax);
+					this.cellMinimumSlider.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "addressSlider3max.widgetSelected, event=" + evt); //$NON-NLS-1$
+							UniLog2SetupConfiguration2.this.configuration.mLinkAddressCellMinimum = (byte) UniLog2SetupConfiguration2.this.cellMinimumSlider.getSelection();
+							UniLog2SetupConfiguration2.this.cellMinimumText.setText(UniLog2SetupConfiguration2.this.sliderValues[UniLog2SetupConfiguration2.this.configuration.mLinkAddressCellMinimum]);
 							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});

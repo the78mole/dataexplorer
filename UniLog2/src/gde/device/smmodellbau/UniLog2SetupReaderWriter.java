@@ -21,6 +21,7 @@ package gde.device.smmodellbau;
 import gde.GDE;
 import gde.device.smmodellbau.unilog2.MessageIds;
 import gde.io.DataParser;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
@@ -53,6 +54,9 @@ public class UniLog2SetupReaderWriter {
 	final static int		TEL_ALARM_HEIGHT				= 0x0010;
 	final static int		TEL_ALARM_VOLTAGE_RX		= 0x0020;
 	final static int		TEL_ALARM_VOLTAGE_CELL	= 0x0040;
+	final static int		TEL_ALARM_ANALOG_1			= 0x2000;
+	final static int		TEL_ALARM_ANALOG_2			= 0x4000;
+	final static int		TEL_ALARM_ANALOG_3			= 0x8000;
 	
 	final static int		AUTO_START_CURRENT			= 0x0001;
 	final static int		AUTO_START_RX						= 0x0002;
@@ -75,19 +79,26 @@ public class UniLog2SetupReaderWriter {
 	short								varioThreshold					= 5;																													// 14 value/10 m/sec
 	short								varioTon								= 0;																													// 15 0=off, 1=up/down, 2=up, 3=down
 	short								limiterModus						= 0;																													// 16 0=off, 1=F1Q, 2=F5D, 3=F5B, 4= F5J
-	short								energyLimit							= 1000;																											// 17 1 - 2000 Wmin
+	short								energyLimit							= 1000;																												// 17 1 - 2000 Wmin
 	short								minMaxRx								= 0;																													// 18 0=off, 1=on
 	short								stopModus								= 0;																													// 19 0=off, 1=on
-	//short[] A = new short[18]; // 20-37
-	short								telemetryAlarms					= 0x0000;																										// 38 current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040
+	short								varioThresholdSink			= 5;																													// 20 value/10 m/sec
+	//short[] A = new short[17]; 																																							// 21-37
+	short								telemetryAlarms					= 0x0000;																											// 38 current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040
 	short								currentAlarm						= 100;																												// 39 1A --> 400A
 	short								voltageStartAlarm				= 124;																												// 40 10V/10 --> 600V/10
 	short								voltageAlarm						= 100;																												// 41 10V/10 --> 600V/10
-	short								capacityAlarm						= 2000;																											// 42 100mAh --> 30000mAh
+	short								capacityAlarm						= 2000;																												// 42 100mAh --> 30000mAh
 	short								heightAlarm							= 200;																												// 43 10m --> 4000m step 50
 	short								voltageRxAlarm					= 450;																												// 44 300 --> 800 V/100
-	short								cellVoltageAlarm				= 30;																												// 45 20 - 40 V/10 
-	//short[] B = new short[19]; // 46-64
+	short								cellVoltageAlarm				= 30;																													// 45 20 - 40 V/10 
+	short								analogAlarm1						= 100;																												// 46 -100 to 3000
+	short								analogAlarm2						= 100;																												// 47 -100 to 3000
+	short								analogAlarm3						= 100;																												// 48 -100 to 3000
+	short								analogAlarm1Direct			= 0;																													// 49 0 = >; 1 = <
+	short								analogAlarm2Direct			= 0;																													// 50 0 = >; 1 = <
+	short								analogAlarm3Direct			= 0;																													// 51 0 = >; 1 = <
+	//short[] B = new short[13]; 																																							// 52-64
 	byte								mLinkAddressVoltage			= 0;																													// 
 	byte								mLinkAddressCurrent			= 1;																													// 65 0 - 15, "--"
 	byte								mLinkAddressRevolution	= 2;																													// 
@@ -97,15 +108,15 @@ public class UniLog2SetupReaderWriter {
 	byte								mLinkAddressA1					= 6;																													// 
 	byte								mLinkAddressA2					= 7;																													// 68 0 - 15, "--"
 	byte								mLinkAddressA3					= 8;																													// 
-	byte								reserve									= 16;																												// 69
-	byte								mLinkAddressCell1				= 16;																												// 70 0 - 15, "--"
-	byte								mLinkAddressCell2				= 16;																												// 
-	byte								mLinkAddressCell3				= 16;																												// 71 0 - 15, "--"
-	byte								mLinkAddressCell4				= 16;																												// 
-	byte								mLinkAddressCell5				= 16;																												// 72 0 - 15, "--"
-	byte								mLinkAddressCell6				= 16;																												//
+	byte								mLinkAddressCellMinimum = 16;																													// 69
+	byte								mLinkAddressCell1				= 16;																													// 70 0 - 15, "--"
+	byte								mLinkAddressCell2				= 16;																													// 
+	byte								mLinkAddressCell3				= 16;																													// 71 0 - 15, "--"
+	byte								mLinkAddressCell4				= 16;																													// 
+	byte								mLinkAddressCell5				= 16;																													// 72 0 - 15, "--"
+	byte								mLinkAddressCell6				= 16;																													//
 	//short[] C = new short[190/2 - 72]; // 73-95
-	short								checkSum;																																						// 55
+	short								checkSum;																																							// 55
 
 	short[]							setupData								= new short[192];
 
@@ -151,9 +162,12 @@ public class UniLog2SetupReaderWriter {
 				this.limiterModus = DataParser.parse2Short(buffer, 30); //0=off, 1=F1Q, 2=F5D, 3=F5B, 4= F5J
 				this.energyLimit = DataParser.parse2Short(buffer, 32); //1 - 2000 Wmin
 				this.minMaxRx = DataParser.parse2Short(buffer, 34); //18 0=off, 1=on
-				this.stopModus = DataParser.parse2Short(buffer, 36); //18 0=off, 1=on
-				//short[] A = new short[20]; // 20-37
-				this.telemetryAlarms = DataParser.parse2Short(buffer, 74); //current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040
+				this.stopModus = DataParser.parse2Short(buffer, 36); //19 0=off, 1=on
+				this.stopModus = DataParser.parse2Short(buffer, 36); //19 0=off, 1=on
+				this.varioThresholdSink = DataParser.parse2Short(buffer, 38); // 20 value/10 m/sec		
+				//short[] A = new short[17]; // 21-37
+				this.telemetryAlarms = DataParser.parse2Short(buffer, 74); //current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040, a1=0x2000, a2=0x4000, a3=0x8000
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.int2bin_16(this.telemetryAlarms));
 				this.currentAlarm = DataParser.parse2Short(buffer, 76); //1A --> 400A
 				this.voltageStartAlarm = DataParser.parse2Short(buffer, 78); //10V/10 --> 600V/10
 				this.voltageAlarm = DataParser.parse2Short(buffer, 80); //10V/10 --> 600V/10
@@ -161,7 +175,13 @@ public class UniLog2SetupReaderWriter {
 				this.heightAlarm = DataParser.parse2Short(buffer, 84); //10m --> 4000m step 50
 				this.voltageRxAlarm = DataParser.parse2Short(buffer, 86); //44 300 --> 800 V/100
 				this.cellVoltageAlarm = DataParser.parse2Short(buffer, 88); //45 20 - 40 V/10 
-				//short[] B = new short[19]; // 46-64
+				this.analogAlarm1 = DataParser.parse2Short(buffer, 90); // 46 -100 to 3000
+				this.analogAlarm2 = DataParser.parse2Short(buffer, 92); // 47 -100 to 3000
+				this.analogAlarm3 = DataParser.parse2Short(buffer, 94); // 48 -100 to 3000
+				this.analogAlarm1Direct = DataParser.parse2Short(buffer, 96); // 49 0 = >; 1 = <
+				this.analogAlarm2Direct = DataParser.parse2Short(buffer, 98); // 50 0 = >; 1 = <
+				this.analogAlarm3Direct = DataParser.parse2Short(buffer, 100); // 51 0 = >; 1 = <
+				//short[] B = new short[13]; // 52-64
 				this.mLinkAddressVoltage = buffer[128]; //0 - 15, "--"
 				this.mLinkAddressCurrent = buffer[129]; //0 - 15, "--"
 				this.mLinkAddressRevolution = buffer[130]; //0 - 15, "--"
@@ -171,7 +191,7 @@ public class UniLog2SetupReaderWriter {
 				this.mLinkAddressA1 = buffer[134]; //0 - 15, "--"
 				this.mLinkAddressA2 = buffer[135]; //0 - 15, "--"
 				this.mLinkAddressA3 = buffer[136]; //0 - 15, "--"
-				this.reserve = buffer[137]; //0 - 15, "--"
+				this.mLinkAddressCellMinimum = buffer[137]; //0 - 15, "--"
 				this.mLinkAddressCell1 = buffer[138]; //0 - 15, "--"
 				this.mLinkAddressCell2 = buffer[139]; //0 - 15, "--"
 				this.mLinkAddressCell3 = buffer[140]; //0 - 15, "--"
@@ -198,7 +218,7 @@ public class UniLog2SetupReaderWriter {
 
 	void saveSetup() {
 		FileDialog fileDialog = this.application.prepareFileSaveDialog(this.parent, Messages.getString(MessageIds.GDE_MSGT2502), new String[] { GDE.FILE_ENDING_STAR_INI, GDE.FILE_ENDING_STAR },
-				this.device.getDataBlockPreferredDataLocation(), this.device.getDefaultConfigurationFileName());
+				this.device.getConfigurationFileDirecotry(), this.device.getDefaultConfigurationFileName());
 		log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
 		String setupFilePath = fileDialog.open();
 		if (setupFilePath != null && setupFilePath.length() > 4) {
@@ -245,9 +265,12 @@ public class UniLog2SetupReaderWriter {
 				buffer[35] = (byte) ((this.minMaxRx & 0xFF00) >> 8);
 				buffer[36] = (byte) (this.stopModus & 0x00FF); //19 0=off, 1=on
 				buffer[37] = (byte) ((this.stopModus & 0xFF00) >> 8);
-				//short[] A = new short[20]; // 20-37
-				buffer[74] = (byte) (this.telemetryAlarms & 0x00FF); //current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040
+				buffer[38] = (byte) (this.varioThresholdSink & 0x00FF); //20 value/10 m/sec
+				buffer[39] = (byte) ((this.varioThresholdSink & 0xFF00) >> 8);
+				//short[] A = new short[17]; // 21-37
+				buffer[74] = (byte) (this.telemetryAlarms & 0x00FF); //current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040, a1=0x2000, a2=0x4000, a3=0x8000
 				buffer[75] = (byte) ((this.telemetryAlarms & 0xFF00) >> 8);
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, StringHelper.int2bin_16(this.telemetryAlarms));
 				buffer[76] = (byte) (this.currentAlarm & 0x00FF); //1A --> 400A
 				buffer[77] = (byte) ((this.currentAlarm & 0xFF00) >> 8);
 				buffer[78] = (byte) (this.voltageStartAlarm & 0x00FF); //10V/10 --> 600V/10
@@ -260,9 +283,23 @@ public class UniLog2SetupReaderWriter {
 				buffer[85] = (byte) ((this.heightAlarm & 0xFF00) >> 8);
 				buffer[86] = (byte) (this.voltageRxAlarm & 0x00FF); //300 --> 800 V/100
 				buffer[87] = (byte) ((this.voltageRxAlarm & 0xFF00) >> 8);
-				buffer[88] = (byte) (this.cellVoltageAlarm & 0x00FF); //20 - 40 V/10 
+				buffer[88] = (byte) (this.cellVoltageAlarm & 0x00FF); //45 20 - 40 V/10 
 				buffer[89] = (byte) ((this.cellVoltageAlarm & 0xFF00) >> 8);
-				//short[] B = new short[19]; // 46-64
+				
+				buffer[90] = (byte) (this.analogAlarm1 & 0x00FF); //46 -100 to 3000
+				buffer[91] = (byte) ((this.analogAlarm1 & 0xFF00) >> 8);
+				buffer[92] = (byte) (this.analogAlarm2 & 0x00FF); //47 -100 to 3000
+				buffer[93] = (byte) ((this.analogAlarm2 & 0xFF00) >> 8);
+				buffer[94] = (byte) (this.analogAlarm3 & 0x00FF); //48 -100 to 3000
+				buffer[95] = (byte) ((this.analogAlarm3 & 0xFF00) >> 8);
+				
+				buffer[96] = (byte) (this.analogAlarm1Direct & 0x00FF); //49  0 = >; 1 = <
+				buffer[97] = (byte) ((this.analogAlarm1Direct & 0xFF00) >> 8);
+				buffer[98] = (byte) (this.analogAlarm2Direct & 0x00FF); //50  0 = >; 1 = <
+				buffer[99] = (byte) ((this.analogAlarm2Direct & 0xFF00) >> 8);
+				buffer[100] = (byte) (this.analogAlarm3Direct & 0x00FF); //51  0 = >; 1 = <
+				buffer[101] = (byte) ((this.analogAlarm3Direct & 0xFF00) >> 8);
+				//short[] B = new short[13]; // 46-64
 				buffer[128] = this.mLinkAddressVoltage; //0 - 15, "--"
 				buffer[129] = this.mLinkAddressCurrent; //0 - 15, "--"
 				buffer[130] = this.mLinkAddressRevolution; //0 - 15, "--"
@@ -272,7 +309,7 @@ public class UniLog2SetupReaderWriter {
 				buffer[134] = this.mLinkAddressA1; //0 - 15, "--"
 				buffer[135] = this.mLinkAddressA2; //0 - 15, "--"
 				buffer[136] = this.mLinkAddressA3; //0 - 15, "--"
-				buffer[137] = this.reserve; //0 - 15, "--"
+				buffer[137] = this.mLinkAddressCellMinimum; //0 - 15, "--"
 				buffer[138] = this.mLinkAddressCell1; //0 - 15, "--"
 				buffer[139] = this.mLinkAddressCell2; //0 - 15, "--"
 				buffer[140] = this.mLinkAddressCell3; //0 - 15, "--"
