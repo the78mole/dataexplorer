@@ -652,5 +652,16 @@ public class StringHelper {
 		}
 		return itemNames;
 	}
+	/**
+	 * @return 16 bit binary representation
+	 */
+	public static String int2bin_16(int value) {
+		StringBuilder sb = new StringBuilder().append("binary : ");
+		for (int i = 0, j = 0x8000; i < 16; i++,j/=2) {
+			if ((value & j) > 0) sb.append("1");
+			else  sb.append("0");
+		}
+		return sb.toString();
+	}
 
 }
