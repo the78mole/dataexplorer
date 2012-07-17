@@ -115,10 +115,6 @@ public class SetupReaderWriter {
 		log.log(Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {
-			if (this.device.getDataBlockPreferredDataLocation().equals(fd.getFilterPath())) {
-				this.device.setDataBlockPreferredDataLocation(fd.getFilterPath());
-			}
-
 			try {
 				FileInputStream file_input = new FileInputStream(new File(selectedSetupFile));
 				DataInputStream data_in = new DataInputStream(file_input);
@@ -191,6 +187,7 @@ public class SetupReaderWriter {
 				this.device.getConfigurationFileDirecotry(), this.device.getDefaultConfigurationFileName());
 		log.log(Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
 		String setupFilePath = fileDialog.open();
+		
 		if (setupFilePath != null && setupFilePath.length() > 4) {
 			File setupFile = new File(setupFilePath);
 			byte[] buffer = new byte[192];

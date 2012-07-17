@@ -486,7 +486,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2000), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
 				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
 
-		if (!application.isObjectoriented())
+		if (!application.isObjectoriented() && !searchDirectory.equals(fd.getFilterPath()))
 			this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 
 		Thread reader = new Thread("reader"){
@@ -690,6 +690,12 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		String searchPath = this.getDataBlockPreferredDataLocation();
 		if (searchPath.contains(GPSLogger.SM_GPS_LOGGER_DIR_STUB)) {
 			searchPath = searchPath.substring(0, searchPath.indexOf(GPSLogger.SM_GPS_LOGGER_DIR_STUB)) + GPSLogger.SM_GPS_LOGGER_INI_DIR;
+		}
+		else {
+			if (searchPath.endsWith(GDE.FILE_SEPARATOR_UNIX))
+				searchPath = searchPath + GPSLogger.SM_GPS_LOGGER_INI_DIR;
+			else 
+				searchPath = searchPath + GDE.FILE_SEPARATOR_UNIX + GPSLogger.SM_GPS_LOGGER_INI_DIR;
 		}
 		return searchPath;
 	}
