@@ -5,6 +5,7 @@ fix several reported minor bugs
 add HoTTAdapterM as HoTT device where GPS coordinates are logged as decimal degrees instead of degree and decimal minutes  
 GPS-Logger - update to firmware version 1.07 and supported features
 UniLog2 - update to firmware version 1.05 and supported features
+GPS-Logger, UniLog2, JLog2 - refine import path including object selection, refine default import path handling 
 
 Version 3.02 - 01 Jul 2012
 fix performance problem while in zoom mode and update statistics data
