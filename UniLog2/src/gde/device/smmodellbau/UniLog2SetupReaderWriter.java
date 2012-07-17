@@ -131,9 +131,7 @@ public class UniLog2SetupReaderWriter {
 		String selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
 		log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
 
-		if (fd.getFileName().length() > 4) {
-			if (!this.device.getConfigurationFileDirecotry().equals(fd.getFilterPath()))
-				this.device.setDataBlockPreferredDataLocation(fd.getFilterPath());
+		if (fd.getFileName().length() > 4) {			
 			try {
 				FileInputStream file_input = new FileInputStream(new File(selectedSetupFile));
 				DataInputStream data_in = new DataInputStream(file_input);
@@ -221,7 +219,8 @@ public class UniLog2SetupReaderWriter {
 				this.device.getConfigurationFileDirecotry(), this.device.getDefaultConfigurationFileName());
 		log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
 		String setupFilePath = fileDialog.open();
-		if (setupFilePath != null && setupFilePath.length() > 4) {
+		
+		if (setupFilePath != null && setupFilePath.length() > 4) {			
 			File setupFile = new File(setupFilePath);
 			byte[] buffer = new byte[192];
 			int tmpCheckSum = 0;
@@ -270,7 +269,7 @@ public class UniLog2SetupReaderWriter {
 				//short[] A = new short[17]; // 21-37
 				buffer[74] = (byte) (this.telemetryAlarms & 0x00FF); //current=0x0001, startVoltage=0x0002, voltage=0x0004, capacity=0x0008, height=0x0010, voltageRx=0x0020, cellVoltage=0x0040, a1=0x2000, a2=0x4000, a3=0x8000
 				buffer[75] = (byte) ((this.telemetryAlarms & 0xFF00) >> 8);
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, StringHelper.int2bin_16(this.telemetryAlarms));
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.int2bin_16(this.telemetryAlarms));
 				buffer[76] = (byte) (this.currentAlarm & 0x00FF); //1A --> 400A
 				buffer[77] = (byte) ((this.currentAlarm & 0xFF00) >> 8);
 				buffer[78] = (byte) (this.voltageStartAlarm & 0x00FF); //10V/10 --> 600V/10

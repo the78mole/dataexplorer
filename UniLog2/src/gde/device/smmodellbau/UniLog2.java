@@ -634,7 +634,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2500), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
 				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
 		
-		if (!searchDirectory.equals(fd.getFilterPath()))
+		if (!this.application.isObjectoriented() && !searchDirectory.equals(fd.getFilterPath()))
 			this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
@@ -675,6 +675,12 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		String searchPath = this.getDataBlockPreferredDataLocation();
 		if (searchPath.contains(UniLog2.SM_UNILOG_2_DIR_STUB)) {
 			searchPath = searchPath.substring(0, searchPath.indexOf(UniLog2.SM_UNILOG_2_DIR_STUB)) + UniLog2.SM_UNILOG_2_INI_PATH;
+		}
+		else {
+			if (searchPath.endsWith(GDE.FILE_SEPARATOR_UNIX))
+				searchPath = searchPath + UniLog2.SM_UNILOG_2_INI_PATH;
+			else 
+				searchPath = searchPath + GDE.FILE_SEPARATOR_UNIX + UniLog2.SM_UNILOG_2_INI_PATH;
 		}
 		return searchPath;
 	}
