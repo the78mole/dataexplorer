@@ -26,6 +26,7 @@ import gde.data.RecordSet;
 import gde.device.DeviceDialog;
 import gde.device.InputTypes;
 import gde.device.smmodellbau.jlog2.MessageIds;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
 
@@ -108,7 +109,7 @@ public class JLog2Dialog extends DeviceDialog {
 			this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
 			this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
-			JLog2Dialog.log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			JLog2Dialog.log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -129,11 +130,11 @@ public class JLog2Dialog extends DeviceDialog {
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
-						JLog2Dialog.log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						JLog2Dialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (JLog2Dialog.this.device.isChangePropery()) {
 							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { JLog2Dialog.this.device.getPropertiesFileName() });
 							if (JLog2Dialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
-								JLog2Dialog.log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
+								JLog2Dialog.log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
 								JLog2Dialog.this.device.storeDeviceProperties();
 								setClosePossible(true);
 							}
@@ -143,13 +144,13 @@ public class JLog2Dialog extends DeviceDialog {
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
-						JLog2Dialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						JLog2Dialog.log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						JLog2Dialog.this.application.openHelpDialog(JLog2Dialog.this.device.getName(), "HelpInfo.html", true); //$NON-NLS-1$
 					}
 				});
 				this.dialogShell.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent paintevent) {
-						if (JLog2Dialog.log.isLoggable(java.util.logging.Level.FINEST)) JLog2Dialog.log.log(java.util.logging.Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
+						if (JLog2Dialog.log.isLoggable(Level.FINEST)) JLog2Dialog.log.log(Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
 						RecordSet activeRecordSet = JLog2Dialog.this.application.getActiveRecordSet();
 						if (JLog2Dialog.this.lastActiveRecordSet == null && activeRecordSet != null
 								|| (activeRecordSet != null && !JLog2Dialog.this.lastActiveRecordSet.getName().equals(activeRecordSet.getName()))) {
@@ -217,7 +218,7 @@ public class JLog2Dialog extends DeviceDialog {
 					this.saveVisualizationButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							JLog2Dialog.log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Dialog.log.log(Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							JLog2Dialog.this.device.storeDeviceProperties();
 							JLog2Dialog.this.saveVisualizationButton.setEnabled(false);
 						}
@@ -237,11 +238,11 @@ public class JLog2Dialog extends DeviceDialog {
 					this.inputFileButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							JLog2Dialog.log.log(java.util.logging.Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Dialog.log.log(Level.FINEST, "inputFileButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (JLog2Dialog.this.isVisibilityChanged) {
 								String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { JLog2Dialog.this.device.getPropertiesFileName() });
 								if (JLog2Dialog.this.application.openYesNoMessageDialog(JLog2Dialog.this.dialogShell, msg) == SWT.YES) {
-									JLog2Dialog.log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
+									JLog2Dialog.log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
 									JLog2Dialog.this.device.storeDeviceProperties();
 								}
 							}
@@ -262,7 +263,7 @@ public class JLog2Dialog extends DeviceDialog {
 					this.helpButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							JLog2Dialog.log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Dialog.log.log(Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							JLog2Dialog.this.application.openHelpDialog(JLog2Dialog.this.device.getName(), "HelpInfo.html", true); //$NON-NLS-1$
 						}
 					});
@@ -280,7 +281,7 @@ public class JLog2Dialog extends DeviceDialog {
 					this.liveGathererButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							if (JLog2Dialog.log.isLoggable(java.util.logging.Level.FINE)) JLog2Dialog.log.log(java.util.logging.Level.FINE, "liveGathererButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (JLog2Dialog.log.isLoggable(Level.FINE)) JLog2Dialog.log.log(Level.FINE, "liveGathererButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (!JLog2Dialog.this.configurationTabItem.getControl().isVisible()) {
 								if (JLog2Dialog.this.liveThread == null || !JLog2Dialog.this.serialPort.isConnected()) {
 									try {
@@ -292,7 +293,7 @@ public class JLog2Dialog extends DeviceDialog {
 											JLog2Dialog.this.liveThread.start();
 										}
 										catch (RuntimeException e) {
-											JLog2Dialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+											JLog2Dialog.log.log(Level.WARNING, e.getMessage(), e);
 										}
 									}
 									catch (Exception e) {
@@ -339,7 +340,7 @@ public class JLog2Dialog extends DeviceDialog {
 					this.closeButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							JLog2Dialog.log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+							JLog2Dialog.log.log(Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 							JLog2Dialog.this.dispose();
 						}
 					});
@@ -364,7 +365,7 @@ public class JLog2Dialog extends DeviceDialog {
 			}
 		}
 		catch (Exception e) {
-			JLog2Dialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			JLog2Dialog.log.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
@@ -410,14 +411,11 @@ public class JLog2Dialog extends DeviceDialog {
 
 	void loadSetup() {
 		FileDialog fd = this.application.openFileOpenDialog(this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2801), new String[] { GDE.FILE_ENDING_STAR_TXT, GDE.FILE_ENDING_STAR },
-				this.device.getDataBlockPreferredDataLocation(), JLog2.SM_JLOG2_CONFIG_TXT, SWT.SINGLE);
+				this.device.getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT, SWT.SINGLE);
 		this.selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
-		JLog2Dialog.log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + this.selectedSetupFile); //$NON-NLS-1$
+		JLog2Dialog.log.log(Level.FINE, "selectedSetupFile = " + this.selectedSetupFile); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {
-			if (!this.device.getDataBlockPreferredDataLocation().equals(fd.getFilterPath())) {
-				this.device.setDataBlockPreferredDataLocation(fd.getFilterPath());
-			}
 			try {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(this.selectedSetupFile), "ISO-8859-1")); //$NON-NLS-1$
 				String line = reader.readLine();
@@ -425,7 +423,7 @@ public class JLog2Dialog extends DeviceDialog {
 				reader.close();
 			}
 			catch (Exception e) {
-				JLog2Dialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+				JLog2Dialog.log.log(Level.SEVERE, e.getMessage(), e);
 				((JLog2Configuration) this.configurationTabItem.getControl()).loadConfiuration(JLog2Configuration.normal);
 			}
 		}
@@ -433,13 +431,11 @@ public class JLog2Dialog extends DeviceDialog {
 
 	void saveSetup() {
 		FileDialog fileDialog = this.application.prepareFileSaveDialog(this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2802), new String[] { GDE.FILE_ENDING_STAR_TXT, GDE.FILE_ENDING_STAR },
-				this.device.getDataBlockPreferredDataLocation(), JLog2.SM_JLOG2_CONFIG_TXT);
-		JLog2Dialog.log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + fileDialog.getFileName()); //$NON-NLS-1$
+				this.device.getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT);
 		String setupFilePath = fileDialog.open();
+		JLog2Dialog.log.log(Level.FINE, "selectedSetupFile = " + setupFilePath); //$NON-NLS-1$
+		
 		if (setupFilePath != null && setupFilePath.length() > 4) {
-			if (!this.device.getDataBlockPreferredDataLocation().equals(fileDialog.getFilterPath())) {
-				this.device.setDataBlockPreferredDataLocation(fileDialog.getFilterPath());
-			}
 			try {
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(setupFilePath), "ISO-8859-1")); //$NON-NLS-1$
 				writer.write(((JLog2Configuration) this.configurationTabItem.getControl()).configuration.getConfiguration());
@@ -448,7 +444,7 @@ public class JLog2Dialog extends DeviceDialog {
 				this.isConfigChanged = false;
 			}
 			catch (Exception e) {
-				JLog2Dialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+				JLog2Dialog.log.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 	}

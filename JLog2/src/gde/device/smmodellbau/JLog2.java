@@ -539,11 +539,17 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 		String fileEnding = this.getDataBlockPreferredFileExtention();
 		fileEnding = fileEnding.startsWith(GDE.STRING_STAR) ? fileEnding.substring(1) : fileEnding;
 		final String dotFileEnding = fileEnding.startsWith(GDE.STRING_DOT) ? fileEnding : GDE.STRING_DOT+fileEnding;
-		if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
+		String objectKey = this.application.getObjectKey();
+		if (this.application.isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
+			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
+			FileUtils.checkDirectoryAndCreate(objectkeyPath);
+			searchDirectory = objectkeyPath;
+		}
+		else if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
 		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2800), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, searchDirectory, null, SWT.MULTI);
-		if (this.getDeviceConfiguration().getDataBlockPreferredDataLocation() != fd.getFilterPath())
+		if (!this.application.isObjectoriented() && !searchDirectory.equals(fd.getFilterPath()))
 			this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
@@ -574,7 +580,7 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 					}
 				}
 				finally {
-					JLog2.this.application.setPortConnected(true);
+					JLog2.this.application.setPortConnected(false);
 				}
 			}
 		};
@@ -609,5 +615,13 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	 */
 	public String getProcessName(byte[] buffer) {
 		return this.getStateProperty(Integer.parseInt((new String(buffer).split(this.getDataBlockSeparator().value())[1]))).getName();
+	}
+	
+	String getConfigurationFileDirecotry() {
+		String searchPath = this.getDataBlockPreferredDataLocation().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		if (!FileUtils.checkFileExist(searchPath + GDE.FILE_SEPARATOR_UNIX + JLog2.SM_JLOG2_CONFIG_TXT)) {
+			searchPath = searchPath.substring(0, (searchPath.indexOf(GDE.FILE_SEPARATOR_UNIX)+1));
+		}
+		return searchPath;
 	}
 }
