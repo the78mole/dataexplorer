@@ -279,10 +279,15 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "currentCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							UniLog2SetupConfiguration2.this.configuration.currentAlarm = (short) Integer.parseInt(UniLog2SetupConfiguration2.this.currentCombo.getText().trim());
-							UniLog2SetupConfiguration2.this.configuration.currentAlarm = UniLog2SetupConfiguration2.this.configuration.currentAlarm < 1 ? 1
-									: UniLog2SetupConfiguration2.this.configuration.currentAlarm > 400 ? 400 : UniLog2SetupConfiguration2.this.configuration.currentAlarm;
-							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								UniLog2SetupConfiguration2.this.configuration.currentAlarm = (short) Integer.parseInt(UniLog2SetupConfiguration2.this.currentCombo.getText().trim());
+								UniLog2SetupConfiguration2.this.configuration.currentAlarm = UniLog2SetupConfiguration2.this.configuration.currentAlarm < 1 ? 1
+										: UniLog2SetupConfiguration2.this.configuration.currentAlarm > 400 ? 400 : UniLog2SetupConfiguration2.this.configuration.currentAlarm;
+								UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore -
+							}
 						}
 					});
 				}
@@ -356,11 +361,16 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "voltageStartCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							UniLog2SetupConfiguration2.this.configuration.voltageStartAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.voltageStartCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
-							UniLog2SetupConfiguration2.this.configuration.voltageStartAlarm = UniLog2SetupConfiguration2.this.configuration.voltageStartAlarm < 10 ? 10
-									: UniLog2SetupConfiguration2.this.configuration.voltageStartAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.voltageStartAlarm;
-							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								UniLog2SetupConfiguration2.this.configuration.voltageStartAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.voltageStartCombo.getText().trim()
+										.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+								UniLog2SetupConfiguration2.this.configuration.voltageStartAlarm = UniLog2SetupConfiguration2.this.configuration.voltageStartAlarm < 10 ? 10
+										: UniLog2SetupConfiguration2.this.configuration.voltageStartAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.voltageStartAlarm;
+								UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore -
+							}
 						}
 					});
 				}
@@ -434,11 +444,16 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "voltageCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							UniLog2SetupConfiguration2.this.configuration.voltageAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.voltageCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
-							UniLog2SetupConfiguration2.this.configuration.voltageAlarm = UniLog2SetupConfiguration2.this.configuration.voltageAlarm < 10 ? 10
-									: UniLog2SetupConfiguration2.this.configuration.voltageAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.voltageAlarm;
-							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								UniLog2SetupConfiguration2.this.configuration.voltageAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.voltageCombo.getText().trim()
+										.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+								UniLog2SetupConfiguration2.this.configuration.voltageAlarm = UniLog2SetupConfiguration2.this.configuration.voltageAlarm < 10 ? 10
+										: UniLog2SetupConfiguration2.this.configuration.voltageAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.voltageAlarm;
+								UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								//ignore -
+							}
 						}
 					});
 				}
@@ -511,10 +526,15 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "capacityCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							UniLog2SetupConfiguration2.this.configuration.capacityAlarm = (short) Integer.parseInt(UniLog2SetupConfiguration2.this.capacityCombo.getText().trim());
-							UniLog2SetupConfiguration2.this.configuration.capacityAlarm = UniLog2SetupConfiguration2.this.configuration.capacityAlarm < 100 ? 100
-									: UniLog2SetupConfiguration2.this.configuration.capacityAlarm > 30000 ? 30000 : UniLog2SetupConfiguration2.this.configuration.capacityAlarm;
-							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								UniLog2SetupConfiguration2.this.configuration.capacityAlarm = (short) Integer.parseInt(UniLog2SetupConfiguration2.this.capacityCombo.getText().trim());
+								UniLog2SetupConfiguration2.this.configuration.capacityAlarm = UniLog2SetupConfiguration2.this.configuration.capacityAlarm < 100 ? 100
+										: UniLog2SetupConfiguration2.this.configuration.capacityAlarm > 30000 ? 30000 : UniLog2SetupConfiguration2.this.configuration.capacityAlarm;
+								UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								//ignore -
+							}
 						}
 					});
 				}
@@ -587,11 +607,16 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "heightCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							UniLog2SetupConfiguration2.this.configuration.heightAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.heightCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
-							UniLog2SetupConfiguration2.this.configuration.heightAlarm = UniLog2SetupConfiguration2.this.configuration.heightAlarm < 10 ? 10
-									: UniLog2SetupConfiguration2.this.configuration.heightAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.heightAlarm;
-							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								UniLog2SetupConfiguration2.this.configuration.heightAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.heightCombo.getText().trim()
+										.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+								UniLog2SetupConfiguration2.this.configuration.heightAlarm = UniLog2SetupConfiguration2.this.configuration.heightAlarm < 10 ? 10
+										: UniLog2SetupConfiguration2.this.configuration.heightAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.heightAlarm;
+								UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore -
+							}
 						}
 					});
 				}
@@ -664,11 +689,16 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "voltageRxCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.voltageRxCombo.getText().trim()
-									.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
-							UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm = UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm < 10 ? 10
-									: UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm;
-							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.voltageRxCombo.getText().trim()
+										.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
+								UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm = UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm < 10 ? 10
+										: UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.voltageRxAlarm;
+								UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore -
+							}
 						}
 					});
 				}
@@ -742,9 +772,14 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "cellVoltageCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.cellVoltageCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
-							UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm < 10 ? 10 : UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm;
-							UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = (short) (Double.parseDouble(UniLog2SetupConfiguration2.this.cellVoltageCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
+								UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm = UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm < 10 ? 10 : UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm > 600 ? 600 : UniLog2SetupConfiguration2.this.configuration.cellVoltageAlarm;
+								UniLog2SetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore -
+							}
 						}
 					});
 				}
@@ -1078,6 +1113,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					addressText1LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressVoltageText.setLayoutData(addressText1LData);
 					this.addressVoltageText.setText(this.sliderValues[this.configuration.mLinkAddressVario]);
+					this.addressVoltageText.setEditable(false);
+					this.addressVoltageText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressVoltageSlider = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -1116,6 +1153,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					addressText2LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressCurrentText.setLayoutData(addressText2LData);
 					this.addressCurrentText.setText(this.sliderValues[this.configuration.mLinkAddressA1]);
+					this.addressCurrentText.setEditable(false);
+					this.addressCurrentText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressCurrentSlider = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -1153,6 +1192,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					addressText2maxLData.width = this.textWidth;
 					addressText2maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressRevolutionText.setLayoutData(addressText2maxLData);
+					this.addressRevolutionText.setEditable(false);
+					this.addressRevolutionText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressRevolutionSlider = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -1191,6 +1232,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					addressText3LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressCapacityText.setLayoutData(addressText3LData);
 					this.addressCapacityText.setText(this.sliderValues[this.configuration.mLinkAddressCapacity]);
+					this.addressCapacityText.setEditable(false);
+					this.addressCapacityText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressCapacitySlider = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -1228,6 +1271,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					addressText3maxLData.width = this.textWidth;
 					addressText3maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressVarioText.setLayoutData(addressText3maxLData);
+					this.addressVarioText.setEditable(false);
+					this.addressVarioText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressVarioSlider = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -1265,6 +1310,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					addressText3maxLData.width = this.textWidth;
 					addressText3maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressHeightText.setLayoutData(addressText3maxLData);
+					this.addressHeightText.setEditable(false);
+					this.addressHeightText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressHeightSlider = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -1302,6 +1349,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					addressText3maxLData.width = this.textWidth;
 					addressText3maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.cellMinimumText.setLayoutData(addressText3maxLData);
+					this.cellMinimumText.setEditable(false);
+					this.cellMinimumText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.cellMinimumSlider = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -1347,6 +1396,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.a1Combo.setLayoutData(a1ComboLData);
 					this.a1Combo.setItems(this.sliderValues);
 					this.a1Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.a1Combo.setEditable(false);
+					this.a1Combo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.a1Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1373,6 +1424,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.a2Combo.setLayoutData(a2ComboLData);
 					this.a2Combo.setItems(this.sliderValues);
 					this.a2Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.a2Combo.setEditable(false);
+					this.a2Combo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.a2Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1399,6 +1452,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.a3Combo.setLayoutData(a3ComboLData);
 					this.a3Combo.setItems(this.sliderValues);
 					this.a3Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.a3Combo.setEditable(false);
+					this.a3Combo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.a3Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1425,6 +1480,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c1Combo.setLayoutData(c1ComboLData);
 					this.c1Combo.setItems(this.sliderValues);
 					this.c1Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.c1Combo.setEditable(false);
+					this.c1Combo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.c1Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1451,6 +1508,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c2Combo.setLayoutData(c2ComboLData);
 					this.c2Combo.setItems(this.sliderValues);
 					this.c2Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.c2Combo.setEditable(false);
+					this.c2Combo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.c2Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1477,6 +1536,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c3Combo.setLayoutData(c3ComboLData);
 					this.c3Combo.setItems(this.sliderValues);
 					this.c3Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.c3Combo.setEditable(false);
+					this.c3Combo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.c3Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1503,6 +1564,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c4Combo.setLayoutData(c4ComboLData);
 					this.c4Combo.setItems(this.sliderValues);
 					this.c4Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.c4Combo.setEditable(false);
+					this.c4Combo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.c4Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1529,6 +1592,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c5Combo.setLayoutData(c5ComboLData);
 					this.c5Combo.setItems(this.sliderValues);
 					this.c5Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.c5Combo.setEditable(false);
+					this.c5Combo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.c5Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1555,6 +1620,8 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 					this.c6Combo.setLayoutData(c6ComboLData);
 					this.c6Combo.setItems(this.sliderValues);
 					this.c6Combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.c6Combo.setEditable(false);
+					this.c6Combo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.c6Combo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {

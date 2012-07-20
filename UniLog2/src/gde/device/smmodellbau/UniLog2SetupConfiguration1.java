@@ -19,10 +19,12 @@
 package gde.device.smmodellbau;
 
 import gde.GDE;
+import gde.device.DataTypes;
 import gde.device.smmodellbau.unilog2.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
 
 import java.util.Locale;
 import java.util.logging.Level;
@@ -31,8 +33,14 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -229,6 +237,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.autoStartCurrentCombo.setLayoutData(currentTriggerComboLData);
 					this.autoStartCurrentCombo.setItems(this.currentStartValues);
 					this.autoStartCurrentCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.autoStartCurrentCombo.setEditable(false);
+					this.autoStartCurrentCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.autoStartCurrentCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -277,6 +287,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.autoStartRxCombo.setLayoutData(rxTriggerComboLData);
 					this.autoStartRxCombo.setItems(this.rxStartValues);
 					this.autoStartRxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.autoStartRxCombo.setEditable(false);
+					this.autoStartRxCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.autoStartRxCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -325,6 +337,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.autoStartTimeCombo.setLayoutData(timeTriggerComboLData);
 					this.autoStartTimeCombo.setItems(this.timeStartValues);
 					this.autoStartTimeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.autoStartTimeCombo.setEditable(false);
+					this.autoStartTimeCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.autoStartTimeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -360,6 +374,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					autoStopComboLData.width = 84;
 					autoStopComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.autoStopCombo.setLayoutData(autoStopComboLData);
+					this.autoStopCombo.setEditable(false);
+					this.autoStopCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.autoStopCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -442,6 +458,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					dataRateComboLData.width = 84;
 					dataRateComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.dataRateCombo.setLayoutData(dataRateComboLData);
+					this.dataRateCombo.setEditable(false);
+					this.dataRateCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.dataRateCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -468,6 +486,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.currentSensorCombo.setLayoutData(currentSensorComboLData);
 					this.currentSensorCombo.setItems(this.currentSensorTypes);
 					this.currentSensorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.currentSensorCombo.setEditable(false);
+					this.currentSensorCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.currentSensorCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -494,6 +514,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					a1ModusComboLData.width = 105;
 					a1ModusComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a1ModusCombo.setLayoutData(a1ModusComboLData);
+					this.a1ModusCombo.setEditable(false);
+					this.a1ModusCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.a1ModusCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -521,6 +543,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					a2ModusComboLData.width = 105;
 					a2ModusComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a2ModusCombo.setLayoutData(a2ModusComboLData);
+					this.a2ModusCombo.setEditable(false);
+					this.a2ModusCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.a2ModusCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -548,6 +572,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					a3ModusComboLData.width = 105;
 					a3ModusComboLData.height = GDE.IS_MAC ? 18 : 14;
 					this.a3ModusCombo.setLayoutData(a3ModusComboLData);
+					this.a3ModusCombo.setEditable(false);
+					this.a3ModusCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.a3ModusCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -575,6 +601,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.propBladesCombo.setLayoutData(propBladesComboLData);
 					this.propBladesCombo.setItems(this.numberProbMotorPoles);
 					this.propBladesCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.propBladesCombo.setEditable(false);
+					this.propBladesCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.propBladesCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -609,6 +637,44 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					gearFactorTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.gearFactorText.setLayoutData(gearFactorTextLData);
 					this.gearFactorText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.gearFactorText.addVerifyListener(new VerifyListener() {
+						public void verifyText(VerifyEvent verifyevent) {
+							log.log(Level.FINEST, "gearFactorText.verify, event=" + verifyevent); //$NON-NLS-1$
+							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, verifyevent.text);
+						}
+					});
+					this.gearFactorText.addKeyListener(new KeyAdapter() {
+						@Override
+						public void keyReleased(KeyEvent keyevent) {
+							log.log(Level.FINEST, "gearFactorText.keyReleased, event=" + keyevent); //$NON-NLS-1$
+							try {
+								UniLog2SetupConfiguration1.this.configuration.gearFactor = (short) (Double.parseDouble(UniLog2SetupConfiguration1.this.gearFactorText.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT))* 100);
+								if (UniLog2SetupConfiguration1.this.configuration.gearFactor < 100) {
+									UniLog2SetupConfiguration1.this.configuration.gearFactor = 100;
+									UniLog2SetupConfiguration1.this.gearFactorText.setText(String.format(Locale.ENGLISH, " %.2f", (UniLog2SetupConfiguration1.this.configuration.gearFactor / 100.0))); //$NON-NLS-1$
+									UniLog2SetupConfiguration1.this.gearFactorSlider.setSelection(UniLog2SetupConfiguration1.this.gearFactorSlider.getMaximum());
+								}
+								else if (UniLog2SetupConfiguration1.this.configuration.gearFactor > 2000) {
+									UniLog2SetupConfiguration1.this.configuration.gearFactor = 2000;
+									UniLog2SetupConfiguration1.this.gearFactorText.setText(String.format(Locale.ENGLISH, " %.2f", (UniLog2SetupConfiguration1.this.configuration.gearFactor / 100.0))); //$NON-NLS-1$
+									UniLog2SetupConfiguration1.this.gearFactorSlider.setSelection(UniLog2SetupConfiguration1.this.gearFactorSlider.getMinimum());
+								}
+								else {
+									UniLog2SetupConfiguration1.this.gearFactorSlider.setSelection(UniLog2SetupConfiguration1.this.configuration.gearFactor - 100);
+								}
+								UniLog2SetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore -
+							}
+						}
+					});
+					this.gearFactorText.addFocusListener( new FocusAdapter() {
+						@Override
+						public void focusLost(FocusEvent evt) {
+							UniLog2SetupConfiguration1.this.gearFactorText.setText(String.format(Locale.ENGLISH, " %.2f", (UniLog2SetupConfiguration1.this.configuration.gearFactor / 100.0))); //$NON-NLS-1$
+						}
+					});
 				}
 				{
 					RowData gearFactorSliderLData = new RowData();
@@ -645,6 +711,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					varioTriggerLevelTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.varioTriggerLevelText.setLayoutData(varioTriggerLevelTextLData);
 					this.varioTriggerLevelText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.varioTriggerLevelText.setEditable(false);
+					this.varioTriggerLevelText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					RowData varioTriggerLevelSliderLData = new RowData();
@@ -681,6 +749,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					varioTriggerSinkLevelTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.varioTriggerSinkLevelText.setLayoutData(varioTriggerSinkLevelTextLData);
 					this.varioTriggerSinkLevelText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.varioTriggerSinkLevelText.setEditable(false);
+					this.varioTriggerSinkLevelText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					RowData varioTriggerSinkLevelSliderLData = new RowData();
@@ -718,6 +788,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.varioToneCombo.setLayoutData(varioToneComboLData);
 					this.varioToneCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2522).split(GDE.STRING_COMMA));
 					this.varioToneCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.varioToneCombo.setEditable(false);
+					this.varioToneCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.varioToneCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -744,6 +816,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.limiterModusCombo.setLayoutData(limiterModusComboLData);
 					this.limiterModusCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2521).split(GDE.STRING_COMMA));
 					this.limiterModusCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.limiterModusCombo.setEditable(false);
+					this.limiterModusCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.limiterModusCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -769,6 +843,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					energyLimitTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.energyLimitText.setLayoutData(energyLimitTextLData);
 					this.energyLimitText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.energyLimitText.setEditable(false);
+					this.energyLimitText.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					RowData energyLimitSliderLData = new RowData();
@@ -806,6 +882,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.minMaxRxCombo.setLayoutData(minMaxRxComboLData);
 					this.minMaxRxCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2519).split(GDE.STRING_COMMA));
 					this.minMaxRxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.minMaxRxCombo.setEditable(false);
+					this.minMaxRxCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.minMaxRxCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
