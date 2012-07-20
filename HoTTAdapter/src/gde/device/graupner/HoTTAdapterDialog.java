@@ -149,25 +149,6 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						HoTTAdapterDialog.this.application.openHelpDialog("HoTTAdapter", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
-				// enable fade in/out alpha blending (do not fade-in on top)
-//				this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
-//					@Override
-//					public void mouseEnter(MouseEvent evt) {
-//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
-//						fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 20, 20, 20, 25);
-//					}
-//
-//					@Override
-//					public void mouseHover(MouseEvent evt) {
-//						log.log(java.util.logging.Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
-//					}
-//
-//					@Override
-//					public void mouseExit(MouseEvent evt) {
-//						log.log(java.util.logging.Level.FINER, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
-//						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 20, 20, -20, 25);
-//					}
-//				});
 				{
 					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
 
@@ -293,6 +274,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.filterFactorLatitudeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.filterFactorLatitudeCombo.setItems(filterItems);
 					this.filterFactorLatitudeCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2420));
+					this.filterFactorLatitudeCombo.setEditable(false);
+					this.filterFactorLatitudeCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.filterFactorLatitudeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -351,6 +334,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.filterFactorLongitudeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.filterFactorLongitudeCombo.setItems(filterItems);
 					this.filterFactorLongitudeCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2423));
+					this.filterFactorLongitudeCombo.setEditable(false);
+					this.filterFactorLongitudeCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.filterFactorLongitudeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -494,6 +479,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.protocolTypesCombo.setLayoutData(timeZoneOffsetUTCComboLData);
 					this.protocolTypesCombo.select(this.protocolTypeOrdinal);
 					this.protocolTypesCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2415));
+					this.protocolTypesCombo.setEditable(false);
+					this.protocolTypesCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 					this.protocolTypesCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
