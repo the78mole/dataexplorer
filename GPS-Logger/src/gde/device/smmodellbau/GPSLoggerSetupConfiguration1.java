@@ -603,10 +603,15 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "heightCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration1.this.configuration.heightAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.heightCombo.getText().trim());
-							GPSLoggerSetupConfiguration1.this.configuration.heightAlarm = GPSLoggerSetupConfiguration1.this.configuration.heightAlarm < 10 ? 10
-									: GPSLoggerSetupConfiguration1.this.configuration.heightAlarm > 4000 ? 4000 : GPSLoggerSetupConfiguration1.this.configuration.heightAlarm; 
-							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								GPSLoggerSetupConfiguration1.this.configuration.heightAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.heightCombo.getText().trim());
+								GPSLoggerSetupConfiguration1.this.configuration.heightAlarm = GPSLoggerSetupConfiguration1.this.configuration.heightAlarm < 10 ? 10
+										: GPSLoggerSetupConfiguration1.this.configuration.heightAlarm > 4000 ? 4000 : GPSLoggerSetupConfiguration1.this.configuration.heightAlarm; 
+								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore illegal char
+							}
 						}
 					});
 				}
@@ -679,10 +684,15 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "velocityCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration1.this.configuration.speedAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.velocityCombo.getText().trim());
-							GPSLoggerSetupConfiguration1.this.configuration.speedAlarm = GPSLoggerSetupConfiguration1.this.configuration.speedAlarm < 10 ? 10
-									: GPSLoggerSetupConfiguration1.this.configuration.speedAlarm > 1000 ? 1000 : GPSLoggerSetupConfiguration1.this.configuration.speedAlarm; 
-							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								GPSLoggerSetupConfiguration1.this.configuration.speedAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.velocityCombo.getText().trim());
+								GPSLoggerSetupConfiguration1.this.configuration.speedAlarm = GPSLoggerSetupConfiguration1.this.configuration.speedAlarm < 10 ? 10
+										: GPSLoggerSetupConfiguration1.this.configuration.speedAlarm > 1000 ? 1000 : GPSLoggerSetupConfiguration1.this.configuration.speedAlarm; 
+								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore illegal char
+							}
 						}
 					});
 				}
@@ -753,10 +763,15 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "distanceCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceCombo.getText().trim());
-							GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm = GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm < 10 ? 10
-									: GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm > 5000 ? 5000 : GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm; 
-							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceCombo.getText().trim());
+								GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm = GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm < 10 ? 10
+										: GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm > 5000 ? 5000 : GPSLoggerSetupConfiguration1.this.configuration.distanceAlarm; 
+								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore illegal char
+							}
 						}
 					});
 				}
@@ -829,10 +844,15 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "tripLengthCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.tripLengthCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
-							GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm < 1 ? 1
-									: GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm > 999 ? 999 : GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm; 
-							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.tripLengthCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+								GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm < 1 ? 1
+										: GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm > 999 ? 999 : GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm; 
+								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore illegal char
+							}
 						}
 					});
 				}
@@ -905,10 +925,15 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "voltageRxCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.voltageRxCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
-							GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm < 300 ? 300
-									: GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm > 800 ? 800 : GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm; 
-							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.voltageRxCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
+								GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm < 300 ? 300
+										: GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm > 800 ? 800 : GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm; 
+								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore illegal char
+							}
 						}
 					});
 				}

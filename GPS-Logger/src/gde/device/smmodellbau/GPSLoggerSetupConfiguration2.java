@@ -192,6 +192,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText1LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText1.setLayoutData(addressText1LData);
 					this.addressText1.setText(sliderValues[this.configuration.mLinkAddressVario]);
+					this.addressText1.setEditable(false);
+					this.addressText1.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider1 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -230,6 +232,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText2LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText2.setLayoutData(addressText2LData);
 					this.addressText2.setText(sliderValues[this.configuration.mLinkAddressSpeed]);
+					this.addressText2.setEditable(false);
+					this.addressText2.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider2 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -268,6 +272,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText2maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText2max.setLayoutData(addressText2maxLData);
 					this.addressText2max.setText(sliderValues[this.configuration.mLinkAddressSpeedMax]);
+					this.addressText2max.setEditable(false);
+					this.addressText2max.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider2max = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -306,6 +312,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText3LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText3.setLayoutData(addressText3LData);
 					this.addressText3.setText(sliderValues[this.configuration.mLinkAddressHeight]);
+					this.addressText3.setEditable(false);
+					this.addressText3.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider3 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -344,6 +352,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText3maxLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText3max.setLayoutData(addressText3maxLData);
 					this.addressText3max.setText(sliderValues[this.configuration.mLinkAddressHeightMax]);
+					this.addressText3max.setEditable(false);
+					this.addressText3max.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider3max = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -382,6 +392,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText4LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText4.setLayoutData(addressText4LData);
 					this.addressText4.setText(sliderValues[this.configuration.mLinkAddressDistance]);
+					this.addressText4.setEditable(false);
+					this.addressText4.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider4 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -420,6 +432,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText5LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText5.setLayoutData(addressText5LData);
 					this.addressText5.setText(sliderValues[this.configuration.mLinkAddressDirection]);
+					this.addressText5.setEditable(false);
+					this.addressText5.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider5 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -458,6 +472,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText6LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText6.setLayoutData(addressText6LData);
 					this.addressText6.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressFlightDirection]);
+					this.addressText6.setEditable(false);
+					this.addressText6.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider6 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -496,6 +512,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText7LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText7.setLayoutData(addressText7LData);
 					this.addressText7.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressDirectionRel]);
+					this.addressText7.setEditable(false);
+					this.addressText7.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider7 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -534,6 +552,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText8LData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText8.setLayoutData(addressText8LData);
 					this.addressText8.setText(sliderValues[GPSLoggerSetupConfiguration2.this.configuration.mLinkAddressTripLength]);
+					this.addressText8.setEditable(false);
+					this.addressText8.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider8 = new Slider(this.mLinkAddressesGroup, SWT.NONE);
@@ -592,6 +612,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText1ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText1UL.setLayoutData(addressText1ULLData);
 					this.addressText1UL.setText(sliderValues[this.configuration.mLinkAddressVoltageUL]);
+					this.addressText1UL.setEditable(false);
+					this.addressText1UL.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider1UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
@@ -630,6 +652,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText2ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText2UL.setLayoutData(addressText2ULLData);
 					this.addressText2UL.setText(sliderValues[this.configuration.mLinkAddressCurrentUL]);
+					this.addressText2UL.setEditable(false);
+					this.addressText2UL.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider2UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
@@ -668,6 +692,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText3ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText3UL.setLayoutData(addressText3ULLData);
 					this.addressText3UL.setText(sliderValues[this.configuration.mLinkAddressRevolutionUL]);
+					this.addressText3UL.setEditable(false);
+					this.addressText3UL.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider3UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
@@ -706,6 +732,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					addressText4ULLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
 					this.addressText4UL.setLayoutData(addressText4ULLData);
 					this.addressText4UL.setText(sliderValues[this.configuration.mLinkAddressCapacityUL]);
+					this.addressText4UL.setEditable(false);
+					this.addressText4UL.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				{
 					this.addressSlider4UL = new Slider(this.unilogTelemtryAlarmsGroup, SWT.NONE);
@@ -788,10 +816,15 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(java.util.logging.Level.FINEST, "currentCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration2.this.currentCombo.getText().trim());
-							GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm < 1 ? 1
-									: GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm > 400 ? 400 : GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm; 
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration2.this.currentCombo.getText().trim());
+								GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm < 1 ? 1
+										: GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm > 400 ? 400 : GPSLoggerSetupConfiguration2.this.configuration.currentUlAlarm; 
+								GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore illegal char
+							}
 						}
 					});
 				}
@@ -864,10 +897,15 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "voltageStartCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageStartCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
-							GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm < 10 ? 10 
-									: GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm > 600 ? 600 : GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm; 
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageStartCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+								GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm < 10 ? 10 
+										: GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm > 600 ? 600 : GPSLoggerSetupConfiguration2.this.configuration.voltageStartUlAlarm; 
+								GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore illegal char
+							}
 						}
 					});
 				}
@@ -940,10 +978,15 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "voltageCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
-							GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm < 10 ? 10 
-									: GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm > 600 ? 600 : GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm; 
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm = (int) (Double.parseDouble(GPSLoggerSetupConfiguration2.this.voltageCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+								GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm < 10 ? 10 
+										: GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm > 600 ? 600 : GPSLoggerSetupConfiguration2.this.configuration.voltageUlAlarm; 
+								GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// ignore illegal char
+							}
 						}
 					});
 				}
@@ -1016,10 +1059,15 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 						@Override
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "capacityCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration2.this.capacityCombo.getText().trim());
-							GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm < 100 ? 100 
-									: GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm > 30000 ? 30000 : GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm; 
-							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							try {
+								GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration2.this.capacityCombo.getText().trim());
+								GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm = GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm < 100 ? 100 
+										: GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm > 30000 ? 30000 : GPSLoggerSetupConfiguration2.this.configuration.capacityUlAlarm; 
+								GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+							}
+							catch (NumberFormatException e) {
+								// illegal char
+							}
 						}
 					});
 				}
