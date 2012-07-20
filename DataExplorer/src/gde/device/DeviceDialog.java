@@ -212,7 +212,7 @@ public abstract class DeviceDialog extends Dialog {
 	 * fade out alpha blending from 254 to the configured alpha value
 	 */
 	public void fadeOutAplhaBlending() {
-		log.log(Level.FINE, "this.isFadeOut = " + this.isFadeOut); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "this.isFadeOut = " + this.isFadeOut); //$NON-NLS-1$
 		if (!this.isFadeOut && this.isAlphaEnabled) {
 			setShellAlpha(254);
 		}
@@ -229,7 +229,7 @@ public abstract class DeviceDialog extends Dialog {
 	 */
 	public void fadeOutAplhaBlending(MouseEvent evt, Point outherBoundSize, int left, int right, int top, int bottom) {
 		boolean isEnterShellEvt = (evt.x < left || evt.x > outherBoundSize.x - right || evt.y < top || evt.y > outherBoundSize.y - bottom) ? true : false;
-		log.log(Level.FINE, "isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
 		if (!this.isFadeOut && isEnterShellEvt && this.isAlphaEnabled) {
 			setShellAlpha(254);
 		}
@@ -246,9 +246,9 @@ public abstract class DeviceDialog extends Dialog {
 	 */
 	public void fadeInAlpaBlending(MouseEvent evt, Point outherBoundSize, int left, int right, int top, int bottom) {
 		boolean isExitShellEvt = (evt.x < left || evt.x > outherBoundSize.x - right || evt.y < top || evt.y > outherBoundSize.y - bottom) ? true : false;
-		log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
 		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
-			log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBoundSize); //$NON-NLS-1$ //$NON-NLS-2$
 			setShellAlpha(getShellAlpha());
 		}
 	}
@@ -264,9 +264,9 @@ public abstract class DeviceDialog extends Dialog {
 	 */
 	public void fadeOutAplhaBlending(MouseEvent evt, Rectangle outherBound, int left, int right, int top, int bottom) {
 		boolean isEnterShellEvt = (evt.x < left || evt.x > outherBound.width - right || evt.y < top || evt.y > outherBound.height - bottom) ? true : false;
-		log.log(Level.FINE, "isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (!this.isFadeOut && isEnterShellEvt && this.isAlphaEnabled) {
-			log.log(Level.FINE, "isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isEnterShellEvt = " + isEnterShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			setShellAlpha(254);
 		}
 	}
@@ -282,9 +282,9 @@ public abstract class DeviceDialog extends Dialog {
 	 */
 	public void fadeInAlpaBlending(MouseEvent evt, Rectangle outherBound, int left, int right, int top, int bottom) {
 		boolean isExitShellEvt = (evt.x < left || evt.x > outherBound.width - right || evt.y < top || evt.y > outherBound.height - bottom) ? true : false;
-		log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (this.isFadeOut && isExitShellEvt && this.isAlphaEnabled) {
-			log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isExitShellEvt = " + isExitShellEvt + " size = " + outherBound.width + "," + outherBound.height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			setShellAlpha(getShellAlpha());
 		}
 	}
