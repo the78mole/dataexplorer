@@ -193,7 +193,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				RowLayout logStartStopGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.logStartStopGroup.setLayout(logStartStopGroupLayout);
 				FormData logStartStopGroupLData = new FormData();
-				logStartStopGroupLData.width = 290;
+				logStartStopGroupLData.width = GDE.IS_LINUX ? 300 : 290;
 				logStartStopGroupLData.height = 110;
 				logStartStopGroupLData.left = new FormAttachment(0, 1000, 12);
 				logStartStopGroupLData.top = new FormAttachment(0, 1000, 400);
@@ -391,7 +391,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				RowLayout commonAdjustmentsGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.commonAdjustmentsGroup.setLayout(commonAdjustmentsGroupLayout);
 				FormData commonAdjustmentsGroupLData = new FormData();
-				commonAdjustmentsGroupLData.width = 290;
+				commonAdjustmentsGroupLData.width = GDE.IS_LINUX ? 300 : 290;
 				commonAdjustmentsGroupLData.height = 340;
 				commonAdjustmentsGroupLData.left = new FormAttachment(0, 1000, 12);
 				commonAdjustmentsGroupLData.top = new FormAttachment(0, 1000, 5);
