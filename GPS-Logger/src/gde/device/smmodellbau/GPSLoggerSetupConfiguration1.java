@@ -153,7 +153,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				FormData gpsLoggerGroupLData = new FormData();
 				gpsLoggerGroupLData.left = new FormAttachment(0, 1000, 15);
 				gpsLoggerGroupLData.top = new FormAttachment(0, 1000, 10);
-				gpsLoggerGroupLData.width = 290;
+				gpsLoggerGroupLData.width = GDE.IS_LINUX ? 300 : 290;
 				gpsLoggerGroupLData.height = 305;
 				RowLayout gpsLoggerGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.gpsLoggerGroup.setLayout(gpsLoggerGroupLayout);
@@ -528,7 +528,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				FormData gpsTelemertieGroupLData = new FormData();
 				gpsTelemertieGroupLData.left = new FormAttachment(0, 1000, 15);
 				gpsTelemertieGroupLData.top = new FormAttachment(0, 1000, 335);
-				gpsTelemertieGroupLData.width = 290;
+				gpsTelemertieGroupLData.width = GDE.IS_LINUX ? 300 : 290;
 				gpsTelemertieGroupLData.height = 140;
 				this.gpsTelemertieGroup = new Group(this, SWT.NONE);
 				RowLayout gpsTelemertieGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
