@@ -206,7 +206,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				FormData unilogTelemtryAlarmsGroupLData = new FormData();
 				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 5);
 				unilogTelemtryAlarmsGroupLData.left = new FormAttachment(0, 1000, 15);
-				unilogTelemtryAlarmsGroupLData.width = GDE.IS_LINUX ? 300 : 290;
+				unilogTelemtryAlarmsGroupLData.width = 290;
 				unilogTelemtryAlarmsGroupLData.height = 235;
 				this.unilogTelemtryAlarmsGroup.setLayoutData(unilogTelemtryAlarmsGroupLData);
 				this.unilogTelemtryAlarmsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1084,7 +1084,7 @@ public class UniLog2SetupConfiguration2 extends org.eclipse.swt.widgets.Composit
 				FormData mLinkAddressesGroupLData = new FormData();
 				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 260);
 				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
-				mLinkAddressesGroupLData.width = GDE.IS_LINUX ? 300 : 290;
+				mLinkAddressesGroupLData.width = 290;
 				mLinkAddressesGroupLData.height = 250;
 				this.mLinkAddressesGroup.setLayoutData(mLinkAddressesGroupLData);
 				this.mLinkAddressesGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
