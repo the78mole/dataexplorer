@@ -301,7 +301,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		final java.awt.Image graphicsImageAWT, compareImageAWT, statisticsImageAWT, objectImageAWT;
 
 		//get all required images
-		if (isGraphics) {
+		if (isGraphics && this.application.getGraphicsPrintImage() != null) {
 			this.application.selectTab(0);
 			WaitTimer.delay(250);
 			graphicsImageAWT = convertToAWT((graphicsImageSWT = this.application.getGraphicsPrintImage()).getImageData());
@@ -310,7 +310,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		else
 			graphicsImageAWT = null;
 
-		if (isStatistics) {
+		if (isStatistics && this.application.getStatisticsTabContentAsImage() != null) {
 			this.application.selectTab(1);
 			WaitTimer.delay(250);
 			statisticsImageAWT = convertToAWT((statisticsImageSWT = this.application.getStatisticsTabContentAsImage()).getImageData());
@@ -319,7 +319,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		else
 			statisticsImageAWT = null;
 
-		if (this.application.isObjectoriented() && isObject) {
+		if (this.application.isObjectoriented() && isObject && this.application.getObjectTabContentAsImage() != null) {
 			this.application.selectTab(8);
 			WaitTimer.delay(250);
 			objectImageAWT = convertToAWT((objectImageSWT = this.application.getObjectTabContentAsImage()).getImageData());
@@ -328,7 +328,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		else
 			objectImageAWT = null;
 
-		if (isCompare) {
+		if (isCompare && this.application.getGraphicsPrintImage() != null) {
 			this.application.selectTab(6);
 			WaitTimer.delay(250);
 			compareImageAWT = convertToAWT((compareImageSWT = this.application.getGraphicsPrintImage()).getImageData());
