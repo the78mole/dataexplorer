@@ -169,7 +169,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				this.mLinkAddressesGroup.setLayout(mLinkAddressesGroupLayout);
 				FormData mLinkAddressesGroupLData = new FormData();
 				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 10);
-				mLinkAddressesGroupLData.width = GDE.IS_LINUX ? 300 : 290;
+				mLinkAddressesGroupLData.width = 290;
 				mLinkAddressesGroupLData.height = 245;
 				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.mLinkAddressesGroup.setLayoutData(mLinkAddressesGroupLData);
@@ -581,7 +581,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				RowLayout unilogTelemtryAlarmsGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.unilogTelemtryAlarmsGroup.setLayout(unilogTelemtryAlarmsGroupLayout);
 				FormData unilogTelemtryAlarmsGroupLData = new FormData();
-				unilogTelemtryAlarmsGroupLData.width = GDE.IS_LINUX ? 300 : 290;
+				unilogTelemtryAlarmsGroupLData.width = 290;
 				unilogTelemtryAlarmsGroupLData.height = 200;
 				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 275);
 				unilogTelemtryAlarmsGroupLData.left = new FormAttachment(0, 1000, 15);
