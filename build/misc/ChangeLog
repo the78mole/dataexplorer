@@ -9,6 +9,7 @@ UniLog2 - update to firmware version 1.05 and supported features
 HoTTAdapter(2) - set "tolerate sign change" to false as default
 Enable menu character accelerator for supporting operating systems
 SWT update to final release 4.2
+Workaround Linux Unity overlay scroll bar problem
 
 Version 3.02 - 01 Jul 2012
 fix performance problem while in zoom mode and update statistics data
