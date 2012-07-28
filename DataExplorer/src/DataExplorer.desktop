@@ -3,7 +3,7 @@ Comment=DataExplorer - explore your measurement data
 Comment[en_US]=DataExplorer - explore your measurement data
 Comment[de_DE]=DataExplorer - erforsche deine Messdaten
 Encoding=UTF-8
-Exec=java -Dfile.encoding=UTF-8 -jar -Xms40m -Xmx256m @GDE_DIR@DataExplorer.jar %f
+Exec=@GDE_DIR@DataExplorer.jar %f
 GenericName=DataExplorer
 Icon=@GDE_DIR@DataExplorer.xpm
 MimeType=application/x-DataExplorer
