@@ -336,10 +336,6 @@ public class GDE {
 				}
 			}
 
-			//fix Ubuntu Unity problem not displaying sliders set LIBOVERLAY_SCROLLBAR to 0
-			if (GDE.IS_LINUX && IS_ARCH_DATA_MODEL_64) {
-				System.setProperty("LIBOVERLAY_SCROLLBAR", "0");
-			}
 			// list system properties
 			StringBuilder sb = new StringBuilder().append("Environment : \n"); //$NON-NLS-1$
 			Properties props = System.getProperties();
