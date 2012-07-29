@@ -173,7 +173,7 @@
 	        <Measurement>
 	            <name>VoltageRx_UL</name>
 	            <symbol>Urx</symbol>
-                <unit>VRx</unit>
+                <unit>V</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
@@ -397,7 +397,7 @@
 	        <Measurement>
 	            <name>VoltageRx</name>
 	            <symbol>Urx</symbol>
-                <unit>VRx</unit>
+                <unit>V</unit>
 	            <active>true</active>
 	            <statistics sigma="false" avg="true" max="true" min="true"/>
 	        </Measurement>
