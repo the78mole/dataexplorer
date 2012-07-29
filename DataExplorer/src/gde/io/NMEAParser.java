@@ -905,7 +905,7 @@ public class NMEAParser {
 				String[] tmpValues = strValues[i + 1].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
 				if (i != 6) {
 					this.values[8 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
-					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals(tmpValues[1])) {
+					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().startsWith(tmpValues[1].substring(0, 1))) {
 						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_STAR)) : tmpValues[1]);
 					}
 				}
