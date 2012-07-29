@@ -734,7 +734,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											//tmpDeviceConfiguration.storeDeviceProperties();
 											DeviceSelectionDialog.this.deviceConfigurations.put(deviceName, tmpDeviceConfiguration);
 											if (!DeviceSelectionDialog.this.activeDevices.contains(deviceName)) DeviceSelectionDialog.this.activeDevices.add(deviceName);
-											if (DeviceSelectionDialog.this.activeDevices.size() == 1) {
+											if (DeviceSelectionDialog.this.activeDevices.size() >= 1) {
 												DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
 											}
 										}
