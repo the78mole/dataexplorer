@@ -106,7 +106,7 @@
             <Measurement>
                 <name>SpannungRx</name>
                 <symbol>Urx</symbol>
-                <unit>VRx</unit>
+                <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
