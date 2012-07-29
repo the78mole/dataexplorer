@@ -5,11 +5,13 @@ Refine import path including object selection, refine default import path handli
 fix several reported minor bugs
 add HoTTAdapterM as HoTT device where GPS coordinates are logged as decimal degrees instead of degree and decimal minutes (Mikrokopter) 
 GPS-Logger - update to firmware version 1.07 and supported features
+GPS-Logger - correct unit of receiver voltage (manual delete device XML required)
 UniLog2 - update to firmware version 1.05 and supported features
 HoTTAdapter(2) - set "tolerate sign change" to false as default
 Enable menu character accelerator for supporting operating systems
 SWT update to release 3.7.2
 Workaround Linux Unity overlay scroll bar problem
+Documantation update
 
 Version 3.02 - 01 Jul 2012
 fix performance problem while in zoom mode and update statistics data
