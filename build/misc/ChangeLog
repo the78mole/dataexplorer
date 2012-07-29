@@ -11,7 +11,7 @@ HoTTAdapter(2) - set "tolerate sign change" to false as default
 Enable menu character accelerator for supporting operating systems
 SWT update to release 3.7.2
 Workaround Linux Unity overlay scroll bar problem
-Documantation update
+Documentation update
 
 Version 3.02 - 01 Jul 2012
 fix performance problem while in zoom mode and update statistics data
