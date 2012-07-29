@@ -21,7 +21,6 @@ package gde.device.graupner;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
-import gde.log.Level;
 
 import java.io.FileNotFoundException;
 
@@ -31,21 +30,21 @@ import javax.xml.bind.JAXBException;
  * Graupner HoTT device class with Mikrokopter adaptation, GPS coordinates in decimal degrees instead of degree decimal mintes
  * @author Winfried Brügmann
  */
-public class HoTTAdapterM extends HoTTAdapter {
+public class HoTTAdapter2M extends HoTTAdapter2 {
+
 	/**
-	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @param deviceProperties
+	 * @throws FileNotFoundException
+	 * @throws JAXBException
 	 */
-	public HoTTAdapterM(String deviceProperties) throws FileNotFoundException, JAXBException {
+	public HoTTAdapter2M(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 	}
 
 	/**
-	 * constructor using existing device configuration
-	 * @param deviceConfig device configuration
+	 * @param deviceConfig
 	 */
-	public HoTTAdapterM(DeviceConfiguration deviceConfig) {
+	public HoTTAdapter2M(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 	}
 
@@ -61,12 +60,18 @@ public class HoTTAdapterM extends HoTTAdapter {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
-				if ((j == 1 || j == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  
+				
+				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+				//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+				//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+				//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
+				//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+
+				if (j == 12 || j == 13) { //12=Latitude, 13=Longitude 
 					dataTableRow[j + 1] = String.format("%02.7f", record.realGet(rowIndex) / 1000000.0); //$NON-NLS-1$
 				}
-				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
-				else if (j >= 0 && j <= 5 && record.getParent().getChannelConfigNumber() == 1){ //Receiver
+				else if (j >= 0 && j <= 5){
 					dataTableRow[j + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0));
 				}
 				else {
@@ -75,7 +80,7 @@ public class HoTTAdapterM extends HoTTAdapter {
 			}
 		}
 		catch (RuntimeException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
+			HoTTAdapter2.logger.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -92,15 +97,21 @@ public class HoTTAdapterM extends HoTTAdapter {
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 		double newValue = 0;
 
-		if (record.getParent().getChannelConfigNumber() == 3 && (record.getOrdinal() == 1 || record.getOrdinal() == 2)) { // 1=GPS-longitude 2=GPS-latitude 
-			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
+		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+
+		if (record.getOrdinal() == 12 || record.getOrdinal() == 13) { //12=Latitude, 13=Longitude
 			newValue = value / 1000.0;
 		}
 		else {
 			newValue = (value - reduction) * factor + offset;
 		}
 
-		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		HoTTAdapter2.logger.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -116,15 +127,22 @@ public class HoTTAdapterM extends HoTTAdapter {
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 		double newValue = 0;
 
-		if ((record.getOrdinal() == 1 || record.getOrdinal() == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  ) 
-			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
+		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+
+		if (record.getOrdinal() == 12 || record.getOrdinal() == 13) { // 12=Latitude, 13=Longitude
 			newValue = value * 1000.0;
 		}
 		else {
 			newValue = (value - offset) / factor + reduction;
 		}
 
-		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		HoTTAdapter2.logger.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
-	}	
+	}
+
 }

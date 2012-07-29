@@ -5,7 +5,7 @@
         <manufacturer>Graupner</manufacturer>
         <manufacturerURL>http://www.graupner.de</manufacturerURL>
         <group>logger</group>
-        <image>HoTTAdapter.png</image>
+        <image>HoTTAdapterM.png</image>
         <usage>false</usage>
     </Device>
     <SerialPort>
