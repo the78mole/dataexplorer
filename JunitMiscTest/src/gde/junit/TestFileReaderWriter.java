@@ -72,6 +72,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 						&& !(file.getPath().toLowerCase().contains("csv2serialadapter") 
 								|| file.getPath().toLowerCase().contains("space pro") 
 								|| file.getPath().toLowerCase().contains("asw")
+								|| file.getPath().toLowerCase().contains("ash")
 								|| file.getPath().toLowerCase().contains("flightrecorder"))) {
 					System.out.println("working with : " + file);
 					
@@ -185,7 +186,8 @@ public class TestFileReaderWriter extends TestSuperClass {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".nmea")
 						&& !(file.getPath().toLowerCase().contains("cappuccino") 
 						|| file.getPath().toLowerCase().contains("space pro") 
-						|| file.getPath().toLowerCase().contains("asw"))) {
+						|| file.getPath().toLowerCase().contains("asw")
+						|| file.getPath().toLowerCase().contains("ash"))) {
 					System.out.println("working with : " + file);
 					
 					try {
