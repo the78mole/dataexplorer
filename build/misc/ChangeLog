@@ -1,5 +1,9 @@
 Development history / change log, please read from bottom up
 
+Version 3.04 - xx yyy 2012
+JLog2 - establish workaround for maximum recording time of 54 minutes
+HoTTAdapter(2) - add filter methods for receiver data
+
 Version 3.03 - 30 Jul 2012
 Refine import path including object selection, refine default import path handling for all device importing data
 fix several reported minor bugs
