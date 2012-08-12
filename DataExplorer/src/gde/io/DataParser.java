@@ -130,8 +130,17 @@ public class DataParser extends NMEAParser {
 
 		strValue = strValues[2].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT);
 		strValue = strValue.length() > 0 ? strValue : "0";
-		if (start_time_ms == Integer.MIN_VALUE)	start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
-		else																					time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - start_time_ms; // Seconds * 1000 = msec			
+		if (start_time_ms == Integer.MIN_VALUE)	{
+			start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
+		}
+		else {
+			if (deviceName.startsWith("JLog") && time_ms >= 3276700) {
+				//JLog2 workaround maximum logging time of 54 minutes
+				time_ms = time_ms + 100;
+			}
+			else 
+				time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - start_time_ms; // Seconds * 1000 = msec			
+		}
 		
 		for (int i = 0; i < this.valueSize; i++) { 
 			strValue = strValues[i+3].trim();
