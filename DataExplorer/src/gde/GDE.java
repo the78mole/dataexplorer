@@ -86,8 +86,9 @@ public class GDE {
 	public static final boolean		IS_WINDOWS											= System.getProperty("os.name").toLowerCase().startsWith("windows");																													//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean		IS_LINUX												= System.getProperty("os.name").toLowerCase().startsWith("linux");																														//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean		IS_MAC													= System.getProperty("os.name").toLowerCase().startsWith("mac");																															//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean		IS_MAC_MOUNTAIN_LION						= System.getProperty("os.version").toLowerCase().startsWith("10.8");	//Mountain Lion																					//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean		IS_MAC_COCOA										= GDE.IS_MAC && System.getProperty("DO_NOT_USE_COCOA") == null && SWT.getPlatform().toLowerCase().startsWith("cocoa");				//$NON-NLS-1$ //$NON-NLS-2$
-	public static final boolean		IS_ARCH_DATA_MODEL_64						= System.getProperty("sun.arch.data.model").equals("64");																																		//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean		IS_ARCH_DATA_MODEL_64						= System.getProperty("sun.arch.data.model").equals("64");																																			//$NON-NLS-1$ //$NON-NLS-2$
 
 	public static final String		STRING_BASE_PACKAGE							= "gde";																																																											//$NON-NLS-1$
 	public final static int				WIDGET_FONT_SIZE								= GDE.IS_LINUX ? 8 : GDE.IS_MAC ? 12 : 9;

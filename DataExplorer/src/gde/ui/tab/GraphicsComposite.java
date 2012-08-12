@@ -640,7 +640,7 @@ public class GraphicsComposite extends Composite {
 		this.graphicsHeader.redraw();
 		this.recordSetComment.redraw();
 		
-		if (!GDE.IS_LINUX) {
+		if (GDE.IS_WINDOWS || (GDE.IS_MAC && !GDE.IS_MAC_MOUNTAIN_LION)) {
 			Point size = this.graphicCanvas.getSize();
 			this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update
 			this.graphicCanvas.redraw(size.x-5,5,5,5,true);
