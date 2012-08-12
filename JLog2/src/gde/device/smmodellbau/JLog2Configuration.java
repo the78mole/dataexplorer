@@ -137,7 +137,7 @@ public class JLog2Configuration extends Composite {
 	final String[]			sysModes						= new String[] { "NEWLOG", "SEQLOG" };																																																																				//$NON-NLS-1$ //$NON-NLS-2$
 	final String[]			logModes						= new String[] { "(0) OF/LV", "(2) SER", "(8) JLV" };																																																												//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	final String[]			motorPols						= new String[] { "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24", "26", "38", "30", "32", "34", "36", "38", "40", "42", "44", "46", "48" };																																							//$NON-NLS-1$
-	final String[]			motorShuntAdjust		= new String[] { "-20", "-19", "-18", "-17", "-16", "-15", "-14", "-13", "-12", "-11", "-10", " -9", " -8", " -7", " -6", " -5", " -4", " -3", " -2", " -1", "  0", "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15", " 16", " 17", " 18", " 19", " 20" };	//$NON-NLS-1$
+	final String[]			motorShuntAdjust		= new String[] { "-15", "-14", "-13", "-12", "-11", "-10", " -9", " -8", " -7", " -6", " -5", " -4", " -3", " -2", " -1", "  0", "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15"};	//$NON-NLS-1$
 	final String[]			zeroTo9							= new String[10];																																																																															;
 	final String[]			zeroTo99						= new String[100];																																																																														;
 	final String[]			zeroTo50						= new String[51];
@@ -1348,7 +1348,7 @@ public class JLog2Configuration extends Composite {
 					this.motorShuntCombo.setLayoutData(motorShuntComboLData);
 					this.motorShuntCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.motorShuntCombo.setItems(this.motorShuntAdjust);
-					this.motorShuntCombo.select(20);
+					this.motorShuntCombo.select(15);
 					this.motorShuntCombo.setVisibleItemCount(10);
 					this.motorShuntCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
