@@ -358,6 +358,20 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					}
 				}
 				break;
+
+			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+				if (dataBuffer.length == 57) {
+					//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
+					if (!HoTTAdapter.isFilterEnabled || true) {
+						points[58] = DataParser.parse2Short(dataBuffer, 17) * 1000;
+						points[59] = DataParser.parse2Short(dataBuffer, 21) * 1000;
+						points[60] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+						points[61] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
+						points[62] = DataParser.parse2Short(dataBuffer, 25) * 1000;
+						points[63] = DataParser.parse2Short(dataBuffer, 33) * 1000;
+					}
+				}
+				break;
 			}
 			break;
 
@@ -496,6 +510,20 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 						points[55] = tmpVoltage2 * 100;
 						points[56] = DataParser.parse2Short(dataBuffer, 42) * 1000;
 						points[57] = DataParser.parse2Short(dataBuffer, 44) * 1000;
+					}
+				}
+				break;
+				
+			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+				if (dataBuffer.length == 27) {
+					//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
+					if (!HoTTAdapter.isFilterEnabled || true) {
+						points[58] = DataParser.parse2Short(dataBuffer, 10) * 1000; 
+						points[59] = DataParser.parse2Short(dataBuffer, 12) * 1000;
+						points[60] = DataParser.parse2Short(dataBuffer, 18) * 1000;
+						points[61] = Double.valueOf(points[1] / 1000.0 * points[2]).intValue(); // power U*I [W];
+						points[62] = DataParser.parse2Short(dataBuffer, 14) * 1000;
+						points[63] = DataParser.parse2Short(dataBuffer, 20) * 1000;
 					}
 				}
 				break;

@@ -690,7 +690,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				}
 				break;
 			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
-				if (dataBuffer.length == 57) {
+				if (dataBuffer.length == 27) {
 					//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature				
 					if (!HoTTAdapter.isFilterEnabled || true) {
 						points[0] = (dataBuffer[9] & 0xFF) * 1000;
