@@ -647,6 +647,8 @@ public class GraphicsComposite extends Composite {
 			this.graphicCanvas.redraw(5,size.y-5,5,5,true);
 			this.graphicCanvas.redraw(size.x-5,size.y-5,5,5,true);
 		}
+		else if (GDE.IS_MAC_MOUNTAIN_LION)
+			this.graphicCanvas.notifyListeners(SWT.Paint, new Event());
 		else
 			this.graphicCanvas.redraw(); // do full update
 	}
