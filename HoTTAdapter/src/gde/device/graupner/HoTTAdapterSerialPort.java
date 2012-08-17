@@ -59,13 +59,14 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static byte			DATA_END										= (byte) 0x7D;
 
 	//HoTT sensor bytes new protocol 
-	final static byte[]		QUERY_SENSOR_DATA_DBM				= { 0x00, 0x00, (byte) 0xff, 0x00, 0x00, 0x04, 0x33, (byte) 0xf4, (byte) 0xca };
-	final static byte[]		QUERY_SENSOR_DATA_RECEIVER	= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x34, 0x13, (byte) 0xba };
-	final static byte[]		QUERY_SENSOR_DATA_GENERAL		= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x35, 0x32, (byte) 0xaa };
-	final static byte[]		QUERY_SENSOR_DATA_ELECTRIC	= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x36, 0x51, (byte) 0x9a };
-	final static byte[]		QUERY_SENSOR_DATA_VARIO			= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x37, 0x70, (byte) 0x8a };
-	final static byte[]		QUERY_SENSOR_DATA_GPS				= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x38, (byte) 0x9f, 0x7b };
-	final static byte[]		answerRx										= new byte[21];																																	//byte array to cache receiver answer data
+	final static byte[]		QUERY_SENSOR_DATA_DBM						= { 0x00, 0x00, (byte) 0xff, 0x00, 0x00, 0x04, 0x33, (byte) 0xf4, (byte) 0xca };
+	final static byte[]		QUERY_SENSOR_DATA_RECEIVER			= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x34, 0x13, (byte) 0xba };
+	final static byte[]		QUERY_SENSOR_DATA_GENERAL				= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x35, 0x32, (byte) 0xaa };
+	final static byte[]		QUERY_SENSOR_DATA_ELECTRIC			= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x36, 0x51, (byte) 0x9a };
+	final static byte[]		QUERY_SENSOR_DATA_VARIO					= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x37, 0x70, (byte) 0x8a };
+	final static byte[]		QUERY_SENSOR_DATA_GPS						= { 0x00, 0x03, (byte) 0xfc, 0x00, 0x00, 0x04, 0x38, (byte) 0x9f, 0x7b };
+	final static byte[]		QUERY_SENSOR_DATA_MOTOR_DRIVER	= { 0x00, 0x04, (byte) 0xfb, 0x00, 0x00, 0x04, 0x39, (byte) 0xbe, (byte) 0x6b };
+	final static byte[]		answerRx												= new byte[21];																																	//byte array to cache receiver answer data
 
 	byte[]								ANSWER_DATA									= new byte[50];
 	int										DATA_LENGTH									= 50;
@@ -351,6 +352,12 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				this.QUERY_SENSOR_TYPE = HoTTAdapterSerialPort.QUERY_SENSOR_DATA_ELECTRIC;
 				this.DATA_LENGTH = 60;
 				break;
+			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
+				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, ">>>SpeedControl<<<");
+				this.ANSWER_DATA = new byte[27];
+				this.QUERY_SENSOR_TYPE = HoTTAdapterSerialPort.QUERY_SENSOR_DATA_MOTOR_DRIVER;
+				this.DATA_LENGTH = 28;
+				break;
 			}
 			break;
 		case TYPE_19200_V4:
@@ -364,9 +371,14 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-				HoTTAdapterSerialPort.log.log(java.util.logging.Level.FINE, sensorType == HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200 ? ">>>Electric<<<"
-						: sensorType == HoTTAdapter.SENSOR_TYPE_GENERAL_19200 ? ">>>General<<<" : sensorType == HoTTAdapter.SENSOR_TYPE_GPS_19200 ? ">>>GPS<<<"
-								: sensorType == HoTTAdapter.SENSOR_TYPE_VARIO_19200 ? ">>>Vario<<<" : ">>>Receiver<<<");
+			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+				HoTTAdapterSerialPort.log.log(Level.FINE, 
+						sensorType == HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200 ? ">>>SpeedControl<<<"
+					: sensorType == HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200 ? ">>>Electric<<<"
+					: sensorType == HoTTAdapter.SENSOR_TYPE_GENERAL_19200 ? ">>>General<<<" 
+					: sensorType == HoTTAdapter.SENSOR_TYPE_GPS_19200 ? ">>>GPS<<<"
+					: sensorType == HoTTAdapter.SENSOR_TYPE_VARIO_19200 ? ">>>Vario<<<" 
+					: ">>>Receiver<<<");
 				this.ANSWER_DATA = new byte[HoTTAdapter.IS_SLAVE_MODE ? 57 : 55];
 				this.DATA_LENGTH = 57;
 				break;

@@ -65,7 +65,7 @@
                 <symbol></symbol>
                 <unit>ms</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name> Tx</name>
@@ -490,13 +490,59 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Measurement>
+                <name>Voltage M</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Current M</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Capacity M</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Power M</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution M</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature M</name>
+                <symbol></symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorGeneral">
             <Measurement>
                 <name>RF_RXSQ</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
@@ -518,7 +564,7 @@
                 <symbol></symbol>
                 <unit>ms</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name> Tx</name>
@@ -946,13 +992,59 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Measurement>
+                <name>Voltage M</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Current M</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Capacity M</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Power M</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution M</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature M</name>
+                <symbol></symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorElectric">
             <Measurement>
                 <name>RF_RXSQ</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
@@ -974,7 +1066,7 @@
                 <symbol></symbol>
                 <unit>ms</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name> Tx</name>
@@ -1402,13 +1494,59 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
+            <Measurement>
+                <name>Voltage M</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Current M</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Capacity M</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Power M</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution M</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature M</name>
+                <symbol></symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+            </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Channels">
             <Measurement>
                 <name>RF_RXSQ</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
@@ -1430,7 +1568,7 @@
                 <symbol></symbol>
                 <unit>ms</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name> Tx</name>
@@ -1856,6 +1994,52 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Voltage M</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Current M</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Capacity M</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Power M</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Revolution M</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperature M</name>
+                <symbol></symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Ch 1</name>

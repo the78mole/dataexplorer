@@ -94,7 +94,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static byte										SENSOR_TYPE_MOTOR_DRIVER_115200		= 0x39;
 
 	final static int										QUERY_GAP_MS									= 30;
-	final static boolean								isSensorType[]								= { false, false, false, false, false };		//isReceiver, isVario, isGPS, isGeneral, isElectric
+	final static boolean								isSensorType[]								= { false, false, false, false, false, false };		//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
 
 	public enum Sensor {
 		RECEIVER("Receiver"), VARIO("Vario"), GPS("GPS"), GENRAL("General-Air"), ELECTRIC("Electric-Air"), CHANNEL("Channel"), MOTORDRIVER("MotorDriver");

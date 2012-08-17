@@ -114,6 +114,9 @@ public class HoTTbinReader {
 					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 						HoTTAdapter.isSensorType[4] = true;
 						break;
+					case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+						HoTTAdapter.isSensorType[5] = true;
+						break;
 					}
 				}
 				for (boolean element : HoTTAdapter.isSensorType) {
@@ -196,7 +199,7 @@ public class HoTTbinReader {
 		HoTTbinReader.recordSetVario = null; //0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 		HoTTbinReader.recordSetGPS = null; //0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		HoTTbinReader.recordSetChannel = null; //0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
-		HoTTbinReader.recordSetMotorDriver = null; //0=Voltage, 1=Current, 2=Temperature, 3=Capacity
+		HoTTbinReader.recordSetMotorDriver = null; //0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
 		HoTTbinReader.pointsReceiver = new int[8];
 		HoTTbinReader.pointsGeneral = new int[21];
 		HoTTbinReader.pointsElectric = new int[27];
@@ -204,7 +207,7 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[12];
 		HoTTbinReader.pointsChannel = new int[19];
-		HoTTbinReader.pointsMotorDriver = new int[4];
+		HoTTbinReader.pointsMotorDriver = new int[7];
 		HoTTbinReader.timeStep_ms = 0;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		HoTTbinReader.buf0 = null;
@@ -484,10 +487,10 @@ public class HoTTbinReader {
 					case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
 						//check if recordSetMotorDriver initialized, transmitter and receiver data always present, but not in the same data rate and signals
 						if (HoTTbinReader.recordSetMotorDriver == null) {
-							channel = HoTTbinReader.channels.get(5);
+							channel = HoTTbinReader.channels.get(7);
 							channel.setFileDescription(application.isObjectoriented() ? date + GDE.STRING_BLANK + application.getObjectKey() : date);
-							recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ELECTRIC.value() + recordSetNameExtend;
-							HoTTbinReader.recordSetMotorDriver = RecordSet.createRecordSet(recordSetName, device, 5, true, true);
+							recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.MOTORDRIVER.value() + recordSetNameExtend;
+							HoTTbinReader.recordSetMotorDriver = RecordSet.createRecordSet(recordSetName, device, 7, true, true);
 							channel.put(recordSetName, HoTTbinReader.recordSetMotorDriver);
 							HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.MOTORDRIVER.value(), HoTTbinReader.recordSetMotorDriver);
 							tmpRecordSet = channel.get(recordSetName);
@@ -507,23 +510,22 @@ public class HoTTbinReader {
 							HoTTbinReader.buf1 = new byte[30];
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
 						}
-//						if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
-//							HoTTbinReader.buf2 = new byte[30];
-//							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-//						}
-//						if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
-//							HoTTbinReader.buf3 = new byte[30];
-//							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-//						}
-//						if (HoTTbinReader.buf4 == null && HoTTbinReader.buf[33] == 4) {
-//							HoTTbinReader.buf4 = new byte[30];
-//							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-//						}
+						if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
+							HoTTbinReader.buf2 = new byte[30];
+							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
+						}
+						if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
+							HoTTbinReader.buf3 = new byte[30];
+							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
+						}
+						if (HoTTbinReader.buf4 == null && HoTTbinReader.buf[33] == 4) {
+							HoTTbinReader.buf4 = new byte[30];
+							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
+						}
 
-						if (HoTTbinReader.buf0 != null && HoTTbinReader.buf1 != null) {
-							parseAddMotorDriver(HoTTbinReader.recordSetMotorDriver, HoTTbinReader.pointsMotorDriver, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4,
-									HoTTbinReader.timeStep_ms);
-							HoTTbinReader.buf1 = null;
+						if (HoTTbinReader.buf0 != null && HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
+							parseAddMotorDriver(HoTTbinReader.recordSetMotorDriver, HoTTbinReader.pointsMotorDriver, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4, HoTTbinReader.timeStep_ms);
+							HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 //							if (numberDatablocks > 30000) { //5 minutes
 //								data_in.skip(HoTTbinReader.dataBlockSize * 25); //take from data points only each half second 
 //								i += 25;
@@ -639,6 +641,7 @@ public class HoTTbinReader {
 		HoTTbinReader.recordSetVario = null; //0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 		HoTTbinReader.recordSetGPS = null; //0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		HoTTbinReader.recordSetChannel = null; //0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
+		HoTTbinReader.recordSetMotorDriver = null; //0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperaure
 		HoTTbinReader.pointsReceiver = new int[8];
 		HoTTbinReader.pointsGeneral = new int[21];
 		HoTTbinReader.pointsElectric = new int[27];
@@ -646,6 +649,7 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[12];
 		HoTTbinReader.pointsChannel = new int[19];
+		HoTTbinReader.pointsMotorDriver = new int[7];
 		HoTTbinReader.timeStep_ms = 0;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		HoTTbinReader.buf0 = new byte[30];
@@ -654,8 +658,7 @@ public class HoTTbinReader {
 		HoTTbinReader.buf3 = new byte[30];
 		HoTTbinReader.buf4 = new byte[30];
 		byte actualSensor = -1, lastSensor = -1;
-//		int lastLogCountVario = 0, lastLogCountGPS = 0, lastLogCountGeneral = 0, lastLogCountElectric = 0;
-		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0;
+		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0, logCountMotorDriver = 0;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = file.lastModified() - (numberDatablocks * 10);
@@ -732,7 +735,7 @@ public class HoTTbinReader {
 
 					if (actualSensor != lastSensor) {
 						//write data just after sensor switch
-						if (logCountVario >= 3 || logCountGPS >= 4 || logCountGeneral >= 5 || logCountElectric >= 5) {
+						if (logCountVario >= 3 || logCountGPS >= 4 || logCountGeneral >= 5 || logCountElectric >= 5 || logCountMotorDriver >= 5) {
 							switch (lastSensor) {
 							case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 							case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
@@ -817,6 +820,27 @@ public class HoTTbinReader {
 								//recordSetElectric initialized and ready to add data
 								parseAddElectric(HoTTbinReader.recordSetElectric, HoTTbinReader.pointsElectric, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4,	HoTTbinReader.timeStep_ms);
 								break;
+
+							case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
+							case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+								//check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
+								if (HoTTbinReader.recordSetMotorDriver == null) {
+									channel = HoTTbinReader.channels.get(7);
+									channel.setFileDescription(application.isObjectoriented() ? date + GDE.STRING_BLANK + application.getObjectKey() : date);
+									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.MOTORDRIVER.value() + recordSetNameExtend;
+									HoTTbinReader.recordSetMotorDriver = RecordSet.createRecordSet(recordSetName, device, 7, true, true);
+									channel.put(recordSetName, HoTTbinReader.recordSetMotorDriver);
+									HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.MOTORDRIVER.value(), HoTTbinReader.recordSetMotorDriver);
+									tmpRecordSet = channel.get(recordSetName);
+									tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+									tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
+									if (HoTTbinReader.application.getMenuToolBar() != null) {
+										channel.applyTemplate(recordSetName, true);
+									}
+								}
+								//recordSetElectric initialized and ready to add data
+								parseAddMotorDriver(HoTTbinReader.recordSetMotorDriver, HoTTbinReader.pointsMotorDriver, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4, HoTTbinReader.timeStep_ms);
+								break;
 							}
 
 //							//skip last log count - 6 logs for speed up right after sensor switch
@@ -868,10 +892,10 @@ public class HoTTbinReader {
 //							lastLogCountElectric = logCountElectric;
 //							break;
 //						}
-						HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS
-								+ " logCountGeneral = " + logCountGeneral + " logCountElectric = " + logCountElectric);
+						if (HoTTbinReader.log.isLoggable(Level.FINE))
+							HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS + " logCountGeneral = " + logCountGeneral + " logCountElectric = " + logCountElectric + " logCountMotorDriver = " + logCountMotorDriver);
 						lastSensor = actualSensor;
-						logCountVario = logCountGPS = logCountGeneral = logCountElectric = 0;
+						logCountVario = logCountGPS = logCountGeneral = logCountElectric = logCountMotorDriver = 0;
 					}
 					else {
 						switch (lastSensor) {
@@ -891,6 +915,10 @@ public class HoTTbinReader {
 						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 							++logCountElectric;
 							break;
+						case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
+						case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
+							++logCountMotorDriver;
+							break;
 						}
 					}
 
@@ -898,16 +926,16 @@ public class HoTTbinReader {
 					if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
 						System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
 					}
-					if (HoTTbinReader.buf[33] == 1) {
+					else if (HoTTbinReader.buf[33] == 1) {
 						System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
 					}
-					if (HoTTbinReader.buf[33] == 2) {
+					else if (HoTTbinReader.buf[33] == 2) {
 						System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
 					}
-					if (HoTTbinReader.buf[33] == 3) {
+					else if (HoTTbinReader.buf[33] == 3) {
 						System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
 					}
-					if (HoTTbinReader.buf[33] == 4) {
+					else if (HoTTbinReader.buf[33] == 4) {
 						System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 					}
 
@@ -1139,7 +1167,7 @@ public class HoTTbinReader {
 				_pointsGPS[1] = tmpLatitude;
 			}
 			else {
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", _timeStep_ms - GDE.ONE_HOUR_MS) + " Lat " + tmpLatitude + " - " + tmpLatitudeDelta);
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, StringHelper.getFormatedTime("HH:mm:ss:SSS", _timeStep_ms - GDE.ONE_HOUR_MS) + " Lat " + tmpLatitude + " - " + tmpLatitudeDelta);
 			}
 			
 			tmpLongitude = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
@@ -1306,23 +1334,18 @@ public class HoTTbinReader {
 	 * @param _timeStep_ms
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseAddMotorDriver(RecordSet _recordSetMotorDriver, int[] _pointsMotorDriver, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4, long _timeStep_ms)
-			throws DataInconsitsentException {
-		printByteValues(timeStep_ms, buf0);
-		printShortValues(timeStep_ms, buf0);
-		//printByteValues(timeStep_ms, buf1);
-		//printShortValues(timeStep_ms, buf1);
-//		printShortValues(timeStep_ms, buf2);
-//		printShortValues(timeStep_ms, buf3);
-
-//			_pointsMotorDriver[0] = (_buf1[4] & 0xFF) * 1000;
-//			_pointsMotorDriver[1] = DataParser.parse2Short(_buf3, 7) * 1000;
-//			_pointsMotorDriver[2] = DataParser.parse2Short(_buf3, 5) * 1000;
-//			_pointsMotorDriver[3] = DataParser.parse2Short(_buf3, 5) * 1000;
-//			_pointsMotorDriver[4] = Double.valueOf(_pointsMotorDriver[1] / 1000.0 * _pointsMotorDriver[2]).intValue(); // power U*I [W];
-//
-//			_recordSetMotorDriver.addPoints(_pointsMotorDriver, _timeStep_ms);
-		
+	private static void parseAddMotorDriver(RecordSet _recordSetMotorDriver, int[] _pointsMotorDriver, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4, long _timeStep_ms) throws DataInconsitsentException {
+		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
+		if (true) {
+			_pointsMotorDriver[0] = (_buf0[4] & 0xFF) * 1000;
+			_pointsMotorDriver[1] = DataParser.parse2Short(_buf1, 3) * 1000;
+			_pointsMotorDriver[2] = DataParser.parse2Short(_buf1, 7) * 1000;
+			_pointsMotorDriver[3] = DataParser.parse2Short(_buf2, 5) * 1000;
+			_pointsMotorDriver[4] = Double.valueOf(_pointsMotorDriver[1] / 1000.0 * _pointsMotorDriver[2]).intValue();
+			_pointsMotorDriver[5] = DataParser.parse2Short(_buf2, 3) * 1000;
+			_pointsMotorDriver[6] =(_buf2[1] & 0xFF) * 1000;
+		}
+		_recordSetMotorDriver.addPoints(_pointsMotorDriver, _timeStep_ms);
 	}
 
 	static void printByteValues(long millisec, byte[] buffer) {
