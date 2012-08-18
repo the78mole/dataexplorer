@@ -363,12 +363,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				if (dataBuffer.length == 57) {
 					//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
 					if (!HoTTAdapter.isFilterEnabled || true) {
-						points[58] = DataParser.parse2Short(dataBuffer, 17) * 1000;
-						points[59] = DataParser.parse2Short(dataBuffer, 21) * 1000;
-						points[60] = DataParser.parse2Short(dataBuffer, 29) * 1000;
-						points[61] = Double.valueOf(points[58] / 1000.0 * points[59]).intValue(); // power U*I [W];
-						points[62] = DataParser.parse2Short(dataBuffer, 25) * 1000;
-						points[63] = DataParser.parse2Short(dataBuffer, 33) * 1000;
+						points[74] = DataParser.parse2Short(dataBuffer, 17) * 1000;
+						points[75] = DataParser.parse2Short(dataBuffer, 21) * 1000;
+						points[76] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+						points[77] = Double.valueOf(points[58] / 1000.0 * points[59]).intValue(); // power U*I [W];
+						points[78] = DataParser.parse2Short(dataBuffer, 25) * 1000;
+						points[79] = DataParser.parse2Short(dataBuffer, 33) * 1000;
 					}
 				}
 				break;
@@ -518,12 +518,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				if (dataBuffer.length == 27) {
 					//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
 					if (!HoTTAdapter.isFilterEnabled || true) {
-						points[58] = DataParser.parse2Short(dataBuffer, 10) * 1000; 
-						points[59] = DataParser.parse2Short(dataBuffer, 14) * 1000;
-						points[60] = DataParser.parse2Short(dataBuffer, 20) * 1000;
-						points[61] = Double.valueOf(points[58] / 1000.0 * points[59]).intValue(); // power U*I [W];
-						points[62] = DataParser.parse2Short(dataBuffer, 18) * 1000;
-						points[63] = DataParser.parse2Short(dataBuffer, 22) * 1000;
+						points[74] = DataParser.parse2Short(dataBuffer, 10) * 1000; 
+						points[75] = DataParser.parse2Short(dataBuffer, 14) * 1000;
+						points[76] = DataParser.parse2Short(dataBuffer, 20) * 1000;
+						points[77] = Double.valueOf(points[58] / 1000.0 * points[59]).intValue(); // power U*I [W];
+						points[78] = DataParser.parse2Short(dataBuffer, 18) * 1000;
+						points[79] = DataParser.parse2Short(dataBuffer, 22) * 1000;
 					}
 				}
 				break;
@@ -973,7 +973,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
 		if ((recordKeys.length - fileRecordsProperties.length) == 6) { //delta motor driver properties
-			if (fileRecordsProperties.length == 58) { // universal, general, electric
+//			if (fileRecordsProperties.length == 58) { // universal, general, electric
 				int i = 0;
 				for (; i < fileRecordsProperties.length; ++i) {
 					cleanedRecordNames.add(recordKeys[i]);
@@ -982,19 +982,44 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				for (; i < recordKeys.length; ++i) {
 					recordSet.remove(recordKeys[i]);
 				}
-			}
-			else if (fileRecordsProperties.length == 74) { // channel
-				for (int i = 0; i < 58; ++i) {
-					cleanedRecordNames.add(recordKeys[i]);
-				}
-				for (int i = 58+6; i < fileRecordsProperties.length; ++i) {
-					cleanedRecordNames.add(recordKeys[i]);
-				}
-				//cleanup recordSet
-				for (int i = 58; i < 58+6; ++i) {
-					recordSet.remove(recordKeys[i]);
-				}
-			}
+//			}
+//			else if (fileRecordsProperties.length == 74) { // channels
+//				int lastEntry = 58;
+//				for (int i = 0; i < lastEntry; ++i) {
+//					cleanedRecordNames.add(recordKeys[i]);
+//				}
+//				for (int i = lastEntry+6; i < fileRecordsProperties.length; ++i) {
+//					cleanedRecordNames.add(recordKeys[i]);
+//				}
+//
+//				//cleanup recordSet
+//				for (int i = lastEntry; i < lastEntry+6; ++i) {
+//					log.log(Level.OFF, recordKeys[i] + " removed!");
+//					recordSet.remove(recordKeys[i]);
+//				}
+//				
+//				//correct SCALE_SYNC_REF_ORDINAL property
+////				for (int i = lastEntry+1; i < fileRecordsProperties.length; ++i) {
+////					log.log(Level.OFF, recordSet.get(i).getName() + " sync property " + recordSet.get(i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()).getValue());
+////				}
+//
+//				PropertyType property = this.getMeasruementProperty(recordSet.getChannelConfigNumber(), lastEntry, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+//				if (property != null) //cleanup if exist
+//					this.removeMeasruementProperty(recordSet.getChannelConfigNumber(), lastEntry, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+//
+//				for (int i = lastEntry + 1; i < fileRecordsProperties.length; ++i) {
+//					property = this.getMeasruementProperty(recordSet.getChannelConfigNumber(), i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+//					if (property != null) {
+//						property.setValue(lastEntry);
+//						//recordSet.get(i).updateProperty(property);
+//						log.log(Level.OFF, recordSet.get(i).getName() + " correct property " + property.getName() + "=" + property.getValue());
+//					}
+//				}
+////				for (int i = lastEntry+1; i < fileRecordsProperties.length; ++i) {
+////					log.log(Level.OFF, recordSet.get(i).getName() + " sync property " + recordSet.get(i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()).getValue());
+////				}
+//				recordSet.syncScaleOfSyncableRecords();
+//			}
 
 			recordKeys = cleanedRecordNames.toArray(new String[1]);
 		}

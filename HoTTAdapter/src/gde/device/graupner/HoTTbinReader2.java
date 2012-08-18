@@ -95,8 +95,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
 		//18=VoltageG, 19=CurrentG, 20=CapacityG, 21=PowerG, 22=BalanceG, 23=CellVoltageG 1, 24=CellVoltageG 2 .... 28=CellVoltageG 6, 29=Revolution, 30=FuelLevel, 31=VoltageG 1, 32=VoltageG 2, 33=TemperatureG 1, 34=TemperatureG 2
 		//35=VoltageE, 36=CurrentE, 37=CapacityE, 38=PowerE, 39=BalanceE, 40=CellVoltageE 1, 41=CellVoltageE 2 .... 53=CellVoltageE 14, 54=VoltageE 1, 55=VoltageE 2, 56=TemperatureE 1, 57=TemperatureE 2
-		//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
-		//64=Ch 1, 65=Ch 2 , 66=Ch 3 .. 79=Ch 16
+		//58=Ch 1, 59=Ch 2 , 60=Ch 3 .. 73=Ch 16
+		//74=VoltageM, 75=CurrentM, 76=CapacityM, 77=PowerM, 78=RevolutionM, 79=TemperatureM
 		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReader2.points[2] = 100000;
 		HoTTbinReader2.timeStep_ms = 0;
@@ -396,8 +396,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
 		//18=VoltageG, 19=CurrentG, 20=CapacityG, 21=PowerG, 22=BalanceG, 23=CellVoltageG 1, 24=CellVoltageG 2 .... 28=CellVoltageG 6, 29=Revolution, 30=FuelLevel, 31=VoltageG 1, 32=VoltageG 2, 33=TemperatureG 1, 34=TemperatureG 2
 		//35=VoltageE, 36=CurrentE, 37=CapacityE, 38=PowerE, 39=BalanceE, 40=CellVoltageE 1, 41=CellVoltageE 2 .... 53=CellVoltageE 14, 54=VoltageE 1, 55=VoltageE 2, 56=TemperatureE 1, 57=TemperatureE 2
-		//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 6=TemperatureM
-		//64=Ch 1, 65=Ch 2 , 66=Ch 3 .. 79=Ch 16
+		//58=Ch 1, 59=Ch 2 , 60=Ch 3 .. 73=Ch 16
+		//74=VoltageM, 75=CurrentM, 76=CapacityM, 77=PowerM, 78=RevolutionM, 79=TemperatureM
 		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReader.pointsGeneral = new int[HoTTbinReader2.points.length];
 		HoTTbinReader.pointsElectric = new int[HoTTbinReader2.points.length];
@@ -681,9 +681,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				points[j] = pointsVario[j];
 			}
 		}
-		//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 6=TemperatureM
+		//74=VoltageM, 75=CurrentM, 76=CapacityM, 77=PowerM, 78=RevolutionM, 79=TemperatureM
 		if (isMotorDriverData) {
-			for (int j = 58; j < 58+6 && j < points.length; j++) {
+			for (int j = 74; j < 74+6 && j < points.length; j++) {
 				points[j] = pointsMotorDriver[j];
 			}
 		}
@@ -918,36 +918,36 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @param _buf
 	 */
 	private static void parseChannel(int[] _points, byte[] _buf) {
-		//64=Ch 1, 65=Ch 2 , 66=Ch 3 .. 79=Ch 16
-		_points[64]  = (DataParser.parse2UnsignedShort(_buf,  8)/2) * 1000; //1197
-		_points[65]  = (DataParser.parse2UnsignedShort(_buf, 10)/2) * 1000; //
-		_points[66]  = (DataParser.parse2UnsignedShort(_buf, 12)/2) * 1000;
-		_points[67]  = (DataParser.parse2UnsignedShort(_buf, 14)/2) * 1000;
-		_points[68]  = (DataParser.parse2UnsignedShort(_buf, 16)/2) * 1000;
-		_points[69]  = (DataParser.parse2UnsignedShort(_buf, 18)/2) * 1000;
-		_points[70]  = (DataParser.parse2UnsignedShort(_buf, 20)/2) * 1000;
-		_points[71] = (DataParser.parse2UnsignedShort(_buf, 22)/2) * 1000;
+		//58=Ch 1, 59=Ch 2 , 50=Ch 3 .. 73=Ch 16
+		_points[58]  = (DataParser.parse2UnsignedShort(_buf,  8)/2) * 1000; //1197
+		_points[59]  = (DataParser.parse2UnsignedShort(_buf, 10)/2) * 1000; //
+		_points[60]  = (DataParser.parse2UnsignedShort(_buf, 12)/2) * 1000;
+		_points[61]  = (DataParser.parse2UnsignedShort(_buf, 14)/2) * 1000;
+		_points[62]  = (DataParser.parse2UnsignedShort(_buf, 16)/2) * 1000;
+		_points[63]  = (DataParser.parse2UnsignedShort(_buf, 18)/2) * 1000;
+		_points[64]  = (DataParser.parse2UnsignedShort(_buf, 20)/2) * 1000;
+		_points[65] = (DataParser.parse2UnsignedShort(_buf, 22)/2) * 1000;
 		if (_buf[5] == 0x00) { //channel 9-12
-			_points[72] = (DataParser.parse2UnsignedShort(_buf, 24)/2) * 1000;
-			_points[73] = (DataParser.parse2UnsignedShort(_buf, 26)/2) * 1000;
-			_points[74] = (DataParser.parse2UnsignedShort(_buf, 28)/2) * 1000;
-			_points[75] = (DataParser.parse2UnsignedShort(_buf, 30)/2) * 1000;
+			_points[66] = (DataParser.parse2UnsignedShort(_buf, 24)/2) * 1000;
+			_points[67] = (DataParser.parse2UnsignedShort(_buf, 26)/2) * 1000;
+			_points[68] = (DataParser.parse2UnsignedShort(_buf, 28)/2) * 1000;
+			_points[69] = (DataParser.parse2UnsignedShort(_buf, 30)/2) * 1000;
 			if (_points[70] == 0) {
-				_points[76] = 1500 * 1000;
-				_points[77] = 1500 * 1000;
-				_points[78] = 1500 * 1000;
-				_points[79] = 1500 * 1000;
-			}
-		} else { //channel 13-16
-			_points[76] = (DataParser.parse2UnsignedShort(_buf, 24)/2) * 1000;
-			_points[77] = (DataParser.parse2UnsignedShort(_buf, 26)/2) * 1000;
-			_points[78] = (DataParser.parse2UnsignedShort(_buf, 28)/2) * 1000;
-			_points[79] = (DataParser.parse2UnsignedShort(_buf, 30)/2) * 1000;
-			if (_points[11] == 0) {
+				_points[70] = 1500 * 1000;
+				_points[71] = 1500 * 1000;
 				_points[72] = 1500 * 1000;
 				_points[73] = 1500 * 1000;
-				_points[74] = 1500 * 1000;
-				_points[75] = 1500 * 1000;
+			}
+		} else { //channel 13-16
+			_points[70] = (DataParser.parse2UnsignedShort(_buf, 24)/2) * 1000;
+			_points[71] = (DataParser.parse2UnsignedShort(_buf, 26)/2) * 1000;
+			_points[72] = (DataParser.parse2UnsignedShort(_buf, 28)/2) * 1000;
+			_points[73] = (DataParser.parse2UnsignedShort(_buf, 30)/2) * 1000;
+			if (_points[11] == 0) {
+				_points[66] = 1500 * 1000;
+				_points[67] = 1500 * 1000;
+				_points[68] = 1500 * 1000;
+				_points[69] = 1500 * 1000;
 			}
 		}
 	}
@@ -965,14 +965,14 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseMotorDriver(int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
-		//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 6=TemperatureM
+		//74=VoltageM, 75=CurrentM, 76=CapacityM, 77=PowerM, 78=RevolutionM, 79=TemperatureM
 		if (true) {
-			_points[58] = DataParser.parse2Short(_buf1, 3) * 1000;
-			_points[59] = DataParser.parse2Short(_buf1, 7) * 1000;
-			_points[60] = DataParser.parse2Short(_buf2, 5) * 1000;
-			_points[61] = Double.valueOf(_points[58] / 1000.0 * _points[59]).intValue();
-			_points[62] = DataParser.parse2Short(_buf2, 3) * 1000;
-			_points[63] =(_buf2[1] & 0xFF) * 1000;
+			_points[74] = DataParser.parse2Short(_buf1, 3) * 1000;
+			_points[75] = DataParser.parse2Short(_buf1, 7) * 1000;
+			_points[76] = DataParser.parse2Short(_buf2, 5) * 1000;
+			_points[77] = Double.valueOf(_points[58] / 1000.0 * _points[59]).intValue();
+			_points[78] = DataParser.parse2Short(_buf2, 3) * 1000;
+			_points[79] =(_buf2[1] & 0xFF) * 1000;
 		}
 	}
 }

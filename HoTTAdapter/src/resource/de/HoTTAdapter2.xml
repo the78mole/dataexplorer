@@ -499,6 +499,7 @@
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Strom M</name>
@@ -507,6 +508,7 @@
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Kapazität M</name>
@@ -514,6 +516,7 @@
                 <unit>mAh</unit>
                 <active>true</active>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Leistung M</name>
@@ -522,6 +525,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Drehzahl M</name>
@@ -530,6 +534,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="29" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperatur M</name>
@@ -537,6 +542,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorGeneral">
@@ -762,7 +768,7 @@
                 <property type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Drehzahl</name>
+                <name>Drehzahl G</name>
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
@@ -1001,6 +1007,7 @@
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Strom M</name>
@@ -1009,6 +1016,7 @@
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Kapazität M</name>
@@ -1016,6 +1024,7 @@
                 <unit>mAh</unit>
                 <active>true</active>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Leistung M</name>
@@ -1024,6 +1033,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Drehzahl M</name>
@@ -1032,6 +1042,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="29" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperatur M</name>
@@ -1039,6 +1050,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="MotorElectric">
@@ -1502,6 +1514,7 @@
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Strom M</name>
@@ -1510,6 +1523,7 @@
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Kapazität M</name>
@@ -1517,6 +1531,7 @@
                 <unit>mAh</unit>
                 <active>true</active>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Leistung M</name>
@@ -1525,6 +1540,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Drehzahl M</name>
@@ -1533,6 +1549,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="29" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Temperatur M</name>
@@ -1540,6 +1557,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
         <Channel type="TYPE_CONFIG" name="Kanäle">
@@ -1547,7 +1565,7 @@
                 <name>RF_RXSQ</name>
                 <symbol></symbol>
                 <unit>%</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
@@ -1996,52 +2014,6 @@
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Spannung M</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Strom M</name>
-                <symbol>I</symbol>
-                <unit>A</unit>
-                <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Kapazität M</name>
-                <symbol>C</symbol>
-                <unit>mAh</unit>
-                <active>true</active>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Leistung M</name>
-                <symbol>P</symbol>
-                <unit>W</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Drehzahl M</name>
-                <symbol>rpm</symbol>
-                <unit>1/min</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
-            </Measurement>
-            <Measurement>
-                <name>Temperatur M</name>
-                <symbol></symbol>
-                <unit>°C</unit>
-                <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
-            <Measurement>
                 <name>Ch 1</name>
                 <symbol></symbol>
                 <unit>msec</unit>
@@ -2054,7 +2026,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 3</name>
@@ -2062,7 +2034,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 4</name>
@@ -2070,7 +2042,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 5</name>
@@ -2078,7 +2050,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 6</name>
@@ -2086,7 +2058,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 7</name>
@@ -2094,7 +2066,7 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 8</name>
@@ -2102,71 +2074,123 @@
                 <unit>msec</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 9</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 10</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 11</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 12</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 13</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 14</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 15</name>
                 <symbol></symbol>
                 <unit>msec</unit>
-                <active>true</active>
+                <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>Ch 16</name>
                 <symbol></symbol>
                 <unit>msec</unit>
+                <active>false</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung M</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom M</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Kapazität M</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Leistung M</name>
+                <symbol>P</symbol>
+                <unit>W</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="64" name="scale_sync_ref_ordinal"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Drehzahl M</name>
+                <symbol>rpm</symbol>
+                <unit>1/min</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="29" name="scale_sync_ref_ordinal"/>
+            </Measurement>
+            <Measurement>
+                <name>Temperatur M</name>
+                <symbol></symbol>
+                <unit>°C</unit>
+                <active>true</active>
+                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
         </Channel>
         <property type="Boolean" value="true" name="enable_filter"/>
