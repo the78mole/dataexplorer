@@ -1781,13 +1781,14 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * synchronize scales according device properties 
 	 */
 	public void syncScaleOfSyncableRecords() {
-		this.scaleSyncedRecords	= new HashMap<Integer,Vector<Record>>(1);
+		this.scaleSyncedRecords.clear(); //	= new HashMap<Integer,Vector<Record>>(1);
 		for (int i = 0; i < this.size() && !this.isCompareSet; i++) {
 			PropertyType syncProperty = this.isUtilitySet ? this.get(i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) : this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-			Record tmpRecord = this.get(i);
 			if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+				Record tmpRecord = this.get(i);
 				int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
 				if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add syncMaster " + this.get(syncMasterRecordOrdinal).name);
 					this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
 					this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
 					this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
@@ -1803,14 +1804,14 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 					this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
 					this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);
 					this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_SCALE_POSITION);
-					log.log(Level.FINE, "add " + tmpRecord.name);
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add " + tmpRecord.name);
 				}
 			}
 		}
 		if (log.isLoggable(Level.FINE)) {
 			StringBuilder sb = new StringBuilder();
 			for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-				sb.append(syncRecordOrdinal).append(GDE.STRING_COLON);
+				sb.append("\n").append(syncRecordOrdinal).append(GDE.STRING_COLON);
 				for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 					sb.append(tmpRecord.name).append(GDE.STRING_SEMICOLON);
 				}
