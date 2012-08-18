@@ -973,7 +973,6 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
 		if ((recordKeys.length - fileRecordsProperties.length) == 6) { //delta motor driver properties
-//			if (fileRecordsProperties.length == 58) { // universal, general, electric
 				int i = 0;
 				for (; i < fileRecordsProperties.length; ++i) {
 					cleanedRecordNames.add(recordKeys[i]);
@@ -982,45 +981,6 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				for (; i < recordKeys.length; ++i) {
 					recordSet.remove(recordKeys[i]);
 				}
-//			}
-//			else if (fileRecordsProperties.length == 74) { // channels
-//				int lastEntry = 58;
-//				for (int i = 0; i < lastEntry; ++i) {
-//					cleanedRecordNames.add(recordKeys[i]);
-//				}
-//				for (int i = lastEntry+6; i < fileRecordsProperties.length; ++i) {
-//					cleanedRecordNames.add(recordKeys[i]);
-//				}
-//
-//				//cleanup recordSet
-//				for (int i = lastEntry; i < lastEntry+6; ++i) {
-//					log.log(Level.OFF, recordKeys[i] + " removed!");
-//					recordSet.remove(recordKeys[i]);
-//				}
-//				
-//				//correct SCALE_SYNC_REF_ORDINAL property
-////				for (int i = lastEntry+1; i < fileRecordsProperties.length; ++i) {
-////					log.log(Level.OFF, recordSet.get(i).getName() + " sync property " + recordSet.get(i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()).getValue());
-////				}
-//
-//				PropertyType property = this.getMeasruementProperty(recordSet.getChannelConfigNumber(), lastEntry, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-//				if (property != null) //cleanup if exist
-//					this.removeMeasruementProperty(recordSet.getChannelConfigNumber(), lastEntry, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-//
-//				for (int i = lastEntry + 1; i < fileRecordsProperties.length; ++i) {
-//					property = this.getMeasruementProperty(recordSet.getChannelConfigNumber(), i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-//					if (property != null) {
-//						property.setValue(lastEntry);
-//						//recordSet.get(i).updateProperty(property);
-//						log.log(Level.OFF, recordSet.get(i).getName() + " correct property " + property.getName() + "=" + property.getValue());
-//					}
-//				}
-////				for (int i = lastEntry+1; i < fileRecordsProperties.length; ++i) {
-////					log.log(Level.OFF, recordSet.get(i).getName() + " sync property " + recordSet.get(i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()).getValue());
-////				}
-//				recordSet.syncScaleOfSyncableRecords();
-//			}
-
 			recordKeys = cleanedRecordNames.toArray(new String[1]);
 		}
 		return recordKeys;
