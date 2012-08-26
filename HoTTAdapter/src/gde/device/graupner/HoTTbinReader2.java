@@ -150,7 +150,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 								+ GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader2.buf[7], false));
 
 					//fill receiver data
-					if (HoTTbinReader2.buf[33] == 0 && (HoTTbinReader2.buf[38]&0x80) != 128 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0) {
+					if (HoTTbinReader2.buf[33] == 0 && (HoTTbinReader2.buf[38]&0x80) != 128 && DataParser.parse2Short(HoTTbinReader2.buf, 40) >= 0) {
 						parseReceiver(HoTTbinReader2.points, HoTTbinReader2.buf);
 						isReceiverData = isSensorDataStart;
 					}
@@ -459,7 +459,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 								+ GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader2.buf[7], false));
 
 					//fill receiver data
-					if (HoTTbinReader2.buf[33] == 0 && (HoTTbinReader2.buf[38]&0x80) != 128 && DataParser.parse2Short(HoTTbinReader2.buf, 40) != 0) {
+					if (HoTTbinReader2.buf[33] == 0 && (HoTTbinReader2.buf[38]&0x80) != 128 && DataParser.parse2Short(HoTTbinReader2.buf, 40) >= 0) {
 						parseReceiver(HoTTbinReader2.points, HoTTbinReader2.buf);
 						isReceiverData = true;
 					}
@@ -709,14 +709,13 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 */
 	private static void parseReceiver(int[] _points, byte[] _buf) {
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
-		tmpPackageLoss = DataParser.parse2Short(_buf, 40);
 		tmpVoltageRx = (_buf[35] & 0xFF);
 		tmpTemperatureRx = (_buf[36] & 0xFF);
-		if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > 0 && tmpVoltageRx > 0 && tmpVoltageRx < 100 && tmpTemperatureRx < 100) {
+		_points[1] = (_buf[38] & 0xFF) * 1000;
+		_points[3] = DataParser.parse2Short(_buf, 40) * 1000;
+		if (!HoTTAdapter.isFilterEnabled || tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 100) {
 			_points[0] = _buf[37] * 1000;
-			_points[1] = (_buf[38] & 0xFF) * 1000;
 			_points[2] = (convertRxDbm2Strength(_buf[4] & 0xFF)) * 1000;
-			_points[3] = DataParser.parse2Short(_buf, 40) * 1000;
 			_points[4] = (_buf[3] & 0xFF) * -1000;
 			_points[5] = (_buf[4] & 0xFF) * -1000;
 			_points[6] = (_buf[35] & 0xFF) * 1000;
@@ -835,9 +834,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	private static void parseGeneral(int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) {
 		tmpHeight = DataParser.parse2Short(_buf3, 0) - 500;
 		tmpClimb3 = (_buf3[4] & 0xFF) - 120;
-		int tmpVoltage1 = DataParser.parse2Short(_buf1[9], _buf2[0]);
-		int tmpVoltage2 = DataParser.parse2Short(_buf2, 1);
-		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
+		tmpVoltage1 = DataParser.parse2Short(_buf1[9], _buf2[0]);
+		tmpVoltage2 = DataParser.parse2Short(_buf2, 1);
+		tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
@@ -883,9 +882,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			throws DataInconsitsentException {
 		tmpHeight = DataParser.parse2Short(_buf3, 3) - 500;
 		tmpClimb3 = (_buf4[3] & 0xFF) - 120;
-		int tmpVoltage1 = DataParser.parse2Short(_buf2, 7);
-		int tmpVoltage2 = DataParser.parse2Short(_buf2[9], _buf3[0]);
-		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
+		tmpVoltage1 = DataParser.parse2Short(_buf2, 7);
+		tmpVoltage2 = DataParser.parse2Short(_buf2[9], _buf3[0]);
+		tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
 		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
@@ -976,23 +975,36 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static void parseMotorDriver(int[] _points, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4, int channelNumber) throws DataInconsitsentException {
+		tmpVoltage = DataParser.parse2Short(_buf1, 3);
+		tmpCurrent = DataParser.parse2Short(_buf1, 7);
+		tmpCapacity = DataParser.parse2Short(_buf2, 5);
+		tmpRevolution = DataParser.parse2Short(_buf2, 3);
+		tmpTemperature = _buf2[1] & 0xFF;
 		if (channelNumber == 4) {
 			//74=VoltageM, 75=CurrentM, 76=CapacityM, 77=PowerM, 78=RevolutionM, 79=TemperatureM
-			_points[74] = DataParser.parse2Short(_buf1, 3) * 1000;
-			_points[75] = DataParser.parse2Short(_buf1, 7) * 1000;
-			_points[76] = DataParser.parse2Short(_buf2, 5) * 1000;
-			_points[77] = Double.valueOf(_points[74] / 1000.0 * _points[75]).intValue();
-			_points[78] = DataParser.parse2Short(_buf2, 3) * 1000;
-			_points[79] =(_buf2[1] & 0xFF) * 1000;
+			if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 200) {
+				_points[74] = tmpVoltage * 1000;
+				_points[75] = tmpCurrent * 1000;
+				_points[77] = Double.valueOf(_points[74] / 1000.0 * _points[75]).intValue();
+			}
+			if (!HoTTAdapter.isFilterEnabled || tmpRevolution > -1 && tmpRevolution < 2000 && tmpCapacity >= _points[76]/1000) { // && tmpTemperature > -20 && tmpTemperature < 150
+				_points[76] = tmpCapacity * 1000;
+				_points[78] = tmpRevolution * 1000;
+				_points[79] = tmpTemperature * 1000;
+			}
 		}
 		else {
 			//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
-			_points[58] = DataParser.parse2Short(_buf1, 3) * 1000;
-			_points[59] = DataParser.parse2Short(_buf1, 7) * 1000;
-			_points[60] = DataParser.parse2Short(_buf2, 5) * 1000;
+			if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 200) {
+			_points[58] = tmpVoltage * 1000;
+			_points[59] = tmpCurrent * 1000;
 			_points[61] = Double.valueOf(_points[58] / 1000.0 * _points[59]).intValue();
-			_points[62] = DataParser.parse2Short(_buf2, 3) * 1000;
-			_points[63] =(_buf2[1] & 0xFF) * 1000;
+			}
+			if (!HoTTAdapter.isFilterEnabled || tmpRevolution > -1 && tmpRevolution < 2000 && tmpCapacity >= _points[60]/1000) { // && tmpTemperature > -20 && tmpTemperature < 150
+			_points[60] = tmpCapacity * 1000;
+			_points[62] = tmpRevolution * 1000;
+			_points[63] = tmpTemperature * 1000;
+			}
 		}
 	}
 }

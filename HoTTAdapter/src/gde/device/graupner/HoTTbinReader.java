@@ -59,12 +59,18 @@ public class HoTTbinReader {
 	static long										timeStep_ms;
 	static int[]									pointsReceiver, pointsGeneral, pointsElectric, pointsVario, pointsGPS, pointsChannel, pointsMotorDriver;
 	static RecordSet							recordSetReceiver, recordSetGeneral, recordSetElectric, recordSetVario, recordSetGPS, recordSetChannel, recordSetMotorDriver;
-	static int tmpPackageLoss = 0;
 	static int tmpVoltageRx = 0;
 	static int tmpTemperatureRx = 0;
 	static int tmpHeight = 0;
+	static int tmpTemperature = 0;
+	static int tmpVoltage = 0;
+	static int tmpCurrent = 0;
+	static int tmpRevolution = 0;
 	static int tmpClimb3 = 0;
 	static int tmpClimb10 = 0;
+	static int tmpVoltage1 = 0;
+	static int tmpVoltage2 = 0;
+	static int tmpCapacity = 0;
 	static int tmpLatitude = 0;
 	static int tmpLatitudeDelta = 0;
 	static double latitudeTolerance = 1;
@@ -278,7 +284,7 @@ public class HoTTbinReader {
 								+ GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader.buf[7], false));
 
 					//fill receiver data
-					if (HoTTbinReader.buf[33] == 0 && (HoTTbinReader2.buf[38]&0x80) != 128 && DataParser.parse2Short(HoTTbinReader.buf, 40) != 0) {
+					if (HoTTbinReader.buf[33] == 0 && (HoTTbinReader2.buf[38]&0x80) != 128 && DataParser.parse2Short(HoTTbinReader.buf, 40) >= 0) {
 						parseAddReceiver(HoTTbinReader.recordSetReceiver, HoTTbinReader.pointsReceiver, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
 						if (HoTTAdapter.isChannelsChannelEnabled) {
 							parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
@@ -720,7 +726,7 @@ public class HoTTbinReader {
 								+ GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader.buf[7], false));
 
 					//fill receiver data
-					if (HoTTbinReader.buf[33] == 0 && (HoTTbinReader2.buf[38]&0x80) != 128 && DataParser.parse2Short(HoTTbinReader.buf, 40) != 0) {
+					if (HoTTbinReader.buf[33] == 0 && (HoTTbinReader2.buf[38]&0x80) != 128 && DataParser.parse2Short(HoTTbinReader.buf, 40) >= 0) {
 						parseAddReceiver(HoTTbinReader.recordSetReceiver, HoTTbinReader.pointsReceiver, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
 						if (HoTTAdapter.isChannelsChannelEnabled) {
 							parseAddChannel(HoTTbinReader.recordSetChannel, HoTTbinReader.pointsChannel, HoTTbinReader.buf, HoTTbinReader.timeStep_ms);
@@ -1000,14 +1006,13 @@ public class HoTTbinReader {
 	 */
 	private static void parseAddReceiver(RecordSet _recordSetReceiver, int[] _pointsReceiver, byte[] _buf, long _timeStep_ms) throws DataInconsitsentException {
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
-		tmpPackageLoss = DataParser.parse2Short(_buf, 40);
 		tmpVoltageRx = (_buf[35] & 0xFF);
 		tmpTemperatureRx = (_buf[36] & 0xFF);
-		if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > 0 && tmpVoltageRx > 0 && tmpVoltageRx < 100 && tmpTemperatureRx < 120) {
+		_pointsReceiver[1] = (_buf[38] & 0xFF) * 1000;
+		_pointsReceiver[3] = DataParser.parse2Short(_buf, 40) * 1000;
+		if (!HoTTAdapter.isFilterEnabled || tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 120) {
 			_pointsReceiver[0] = _buf[37] * 1000;
-			_pointsReceiver[1] = (_buf[38] & 0xFF) * 1000;
 			_pointsReceiver[2] = (convertRxDbm2Strength(_buf[4] & 0xFF)) * 1000;
-			_pointsReceiver[3] = DataParser.parse2Short(_buf, 40) * 1000;
 			_pointsReceiver[4] = (_buf[3] & 0xFF) * -1000;
 			_pointsReceiver[5] = (_buf[4] & 0xFF) * -1000;
 			_pointsReceiver[6] = (_buf[35] & 0xFF) * 1000;
@@ -1151,9 +1156,9 @@ public class HoTTbinReader {
 	private static void parseAddGPS(RecordSet _recordSetGPS, int[] _pointsGPS, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, long _timeStep_ms) throws DataInconsitsentException {
 		tmpHeight = DataParser.parse2Short(_buf2, 8);
 		tmpClimb3 = (_buf3[2] & 0xFF);
+		_pointsGPS[0] = (_buf0[4] & 0xFF) * 1000;
 		if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
-			_pointsGPS[0] = (_buf0[4] & 0xFF) * 1000;
 			_pointsGPS[6] = DataParser.parse2Short(_buf1, 4) * 1000;
 			
 			tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
@@ -1221,14 +1226,14 @@ public class HoTTbinReader {
 			throws DataInconsitsentException {
 		tmpHeight = DataParser.parse2Short(_buf3, 0);
 		tmpClimb3 = (_buf3[4] & 0xFF);
-		int tmpVoltage1 = DataParser.parse2Short(_buf1[9], _buf2[0]);
-		int tmpVoltage2 = DataParser.parse2Short(_buf2, 1);
-		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
+		tmpVoltage1 = DataParser.parse2Short(_buf1[9], _buf2[0]);
+		tmpVoltage2 = DataParser.parse2Short(_buf2, 1);
+		tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2							
+		_pointsGeneral[0] = (_buf0[4] & 0xFF) * 1000;
 		if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsGeneral[3] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
-			_pointsGeneral[0] = (_buf0[4] & 0xFF) * 1000;
 			_pointsGeneral[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			_pointsGeneral[2] = DataParser.parse2Short(_buf3, 5) * 1000;
 			_pointsGeneral[3] = tmpCapacity * 1000;
@@ -1281,14 +1286,14 @@ public class HoTTbinReader {
 			throws DataInconsitsentException {
 		tmpHeight = DataParser.parse2Short(_buf3, 3);
 		tmpClimb3 = (_buf4[3] & 0xFF);
-		int tmpVoltage1 = DataParser.parse2Short(_buf2, 7);
-		int tmpVoltage2 = DataParser.parse2Short(_buf2[9], _buf3[0]);
-		int tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
+		tmpVoltage1 = DataParser.parse2Short(_buf2, 7);
+		tmpVoltage2 = DataParser.parse2Short(_buf2[9], _buf3[0]);
+		tmpCapacity = DataParser.parse2Short(_buf3[9], _buf4[0]);
 		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 
+		_pointsElectric[0] = (_buf1[4] & 0xFF) * 1000;
 		if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600	&& tmpCapacity >= _pointsElectric[3] / 1000) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
-			_pointsElectric[0] = (_buf1[4] & 0xFF) * 1000;
 			_pointsElectric[1] = DataParser.parse2Short(_buf3, 7) * 1000;
 			_pointsElectric[2] = DataParser.parse2Short(_buf3, 5) * 1000;
 			_pointsElectric[3] = tmpCapacity * 1000;
@@ -1336,14 +1341,21 @@ public class HoTTbinReader {
 	 */
 	private static void parseAddMotorDriver(RecordSet _recordSetMotorDriver, int[] _pointsMotorDriver, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4, long _timeStep_ms) throws DataInconsitsentException {
 		//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
-		if (true) {
-			_pointsMotorDriver[0] = (_buf0[4] & 0xFF) * 1000;
-			_pointsMotorDriver[1] = DataParser.parse2Short(_buf1, 3) * 1000;
-			_pointsMotorDriver[2] = DataParser.parse2Short(_buf1, 7) * 1000;
-			_pointsMotorDriver[3] = DataParser.parse2Short(_buf2, 5) * 1000;
+		tmpVoltage = DataParser.parse2Short(_buf1, 3);
+		tmpCurrent = DataParser.parse2Short(_buf1, 7);
+		_pointsMotorDriver[0] = (_buf0[4] & 0xFF) * 1000;
+		if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 200) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
+			_pointsMotorDriver[1] = tmpVoltage * 1000;
+			_pointsMotorDriver[2] = tmpCurrent * 1000;
 			_pointsMotorDriver[4] = Double.valueOf(_pointsMotorDriver[1] / 1000.0 * _pointsMotorDriver[2]).intValue();
-			_pointsMotorDriver[5] = DataParser.parse2Short(_buf2, 3) * 1000;
-			_pointsMotorDriver[6] =(_buf2[1] & 0xFF) * 1000;
+		}
+		tmpCapacity = DataParser.parse2Short(_buf2, 5);
+		tmpRevolution = DataParser.parse2Short(_buf2, 3);
+		tmpTemperature = _buf2[1] & 0xFF;
+		if (!HoTTAdapter.isFilterEnabled || tmpRevolution > -1 && tmpRevolution < 2000 && tmpCapacity >= _pointsMotorDriver[3]/1000) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
+			_pointsMotorDriver[3] = tmpCapacity * 1000;
+			_pointsMotorDriver[5] = tmpRevolution * 1000;
+			_pointsMotorDriver[6] = tmpTemperature * 1000;
 		}
 		_recordSetMotorDriver.addPoints(_pointsMotorDriver, _timeStep_ms);
 	}
