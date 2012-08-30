@@ -2123,6 +2123,34 @@
                 <property description="Scale synchronisazion measurement reference as ordinal value" type="Integer" value="58" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
+                <name>Power Off</name>
+                <symbol>evt</symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Batt Low</name>
+                <symbol>evt</symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Reset</name>
+                <symbol>evt</symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
+                <name>Reserve</name>
+                <symbol>evt</symbol>
+                <unit></unit>
+                <active>false</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
+            </Measurement>
+            <Measurement>
                 <name>Voltage M</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
