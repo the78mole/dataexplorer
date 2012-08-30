@@ -2163,12 +2163,29 @@ public class DeviceConfiguration {
 	public ChannelPropertyType getChannelProperty(ChannelPropertyTypes key) {
 		if (getChannelProperties() != null) {
 			for (ChannelPropertyType property : getChannelProperties()) {
-				if (property.name.equals(key)) return property;
+				if (property.name.equals(key)) 
+					return property;
 			}
 		}
 		ChannelPropertyType channelProperty = new ObjectFactory().createChannelPropertyType();
 		channelProperty.setName(key);
 		return channelProperty;
+	}
+	
+	/**
+	 * set a channel property value
+	 * @param key
+	 * @param type
+	 * @param value
+	 */
+	public void setChannelProperty(ChannelPropertyTypes key, DataTypes type, String value) {
+		ChannelPropertyType channelProperty = getChannelProperty(key);
+		channelProperty.setType(type);
+		channelProperty.setValue(value);
+		List<ChannelPropertyType> properties = getChannelProperties();
+		if (!properties.contains(channelProperty)) 
+			properties.add(channelProperty);
+		this.isChangePropery = true;
 	}
 	
 	/**
