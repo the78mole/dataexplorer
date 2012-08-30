@@ -221,7 +221,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "enableChannelRecords.widgetSelected, event=" + evt); //$NON-NLS-1$
-								HoTTAdapterDialog.this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).setValue(GDE.STRING_EMPTY + HoTTAdapterDialog.this.enableChannelRecords.getSelection());
+								HoTTAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL, DataTypes.BOOLEAN, GDE.STRING_EMPTY + HoTTAdapterDialog.this.enableChannelRecords.getSelection());
 								HoTTAdapter.setChannelEnabledProperty(HoTTAdapterDialog.this.enableChannelRecords.getSelection());
 								HoTTAdapterDialog.this.enableSaveButton(true);
 							}
@@ -576,6 +576,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.dialogShell.setActive();
 			}
 			
+			if (this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != null)
+				this.enableChannelRecords.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()));
 			this.enableFilter.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()));
 			if (isHoTTAdapter) {
 				this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
