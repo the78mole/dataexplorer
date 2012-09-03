@@ -2220,5 +2220,13 @@ public class DeviceConfiguration {
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
 		return recordSet.getRecordNames(); // return unchanged set of measurements as default
 	}
-
+	
+	/**
+	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 * @param record
+	 * @return
+	 */
+	public boolean isGPSCoordinates(Record record) {
+		return false;
+	}
 }

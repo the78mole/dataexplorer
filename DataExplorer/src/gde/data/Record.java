@@ -1363,7 +1363,22 @@ public class Record extends Vector<Integer> {
 		//log.log(Level.OFF, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue()) + ")");
 		return new Point(
 			xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), 
-			yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
+			yDisplayOffset - Double.valueOf(((this.get(measurementPointIndex)/1000.0) - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
+	}
+	
+	/**
+	 * method to query time and value for display at a given index
+	 * @param measurementPointIndex (differs from index if display width != measurement size)
+	 * @param xDisplayOffset
+	 * @param yDisplayOffset
+	 * @return point time, value
+	 */
+	public Point getGPSDisplayPoint(int measurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
+		//log.log(Level.OFF, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue()) + ")");
+		int grad = this.get(measurementPointIndex)/1000000;
+		return new Point(
+			xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), 
+			yDisplayOffset - Double.valueOf((((grad + ((this.get(measurementPointIndex)/1000000.0-grad)/0.60)) * 1000.0) - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
 	}
 	
 	/**
@@ -1570,7 +1585,12 @@ public class Record extends Vector<Integer> {
 	 * @param newMinDisplayValue the minDisplayValue to set
 	 */
 	public void setMinDisplayValue(double newMinDisplayValue) {
-		this.minDisplayValue = newMinDisplayValue;
+		if (this.device.isGPSCoordinates(this)) {
+			this.minDisplayValue = this.device.translateValue(this, newMinDisplayValue)*1000;
+		}
+		else
+			this.minDisplayValue = newMinDisplayValue;
+		
 		if (this.parent.isOneOfSyncableRecord(this)) {
 			for (Record tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
 				tmpRecord.minDisplayValue = this.minDisplayValue;
@@ -1582,7 +1602,12 @@ public class Record extends Vector<Integer> {
 	 * @param newMaxDisplayValue the maxDisplayValue to set
 	 */
 	public void setMaxDisplayValue(double newMaxDisplayValue) {
-		this.maxDisplayValue = newMaxDisplayValue;
+		if (this.device.isGPSCoordinates(this)) {
+			this.maxDisplayValue = this.device.translateValue(this, newMaxDisplayValue)*1000;
+		}
+		else
+			this.maxDisplayValue = newMaxDisplayValue;
+		
 		if (this.parent.isOneOfSyncableRecord(this)) {
 			for (Record tmpRecord : this.parent.scaleSyncedRecords.get(this.parent.getSyncMasterRecordOrdinal(this))) {
 				tmpRecord.maxDisplayValue = this.maxDisplayValue;

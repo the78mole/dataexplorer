@@ -916,4 +916,13 @@ public interface IDevice {
 	 * get the curve point device individual filtered if required
 	 */
 	public Integer getFilteredPoint(int channelNumber, Record record, int index);
+	
+	
+	/**
+	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 * @param record
+	 * @return
+	 */
+	public boolean isGPSCoordinates(Record record);
+
 }
