@@ -742,7 +742,24 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						//ignore and go ahead detecting sensors
 					}
 				}
-				if (isSensorType[1] || isSensorType[2] || isSensorType[3] || isSensorType[4]) isSensorType[0] = true;
+				if (!isSensorType[5]) {
+					try {
+						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ SpeedControler");
+						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200);
+						this.serialPort.getData(false);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						this.serialPort.getData(true);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						this.serialPort.getData(true);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						isSensorType[5] = (this.serialPort.getData(true)[15] == HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+					}
+					catch (Exception e) {
+						//ignore and go ahead detecting sensors
+					}
+				}
+				if (isSensorType[1] || isSensorType[2] || isSensorType[3] || isSensorType[4] || isSensorType[5]) isSensorType[0] = true;
 				if (!isSensorType[0]) {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Receiver");
@@ -766,6 +783,23 @@ public class HoTTAdapterLiveGatherer extends Thread {
 		case TYPE_115200:
 			if (!this.serialPort.isInterruptedByUser) {
 				//V4 has multi sensor capability which might need more queries for stable result
+				if (!isSensorType[5]) {
+					try {
+						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ SpeedControler");
+						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200);
+						this.serialPort.getData(0);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						this.serialPort.getData(0);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						this.serialPort.getData(0);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						isSensorType[5] = (DataParser.parse2Short(this.serialPort.getData(0), 22) != 0);
+						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+					}
+					catch (Exception e) {
+						//ignore and go ahead detecting sensors
+					}
+				}
 				if (!isSensorType[4]) {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Electric");
@@ -836,7 +870,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						//ignore and go ahead detecting sensors
 					}
 				}
-				if (isSensorType[1] || isSensorType[2] || isSensorType[3] || isSensorType[4]) isSensorType[0] = true;
+				if (isSensorType[1] || isSensorType[2] || isSensorType[3] || isSensorType[4] || isSensorType[5]) isSensorType[0] = true;
 				if (!isSensorType[0]) {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Receiver");

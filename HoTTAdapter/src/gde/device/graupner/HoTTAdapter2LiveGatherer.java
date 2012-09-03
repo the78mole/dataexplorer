@@ -100,11 +100,11 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 				//0=isReceiver, 1=isVario, 2=isGPS, 3=isGeneral, 4=isElectric
 				for (int i = HoTTAdapter.isSensorType.length - 1; i >= 0; i--) {
 					if (sb.length() == 0 && tmpSensorType[i]) {
-						sb.append(tmpSensorType[5] ? ">>>SpeedControl<<<" : tmpSensorType[4] ? ">>>Electric<<<" : tmpSensorType[3] ? ">>>General<<<" : tmpSensorType[2] ? ">>>GPS<<<" : tmpSensorType[1] ? ">>>Vario<<<" : tmpSensorType[0] ? ">>>Receiver<<<" : "");
+						sb.append(tmpSensorType[5] ? ">>>SpeedControler<<<" : tmpSensorType[4] ? ">>>Electric<<<" : tmpSensorType[3] ? ">>>General<<<" : tmpSensorType[2] ? ">>>GPS<<<" : tmpSensorType[1] ? ">>>Vario<<<" : tmpSensorType[0] ? ">>>Receiver<<<" : "");
 						tmpSensorType[i] = false;
 					}
 					else if (tmpSensorType[i]) {
-						sb.append(GDE.STRING_MESSAGE_CONCAT).append(tmpSensorType[5] ? ">>>SpeedControl<<<" : tmpSensorType[4] ? ">>>Electric<<<" : tmpSensorType[3] ? ">>>General<<<" : tmpSensorType[2] ? ">>>GPS<<<" : tmpSensorType[1] ? ">>>Vario<<<" : tmpSensorType[0] ? ">>>Receiver<<<" : "");
+						sb.append(GDE.STRING_MESSAGE_CONCAT).append(tmpSensorType[5] ? ">>>SpeedControler<<<" : tmpSensorType[4] ? ">>>Electric<<<" : tmpSensorType[3] ? ">>>General<<<" : tmpSensorType[2] ? ">>>GPS<<<" : tmpSensorType[1] ? ">>>Vario<<<" : tmpSensorType[0] ? ">>>Receiver<<<" : "");
 						tmpSensorType[i] = false;
 					}
 				}
