@@ -368,20 +368,20 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				if (dataBuffer.length == 57) {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 17);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
-					if (this.application.getActiveChannelNumber() == 4) {
-						//74=VoltageM, 75=CurrentM, 76=CapacityM, 77=PowerM, 78=RevolutionM, 79=TemperatureM
-						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 200) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
-							points[74] = tmpVoltage * 1000;
-							points[75] = tmpCurrent * 1000;
-							points[76] = DataParser.parse2Short(dataBuffer, 29) * 1000;
-							points[77] = Double.valueOf(points[74] / 1000.0 * points[75]).intValue(); // power U*I [W];
-							points[78] = DataParser.parse2Short(dataBuffer, 25) * 1000;
-							points[79] = DataParser.parse2Short(dataBuffer, 33) * 1000;
+					if (this.application.getActiveChannelNumber() == 4) {					
+						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
+							//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
+							points[78] = tmpVoltage * 1000;
+							points[79] = tmpCurrent * 1000;
+							points[80] = DataParser.parse2Short(dataBuffer, 29) * 1000;
+							points[81] = Double.valueOf(points[78] / 1000.0 * points[79]).intValue(); // power U*I [W];
+							points[82] = DataParser.parse2Short(dataBuffer, 25) * 1000;
+							points[83] = DataParser.parse2Short(dataBuffer, 33) * 1000;
 						}
 					}
 					else {
 						//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
-						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 200) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
+						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
 							points[58] = tmpVoltage * 1000;
 							points[59] = tmpCurrent * 1000;
 							points[60] = DataParser.parse2Short(dataBuffer, 29) * 1000;
@@ -539,13 +539,13 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				}
 				break;
 				
-			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
-				if (dataBuffer.length == 27) {
+			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
+				if (dataBuffer.length == 28) {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
 					if (this.application.getActiveChannelNumber() == 4) {
 						//74=VoltageM, 75=CurrentM, 76=CapacityM, 77=PowerM, 78=RevolutionM, 79=TemperatureM
-						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 200) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
+						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
 							points[74] = tmpVoltage * 1000; 
 							points[75] = tmpCurrent * 1000;
 							points[76] = DataParser.parse2Short(dataBuffer, 20) * 1000;
@@ -556,7 +556,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 					}
 					else {
 						//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
-						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 200) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
+						if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
 							points[58] = tmpVoltage * 1000; 
 							points[59] = tmpCurrent * 1000;
 							points[60] = DataParser.parse2Short(dataBuffer, 20) * 1000;
@@ -648,7 +648,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				if (j == 12 || j == 13) { //12=Latitude, 13=Longitude 
 					int grad = record.realGet(rowIndex) / 1000000;
 					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-					dataTableRow[j + 1] = String.format("%d %.4f", grad, minuten); //$NON-NLS-1$
+					dataTableRow[j + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
 				}
 				else if (j >= 0 && j <= 5){
 					dataTableRow[j + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0));
@@ -663,6 +663,17 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		}
 		return dataTableRow;
 	}
+	
+	/**
+	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 * @param record
+	 * @return
+	 */
+	@Override
+	public boolean isGPSCoordinates(Record record) {
+		//12=Latitude, 13=Longitude
+		return record.getOrdinal() == 12 || record.getOrdinal() == 13;
+	}
 
 	/**
 	 * function to translate measured values from a device to values represented
@@ -671,9 +682,6 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 	 */
 	@Override
 	public double translateValue(Record record, double value) {
-		double factor = record.getFactor(); // != 1 if a unit translation is required
-		double offset = record.getOffset(); // != 0 if a unit translation is required
-		double reduction = record.getReduction(); // != 0 if a unit translation is required
 		double newValue = 0;
 
 		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
@@ -689,6 +697,9 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			newValue = grad + minuten / 60.0;
 		}
 		else {
+			double factor = record.getFactor(); // != 1 if a unit translation is required
+			double offset = record.getOffset(); // != 0 if a unit translation is required
+			double reduction = record.getReduction(); // != 0 if a unit translation is required
 			newValue = (value - reduction) * factor + offset;
 		}
 

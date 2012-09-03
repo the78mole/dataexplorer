@@ -534,7 +534,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					points[0] = (dataBuffer[9] & 0xFF) * 1000;
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 17);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 200) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
+					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
 						points[1] = tmpVoltage * 1000;
 						points[2] = tmpCurrent * 1000;
 						points[3] = DataParser.parse2Short(dataBuffer, 29) * 1000;
@@ -691,13 +691,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 					}
 				}
 				break;
-			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200:
-				if (dataBuffer.length == 27) {
+			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
+				if (dataBuffer.length == 28) {
 					//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature				
 					points[0] = (dataBuffer[9] & 0xFF) * 1000;
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 200) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
+					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 1000) { // && tmpTemperature > -20 && tmpTemperature < 150 && tmpRevolution > 0 && tmpRevolution < 2000) {
 						points[1] = tmpVoltage * 1000; 
 						points[2] = tmpCurrent * 1000;
 						points[3] = DataParser.parse2Short(dataBuffer, 20) * 1000;
@@ -779,7 +779,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				if ((j == 1 || j == 2) && record.getParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  
 					int grad = record.realGet(rowIndex) / 1000000;
 					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
-					dataTableRow[j + 1] = String.format("%d %.4f", grad, minuten); //$NON-NLS-1$
+					dataTableRow[j + 1] = String.format("%02d %07.4f", grad, minuten); //$NON-NLS-1$
 				}
 				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
 				else if (j >= 0 && j <= 5 && record.getParent().getChannelConfigNumber() == 1){ //Receiver
@@ -1102,6 +1102,17 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	public void export2KMZ3D(int type) {
 		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2403), 2, 1, 3, 6, 5, 9, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+	}
+	
+	/**
+	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 * @param record
+	 * @return
+	 */
+	@Override
+	public boolean isGPSCoordinates(Record record) {
+		//0=RXSQ, 1=Latitude, 2=Longitude
+		return record.getOrdinal() == 1 || record.getOrdinal() == 2;
 	}
 		
 	/**
