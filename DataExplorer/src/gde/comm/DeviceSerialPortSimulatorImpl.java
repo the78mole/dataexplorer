@@ -24,6 +24,8 @@ import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.FailedQueryException;
+import gde.exception.NotSupportedException;
+import gde.exception.NotSupportedFileFormatException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.io.LogViewReader;
@@ -41,8 +43,10 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -92,45 +96,54 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	public SerialPort open() throws ApplicationConfigurationException, SerialPortException {
 		try {
 			if (this.application != null) {
-				String path;
-				if (this.application.isObjectoriented()) {
-					path = this.application.getObjectFilePath();
-				}
-				else {
-					String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-					path = this.application.getActiveDevice() != null ? this.settings.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX : this.settings.getDataFilePath();
-					if (!FileUtils.checkDirectoryAndCreate(path)) {
-						this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
-					}
-				}
-				FileDialog openFileDialog = this.application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV, GDE.FILE_ENDING_STAR_TXT,
-						GDE.FILE_ENDING_STAR_LOG }, path, null, SWT.SINGLE);
-				if (openFileDialog.getFileName().length() > 4) {
-					String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				GDE.display.syncExec(new Runnable() {
+					public void run() {
+						String path;
+						if (application.isObjectoriented()) {
+							path = application.getObjectFilePath();
+						}
+						else {
+							String devicePath = application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+							path = application.getActiveDevice() != null ? settings.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX : settings.getDataFilePath();
+							if (!FileUtils.checkDirectoryAndCreate(path)) {
+								application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
+							}
+						}
+						FileDialog openFileDialog = application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV, GDE.FILE_ENDING_STAR_TXT,
+								GDE.FILE_ENDING_STAR_LOG }, path, null, SWT.SINGLE);
+						if (openFileDialog.getFileName().length() > 4) {
+							String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 
-					if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
-						fileType = GDE.FILE_ENDING_STAR_OSD;
-						//TODO add implementation to use *.osd files as simulation data input
+							try {
+								if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
+									fileType = GDE.FILE_ENDING_STAR_OSD;
+									//TODO add implementation to use *.osd files as simulation data input
+								}
+								else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
+									fileType = GDE.FILE_ENDING_STAR_LOV;
+									data_in = new DataInputStream(new FileInputStream(new File(openFilePath)));
+									LogViewReader.readHeader(data_in);
+								}
+								else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
+									fileType = GDE.FILE_ENDING_STAR_TXT;
+									txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
+									txt_in.read();
+								}
+								else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+									fileType = GDE.FILE_ENDING_STAR_LOG;
+									txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
+								}
+								else
+									application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0008) + openFilePath);
+							}
+							catch (Exception e) {
+								log.log(Level.SEVERE, e.getMessage(), e);
+							}
+						}
+						isConnected = data_in != null || txt_in != null;
+						application.setPortConnected(isConnected);
 					}
-					else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
-						fileType = GDE.FILE_ENDING_STAR_LOV;
-						data_in = new DataInputStream(new FileInputStream(new File(openFilePath)));
-						LogViewReader.readHeader(data_in);
-					}
-					else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
-						fileType = GDE.FILE_ENDING_STAR_TXT;
-						txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
-						txt_in.read();
-					}
-					else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
-						fileType = GDE.FILE_ENDING_STAR_LOG;
-						txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
-					}
-					else
-						this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0008) + openFilePath);
-				}
-				this.isConnected = data_in != null || txt_in != null;
-				this.application.setPortConnected(this.isConnected);
+				});
 			}
 		}
 		catch (Throwable e) {
@@ -254,8 +267,44 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @see gde.serial.IDeviceSerialPort#read(byte[], int, boolean)
 	 */
 	public byte[] read(byte[] readBuffer, int timeout_msec, boolean checkFailedQuery) throws IOException, FailedQueryException, TimeOutException {
-		log.log(Level.WARNING, "read() not supported in simulation");
-		return new byte[0];
+		byte[] resultBuffer = new byte[0];
+		try {
+			wait4Bytes(1000);
+		}
+		catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (this.isConnected) {
+			if (this.fileType.equals(GDE.FILE_ENDING_STAR_TXT)) {
+				String line;
+				if ((line = txt_in.readLine()) != null) {
+					while (!line.contains("[<]") && (line = txt_in.readLine()) != null)
+						;
+
+					//System.out.println(line);
+					if (line != null && line.contains("[<]")) {
+						line = line.substring(line.indexOf("[<]") + 19);
+						StringTokenizer token = new StringTokenizer(line);
+						StringBuffer sb = new StringBuffer();
+						while (token.hasMoreElements()) {
+							sb.append(token.nextToken());
+						}
+						//System.out.println(sb.toString());
+						resultBuffer = StringHelper.convert2ByteArray(sb.toString());
+						System.arraycopy(resultBuffer, 0, readBuffer, 0, resultBuffer.length < readBuffer.length ? resultBuffer.length : readBuffer.length);
+					}
+					else { // WARNING, assume time out
+						if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, $CLASS_NAME, "read()", "delay " + timeout_msec);
+						WaitTimer.delay(timeout_msec);
+						throw new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { "*", timeout_msec })); //$NON-NLS-1$ 
+					}
+				}
+				else
+					this.close();
+			}
+		}
+		return readBuffer;
 	}
 
 	/* (non-Javadoc)
@@ -451,7 +500,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @throws IOException
 	 */
 	public void write(byte[] writeBuffer) throws IOException {
-		log.log(Level.WARNING, "write() not supported in simulation");
+		//log.log(Level.WARNING, "write() not supported in simulation");
 	}
 
 	/**
