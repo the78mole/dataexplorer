@@ -1023,7 +1023,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
-		if ((recordKeys.length - fileRecordsProperties.length) == 6) { //delta motor driver properties
+		if ((recordKeys.length - fileRecordsProperties.length) > 0 ) { //delta events  //delta motor driver properties
 				int i = 0;
 				for (; i < fileRecordsProperties.length; ++i) {
 					cleanedRecordNames.add(recordKeys[i]);
@@ -1035,6 +1035,5 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			recordKeys = cleanedRecordNames.toArray(new String[1]);
 		}
 		return recordKeys;
-
 	}
 }

@@ -1111,8 +1111,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public boolean isGPSCoordinates(Record record) {
-		//0=RXSQ, 1=Latitude, 2=Longitude
-		return record.getOrdinal() == 1 || record.getOrdinal() == 2;
+		if (this.application.getActiveChannelNumber() == 3) {
+			//0=RXSQ, 1=Latitude, 2=Longitude
+			return record.getOrdinal() == 1 || record.getOrdinal() == 2;
+		}
+		return false;
 	}
 		
 	/**
@@ -1202,5 +1205,32 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public CTabItem getUtilityDeviceTabItem() {
 		return new FileTransferTabItem(this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount(), this, this.serialPort);
+	}
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	@Override
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
+		String[] recordKeys = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //events ...
+				int i = 0;
+				for (; i < fileRecordsProperties.length; ++i) {
+					cleanedRecordNames.add(recordKeys[i]);
+				}
+				//cleanup recordSet
+				for (; i < recordKeys.length; ++i) {
+					recordSet.remove(recordKeys[i]);
+				}
+			recordKeys = cleanedRecordNames.toArray(new String[1]);
+		}
+		return recordKeys;
 	}
 }
