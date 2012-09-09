@@ -82,7 +82,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static byte										ANSWER_SENSOR_GPS_19200						= (byte) (0xA0 & 0xFF);
 	final static byte										ANSWER_SENSOR_GENERAL_19200				= (byte) (0xD0 & 0xFF);
 	final static byte										ANSWER_SENSOR_ELECTRIC_19200			= (byte) (0xE0 & 0xFF);
-	final static byte										ANSWER_SENSOR_MOTOR_DRIVER_19200	= (byte) (0xE0 & 0xFF);
+	final static byte										ANSWER_SENSOR_MOTOR_DRIVER_19200	= (byte) (0xF0 & 0xFF);
 
 	//HoTT sensor bytes 115200 Baud protocol (actual no slave mode)
 	//there is no real slave mode for this protocol
