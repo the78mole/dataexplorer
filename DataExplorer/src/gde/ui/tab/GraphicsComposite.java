@@ -634,12 +634,13 @@ public class GraphicsComposite extends Composite {
 	}
 
 	/**
-	 * updates the graphics canvas, while repeatabel redraw calls it optimized to the required area
+	 * updates the graphics canvas, while repeatable redraw calls it optimized to the required area
 	 */
 	synchronized void doRedrawGraphics() {
 		this.graphicsHeader.redraw();
 		this.recordSetComment.redraw();
 		
+    //if (!GDE.IS_LINUX) { //old code changed due to Mountain Lion refresh problems
 		if (GDE.IS_WINDOWS || (GDE.IS_MAC && !GDE.IS_MAC_MOUNTAIN_LION)) {
 			//log.log(Level.OFF, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update");
 			Point size = this.graphicCanvas.getSize();
@@ -648,7 +649,7 @@ public class GraphicsComposite extends Composite {
 			this.graphicCanvas.redraw(5,size.y-5,5,5,true);
 			this.graphicCanvas.redraw(size.x-5,size.y-5,5,5,true);
 		}
-		else if (GDE.IS_MAC_MOUNTAIN_LION) {
+		else if (GDE.IS_MAC_MOUNTAIN_LION) { //added sending paint event directly
 			//log.log(Level.OFF, "this.graphicCanvas.notifyListeners(SWT.Paint, new Event()); // GDE.IS_MAC_MOUNTAIN_LION");
 			this.graphicCanvas.notifyListeners(SWT.Paint, new Event());
 		}
