@@ -1430,17 +1430,31 @@ public class Record extends Vector<Integer> {
 			int[] indexs = this.findBoundingIndexes(tmpTimeValue);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, tmpTimeValue + "; " + indexs[0] + "; " + indexs[1]); //$NON-NLS-1$ //$NON-NLS-2$
 			if (super.size() > 0) {
-				if (indexs[0] == indexs[1]) {
-					pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+				if (this.getDevice().isGPSCoordinates(this)) {
+					int grad0 = this.get(indexs[0])/1000000;
+					if (indexs[0] == indexs[1]) {
+						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - ((((grad0 + ((this.get(indexs[0])/1000000.0-grad0)/0.60)) * 1000.0) - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+					}
+					else {
+						int grad1 = this.get(indexs[1])/1000000;
+						double deltaValueY = (grad1 + ((this.get(indexs[1])/1000000.0-grad1)/0.60)) - (grad0 + ((this.get(indexs[0])/1000000.0-grad0)/0.60));
+						double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[1]) - this.parent.timeStep_ms.getTime_ms(indexs[0]);
+						double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deltyValueY = " + deltaValueY + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - ((((grad0 + ((this.get(indexs[0])/1000000.0-grad0)/0.60)) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor))	* this.displayScaleFactorValue).intValue();
+					}
 				}
 				else {
-					int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
-					double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[1])
-							- this.parent.timeStep_ms.getTime_ms(indexs[0]);
-					double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deltyValueY = " + deltaValueY + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					pointPosY = Double.valueOf(
-							this.parent.drawAreaBounds.height - (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue();
+					if (indexs[0] == indexs[1]) {
+						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+					}
+					else {
+						int deltaValueY = super.get(indexs[1]) - super.get(indexs[0]);
+						double deltaTimeIndex01 = this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[1]) - this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[1]) - this.parent.timeStep_ms.getTime_ms(indexs[0]);
+						double xPosDeltaTime2Index0 = tmpTimeValue - (this.timeStep_ms != null ? this.timeStep_ms.getTime_ms(indexs[0]) : this.parent.timeStep_ms.getTime_ms(indexs[0]));
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deltyValueY = " + deltaValueY + " deltaTime = " + deltaTimeIndex01 + " deltaTimeValue = " + xPosDeltaTime2Index0); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height - (((super.get(indexs[0]) + (xPosDeltaTime2Index0 / deltaTimeIndex01 * deltaValueY)) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue).intValue();
+					}
 				}
 			}
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, xPos + " -> timeValue = " + TimeLine.getFomatedTime(tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
