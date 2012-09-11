@@ -7,6 +7,7 @@ HoTTAdapter(2) - add support for motor driver (speed control)
 MAC OS Mountain Lion - fix refresh problem
 HoTTAdapter - fix Problem saving channel enable selection
 HoTTAdapter(2) - fix latitude/longitude curve display for data with full degree overflow
+HoTTAdapter(2) - fix GAM, EAM detection problem while only temperature sensor is connected
 
 Version 3.03 - 30 Jul 2012
 Refine import path including object selection, refine default import path handling for all device importing data
