@@ -205,7 +205,7 @@ public class GraphicsComposite extends Composite {
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "size changed, update " + GraphicsComposite.this.oldSize + " - " + size);
 					GraphicsComposite.this.oldSize = size;
 					setComponentBounds();
-					doRedrawGraphics();
+					//doRedrawGraphics();
 				}
 			}
 		});
@@ -327,7 +327,7 @@ public class GraphicsComposite extends Composite {
 			});
 			this.graphicCanvas.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					//if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "graphicCanvas.paintControl, event=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "graphicCanvas.paintControl, event=" + evt); //$NON-NLS-1$
 					//System.out.println("width = " + GraphicsComposite.this.getSize().x);
 					try {
 						drawAreaPaintControl(evt);
@@ -640,19 +640,20 @@ public class GraphicsComposite extends Composite {
 		this.graphicsHeader.redraw();
 		this.recordSetComment.redraw();
 		
-    //if (!GDE.IS_LINUX) { //old code changed due to Mountain Lion refresh problems
-		if (GDE.IS_WINDOWS || (GDE.IS_MAC && !GDE.IS_MAC_MOUNTAIN_LION)) {
-			//log.log(Level.OFF, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update");
+		setComponentBounds();
+    if (!GDE.IS_LINUX) { //old code changed due to Mountain Lion refresh problems
+		//if (GDE.IS_WINDOWS || (GDE.IS_MAC && !GDE.IS_MAC_MOUNTAIN_LION)) {
+			log.log(Level.OFF, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update");
 			Point size = this.graphicCanvas.getSize();
 			this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update
 			this.graphicCanvas.redraw(size.x-5,5,5,5,true);
 			this.graphicCanvas.redraw(5,size.y-5,5,5,true);
 			this.graphicCanvas.redraw(size.x-5,size.y-5,5,5,true);
 		}
-		else if (GDE.IS_MAC_MOUNTAIN_LION) { //added sending paint event directly
-			//log.log(Level.OFF, "this.graphicCanvas.notifyListeners(SWT.Paint, new Event()); // GDE.IS_MAC_MOUNTAIN_LION");
-			this.graphicCanvas.notifyListeners(SWT.Paint, new Event());
-		}
+//		else if (GDE.IS_MAC_MOUNTAIN_LION) { //added sending paint event directly
+//			//log.log(Level.OFF, "this.graphicCanvas.notifyListeners(SWT.Paint, new Event()); // GDE.IS_MAC_MOUNTAIN_LION");
+//			this.graphicCanvas.notifyListeners(SWT.Paint, new Event());
+//		}
 		else {
 			//log.log(Level.OFF, "this.graphicCanvas.redraw(); // do full update");
 			this.graphicCanvas.redraw(); // do full update
