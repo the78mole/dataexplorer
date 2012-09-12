@@ -136,7 +136,6 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 			this.dialog.resetButtons();
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 			GDE.display.asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					HoTTAdapter2LiveGatherer.this.application.getDeviceSelectionDialog().open();
 				}
@@ -444,7 +443,6 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 			finalizeRecordSet(tmpRecordSet);
 		}
 		GDE.display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				HoTTAdapter2LiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
 			}
