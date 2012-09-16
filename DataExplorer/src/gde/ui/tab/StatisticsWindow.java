@@ -388,7 +388,9 @@ public class StatisticsWindow extends CTabItem {
 								this.tabelItemText.set(0, this.tabelItemText.get(0) + (activeRecordSet.isTimeStepConstant() ? ", " : GDE.STRING_EMPTY) + measurementStatistics.getSumTriggerTimeText() + " = " + record.getTimeSumTriggeredRange());
 							}
 
-							int customColumnTextExtent = 15 + SWTResourceManager.getGC(this.dataTable.getDisplay()).textExtent(sb.substring(sb.lastIndexOf(DELIMITER) + 1)).x;
+							GC displayGC = new GC(this.dataTable.getDisplay());
+							int customColumnTextExtent = 15 + displayGC.textExtent(sb.substring(sb.lastIndexOf(DELIMITER) + 1)).x;
+							displayGC.dispose();
 							this.customTableColumnWidth = customColumnTextExtent > this.customTableColumnWidth ? customColumnTextExtent : this.customTableColumnWidth;
 
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, sb.toString());

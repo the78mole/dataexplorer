@@ -168,7 +168,7 @@ public class AnalogDisplay extends Composite {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "canvas size = " + this.width + " x " + this.height); //$NON-NLS-1$ //$NON-NLS-2$
 			// get the image and prepare GC
 			this.tachoImage = SWTResourceManager.getImage(this.width, this.height, this.recordKey);
-			this.tachoImageGC = SWTResourceManager.getGC(this.tachoImage);
+			this.tachoImageGC = new GC(this.tachoImage); //SWTResourceManager.getGC(this.tachoImage);
 			//clear image with background color
 			this.tachoImageGC.setBackground(this.backgroundColor);
 			this.tachoImageGC.fillRectangle(0, 0, this.width, this.height);
@@ -251,6 +251,7 @@ public class AnalogDisplay extends Composite {
 	
 				drawTachoNeedle(evt.gc, DataExplorer.COLOR_BLACK);
 			}
+			this.tachoImageGC.dispose();
 		}
 	}
 

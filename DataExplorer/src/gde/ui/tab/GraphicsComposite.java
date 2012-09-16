@@ -205,7 +205,7 @@ public class GraphicsComposite extends Composite {
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "size changed, update " + GraphicsComposite.this.oldSize + " - " + size);
 					GraphicsComposite.this.oldSize = size;
 					setComponentBounds();
-					//doRedrawGraphics();
+					doRedrawGraphics();
 				}
 			}
 		});
@@ -327,7 +327,7 @@ public class GraphicsComposite extends Composite {
 			});
 			this.graphicCanvas.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
-					if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "graphicCanvas.paintControl, event=" + evt); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "graphicCanvas.paintControl, event=" + evt); //$NON-NLS-1$
 					//System.out.println("width = " + GraphicsComposite.this.getSize().x);
 					try {
 						drawAreaPaintControl(evt);
@@ -391,12 +391,12 @@ public class GraphicsComposite extends Composite {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "canvas size = " + this.canvasBounds); //$NON-NLS-1$
 		
 		this.canvasImage = SWTResourceManager.getImage(this.canvasBounds.width, this.canvasBounds.height);
-		this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
+		this.canvasImageGC = new GC(this.canvasImage); //SWTResourceManager.getGC(this.canvasImage);
 		this.canvasImageGC.setBackground(this.surroundingBackground);
 		this.canvasImageGC.fillRectangle(this.canvasBounds);
 		this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		//get gc for other drawing operations
-		this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
+		this.canvasGC = new GC(this.graphicCanvas); //SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
 
 		RecordSet recordSet = null;
 		switch (this.windowType) {
@@ -434,6 +434,9 @@ public class GraphicsComposite extends Composite {
 		}
 		else
 			this.canvasGC.drawImage(this.canvasImage, 0,0);			
+		
+		this.canvasGC.dispose();
+		this.canvasImageGC.dispose();
 	}
 
 	/**
@@ -640,10 +643,9 @@ public class GraphicsComposite extends Composite {
 		this.graphicsHeader.redraw();
 		this.recordSetComment.redraw();
 		
-		setComponentBounds();
     if (!GDE.IS_LINUX) { //old code changed due to Mountain Lion refresh problems
 		//if (GDE.IS_WINDOWS || (GDE.IS_MAC && !GDE.IS_MAC_MOUNTAIN_LION)) {
-			log.log(Level.OFF, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update");
+    	if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update");
 			Point size = this.graphicCanvas.getSize();
 			this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update
 			this.graphicCanvas.redraw(size.x-5,5,5,5,true);
@@ -651,12 +653,13 @@ public class GraphicsComposite extends Composite {
 			this.graphicCanvas.redraw(size.x-5,size.y-5,5,5,true);
 		}
 //		else if (GDE.IS_MAC_MOUNTAIN_LION) { //added sending paint event directly
-//			//log.log(Level.OFF, "this.graphicCanvas.notifyListeners(SWT.Paint, new Event()); // GDE.IS_MAC_MOUNTAIN_LION");
-//			this.graphicCanvas.notifyListeners(SWT.Paint, new Event());
+//			 Rectangle rect = this.graphicCanvas.getBounds();
+//			 log.log(Level.FINER, "this.graphicCanvas.redraw(" + rect + "); // GDE.IS_MAC_MOUNTAIN_LION");
+//			this.graphicCanvas.redraw(rect.x, rect.y, rect.width, rect.height, true);
 //		}
 		else {
-			//log.log(Level.OFF, "this.graphicCanvas.redraw(); // do full update");
-			this.graphicCanvas.redraw(); // do full update
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(); // do full update where required");
+			this.graphicCanvas.redraw(); // do full update where required
 		}
 	}
 
@@ -677,6 +680,7 @@ public class GraphicsComposite extends Composite {
 		Record record = recordSet.get(measureRecordKey);
 
 		// set the gc properties
+		this.canvasGC = new GC(this.graphicCanvas);
 		this.canvasGC.setLineWidth(1);
 		this.canvasGC.setLineStyle(SWT.LINE_DASH);
 		this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
@@ -721,6 +725,7 @@ public class GraphicsComposite extends Composite {
 						record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }
 			));
 		}
+		this.canvasGC.dispose();
 	}
 
 	/**
@@ -837,6 +842,10 @@ public class GraphicsComposite extends Composite {
 	 */
 	public void cleanMeasurementPointer() {
 		try {
+			boolean isGCset = false;
+			if (this.canvasGC != null && this.canvasGC.isDisposed()) {
+				this.canvasGC = new GC(this.graphicCanvas);
+			}
 			if ((this.xPosMeasure != 0 && (this.xPosMeasure < this.offSetX || this.xPosMeasure > this.offSetX + this.curveAreaBounds.width))
 					|| (this.yPosMeasure != 0 && (this.yPosMeasure < this.offSetY || this.yPosMeasure > this.offSetY + this.curveAreaBounds.height))
 					|| (this.xPosDelta != 0 && (this.xPosDelta < this.offSetX || this.xPosDelta > this.offSetX + this.curveAreaBounds.width))
@@ -855,6 +864,7 @@ public class GraphicsComposite extends Composite {
 					cleanConnectingLineObsoleteRectangle();
 				}
 			}
+			if (isGCset) this.canvasGC.dispose();
 		}
 		catch (RuntimeException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
@@ -874,6 +884,7 @@ public class GraphicsComposite extends Composite {
 		boolean isGraphicsWindow = this.windowType == GraphicsWindow.TYPE_NORMAL;
 		if (isGraphicsWindow) {
 			// set the gc properties
+			this.canvasGC = new GC(this.graphicCanvas);
 			this.canvasGC.setLineWidth(1);
 			this.canvasGC.setLineStyle(SWT.LINE_SOLID);
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
@@ -900,6 +911,7 @@ public class GraphicsComposite extends Composite {
 				cleanCutPointer();
 			}
 		}
+		this.canvasGC.dispose();
 	}
 
 	/**
@@ -1034,6 +1046,7 @@ public class GraphicsComposite extends Composite {
 		if (activeChannel != null) {
 			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet() : this.application.getCompareSet();
 			if (recordSet != null && this.canvasImage != null) {
+				this.canvasGC = new GC(this.graphicCanvas);
 				Point point = checkCurveBounds(evt.x, evt.y);
 				evt.x = point.x;
 				evt.y = point.y;
@@ -1243,6 +1256,7 @@ public class GraphicsComposite extends Composite {
 				else {
 					this.graphicCanvas.setCursor(this.application.getCursor());
 				}
+				this.canvasGC.dispose();
 			}
 		}
 	}
@@ -1512,11 +1526,11 @@ public class GraphicsComposite extends Composite {
 				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 				if (activeRecordSet != null) {
 					this.canvasImage = SWTResourceManager.getImage(this.canvasBounds.width, this.canvasBounds.height);
-					this.canvasImageGC = SWTResourceManager.getGC(this.canvasImage);
+					this.canvasImageGC = new GC(this.canvasImage); //SWTResourceManager.getGC(this.canvasImage);
 					this.canvasImageGC.setBackground(this.surroundingBackground);
 					this.canvasImageGC.fillRectangle(this.canvasBounds);
 					this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.canvasGC = SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
+					this.canvasGC = new GC(this.graphicCanvas); //SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
 					drawCurves(activeRecordSet, this.canvasBounds, this.canvasImageGC);
 					graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
 					GC graphicsGC = new GC(graphicsImage);
@@ -1533,6 +1547,8 @@ public class GraphicsComposite extends Composite {
 					}
 					graphicsGC.drawImage(this.canvasImage, 0, 30);
 					graphicsGC.dispose();
+					this.canvasGC.dispose();
+					this.canvasImageGC.dispose();
 				}
 			}
 		}

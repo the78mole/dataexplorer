@@ -36,7 +36,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Pattern;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Canvas;
+//import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -539,33 +539,33 @@ public class SWTResourceManager {
 		}
 	}
 
-	public static GC getGC(Image img) {
-		String name = "GC_IMAGE:" + img.hashCode(); //$NON-NLS-1$
-		if (resources.containsKey(name))
-			return (GC) resources.get(name);
-		GC gc = new GC(img);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new GC created = " + name); //$NON-NLS-1$
-		resources.put(name, gc);
-		return gc;
-	}
-
-	public static GC getGC(Display display) {
-		String name = "GC_IMAGE:" + display.hashCode(); //$NON-NLS-1$
-		if (resources.containsKey(name))
-			return (GC) resources.get(name);
-		GC gc = new GC(display);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new GC created = " + name); //$NON-NLS-1$
-		resources.put(name, gc);
-		return gc;
-	}
-	
-	public static GC getGC(Canvas canvas, String descriptorKey) {
-		String name = "GC_CANVAS:" + descriptorKey; //$NON-NLS-1$
-		if (resources.containsKey(name))
-			return (GC) resources.get(name);
-		GC gc = new GC(canvas);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new GC created = " + name); //$NON-NLS-1$
-		resources.put(name, gc);
-		return gc;
-	}
+//	public static GC getGC(Image img) {
+//		String name = "GC_IMAGE:" + img.hashCode(); //$NON-NLS-1$
+//		if (resources.containsKey(name))
+//			return (GC) resources.get(name);
+//		GC gc = new GC(img);
+//		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new GC created = " + name); //$NON-NLS-1$
+//		resources.put(name, gc);
+//		return gc;
+//	}
+//
+//	public static GC getGC(Display display) {
+//		String name = "GC_IMAGE:" + display.hashCode(); //$NON-NLS-1$
+//		if (resources.containsKey(name))
+//			return (GC) resources.get(name);
+//		GC gc = new GC(display);
+//		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new GC created = " + name); //$NON-NLS-1$
+//		resources.put(name, gc);
+//		return gc;
+//	}
+//	
+//	public static GC getGC(Canvas canvas, String descriptorKey) {
+//		String name = "GC_CANVAS:" + descriptorKey; //$NON-NLS-1$
+//		if (resources.containsKey(name))
+//			return (GC) resources.get(name);
+//		GC gc = new GC(canvas);
+//		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new GC created = " + name); //$NON-NLS-1$
+//		resources.put(name, gc);
+//		return gc;
+//	}
 }

@@ -234,7 +234,7 @@ public class CellVoltageDisplay extends Composite {
 		Rectangle rect = this.cellCanvas.getClientArea();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cellCanvas.getBounds = " + rect); //$NON-NLS-1$
 		// using hashCode and size as qualifier will re-use the GC if only voltage values changed
-		GC gc = SWTResourceManager.getGC(this.cellCanvas, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
+		GC gc = new GC(this.cellCanvas); //SWTResourceManager.getGC(this.cellCanvas, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.cellCanvas.hashCode() + "_" + rect.width + "_" + rect.height); //$NON-NLS-1$ //$NON-NLS-2$
 		Point topHeight = calculateBarGraph(rect);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, valueText + " redraw "+ ", " + topHeight.x + " -> " + topHeight.y); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -268,6 +268,8 @@ public class CellVoltageDisplay extends Composite {
 		gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		gc.drawLine(1, topHeight.x, rect.width-1, topHeight.x);
 		gc.drawRectangle(0, 0, rect.width, rect.height+topHeight.x);
+		
+		gc.dispose();
 	}
 
 	/**

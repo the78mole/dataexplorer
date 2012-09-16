@@ -169,7 +169,7 @@ public class GraphicsUtils {
 
 		Point pt = gc.textExtent(string); // string dimensions
 		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y);
-		GC stringGc = SWTResourceManager.getGC(stringImage);
+		GC stringGc = new GC(stringImage); //SWTResourceManager.getGC(stringImage);
 		stringGc.setForeground(gc.getForeground());
 		stringGc.setBackground(gc.getBackground());
 		stringGc.setFont(gc.getFont());
@@ -183,6 +183,7 @@ public class GraphicsUtils {
 		else { // draw the image vertically onto the original GC	
 			drawVerticalImage(stringImage, x, y - pt.x / 2, gc, style, string+(gc.getBackground().getRGB().toString()));
 		}
+		stringGc.dispose();
 	}
 
 	/**
@@ -200,7 +201,7 @@ public class GraphicsUtils {
 	
 		Point pt = gc.textExtent(string); // string dimensions
 		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y);
-		GC stringGc = SWTResourceManager.getGC(stringImage);
+		GC stringGc = new GC(stringImage); //SWTResourceManager.getGC(stringImage);
 		stringGc.setForeground(gc.getForeground());
 		stringGc.setBackground(gc.getBackground());
 		stringGc.setFont(gc.getFont());
@@ -214,6 +215,7 @@ public class GraphicsUtils {
 		else { // draw the image vertically onto the original GC			
 			drawVerticalImage(stringImage, x, y, gc, style, string);
 		}
+		stringGc.dispose();
 	}
 
 	/**
@@ -231,7 +233,7 @@ public class GraphicsUtils {
 
 		Point pt = gc.textExtent(string); // string dimensions
 		Image stringImage = SWTResourceManager.getImage(pt.x, pt.y);
-		GC stringGc = SWTResourceManager.getGC(stringImage);
+		GC stringGc = new GC(stringImage); //SWTResourceManager.getGC(stringImage);
 		stringGc.setForeground(gc.getForeground());
 		stringGc.setBackground(gc.getBackground());
 		stringGc.setFont(gc.getFont());
@@ -252,6 +254,7 @@ public class GraphicsUtils {
 		else { // draw the image vertically onto the original GC
 			drawVerticalImage(stringImage, x, y - pt.x / 2, gc, style, string);
 		}
+		stringGc.dispose();
 	}
 
 	/**
