@@ -52,8 +52,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -75,9 +73,7 @@ public class TestSuperClass extends TestCase {
 
 	final TimeLine												timeLine		= new TimeLine();
 	Image																	curveArea;
-	GC																		curveAreaGC;
 	Rectangle															curveAreaBounds;
-	GC																		canvasGC;
 	int																		offSetX, offSetY;
 
 	TreeMap<String, DeviceConfiguration>	deviceConfigurations;
@@ -123,9 +119,6 @@ public class TestSuperClass extends TestCase {
 		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
 		this.legacyDeviceNames.put("QuadroControl", "QC-Copter");
 		this.legacyDeviceNames.put("PichlerP60", "PichlerP60 50W");
-
-		Canvas canvas = new Canvas(new Composite(Display.getDefault().getShells()[0], SWT.NONE), SWT.NONE);
-		this.canvasGC = SWTResourceManager.getGC(canvas, "curveArea_" + 0); //$NON-NLS-1$
 	}
 
 	/**
@@ -241,7 +234,7 @@ public class TestSuperClass extends TestCase {
 	protected void drawCurves(RecordSet recordSet, int maxX, int maxY) {
 		// get the image and prepare GC
 		this.curveArea = SWTResourceManager.getImage(maxX, maxY);
-		GC gc = this.curveAreaGC = SWTResourceManager.getGC(this.curveArea);
+		GC gc = new GC(this.curveArea); //SWTResourceManager.getGC(this.curveArea);
 		Rectangle bounds = new Rectangle(0, 0, maxX, maxY);
 			
 		//prepare time scale
@@ -341,7 +334,7 @@ public class TestSuperClass extends TestCase {
 				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth);
 
 			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
-				drawCurveGrid(recordSet, this.curveAreaGC, this.offSetY, width, this.settings.getGridDashStyle());
+				drawCurveGrid(recordSet, gc, this.offSetY, width, this.settings.getGridDashStyle());
 
 			if (isActualRecordEnabled) {
 				//gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
@@ -360,6 +353,7 @@ public class TestSuperClass extends TestCase {
 			gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_RED));
 			gc.drawText(strStartTime, 10, yPosition - point.y / 2);
 		}
+		gc.dispose();
 	}
 
 	/**
