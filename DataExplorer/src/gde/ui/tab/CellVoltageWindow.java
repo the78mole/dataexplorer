@@ -207,7 +207,7 @@ public class CellVoltageWindow extends CTabItem {
 			{
 				RowData liPoButtonLData = new RowData();
 				liPoButtonLData.width = 70;
-				liPoButtonLData.height = 20;
+				liPoButtonLData.height = 18;
 				this.liPoButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liPoButton.setLayoutData(liPoButtonLData);
 				this.liPoButton.setBackground(this.surroundingBackground);
