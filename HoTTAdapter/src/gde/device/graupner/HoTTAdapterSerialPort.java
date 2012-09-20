@@ -1172,6 +1172,9 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				break;
 			default:
 			case MC_20:
+				modelNameLength = 10;
+				startIndex = 177+12;
+				break;
 			case MX_20:
 				modelNameLength = 10;
 				startIndex = 177;
