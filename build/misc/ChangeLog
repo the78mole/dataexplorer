@@ -1,13 +1,14 @@
 Development history / change log, please read from bottom up
 
-Version 3.04 - xx yyy 2012
+Version 3.04 - 21 Sep 2012
 JLog2 - establish workaround for maximum recording time of 54 minutes, accept all follow on measurements with a default time step
 HoTTAdapter(2) - add filter methods for receiver data
 HoTTAdapter(2) - add support for motor driver (speed control)
-MAC OS Mountain Lion - fix refresh problem
+MAC OS Mountain Lion - fix graphics refresh problem
 HoTTAdapter - fix Problem saving channel enable selection
 HoTTAdapter(2) - fix latitude/longitude curve display for data with full degree overflow
 HoTTAdapter(2) - fix GAM, EAM detection problem while only temperature sensor is connected
+HoTTAdapter(2) - correct names mc-20 model memory backup
 
 Version 3.03 - 30 Jul 2012
 Refine import path including object selection, refine default import path handling for all device importing data
