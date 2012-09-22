@@ -1,17 +1,13 @@
-GNU DataExplorer - News - comes with version 3.01
+GNU DataExplorer - News - comes with version 3.04
 
-1)	fix scale synchronization problem while change zoom
-2)	fix problem zoomed graphics versus table view with lazy update
-3)	fix record length created by regression calculation
-4)	fix problem synchronizing record scales for records with different measurement factors
-5)	JLog2 - correct measurement names, and units
-6)	Jlog2 - fix configuration 
-7)	Jlog2 - fix time step error
-8)	HoTTAdapter(2) - enable GPS data filter access in device dialog
-9)	HoTTAdapter - add channel configuration to display channel data
-10)	update Linux cp210x kernel module for kernel 3.2.0.24
-11)	documentation update
-
+1) JLog2 - establish workaround for maximum recording time of 54 minutes, accept all follow on measurements with a default time step
+2) HoTTAdapter(2) - add filter methods for receiver data
+3) HoTTAdapter(2) - add support for motor driver (speed control)
+4) MAC OS Mountain Lion - fix graphics refresh problem
+5) HoTTAdapter - fix Problem saving channel enable selection
+6) HoTTAdapter(2) - fix latitude/longitude curve display for data with even degree value overflow
+7) HoTTAdapter(2) - fix GAM, EAM detection problem while only temperature sensor is connected
+8) HoTTAdapter(2) - correct names while processing mc-20 model memory backup 
 
 
 
