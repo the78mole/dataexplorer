@@ -102,7 +102,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
 		HoTTbinReader2.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReader2.points[2] = 100000;
-		HoTTbinReader.pointsGeneral = HoTTbinReader.pointsElectric = HoTTbinReader.pointsMotorDriver = HoTTbinReader.pointsVario = HoTTbinReader.pointsGPS = HoTTbinReader2.points;
+		HoTTbinReader.pointsChannel = HoTTbinReader.pointsGeneral = HoTTbinReader.pointsElectric = HoTTbinReader.pointsMotorDriver = HoTTbinReader.pointsVario = HoTTbinReader.pointsGPS = HoTTbinReader2.points;
 		HoTTbinReader.timeStep_ms = 0;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		HoTTbinReader.buf0 = null;
@@ -332,19 +332,20 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader.timeStep_ms += 10;
 				}
 
-				if (menuToolBar != null && i % (numberDatablocks / 4) == 0) {
-					if (!isInitialSwitched) {
-						HoTTbinReader.channels.switchChannel(channel.getName());
-						device.updateVisibilityStatus(channel.getActiveRecordSet(), true);
-						channel.switchRecordSet(recordSetName);
-						isInitialSwitched = true;
-					}
-					else
-						HoTTbinReader.application.updateAllTabs(false);
-
-					if (HoTTbinReader2.logger.isLoggable(Level.TIME))
-						HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-				}
+				//remove this update cycle due to performance reasons and statistics calculations (trigger ranges)
+				//if (menuToolBar != null && (i > 0 && i % (numberDatablocks / 4) == 0)) {
+				//	if (!isInitialSwitched) {
+				//		HoTTbinReader.channels.switchChannel(channel.getName());
+				//		channel.switchRecordSet(recordSetName);
+				//		device.updateVisibilityStatus(channel.getActiveRecordSet(), true);
+				//		isInitialSwitched = true;
+				//	}
+				//	else
+				//		HoTTbinReader.application.updateAllTabs(false);
+				//
+				//	if (HoTTbinReader2.logger.isLoggable(Level.TIME))
+				//		HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+				//}
 			}
 			HoTTbinReader2.logger.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
@@ -362,7 +363,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
 
-				HoTTbinReader.application.updateAllTabs(false);
+				HoTTbinReader.application.updateAllTabs(true);
 				HoTTbinReader.application.setProgress(100, sThreadId);
 			}
 		}
@@ -416,6 +417,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader.pointsVario = new int[HoTTbinReader2.points.length];
 		HoTTbinReader.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[HoTTbinReader2.points.length];
+		HoTTbinReader.pointsChannel = new int[HoTTbinReader2.points.length];
 		HoTTbinReader.timeStep_ms = 0;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		HoTTbinReader.buf0 = new byte[30];
@@ -609,19 +611,20 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader.timeStep_ms += 10;
 				}
 
-				if (menuToolBar != null && i % (numberDatablocks / 4) == 0) {
-					if (!isInitialSwitched) {
-						HoTTbinReader.channels.switchChannel(channel.getName());
-						device.updateVisibilityStatus(channel.getActiveRecordSet(), true);
-						channel.switchRecordSet(recordSetName);
-						isInitialSwitched = true;
-					}
-					else
-						HoTTbinReader.application.updateAllTabs(false);
-
-					if (HoTTbinReader2.logger.isLoggable(Level.TIME))
-						HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-				}
+				//remove this update cycle due to performance reasons and statistics calculations (trigger ranges)
+				//if (menuToolBar != null && (i > 0 && i % (numberDatablocks / 4) == 0)) {
+				//	if (!isInitialSwitched) {
+				//		HoTTbinReader.channels.switchChannel(channel.getName());
+				//		channel.switchRecordSet(recordSetName);
+				//		device.updateVisibilityStatus(channel.getActiveRecordSet(), true);
+				//		isInitialSwitched = true;
+				//	}
+				//	else
+				//		HoTTbinReader.application.updateAllTabs(false);
+				//
+				//	if (HoTTbinReader2.logger.isLoggable(Level.TIME))
+				//		HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+				//}
 			}
 			HoTTbinReader2.logger.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
@@ -871,10 +874,10 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.pointsGeneral[9] = (DataParser.parse2UnsignedShort(_buf3, 2) - 30000) * 10;
 			HoTTbinReader2.pointsGeneral[10] = HoTTbinReader.tmpClimb3 * 1000;
 			HoTTbinReader2.pointsGeneral[30] = DataParser.parse2Short(_buf2, 6) * 1000;
-			HoTTbinReader2.pointsGeneral[31] = HoTTbinReader.tmpVoltage1 * 1000;
-			HoTTbinReader2.pointsGeneral[32] = HoTTbinReader.tmpVoltage2 * 1000;
-			HoTTbinReader2.pointsGeneral[33] = ((_buf2[3] & 0xFF) + 20) * 1000;
-			HoTTbinReader2.pointsGeneral[34] = ((_buf2[4] & 0xFF) + 20) * 1000;
+			HoTTbinReader2.pointsGeneral[31] = HoTTbinReader.tmpVoltage1 * 100;
+			HoTTbinReader2.pointsGeneral[32] = HoTTbinReader.tmpVoltage2 * 100;
+			HoTTbinReader2.pointsGeneral[33] = ((_buf2[3] & 0xFF) - 20) * 1000;
+			HoTTbinReader2.pointsGeneral[34] = ((_buf2[4] & 0xFF) - 20) * 1000;
 		}
 	}
 
@@ -923,10 +926,10 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.pointsElectric[8] = HoTTbinReader.tmpHeight * 1000;
 			HoTTbinReader2.pointsElectric[9] = (DataParser.parse2UnsignedShort(_buf4, 1) - 30000) * 10;
 			HoTTbinReader2.pointsElectric[10] = HoTTbinReader.tmpClimb3 * 1000;
-			HoTTbinReader2.pointsElectric[54] = HoTTbinReader.tmpVoltage1 * 1000;
-			HoTTbinReader2.pointsElectric[55] = HoTTbinReader.tmpVoltage2 * 1000;
-			HoTTbinReader2.pointsElectric[56] = ((_buf3[1] & 0xFF) + 20) * 1000;
-			HoTTbinReader2.pointsElectric[57] = ((_buf3[2] & 0xFF) + 20) * 1000;
+			HoTTbinReader2.pointsElectric[54] = HoTTbinReader.tmpVoltage1 * 100;
+			HoTTbinReader2.pointsElectric[55] = HoTTbinReader.tmpVoltage2 * 100;
+			HoTTbinReader2.pointsElectric[56] = ((_buf3[1] & 0xFF) - 20) * 1000;
+			HoTTbinReader2.pointsElectric[57] = ((_buf3[2] & 0xFF) - 20) * 1000;
 		}
 	}
 

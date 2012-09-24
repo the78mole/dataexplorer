@@ -31,7 +31,7 @@
         <timeUnit>msec</timeUnit>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredDataLocation>G:\LogData</preferredDataLocation>
+        <preferredDataLocation></preferredDataLocation>
         <preferredFileExtention>*.bin</preferredFileExtention>
     </DataBlock>
     <State>
@@ -264,13 +264,14 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Voltage</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
+                <statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
@@ -279,7 +280,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics sumTriggerTimeText="Motor runtime:" countTriggerText="Number climb flights" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
-                    <trigger comment="Current &gt; 3 A over &gt; 3 Seconds" minTimeSec="3" isGreater="true" level="3000"/>
+                    <trigger comment="Current &gt; 3 A over &gt; 5 Seconds" minTimeSec="5" isGreater="true" level="3000"/>
                 </statistics>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
@@ -296,7 +297,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="false" max="true" min="true"/>
+                <statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
@@ -448,6 +449,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
+                <statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="false"/>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
@@ -456,7 +458,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics sumTriggerTimeText="Motor runtime:" countTriggerText="Number climb flights" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
-                    <trigger comment="Current &gt; 3 A over &gt; 3 Seconds" minTimeSec="3" isGreater="true" level="3000"/>
+                    <trigger comment="Current &gt; 3 A over &gt; 5 Seconds" minTimeSec="5" isGreater="true" level="3000"/>
                 </statistics>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
@@ -861,7 +863,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
@@ -869,7 +871,9 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
+                <statistics sumTriggerTimeText="Motor runtime:" countTriggerText="Number climb flights" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
+                    <trigger comment="Current &gt; 3 A over &gt; 5 Seconds" minTimeSec="5" isGreater="true" level="3000"/>
+                </statistics>
                 <property description="Factor to a measured value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
@@ -877,6 +881,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -884,7 +889,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Related to current trigger range" triggerRefOrdinal="2" sigma="true" avg="true" max="true" min="true"/>
                 <property description="Factor to a measured value" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
