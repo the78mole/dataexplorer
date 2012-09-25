@@ -44,7 +44,6 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -102,7 +101,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="9" sigma="false" avg="false" max="true" min="true"/>
+                <statistics sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="9" triggerRefOrdinal="9" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 1</name>
@@ -575,7 +574,6 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -585,7 +583,7 @@
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Strenght</name>
+                <name>Strength</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
@@ -633,7 +631,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics countTriggerText="Ermittelt über Stromtrigger" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="19" sigma="false" avg="false" max="true" min="true"/>
+                <statistics ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug" ratioRefOrdinal="20" countTriggerText="Bezogen auf Stromtrigger" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="19" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 1</name>
@@ -708,7 +706,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics comment="Ermittelt über Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
@@ -726,7 +724,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Ermittelt über Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="false" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -734,7 +732,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Ermittelt über Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
@@ -803,7 +801,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="Ermittelt über Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -849,7 +847,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics comment="Ermittelt über Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -858,7 +856,7 @@
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
-                <statistics comment="Ermittelt über Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -867,7 +865,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics comment="Ermittelt über Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -876,7 +874,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="Ermittelt über Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="Bezogen auf Stromtrigger" triggerRefOrdinal="19" sigma="false" avg="true" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="21" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -1106,7 +1104,6 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -1116,7 +1113,7 @@
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Strenght</name>
+                <name>Strength</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
@@ -1164,7 +1161,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics countTriggerText="Ermittelt über Stromtrigger" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="36" sigma="false" avg="false" max="true" min="true"/>
+                <statistics ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug" ratioRefOrdinal="37" countTriggerText="Bezogen auf Stromtrigger" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="36" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 1</name>
@@ -1637,7 +1634,6 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -1929,6 +1925,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="false" max="true" min="true"/>
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
                 <property description="Skalasynchronisations Messwertreferenz als Zahl" type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -2322,7 +2319,6 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -2332,7 +2328,7 @@
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Strenght</name>
+                <name>Strength</name>
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
@@ -2380,7 +2376,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics countTriggerText="Ermittelt über Stromtrigger" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="59" sigma="false" avg="false" max="true" min="true"/>
+                <statistics  ratioText="Verbrauchte Kapazität/Höhenmeter Steigflug" ratioRefOrdinal="60" sumTriggerText="Summe Motorhöhe" sumByTriggerRefOrdinal="59" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Steigen 1</name>

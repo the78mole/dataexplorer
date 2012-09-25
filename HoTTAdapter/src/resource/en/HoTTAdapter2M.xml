@@ -44,7 +44,6 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -575,7 +574,6 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -633,7 +631,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics countTriggerText="Calculated within current trigger" sumTriggerText="Sum motor height" sumByTriggerRefOrdinal="19" sigma="false" avg="false" max="true" min="true"/>
+                <statistics ratioText="Used Capacity/Height climb meter" ratioRefOrdinal="20" sumTriggerText="Sum motor height" sumByTriggerRefOrdinal="19" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Climb 1</name>
@@ -1106,7 +1104,6 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -1164,7 +1161,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics countTriggerText="Calculated within current trigger" sumTriggerText="Sum motor climbs" sumByTriggerRefOrdinal="36" sigma="false" avg="false" max="true" min="true"/>
+                <statistics ratioText="Used Capacity/Height climb meter" ratioRefOrdinal="37" sumTriggerText="Sum motor climbs" sumByTriggerRefOrdinal="36" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Climb 1</name>
@@ -1637,7 +1634,6 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -2323,7 +2319,6 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>false</active>
-                <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -2381,7 +2376,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics countTriggerText="Calculated within current trigger" sumTriggerText="Sum motor climbs" sumByTriggerRefOrdinal="59" sigma="false" avg="false" max="true" min="true"/>
+                <statistics ratioText="Used Capacity/Height climb meter" ratioRefOrdinal="60" sumTriggerText="Sum motor climbs" sumByTriggerRefOrdinal="59" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>Climb 1</name>
