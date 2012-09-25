@@ -858,7 +858,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader2.pointsGeneral[18] = DataParser.parse2Short(_buf3, 7) * 1000;
-			HoTTbinReader2.pointsGeneral[19] = DataParser.parse2Short(_buf3, 5) * 1000;
+			//filter current drops to zero if current > 10 A
+			HoTTbinReader2.tmpCurrent = DataParser.parse2Short(_buf3, 5);
+			HoTTbinReader2.pointsGeneral[19] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsGeneral[19] > 10000 && (HoTTbinReader2.pointsGeneral[19] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsGeneral[19]) ? HoTTbinReader2.pointsGeneral[19] : HoTTbinReader2.tmpCurrent * 1000;
 			HoTTbinReader2.pointsGeneral[20] = HoTTbinReader.tmpCapacity * 1000;
 			HoTTbinReader2.pointsGeneral[21] = Double.valueOf(HoTTbinReader2.pointsGeneral[18] / 1000.0 * HoTTbinReader2.pointsGeneral[19]).intValue();
 			for (int j = 0; j < 6; j++) {
@@ -904,7 +906,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 			HoTTbinReader2.pointsElectric[35] = DataParser.parse2Short(_buf3, 7) * 1000;
-			HoTTbinReader2.pointsElectric[36] = DataParser.parse2Short(_buf3, 5) * 1000;
+			//filter current drops to zero if current > 10 A
+			HoTTbinReader2.tmpCurrent = DataParser.parse2Short(_buf3, 5) * 1000;
+			HoTTbinReader2.pointsElectric[36] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsElectric[36] > 10000 && (HoTTbinReader2.pointsElectric[36] - HoTTbinReader2.tmpCurrent) == HoTTbinReader2.pointsElectric[36]) ? HoTTbinReader2.pointsElectric[36] : HoTTbinReader2.tmpCurrent * 1000;
 			HoTTbinReader2.pointsElectric[37] = HoTTbinReader.tmpCapacity * 1000;
 			HoTTbinReader2.pointsElectric[38] = Double.valueOf(HoTTbinReader2.pointsElectric[35] / 1000.0 * HoTTbinReader2.pointsElectric[36]).intValue(); // power U*I [W];
 			for (int j = 0; j < 7; j++) {
@@ -998,7 +1002,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			//78=VoltageM, 79=CurrentM, 80=CapacityM, 81=PowerM, 82=RevolutionM, 83=TemperatureM
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > -1 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 1000) {
 				HoTTbinReader2.pointsMotorDriver[78] = HoTTbinReader.tmpVoltage * 1000;
-				HoTTbinReader2.pointsMotorDriver[79] = HoTTbinReader.tmpCurrent * 1000;
+				//filter current drops to zero if current > 10 A
+				HoTTbinReader2.pointsMotorDriver[79] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsMotorDriver[79] > 10000 && (HoTTbinReader2.pointsMotorDriver[79] - HoTTbinReader.tmpCurrent) == HoTTbinReader2.pointsMotorDriver[79]) ? HoTTbinReader2.pointsMotorDriver[79] : HoTTbinReader.tmpCurrent * 1000;
 				HoTTbinReader2.pointsMotorDriver[81] = Double.valueOf(HoTTbinReader2.pointsMotorDriver[78] / 1000.0 * HoTTbinReader2.pointsMotorDriver[79]).intValue();
 			}
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpRevolution > -1 && HoTTbinReader.tmpRevolution < 2000 && HoTTbinReader.tmpCapacity >= HoTTbinReader2.pointsMotorDriver[76] / 1000) { // && tmpTemperature > -20 && tmpTemperature < 150
@@ -1011,7 +1016,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			//58=VoltageM, 59=CurrentM, 60=CapacityM, 61=PowerM, 62=RevolutionM, 63=TemperatureM
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > -1 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 1000) {
 				HoTTbinReader2.pointsMotorDriver[58] = HoTTbinReader.tmpVoltage * 1000;
-				HoTTbinReader2.pointsMotorDriver[59] = HoTTbinReader.tmpCurrent * 1000;
+				//filter current drops to zero if current > 10 A
+				HoTTbinReader2.pointsMotorDriver[59] = (!HoTTAdapter.isFilterEnabled || HoTTbinReader2.pointsMotorDriver[59] > 10000 && (HoTTbinReader2.pointsMotorDriver[59] - HoTTbinReader.tmpCurrent) == HoTTbinReader2.pointsMotorDriver[59]) ? HoTTbinReader2.pointsMotorDriver[59] : HoTTbinReader.tmpCurrent * 1000;
 				HoTTbinReader2.pointsMotorDriver[61] = Double.valueOf(HoTTbinReader2.pointsMotorDriver[58] / 1000.0 * HoTTbinReader2.pointsMotorDriver[59]).intValue();
 			}
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpRevolution > -1 && HoTTbinReader.tmpRevolution < 2000 && HoTTbinReader.tmpCapacity >= HoTTbinReader2.pointsMotorDriver[60] / 1000) { // && tmpTemperature > -20 && tmpTemperature < 150
