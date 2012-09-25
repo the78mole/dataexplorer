@@ -2,6 +2,7 @@ Development history / change log, please read from bottom up
 
 Version 3.05 - xx yyy 2012
 HoTTAdapter(2) - correct device XMLs to support current related statistics (number motor climbs vs gained height)
+HottAdapter(2) - enable filter for current drops to zero above 10A (this hurts statistics calculation regarding trigger usage)
 
 Version 3.04 - 21 Sep 2012
 JLog2 - establish workaround for maximum recording time of 54 minutes, accept all follow on measurements with a default time step
