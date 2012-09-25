@@ -90,6 +90,8 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 		this.measurementsTabFolder = parent;
 		this.propsEditor = DevicePropertiesEditor.getInstance();
 		this.tabName = GDE.STRING_BLANK + (index + 1) + GDE.STRING_BLANK;
+		
+		SWTResourceManager.registerResourceUser(this);
 		initGUI();
 	}
 
@@ -104,6 +106,9 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 	 */
 	private MeasurementTypeTabItem(MeasurementTypeTabItem copyFrom) {
 		super(copyFrom.measurementsTabFolder, SWT.CLOSE);
+		
+		SWTResourceManager.registerResourceUser(this);
+
 		this.propsEditor = DevicePropertiesEditor.getInstance();
 		this.measurementsTabFolder = copyFrom.measurementsTabFolder;
 		this.measurementName = Messages.getString(MessageIds.GDE_MSGT0529);
@@ -175,10 +180,22 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 	/**
 	 * @param useDeviceConfig the deviceConfig to set
 	 */
+	public void setMeasurementTypeName(DeviceConfiguration useDeviceConfig, MeasurementType useMeasurementType, int useChannelConfigNumber) {
+		this.deviceConfig = useDeviceConfig;
+		this.measurementType = useMeasurementType;
+		this.channelConfigNumber = useChannelConfigNumber;
+
+		this.setText(GDE.STRING_BLANK + (this.measurementName = this.measurementType.getName()) + GDE.STRING_BLANK);
+	}
+
+	/**
+	 * @param useDeviceConfig the deviceConfig to set
+	 */
 	public void setMeasurementType(DeviceConfiguration useDeviceConfig, MeasurementType useMeasurementType, int useChannelConfigNumber) {
 		this.deviceConfig = useDeviceConfig;
 		this.measurementType = useMeasurementType;
 		this.channelConfigNumber = useChannelConfigNumber;
+		
 
 		this.measurementNameText.setText(this.measurementName = this.measurementType.getName());
 		this.measurementSymbolText.setText(this.measurementSymbol = this.measurementType.getSymbol());
@@ -253,27 +270,18 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 		}
 		//end properties
 		initialize();
-	}
-
-	public MeasurementTypeTabItem(CTabFolder parent, int style, int index, MeasurementType useMeasurementType) {
-		super(parent, style, index);
-		this.measurementsTabFolder = parent;
-		this.propsEditor = DevicePropertiesEditor.getInstance();
-		this.tabName = GDE.STRING_BLANK + (index + 1) + GDE.STRING_BLANK;
-		this.measurementType = useMeasurementType;
-		initGUI();
+		SWTResourceManager.listResourceStatus(this.getClass().getSimpleName()+".setMeasurementType()");
 	}
 
 	private void initGUI() {
 		try {
-			SWTResourceManager.registerResourceUser(this);
 			this.setText(this.tabName);
 			this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "measurementtypeTabItem.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					MeasurementTypeTabItem.this.enableContextMenu(false);
-					if (MeasurementTypeTabItem.this.propsEditor.deviceConfig != null) {
+					if (MeasurementTypeTabItem.this.propsEditor.deviceConfig != null && MeasurementTypeTabItem.this.propsEditor.deviceConfig.isChangePropery()) {
 						MeasurementTypeTabItem.this.propsEditor.enableSaveButton(true);
 					}
 				}
@@ -421,42 +429,6 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 				{
 					this.channelConfigMeasurementPropertiesTabFolder = new CTabFolder(this.measurementsComposite, SWT.BORDER);
 					this.channelConfigMeasurementPropertiesTabFolder.setBounds(237, 0, 379 + 45, 199 + 30 + 15);
-					//this.channelConfigMeasurementPropertiesTabFolder.setMenu(this.popupMenu);
-					{
-						createStatisticsTabItem();
-					}
-					{
-						createMeasurementPropertyTabItemWithSubTabFolder();
-						if (this.measurementType != null) {
-							for (PropertyType tmpPropertyType : this.measurementType.getProperty()) {
-								createMeasurementPropertyTabItem(tmpPropertyType.getName());
-								//createMeasurementPropertyTabItem(MeasurementPropertyTypes.OFFSET.value());
-								//createMeasurementPropertyTabItem(MeasurementPropertyTypes.FACTOR.value());
-								//createMeasurementPropertyTabItem(MeasurementPropertyTypes.REDUCTION.value());
-							}
-						}
-						this.measurementPropertiesTabFolder.setSelection(0);
-						this.measurementPropertiesTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
-							@Override
-							public void restore(CTabFolderEvent evt) {
-								log.log(java.util.logging.Level.FINE, "measurementsPropertiesTabFolder.restore, event=" + evt); //$NON-NLS-1$
-								((CTabItem) evt.item).getControl();
-							}
-
-							@Override
-							public void close(CTabFolderEvent evt) {
-								log.log(java.util.logging.Level.FINE, "measurementsPropertiesTabFolder.close, event=" + evt); //$NON-NLS-1$
-								//a measurement property gets removed
-								PropertyTypeTabItem tabItem = ((PropertyTypeTabItem) evt.item);
-								if (MeasurementTypeTabItem.this.deviceConfig != null) {
-									MeasurementTypeTabItem.this.measurementType.getProperty().remove(tabItem.propertyType);
-									MeasurementTypeTabItem.this.deviceConfig.setChangePropery(true);
-									MeasurementTypeTabItem.this.propsEditor.enableSaveButton(true);
-								}
-								tabItem.dispose();
-							}
-						});
-					}
 					this.channelConfigMeasurementPropertiesTabFolder.setSelection(0);
 					this.channelConfigMeasurementPropertiesTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
 						@Override

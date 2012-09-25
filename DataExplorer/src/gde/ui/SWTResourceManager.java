@@ -118,9 +118,9 @@ public class SWTResourceManager {
 //		}
 //	}
 	
-	public static void listResourceStatus() {
+	public static void listResourceStatus(String callIdentifier) {
 		Iterator<String> it = resources.keySet().iterator();
-		log.log(Level.WARNING, "number collected resources = " + resources.size());
+		log.log(Level.WARNING, callIdentifier + ": number collected resources = " + resources.size());
 		int numFonts = 0, numColors = 0, numImage = 0, numCursor = 0, numMenu = 0;
 		while (it.hasNext()) {
 			Object resource = resources.get(it.next());

@@ -37,6 +37,7 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -132,9 +133,10 @@ public class ChannelTypeTabItem extends CTabItem implements Cloneable {
 			}
 		}
 		this.measurementsTabFolder.getItem(measurementTypeCount - 1).setShowClose(true);
-		for (int i = 0; i < measurementTypeCount; i++) {
+		((MeasurementTypeTabItem) this.measurementsTabFolder.getItem(0)).setMeasurementType(this.deviceConfig, this.channelType.getMeasurement().get(0), this.channelConfigNumber);
+		for (int i = 1; i < measurementTypeCount; i++) {
 			MeasurementTypeTabItem measurementTabItem = (MeasurementTypeTabItem) this.measurementsTabFolder.getItem(i);
-			measurementTabItem.setMeasurementType(this.deviceConfig, this.channelType.getMeasurement().get(i), this.channelConfigNumber);
+			measurementTabItem.setMeasurementTypeName(this.deviceConfig, this.channelType.getMeasurement().get(i), this.channelConfigNumber);
 		}
 		((MeasurementTypeTabItem) this.measurementsTabFolder.getSelection()).enableContextMenu(true);
 		//MeasurementType end
@@ -159,14 +161,6 @@ public class ChannelTypeTabItem extends CTabItem implements Cloneable {
 			tmpMeasurementTypeTabItem.dispose();
 		}
 	}
-//	public ChannelTypeTabItem(CTabFolder parent, int style, int index, ChannelType useChannelType) {
-//		super(parent, style);
-//		this.channelConfigInnerTabFolder = parent;
-//		this.propsEditor = DevicePropertiesEditor.getInstance();
-//		this.tabName = GDE.STRING_BLANK + (index + 1) + GDE.STRING_BLANK;
-//		this.channelType = useChannelType;
-//		initGUI();
-//	}
 
 	@Override
 	public synchronized ChannelTypeTabItem clone() {
@@ -341,7 +335,13 @@ public class ChannelTypeTabItem extends CTabItem implements Cloneable {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "measurementsTabFolder.close, event=" + evt); //$NON-NLS-1$
-							((MeasurementTypeTabItem) ChannelTypeTabItem.this.measurementsTabFolder.getSelection()).enableContextMenu(true);
+							Display.getCurrent().asyncExec(new Runnable() {
+								public void run() {
+									MeasurementTypeTabItem tmpMeasurementTypeTabItem = (MeasurementTypeTabItem) ChannelTypeTabItem.this.measurementsTabFolder.getSelection();
+									tmpMeasurementTypeTabItem.setMeasurementType(tmpMeasurementTypeTabItem.deviceConfig, tmpMeasurementTypeTabItem.measurementType, tmpMeasurementTypeTabItem.channelConfigNumber);
+									tmpMeasurementTypeTabItem.enableContextMenu(true);
+								}
+							});
 						}
 					});
 				}

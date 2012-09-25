@@ -491,6 +491,7 @@ public class DevicePropertiesEditor extends Composite {
 					public void widgetSelected(SelectionEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 						DevicePropertiesEditor.this.getShell().dispose();
+						SWTResourceManager.listResourceStatus("DevicePropertiesEditor.close()");
 					}
 				});
 			}

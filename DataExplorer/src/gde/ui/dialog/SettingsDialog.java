@@ -846,7 +846,7 @@ public class SettingsDialog extends Dialog {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "resourceConsumptionButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-										SWTResourceManager.listResourceStatus();
+										SWTResourceManager.listResourceStatus(this.getClass().getSimpleName());
 									}
 								});
 							}

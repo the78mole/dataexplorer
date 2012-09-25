@@ -21,6 +21,7 @@ package gde.utils;
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
 import gde.device.DataTypes;
+import gde.io.DataParser;
 import gde.log.Level;
 
 import java.text.SimpleDateFormat;
@@ -662,6 +663,99 @@ public class StringHelper {
 			else  sb.append("0");
 		}
 		return sb.toString();
+	}
+	
+	/**
+	 * print memory area as integer representation
+	 * @param name
+	 * @param buffer
+	 * @param startIndex
+	 * @param _byte
+	 * @param width
+	 * @param count
+	 */
+	public static void printMemInt(String name, byte[] buffer, int startIndex, int _byte, int width, int count) {
+		System.out.println(String.format("%s 0x%04X", name, startIndex));
+		for (int i = 0; i < count; ++i) {
+			switch (_byte) {
+			case 1:
+				for (int j = 0; j < width; j++) {
+					System.out.print(String.format("%02d", buffer[startIndex]));
+					++startIndex;
+				}
+				break;
+			case 2:
+				for (int j = 0; j < width; j++) {
+					System.out.print(DataParser.parse2Short(buffer, startIndex));
+					startIndex += 2;
+				}
+				break;
+			}
+			System.out.print("; ");
+		}
+		System.out.println();
+	}
+	
+	/**
+	 * print memory area in hex representation
+	 * @param name
+	 * @param buffer
+	 * @param startIndex
+	 * @param _byte
+	 * @param width
+	 * @param count
+	 */
+	public static void printMemHex(String name, byte[] buffer, int startIndex, int _byte, int width, int count) {
+		System.out.println(String.format("%s 0x%04X", name, startIndex));
+		for (int i = 0; i < count; ++i) {
+			switch (_byte) {
+			case 1:
+				for (int j = 0; j < width; j++) {
+					System.out.print(String.format("%02x", buffer[startIndex]));
+					++startIndex;
+				}
+				break;
+			case 2:
+				for (int j = 0; j < width; j++) {
+					System.out.print(String.format("%02x%02x", buffer[startIndex], buffer[startIndex+1]));
+					startIndex += 2;
+				}
+				break;
+			}
+			System.out.print("; ");
+		}
+		System.out.println();
+	}
+	
+	/**
+	 * print memory area in character representation
+	 * @param name
+	 * @param buffer
+	 * @param startIndex
+	 * @param _byte
+	 * @param width
+	 * @param count
+	 */
+	public static void printMemChar(String name, byte[] buffer, int startIndex, int _byte, int width, int count) {
+		System.out.println(String.format("%s 0x%04X", name, startIndex));
+		for (int i = 0; i < count; ++i) {
+			switch (_byte) {
+			case 1:
+				for (int j = 0; j < width; j++) {
+					System.out.print(String.format("%c", buffer[startIndex]));
+					++startIndex;
+				}
+				break;
+			case 2:
+				for (int j = 0; j < width; j++) {
+					System.out.print(String.format("%c%c", buffer[startIndex], buffer[startIndex+1]));
+					startIndex += 2;
+				}
+				break;
+			}
+			System.out.print("; ");
+		}
+		System.out.println();
 	}
 
 }

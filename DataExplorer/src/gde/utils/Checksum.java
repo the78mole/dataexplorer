@@ -348,4 +348,15 @@ public class Checksum {
 		return value;
 	}
 
+	/**
+	 * calculate the CRC16CCITT of the given area and write to end address
+	 * @param bytes
+	 * @param start address
+	 * @param end address
+	 */
+	public static void calculateAndWrite(byte[] bytes, int start, int end) {
+		int checkSum = Checksum.CRC16CCITT(bytes, start, end - start);
+		bytes[end] = (byte) (checkSum & 0xFF);
+		bytes[end+1] = (byte) ((checkSum & 0xFF00) >> 8);
+	}
 }

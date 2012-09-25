@@ -84,7 +84,7 @@ public class StatisticsWindow extends CTabItem {
 	final int											extentFactor	= 8;																									// factor to calculate column width
 	RecordSet											oldRecordSet	= null;
 	int														oldNumberDisplayableRecords = 0;
-	final DataExplorer	application;
+	final DataExplorer						application;
 	final Channels								channels;
 	final Settings								settings;
 	final CTabFolder							tabFolder;
@@ -112,13 +112,6 @@ public class StatisticsWindow extends CTabItem {
 			this.composite.setLayout(null);
 			this.composite.setBackground(this.surroundingBackground);
 			this.composite.setMenu(this.popupmenu);			
-//			this.composite.addPaintListener(new PaintListener() {			
-//				@Override
-//				public void paintControl(PaintEvent evt) {
-//					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.paintControl " + evt); //$NON-NLS-1$
-//					StatisticsWindow.this.contextMenu.createMenu(StatisticsWindow.this.popupmenu);
-//				}
-//			});
 			this.composite.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
@@ -359,7 +352,7 @@ public class StatisticsWindow extends CTabItem {
 								// append ratio text + ratio value
 								if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
 									sb.append(measurementStatistics.getRatioText()).append(" = "); //$NON-NLS-1$
-									Record referencedRecord = activeRecordSet.get(measurementStatistics.getRatioRefOrdinal());
+									Record referencedRecord = activeRecordSet.get(measurementStatistics.getRatioRefOrdinal().intValue());
 									StatisticsType referencedStatistics = device.getMeasurementStatistic(activeChannel.getNumber(), measurementStatistics.getRatioRefOrdinal());
 
 									if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
