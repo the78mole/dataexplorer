@@ -785,7 +785,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				log.log(Level.FINE, "start data calculation for record = " + record.getName()); //$NON-NLS-1$
 			record.setDisplayable(false);
 			record.clear();
-			Record recordCurrent = recordSet.get(3); // 2=current
+			Record recordCurrent = recordSet.get(2); // 2=current
 			double timeStep_ms = recordCurrent.getAverageTimeStep_ms(); // timeStep_ms
 			Double capacity = 0.0;
 			for (int i = 0; i < recordCurrent.size(); i++) {
