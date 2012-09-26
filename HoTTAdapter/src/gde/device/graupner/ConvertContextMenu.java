@@ -52,20 +52,20 @@ public class ConvertContextMenu {
 				switch (transmiterCode) {
 				case MC_32:
 					ConvertContextMenu.this.convert2mc32.setEnabled(false);
-					ConvertContextMenu.this.convert2mc20.setEnabled(false);
-					ConvertContextMenu.this.convert2mx20.setEnabled(false);
+					ConvertContextMenu.this.convert2mc20.setEnabled(true);
+					ConvertContextMenu.this.convert2mx20.setEnabled(true);
 					ConvertContextMenu.this.convert2mx16.setEnabled(false);
 					ConvertContextMenu.this.convert2mx12.setEnabled(false);
 					break;
 				case MC_20:
-					ConvertContextMenu.this.convert2mc32.setEnabled(false);
+					ConvertContextMenu.this.convert2mc32.setEnabled(true);
 					ConvertContextMenu.this.convert2mc20.setEnabled(false);
 					ConvertContextMenu.this.convert2mx20.setEnabled(true);
 					ConvertContextMenu.this.convert2mx16.setEnabled(false);
 					ConvertContextMenu.this.convert2mx12.setEnabled(false);
 					break;
 				case MX_20:
-					ConvertContextMenu.this.convert2mc32.setEnabled(false);
+					ConvertContextMenu.this.convert2mc32.setEnabled(true);
 					ConvertContextMenu.this.convert2mc20.setEnabled(true);
 					ConvertContextMenu.this.convert2mx20.setEnabled(false);
 					ConvertContextMenu.this.convert2mx16.setEnabled(false);
