@@ -378,14 +378,14 @@ public enum Transmitter {
 		for (int i = 0; i < 2*12; i++) {
 			bytes[0x19AE + i] = (byte) 0xFF;
 		}
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x19AE", bytes, 0x19AE, 1, 2, 12);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x19AE", bytes, 0x19AE, 1, 4, 16);
 		calculateAndWriteCRC(bytes, 0x198A, 0x1AB6);
 
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1F59", bytes, 0x1F59, 1, 2, 4);
-		for (int i = 0; i < 2*4; i++) {
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1F59", bytes, 0x1F59, 1, 4, 16);
+		for (int i = 0; i < 16*4; i++) {
 			bytes[0x1F59 + i] = (byte) 0xFF;
 		}
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1F59", bytes, 0x1F59, 1, 2, 4);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1F59", bytes, 0x1F59, 1, 2, 8);
 		calculateAndWriteCRC(bytes, 0x1EE9, 0x1F99);
 
 		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x2482", bytes, 0x2482, 1, 2, 1);
