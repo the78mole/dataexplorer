@@ -67,14 +67,14 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name> Tx</name>
+                <name>Tx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name> Rx</name>
+                <name>Rx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -174,7 +174,7 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Spannung G </name>
+                <name>Spannung G</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -182,7 +182,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Strom G </name>
+                <name>Strom G</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -190,7 +190,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Kapazität G </name>
+                <name>Kapazität G</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
@@ -198,7 +198,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Leistung G </name>
+                <name>Leistung G</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
@@ -206,7 +206,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Balance G </name>
+                <name>Balance G</name>
                 <symbol></symbol>
                 <unit>mV</unit>
                 <active>true</active>
@@ -597,14 +597,14 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name> Tx</name>
+                <name>Tx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name> Rx</name>
+                <name>Rx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -702,7 +702,7 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Spannung G </name>
+                <name>Spannung G</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -710,7 +710,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Strom G </name>
+                <name>Strom G</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -720,7 +720,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Kapazität G </name>
+                <name>Kapazität G</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
@@ -728,7 +728,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Leistung G </name>
+                <name>Leistung G</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
@@ -736,7 +736,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Balance G </name>
+                <name>Balance G</name>
                 <symbol></symbol>
                 <unit>mV</unit>
                 <active>true</active>
@@ -1127,14 +1127,14 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name> Tx</name>
+                <name>Tx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name> Rx</name>
+                <name>Rx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -1232,7 +1232,7 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Spannung G </name>
+                <name>Spannung G</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -1240,7 +1240,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Strom G </name>
+                <name>Strom G</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -1248,7 +1248,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Kapazität G </name>
+                <name>Kapazität G</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
@@ -1256,7 +1256,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Leistung G </name>
+                <name>Leistung G</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
@@ -1264,7 +1264,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Balance G </name>
+                <name>Balance G</name>
                 <symbol></symbol>
                 <unit>mV</unit>
                 <active>true</active>
@@ -1657,14 +1657,14 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name> Tx</name>
+                <name>Tx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name> Rx</name>
+                <name>Rx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -1764,7 +1764,7 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Spannung G </name>
+                <name>Spannung G</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -1772,7 +1772,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Strom G </name>
+                <name>Strom G</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -1780,7 +1780,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Kapazität G </name>
+                <name>Kapazität G</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
@@ -1788,7 +1788,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Leistung G </name>
+                <name>Leistung G</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
@@ -1796,7 +1796,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Balance G </name>
+                <name>Balance G</name>
                 <symbol></symbol>
                 <unit>mV</unit>
                 <active>true</active>
@@ -2342,14 +2342,14 @@
                 <statistics sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name> Tx</name>
+                <name>Tx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name> Rx</name>
+                <name>Rx</name>
                 <symbol></symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -2447,7 +2447,7 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>Spannung G </name>
+                <name>Spannung G</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -2455,7 +2455,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Strom G </name>
+                <name>Strom G</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -2463,7 +2463,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Kapazität G </name>
+                <name>Kapazität G</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
@@ -2471,7 +2471,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Leistung G </name>
+                <name>Leistung G</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
@@ -2479,7 +2479,7 @@
                 <property description="Faktor zu einem gemessenem Wert" type="Double" value="0.01" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Balance G </name>
+                <name>Balance G</name>
                 <symbol></symbol>
                 <unit>mV</unit>
                 <active>true</active>
