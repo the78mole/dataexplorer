@@ -43,7 +43,9 @@ import gde.utils.GPSHelper;
 import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -106,6 +108,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 
 		public String value() {
 			return this.value;
+		}
+		
+		public static List<Sensor> getAsList() {
+			List<HoTTAdapter.Sensor> sensors = new ArrayList<HoTTAdapter.Sensor>();
+			for (Sensor sensor : Sensor.values()) {
+				sensors.add(sensor);
+			}
+			return sensors;
 		}
 	};
 
@@ -730,20 +740,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 1;
-		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 		int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 		byte[] timeStampBuffer = new byte[timeStampBufferSize];
-		if (!recordSet.isTimeStepConstant()) {
-			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
-
-			for (int i = 0; i < recordDataSize; i++) {
-				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8)
-						+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
-			}
-		}
-		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
+		System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
 
 		for (int i = 0; i < recordDataSize; i++) {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
@@ -756,7 +757,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 			if (recordSet.isTimeStepConstant())
 				recordSet.addPoints(points);
 			else
-				recordSet.addPoints(points, timeStamps.get(i) / 10.0);
+				recordSet.addPoints(points, 
+						(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8)	+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}

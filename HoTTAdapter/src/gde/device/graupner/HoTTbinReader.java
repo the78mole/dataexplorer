@@ -250,7 +250,7 @@ public class HoTTbinReader {
 			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 			tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 			if (HoTTbinReader.application.getMenuToolBar() != null) {
-				channel.applyTemplate(recordSetName, true);
+				channel.applyTemplate(recordSetName, false);
 			}
 			//recordSetReceiver initialized and ready to add data
 
@@ -267,7 +267,7 @@ public class HoTTbinReader {
 				tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 				tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 				if (HoTTbinReader.application.getMenuToolBar() != null) {
-					channel.applyTemplate(recordSetName, true);
+					channel.applyTemplate(recordSetName, false);
 				}
 				//recordSetChannel initialized and ready to add data
 			}
@@ -310,7 +310,7 @@ public class HoTTbinReader {
 							tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 							tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 							if (HoTTbinReader.application.getMenuToolBar() != null) {
-								channel.applyTemplate(recordSetName, true);
+								channel.applyTemplate(recordSetName, false);
 							}
 						}
 						//recordSetVario initialized and ready to add data
@@ -349,7 +349,7 @@ public class HoTTbinReader {
 							tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 							tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 							if (HoTTbinReader.application.getMenuToolBar() != null) {
-								channel.applyTemplate(recordSetName, true);
+								channel.applyTemplate(recordSetName, false);
 							}
 						}
 						//recordSetGPS initialized and ready to add data
@@ -392,7 +392,7 @@ public class HoTTbinReader {
 							tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 							tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 							if (HoTTbinReader.application.getMenuToolBar() != null) {
-								channel.applyTemplate(recordSetName, true);
+								channel.applyTemplate(recordSetName, false);
 							}
 						}
 						//recordSetGeneral initialized and ready to add data
@@ -438,7 +438,7 @@ public class HoTTbinReader {
 							tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 							tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 							if (HoTTbinReader.application.getMenuToolBar() != null) {
-								channel.applyTemplate(recordSetName, true);
+								channel.applyTemplate(recordSetName, false);
 							}
 						}
 						//recordSetElectric initialized and ready to add data
@@ -484,7 +484,7 @@ public class HoTTbinReader {
 							tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 							tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 							if (HoTTbinReader.application.getMenuToolBar() != null) {
-								channel.applyTemplate(recordSetName, true);
+								channel.applyTemplate(recordSetName, false);
 							}
 						}
 						//recordSetMotorDriver initialized and ready to add data
@@ -547,23 +547,21 @@ public class HoTTbinReader {
 			}
 			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			HoTTbinReader.application.setProgress(100, sThreadId);
+
+			if (!isInitialSwitched) {
+				HoTTbinReader.channels.switchChannel(channel.getName());
+				channel.switchRecordSet(recordSetName);
+			}
+
+			for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
+				device.makeInActiveDisplayable(recordSet);
+				device.updateVisibilityStatus(recordSet, true);
+			}
 
 			if (menuToolBar != null) {
-				if (!isInitialSwitched) {
-					HoTTbinReader.channels.switchChannel(channel.getName());
-					channel.switchRecordSet(recordSetName);
-				}
-
-				for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
-					device.makeInActiveDisplayable(recordSet);
-					device.updateVisibilityStatus(recordSet, true);
-				}
-
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
-
-				HoTTbinReader.application.updateAllTabs(false);
-				HoTTbinReader.application.setProgress(100, sThreadId);
 			}
 		}
 		finally {
@@ -669,7 +667,7 @@ public class HoTTbinReader {
 			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 			tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 			if (HoTTbinReader.application.getMenuToolBar() != null) {
-				channel.applyTemplate(recordSetName, true);
+				channel.applyTemplate(recordSetName, false);
 			}
 			//recordSetReceiver initialized and ready to add data
 
@@ -686,7 +684,7 @@ public class HoTTbinReader {
 				tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 				tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 				if (HoTTbinReader.application.getMenuToolBar() != null) {
-					channel.applyTemplate(recordSetName, true);
+					channel.applyTemplate(recordSetName, false);
 				}
 				//recordSetChannel initialized and ready to add data
 			}
@@ -737,7 +735,7 @@ public class HoTTbinReader {
 									tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 									tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 									if (HoTTbinReader.application.getMenuToolBar() != null) {
-										channel.applyTemplate(recordSetName, true);
+										channel.applyTemplate(recordSetName, false);
 									}
 								}
 								//recordSetVario initialized and ready to add data
@@ -758,7 +756,7 @@ public class HoTTbinReader {
 									tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 									tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 									if (HoTTbinReader.application.getMenuToolBar() != null) {
-										channel.applyTemplate(recordSetName, true);
+										channel.applyTemplate(recordSetName, false);
 									}
 								}
 								//recordSetGPS initialized and ready to add data
@@ -779,7 +777,7 @@ public class HoTTbinReader {
 									tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 									tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 									if (HoTTbinReader.application.getMenuToolBar() != null) {
-										channel.applyTemplate(recordSetName, true);
+										channel.applyTemplate(recordSetName, false);
 									}
 								}
 								//recordSetGeneral initialized and ready to add data
@@ -800,7 +798,7 @@ public class HoTTbinReader {
 									tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 									tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 									if (HoTTbinReader.application.getMenuToolBar() != null) {
-										channel.applyTemplate(recordSetName, true);
+										channel.applyTemplate(recordSetName, false);
 									}
 								}
 								//recordSetElectric initialized and ready to add data
@@ -821,7 +819,7 @@ public class HoTTbinReader {
 									tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 									tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 									if (HoTTbinReader.application.getMenuToolBar() != null) {
-										channel.applyTemplate(recordSetName, true);
+										channel.applyTemplate(recordSetName, false);
 									}
 								}
 								//recordSetElectric initialized and ready to add data
@@ -908,23 +906,21 @@ public class HoTTbinReader {
 			}
 			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			HoTTbinReader.application.setProgress(100, sThreadId);
+
+			if (!isInitialSwitched) {
+				HoTTbinReader.channels.switchChannel(channel.getName());
+				channel.switchRecordSet(recordSetName);
+			}
+
+			for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
+				device.makeInActiveDisplayable(recordSet);
+				device.updateVisibilityStatus(recordSet, true);
+			}
 
 			if (menuToolBar != null) {
-				for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
-					device.makeInActiveDisplayable(recordSet);
-					device.updateVisibilityStatus(recordSet, true);
-				}
-
-				if (!isInitialSwitched) {
-					HoTTbinReader.channels.switchChannel(channel.getName());
-					channel.switchRecordSet(recordSetName);
-				}
-
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
-
-				HoTTbinReader.application.updateAllTabs(false);
-				HoTTbinReader.application.setProgress(100, sThreadId);
 			}
 		}
 		finally {

@@ -591,20 +591,11 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 1;
-		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 		int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 		byte[] timeStampBuffer = new byte[timeStampBufferSize];
-		if (!recordSet.isTimeStepConstant()) {
-			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
-
-			for (int i = 0; i < recordDataSize; i++) {
-				timeStamps.add(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8)
-						+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
-			}
-		}
-		HoTTAdapter2.logger.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
+		System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
 
 		for (int i = 0; i < recordDataSize; i++) {
 			HoTTAdapter2.logger.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
@@ -617,12 +608,13 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 			if (recordSet.isTimeStepConstant())
 				recordSet.addPoints(points);
 			else
-				recordSet.addPoints(points, timeStamps.get(i) / 10.0);
+				recordSet.addPoints(points, 
+						(((timeStampBuffer[0 + (i * 4)] & 0xff) << 24) + ((timeStampBuffer[1 + (i * 4)] & 0xff) << 16) + ((timeStampBuffer[2 + (i * 4)] & 0xff) << 8)	+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
-		this.updateVisibilityStatus(recordSet, true);
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		this.updateVisibilityStatus(recordSet, true);
 	}
 
 	/**
