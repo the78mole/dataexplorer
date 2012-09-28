@@ -307,38 +307,38 @@ public enum Transmitter {
 	}
 
 	public static void cleanSwAssignements(byte[] bytes) {
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1000", bytes, 0x1062, 1, 2, 9);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1062", bytes, 0x1062, 1, 2, 9);
 		for (int i = 0; i < 2*9; i++) {
 			bytes[0x1062 + i] = (byte) 0xFF;
 		}
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1000", bytes, 0x1062, 1, 2, 9);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1062", bytes, 0x1062, 1, 2, 9);
 		calculateAndWriteCRC(bytes, 0x1000, 0x1074);
 
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x14B8", bytes, 0x1518, 1, 16, 6);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1518", bytes, 0x1518, 1, 6, 16);
 		for (int i = 0; i < 16*6; i++) {
 			bytes[0x1518 + i] = (byte) 0xFF;
 		}
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x14B8", bytes, 0x1518, 1, 16, 6);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1518", bytes, 0x1518, 1, 6, 16);
 		calculateAndWriteCRC(bytes, 0x14B8, 0x1578);
 
 		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x157A", bytes, 0x157A, 1, 2, 8);
 		for (int i = 0; i < 2*8; i++) {
 			bytes[0x157A + i] = (byte) 0xFF;
 		}
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x157A", bytes, 0x157A, 1, 4, 8);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x157A", bytes, 0x157A, 1, 2, 8);
 		
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x159A", bytes, 0x159A, 1, 4, 8);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x159A", bytes, 0x159A, 1, 2, 8);
 		for (int i = 0; i < 2*8; i++) {
 			bytes[0x159A + i] = (byte) 0xFF;
 		}
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x159A", bytes, 0x159A, 1, 4, 8);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x159A", bytes, 0x159A, 1, 2, 8);
 		calculateAndWriteCRC(bytes, 0x157A, 0x15B2);
 
 		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x15B4", bytes, 0x15B4, 1, 4, 8);
 		for (int i = 0; i < 4*8; i++) {
 			bytes[0x15B4 + i] = (byte) 0xFF;
 		}
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x15B4", bytes, 0x15B4, 1, 2, 8);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x15B4", bytes, 0x15B4, 1, 4, 8);
 		calculateAndWriteCRC(bytes, 0x15B4, 0x15E4);
 
 		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1640", bytes, 0x1640, 1, 2, 6);
@@ -366,7 +366,7 @@ public enum Transmitter {
 		for (int i = 0; i < 1*12; i++) {
 			bytes[0x1811 + i] = (byte) 0x00;
 		}
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1811", bytes, 0x182A, 1, 2, 1);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1811", bytes, 0x182A, 1, 1, 12);
 		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x182A", bytes, 0x182A, 1, 2, 1);
 		for (int i = 0; i < 2*1; i++) {
 			bytes[0x182A + i] = (byte) 0xFF;
@@ -378,14 +378,14 @@ public enum Transmitter {
 		for (int i = 0; i < 2*12; i++) {
 			bytes[0x19AE + i] = (byte) 0xFF;
 		}
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x19AE", bytes, 0x19AE, 1, 4, 16);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x19AE", bytes, 0x19AE, 1, 2, 12);
 		calculateAndWriteCRC(bytes, 0x198A, 0x1AB6);
 
 		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1F59", bytes, 0x1F59, 1, 4, 16);
 		for (int i = 0; i < 16*4; i++) {
 			bytes[0x1F59 + i] = (byte) 0xFF;
 		}
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1F59", bytes, 0x1F59, 1, 2, 8);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x1F59", bytes, 0x1F59, 1, 4, 16);
 		calculateAndWriteCRC(bytes, 0x1EE9, 0x1F99);
 
 		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x2482", bytes, 0x2482, 1, 2, 1);
@@ -402,11 +402,11 @@ public enum Transmitter {
 		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x24D3", bytes, 0x24D3, 1, 2, 1);
 		calculateAndWriteCRC(bytes, 0x249C, 0x24D6);
 
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x258F", bytes, 0x258F, 1, 2, 1);
-		for (int i = 0; i < 2*1; i++) {
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x258F", bytes, 0x258F, 1, 2, 8);
+		for (int i = 0; i < 2*8; i++) {
 			bytes[0x2482 + i] = (byte) 0xFF;
 		}
-		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x258F", bytes, 0x258F, 1, 2, 1);
+		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x258F", bytes, 0x258F, 1, 2, 8);
 		calculateAndWriteCRC(bytes, 0x2587, 0x259F);
 	}
 	
