@@ -1824,7 +1824,7 @@ public class Record extends Vector<Integer> {
 		if (tmpValue!=null && tmpValue.length() > 0) this.minScaleValue =  new Double(tmpValue.trim()).doubleValue();
 
 		tmpValue =  recordProps.get(NAME);
-		if (tmpValue!=null && tmpValue.length() > 0 && !this.name.equalsIgnoreCase(tmpValue)) {
+		if (tmpValue!=null && tmpValue.length() > 0 && !this.name.trim().equalsIgnoreCase(tmpValue.trim())) {
 			this.setName(tmpValue.trim()); // might replace the record set key as well
 		}
 }
