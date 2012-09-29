@@ -7,6 +7,7 @@ DevicePropertiesEditor - fix problem killing application due to SWT out of handl
 HottAdapter(2) - enable/refine mx20, mc20 <-> mc32 model configuration files conversion 
 UniLog - fix capacity calculation
 Implement support for zip compression of OSD files
+[bug #37464] fixed Title bar of "Device Properties Editor" shows "&"
 
 Version 3.04 - 21 Sep 2012
 JLog2 - establish workaround for maximum recording time of 54 minutes, accept all follow on measurements with a default time step
