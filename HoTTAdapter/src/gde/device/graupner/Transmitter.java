@@ -404,7 +404,7 @@ public enum Transmitter {
 
 		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x258F", bytes, 0x258F, 1, 2, 8);
 		for (int i = 0; i < 2*8; i++) {
-			bytes[0x2482 + i] = (byte) 0xFF;
+			bytes[0x258F + i] = (byte) 0xFF;
 		}
 		if (log.isLoggable(Level.FINE)) StringHelper.printMemHex("0x258F", bytes, 0x258F, 1, 2, 8);
 		calculateAndWriteCRC(bytes, 0x2587, 0x259F);
