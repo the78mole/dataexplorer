@@ -547,21 +547,21 @@ public class HoTTbinReader {
 			}
 			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-			HoTTbinReader.application.setProgress(100, sThreadId);
-
-			if (!isInitialSwitched) {
-				HoTTbinReader.channels.switchChannel(channel.getName());
-				channel.switchRecordSet(recordSetName);
-			}
-
-			for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
-				device.makeInActiveDisplayable(recordSet);
-				device.updateVisibilityStatus(recordSet, true);
-			}
 
 			if (menuToolBar != null) {
+				if (!isInitialSwitched) {
+					HoTTbinReader.channels.switchChannel(channel.getName());
+					channel.switchRecordSet(recordSetName);
+				}
+	
+				for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
+					device.makeInActiveDisplayable(recordSet);
+					device.updateVisibilityStatus(recordSet, true);
+				}
+
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
+				HoTTbinReader.application.setProgress(100, sThreadId);
 			}
 		}
 		finally {
@@ -906,21 +906,21 @@ public class HoTTbinReader {
 			}
 			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-			HoTTbinReader.application.setProgress(100, sThreadId);
-
-			if (!isInitialSwitched) {
-				HoTTbinReader.channels.switchChannel(channel.getName());
-				channel.switchRecordSet(recordSetName);
-			}
-
-			for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
-				device.makeInActiveDisplayable(recordSet);
-				device.updateVisibilityStatus(recordSet, true);
-			}
 
 			if (menuToolBar != null) {
+				if (!isInitialSwitched) {
+					HoTTbinReader.channels.switchChannel(channel.getName());
+					channel.switchRecordSet(recordSetName);
+				}
+	
+				for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
+					device.makeInActiveDisplayable(recordSet);
+					device.updateVisibilityStatus(recordSet, true);
+				}
+
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
+				HoTTbinReader.application.setProgress(100, sThreadId);
 			}
 		}
 		finally {
