@@ -405,7 +405,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 			List<File> files = FileUtils.getFileListing(new File(tmpDir1), 1);
 
 			for (File file : files) {
-				String filePath = file.getAbsolutePath();
+				String filePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 				if (filePath.toLowerCase().endsWith(".osd")) {
 					try {
 						if (filePath.equals(OperatingSystemHelper.getLinkContainedFilePath(filePath))) {
@@ -482,7 +482,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
 
 			for (File file : files) {
-				String filePath = file.getAbsolutePath();
+				String filePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 				if (filePath.toLowerCase().endsWith(".osd")) {
 					try {
 						if (filePath.equals(OperatingSystemHelper.getLinkContainedFilePath(filePath))) {
