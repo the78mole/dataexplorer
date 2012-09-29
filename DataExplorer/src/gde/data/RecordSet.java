@@ -1046,7 +1046,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 				if (activeChannel != null) 
 					activeChannel.checkAndLoadData();
 			}
-		});
+		}, "DataLoadCheck");
 		try {
 			dataLoadThread.setPriority(Thread.NORM_PRIORITY - 2);
 			dataLoadThread.start();

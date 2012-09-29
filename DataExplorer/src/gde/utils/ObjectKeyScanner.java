@@ -114,7 +114,7 @@ public class ObjectKeyScanner extends Thread {
 				List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()), 1);
 				for (File file : files) {
 					try {
-						String actualFilePath = file.getAbsolutePath();
+						String actualFilePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 						if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD) && actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
 							log.log(Level.FINER, "working with " + file.getName()); //$NON-NLS-1$
 							if (this.objectKey.equals(OsdReaderWriter.getHeader(file.getCanonicalPath()).get(GDE.OBJECT_KEY))) {
@@ -148,7 +148,7 @@ public class ObjectKeyScanner extends Thread {
 					List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()), 1);
 					for (File file : files) {
 						try {
-							String actualFilePath = file.getAbsolutePath();
+							String actualFilePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 							if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD)) {
 								fileCounter++;
 								if (actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) { // this is not a link
@@ -240,7 +240,7 @@ public class ObjectKeyScanner extends Thread {
 			List<File> files = FileUtils.getFileListing(new File(Settings.getInstance().getDataFilePath()), 1);
 			for (File file : files) {
 				try {
-					String actualFilePath = file.getAbsolutePath();
+					String actualFilePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 					if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD) && !actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
 						log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
 						if (!file.delete()) {
