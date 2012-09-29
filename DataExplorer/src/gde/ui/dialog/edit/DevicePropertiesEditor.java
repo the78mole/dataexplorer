@@ -220,7 +220,7 @@ public class DevicePropertiesEditor extends Composite {
 			devicePropsEditor.open();
 			Point size = devicePropsEditor.getSize();
 			DevicePropertiesEditor.dialogShell.setLayout(new FillLayout());
-			DevicePropertiesEditor.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0465));
+			DevicePropertiesEditor.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0440));
 			DevicePropertiesEditor.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/EditHot.gif")); //$NON-NLS-1$
 			DevicePropertiesEditor.dialogShell.setLocation(100, 100);
 			//Rectangle displayBounds = display.getBounds();
@@ -253,7 +253,7 @@ public class DevicePropertiesEditor extends Composite {
 			devicePropsEditor.open();
 			Point size = devicePropsEditor.getSize();
 			DevicePropertiesEditor.dialogShell.setLayout(new FillLayout());
-			DevicePropertiesEditor.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0465));
+			DevicePropertiesEditor.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0440));
 			DevicePropertiesEditor.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/EditHot.gif")); //$NON-NLS-1$
 			DevicePropertiesEditor.dialogShell.setLocation(DataExplorer.getInstance().getShell().toDisplay(100, 50));
 			DevicePropertiesEditor.dialogShell.layout();
@@ -389,7 +389,7 @@ public class DevicePropertiesEditor extends Composite {
 
 								if (!(new File(getDevicesPath() + GDE.FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.devicePropertiesFileName)).exists()) {
 									MessageBox okCancelMessageDialog = new MessageBox(DevicePropertiesEditor.this.getShell(), SWT.PRIMARY_MODAL | SWT.OK | SWT.CANCEL | SWT.ICON_QUESTION);
-									okCancelMessageDialog.setText(Messages.getString(MessageIds.GDE_MSGT0465));
+									okCancelMessageDialog.setText(Messages.getString(MessageIds.GDE_MSGT0440));
 									okCancelMessageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGE0003) + DevicePropertiesEditor.this.devicePropertiesFileName + Messages.getString(MessageIds.GDE_MSGT0481));
 									if (SWT.OK == okCancelMessageDialog.open()) {
 										if (FileUtils
