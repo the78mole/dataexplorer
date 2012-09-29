@@ -54,6 +54,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author Winfried Brügmann
@@ -76,6 +79,13 @@ public class OsdReaderWriter {
 	 */
 
 	public static HashMap<String, String> getHeader(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormatException {
+		filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+    ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
+    ZipEntry zip_entry = zip_input.getNextEntry();
+    if (zip_entry != null && zip_entry.getName().equals(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1))) {
+  		DataInputStream data_in    = new DataInputStream(zip_input);
+  		return readHeader(filePath, data_in);
+    }
 		FileInputStream file_input = new FileInputStream(new File(filePath));
 		DataInputStream data_in    = new DataInputStream(file_input);
 		return readHeader(filePath, data_in);
@@ -161,8 +171,20 @@ public class OsdReaderWriter {
 	 * @throws DataInconsitsentException
 	 */
 	public static RecordSet read(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException {
-		FileInputStream file_input = new FileInputStream(new File(filePath));
-		DataInputStream data_in    = new DataInputStream(file_input);
+		filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+    ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
+    ZipEntry zip_entry = zip_input.getNextEntry();
+    FileInputStream file_input = null;
+    DataInputStream data_in = null;
+    if (zip_entry != null && zip_entry.getName().equals(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1))) {
+  		data_in = new DataInputStream(zip_input);
+    }
+    else {
+    	zip_input.close();
+    	zip_input = null;
+  		file_input = new FileInputStream(new File(filePath));
+  		data_in    = new DataInputStream(file_input);
+    }
 		String channelConfig = GDE.STRING_EMPTY;
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetComment = GDE.STRING_EMPTY;
@@ -316,9 +338,18 @@ public class OsdReaderWriter {
 			return recordSet;
 		}
 		finally {
-			data_in.close ();
+			if (zip_input != null) {
+				zip_input.closeEntry();
+				data_in.close();
+				zip_input.close();
+			}
+			else if (file_input != null) {
+				data_in.close();
+				file_input.close();
+			}
 			data_in = null;
 			file_input = null;
+			zip_input = null;
 		}
 	}
 
@@ -342,8 +373,10 @@ public class OsdReaderWriter {
 	 * @throws IOException
 	 */
 	public static void write(String fullQualifiedFilePath, Channel activeChannel, int useVersion) throws FileNotFoundException, IOException {
+		fullQualifiedFilePath = fullQualifiedFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		if (activeChannel != null && fullQualifiedFilePath != null && useVersion != 0) {
-			FileOutputStream file_out = new FileOutputStream(new File(fullQualifiedFilePath));
+			ZipOutputStream file_out = new ZipOutputStream(new FileOutputStream(new File(fullQualifiedFilePath)));
+			file_out.putNextEntry(new ZipEntry(fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1)));
 			DataOutputStream data_out = new DataOutputStream(file_out);
 			IDevice activeDevice = OsdReaderWriter.application.getActiveDevice();
 			boolean isObjectOriented = OsdReaderWriter.application.isObjectoriented();
@@ -525,8 +558,10 @@ public class OsdReaderWriter {
 			}
 			finally {
 				data_out.flush();
+				file_out.closeEntry();
 				data_out.close();
 				data_out = null;
+				file_out.close();
 				file_out = null;
 			}
 		}
@@ -543,17 +578,32 @@ public class OsdReaderWriter {
 	 * @throws DataInconsitsentException
 	 */
 	public static void readRecordSetsData(RecordSet recordSet, String filePath, boolean doUpdateProgressBar) throws FileNotFoundException, IOException, DataInconsitsentException {
-		RandomAccessFile random_in = new RandomAccessFile(new File(filePath), "r"); //$NON-NLS-1$
+		filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+    ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
+    ZipEntry zip_entry = zip_input.getNextEntry();
+		RandomAccessFile random_in = null;
+    DataInputStream data_in = null;
 		try {
 			long recordSetFileDataPointer = recordSet.getFileDataPointer();
 			int recordFileDataSize = recordSet.getFileDataSize();
-			random_in.seek(recordSetFileDataPointer);
 			long startTime = new Date().getTime();
 			int dataSizeRecord = GDE.SIZE_BYTES_INTEGER * recordFileDataSize;
 			int dataSizeRecords = dataSizeRecord * recordSet.getNoneCalculationRecordNames().length;
 			int dataSizeRecordsTimeStamp = dataSizeRecord + dataSizeRecords;
 			byte[] buffer = new byte[recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp];
-			random_in.readFully(buffer);
+			
+	    if (zip_entry != null && zip_entry.getName().equals(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1))) {
+	  		data_in = new DataInputStream(zip_input);
+	  		data_in.skip(recordSetFileDataPointer);
+	  		data_in.readFully(buffer);
+	    }
+	    else {
+	    	zip_input.close();
+	    	zip_input = null;
+	    	random_in = new RandomAccessFile(new File(filePath), "r"); //$NON-NLS-1$;
+				random_in.seek(recordSetFileDataPointer);
+				random_in.readFully(buffer);
+	    }
 			recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
 			log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 		}
@@ -570,7 +620,17 @@ public class OsdReaderWriter {
 			throw e;
 		}
 		finally {
-			random_in.close();
+			if (zip_input != null && data_in != null) {
+				zip_input.closeEntry();
+				data_in.close();
+				zip_input.close();
+			}
+			else if (random_in != null) {
+				random_in.close();
+			}
+			data_in = null;
+			random_in = null;
+			zip_input = null;
 		}
 	}
 	

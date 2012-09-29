@@ -34,6 +34,7 @@ import java.net.URLClassLoader;
 import java.util.jar.JarFile;
 import gde.log.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipInputStream;
 
 import gde.GDE;
 import gde.messages.MessageIds;
@@ -58,31 +59,31 @@ public class OperatingSystemHelper {
 		String sourceBasePath = url.getPath(), targetBasePath;
 
 		if (url.getPath().endsWith(GDE.FILE_SEPARATOR_UNIX)) { // running inside Eclipse
-			log.log(Level.INFO, "started inside Eclipse -> skip creation of shortcut"); //$NON-NLS-1$
+			if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "started inside Eclipse -> skip creation of shortcut"); //$NON-NLS-1$
 		}
 		else {
-			log.log(Level.INFO, "started outside with: java -jar *.jar"); //$NON-NLS-1$
+			if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 
 			if (GDE.IS_WINDOWS) {
 				try {
 					String launchFilename = "DataExplorer.exe"; //$NON-NLS-1$
 					sourceBasePath = sourceBasePath.substring(1, sourceBasePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK); //$NON-NLS-1$ //$NON-NLS-2$
-					log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
 					sourceLaunchFilePath = (sourceBasePath + launchFilename);
-					log.log(Level.INFO, "sourceLaunchFilePath = " + sourceLaunchFilePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "sourceLaunchFilePath = " + sourceLaunchFilePath); //$NON-NLS-1$
 					targetBasePath = System.getenv("USERPROFILE") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 					targetDesktopLaucherFilePath = targetBasePath + "DataExplorer.lnk"; //$NON-NLS-1$
-					log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 					String fqExecutablePath = sourceLaunchFilePath.replace("/", GDE.FILE_SEPARATOR); //$NON-NLS-1$
-					log.log(Level.INFO, "fqExecutablePath = " + fqExecutablePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "fqExecutablePath = " + fqExecutablePath); //$NON-NLS-1$
 					String executableArguments = GDE.STRING_EMPTY; //exe wrapper dont need arguments - "-jar -Xms40M -Xmx256M \"" + sourceLaunchFilePath + "jar\""; //$NON-NLS-1$
-					log.log(Level.INFO, "executableArguments = " + executableArguments); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "executableArguments = " + executableArguments); //$NON-NLS-1$
 					String workingDirectory = sourceBasePath.replace("/", GDE.FILE_SEPARATOR); //$NON-NLS-1$
-					log.log(Level.INFO, "workingDirectory = " + workingDirectory); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "workingDirectory = " + workingDirectory); //$NON-NLS-1$
 					String fqIconPath = fqExecutablePath; // exe wrapper will contain icon - sourceLaunchFilePath + "ico";
-					log.log(Level.INFO, "fqIconPath = " + fqIconPath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "fqIconPath = " + fqIconPath); //$NON-NLS-1$
 					String description = Messages.getString(MessageIds.GDE_MSGT0000);
-					log.log(Level.INFO, "description = " + description); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "description = " + description); //$NON-NLS-1$
 
 					String[] shellLinkArgs = new String[] { targetDesktopLaucherFilePath, fqExecutablePath, executableArguments, workingDirectory, fqIconPath, description };
 					WindowsHelper.createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
@@ -90,20 +91,20 @@ public class OperatingSystemHelper {
 					sourceBasePath = url.getPath();
 					launchFilename = "DevicePropertiesEditor.exe"; //$NON-NLS-1$
 					sourceBasePath = sourceBasePath.substring(1, sourceBasePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK); //$NON-NLS-1$ //$NON-NLS-2$
-					log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
 					sourceLaunchFilePath = (sourceBasePath + launchFilename);
-					log.log(Level.INFO, "sourceLaunchFilePath = " + sourceLaunchFilePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "sourceLaunchFilePath = " + sourceLaunchFilePath); //$NON-NLS-1$
 					targetBasePath = System.getenv("USERPROFILE") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 					targetDesktopLaucherFilePath = targetBasePath + "DeviceProperties Editor.lnk"; //$NON-NLS-1$
-					log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 					fqExecutablePath = sourceLaunchFilePath.replace("/", GDE.FILE_SEPARATOR); //$NON-NLS-1$
-					log.log(Level.INFO, "fqExecutablePath = " + fqExecutablePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "fqExecutablePath = " + fqExecutablePath); //$NON-NLS-1$
 					executableArguments = GDE.STRING_EMPTY; //exe wrapper dont need arguments - "-jar -Xms40M -Xmx256M \"" + sourceLaunchFilePath + "jar\""; //$NON-NLS-1$
-					log.log(Level.INFO, "executableArguments = " + executableArguments); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "executableArguments = " + executableArguments); //$NON-NLS-1$
 					fqIconPath = fqExecutablePath; // exe wrapper will contain icon - sourceLaunchFilePath + "ico";
-					log.log(Level.INFO, "fqIconPath = " + fqIconPath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "fqIconPath = " + fqIconPath); //$NON-NLS-1$
 					description = Messages.getString(MessageIds.GDE_MSGT0595);
-					log.log(Level.INFO, "description = " + description); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "description = " + description); //$NON-NLS-1$
 
 					shellLinkArgs = new String[] { targetDesktopLaucherFilePath, fqExecutablePath, executableArguments, workingDirectory, fqIconPath, description };
 					WindowsHelper.createDesktopLink(shellLinkArgs[0], shellLinkArgs[1], shellLinkArgs[2], shellLinkArgs[3], shellLinkArgs[4], 0, shellLinkArgs[5]);
@@ -116,24 +117,24 @@ public class OperatingSystemHelper {
 			else if (GDE.IS_LINUX) { //$NON-NLS-1$
 				try {
 					sourceBasePath = sourceBasePath.substring(0, sourceBasePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1);
-					log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
 
 					String desktopFileName = "DataExplorer.desktop"; //$NON-NLS-1$
 					String extractTargetFilePath = sourceBasePath+desktopFileName;
-					log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
 					File targetFile = new File(extractTargetFilePath);
 
 					//installation directory must contain DataExplorer.desktop with write permission
 					if (targetFile.exists()  && targetFile.canWrite()) {
 						String jarFilePath = sourceBasePath + "DataExplorer.jar"; //$NON-NLS-1$
-						log.log(Level.INFO, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
+						if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
 
 						FileUtils.extractWhileReplace("@GDE_DIR@", sourceBasePath, jarFilePath, desktopFileName, extractTargetFilePath, GDE.STRING_UTF_8, GDE.STRING_UTF_8); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 						targetBasePath = System.getenv("HOME") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
-						log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
+						if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
 						targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
-						log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+						if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 						FileUtils.copyFile(new File(extractTargetFilePath), new File(targetDesktopLaucherFilePath));
 					}
 					else {
@@ -142,20 +143,20 @@ public class OperatingSystemHelper {
 					
 					desktopFileName = "DevicePropertiesEditor.desktop"; //$NON-NLS-1$
 					extractTargetFilePath = sourceBasePath+desktopFileName;
-					log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
 					targetFile = new File(extractTargetFilePath);
 
 					//installation directory must contain DevicePropertiesEditor.desktop with write permission
 					if (targetFile.exists()  && targetFile.canWrite()) {
 						String jarFilePath = sourceBasePath + "DataExplorer.jar"; //$NON-NLS-1$
-						log.log(Level.INFO, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
+						if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "jarFilePath = " + jarFilePath); //$NON-NLS-1$
 
 						FileUtils.extractWhileReplace("@GDE_DIR@", sourceBasePath, jarFilePath, desktopFileName, extractTargetFilePath, GDE.STRING_UTF_8, GDE.STRING_UTF_8); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 						targetBasePath = System.getenv("HOME") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
-						log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
+						if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
 						targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
-						log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+						if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 						FileUtils.copyFile(new File(extractTargetFilePath), new File(targetDesktopLaucherFilePath));
 					}
 					else {
@@ -190,7 +191,7 @@ public class OperatingSystemHelper {
 				isCreated = true;
 			}
 		}
-		log.log(Level.INFO, "DataExplorer desktop created = " + isCreated); //$NON-NLS-1$
+		if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "DataExplorer desktop created = " + isCreated); //$NON-NLS-1$
 		return isCreated;
 	}
 
@@ -205,7 +206,7 @@ public class OperatingSystemHelper {
 			if (GDE.IS_WINDOWS) {
 				targetBasePath = System.getenv("USERPROFILE") + GDE.FILE_SEPARATOR_WINDOWS + "Desktop" + GDE.FILE_SEPARATOR_WINDOWS; //$NON-NLS-1$ //$NON-NLS-2$
 				targetDesktopLaucherFilePath = targetBasePath + "DataExplorer.lnk"; //$NON-NLS-1$
-				log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 
 				Process process = new ProcessBuilder("cmd", "/C", "erase", "/F", targetDesktopLaucherFilePath).start(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				process.waitFor();
@@ -214,7 +215,7 @@ public class OperatingSystemHelper {
 				}
 
 				targetDesktopLaucherFilePath = targetBasePath + "DeviceProperties*.lnk"; //$NON-NLS-1$
-				log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 
 				process = new ProcessBuilder("cmd", "/C", "erase", "/F", targetDesktopLaucherFilePath).start(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				process.waitFor();
@@ -229,7 +230,7 @@ public class OperatingSystemHelper {
 				targetBasePath = System.getenv("HOME") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 				log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
 				targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
-				log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 
 				Process process = new ProcessBuilder("rm", "-f", targetDesktopLaucherFilePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
@@ -239,9 +240,9 @@ public class OperatingSystemHelper {
 
 				desktopFileName = "DevicePropertiesEditor.desktop"; //$NON-NLS-1$
 				targetBasePath = System.getenv("HOME") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
-				log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
 				targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
-				log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 
 				process = new ProcessBuilder("rm", "-f", targetDesktopLaucherFilePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
@@ -278,10 +279,10 @@ public class OperatingSystemHelper {
 			URL url = FileUtils.class.getProtectionDomain().getCodeSource().getLocation();
 
 			if (url.getPath().endsWith(GDE.FILE_SEPARATOR_UNIX)) { // running inside Eclipse
-				log.log(Level.INFO, "started inside Eclipse -> skip creation of shortcut"); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "started inside Eclipse -> skip creation of shortcut"); //$NON-NLS-1$
 			}
 			else {
-				log.log(Level.INFO, "started outside with: java -jar *.jar"); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "started outside with: java -jar *.jar"); //$NON-NLS-1$
 
 				String jarBasePath = FileUtils.getJarBasePath();
 				String jarFilePath = jarBasePath + "/DataExplorer.jar"; //$NON-NLS-1$
@@ -299,7 +300,7 @@ public class OperatingSystemHelper {
 					targetBasePath = targetBasePath.startsWith(GDE.FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(1) : targetBasePath;
 					targetBasePath = targetBasePath.endsWith(GDE.FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(0, targetBasePath.length()-1) : targetBasePath;
 					command = "cmd /C " + targetDir + regExe + GDE.STRING_BLANK + targetBasePath; //$NON-NLS-1$
-					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 					Process process = new ProcessBuilder("cmd", "/C", targetDir + regExe, targetBasePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 					process.waitFor();
 					bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -310,12 +311,12 @@ public class OperatingSystemHelper {
 					while ((line = bisr.readLine()) != null) {
 						sb.append(line);
 					}
-					log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
 					sb = new StringBuilder();
 					while ((line = besr.readLine()) != null) {
 						sb.append(line);
 					}
-					log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
 					if (process.exitValue() != 0) {
 						String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 						log.log(Level.SEVERE, msg);
@@ -329,7 +330,7 @@ public class OperatingSystemHelper {
 
 					//check if registration was successful
 					command = "cmd /C assoc .osd"; //$NON-NLS-1$
-					log.log(Level.INFO, "executing \"" + command + "\" to check association"); //$NON-NLS-1$ //$NON-NLS-2$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "executing \"" + command + "\" to check association"); //$NON-NLS-1$ //$NON-NLS-2$
 					process = Runtime.getRuntime().exec(command);
 					process.waitFor();
 					bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -339,13 +340,15 @@ public class OperatingSystemHelper {
 					while ((line = bisr.readLine()) != null) {
 						sb.append(line);
 					}
-					log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
 					sb = new StringBuilder();
 					while ((line = besr.readLine()) != null) {
 						sb.append(line);
 					}
-					log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
-					log.log(Level.INFO, "\"" + command + "\" rc = " + process.exitValue()); //$NON-NLS-1$ //$NON-NLS-2$
+					if(log.isLoggable(Level.INFO)) {
+						log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
+						log.log(Level.INFO, "\"" + command + "\" rc = " + process.exitValue()); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 					if (process.exitValue() != 0) {
 						log.log(Level.WARNING, "failed to register DataExplorer MIME type rc = " + process.exitValue()); //$NON-NLS-1$
 						throw new IOException("error=740"); //$NON-NLS-1$
@@ -355,7 +358,7 @@ public class OperatingSystemHelper {
 				else if (GDE.IS_LINUX) {
 					String desktopFileName = "DataExplorer.desktop"; //$NON-NLS-1$
 					String extractTargetFilePath = jarBasePath + desktopFileName;
-					log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
 					File targetFile = new File(extractTargetFilePath);
 					//installation directory must contain DataExplorer.desktop with write permission
 					if (targetFile.exists() && targetFile.canWrite()) {
@@ -363,7 +366,7 @@ public class OperatingSystemHelper {
 
 						desktopFileName = "DevicePropertiesEditor.desktop"; //$NON-NLS-1$
 						extractTargetFilePath = jarBasePath + desktopFileName;
-						log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
+						if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
 						targetFile = new File(extractTargetFilePath);
 						//installation directory must contain DataExplorer.desktop with write permission
 						if (targetFile.exists() && targetFile.canWrite()) {
@@ -381,7 +384,7 @@ public class OperatingSystemHelper {
 
 					//check if xdg-utls are installed, this is the prerequisite for the registration process
 					if (Runtime.getRuntime().exec("which xdg-mime").waitFor() != 0) { //$NON-NLS-1$
-						log.log(Level.INFO, "DataExplorer program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
+						if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "DataExplorer program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
 						DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0030));
 						rc = 0;
 					}
@@ -390,10 +393,10 @@ public class OperatingSystemHelper {
 
 						// all files extracted, exec register command
 						command = "chmod +x " + targetDir + "/register.sh"; //$NON-NLS-1$ //$NON-NLS-2$
-						log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+						if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 						Runtime.getRuntime().exec(command).waitFor();
 						command = targetDir + "/register.sh"; //$NON-NLS-1$
-						log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+						if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 						rc = Runtime.getRuntime().exec(command).waitFor();
 						
 					}
@@ -403,7 +406,7 @@ public class OperatingSystemHelper {
 					rc = 0;
 				}
 				else {
-					log.log(Level.INFO, "Unsupported OS, shell integration, MIME registration NOT IMPLEMENTED"); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "Unsupported OS, shell integration, MIME registration NOT IMPLEMENTED"); //$NON-NLS-1$
 					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0024, new Object[] {System.getProperty(GDE.STRING_OS_NAME)}));
 					rc = 0;
 				}
@@ -432,7 +435,7 @@ public class OperatingSystemHelper {
 				// ignore
 			}
 		}
-		log.log(Level.INFO, "DataExplorer MIME registered = " + (rc == 0)); //$NON-NLS-1$
+		if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "DataExplorer MIME registered = " + (rc == 0)); //$NON-NLS-1$
 		return rc == 0;
 	}
 
@@ -464,11 +467,11 @@ public class OperatingSystemHelper {
 					//enable suppress this warning while cleaning settings
 				}
 				String regExe = "Register" + GDE.BIT_MODE + ".exe"; //$NON-NLS-1$ //$NON-NLS-2$
-				log.log(Level.INFO, "register exe = " + regExe); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "register exe = " + regExe); //$NON-NLS-1$
 
 				FileUtils.extract(jarFile, regExe, GDE.STRING_EMPTY, targetDir, "WIN"); //$NON-NLS-1$
 				command = "cmd /C " + targetDir + regExe; //$NON-NLS-1$
-				log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 				Process process = new ProcessBuilder("cmd", "/C", targetDir + regExe).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
 				bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -479,12 +482,12 @@ public class OperatingSystemHelper {
 				while ((line = bisr.readLine()) != null) {
 					sb.append(line);
 				}
-				log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
 				sb = new StringBuilder();
 				while ((line = besr.readLine()) != null) {
 					sb.append(line);
 				}
-				log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
 				if (process.exitValue() != 0) {
 					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 					log.log(Level.SEVERE, msg);
@@ -506,13 +509,13 @@ public class OperatingSystemHelper {
 				while ((line = bisr.readLine()) != null) {
 					sb.append(line);
 				}
-				log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "std.out = " + sb.toString()); //$NON-NLS-1$
 				sb = new StringBuilder();
 				while ((line = besr.readLine()) != null) {
 					sb.append(line);
 				}
-				log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
-				log.log(Level.INFO, "\"cmd /C assoc .osd\" rc = " + process.exitValue()); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "std.err = " + sb.toString()); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "\"cmd /C assoc .osd\" rc = " + process.exitValue()); //$NON-NLS-1$
 				if (process.exitValue() == 0) {
 					log.log(Level.WARNING, "failed to deregister DataExplorer MIME type to OS rc = " + process.exitValue()); //$NON-NLS-1$
 					throw new IOException("error=740"); //$NON-NLS-1$
@@ -522,7 +525,7 @@ public class OperatingSystemHelper {
 			else if (GDE.IS_LINUX) {
 				String desktopFileName = "DataExplorer.desktop"; //$NON-NLS-1$
 				String extractTargetFilePath = jarBasePath + desktopFileName;
-				log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
+				if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
 				File targetFile = new File(extractTargetFilePath);
 				//installation directory must contain DataExplorer.desktop with write permission
 				if (targetFile.exists() && targetFile.canWrite()) {
@@ -530,7 +533,7 @@ public class OperatingSystemHelper {
 
 					desktopFileName = "DevicePropertiesEditor.desktop"; //$NON-NLS-1$
 					extractTargetFilePath = jarBasePath + desktopFileName;
-					log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "extractTargetFilePath = " + extractTargetFilePath); //$NON-NLS-1$
 					targetFile = new File(extractTargetFilePath);
 					//installation directory must contain DataExplorer.desktop with write permission
 					if (targetFile.exists() && targetFile.canWrite()) {
@@ -548,7 +551,7 @@ public class OperatingSystemHelper {
 
 				//check if xdg-utls are installed, this is the prerequisite for the registration process
 				if (Runtime.getRuntime().exec("which xdg-mime").waitFor() != 0) { //$NON-NLS-1$
-					log.log(Level.INFO, "DataExplorer program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "DataExplorer program can not registered until xdg-utils are installed and in path"); //$NON-NLS-1$
 					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0030));
 					rc = 0;
 				}
@@ -556,10 +559,10 @@ public class OperatingSystemHelper {
 					FileUtils.extract(jarFile, "unregister.sh", GDE.STRING_EMPTY, targetDir, "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 					command = "chmod +x " + targetDir + "/unregister.sh"; //$NON-NLS-1$ //$NON-NLS-2$
-					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 					Runtime.getRuntime().exec(command).waitFor();
 					command = targetDir + "/unregister.sh"; //$NON-NLS-1$
-					log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
+					if(log.isLoggable(Level.INFO)) log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 					rc = Runtime.getRuntime().exec(command).waitFor();					
 				}
 			}
@@ -613,10 +616,10 @@ public class OperatingSystemHelper {
 					fullQualifiedSourceFilePath = fullQualifiedSourceFilePath.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR_WINDOWS);
 					fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR_WINDOWS);
 					String sourceBasePath = fullQualifiedSourceFilePath.substring(0, fullQualifiedSourceFilePath.lastIndexOf(GDE.FILE_SEPARATOR_WINDOWS) + 1);
-					log.log(Level.FINE, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
+					if(log.isLoggable(Level.FINE)) log.log(Level.FINE, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
 
 					String targetFileLinkPath = fullQualifiedTargetFilePath.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR_WINDOWS); // + ".lnk"; //$NON-NLS-1$
-					log.log(Level.FINE, "targetFileLinkPath = " + targetFileLinkPath); //$NON-NLS-1$
+					if(log.isLoggable(Level.FINE)) log.log(Level.FINE, "targetFileLinkPath = " + targetFileLinkPath); //$NON-NLS-1$
 
 					String[] shellLinkArgs = { targetFileLinkPath, fullQualifiedSourceFilePath, GDE.STRING_EMPTY, sourceBasePath, fullQualifiedSourceFilePath, GDE.STRING_EMPTY };
 
@@ -631,7 +634,7 @@ public class OperatingSystemHelper {
 					String fullQualifiedLinkTargetPath = fullQualifiedSourceFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 					String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 					String command = "ln -s '" + fullQualifiedLinkTargetPath + "' '" + fullQualifiedLinkPath +"'";  //$NON-NLS-1$
-					log.log(Level.FINE, "executing: " + command); //$NON-NLS-1$
+					if(log.isLoggable(Level.FINE)) log.log(Level.FINE, "executing: " + command); //$NON-NLS-1$
 
 					Process process = new ProcessBuilder("ln", "-s", fullQualifiedLinkTargetPath, fullQualifiedLinkPath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 					process.waitFor();
@@ -642,7 +645,7 @@ public class OperatingSystemHelper {
 						log.log(Level.FINE, "std.out = " + line); //$NON-NLS-1$
 					}
 					while ((line = besr.readLine()) != null) {
-						log.log(Level.FINE, "std.err = " + line); //$NON-NLS-1$
+						if(log.isLoggable(Level.FINE)) log.log(Level.FINE, "std.err = " + line); //$NON-NLS-1$
 					}
 					if (process.exitValue() != 0) {
 						String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
@@ -658,7 +661,7 @@ public class OperatingSystemHelper {
 			else if (GDE.IS_MAC) { //$NON-NLS-1$
 				fullQualifiedSourceFilePath = fullQualifiedSourceFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 				fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-				log.log(Level.FINE, "sourceBasePath = " + fullQualifiedSourceFilePath + ", targetFileLinkPath = " + fullQualifiedTargetFilePath); //$NON-NLS-1$
+				if(log.isLoggable(Level.FINE)) log.log(Level.FINE, "sourceBasePath = " + fullQualifiedSourceFilePath + ", targetFileLinkPath = " + fullQualifiedTargetFilePath); //$NON-NLS-1$
 				
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fullQualifiedTargetFilePath), "UTF-8")); //$NON-NLS-1$
 				writer.write(fullQualifiedSourceFilePath);
@@ -681,46 +684,48 @@ public class OperatingSystemHelper {
 	 * @return if shell link file the contained file path is returned, else the given file path is returned
 	 * @throws IOException
 	 */
-	public static String getLinkContainedFilePath(String filePath) throws IOException {
+	public static String getLinkContainedFilePath(String filePath) throws IOException {		filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		String ret = filePath;
+		String line = GDE.STRING_EMPTY;
 		if (GDE.IS_WINDOWS) {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					new FileInputStream(filePath), "UTF-8")); //$NON-NLS-1$
-			char[] tmpChars = new char[25];
-			if(reader.read(tmpChars) != 25)
-				log.log(Level.WARNING, "failed reading " + filePath);
-			String line = new String(tmpChars);
-			log.log(Level.FINE, "line = " + line); //$NON-NLS-1$
-			reader.close();
-			if (!line.contains(GDE.DATA_EXPLORER_FILE) && !line.contains(GDE.LEGACY_OSDE_FILE)) {
-				log.log(Level.FINE, "source filePath = " + filePath); //$NON-NLS-1$
-				ret = WindowsHelper.getFilePathFromLink(filePath);
-				log.log(Level.FINE, "returned FilePath = " + ret); //$NON-NLS-1$
-				if (ret.startsWith("GDE_MSGE")) { //$NON-NLS-1$
-					String msgKey = ret.split(GDE.STRING_SEMICOLON)[0];
-					String msgValue = ret.split("; ")[1];
-					throw new UnsatisfiedLinkError(Messages.getString(msgKey,
-							new Object[] { msgValue }));
+	    ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
+			if (zip_input.getNextEntry() == null) {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8")); //$NON-NLS-1$
+				char[] tmpChars = new char[25];
+				if (reader.read(tmpChars) != 25) log.log(Level.WARNING, "failed reading " + filePath);
+				line = new String(tmpChars);
+				if(log.isLoggable(Level.FINE)) log.log(Level.FINE, "line = " + line); //$NON-NLS-1$
+				reader.close();
+				if (!line.contains(GDE.DATA_EXPLORER_FILE) && !line.contains(GDE.LEGACY_OSDE_FILE)) {
+					log.log(Level.FINE, "source filePath = " + filePath); //$NON-NLS-1$
+					ret = WindowsHelper.getFilePathFromLink(filePath);
+					log.log(Level.FINE, "returned FilePath = " + ret); //$NON-NLS-1$
+					if (ret.startsWith("GDE_MSGE")) { //$NON-NLS-1$
+						String msgKey = ret.split(GDE.STRING_SEMICOLON)[0];
+						String msgValue = ret.split("; ")[1];
+						throw new UnsatisfiedLinkError(Messages.getString(msgKey,
+								new Object[] { msgValue }));
+					}
 				}
 			}
+	    zip_input.close();
 		}
 		else if (GDE.IS_LINUX) {
 			try {
 				String command = "ls -al " + filePath;  //$NON-NLS-1$
-				log.log(Level.FINER, "executing: " + command); //$NON-NLS-1$
+				if(log.isLoggable(Level.FINE)) log.log(Level.FINE, "executing: " + command); //$NON-NLS-1$
 				Process process = new ProcessBuilder("ls", "-al", filePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				process.waitFor();
 				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-				String line;
 				while ((line = bisr.readLine()) != null) {
-					log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
+					if(log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
 					if (line.contains(OperatingSystemHelper.STRING_LINK_POINTER)) {
 						ret = line.split(OperatingSystemHelper.STRING_LINK_POINTER)[1].trim();
 					}
 				}
 				while ((line = besr.readLine()) != null) {
-					log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
+					if(log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
 				}
 				if (process.exitValue() != 0) {
 					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
@@ -734,23 +739,27 @@ public class OperatingSystemHelper {
 
 		}
 		else if (GDE.IS_MAC) {
+	    ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
+			if (zip_input.getNextEntry() == null) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8")); //$NON-NLS-1$
 			char[] tmpChars = new char[25]; // max path length
 			if( 25 != reader.read(tmpChars))
 				log.log(Level.WARNING, "failed to read from " + filePath);
-			String line = new String(tmpChars);
+			line = new String(tmpChars);
 			log.log(Level.FINE, "line = " + line); //$NON-NLS-1$
 			if (!line.contains(GDE.DATA_EXPLORER_FILE) && !line.contains(GDE.LEGACY_OSDE_FILE)) {
 				line = line + reader.readLine();
 				ret = line.trim();
-				log.log(Level.FINE, "returned FilePath = " + ret); //$NON-NLS-1$
+				if(log.isLoggable(Level.FINE)) log.log(Level.FINE, "returned FilePath = " + ret); //$NON-NLS-1$
 			}
 			reader.close();
+			}
+			zip_input.close();
 		}
 		else {
 			log.log(Level.WARNING, "Operating System implementation not available"); //$NON-NLS-1$
 		}
-		log.log(Level.FINE, ret);
+		if(log.isLoggable(Level.FINE)) log.log(Level.FINE, ret);
 		return ret;
 	}
 	
@@ -800,20 +809,20 @@ public class OperatingSystemHelper {
 		boolean isMember = false;
 		try {
 			String command = "groups";  //$NON-NLS-1$
-			log.log(Level.FINER, "executing: " + command); //$NON-NLS-1$
+			if(log.isLoggable(Level.FINER)) log.log(Level.FINER, "executing: " + command); //$NON-NLS-1$
 			Process process = new ProcessBuilder(command).start(); //$NON-NLS-1$ //$NON-NLS-2$
 			process.waitFor();
 			BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			String line;
 			while ((line = bisr.readLine()) != null) {
-				log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
+				if(log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
 				if (line.contains("uucp")) {
 					isMember = true;
 				}
 			}
 			while ((line = besr.readLine()) != null) {
-				log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
+				if(log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
 			}
 			if (process.exitValue() != 0) {
 				String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
@@ -836,19 +845,19 @@ public class OperatingSystemHelper {
 		String result = grepChunk;
 		try {
 			String[] command = {"/bin/sh", "-c", "ls -l " + directory + " | grep " + grepChunk};  //$NON-NLS-1$ //$NON-NLS-2$
-			log.log(Level.FINE, "executing: ls -l " + directory + " | grep " + grepChunk);//$NON-NLS-1$ //$NON-NLS-2$
+			if(log.isLoggable(Level.FINE)) log.log(Level.FINE, "executing: ls -l " + directory + " | grep " + grepChunk);//$NON-NLS-1$ //$NON-NLS-2$
 			Process process = new ProcessBuilder(command).start(); 
 			process.waitFor();
 			BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			String line;
 			while ((line = bisr.readLine()) != null) {
-				log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
+				if(log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
 				if (line.contains("->"))
 					result = line.substring(0, line.lastIndexOf("->")-1); //$NON-NLS-1$
 			}
 			while ((line = besr.readLine()) != null) {
-				log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
+				if(log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
 			}
 			besr.close();
 			bisr.close();
