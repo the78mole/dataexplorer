@@ -577,7 +577,7 @@ public class OsdReaderWriter {
 	 * @param filePath
 	 * @throws DataInconsitsentException
 	 */
-	public static void readRecordSetsData(RecordSet recordSet, String filePath, boolean doUpdateProgressBar) throws FileNotFoundException, IOException, DataInconsitsentException {
+	public static synchronized void readRecordSetsData(RecordSet recordSet, String filePath, boolean doUpdateProgressBar) throws FileNotFoundException, IOException, DataInconsitsentException {
 		filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
     ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
     ZipEntry zip_entry = zip_input.getNextEntry();
