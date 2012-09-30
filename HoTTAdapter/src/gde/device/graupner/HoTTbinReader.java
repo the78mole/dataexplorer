@@ -285,7 +285,7 @@ public class HoTTbinReader {
 					if (HoTTbinReader.log.isLoggable(java.util.logging.Level.FINER))
 						HoTTbinReader.log.logp(java.util.logging.Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1)
 								+ GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader.buf[7], false));
-
+					
 					//fill receiver data
 					if (HoTTbinReader.buf[33] == 0 && (HoTTbinReader.buf[38] & 0x80) != 128 && DataParser.parse2Short(HoTTbinReader.buf, 40) >= 0) {
 						parseAddReceiver(HoTTbinReader.buf);
@@ -294,6 +294,8 @@ public class HoTTbinReader {
 						parseAddChannel(HoTTbinReader.buf);
 					}
 
+					HoTTbinReader.timeStep_ms += 10;// add default time step from device of 10 msec
+					
 					//log.log(Level.OFF, "sensor type ID = " + StringHelper.byte2Hex2CharString(new byte[] {(byte) (HoTTbinReader.buf[7] & 0xFF)}, 1));
 					switch ((byte) (HoTTbinReader.buf[7] & 0xFF)) {
 					case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
@@ -509,16 +511,13 @@ public class HoTTbinReader {
 							HoTTbinReader.buf4 = new byte[30];
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 						}
-
+						
 						if (HoTTbinReader.buf0 != null && HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
 							parseAddMotorDriver(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 							HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 						}
 						break;
 					}
-
-					// add default time step from device of 10 msec
-					HoTTbinReader.timeStep_ms += 10;
 
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
@@ -529,21 +528,6 @@ public class HoTTbinReader {
 					++countPackageLoss;
 					HoTTbinReader.timeStep_ms += 10;
 				}
-
-				//remove this update cycle due to performance reasons and statistics calculations (trigger ranges)
-				//if (menuToolBar != null && (i > 0 && i % (numberDatablocks / 4) == 0)) {
-				//	if (!isInitialSwitched) {
-				//		HoTTbinReader.channels.switchChannel(channel.getName());
-				//		channel.switchRecordSet(recordSetName);
-				//		device.updateVisibilityStatus(channel.getActiveRecordSet(), true);
-				//		isInitialSwitched = true;
-				//	}
-				//	else
-				//		HoTTbinReader.application.updateAllTabs(false);
-				//
-				//	if (HoTTbinReader2.logger.isLoggable(Level.TIME))
-				//		HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-				//}
 			}
 			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
@@ -711,6 +695,8 @@ public class HoTTbinReader {
 						parseAddChannel(HoTTbinReader.buf);
 					}
 
+					HoTTbinReader.timeStep_ms += 10;// add default time step from log record of 10 msec
+
 					//detect sensor switch
 					if (actualSensor == -1)
 						lastSensor = actualSensor = (byte) (HoTTbinReader.buf[7] & 0xFF);
@@ -876,9 +862,6 @@ public class HoTTbinReader {
 						System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 					}
 
-					// add default time step from log record of 10 msec
-					HoTTbinReader.timeStep_ms += 10;
-
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //tx,rx == 0
@@ -888,21 +871,6 @@ public class HoTTbinReader {
 					++countPackageLoss;
 					HoTTbinReader.timeStep_ms += 10;
 				}
-
-				//remove this update cycle due to performance reasons and statistics calculations (trigger ranges)
-				//if (menuToolBar != null && (i > 0 && i % (numberDatablocks / 4) == 0)) {
-				//	if (!isInitialSwitched) {
-				//		HoTTbinReader.channels.switchChannel(channel.getName());
-				//		channel.switchRecordSet(recordSetName);
-				//		device.updateVisibilityStatus(channel.getActiveRecordSet(), true);
-				//		isInitialSwitched = true;
-				//	}
-				//	else
-				//		HoTTbinReader.application.updateAllTabs(false);
-				//
-				//	if (HoTTbinReader2.logger.isLoggable(Level.TIME))
-				//		HoTTbinReader2.logger.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-				//}
 			}
 			HoTTbinReader.log.logp(java.util.logging.Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$

@@ -314,13 +314,13 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						break;
 					}
 
+					
+					HoTTbinReader2.timeStep_ms += 10; // add default time step from device of 10 msec
+					
 					if (isSensorData || isReceiverData) {
 						HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader2.timeStep_ms);
 						isSensorData = isReceiverData = false;
 					}
-					// add default time step from device of 10 msec
-					HoTTbinReader2.timeStep_ms += 10;
-
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //skip empty block, but add time step
@@ -456,6 +456,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					}
 					if (channelNumber == 4) parseChannel(HoTTbinReader2.buf);
 
+					HoTTbinReader2.timeStep_ms += 10;// add default time step from log record of 10 msec
+
 					if (actualSensor == -1)
 						lastSensor = actualSensor = (byte) (HoTTbinReader2.buf[7] & 0xFF);
 					else
@@ -579,10 +581,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					if (HoTTbinReader2.buf[33] == 4) {
 						System.arraycopy(HoTTbinReader2.buf, 34, HoTTbinReader2.buf4, 0, HoTTbinReader2.buf4.length);
 					}
-
-					// add default time step from log record of 10 msec
-					HoTTbinReader2.timeStep_ms += 10;
-
+				
 					if (menuToolBar != null && i % 100 == 0) HoTTbinReader2.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 				}
 				else { //skip empty block, but add time step
