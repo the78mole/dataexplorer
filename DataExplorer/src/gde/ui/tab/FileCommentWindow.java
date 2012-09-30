@@ -112,6 +112,7 @@ public class FileCommentWindow extends CTabItem {
 		this.commentMainComposite.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "commentMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
+				setFileComment();
 				updateRecordSetTable();
 			}
 		});
@@ -119,6 +120,15 @@ public class FileCommentWindow extends CTabItem {
 			public void helpRequested(HelpEvent evt) {
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "commentMainComposite.helpRequested " + evt); //$NON-NLS-1$
 				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_92.html"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		});
+		this.commentMainComposite.addFocusListener(new FocusListener() {
+			public void focusLost(FocusEvent evt) {
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "commentMainComposite.focusLost() , event=" + evt); //$NON-NLS-1$
+				setFileComment();
+			}
+			public void focusGained(FocusEvent evt) {
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "commentMainComposite.focusGained() , event=" + evt); //$NON-NLS-1$
 			}
 		});
 		{

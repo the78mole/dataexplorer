@@ -256,16 +256,16 @@ public class GraphicsComposite extends Composite {
 							RecordSet recordSet = activeChannel.getActiveRecordSet();
 							if (recordSet != null) {
 								String tmpDescription = activeChannel.getFileDescription();
-								if (tmpDescription.contains(",") ) {
-									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(","));
-								}
-								else if (tmpDescription.contains(":")) {
+								if (tmpDescription.contains(":")) {
 									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(":"));
 								}
-								else if (tmpDescription.contains(";")) {
+								if (tmpDescription.contains(";")) {
 									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf(";"));
 								}
-								else if (tmpDescription.contains("\n")) {
+								if (tmpDescription.contains("\r")) {
+									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\r"));
+								}
+								if (tmpDescription.contains("\n")) {
 									tmpDescription = tmpDescription.substring(0, tmpDescription.indexOf("\n"));
 								}
 								String tmpHeader = tmpDescription + GDE.STRING_MESSAGE_CONCAT + recordSet.getName();
