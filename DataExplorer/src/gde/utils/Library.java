@@ -141,7 +141,7 @@ public class Library {
 		if (mapName && load (libName)) return;
 		
 		/* Try loading library from the tmp directory */
-		String path = System.getProperty ("java.io.tmpdir"); //$NON-NLS-1$
+		String path = System.getProperty ("user.dir"); //$NON-NLS-1$
 		path = new File (path).getAbsolutePath ();
 		//log.log(Level.INFO, "before load " + path + SEPARATOR + mappedName); //$NON-NLS-1$
 		if (load (path + SEPARATOR + mappedName)) return;
