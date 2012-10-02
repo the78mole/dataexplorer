@@ -74,6 +74,8 @@ public class FileCommentWindow extends CTabItem {
 	TableColumn										recordCommentTableHeader2;
 	Color													innerAreaBackground;
 	Color													surroundingBackground;
+	
+	int fileCommentCaretPosition = 0;
 
 	final DataExplorer	application;
 	final Channels								channels;
@@ -152,6 +154,7 @@ public class FileCommentWindow extends CTabItem {
 			this.fileCommentText.setText(Messages.getString(MessageIds.GDE_MSGT0241));
 			this.fileCommentText.setBounds(50, 40, 500, 100);
 			this.fileCommentText.setText(this.channels.getActiveChannel() != null ? this.channels.getActiveChannel().getFileDescription() : GDE.STRING_EMPTY);
+			this.fileCommentCaretPosition = this.fileCommentText.getText().length();
 			this.fileCommentText.setMenu(this.popupmenu);
 			this.fileCommentText.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
@@ -164,15 +167,28 @@ public class FileCommentWindow extends CTabItem {
 				public void keyPressed(KeyEvent e) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
 					FileCommentWindow.this.isFileCommentChanged = true;
+					FileCommentWindow.this.fileCommentCaretPosition = FileCommentWindow.this.fileCommentText.getCaretPosition();
 				}
 			});
 			this.fileCommentText.addFocusListener(new FocusListener() {
 				public void focusLost(FocusEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
 					setFileComment();
+					FileCommentWindow.this.fileCommentCaretPosition = FileCommentWindow.this.fileCommentCaretPosition == 0 
+							? FileCommentWindow.this.fileCommentText.getText().length() : FileCommentWindow.this.fileCommentCaretPosition;
 				}
 				public void focusGained(FocusEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
+					FileCommentWindow.this.fileCommentText.setSelection(FileCommentWindow.this.fileCommentCaretPosition);
+				}
+			});
+			this.fileCommentText.addPaintListener(new PaintListener() {		
+				@Override
+				public void paintControl(PaintEvent evt) {
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.paintControl() , event=" + evt); //$NON-NLS-1$
+					FileCommentWindow.this.fileCommentCaretPosition = FileCommentWindow.this.fileCommentCaretPosition == 0 
+							? FileCommentWindow.this.fileCommentText.getText().length() : FileCommentWindow.this.fileCommentCaretPosition;
+					FileCommentWindow.this.fileCommentText.setSelection(FileCommentWindow.this.fileCommentCaretPosition);
 				}
 			});
 		}
