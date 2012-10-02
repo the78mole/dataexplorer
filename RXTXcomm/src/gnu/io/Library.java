@@ -34,6 +34,7 @@ public class Library {
 							Runtime.getRuntime().exec(new String[] { "chmod", "755", fileName }).waitFor(); //$NON-NLS-1$ //$NON-NLS-2$
 						}
 						catch (Throwable e) {
+							//ignore
 						}
 					}
 					if (load(fileName)) return true;
@@ -45,11 +46,13 @@ public class Library {
 				if (os != null) os.close();
 			}
 			catch (IOException e1) {
+				//ignore
 			}
 			try {
 				if (is != null) is.close();
 			}
 			catch (IOException e1) {
+				//ignore
 			}
 		}
 		if (file.exists()) file.delete();
@@ -67,6 +70,7 @@ public class Library {
 			return true;
 		}
 		catch (UnsatisfiedLinkError e) {
+			//ignore
 		}
 		return false;
 	}
@@ -124,6 +128,14 @@ public class Library {
 
 		/* Try loading library from the tmp directory */
 		String path = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
+		try {
+			if (osPath.startsWith("win") && new File(System.getProperty("user.dir")+ SEPARATOR + "test.file").createNewFile() && new File(System.getProperty("user.dir")+ SEPARATOR + "test.file").delete()) {
+				path = System.getProperty("user.dir");
+			}
+		}
+		catch (IOException e) {
+			//write permission denied
+		}
 		path = new File(path).getAbsolutePath();
 		//System.out.println("...loading library from java.io.tmpdir : libname = " + path + SEPARATOR + mappedName);
 		if (load(path + SEPARATOR + mappedName)) return;
