@@ -18,11 +18,13 @@
 ****************************************************************************************/
 package gde.utils;
 
+import gde.GDE;
+import gde.log.Level;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 /**
@@ -141,7 +143,15 @@ public class Library {
 		if (mapName && load (libName)) return;
 		
 		/* Try loading library from the tmp directory */
-		String path = System.getProperty ("user.dir"); //$NON-NLS-1$
+		String path = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
+		try {
+			if (GDE.IS_WINDOWS && new File(System.getProperty("user.dir")+ SEPARATOR + "test.file").createNewFile() && new File(System.getProperty("user.dir")+ SEPARATOR + "test.file").delete()) {
+				path = System.getProperty("user.dir");
+			}
+		}
+		catch (IOException e) {
+			//write permission denied
+		}
 		path = new File (path).getAbsolutePath ();
 		//log.log(Level.INFO, "before load " + path + SEPARATOR + mappedName); //$NON-NLS-1$
 		if (load (path + SEPARATOR + mappedName)) return;

@@ -1273,7 +1273,7 @@ public class FileUtils {
 	 */
 	public static void cleanupPre() {
 		if (GDE.IS_WINDOWS) 
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "rxtxSerial.dll"}); //$NON-NLS-1$ //$NON-NLS-2$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "WinHelper*.dll", "Register*.exe", "rxtxSerial.dll"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		else if (GDE.IS_LINUX)
 			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.*", "*register.sh", "librxtxSerial.so"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		else if (GDE.IS_MAC)
@@ -1326,10 +1326,10 @@ public class FileUtils {
 			}
 		}
 		if (GDE.IS_WINDOWS) 
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "rxtxSerial.dll", "GDE", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "rxtxSerial.dll", "GDE", "WinHelper*.dll", "Register*.exe", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		else if (GDE.IS_LINUX)
 			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", "*register.sh", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		else if (GDE.IS_MAC)
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", "swtlib-"+GDE.BIT_MODE, GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
