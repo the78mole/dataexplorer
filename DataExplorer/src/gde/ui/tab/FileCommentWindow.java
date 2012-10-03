@@ -45,6 +45,8 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -76,7 +78,7 @@ public class FileCommentWindow extends CTabItem {
 	Color													surroundingBackground;
 	
 	int fileCommentCaretPosition = 0;
-	int fileCommentKeyCode = SWT.NONE;
+	boolean isFocusGained = false;
 
 	final DataExplorer	application;
 	final Channels								channels;
@@ -163,42 +165,39 @@ public class FileCommentWindow extends CTabItem {
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_92.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
+			this.fileCommentText.addVerifyListener(new VerifyListener() {		
+				@Override
+				public void verifyText(VerifyEvent e) {
+					if (isFocusGained) {
+						e.doit = false;
+						isFocusGained = false;
+					}
+					else
+						e.doit = true;
+					//System.out.println("verify " + FileCommentWindow.this.fileCommentText.getCaretPosition());					
+				}
+			});
 			this.fileCommentText.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyPressed(KeyEvent e) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
 					FileCommentWindow.this.isFileCommentChanged = true;
-					FileCommentWindow.this.fileCommentCaretPosition = FileCommentWindow.this.fileCommentText.getCaretPosition();
-					if (e.keyCode == SWT.BS) 
-						FileCommentWindow.this.fileCommentKeyCode = SWT.BS;
-					//System.out.println("pressed " + FileCommentWindow.this.fileCommentCaretPosition);
+					//System.out.println("pressed " + FileCommentWindow.this.fileCommentText.getCaretPosition());
 				}
 			});
 			this.fileCommentText.addFocusListener(new FocusListener() {
 				public void focusLost(FocusEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
 					setFileComment();
-					FileCommentWindow.this.fileCommentCaretPosition = FileCommentWindow.this.fileCommentCaretPosition == 0 
-							? FileCommentWindow.this.fileCommentText.getText().length() : FileCommentWindow.this.fileCommentCaretPosition;
+					FileCommentWindow.this.fileCommentCaretPosition = FileCommentWindow.this.fileCommentCaretPosition == 0 && FileCommentWindow.this.fileCommentText.getCaretPosition() == 0
+							? FileCommentWindow.this.fileCommentText.getText().length() : FileCommentWindow.this.fileCommentText.getCaretPosition();
+					//System.out.println("lost " + FileCommentWindow.this.fileCommentText.getCaretPosition() + " " + FileCommentWindow.this.fileCommentCaretPosition);
 				}
 				public void focusGained(FocusEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
 					FileCommentWindow.this.fileCommentText.setSelection(FileCommentWindow.this.fileCommentCaretPosition);
-				}
-			});
-			this.fileCommentText.addPaintListener(new PaintListener() {		
-				@Override
-				public void paintControl(PaintEvent evt) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.paintControl() , event=" + evt); //$NON-NLS-1$
-					//System.out.println("paint pre " + FileCommentWindow.this.fileCommentCaretPosition);
-					FileCommentWindow.this.fileCommentCaretPosition = FileCommentWindow.this.fileCommentCaretPosition == 0 
-							? FileCommentWindow.this.fileCommentText.getText().length() : FileCommentWindow.this.fileCommentCaretPosition;
-					if (FileCommentWindow.this.fileCommentKeyCode == SWT.BS) {
-						--FileCommentWindow.this.fileCommentCaretPosition;
-						FileCommentWindow.this.fileCommentKeyCode = SWT.NONE;
-					}
-					FileCommentWindow.this.fileCommentText.setSelection(FileCommentWindow.this.fileCommentCaretPosition);
-					//System.out.println("paint post " + FileCommentWindow.this.fileCommentCaretPosition);
+					//System.out.println("gained " + FileCommentWindow.this.fileCommentText.getCaretPosition());
+					isFocusGained = true;
 				}
 			});
 		}
