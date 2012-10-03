@@ -76,6 +76,7 @@ public class FileCommentWindow extends CTabItem {
 	Color													surroundingBackground;
 	
 	int fileCommentCaretPosition = 0;
+	int fileCommentKeyCode = SWT.NONE;
 
 	final DataExplorer	application;
 	final Channels								channels;
@@ -168,6 +169,9 @@ public class FileCommentWindow extends CTabItem {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
 					FileCommentWindow.this.isFileCommentChanged = true;
 					FileCommentWindow.this.fileCommentCaretPosition = FileCommentWindow.this.fileCommentText.getCaretPosition();
+					if (e.keyCode == SWT.BS) 
+						FileCommentWindow.this.fileCommentKeyCode = SWT.BS;
+					//System.out.println("pressed " + FileCommentWindow.this.fileCommentCaretPosition);
 				}
 			});
 			this.fileCommentText.addFocusListener(new FocusListener() {
@@ -186,9 +190,15 @@ public class FileCommentWindow extends CTabItem {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.paintControl() , event=" + evt); //$NON-NLS-1$
+					//System.out.println("paint pre " + FileCommentWindow.this.fileCommentCaretPosition);
 					FileCommentWindow.this.fileCommentCaretPosition = FileCommentWindow.this.fileCommentCaretPosition == 0 
 							? FileCommentWindow.this.fileCommentText.getText().length() : FileCommentWindow.this.fileCommentCaretPosition;
+					if (FileCommentWindow.this.fileCommentKeyCode == SWT.BS) {
+						--FileCommentWindow.this.fileCommentCaretPosition;
+						FileCommentWindow.this.fileCommentKeyCode = SWT.NONE;
+					}
 					FileCommentWindow.this.fileCommentText.setSelection(FileCommentWindow.this.fileCommentCaretPosition);
+					//System.out.println("paint post " + FileCommentWindow.this.fileCommentCaretPosition);
 				}
 			});
 		}
