@@ -11,6 +11,7 @@ Implement support for zip compression of OSD files
 fixed [bug #37464] Title bar of "Device Properties Editor" shows "&"
 fixed [bug #37302] File comment is reset when I move the mouse
 fixed [bug #37460] DataExplorer triggers Microsoft Security Essentials
+fixed [bug #37465] Keep selection in curves selector after pressing space
 documentation update
 
 Version 3.04 - 21 Sep 2012
