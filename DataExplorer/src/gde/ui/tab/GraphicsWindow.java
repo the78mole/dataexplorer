@@ -112,18 +112,18 @@ public class GraphicsWindow extends CTabItem {
 	/**
 	 * redraws the graphics canvas as well as the curve selector table
 	 */
-	public void redrawGraphics() {
+	public void redrawGraphics(final boolean redrawCurveSelector) {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			this.graphicsComposite.doRedrawGraphics();
 			this.graphicsComposite.updateCaptions();
-			this.curveSelectorComposite.doUpdateCurveSelectorTable();
+			if (redrawCurveSelector) this.curveSelectorComposite.doUpdateCurveSelectorTable();
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
 					GraphicsWindow.this.graphicsComposite.doRedrawGraphics();
 					GraphicsWindow.this.graphicsComposite.updateCaptions();
-					GraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
+					if (redrawCurveSelector) GraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 				}
 			});
 		}

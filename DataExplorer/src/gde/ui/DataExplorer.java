@@ -1693,13 +1693,20 @@ public class DataExplorer extends Composite {
 		colorDialog.setText(this.getClass().getSimpleName() + Messages.getString(MessageIds.GDE_MSGT0145));
 		return colorDialog.open();
 	}
-	
+
 	/**
 	 * update all visualization windows
 	 */
 	public void updateAllTabs(final boolean force) {
+		updateAllTabs(force, true);
+	}
+	
+	/**
+	 * update all visualization windows
+	 */
+	public void updateAllTabs(final boolean force, final boolean redrawCurveSelector) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			this.updateGraphicsWindow();
+			this.updateGraphicsWindow(redrawCurveSelector);
 			this.updateStatisticsData(true);
 			if (force) {
 				this.updateDigitalWindow();
@@ -1721,7 +1728,7 @@ public class DataExplorer extends Composite {
 		else {
 			GDE.display.asyncExec(new Runnable() {
 				public void run() {
-					DataExplorer.this.updateGraphicsWindow();
+					DataExplorer.this.updateGraphicsWindow(redrawCurveSelector);
 					DataExplorer.this.updateStatisticsData(true);
 					if (force) {
 						DataExplorer.this.updateDigitalWindow();
@@ -1748,19 +1755,26 @@ public class DataExplorer extends Composite {
 	 * update the graphicsWindow
 	 */
 	public void updateGraphicsWindow() {
+		updateGraphicsWindow(true);
+	}
+		
+	/**
+	 * update the graphicsWindow
+	 */
+	public void updateGraphicsWindow(final boolean refreshCurveSelector) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			if (!this.graphicsTabItem.isActiveCurveSelectorContextMenu()) {
 				int tabSelectionIndex = this.displayTab.getSelectionIndex();
 				if (tabSelectionIndex == 0) { //graphics tab is alwasy the first one
-					this.graphicsTabItem.redrawGraphics();
+					this.graphicsTabItem.redrawGraphics(refreshCurveSelector);
 				}
 				else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) 
 						&& DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
-					this.compareTabItem.redrawGraphics();
+					this.compareTabItem.redrawGraphics(refreshCurveSelector);
 				}
 				else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) 
 						&& DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
-					this.utilGraphicsTabItem.redrawGraphics();
+					this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 				}
 			}
 		}
@@ -1770,15 +1784,15 @@ public class DataExplorer extends Composite {
 					if (!DataExplorer.this.graphicsTabItem.isActiveCurveSelectorContextMenu()) {
 						int tabSelectionIndex = DataExplorer.this.displayTab.getSelectionIndex();
 						if (tabSelectionIndex == 0) {
-							DataExplorer.this.graphicsTabItem.redrawGraphics();
+							DataExplorer.this.graphicsTabItem.redrawGraphics(refreshCurveSelector);
 						}
 						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) 
 								&& DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_COMPARE)) {
-								DataExplorer.this.compareTabItem.redrawGraphics();
+								DataExplorer.this.compareTabItem.redrawGraphics(refreshCurveSelector);
 						}
 						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) 
 								&& DataExplorer.this.isRecordSetVisible(GraphicsWindow.TYPE_UTIL)) {
-							DataExplorer.this.utilGraphicsTabItem.redrawGraphics();
+							DataExplorer.this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 						}
 					}
 				}
@@ -1867,7 +1881,7 @@ public class DataExplorer extends Composite {
 	}
 
 	public void updateCompareWindow() {
-		this.compareTabItem.redrawGraphics();
+		this.compareTabItem.redrawGraphics(true);
 	}
 
 	public RecordSet getCompareSet() {

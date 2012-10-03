@@ -279,7 +279,7 @@ public class StringHelper {
 		case SWT.HELP:					keyCode = "HELP"; break;
 		default :								
 		}
-		log.log(Level.INFO, "keyCode = SWT." + keyCode);
+		log.log(Level.OFF, "keyCode = SWT." + keyCode);
 	}
 
 	/**

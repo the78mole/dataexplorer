@@ -176,7 +176,7 @@ public class SelectorComposite extends Composite {
 								}
 								activeRecord.getParent().syncScaleOfSyncableRecords();
 							}
-							SelectorComposite.this.application.updateAllTabs(false);
+							SelectorComposite.this.application.updateAllTabs(false, false);
 						}
 					}
 				}
