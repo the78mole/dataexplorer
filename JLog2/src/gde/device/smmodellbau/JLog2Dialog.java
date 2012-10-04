@@ -128,6 +128,17 @@ public class JLog2Dialog extends DeviceDialog {
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+				this.dialogShell.addListener(SWT.Traverse, new Listener() {
+		      public void handleEvent(Event event) {
+		        switch (event.detail) {
+		        case SWT.TRAVERSE_ESCAPE:
+		        	JLog2Dialog.this.dialogShell.close();
+		          event.detail = SWT.TRAVERSE_NONE;
+		          event.doit = false;
+		          break;
+		        }
+		      }
+		    });
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						JLog2Dialog.log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
