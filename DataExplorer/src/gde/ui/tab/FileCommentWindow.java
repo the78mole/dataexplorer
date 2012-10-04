@@ -166,7 +166,6 @@ public class FileCommentWindow extends CTabItem {
 				}
 			});
 			this.fileCommentText.addVerifyListener(new VerifyListener() {		
-				@Override
 				public void verifyText(VerifyEvent e) {
 					if (isFocusGained) {
 						e.doit = false;
