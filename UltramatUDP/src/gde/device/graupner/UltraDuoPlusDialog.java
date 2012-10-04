@@ -456,6 +456,17 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.dialogShell.layout();
 				this.dialogShell.pack();
 				this.dialogShell.setSize(655, 655);
+				this.dialogShell.addListener(SWT.Traverse, new Listener() {
+		      public void handleEvent(Event event) {
+		        switch (event.detail) {
+		        case SWT.TRAVERSE_ESCAPE:
+		        	UltraDuoPlusDialog.this.dialogShell.close();
+		          event.detail = SWT.TRAVERSE_NONE;
+		          event.doit = false;
+		          break;
+		        }
+		      }
+		    });
 				this.dialogShell.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
 						log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
