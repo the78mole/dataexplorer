@@ -320,6 +320,8 @@
             <fileset file="build/misc/DataExplorer.ico" />
             <fileset file="build/misc/DevicePropertiesEditor.ico" />
             -->
+			<fileset file="RXTXcomm/src/win32/rxtxSerial.dll" />
+			<fileset file="DataExplorer/src/WinHelper32.dll" />
 		</copy>
 		<copy todir="${output.windows32.program.devices}" flatten="yes">
 			<fileset dir="${basedir}">
@@ -335,6 +337,8 @@
             <fileset file="build/misc/DataExplorer.ico" />
             <fileset file="build/misc/DevicePropertiesEditor.ico" />
             -->
+			<fileset file="RXTXcomm/src/win64/rxtxSerial.dll" />
+			<fileset file="DataExplorer/src/WinHelper64.dll" />
 		</copy>
 		<copy todir="${output.windows64.program.devices}" flatten="yes">
 			<fileset dir="${basedir}">
@@ -352,6 +356,7 @@
 			<fileset file="build/misc/DataExplorer.desktop" />
 			<fileset file="build/misc/DevicePropertiesEditor" />
 			<fileset file="build/misc/DevicePropertiesEditor.desktop" />
+			<fileset file="RXTXcomm/src/lnx32/librxtxSerial.so" />
 		</copy>
 		<copy todir="${output.gnulinux32.program.devices}" flatten="yes">
 			<fileset dir="${basedir}">
@@ -369,6 +374,7 @@
 			<fileset file="build/misc/DataExplorer.desktop" />
 			<fileset file="build/misc/DevicePropertiesEditor" />
 			<fileset file="build/misc/DevicePropertiesEditor.desktop" />
+			<fileset file="RXTXcomm/src/lnx64/librxtxSerial.so" />
 		</copy>
 		<copy todir="${output.gnulinux64.program.devices}" flatten="yes">
 			<fileset dir="${basedir}">
@@ -380,6 +386,7 @@
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer.icns" />
 			<fileset file="build/misc/DevicePropertiesEditor.icns" />
+			<fileset file="RXTXcomm/src/mac/librxtxSerial.jnilib" />
 		</copy>
 		<copy todir="${output.mac32.bundle}" flatten="yes">
 			<fileset file="build/lib/MAC/32/Info.plist" />
@@ -400,6 +407,7 @@
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer.icns" />
 			<fileset file="build/misc/DevicePropertiesEditor.icns" />
+			<fileset file="RXTXcomm/src/mac/librxtxSerial.jnilib" />
 		</copy>
 		<copy todir="${output.mac64.bundle}" flatten="yes">
 			<fileset file="build/lib/MAC/64/Info.plist" />
