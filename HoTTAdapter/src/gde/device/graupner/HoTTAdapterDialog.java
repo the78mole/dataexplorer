@@ -49,6 +49,8 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -129,6 +131,17 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+				this.dialogShell.addListener(SWT.Traverse, new Listener() {
+		      public void handleEvent(Event event) {
+		        switch (event.detail) {
+		        case SWT.TRAVERSE_ESCAPE:
+		        	HoTTAdapterDialog.this.dialogShell.close();
+		          event.detail = SWT.TRAVERSE_NONE;
+		          event.doit = false;
+		          break;
+		        }
+		      }
+		    });
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
