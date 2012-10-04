@@ -441,45 +441,37 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
-		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		String objectKey = this.application.getObjectKey();
-		if (this.application.isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
-			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
-			FileUtils.checkDirectoryAndCreate(objectkeyPath);
-			searchDirectory = objectkeyPath;
-		}
-		else if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
-			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
-		}
-		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2700), new String[] {this.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR}, searchDirectory, null, SWT.MULTI);
-		
-		if (!this.application.isObjectoriented() && !searchDirectory.equals(fd.getFilterPath()))
-			this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2700));
 
 		Thread reader = new Thread("reader") {
 			@Override
 			public void run() {
-				for (String tmpFileName : fd.getFileNames()) {
-					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-					if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
-						if (selectedImportFile.contains(GDE.STRING_DOT)) {
-							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+				try {
+					FlightRecorder.this.application.setPortConnected(true);
+					for (String tmpFileName : fd.getFileNames()) {
+						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
+							if (selectedImportFile.contains(GDE.STRING_DOT)) {
+								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+							}
+							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
 						}
-						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
+						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+						
+						if (fd.getFileName().length() > 4) {
+							try {
+								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
+								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								CSVSerialDataReaderWriter.read(selectedImportFile, FlightRecorder.this, recordNameExtend, channelConfigNumber, true);
+							}
+							catch (Throwable e) {
+								log.log(Level.WARNING, e.getMessage(), e);
+							}
+						}
 					}
-					log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-					
-					if (fd.getFileName().length() > 4) {
-						try {
-							Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-							String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-							CSVSerialDataReaderWriter.read(selectedImportFile, FlightRecorder.this, recordNameExtend, channelConfigNumber, true);
-						}
-						catch (Throwable e) {
-							log.log(Level.WARNING, e.getMessage(), e);
-						}
-					}
+				}
+				finally {
+					FlightRecorder.this.application.setPortConnected(false);
 				}
 			}
 		};
