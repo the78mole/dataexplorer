@@ -966,7 +966,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * import device specific *.bin data files
 	 */
 	protected void importDeviceData() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2400));
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2400), "LogData");
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
