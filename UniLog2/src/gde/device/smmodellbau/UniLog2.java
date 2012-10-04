@@ -619,48 +619,39 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	/**
 	 * 
 	 */
-	public void importDeviceData() {
-		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		String objectKey = this.application.getObjectKey();
-		if (this.application.isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
-			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
-			FileUtils.checkDirectoryAndCreate(objectkeyPath);
-			searchDirectory = objectkeyPath;
-		}
-		else if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
-				searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
-		}
-		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2500), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
-				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
-		
-		if (!this.application.isObjectoriented() && !searchDirectory.equals(fd.getFilterPath()))
-			this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+	public void importDeviceData() {		
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2500));
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
 			public void run() {
-				for (String tmpFileName : fd.getFileNames()) {
-					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-					if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
-						if (selectedImportFile.contains(GDE.STRING_DOT)) {
-							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+				try {
+					UniLog2.this.application.setPortConnected(true);
+					for (String tmpFileName : fd.getFileNames()) {
+						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
+							if (selectedImportFile.contains(GDE.STRING_DOT)) {
+								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+							}
+							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_TXT;
 						}
-						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_TXT;
-					}
-					log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
-					if (fd.getFileName().length() > 4) {
-						Integer channelConfigNumber = UniLog2.this.application.getActiveChannelNumber();
-						channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
-						String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-						try {
-							NMEAReaderWriter.read(selectedImportFile, UniLog2.this, recordNameExtend, channelConfigNumber);
-						}
-						catch (Exception e) {
-							log.log(Level.WARNING, e.getMessage(), e);
+						if (fd.getFileName().length() > 4) {
+							Integer channelConfigNumber = UniLog2.this.application.getActiveChannelNumber();
+							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
+							String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+							try {
+								NMEAReaderWriter.read(selectedImportFile, UniLog2.this, recordNameExtend, channelConfigNumber);
+							}
+							catch (Exception e) {
+								log.log(Level.WARNING, e.getMessage(), e);
+							}
 						}
 					}
+				}
+				finally {
+					UniLog2.this.application.setPortConnected(false);
 				}
 			}
 		};
