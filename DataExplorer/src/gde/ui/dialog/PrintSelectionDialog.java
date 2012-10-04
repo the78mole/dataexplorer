@@ -65,7 +65,9 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -123,6 +125,17 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(400, 320);
+			this.dialogShell.addListener(SWT.Traverse, new Listener() {
+	      public void handleEvent(Event event) {
+	        switch (event.detail) {
+	        case SWT.TRAVERSE_ESCAPE:
+	        	PrintSelectionDialog.this.dialogShell.close();
+	          event.detail = SWT.TRAVERSE_NONE;
+	          event.doit = false;
+	          break;
+	        }
+	      }
+	    });
 			this.dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent arg0) {
 					PrintSelectionDialog.this.application.resetShellIcon();

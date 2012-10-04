@@ -80,9 +80,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -261,6 +263,17 @@ public class DevicePropertiesEditor extends Composite {
 			DevicePropertiesEditor.dialogShell.setSize(shellBounds.width, shellBounds.height);
 			DevicePropertiesEditor.dialogShell.setMinimumSize(shellBounds.width, shellBounds.height);
 			DevicePropertiesEditor.dialogShell.open();
+			DevicePropertiesEditor.dialogShell.addListener(SWT.Traverse, new Listener() {
+	      public void handleEvent(Event event) {
+	        switch (event.detail) {
+	        case SWT.TRAVERSE_ESCAPE:
+	        	DevicePropertiesEditor.dialogShell.close();
+	          event.detail = SWT.TRAVERSE_NONE;
+	          event.doit = false;
+	          break;
+	        }
+	      }
+	    });
 
 			this.deviceConfig = useDeviceConfiguration;
 			this.devicePropertiesFileName = this.deviceConfig.getPropertiesFileName();

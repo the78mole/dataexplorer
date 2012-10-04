@@ -53,7 +53,9 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -131,6 +133,17 @@ public class IgcExportDialog extends Dialog {
 			this.dialogShell.layout();
 			this.dialogShell.pack();
 			this.dialogShell.setSize(800, 480);
+			this.dialogShell.addListener(SWT.Traverse, new Listener() {
+	      public void handleEvent(Event event) {
+	        switch (event.detail) {
+	        case SWT.TRAVERSE_ESCAPE:
+	        	IgcExportDialog.this.dialogShell.close();
+	          event.detail = SWT.TRAVERSE_NONE;
+	          event.doit = false;
+	          break;
+	        }
+	      }
+	    });
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$

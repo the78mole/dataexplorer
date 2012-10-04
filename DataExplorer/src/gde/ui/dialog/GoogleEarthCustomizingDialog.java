@@ -57,6 +57,8 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -126,6 +128,17 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			dialogShell.layout();
 			dialogShell.pack();			
 			dialogShell.setSize(350, 200);
+			this.dialogShell.addListener(SWT.Traverse, new Listener() {
+	      public void handleEvent(Event event) {
+	        switch (event.detail) {
+	        case SWT.TRAVERSE_ESCAPE:
+	        	GoogleEarthCustomizingDialog.this.dialogShell.close();
+	          event.detail = SWT.TRAVERSE_NONE;
+	          event.doit = false;
+	          break;
+	        }
+	      }
+	    });
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/EarthConfigHot.gif")); //$NON-NLS-1$
 			dialogShell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent evt) {

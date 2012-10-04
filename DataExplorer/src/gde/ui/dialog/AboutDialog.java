@@ -18,7 +18,13 @@
 ****************************************************************************************/
 package gde.ui.dialog;
 
+import gde.GDE;
 import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -29,14 +35,10 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-
-import gde.GDE;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 /**
  * Dialog class showing some info text with disclaimers, version , ...
@@ -84,6 +86,17 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.pack();			
 			this.dialogShell.setSize(650, 430);
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0146));
+			this.dialogShell.addListener(SWT.Traverse, new Listener() {
+	      public void handleEvent(Event event) {
+	        switch (event.detail) {
+	        case SWT.TRAVERSE_ESCAPE:
+	        	AboutDialog.this.dialogShell.close();
+	          event.detail = SWT.TRAVERSE_NONE;
+	          event.doit = false;
+	          break;
+	        }
+	      }
+	    });
 			{
 				FormData infoTextLData = new FormData();
 				infoTextLData.width = 610;

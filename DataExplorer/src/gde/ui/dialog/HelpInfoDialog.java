@@ -30,6 +30,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import gde.GDE;
@@ -97,6 +99,17 @@ public class HelpInfoDialog extends Dialog {
 			this.dialogShell.setVisible(true);
 			this.dialogShell.forceActive();
 		}
+		this.dialogShell.addListener(SWT.Traverse, new Listener() {
+      public void handleEvent(Event event) {
+        switch (event.detail) {
+        case SWT.TRAVERSE_ESCAPE:
+        	HelpInfoDialog.this.dialogShell.close();
+          event.detail = SWT.TRAVERSE_NONE;
+          event.doit = false;
+          break;
+        }
+      }
+    });
 		Display display = this.dialogShell.getDisplay();
 		while (!this.dialogShell.isDisposed()) {
 			if (!display.readAndDispatch()) display.sleep();

@@ -68,8 +68,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Table;
@@ -230,6 +232,17 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.pack();
 			this.dialogShell.setSize(566, 644);
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0189));
+			this.dialogShell.addListener(SWT.Traverse, new Listener() {
+	      public void handleEvent(Event event) {
+	        switch (event.detail) {
+	        case SWT.TRAVERSE_ESCAPE:
+	        	DeviceSelectionDialog.this.dialogShell.close();
+	          event.detail = SWT.TRAVERSE_NONE;
+	          event.doit = false;
+	          break;
+	        }
+	      }
+	    });
 			this.dialogShell.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(java.util.logging.Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$

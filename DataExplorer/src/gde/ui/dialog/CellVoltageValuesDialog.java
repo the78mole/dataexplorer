@@ -42,7 +42,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import gde.GDE;
@@ -113,6 +115,17 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.setSize(380, 380);
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0376));
 			this.dialogShell.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+			this.dialogShell.addListener(SWT.Traverse, new Listener() {
+	      public void handleEvent(Event event) {
+	        switch (event.detail) {
+	        case SWT.TRAVERSE_ESCAPE:
+	        	CellVoltageValuesDialog.this.dialogShell.close();
+	          event.detail = SWT.TRAVERSE_NONE;
+	          event.doit = false;
+	          break;
+	        }
+	      }
+	    });
 			this.dialogShell.addDisposeListener( new DisposeListener() {
 				public void widgetDisposed(DisposeEvent event) {
 					CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "dialogShell.disposeListener, event=" + event); //$NON-NLS-1$
