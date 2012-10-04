@@ -376,6 +376,17 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 					AkkuMasterC4Dialog.this.application.openHelpDialog(AKKU_MASTER_HELP_DIR, "HelpInfo.html"); //$NON-NLS-1$
 				}
 			});
+			this.dialogShell.addListener(SWT.Traverse, new Listener() {
+				public void handleEvent(Event event) {
+					switch (event.detail) {
+					case SWT.TRAVERSE_ESCAPE:
+						AkkuMasterC4Dialog.this.dialogShell.close();
+						event.detail = SWT.TRAVERSE_NONE;
+						event.doit = false;
+						break;
+					}
+				}
+			});
 			this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x/2-220, 70));
 			this.dialogShell.open();
 			startUpdateVersionThread();
