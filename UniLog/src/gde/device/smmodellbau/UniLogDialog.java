@@ -54,8 +54,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
@@ -268,6 +270,17 @@ public class UniLogDialog extends DeviceDialog {
 				this.dialogShell.layout();
 				this.dialogShell.pack();
 				this.dialogShell.setSize(642, 446);
+				this.dialogShell.addListener(SWT.Traverse, new Listener() {
+		      public void handleEvent(Event event) {
+		        switch (event.detail) {
+		        case SWT.TRAVERSE_ESCAPE:
+		        	UniLogDialog.this.dialogShell.close();
+		          event.detail = SWT.TRAVERSE_NONE;
+		          event.doit = false;
+		          break;
+		        }
+		      }
+		    });
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
