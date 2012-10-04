@@ -18,7 +18,6 @@
 ****************************************************************************************/
 package gde.utils;
 
-import gde.GDE;
 import gde.log.Level;
 
 import java.io.File;
@@ -142,19 +141,17 @@ public class Library {
 		if (load (libName)) return;
 		if (mapName && load (libName)) return;
 		
+		/* Try loading library from the user.dir directory which is the directory where application gets started */
+		String path = System.getProperty("user.dir"); //$NON-NLS-1$
+		path = new File(path).getAbsolutePath();
+		//System.out.println("...loading library from java.io.tmpdir : libname = " + path + SEPARATOR + mappedName);
+		if (load(path + SEPARATOR + mappedName)) return;
+		
 		/* Try loading library from the tmp directory */
-		String path = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
-		try {
-			if (GDE.IS_WINDOWS && new File(System.getProperty("user.dir")+ SEPARATOR + "test.file").createNewFile() && new File(System.getProperty("user.dir")+ SEPARATOR + "test.file").delete()) {
-				path = System.getProperty("user.dir");
-			}
-		}
-		catch (IOException e) {
-			//write permission denied
-		}
-		path = new File (path).getAbsolutePath ();
-		//log.log(Level.INFO, "before load " + path + SEPARATOR + mappedName); //$NON-NLS-1$
-		if (load (path + SEPARATOR + mappedName)) return;
+		path = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
+		path = new File(path).getAbsolutePath();
+		//System.out.println("...loading library from java.io.tmpdir : libname = " + path + SEPARATOR + mappedName);
+		if (load(path + SEPARATOR + mappedName)) return;
 			
 		/* Try extracting and loading library from jar */
 		//log.log(Level.INFO, "before extract " + path + SEPARATOR + mappedName); //$NON-NLS-1$
