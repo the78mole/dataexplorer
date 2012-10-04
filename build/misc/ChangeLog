@@ -13,6 +13,7 @@ fixed [bug #37302] File comment is reset when I move the mouse
 fixed [bug #37460] DataExplorer triggers Microsoft Security Essentials
 fixed [bug #37465] Keep selection in curves selector after pressing space
 fixed [bug #37487] Strange bug when editing in the file comment tab, if deleted within the line
+fixed [bug #37463] Close all dialogs with ESC key
 documentation update
 
 Version 3.04 - 21 Sep 2012
