@@ -472,56 +472,47 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
-		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		String objectKey = this.application.getObjectKey();
-		if (this.application.isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
-				String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
-				FileUtils.checkDirectoryAndCreate(objectkeyPath);
-				searchDirectory = objectkeyPath;
-		}
-		else if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
-				searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
-		}
-		final FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT2000), new String[] { this.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
-				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
-
-		if (!application.isObjectoriented() && !searchDirectory.equals(fd.getFilterPath()))
-			this.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2000));
 
 		Thread reader = new Thread("reader"){
 			@Override
 			public void run() {
-				for (String tmpFileName : fd.getFileNames()) {
-					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-					if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_NMEA)) {
-						if (selectedImportFile.contains(GDE.STRING_DOT)) {
-							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+				try {
+					GPSLogger.this.application.setPortConnected(true);
+					for (String tmpFileName : fd.getFileNames()) {
+						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_NMEA)) {
+							if (selectedImportFile.contains(GDE.STRING_DOT)) {
+								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+							}
+							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_NMEA;
 						}
-						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_NMEA;
-					}
-					log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
-					if (fd.getFileName().length() > 4) {
-						try {
-							Integer channelConfigNumber = 1; //channelCongig 1 : UniLog
-							String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-								//check for GPS-Logger containing $UL2
-								DataInputStream binReader = new DataInputStream(new FileInputStream(selectedImportFile));
-								byte[] buffer = new byte[1024];
-								int numBytes = binReader.read(buffer);
-								if (numBytes > 0 && new String(buffer).contains("$UL2")) {
-									channelConfigNumber = 2;
-									GPSLogger.this.channels.switchChannel(channelConfigNumber, GDE.STRING_EMPTY); //channelCongig 2 : UniLog2
-								}
-								binReader.close();
+						if (fd.getFileName().length() > 4) {
+							try {
+								Integer channelConfigNumber = 1; //channelCongig 1 : UniLog
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+									//check for GPS-Logger containing $UL2
+									DataInputStream binReader = new DataInputStream(new FileInputStream(selectedImportFile));
+									byte[] buffer = new byte[1024];
+									int numBytes = binReader.read(buffer);
+									if (numBytes > 0 && new String(buffer).contains("$UL2")) {
+										channelConfigNumber = 2;
+										GPSLogger.this.channels.switchChannel(channelConfigNumber, GDE.STRING_EMPTY); //channelCongig 2 : UniLog2
+									}
+									binReader.close();
 
-							NMEAReaderWriter.read(selectedImportFile, GPSLogger.this, recordNameExtend, channelConfigNumber);
-						}
-						catch (Exception e) {
-							log.log(Level.WARNING, e.getMessage(), e);
+								NMEAReaderWriter.read(selectedImportFile, GPSLogger.this, recordNameExtend, channelConfigNumber);
+							}
+							catch (Exception e) {
+								log.log(Level.WARNING, e.getMessage(), e);
+							}
 						}
 					}
+				}
+				finally {
+					GPSLogger.this.application.setPortConnected(false);
 				}
 			}
 		};
