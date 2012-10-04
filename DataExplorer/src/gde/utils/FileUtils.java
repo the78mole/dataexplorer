@@ -64,6 +64,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
@@ -1331,5 +1332,31 @@ public class FileUtils {
 			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", "*register.sh", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		else if (GDE.IS_MAC)
 			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * query the import data directory in dependency of searchDi
+	 * @param searchDirectory
+	 * @param objectKey
+	 * @return
+	 */
+	public static FileDialog getImportDirectoryFileDialog(IDevice device, String dialogTitleMessage) {
+		String devicePath = DataExplorer.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String objectKey = DataExplorer.application.getObjectKey();
+		
+		if (Settings.getInstance().isDeviceImportDirectoryObjectRelated() && DataExplorer.application.isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
+			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
+			FileUtils.checkDirectoryAndCreate(objectkeyPath);
+			searchDirectory = objectkeyPath;
+		}
+		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
+			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
+		}
+		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage, new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
+				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
+
+		if (!DataExplorer.application.isObjectoriented() && !searchDirectory.equals(fd.getFilterPath())) device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+		return fd;
 	}
 }

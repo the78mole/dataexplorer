@@ -142,6 +142,7 @@ public class SettingsDialog extends Dialog {
 	Button															deviceDialogModalButton;
 	Button															deviceDialogOnTopButton;
 	Button															deviceDialogAlphaButton;
+	Button															deviceImportDialogButton;
 	Group																deviceDialogGroup;
 	Group																serialPortGroup;
 	Group																separatorGroup;
@@ -220,7 +221,7 @@ public class SettingsDialog extends Dialog {
 						this.generalTabComposite.setLayout(new FormLayout());
 						{
 							FormData groupLocaleLData = new FormData();
-							groupLocaleLData.height = 38;
+							groupLocaleLData.height = 30;
 							groupLocaleLData.left = new FormAttachment(0, 1000, 12);
 							groupLocaleLData.right = new FormAttachment(1000, 1000, -12);
 							groupLocaleLData.top = new FormAttachment(0, 1000, 7);
@@ -234,7 +235,7 @@ public class SettingsDialog extends Dialog {
 								this.localCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.localCombo.setItems(this.supportedLocals);
 								this.localCombo.select(getLocalLanguageIndex());
-								this.localCombo.setBounds(354, GDE.IS_MAC_COCOA ? 12 : 22, 54, GDE.IS_LINUX ? 22 : 20);
+								this.localCombo.setBounds(354, GDE.IS_MAC_COCOA ? 10 : 20, 54, GDE.IS_LINUX ? 22 : 20);
 								this.localCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0306));
 								this.localCombo.setEditable(false);
 								this.localCombo.setBackground(SWTResourceManager.getColor(255, 255, 255));
@@ -251,7 +252,7 @@ public class SettingsDialog extends Dialog {
 							{
 								this.localLabel = new CLabel(this.groupLocale, SWT.LEFT);
 								this.localLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.localLabel.setBounds(15, GDE.IS_MAC_COCOA ? 12 : 22, 292, 20);
+								this.localLabel.setBounds(15, GDE.IS_MAC_COCOA ? 10 : 20, 292, 20);
 								this.localLabel.setText(Messages.getString(MessageIds.GDE_MSGT0307));
 								this.localLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0308));
 							}
@@ -260,10 +261,10 @@ public class SettingsDialog extends Dialog {
 							this.defaultDataPathGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.defaultDataPathGroup.setLayout(null);
 							FormData classSelectionGroupLData = new FormData();
-							classSelectionGroupLData.height = 42;
+							classSelectionGroupLData.height = 30;
 							classSelectionGroupLData.left = new FormAttachment(0, 1000, 12);
 							classSelectionGroupLData.right = new FormAttachment(1000, 1000, -12);
-							classSelectionGroupLData.top = new FormAttachment(0, 1000, 66);
+							classSelectionGroupLData.top = new FormAttachment(0, 1000, 60);
 							this.defaultDataPathGroup.setLayoutData(classSelectionGroupLData);
 							this.defaultDataPathGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.defaultDataPathGroup.setText(Messages.getString(MessageIds.GDE_MSGT0310));
@@ -271,18 +272,18 @@ public class SettingsDialog extends Dialog {
 								this.defaultDataPathLabel = new CLabel(this.defaultDataPathGroup, SWT.NONE);
 								this.defaultDataPathLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.defaultDataPathLabel.setText(Messages.getString(MessageIds.GDE_MSGT0311));
-								this.defaultDataPathLabel.setBounds(15, GDE.IS_MAC_COCOA ? 14 : 24, 90, 20);
+								this.defaultDataPathLabel.setBounds(15, GDE.IS_MAC_COCOA ? 10 : 20, 90, 20);
 							}
 							{
 								this.defaultDataPath = new Text(this.defaultDataPathGroup, SWT.BORDER);
 								this.defaultDataPath.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.defaultDataPath.setBounds(107, GDE.IS_MAC_COCOA ? 14 : 24, 295, GDE.IS_LINUX ? 22 : 20);
+								this.defaultDataPath.setBounds(107, GDE.IS_MAC_COCOA ? 8 : 18, 295, GDE.IS_LINUX ? 22 : 20);
 							}
 							{
 								this.defaultDataPathAdjustButton = new Button(this.defaultDataPathGroup, SWT.PUSH | SWT.CENTER);
 								this.defaultDataPathAdjustButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.defaultDataPathAdjustButton.setText(". . . "); //$NON-NLS-1$
-								this.defaultDataPathAdjustButton.setBounds(405, GDE.IS_MAC_COCOA ? 14 : 24, GDE.IS_MAC ? 50 : 30, 20);
+								this.defaultDataPathAdjustButton.setBounds(405, GDE.IS_MAC_COCOA ? 10 : 20, GDE.IS_MAC ? 50 : 30, 20);
 								this.defaultDataPathAdjustButton.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -299,10 +300,10 @@ public class SettingsDialog extends Dialog {
 						} // end default data path group
 						{ // begin file save dialog filename leader
 							FormData fileOpenSaveDialogGroupLData = new FormData();
-							fileOpenSaveDialogGroupLData.height = 44;
+							fileOpenSaveDialogGroupLData.height = 30;
 							fileOpenSaveDialogGroupLData.left = new FormAttachment(0, 1000, 12);
 							fileOpenSaveDialogGroupLData.right = new FormAttachment(1000, 1000, -12);
-							fileOpenSaveDialogGroupLData.top = new FormAttachment(0, 1000, 129);
+							fileOpenSaveDialogGroupLData.top = new FormAttachment(0, 1000, 112);
 							this.fileOpenSaveDialogGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.fileOpenSaveDialogGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.fileOpenSaveDialogGroup.setLayout(null);
@@ -312,7 +313,7 @@ public class SettingsDialog extends Dialog {
 								this.suggestDate = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.suggestDate.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.suggestDate.setText(Messages.getString(MessageIds.GDE_MSGT0316));
-								this.suggestDate.setBounds(15, GDE.IS_MAC_COCOA ? 18 : 28, 194, 16);
+								this.suggestDate.setBounds(15, GDE.IS_MAC_COCOA ? 10 : 20, 194, 16);
 								this.suggestDate.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -325,7 +326,7 @@ public class SettingsDialog extends Dialog {
 								this.suggestObjectKey = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.suggestObjectKey.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.suggestObjectKey.setText(Messages.getString(MessageIds.GDE_MSGT0317));
-								this.suggestObjectKey.setBounds(239, GDE.IS_MAC_COCOA ? 18 : 28, 194, 16);
+								this.suggestObjectKey.setBounds(239, GDE.IS_MAC_COCOA ? 10 : 20, 194, 16);
 								this.suggestObjectKey.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -337,10 +338,10 @@ public class SettingsDialog extends Dialog {
 						} // end file save dialog filename leader
 						{ // begin device dialog settings
 							FormData deviceDialogLData = new FormData();
-							deviceDialogLData.height = 55;
+							deviceDialogLData.height = 85;
 							deviceDialogLData.left = new FormAttachment(0, 1000, 12);
 							deviceDialogLData.right = new FormAttachment(1000, 1000, -12);
-							deviceDialogLData.top = new FormAttachment(0, 1000, 194);
+							deviceDialogLData.top = new FormAttachment(0, 1000, 164);
 							this.deviceDialogGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.deviceDialogGroup.setLayout(null);
 							this.deviceDialogGroup.setLayoutData(deviceDialogLData);
@@ -350,7 +351,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogModalButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.deviceDialogModalButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.deviceDialogModalButton.setText(Messages.getString(MessageIds.GDE_MSGT0319));
-								this.deviceDialogModalButton.setBounds(16, GDE.IS_MAC_COCOA ? 14 : 24, 254, 18);
+								this.deviceDialogModalButton.setBounds(16, GDE.IS_MAC_COCOA ? 10 : 20, 254, 18);
 								this.deviceDialogModalButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0320));
 								this.deviceDialogModalButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -365,7 +366,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogOnTopButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.deviceDialogOnTopButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.deviceDialogOnTopButton.setText(Messages.getString(MessageIds.GDE_MSGT0309));
-								this.deviceDialogOnTopButton.setBounds(282, GDE.IS_MAC_COCOA ? 14 : 24, 165, 18);
+								this.deviceDialogOnTopButton.setBounds(282, GDE.IS_MAC_COCOA ? 10 : 20, 165, 18);
 								this.deviceDialogOnTopButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0320));
 								this.deviceDialogOnTopButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -379,7 +380,7 @@ public class SettingsDialog extends Dialog {
 								this.deviceDialogAlphaButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.deviceDialogAlphaButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.deviceDialogAlphaButton.setText(Messages.getString(MessageIds.GDE_MSGT0321));
-								this.deviceDialogAlphaButton.setBounds(16, GDE.IS_MAC_COCOA ? 37 : 47, 254, 18);
+								this.deviceDialogAlphaButton.setBounds(16, GDE.IS_MAC_COCOA ? 35 : 45, 254, 18);
 								this.deviceDialogAlphaButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0322));
 								this.deviceDialogAlphaButton.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -392,7 +393,7 @@ public class SettingsDialog extends Dialog {
 							}
 							{
 								this.alphaSlider = new Slider(this.deviceDialogGroup, SWT.NONE);
-								this.alphaSlider.setBounds(282, GDE.IS_MAC_COCOA ? 28 : 47, 163, GDE.IS_WINDOWS ? 22 : 28);
+								this.alphaSlider.setBounds(282, GDE.IS_MAC_COCOA ? 25 : 45, 163, GDE.IS_WINDOWS ? 18 : 24);
 								this.alphaSlider.setIncrement(5);
 								this.alphaSlider.setMinimum(10);
 								this.alphaSlider.setMaximum(180);
@@ -411,6 +412,20 @@ public class SettingsDialog extends Dialog {
 											break;
 										}
 										SettingsDialog.this.settings.setDialogAlphaValue(SettingsDialog.this.alphaSlider.getSelection());
+									}
+								});
+							}
+							{
+								this.deviceImportDialogButton = new Button(this.deviceDialogGroup, SWT.CHECK | SWT.LEFT);
+								this.deviceImportDialogButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.deviceImportDialogButton.setText(Messages.getString(MessageIds.GDE_MSGT0409));
+								this.deviceImportDialogButton.setBounds(16, GDE.IS_MAC_COCOA ? 62 : 72, 435, 18);
+								this.deviceImportDialogButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0437));
+								this.deviceImportDialogButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "deviceDialogButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setDeviceImportDirectoryObjectRelated(SettingsDialog.this.deviceImportDialogButton.getSelection());
 									}
 								});
 							}
@@ -1336,6 +1351,7 @@ public class SettingsDialog extends Dialog {
 		SettingsDialog.this.deviceDialogAlphaButton.setSelection(SettingsDialog.this.settings.isDeviceDialogAlphaEnabled());
 		SettingsDialog.this.alphaSlider.setEnabled(SettingsDialog.this.settings.isDeviceDialogAlphaEnabled());
 		SettingsDialog.this.alphaSlider.setSelection(SettingsDialog.this.settings.getDialogAlphaValue());
+		SettingsDialog.this.deviceImportDialogButton.setSelection(SettingsDialog.this.settings.isDeviceImportDirectoryObjectRelated());
 
 		SettingsDialog.this.decimalSeparator.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getDecimalSeparator());
 		SettingsDialog.this.listSeparator.setText(GDE.STRING_BLANK + SettingsDialog.this.settings.getListSeparator());
