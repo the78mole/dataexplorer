@@ -57,6 +57,8 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -292,6 +294,17 @@ public class SimulatorDialog extends DeviceDialog {
 						}
 					});
 				}
+				this.dialogShell.addListener(SWT.Traverse, new Listener() {
+		      public void handleEvent(Event event) {
+		        switch (event.detail) {
+		        case SWT.TRAVERSE_ESCAPE:
+		        	SimulatorDialog.this.dialogShell.close();
+		          event.detail = SWT.TRAVERSE_NONE;
+		          event.doit = false;
+		          break;
+		        }
+		      }
+		    });
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
