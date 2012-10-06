@@ -377,7 +377,7 @@ public class GDE {
 		log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "base URL = " + url.toString()); //$NON-NLS-1$
 		if (url.getPath().endsWith(GDE.FILE_SEPARATOR_UNIX)) { // running inside Eclipse
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "started inside Eclipse"); //$NON-NLS-1$
-			basePath = url.getFile().substring(0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
+			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "basePath = " + basePath); //$NON-NLS-1$
 			File file = new File(basePath);

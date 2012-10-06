@@ -1254,7 +1254,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public void setZoomMode(boolean zoomModeEnabled) {
 		if (!zoomModeEnabled) {
 			this.resetMeasurement();
-			if (this.recordNames.length != 0) { // check existens of records, a compare set may have no records
+			if (this.recordNames.length != 0) { // check existence of records, a compare set may have no records
 				// iterate children and reset min/max values
 				for (Record record : this.values()) {
 					record.zoomOffset = 0;

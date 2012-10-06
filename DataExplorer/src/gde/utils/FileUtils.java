@@ -140,7 +140,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * check existent of a directory and file version and create if not exist, backup if version does not match
+	 * check existence of a directory and file version and create if not exist, backup if version does not match
 	 * @param directory
 	 * @param versionFileName string qualifier "_V01" checks for file *_V01.* 
 	 * @return true false if directory needs to be created
@@ -191,7 +191,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * check existent of a directory and delete underlying files as well as the directory
+	 * check existence of a directory and delete underlying files as well as the directory
 	 * attention, this runs for structure up to 5 directory levels only
 	 * @param fullQualifiedDirectoryPath
 	 * @return true false if directory needs to be created
@@ -1010,7 +1010,7 @@ public class FileUtils {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
 		if (url.getPath().endsWith("/")) { // running inside Eclipse //$NON-NLS-1$
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$
-			basePath = url.getFile().substring(GDE.IS_WINDOWS ? 1 : 0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
+			basePath = url.getFile().substring(GDE.IS_WINDOWS ? 1 : 0, url.getPath().lastIndexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			basePath = basePath + "build" + "/target/" 																																																				//$NON-NLS-1$ //$NON-NLS-2$
 				+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY )+ System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE		//$NON-NLS-1$ //$NON-NLS-2$ 
@@ -1037,7 +1037,7 @@ public class FileUtils {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "base URL = " + url.toExternalForm()); //$NON-NLS-1$
 		if (url.getPath().endsWith("/")) { // running inside Eclipse //$NON-NLS-1$
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "started inside Eclipse"); //$NON-NLS-1$
-			basePath = url.getFile().substring(0, url.getPath().indexOf(DataExplorer.class.getSimpleName()));
+			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
@@ -1079,8 +1079,8 @@ public class FileUtils {
 		Manifest m = jarFile.getManifest();
 		String services = m.getMainAttributes().getValue("Export-Service"); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "Export-Service = " + services); //$NON-NLS-1$
-		String[] seriveNames = services.split(", *"); //$NON-NLS-1$
-		for (String name : seriveNames) {
+		String[] serviceNames = services.split(", *"); //$NON-NLS-1$
+		for (String name : serviceNames) {
 			name = name.substring(name.lastIndexOf('.') + 1);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "service name = " + name); //$NON-NLS-1$
 			pluginNamesVector.add(name);

@@ -185,7 +185,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		for (int i = 0; files != null && i < files.length; i++) {
 			try {
 				// loop through all device properties XML and check if device used
-				if (files[i].endsWith(".xml")) {
+				if (files[i].endsWith(GDE.FILE_ENDING_DOT_XML)) {
 					String deviceKey = files[i].substring(0, files[i].length() - 4);
 					devConfig = new DeviceConfiguration(this.settings.getDevicesPath() + GDE.FILE_SEPARATOR_UNIX + files[i]);
 					if (devConfig.getName().equals(this.activeDeviceName) && devConfig.isUsed()) { // define the active device after re-start

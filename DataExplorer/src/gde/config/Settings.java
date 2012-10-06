@@ -278,7 +278,7 @@ public class Settings extends Properties {
 
 		this.load();
 
-		// check existent of application home directory, check XSD version, copy all device XML+XSD and image files
+		// check existence of application home directory, check XSD version, copy all device XML+XSD and image files
 		FileUtils.checkDirectoryAndCreate(this.applHomePath);
 		String devicePropertiesTargetpath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME;
 		devicePropertiesTargetpath = devicePropertiesTargetpath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
@@ -324,7 +324,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * check existens of directory, create if required and update all
+	 * check existence of directory, create if required and update all
 	 * @param devicePropertiesTargetpath
 	 */
 	private void updateDeviceProperties(String devicePropertiesTargetpath, boolean existCheck) {
@@ -348,10 +348,10 @@ public class Settings extends Properties {
 				for (String plugin : plugins) {
 					if (existCheck) {
 						if (!FileUtils.checkFileExist(devicePropertiesTargetpath + plugin + GDE.FILE_ENDING_DOT_XML))
-							FileUtils.extract(jarFile, plugin + ".xml", Settings.PATH_RESOURCE + this.getLocale().getLanguage() + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
+							FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + this.getLocale().getLanguage() + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
 					}
 					else {
-						FileUtils.extract(jarFile, plugin + ".xml", Settings.PATH_RESOURCE + this.getLocale().getLanguage() + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
+						FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE + this.getLocale().getLanguage() + GDE.FILE_SEPARATOR_UNIX, devicePropertiesTargetpath, Settings.PERMISSION_555); //$NON-NLS-1$ 
 					}
 				}
 			}
@@ -359,7 +359,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * check existens of device graphics default templates, extract if required
+	 * check existence of device graphics default templates, extract if required
 	 * @param templateDirectoryTargetPath
 	 */
 	private void checkDeviceTemplates(String templateDirectoryTargetPath) {
