@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.multiplex.FlightRecorder">FlightRecorder</name>
         <manufacturer>Multiplex Modellsport</manufacturer>
-        <manufacturerURL>http://www.mltiplex-rc.de</manufacturerURL>
+        <manufacturerURL>http://www.multiplex-rc.de</manufacturerURL>
         <group>logger</group>
         <image>FlightRecorder.png</image>
         <usage>false</usage>
