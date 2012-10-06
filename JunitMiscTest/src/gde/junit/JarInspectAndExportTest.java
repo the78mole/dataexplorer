@@ -143,7 +143,7 @@ public class JarInspectAndExportTest extends TestCase {
 				String[] plugins = FileUtils.getDeviceJarServicesNames(jarFile);
 				for (String plugin : plugins) {
 					String targetDirectory = System.getProperty("java.io.tmpdir");
-					FileUtils.extract(jarFile, plugin + ".xml", "resource/en/", targetDirectory, "555");
+					FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, "resource/en/", targetDirectory, "555");
 				}
 			}
 		}

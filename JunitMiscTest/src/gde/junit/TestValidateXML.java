@@ -58,7 +58,7 @@ public class TestValidateXML extends TestCase {
 			List<File> files = FileUtils.getFileListing(new File(basePath), 2);
 
 			for (File file : files) {
-				if (file.getAbsolutePath().toLowerCase().endsWith(".xml") && file.getPath().contains("src") && file.getPath().contains("resource") 
+				if (file.getAbsolutePath().toLowerCase().endsWith(GDE.FILE_ENDING_DOT_XML) && file.getPath().contains("src") && file.getPath().contains("resource") 
 						&& !file.getPath().contains("template") && !file.getPath().contains("DataExplorer_Sample")) {
 					log.log(Level.INFO, "working with : " + file);
 
@@ -101,7 +101,7 @@ public class TestValidateXML extends TestCase {
 //			List<File> files = FileUtils.getFileListing(new File(this.getDevicesPath()));
 //
 //			for (File file : files) {
-//				if (file.getAbsolutePath().toLowerCase().endsWith(".xml")) {
+//				if (file.getAbsolutePath().toLowerCase().endsWith(GDE.FILE_ENDING_DOT_XML)) {
 //					log.log(Level.INFO, "working with : " + file);
 //
 //					try {
