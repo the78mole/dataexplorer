@@ -167,6 +167,7 @@ public class FileCommentWindow extends CTabItem {
 			});
 			this.fileCommentText.addVerifyListener(new VerifyListener() {		
 				public void verifyText(VerifyEvent e) {
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.verifyText , event=" + e); //$NON-NLS-1$
 					if (isFocusGained) {
 						e.doit = false;
 						isFocusGained = false;
@@ -180,8 +181,17 @@ public class FileCommentWindow extends CTabItem {
 				@Override
 				public void keyPressed(KeyEvent e) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
-					FileCommentWindow.this.isFileCommentChanged = true;
-					//System.out.println("pressed " + FileCommentWindow.this.fileCommentText.getCaretPosition());
+
+					if (e.character == '\0' || e.keyCode == SWT.ESC) {
+						//ignore when only Shift, Ctrl, etc or ESC was pressed
+					} 
+					else if((e.stateMask & SWT.MOD1) != 0 && ((char) e.keyCode) == 'a' ) {
+						// select all text on Ctrl+a
+						fileCommentText.selectAll();
+					}
+					else {
+						FileCommentWindow.this.isFileCommentChanged = true;
+					}
 				}
 			});
 			this.fileCommentText.addFocusListener(new FocusListener() {

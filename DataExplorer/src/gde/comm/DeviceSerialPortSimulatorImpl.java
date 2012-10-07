@@ -268,7 +268,6 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 			wait4Bytes(1000);
 		}
 		catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (this.isConnected) {
@@ -614,12 +613,10 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	}
 
 	public byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex, int minCountBytes) throws IOException, TimeOutException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public int waitForStableReceiveBuffer(int expectedBytes, int timeout_msec, int stableIndex, int minCount) throws InterruptedException, TimeOutException, IOException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 }
