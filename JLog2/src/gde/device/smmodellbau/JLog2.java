@@ -59,7 +59,6 @@ import org.eclipse.swt.widgets.MenuItem;
 public class JLog2 extends DeviceConfiguration implements IDevice {
 	final static Logger		log								= Logger.getLogger(JLog2.class.getName());
 
-	//TODO
 	final static String		SM_JLOG2_CONFIG_TXT				= "CONFIG.txt";													//$NON-NLS-1$
 
 	final DataExplorer		application;
