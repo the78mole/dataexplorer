@@ -1286,7 +1286,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												//check if time stamp was changed, if yes write back changed data to device
 												if (isDateChanged) {
 													UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2333));
-													//TODO serialPort.writeMemoryCycleData(UltraDuoPlusDialog.this.memorySelectionIndexData, cyclesData);
+													//not implemented device firmware: serialPort.writeMemoryCycleData(UltraDuoPlusDialog.this.memorySelectionIndexData, cyclesData);
 													isDateChanged = false;
 												}
 
