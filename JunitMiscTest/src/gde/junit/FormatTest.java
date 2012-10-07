@@ -25,7 +25,6 @@ public class FormatTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 
 		Double zahl = 234.5657687;
 		System.out.println(String.format("%.2f", zahl));
