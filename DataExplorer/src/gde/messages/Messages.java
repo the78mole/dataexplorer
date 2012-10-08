@@ -121,4 +121,25 @@ public class Messages {
 			log.log(Level.SEVERE, newBundleName, e);
 		}
 	}
+	
+	/**
+	 * query the accelerator character to have it language dependent
+	 * @param key resource bundle constant key
+	 * @return accelerator character
+	 */
+	public static char getAcceleratorChar(String key) {
+		try {
+			String resourceString;
+			if (new Integer(key.substring(key.length()-4)) <= 1000) {
+				resourceString = mainResourceBundle.getString(key);
+			}
+			else {
+				resourceString = deviceResourceBundle.getString(key);
+			}
+			return resourceString.charAt(resourceString.length()-1);
+		}
+		catch (MissingResourceException e) {
+			return '?';
+		}
+	}
 }

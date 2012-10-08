@@ -37,6 +37,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.ConsoleHandler;
@@ -220,6 +221,9 @@ public class GDE {
 
 	public static final String		BOOTSTRAP_LOG										= "/bootstrap.log";																																																					//$NON-NLS-1$
 	public static final String		ECLIPSE_STRING									= "ECLIPSE";																																																									//$NON-NLS-1$
+	public static final String[] 	MOD1 														= new String[] {GDE.IS_MAC ? "\u00E6" : Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Strg" : "Ctrl"};
+	public static final String[] 	MOD2 														= new String[] {Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Umschalt" : "Shift"};
+	public static final String[] 	MOD3 														= new String[] {"Alt"};
 	// ****** end global constants section *******
 
 	// begin OSD file format

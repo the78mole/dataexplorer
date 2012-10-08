@@ -18,9 +18,30 @@
 ****************************************************************************************/
 package gde.ui.menu;
 
+import gde.GDE;
+import gde.comm.DeviceCommPort;
+import gde.config.GraphicsTemplate;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceConfiguration;
+import gde.device.DeviceDialog;
+import gde.device.IDevice;
+import gde.io.FileHandler;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.dialog.DeviceSelectionDialog;
+import gde.ui.dialog.PrintSelectionDialog;
+import gde.ui.dialog.edit.DevicePropertiesEditor;
+import gde.ui.tab.GraphicsComposite;
+import gde.ui.tab.GraphicsWindow;
+
 import java.util.Iterator;
 import java.util.List;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -35,27 +56,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-
-import gde.GDE;
-import gde.comm.DeviceCommPort;
-import gde.config.GraphicsTemplate;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.device.DeviceConfiguration;
-import gde.device.DeviceDialog;
-import gde.device.IDevice;
-import gde.io.FileHandler;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.dialog.DeviceSelectionDialog;
-import gde.ui.dialog.PrintSelectionDialog;
-import gde.ui.dialog.edit.DevicePropertiesEditor;
-import gde.ui.tab.GraphicsComposite;
-import gde.ui.tab.GraphicsWindow;
 
 /**
  * menu bar implementation class for the DataExplorer
@@ -73,8 +73,8 @@ public class MenuBar {
 	MenuItem											contentsMenuItem, webCheckMenuItem;
 	Menu													helpMenu;
 	MenuItem											helpMenuItem;
-	MenuItem											recordCommentMenuItem, graphicsHeaderMenuItem;
-	MenuItem											curveSelectionMenuItem;
+	MenuItem											recordCommentMenuItem, graphicsHeaderMenuItem, prevTabConfigItem, nextTabConfigItem;
+	MenuItem											curveSelectionMenuItem, prevChannelConfigItem, nextChannelConfigItem, prevRecordSetItem, nextRecordSetItem;
 	Menu													viewMenu;
 	MenuItem											viewMenuItem;
 	Menu													graphicsMenu;
@@ -143,8 +143,9 @@ public class MenuBar {
 				});
 				{
 					this.newFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.newFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0002)); //$NON-NLS-1$
+					this.newFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0002, GDE.MOD1)); //$NON-NLS-1$
 					this.newFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/NewHot.gif")); //$NON-NLS-1$
+					this.newFileMenuItem.setAccelerator(SWT.MOD1  + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0002));
 					this.newFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -157,8 +158,9 @@ public class MenuBar {
 				}
 				{
 					this.openFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.openFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0003)); 
+					this.openFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0003, GDE.MOD1)); 
 					this.openFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/OpenHot.gif")); //$NON-NLS-1$
+					this.openFileMenuItem.setAccelerator(SWT.MOD1  + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0003));
 					this.openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -169,8 +171,9 @@ public class MenuBar {
 				}
 				{
 					this.saveFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.saveFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0005));
+					this.saveFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0005, GDE.MOD1));
 					this.saveFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/SaveHot.gif")); //$NON-NLS-1$
+					this.saveFileMenuItem.setAccelerator(SWT.MOD1  + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0005));
 					this.saveFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -187,8 +190,9 @@ public class MenuBar {
 				}
 				{
 					this.saveAsFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.saveAsFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0008));
+					this.saveAsFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0008, GDE.MOD1));
 					this.saveAsFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/SaveAsHot.gif")); //$NON-NLS-1$
+					this.saveFileMenuItem.setAccelerator(SWT.MOD1 + SWT.F12);
 					this.saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -199,7 +203,8 @@ public class MenuBar {
 				}
 				{
 					this.historyFileMenuItem = new MenuItem(this.fileMenu, SWT.CASCADE);
-					this.historyFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0009));
+					this.historyFileMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0009));
+					this.historyFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0009, GDE.MOD1));
 					{
 						this.fileHistoryMenu = new Menu(this.historyFileMenuItem);
 						this.historyFileMenuItem.setMenu(this.fileHistoryMenu);
@@ -295,8 +300,9 @@ public class MenuBar {
 				}
 				{
 					this.printMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.printMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0052));
+					this.printMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0052, GDE.MOD1));
 					this.printMenuItem.setImage(SWTResourceManager.getImage("gde/resource/PrintHot.gif")); //$NON-NLS-1$
+					this.printMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0052));
 					this.printMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -310,7 +316,8 @@ public class MenuBar {
 				}
 				{
 					this.exitMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.exitMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0021));
+					this.exitMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0021, GDE.MOD1));
+					this.exitMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0021));
 					this.exitMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -358,8 +365,9 @@ public class MenuBar {
 				});
 				{
 					this.activateZoomGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.activateZoomGraphicMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0023));
+					this.activateZoomGraphicMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0023, GDE.MOD1));
 					this.activateZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ZoomHot.gif")); //$NON-NLS-1$
+					this.activateZoomGraphicMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0023));
 					this.activateZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -370,8 +378,9 @@ public class MenuBar {
 				}
 				{
 					this.resetZoomGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.resetZoomGraphicMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0024));
+					this.resetZoomGraphicMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0024, GDE.MOD1));
 					this.resetZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ExpandHot.gif")); //$NON-NLS-1$
+					this.resetZoomGraphicMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0024));
 					this.resetZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -398,7 +407,8 @@ public class MenuBar {
 				}
 				{
 					this.copyTabContentAsImageMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.copyTabContentAsImageMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0026));
+					this.copyTabContentAsImageMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0026, GDE.MOD1));
+					this.copyTabContentAsImageMenuItem.setAccelerator(SWT.MOD1 + SWT.SHIFT + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0026));
 					this.copyTabContentAsImageMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -409,7 +419,8 @@ public class MenuBar {
 				}
 				{
 					this.copyGraphicsPrintImageMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.copyGraphicsPrintImageMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0027));
+					this.copyGraphicsPrintImageMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0027, GDE.MOD1));
+					this.copyGraphicsPrintImageMenuItem.setAccelerator(SWT.MOD1 + SWT.SHIFT + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0027));
 					this.copyGraphicsPrintImageMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -434,8 +445,9 @@ public class MenuBar {
 				this.deviceMenuItem.setMenu(this.deviceMenu);
 				{
 					this.toolBoxDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
-					this.toolBoxDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0029));
+					this.toolBoxDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0029, GDE.MOD1));
 					this.toolBoxDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+					this.toolBoxDeviceMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0029));
 					this.toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -465,8 +477,9 @@ public class MenuBar {
 				}
 				{
 					this.selectDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
-					this.selectDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0030));
+					this.selectDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0030, GDE.MOD1));
 					this.selectDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/DeviceSelectionHot.gif")); //$NON-NLS-1$
+					this.selectDeviceMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0030));
 					this.selectDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -481,7 +494,8 @@ public class MenuBar {
 				{
 					this.prevDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
 					this.prevDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
-					this.prevDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0031)); 
+					this.prevDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0031, GDE.MOD2)); 
+					this.prevDeviceMenuItem.setAccelerator(SWT.MOD2 + SWT.ARROW_RIGHT);
 					this.prevDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -516,7 +530,8 @@ public class MenuBar {
 				{
 					this.nextDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
 					this.nextDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
-					this.nextDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0032)); 
+					this.nextDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0032, GDE.MOD2)); 
+					this.nextDeviceMenuItem.setAccelerator(SWT.MOD2 + SWT.ARROW_LEFT);
 					this.nextDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -552,8 +567,9 @@ public class MenuBar {
 				}
 				{
 					this.devicePropertyFileEditMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
-					this.devicePropertyFileEditMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0465));
+					this.devicePropertyFileEditMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0465, GDE.MOD1));
 					this.devicePropertyFileEditMenuItem.setImage(SWTResourceManager.getImage("gde/resource/EditHot.gif")); //$NON-NLS-1$
+					this.devicePropertyFileEditMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0465));
 					this.devicePropertyFileEditMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -589,7 +605,8 @@ public class MenuBar {
 				}
 				{
 					this.restoreDefaultGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
-					this.restoreDefaultGraphicsTemplateItem.setText(Messages.getString(MessageIds.GDE_MSGT0195));
+					this.restoreDefaultGraphicsTemplateItem.setText(Messages.getString(MessageIds.GDE_MSGT0195, GDE.MOD1));
+					this.restoreDefaultGraphicsTemplateItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0195));
 					this.restoreDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -683,9 +700,6 @@ public class MenuBar {
 					});
 				}
 				{
-					new MenuItem(this.viewMenu, SWT.SEPARATOR);
-				}
-				{
 					this.graphicsHeaderMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
 					this.graphicsHeaderMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0041));
 					this.graphicsHeaderMenuItem.setSelection(false);
@@ -705,9 +719,6 @@ public class MenuBar {
 					});
 				}
 				{
-					new MenuItem(this.viewMenu, SWT.SEPARATOR);
-				}
-				{
 					this.recordCommentMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
 					this.recordCommentMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0042)); 
 					this.recordCommentMenuItem.setSelection(false);
@@ -723,6 +734,87 @@ public class MenuBar {
 								MenuBar.this.application.enableRecordSetComment(false);
 								MenuBar.this.application.updateDisplayTab();
 							}
+						}
+					});
+				}
+				{
+					new MenuItem(this.viewMenu, SWT.SEPARATOR);
+				}
+				{
+					this.prevTabConfigItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.prevTabConfigItem.setText(Messages.getString(MessageIds.GDE_MSGT0438, GDE.MOD1));
+					this.prevTabConfigItem.setAccelerator(SWT.MOD1 + SWT.PAGE_UP);
+					this.prevTabConfigItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.OFF, "prevTabConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.this.application.getMenuToolBar().prevChannel.notifyListeners(SWT.Selection, new Event());
+						}
+					});
+				}
+				{
+					this.nextTabConfigItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.nextTabConfigItem.setText(Messages.getString(MessageIds.GDE_MSGT0439, GDE.MOD1));
+					this.nextTabConfigItem.setAccelerator(SWT.MOD1 + SWT.PAGE_DOWN);
+					this.nextTabConfigItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.OFF, "nextTabConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.this.application.getMenuToolBar().nextChannel.notifyListeners(SWT.Selection, new Event());
+						}
+					});
+				}
+				{
+					new MenuItem(this.viewMenu, SWT.SEPARATOR);
+				}
+				{
+					this.prevChannelConfigItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.prevChannelConfigItem.setText(Messages.getString(MessageIds.GDE_MSGT0663, GDE.MOD1));
+					this.prevChannelConfigItem.setAccelerator(SWT.MOD1 + SWT.ARROW_RIGHT);
+					this.prevChannelConfigItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.OFF, "prevChannelConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.this.application.getMenuToolBar().prevChannel.notifyListeners(SWT.Selection, new Event());
+						}
+					});
+				}
+				{
+					this.nextChannelConfigItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.nextChannelConfigItem.setText(Messages.getString(MessageIds.GDE_MSGT0664, GDE.MOD1));
+					this.nextChannelConfigItem.setAccelerator(SWT.MOD1 + SWT.ARROW_LEFT);
+					this.nextChannelConfigItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.OFF, "nextChannelConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.this.application.getMenuToolBar().nextChannel.notifyListeners(SWT.Selection, new Event());
+						}
+					});
+				}
+				{
+					new MenuItem(this.viewMenu, SWT.SEPARATOR);
+				}
+				{
+					this.prevRecordSetItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.prevRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0665, GDE.MOD3));
+					this.prevRecordSetItem.setAccelerator(SWT.MOD3 + SWT.ARROW_RIGHT);
+					this.prevRecordSetItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.OFF, "prevRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.this.application.getMenuToolBar().prevRecord.notifyListeners(SWT.Selection, new Event());
+						}
+					});
+				}
+				{
+					this.nextRecordSetItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.nextRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0666, GDE.MOD3));
+					this.nextRecordSetItem.setAccelerator(SWT.MOD3 + SWT.ARROW_LEFT);
+					this.nextRecordSetItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.OFF, "nextRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.this.application.getMenuToolBar().nextRecord.notifyListeners(SWT.Selection, new Event());
 						}
 					});
 				}
