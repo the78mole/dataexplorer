@@ -14,6 +14,7 @@ fixed [bug #37460] DataExplorer triggers Microsoft Security Essentials
 fixed [bug #37465] Keep selection in curves selector after pressing space
 fixed [bug #37487] Strange bug when editing in the file comment tab, if deleted within the line
 fixed [bug #37463] Close all dialogs with ESC key
+fixed [bug #37462] Add shortcuts like e.g. Ctrl+s to save
 all devices importing data - refine import path handling, enable configuration using preferences
 documentation update
 
