@@ -581,7 +581,8 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
-			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2808));
+			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2808, GDE.MOD1));
+			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT2808));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
