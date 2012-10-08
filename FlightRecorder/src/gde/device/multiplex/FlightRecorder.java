@@ -691,7 +691,8 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
-			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2708));
+			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2708, GDE.MOD1));
+			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT2708));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
