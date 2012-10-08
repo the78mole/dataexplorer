@@ -35,6 +35,7 @@ import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
@@ -369,6 +370,50 @@ public class FileHandler {
 			this.application.updateSubHistoryMenuItem(osdFilePath);
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
+	}
+
+	/**
+	 * handles the delete functionality
+	 * @param dialogName
+	 * @param fileName
+	 */
+	public boolean deleteOsdFile() {
+
+		// get file name that is currently opened
+		String filename = this.channels.getActiveChannel().getFullQualifiedFileName();
+		if (filename == null || filename.isEmpty()) {
+			return false;
+		}
+
+		// check if the file exists and if the user really wants to delete it
+		File osdFile = new File(filename);
+		if (! FileUtils.checkFileExist(filename) || this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0050, new Object[] { osdFile.getAbsolutePath() })) == SWT.NO) {
+			return false;
+		}
+
+		try {
+			this.application.enableMenuActions(false);
+			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+			FileUtils.deleteFile(filename);
+
+			// also delete the linked file
+			if (this.application.isObjectoriented()) {
+				String linkedFile = this.application.getObjectFilePath() + this.channels.getActiveChannel().getFileName();
+				FileUtils.deleteFile(linkedFile);
+			}
+		}
+		catch (Exception e) {
+			FileHandler.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+			this.application.openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+		}
+
+		this.application.enableMenuActions(true);
+		// remove from history
+		Settings.getInstance().getFileHistory().remove(filename);
+		this.application.updateSubHistoryMenuItem(null);
+		this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+		
+		return true;
 	}
 
 	/**

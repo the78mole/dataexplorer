@@ -234,6 +234,29 @@ public class FileUtils {
 	}	
 	
 	/**
+	 * Deletes a file
+	 * @param filename the file name to delete
+	 */
+	public static void deleteFile(String filename) {
+
+		if (! FileUtils.checkFileExist(filename)) {
+			return;
+		}
+		
+		File file = new File(filename);
+		try {
+			if (! file.canWrite()) {
+				log.log(Level.WARNING, "no delete permission on " + filename);
+			}
+			log.log(Level.WARNING, "deleting " + filename);
+			file.delete();
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, filename, e);
+		}
+	}
+	
+	/**
 	 * check if a file exist, the file path given must fully qualified
 	 * @param fullQualifiedFileName
 	 * @return true if file exist

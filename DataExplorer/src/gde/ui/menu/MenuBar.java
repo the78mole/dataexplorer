@@ -103,6 +103,7 @@ public class MenuBar {
 	MenuItem											saveAsFileMenuItem;
 	MenuItem											saveFileMenuItem;
 	MenuItem											newFileMenuItem;
+	MenuItem											deleteFileMenuItem;
 	
 	int														iconSet = DeviceCommPort.ICON_SET_OPEN_CLOSE; 
 	
@@ -137,6 +138,18 @@ public class MenuBar {
 					public void menuShown(MenuEvent evt) {
 						MenuBar.log.log(Level.FINEST, "fileMenu.handleEvent, event=" + evt); //$NON-NLS-1$
 						MenuBar.this.updateSubHistoryMenuItem(GDE.STRING_EMPTY); //$NON-NLS-1$
+						
+						// check if the deleteFileMenuItem should be enabled
+						boolean fileIsLoaded = false;
+						Channel activeChannel = MenuBar.this.channels.getActiveChannel();
+						if (activeChannel != null) {
+							String filename = activeChannel.getFullQualifiedFileName();
+							if (filename != null && !filename.isEmpty()) {
+								fileIsLoaded = true;
+							}
+						}
+						MenuBar.this.deleteFileMenuItem.setEnabled(fileIsLoaded);
+
 					}
 					public void menuHidden(MenuEvent evt) {
 						log.log(Level.FINEST, "fileMenu.menuHidden " + evt); //$NON-NLS-1$
@@ -199,6 +212,20 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.FINEST, "saveAsFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0006), GDE.STRING_EMPTY); //$NON-NLS-1$
+						}
+					});
+				}
+				{
+					this.deleteFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+					this.deleteFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0667));
+					this.deleteFileMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							MenuBar.log.log(Level.FINEST, "deleteFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (MenuBar.this.fileHandler.deleteOsdFile()) {
+								// initialize new data
+								MenuBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuBar.this.application.getActiveDevice());
+							}
 						}
 					});
 				}
