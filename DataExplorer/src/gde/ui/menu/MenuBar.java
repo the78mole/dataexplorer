@@ -40,6 +40,7 @@ import gde.ui.dialog.edit.DevicePropertiesEditor;
 import gde.ui.tab.GraphicsComposite;
 import gde.ui.tab.GraphicsWindow;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -912,19 +913,33 @@ public class MenuBar {
 			historyImportMenuItem.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					MenuBar.log.log(Level.FINEST, "historyImportMenuItem.widgetSelected, event=" + evt);//$NON-NLS-1$
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "historyImportMenuItem.widgetSelected, event=" + evt);//$NON-NLS-1$
 					String fileName = (String) historyImportMenuItem.getData(historyImportMenuItem.getText());
 					String fileType = fileName.substring(fileName.lastIndexOf('.') + 1);
 					if (fileType != null && fileType.length() > 2) {
-						MenuBar.log.log(Level.FINE, "opening file = " + fileName);//$NON-NLS-1$
-						if (fileType.equalsIgnoreCase(GDE.FILE_ENDING_OSD)) { 
-							MenuBar.this.fileHandler.openOsdFile(fileName);
-						}
-						else if (fileType.equalsIgnoreCase(GDE.FILE_ENDING_LOV)) { 
-							MenuBar.this.fileHandler.openLovFile(fileName);
-						}
-						else {
-							MenuBar.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0003)); 
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "opening file = " + fileName);//$NON-NLS-1$
+						
+						// check if the file still exists
+						File file = new File(fileName);
+						if (! file.exists()) {
+							int answer = MenuBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0046, new Object[] {file.getAbsolutePath()}));
+							if (answer == SWT.YES) {
+								// remove from history
+								Settings.getInstance().getFileHistory().remove(fileName);
+								updateSubHistoryMenuItem(null);
+							}
+						} else {
+							// open file from history
+							MenuBar.log.log(Level.FINE, "opening file = " + fileName);//$NON-NLS-1$
+							if (fileType.equalsIgnoreCase(GDE.FILE_ENDING_OSD)) { 
+								MenuBar.this.fileHandler.openOsdFile(fileName);
+							}
+							else if (fileType.equalsIgnoreCase(GDE.FILE_ENDING_LOV)) { 
+								MenuBar.this.fileHandler.openLovFile(fileName);
+							}
+							else {
+								MenuBar.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0003)); 
+							}
 						}
 					}
 				}

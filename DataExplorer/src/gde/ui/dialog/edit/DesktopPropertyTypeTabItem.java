@@ -228,11 +228,20 @@ public class DesktopPropertyTypeTabItem extends CTabItem {
 				this.descriptionText.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent evt) {
-						log.log(java.util.logging.Level.FINEST, "descriptionText.keyReleased, event=" + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionText.keyReleased, event=" + evt); //$NON-NLS-1$
 						DesktopPropertyTypeTabItem.this.propertyType.setDescription(DesktopPropertyTypeTabItem.this.descriptionText.getText());
 						if (DesktopPropertyTypeTabItem.this.deviceConfig != null) {
 							DesktopPropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
 							DesktopPropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
+						}
+					}					
+					@Override
+					public void keyPressed(KeyEvent e) {
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionText.keyPressed , event=" + e); //$NON-NLS-1$
+
+						// select all text on ctrl+a
+						if (e.keyCode=='a' && ((e.stateMask & SWT.MOD1) != 0)) {
+							descriptionText.selectAll();
 						}
 					}
 				});
@@ -247,7 +256,7 @@ public class DesktopPropertyTypeTabItem extends CTabItem {
 					this.attributeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "attributeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "attributeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (DesktopPropertyTypeTabItem.this.deviceConfig != null) {
 								DesktopPropertyTypeTabItem.this.propertyType.setTargetReferenceOrdinal(DesktopPropertyTypeTabItem.this.attributeCombo.getSelectionIndex());
 							}
