@@ -1,0 +1,28 @@
+How to setup eclipse workspace to build the DataExplorer
+
+== Prepare your system ==
+- Install the JDK
+- Install Eclipse
+- Install ant-contrib from http://ant-contrib.sourceforge.net/
+- Make sure that the ANT classpath (Window > Preferences > Ant > Runtime) is correct, containing...
+  - all the jars from Eclipse�s org.apache.ant plugin directory
+  - the tools.jar from the JDK�s lib directory
+  - the ant-contrib jar
+- Check that the file encoding is set to UTF-8 (Window > Preferences > General > Workspace)
+
+== Setup DataExplorer in Eclipse ==
+- Check out all projects via CVS (https://savannah.nongnu.org/cvs/?group=dataexplorer). Checking out only specific projects won't work, as the build files expect all projects to exist
+- Next, configure the needed classpath variable:
+  - Window > Preferences > Java > Build Path > Classpath Variables
+    - Add "SWT_JAR_PATH" with the appropriate path to your system in "build/lib"
+- Open the properties of the DataExplorer project
+  - Enable project specific settings for "Clean Up" and "Formatter"
+    - Import the settings from "build/setup" (code_cleanup_preferences.xml and code_format_preferences.xml)
+
+== Prepare stuff ==
+- In the "build" project, locate the file "build build.xml clean dist.launch"
+  - Right-click on it and choose "Run as"
+    - Select the first entry from the context menu to create all needed directories and files within
+
+== Start the application within Eclipse ==
+- In the DataExplorer project, locate the file "DataExplorer.launch", right-click on it and choose "Debug as > Java Application"
