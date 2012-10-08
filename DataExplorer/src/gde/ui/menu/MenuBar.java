@@ -776,7 +776,7 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.OFF, "prevTabConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.getMenuToolBar().prevChannel.notifyListeners(SWT.Selection, new Event());
+							MenuBar.this.application.switchPreviousTabulator();
 						}
 					});
 				}
@@ -788,7 +788,7 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							MenuBar.log.log(Level.OFF, "nextTabConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.getMenuToolBar().nextChannel.notifyListeners(SWT.Selection, new Event());
+							MenuBar.this.application.switchNextTabulator();
 						}
 					});
 				}

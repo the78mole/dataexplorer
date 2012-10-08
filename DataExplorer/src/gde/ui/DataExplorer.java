@@ -2810,4 +2810,34 @@ public class DataExplorer extends Composite {
 	public Channel getActiveChannel() {
 		return this.channels.getActiveChannel();
 	}
+	
+	/**
+	 * switch around to previous tabulator
+	 */
+	public void switchPreviousTabulator() {
+		CTabItem[] tabItems = this.displayTab.getItems();
+		for (int i = 0; i < tabItems.length; i++) {
+			CTabItem tabItem = tabItems[i];
+			if (tabItem.getControl().isVisible()) {
+				if (i-1 >= 0) tabItem.getParent().setSelection(i-1);
+				else tabItem.getParent().setSelection(tabItems.length-1);
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * switch around to next tabulator
+	 */
+	public void switchNextTabulator() {
+		CTabItem[] tabItems = this.displayTab.getItems();
+		for (int i = 0; i < tabItems.length; i++) {
+			CTabItem tabItem = tabItems[i];
+			if (tabItem.getControl().isVisible()) {
+				if (i+1 <= tabItems.length-1) tabItem.getParent().setSelection(i+1);
+				else tabItem.getParent().setSelection(0);
+				break;
+			}
+		}
+	}
 }
