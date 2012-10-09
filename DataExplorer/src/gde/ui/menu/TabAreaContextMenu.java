@@ -121,7 +121,7 @@ public class TabAreaContextMenu {
 
 			if (type != TYPE_TABLE) {
 				this.copyTabItem = new MenuItem(popupMenu, SWT.PUSH);
-				this.copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026));
+				this.copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026).substring(0,Messages.getString(MessageIds.GDE_MSGT0026).lastIndexOf('\t')));
 				this.copyTabItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
@@ -132,7 +132,7 @@ public class TabAreaContextMenu {
 			
 			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE || type == TYPE_UTILITY) {
 				this.copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
-				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027));
+				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027).substring(0,Messages.getString(MessageIds.GDE_MSGT0027).lastIndexOf('\t')));
 				this.copyPrintImageItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "copyPrintImageItem action performed! " + e); //$NON-NLS-1$

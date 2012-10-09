@@ -136,7 +136,7 @@ public class MenuBar {
 				this.fileMenu = new Menu(this.fileMenuItem);
 				this.fileMenu.addMenuListener(new MenuListener() {
 					public void menuShown(MenuEvent evt) {
-						MenuBar.log.log(Level.FINEST, "fileMenu.handleEvent, event=" + evt); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "fileMenu.handleEvent, event=" + evt); //$NON-NLS-1$
 						MenuBar.this.updateSubHistoryMenuItem(GDE.STRING_EMPTY); //$NON-NLS-1$
 						
 						// check if the deleteFileMenuItem should be enabled
@@ -163,7 +163,7 @@ public class MenuBar {
 					this.newFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "newFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "newFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
 								MenuBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuBar.this.application.getActiveDevice());
 							}
@@ -178,7 +178,7 @@ public class MenuBar {
 					this.openFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "openFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "openFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.fileHandler.openFileDialog(Messages.getString(MessageIds.GDE_MSGT0004));
 						}
 					});
@@ -191,7 +191,7 @@ public class MenuBar {
 					this.saveFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "saveFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
 								if (!activeChannel.isSaved())
@@ -204,13 +204,13 @@ public class MenuBar {
 				}
 				{
 					this.saveAsFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.saveAsFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0008, GDE.MOD1));
+					this.saveAsFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0008));
 					this.saveAsFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/SaveAsHot.gif")); //$NON-NLS-1$
-					this.saveFileMenuItem.setAccelerator(SWT.MOD1 + SWT.F12);
+					this.saveAsFileMenuItem.setAccelerator(SWT.F12);
 					this.saveAsFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "saveAsFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveAsFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.fileHandler.saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0006), GDE.STRING_EMPTY); //$NON-NLS-1$
 						}
 					});
@@ -221,7 +221,7 @@ public class MenuBar {
 					this.deleteFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "deleteFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "deleteFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.fileHandler.deleteOsdFile()) {
 								// initialize new data
 								MenuBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuBar.this.application.getActiveDevice());
@@ -231,8 +231,7 @@ public class MenuBar {
 				}
 				{
 					this.historyFileMenuItem = new MenuItem(this.fileMenu, SWT.CASCADE);
-					this.historyFileMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0009));
-					this.historyFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0009, GDE.MOD1));
+					this.historyFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0009));
 					{
 						this.fileHistoryMenu = new Menu(this.historyFileMenuItem);
 						this.historyFileMenuItem.setMenu(this.fileHistoryMenu);
@@ -253,7 +252,7 @@ public class MenuBar {
 							this.csvImportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									MenuBar.log.log(Level.FINEST, "csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 									MenuBar.this.fileHandler.importFileCSV(Messages.getString(MessageIds.GDE_MSGT0012), false);
 								}
 							});
@@ -264,7 +263,7 @@ public class MenuBar {
 							this.csvImportMenuItem2.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									MenuBar.log.log(Level.FINEST, "csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "csvImportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 									MenuBar.this.fileHandler.importFileCSV(Messages.getString(MessageIds.GDE_MSGT0014), true);
 								}
 							});
@@ -283,7 +282,7 @@ public class MenuBar {
 							this.csvExportMenuItem1.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
-									MenuBar.log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+									if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 									MenuBar.this.fileHandler.exportFileCSV(Messages.getString(MessageIds.GDE_MSGT0017), false);
 								}
 							});
@@ -295,7 +294,7 @@ public class MenuBar {
 						this.csvExportMenuItem2.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								MenuBar.log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+								if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "csvExportMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 								MenuBar.this.fileHandler.exportFileCSV(Messages.getString(MessageIds.GDE_MSGT0019), true); 
 							}
 						});
@@ -306,12 +305,13 @@ public class MenuBar {
 				}
 				{
 					this.preferencesFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.preferencesFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0020));
+					this.preferencesFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0020, GDE.MOD3));
+					this.preferencesFileMenuItem.setAccelerator(SWT.MOD3 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0052));
 					this.preferencesFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/SettingsHot.gif")); //$NON-NLS-1$
 					this.preferencesFileMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "preferencesFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "preferencesFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							// check if other none modal dialog is open
 							DeviceDialog deviceDialog = MenuBar.this.application.getDeviceDialog();
 							if (deviceDialog == null || deviceDialog.isDisposed()) {
@@ -334,7 +334,7 @@ public class MenuBar {
 					this.printMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							new PrintSelectionDialog(GDE.shell, SWT.NULL).open();
 						}
 					});
@@ -344,12 +344,12 @@ public class MenuBar {
 				}
 				{
 					this.exitMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.exitMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0021, GDE.MOD1));
-					this.exitMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0021));
+					this.exitMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0021, GDE.MOD3));
+					this.exitMenuItem.setAccelerator(SWT.MOD3 + SWT.F4);
 					this.exitMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
 							if (deviceSelect.checkDataSaved()) {
 								MenuBar.this.parent.getParent().dispose();
@@ -374,7 +374,7 @@ public class MenuBar {
 				this.editMenuItem.setMenu(this.editMenu);
 				this.editMenu.addMenuListener(new MenuListener() {				
 					public void menuShown(MenuEvent e) {
-						MenuBar.log.log(Level.FINEST, "editMenu.menuShown, event=" + e); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "editMenu.menuShown, event=" + e); //$NON-NLS-1$
 						Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 						boolean isRecordSetRelatedCopyable = false;
 						if(activeChannel != null) {
@@ -388,7 +388,7 @@ public class MenuBar {
 						MenuBar.this.copyGraphicsPrintImageMenuItem.setEnabled((isRecordSetRelatedCopyable  && MenuBar.this.application.getTabSelectionIndex() == 0) || isCompareSetCopyable);
 					}
 					public void menuHidden(MenuEvent e) {
-						MenuBar.log.log(Level.FINEST, "editMenu.menuHidden, event=" + e); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "editMenu.menuHidden, event=" + e); //$NON-NLS-1$
 					}
 				});
 				{
@@ -399,7 +399,7 @@ public class MenuBar {
 					this.activateZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "activateZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "activateZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_ZOOM, true);
 						}
 					});
@@ -412,7 +412,7 @@ public class MenuBar {
 					this.resetZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "resetZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "resetZoomGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
 						}
 					});
@@ -425,7 +425,7 @@ public class MenuBar {
 					this.panGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "panGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "panGraphicMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.setGraphicsMode(GraphicsComposite.MODE_PAN, true);
 						}
 					});
@@ -479,7 +479,7 @@ public class MenuBar {
 					this.toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "toolBoxDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "toolBoxDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.openDeviceDialog();
 						}
 					});
@@ -494,7 +494,7 @@ public class MenuBar {
 					this.portMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "selectDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "selectDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							IDevice activeDevice = MenuBar.this.application.getActiveDevice();
 							if(activeDevice != null) activeDevice.open_closeCommPort();
 						}
@@ -511,7 +511,7 @@ public class MenuBar {
 					this.selectDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "selectDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "selectDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DeviceSelectionDialog deviceSelection = MenuBar.this.application.getDeviceSelectionDialog();
 							if (deviceSelection.checkDataSaved()) {
 								deviceSelection.open();
@@ -527,7 +527,7 @@ public class MenuBar {
 					this.prevDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "prevDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "prevDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.getActiveDevice().getCommunicationPort() == null || !MenuBar.this.application.getActiveDevice().getCommunicationPort().isConnected()) { // allow device switch only if port noct connected
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
@@ -563,7 +563,7 @@ public class MenuBar {
 					this.nextDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "nextDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "nextDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.getActiveDevice().getCommunicationPort() == null || !MenuBar.this.application.getActiveDevice().getCommunicationPort().isConnected()) { // allow device switch only if port noct connected
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
@@ -601,7 +601,7 @@ public class MenuBar {
 					this.devicePropertyFileEditMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "devicePropertyFileEditMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "devicePropertyFileEditMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DevicePropertiesEditor.getInstance().openAsDialog(MenuBar.this.application.getActiveDevice().getDeviceConfiguration());
 						}
 					});
@@ -626,7 +626,7 @@ public class MenuBar {
 					this.saveDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.channels.getActiveChannel().saveTemplate();
 						}
 					});
@@ -638,7 +638,7 @@ public class MenuBar {
 					this.restoreDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "restoreDefaultGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreDefaultGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							GraphicsTemplate template = activeChannel.getTemplate();
 							template.setNewFileName(template.getDefaultFileName());
@@ -657,7 +657,7 @@ public class MenuBar {
 					this.saveAsGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 							if (activeChannel != null) {
@@ -681,7 +681,7 @@ public class MenuBar {
 					this.restoreGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance() 
 									.getGraphicsTemplatePath(), null, SWT.SINGLE);
 							Channel activeChannel = MenuBar.this.channels.getActiveChannel();
@@ -717,7 +717,7 @@ public class MenuBar {
 					this.curveSelectionMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "kurveSelectionMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "kurveSelectionMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.curveSelectionMenuItem.getSelection()) {
 								MenuBar.this.application.setCurveSelectorEnabled(true);
 							}
@@ -734,7 +734,7 @@ public class MenuBar {
 					this.graphicsHeaderMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "graphicsHeaderMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicsHeaderMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.graphicsHeaderMenuItem.getSelection()) {
 								MenuBar.this.application.enableGraphicsHeader(true);
 								MenuBar.this.application.updateDisplayTab();
@@ -753,7 +753,7 @@ public class MenuBar {
 					this.recordCommentMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "recordCommentMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "recordCommentMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.recordCommentMenuItem.getSelection()) {
 								MenuBar.this.application.enableRecordSetComment(true);
 								MenuBar.this.application.updateDisplayTab();
@@ -775,7 +775,7 @@ public class MenuBar {
 					this.prevTabConfigItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.OFF, "prevTabConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "prevTabConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.switchPreviousTabulator();
 						}
 					});
@@ -787,7 +787,7 @@ public class MenuBar {
 					this.nextTabConfigItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.OFF, "nextTabConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "nextTabConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.switchNextTabulator();
 						}
 					});
@@ -798,11 +798,11 @@ public class MenuBar {
 				{
 					this.prevChannelConfigItem = new MenuItem(this.viewMenu, SWT.PUSH);
 					this.prevChannelConfigItem.setText(Messages.getString(MessageIds.GDE_MSGT0663, GDE.MOD1));
-					this.prevChannelConfigItem.setAccelerator(SWT.MOD1 + SWT.ARROW_RIGHT);
+					this.prevChannelConfigItem.setAccelerator(SWT.MOD1 + SWT.ARROW_LEFT);
 					this.prevChannelConfigItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.OFF, "prevChannelConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "prevChannelConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.getMenuToolBar().prevChannel.notifyListeners(SWT.Selection, new Event());
 						}
 					});
@@ -810,11 +810,11 @@ public class MenuBar {
 				{
 					this.nextChannelConfigItem = new MenuItem(this.viewMenu, SWT.PUSH);
 					this.nextChannelConfigItem.setText(Messages.getString(MessageIds.GDE_MSGT0664, GDE.MOD1));
-					this.nextChannelConfigItem.setAccelerator(SWT.MOD1 + SWT.ARROW_LEFT);
+					this.nextChannelConfigItem.setAccelerator(SWT.MOD1 + SWT.ARROW_RIGHT);
 					this.nextChannelConfigItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.OFF, "nextChannelConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "nextChannelConfigItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.getMenuToolBar().nextChannel.notifyListeners(SWT.Selection, new Event());
 						}
 					});
@@ -825,11 +825,11 @@ public class MenuBar {
 				{
 					this.prevRecordSetItem = new MenuItem(this.viewMenu, SWT.PUSH);
 					this.prevRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0665, GDE.MOD3));
-					this.prevRecordSetItem.setAccelerator(SWT.MOD3 + SWT.ARROW_RIGHT);
+					this.prevRecordSetItem.setAccelerator(SWT.MOD3 + SWT.ARROW_LEFT);
 					this.prevRecordSetItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.OFF, "prevRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "prevRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.getMenuToolBar().prevRecord.notifyListeners(SWT.Selection, new Event());
 						}
 					});
@@ -837,11 +837,11 @@ public class MenuBar {
 				{
 					this.nextRecordSetItem = new MenuItem(this.viewMenu, SWT.PUSH);
 					this.nextRecordSetItem.setText(Messages.getString(MessageIds.GDE_MSGT0666, GDE.MOD3));
-					this.nextRecordSetItem.setAccelerator(SWT.MOD3 + SWT.ARROW_LEFT);
+					this.nextRecordSetItem.setAccelerator(SWT.MOD3 + SWT.ARROW_RIGHT);
 					this.nextRecordSetItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.OFF, "nextRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "nextRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.getMenuToolBar().nextRecord.notifyListeners(SWT.Selection, new Event());
 						}
 					});
@@ -891,7 +891,7 @@ public class MenuBar {
 					this.webCheckMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "webCheckMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "webCheckMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.openWebBrowser(Messages.getString(MessageIds.GDE_MSGT0046));
 						}
 					});
@@ -902,7 +902,7 @@ public class MenuBar {
 					this.aboutMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							MenuBar.log.log(Level.FINEST, "aboutMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "aboutMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.openAboutDialog();
 						}
 					});
