@@ -344,8 +344,8 @@ public class MenuBar {
 				}
 				{
 					this.exitMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.exitMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0021, GDE.MOD3));
-					this.exitMenuItem.setAccelerator(SWT.MOD3 + SWT.F4);
+					this.exitMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0021, GDE.MOD1));
+					this.exitMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0021));
 					this.exitMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
