@@ -725,7 +725,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							this.deviceGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.deviceGroup.setText(Messages.getString(MessageIds.GDE_MSGT0187));
 							{
-								this.deviceTable = new Table(this.deviceGroup, SWT.MULTI | SWT.CHECK | SWT.BORDER);
+								this.deviceTable = new Table(this.deviceGroup, SWT.MULTI | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION);
 								FormData deviceTableLData = new FormData();
 								deviceTableLData.top = new FormAttachment(0, 1000, 20);
 								deviceTableLData.bottom = new FormAttachment(1000, 1000, -20);
@@ -773,19 +773,20 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									}
 								});
 								this.deviceTable.setLinesVisible(true);
+								this.deviceTable.setHeaderVisible(true);
 								{
 									this.tableColumn1 = new TableColumn(this.deviceTable, SWT.LEFT);
-									this.tableColumn1.setText("Column1"); //$NON-NLS-1$
+									this.tableColumn1.setText(Messages.getString(MessageIds.GDE_MSGT0668));
 									this.tableColumn1.setWidth(200);
 								}
 								{
 									this.tableColumn2 = new TableColumn(this.deviceTable, SWT.LEFT);
-									this.tableColumn2.setText("Column2"); //$NON-NLS-1$
+									this.tableColumn2.setText(Messages.getString(MessageIds.GDE_MSGT0669));
 									this.tableColumn2.setWidth(180);
 								}
 								{
 									this.tableColumn3 = new TableColumn(this.deviceTable, SWT.LEFT);
-									this.tableColumn3.setText("Column3"); //$NON-NLS-1$
+									this.tableColumn3.setText(Messages.getString(MessageIds.GDE_MSGT0670));
 									this.tableColumn3.setWidth(90);
 								}
 								{
