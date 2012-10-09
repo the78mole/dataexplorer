@@ -393,9 +393,8 @@ public class MenuBar {
 				});
 				{
 					this.activateZoomGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.activateZoomGraphicMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0023, GDE.MOD1));
+					this.activateZoomGraphicMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0023));
 					this.activateZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ZoomHot.gif")); //$NON-NLS-1$
-					this.activateZoomGraphicMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0023));
 					this.activateZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -406,9 +405,8 @@ public class MenuBar {
 				}
 				{
 					this.resetZoomGraphicMenuItem = new MenuItem(this.editMenu, SWT.PUSH);
-					this.resetZoomGraphicMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0024, GDE.MOD1));
+					this.resetZoomGraphicMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0024));
 					this.resetZoomGraphicMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ExpandHot.gif")); //$NON-NLS-1$
-					this.resetZoomGraphicMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0024));
 					this.resetZoomGraphicMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
