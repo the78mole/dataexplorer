@@ -16,6 +16,7 @@ fixed [bug #37487] Strange bug when editing in the file comment tab, if deleted 
 fixed [bug #37463] Close all dialogs with ESC key
 fixed [bug #37462] Add shortcuts like e.g. Ctrl+s to save
 all devices importing data - refine import path handling, enable configuration using preferences
+refine zoom handling, support left to right zooming, right to left reset and mouse wheel support
 documentation update
 
 Version 3.04 - 21 Sep 2012
