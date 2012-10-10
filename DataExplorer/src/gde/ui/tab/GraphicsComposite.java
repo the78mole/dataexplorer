@@ -21,7 +21,6 @@ package gde.ui.tab;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -36,6 +35,7 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -56,6 +56,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -71,95 +72,98 @@ import gde.utils.TimeLine;
  * @author Winfried Brügmann
  */
 public class GraphicsComposite extends Composite {
-	final static Logger						log											= Logger.getLogger(GraphicsComposite.class.getName());
-	
-	public final static int				MODE_RESET							= 0;
-	public final static int				MODE_ZOOM								= 1;
-	public final static int				MODE_MEASURE						= 2;
-	public final static int				MODE_MEASURE_DELTA			= 3;
-	public final static int				MODE_PAN								= 4;
-	public final static int				MODE_CUT_LEFT						= 6;
-	public final static int				MODE_CUT_RIGHT					= 7;
-	public final static int				MODE_SCOPE							= 8;
+	final static Logger				log											= Logger.getLogger(GraphicsComposite.class.getName());
 
-	final	DataExplorer						application 						= DataExplorer.getInstance();
-	final Settings								settings								= Settings.getInstance();
-	final Channels								channels								= Channels.getInstance();
-	final TimeLine								timeLine								= new TimeLine();
-	final SashForm								graphicSashForm;
-	final int											windowType;
+	public final static int		MODE_RESET							= 0;
+	public final static int		MODE_ZOOM								= 1;
+	public final static int		MODE_MEASURE						= 2;
+	public final static int		MODE_MEASURE_DELTA			= 3;
+	public final static int		MODE_PAN								= 4;
+	public final static int		MODE_CUT_LEFT						= 6;
+	public final static int		MODE_CUT_RIGHT					= 7;
+	public final static int		MODE_SCOPE							= 8;
 
-	Menu													popupmenu;
-	TabAreaContextMenu						contextMenu;
-	Color													curveAreaBackground;
-	Color													surroundingBackground;
-	Color													curveAreaBorderColor;
+	final DataExplorer				application							= DataExplorer.getInstance();
+	final Settings						settings								= Settings.getInstance();
+	final Channels						channels								= Channels.getInstance();
+	final TimeLine						timeLine								= new TimeLine();
+	final SashForm						graphicSashForm;
+	final int									windowType;
+
+	Menu											popupmenu;
+	TabAreaContextMenu				contextMenu;
+	Color											curveAreaBackground;
+	Color											surroundingBackground;
+	Color											curveAreaBorderColor;
 
 	// drawing canvas
-	Text													graphicsHeader;
-	Text													recordSetComment;
-	boolean 											isRecordCommentChanged = false;
+	Text											graphicsHeader;
+	Text											recordSetComment;
+	boolean										isRecordCommentChanged	= false;
 
-	Canvas												graphicCanvas;
-	int														headerHeight						= 0;
-	int														headerGap								= 0;
-	int														commentHeight						= 0;
-	int														commentGap							= 0;
-	String												graphicsHeaderText, recordSetCommentText;
-	Point													oldSize = new Point(0,0); // composite size - control resized
-	
+	Canvas										graphicCanvas;
+	int												headerHeight						= 0;
+	int												headerGap								= 0;
+	int												commentHeight						= 0;
+	int												commentGap							= 0;
+	String										graphicsHeaderText, recordSetCommentText;
+	Point											oldSize									= new Point(0, 0);																			// composite size - control resized
+
 	// update graphics only area required
-	RecordSet											oldActiveRecordSet	= null;
-	int 													oldChangeCounter = 0;
-	boolean												isFileCommentChanged = false;
+	RecordSet									oldActiveRecordSet			= null;
+	int												oldChangeCounter				= 0;
+	boolean										isFileCommentChanged		= false;
 
-	HashMap<String, Integer>			leftSideScales = new HashMap<String, Integer>();
-	HashMap<String, Integer>			rightSideScales = new HashMap<String, Integer>();
-	int 													oldScopeLevel = 0;
-	boolean												oldZoomLevel = false;
+	HashMap<String, Integer>	leftSideScales					= new HashMap<String, Integer>();
+	HashMap<String, Integer>	rightSideScales					= new HashMap<String, Integer>();
+	int												oldScopeLevel						= 0;
+	boolean										oldZoomLevel						= false;
 
 	// mouse actions
-	int														xDown										= 0;
-	int														xUp											= 0;
-	int														xLast										= 0;
-	int														yDown										= 0;
-	int														yUp											= 0;
-	int														yLast										= 0;
-	int														leftLast								= 0;
-	int														topLast									= 0;
-	int														rightLast								= 0;
-	int														bottomLast							= 0;
-	int														offSetX, offSetY;
-	Rectangle 										canvasBounds;
-	Image													canvasImage;
-	GC														canvasImageGC;
-	GC														canvasGC;
-	Rectangle											curveAreaBounds					= new Rectangle(0,0,1,1);
-		
-	boolean												isLeftMouseMeasure			= false;
-	boolean												isRightMouseMeasure			= false;
-	int														xPosMeasure							= 0, yPosMeasure = 0;
-	int														xPosDelta								= 0, yPosDelta = 0;
+	int												xDown										= 0;
+	int												xUp											= 0;
+	int												xLast										= 0;
+	int												yDown										= 0;
+	int												yUp											= 0;
+	int												yLast										= 0;
+	int												leftLast								= 0;
+	int												topLast									= 0;
+	int												rightLast								= 0;
+	int												bottomLast							= 0;
+	int												offSetX, offSetY;
+	Rectangle									canvasBounds;
+	Image											canvasImage;
+	GC												canvasImageGC;
+	GC												canvasGC;
+	Rectangle									curveAreaBounds					= new Rectangle(0, 0, 1, 1);
 
-	boolean												isZoomMouse							= false;
-	boolean												isResetZoomPosition			= false;
+	boolean										isLeftMouseMeasure			= false;
+	boolean										isRightMouseMeasure			= false;
+	int												xPosMeasure							= 0, yPosMeasure = 0;
+	int												xPosDelta								= 0, yPosDelta = 0;
 
-	boolean												isPanMouse							= false;
-	int														xDeltaPan								= 0;
-	int														yDeltaPan								= 0;
+	boolean										isZoomMouse							= false;
+	boolean										isResetZoomPosition			= false;
+	boolean										isTransientZoom					= false;
+	boolean										isZoomX									= false;
+	boolean										isZoomY									= false;
 
-	boolean												isLeftCutMode						= false;
-	boolean												isRightCutMode					= false;
-	int														xPosCut									= 0;
-	
-	boolean												isScopeMode							= false;
+	boolean										isPanMouse							= false;
+	int												xDeltaPan								= 0;
+	int												yDeltaPan								= 0;
+
+	boolean										isLeftCutMode						= false;
+	boolean										isRightCutMode					= false;
+	int												xPosCut									= 0;
+
+	boolean										isScopeMode							= false;
 
 	GraphicsComposite(final SashForm useParent, int useWindowType) {
 		super(useParent, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
 		this.graphicSashForm = useParent;
 		this.windowType = useWindowType;
-		
+
 		//get the background colors
 		switch (this.windowType) {
 		case GraphicsWindow.TYPE_COMPARE:
@@ -173,17 +177,17 @@ public class GraphicsComposite extends Composite {
 			this.surroundingBackground = this.settings.getUtilitySurroundingBackground();
 			this.curveAreaBorderColor = this.settings.getUtilityCurvesBorderColor();
 			break;
-			
+
 		default:
 			this.curveAreaBackground = this.settings.getGraphicsCurveAreaBackground();
 			this.surroundingBackground = this.settings.getGraphicsSurroundingBackground();
 			this.curveAreaBorderColor = this.settings.getGraphicsCurvesBorderColor();
 			break;
 		}
-			
+
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
-		
+
 		init();
 	}
 
@@ -191,18 +195,19 @@ public class GraphicsComposite extends Composite {
 		this.setLayout(null);
 		this.setDragDetect(false);
 		this.setBackground(this.surroundingBackground);
-		
+
 		this.contextMenu.createMenu(this.popupmenu, this.windowType);
-		
+
 		// help lister does not get active on Composite as well as on Canvas
 		this.addListener(SWT.Resize, new Listener() {
-			public void handleEvent( Event evt) {
+			public void handleEvent(Event evt) {
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "GraphicsComposite.controlResized() = " + evt);
 				Rectangle clientRect = GraphicsComposite.this.getClientArea();
 				Point size = new Point(clientRect.width, clientRect.height);
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, GraphicsComposite.this.oldSize + " - " + size);
 				if (!GraphicsComposite.this.oldSize.equals(size)) {
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "size changed, update " + GraphicsComposite.this.oldSize + " - " + size);
+					if (log.isLoggable(Level.FINE))
+						log.log(Level.FINE, "size changed, update " + GraphicsComposite.this.oldSize + " - " + size);
 					GraphicsComposite.this.oldSize = size;
 					setComponentBounds();
 					doRedrawGraphics();
@@ -211,17 +216,17 @@ public class GraphicsComposite extends Composite {
 		});
 		this.addHelpListener(new HelpListener() {
 			public void helpRequested(HelpEvent evt) {
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "GraphicsComposite.helpRequested " + evt); 			//$NON-NLS-1$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "GraphicsComposite.helpRequested " + evt); //$NON-NLS-1$
 				switch (GraphicsComposite.this.windowType) {
 				default:
 				case GraphicsWindow.TYPE_NORMAL:
-					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 				case GraphicsWindow.TYPE_COMPARE:
-					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_91.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_91.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 				case GraphicsWindow.TYPE_UTIL:
-					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 				}
 			}
@@ -233,8 +238,8 @@ public class GraphicsComposite extends Composite {
 			this.graphicsHeader.setMenu(this.popupmenu);
 			this.graphicsHeader.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.helpRequested " + evt); 			//$NON-NLS-1$
-					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.helpRequested " + evt); //$NON-NLS-1$
+					GraphicsComposite.this.application.openHelpDialog("", "HelpInfo_4.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.graphicsHeader.addPaintListener(new PaintListener() {
@@ -244,7 +249,7 @@ public class GraphicsComposite extends Composite {
 					if (GraphicsComposite.this.windowType == GraphicsWindow.TYPE_UTIL) {
 						RecordSet utilitySet = GraphicsComposite.this.application.getUtilitySet();
 						if (utilitySet != null) {
-						String tmpHeader = utilitySet.getRecordSetDescription();
+							String tmpHeader = utilitySet.getRecordSetDescription();
 							if (GraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(GraphicsComposite.this.graphicsHeaderText)) {
 								GraphicsComposite.this.graphicsHeader.setText(GraphicsComposite.this.graphicsHeaderText = tmpHeader);
 							}
@@ -277,18 +282,18 @@ public class GraphicsComposite extends Composite {
 					}
 				}
 			});
-			this.graphicsHeader.addKeyListener( new KeyAdapter() {
+			this.graphicsHeader.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyPressed(KeyEvent e) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.keyPressed , event=" + e); //$NON-NLS-1$
-					isFileCommentChanged = true;						
+					GraphicsComposite.this.isFileCommentChanged = true;
 				}
 			});
-			this.graphicsHeader.addFocusListener(new FocusListener() {			
+			this.graphicsHeader.addFocusListener(new FocusListener() {
 				public void focusLost(FocusEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusLost() , event=" + evt); //$NON-NLS-1$
-					isFileCommentChanged = false;
-					setFileComment();						
+					GraphicsComposite.this.isFileCommentChanged = false;
+					setFileComment();
 				}
 				public void focusGained(FocusEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "fileCommentText.focusGained() , event=" + evt); //$NON-NLS-1$
@@ -300,6 +305,7 @@ public class GraphicsComposite extends Composite {
 			this.graphicCanvas.setBackground(this.surroundingBackground);
 			this.graphicCanvas.setMenu(this.popupmenu);
 			this.graphicCanvas.addMouseMoveListener(new MouseMoveListener() {
+				@Override
 				public void mouseMove(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseMove = " + evt); //$NON-NLS-1$
 					mouseMoveAction(evt);
@@ -325,7 +331,81 @@ public class GraphicsComposite extends Composite {
 					mouseUpAction(evt);
 				}
 			});
+			this.graphicCanvas.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.keyPressed() , event=" + e); //$NON-NLS-1$
+					if (e.keyCode == 'x') {
+						System.out.println("x-direction");
+						GraphicsComposite.this.isZoomX = true;
+						GraphicsComposite.this.isZoomY = false;
+					}
+					else if (e.keyCode == 'y') {
+						System.out.println("y-direction");
+						GraphicsComposite.this.isZoomY = true;
+						GraphicsComposite.this.isZoomX = false;
+					}
+					else {
+						GraphicsComposite.this.isZoomX = GraphicsComposite.this.isZoomY = false;
+					}
+				}
+
+				@Override
+				public void keyReleased(KeyEvent e) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.keyReleased() , event=" + e); //$NON-NLS-1$
+					System.out.println("x,y off");
+					GraphicsComposite.this.isZoomX = GraphicsComposite.this.isZoomY = false;
+				}
+			});
+			this.graphicCanvas.addMouseWheelListener(new MouseWheelListener() {
+				@Override
+				public void mouseScrolled(MouseEvent evt) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseScrolled, event=" + evt); //$NON-NLS-1$
+					if (GraphicsComposite.this.isTransientZoom) {
+						GraphicsComposite.this.isResetZoomPosition = false;
+						Channel activeChannel = Channels.getInstance().getActiveChannel();
+						if (activeChannel != null) {
+							RecordSet recordSet = (GraphicsComposite.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet()
+									: GraphicsComposite.this.application.getCompareSet();
+							if (GraphicsComposite.this.canvasImage != null && recordSet != null) {
+
+								float boundsRelation = 1.0f * GraphicsComposite.this.curveAreaBounds.width / GraphicsComposite.this.curveAreaBounds.height;
+								Point point = checkCurveBounds(evt.x, evt.y);
+								float mouseRelationX = 1.0f * point.x / GraphicsComposite.this.curveAreaBounds.width * 2;
+								float mouseRelationY = 1.0f * point.y / GraphicsComposite.this.curveAreaBounds.height * 2;
+								//System.out.println(point + " - " + mouseRelationX + " - " + mouseRelationY);
+
+								if (evt.count > 0) { //reduce
+									int xStart = (int) (-50 * boundsRelation * mouseRelationX); //xDown < xUp ? xDown : xUp;
+									int xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width + 50 * boundsRelation * (2 - mouseRelationX)); //xDown > xUp ? xDown + 1 : xUp + 1;
+									int yMax = (int) (GraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY); //(yDown < yUp ? yDown : yUp);
+									int yMin = (int) (-50 * (2 - mouseRelationY)); //curveAreaBounds.height - (yDown > yUp ? yDown : yUp) - 1;
+									if (log.isLoggable(Level.FINEST))
+										log.log(Level.FINEST, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+									if (xEnd - xStart > 5 && yMax - yMin > 5) {
+										recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
+										redrawGraphics();
+									}
+								}
+								else { //enlarge
+									int xStart = (int) (50 * boundsRelation * mouseRelationX); //xDown < xUp ? xDown : xUp;
+									int xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width - 50 * boundsRelation * (2 - mouseRelationX)); //xDown > xUp ? xDown + 1 : xUp + 1;
+									int yMax = (int) (GraphicsComposite.this.curveAreaBounds.height - 50 * mouseRelationY); //(yDown < yUp ? yDown : yUp);
+									int yMin = (int) (50 * (2 - mouseRelationY)); //curveAreaBounds.height - (yDown > yUp ? yDown : yUp) - 1;
+									if (log.isLoggable(Level.FINEST))
+										log.log(Level.FINEST, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+									if (xEnd - xStart > 5 && yMax - yMin > 5) {
+										recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
+										redrawGraphics();
+									}
+								}
+							}
+						}
+					}
+				}
+			});
 			this.graphicCanvas.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "graphicCanvas.paintControl, event=" + evt); //$NON-NLS-1$
 					//System.out.println("width = " + GraphicsComposite.this.getSize().x);
@@ -340,8 +420,8 @@ public class GraphicsComposite extends Composite {
 		}
 		{
 			this.recordSetComment = new Text(this, SWT.MULTI | SWT.LEFT);
-			this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
-			this.recordSetComment.setBackground(this.surroundingBackground); 
+			this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+			this.recordSetComment.setBackground(this.surroundingBackground);
 			this.recordSetComment.setMenu(this.popupmenu);
 			this.recordSetComment.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent evt) {
@@ -354,24 +434,24 @@ public class GraphicsComposite extends Composite {
 					}
 				}
 			});
-			
+
 			this.recordSetComment.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetCommentText.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_11.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
-			this.recordSetComment.addKeyListener( new KeyAdapter() {
+			this.recordSetComment.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyPressed(KeyEvent e) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "recordSetComment.keyPressed() , event=" + e); //$NON-NLS-1$
-					isRecordCommentChanged = true;
+					GraphicsComposite.this.isRecordCommentChanged = true;
 				}
 			});
-			this.recordSetComment.addFocusListener(new FocusListener() {				
+			this.recordSetComment.addFocusListener(new FocusListener() {
 				public void focusLost(FocusEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "recordSetComment.focusLost() , event=" + evt); //$NON-NLS-1$
-					updateRecordSetComment();					
+					updateRecordSetComment();
 				}
 				public void focusGained(FocusEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "recordSetComment.focusGained() , event=" + evt); //$NON-NLS-1$
@@ -389,14 +469,14 @@ public class GraphicsComposite extends Composite {
 		// Get the canvas and its dimensions
 		this.canvasBounds = this.graphicCanvas.getClientArea();
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "canvas size = " + this.canvasBounds); //$NON-NLS-1$
-		
+
 		this.canvasImage = SWTResourceManager.getImage(this.canvasBounds.width, this.canvasBounds.height);
 		this.canvasImageGC = new GC(this.canvasImage); //SWTResourceManager.getGC(this.canvasImage);
 		this.canvasImageGC.setBackground(this.surroundingBackground);
 		this.canvasImageGC.fillRectangle(this.canvasBounds);
 		this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		//get gc for other drawing operations
-		this.canvasGC = new GC(this.graphicCanvas); //SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
+		this.canvasGC = new GC(this.graphicCanvas); //SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); 
 
 		RecordSet recordSet = null;
 		switch (this.windowType) {
@@ -420,8 +500,8 @@ public class GraphicsComposite extends Composite {
 		}
 		if (recordSet != null && recordSet.realSize() > 0) {
 			drawCurves(recordSet, this.canvasBounds, this.canvasImageGC);
-			this.canvasGC.drawImage(this.canvasImage, 0,0);
-			
+			this.canvasGC.drawImage(this.canvasImage, 0, 0);
+
 			if (recordSet.isMeasurementMode(recordSet.getRecordKeyMeasurement()) || recordSet.isDeltaMeasurementMode(recordSet.getRecordKeyMeasurement())) {
 				drawMeasurePointer(recordSet, GraphicsComposite.MODE_MEASURE, true);
 			}
@@ -433,8 +513,8 @@ public class GraphicsComposite extends Composite {
 			}
 		}
 		else
-			this.canvasGC.drawImage(this.canvasImage, 0,0);			
-		
+			this.canvasGC.drawImage(this.canvasImage, 0, 0);
+
 		this.canvasGC.dispose();
 		this.canvasImageGC.dispose();
 	}
@@ -458,7 +538,7 @@ public class GraphicsComposite extends Composite {
 				recordSet.setScopeMode(true);
 			}
 		}
-		
+
 		//prepare time scale
 		double totalDisplayDeltaTime_ms = recordSet.get(0).getDrawTimeWidth_ms();
 		int[] timeScale = this.timeLine.getScaleMaxTimeNumber(totalDisplayDeltaTime_ms);
@@ -471,7 +551,8 @@ public class GraphicsComposite extends Composite {
 		int numberCurvesLeft = 0;
 		for (Record tmpRecord : recordSet.getRecordsSortedForDisplay()) {
 			if (tmpRecord != null && tmpRecord.isScaleVisible()) {
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "==>> " + tmpRecord.getName() + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$ 
+				if (log.isLoggable(Level.FINER))
+					log.log(Level.FINER, "==>> " + tmpRecord.getName() + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$ 
 				if (tmpRecord.isPositionLeft())
 					numberCurvesLeft++;
 				else
@@ -483,7 +564,8 @@ public class GraphicsComposite extends Composite {
 			numberCurvesLeft = 1; //numberCurvesLeft > 0 ? 1 : 0;
 			numberCurvesRight = 0; //numberCurvesRight > 0 && numberCurvesLeft == 0 ? 1 : 0;
 		}
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE))
+			log.log(Level.FINE, "nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//calculate the bounds left for the curves
 		int dataScaleWidth; // horizontal space used for text and scales, numbers and caption
@@ -492,28 +574,29 @@ public class GraphicsComposite extends Composite {
 		int width; // x coordinate width	- time scale
 		int height; // y coordinate - make modulo 10 ??
 		int startTimeFormated, endTimeFormated;
-		
+
 		// calculate the horizontal space width to be used for the scales
 		Point pt = gc.textExtent("-000,00"); //$NON-NLS-1$
-		int horizontalGap = pt.x/5;
+		int horizontalGap = pt.x / 5;
 		int horizontalNumberExtend = pt.x;
 		int horizontalCaptionExtend = pt.y;
-		dataScaleWidth = recordSet.isCompareSet() ? horizontalNumberExtend + horizontalGap : horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;	
+		dataScaleWidth = recordSet.isCompareSet() ? horizontalNumberExtend + horizontalGap : horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;
 		int spaceLeft = numberCurvesLeft * dataScaleWidth;
 		int spaceRight = numberCurvesRight * dataScaleWidth;
-		
+
 		// calculate the horizontal area available for plotting graphs
 		int gapSide = 10; // free gap left or right side of the curves
-		x0 = spaceLeft + (numberCurvesLeft > 0 ? gapSide/2 : gapSide);// enable a small gap if no axis is shown
-		xMax = bounds.width - spaceRight - (numberCurvesRight > 0 ? gapSide/2 : gapSide);
+		x0 = spaceLeft + (numberCurvesLeft > 0 ? gapSide / 2 : gapSide);// enable a small gap if no axis is shown
+		xMax = bounds.width - spaceRight - (numberCurvesRight > 0 ? gapSide / 2 : gapSide);
 		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
-		
+
 		// calculate the vertical area available for plotting graphs
 		yMax = 10; // free gap on top of the curves
 		int gapBot = 3 * pt.y + 4; // space used for time scale text and scales with description or legend;
 		y0 = bounds.height - yMax - gapBot;
 		height = y0 - yMax; // recalculate due to modulo 10 ??
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		// set offset values used for mouse measurement pointers
 		this.offSetX = x0;
 		this.offSetY = y0 - height;
@@ -522,7 +605,7 @@ public class GraphicsComposite extends Composite {
 		this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
 		recordSet.setDrawAreaBounds(this.curveAreaBounds);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
-		
+
 		gc.setBackground(this.curveAreaBackground);
 		gc.fillRectangle(this.curveAreaBounds);
 		gc.setBackground(this.surroundingBackground);
@@ -536,7 +619,7 @@ public class GraphicsComposite extends Composite {
 
 		// draw draw area bounding 
 		gc.setForeground(this.curveAreaBorderColor);
-		
+
 		gc.drawLine(x0-1, yMax-1, xMax+1, yMax-1);
 		gc.drawLine(x0-1, yMax-1, x0-1, y0); 
 		gc.drawLine(xMax+1, yMax-1, xMax+1, y0);
@@ -571,7 +654,7 @@ public class GraphicsComposite extends Composite {
 		}
 
 		// draw start time for zoom mode or scope mode
-		if (startTimeFormated != 0) { 
+		if (startTimeFormated != 0) {
 			String strStartTime = Messages.getString(MessageIds.GDE_MSGT0255) + TimeLine.getFomatedTimeWithUnit(recordSet.getStartTime());
 			Point point = gc.textExtent(strStartTime);
 			int yPosition = (int) (y0 + pt.y * 2.5);
@@ -579,7 +662,7 @@ public class GraphicsComposite extends Composite {
 			gc.drawText(strStartTime, 10, yPosition - point.y / 2);
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, strStartTime);
 		}
-		if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));		
+		if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 	}
 
 	/**
@@ -594,9 +677,9 @@ public class GraphicsComposite extends Composite {
 		gc.setLineDash(dashLineStyle);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
 		gc.setForeground(recordSet.getHorizontalGridColor());
-		
+
 		Vector<Integer> horizontalGridVector = recordSet.getHorizontalGrid();
-		for (int i=0; i<horizontalGridVector.size(); i+=recordSet.getHorizontalGridType()) {
+		for (int i = 0; i < horizontalGridVector.size(); i += recordSet.getHorizontalGridType()) {
 			int y = horizontalGridVector.get(i);
 			if (y > bounds.y && y < (bounds.y+bounds.height))
 				gc.drawLine(bounds.x, y, bounds.x+bounds.width, y);
@@ -616,7 +699,7 @@ public class GraphicsComposite extends Composite {
 		gc.setLineStyle(SWT.LINE_CUSTOM);
 		gc.setForeground(recordSet.getColorTimeGrid());
 		for (Integer x : recordSet.getTimeGrid()) {
-			gc.drawLine(x, bounds.y, x, bounds.y+bounds.height);
+			gc.drawLine(x, bounds.y, x, bounds.y + bounds.height);
 		}
 	}
 
@@ -644,19 +727,13 @@ public class GraphicsComposite extends Composite {
 		this.recordSetComment.redraw();
 		
     if (!GDE.IS_LINUX) { //old code changed due to Mountain Lion refresh problems
-		//if (GDE.IS_WINDOWS || (GDE.IS_MAC && !GDE.IS_MAC_MOUNTAIN_LION)) {
     	if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update");
 			Point size = this.graphicCanvas.getSize();
-			this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update
-			this.graphicCanvas.redraw(size.x-5,5,5,5,true);
-			this.graphicCanvas.redraw(5,size.y-5,5,5,true);
-			this.graphicCanvas.redraw(size.x-5,size.y-5,5,5,true);
+			this.graphicCanvas.redraw(5, 5, 5, 5, true); // image based - let OS handle the update
+			this.graphicCanvas.redraw(size.x - 5, 5, 5, 5, true);
+			this.graphicCanvas.redraw(5, size.y - 5, 5, 5, true);
+			this.graphicCanvas.redraw(size.x - 5, size.y - 5, 5, 5, true);
 		}
-//		else if (GDE.IS_MAC_MOUNTAIN_LION) { //added sending paint event directly
-//			 Rectangle rect = this.graphicCanvas.getBounds();
-//			 log.log(Level.FINER, "this.graphicCanvas.redraw(" + rect + "); // GDE.IS_MAC_MOUNTAIN_LION");
-//			this.graphicCanvas.redraw(rect.x, rect.y, rect.width, rect.height, true);
-//		}
 		else {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(); // do full update where required");
 			this.graphicCanvas.redraw(); // do full update where required
@@ -714,9 +791,9 @@ public class GraphicsComposite extends Composite {
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
 			drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
 			drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
-			
+
 			drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
-			
+
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
 			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257, 
@@ -816,7 +893,7 @@ public class GraphicsComposite extends Composite {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			this.canvasGC.drawImage(this.canvasImage, left + this.offSetX, top + this.offSetY, width, height, left + this.offSetX, top + this.offSetY,  width, height);
 		}
-		
+
 		this.leftLast = this.xPosMeasure <= this.xPosDelta ? this.xPosMeasure : this.xPosDelta;
 		this.topLast = this.yPosDelta <= this.yPosMeasure ? this.yPosDelta : this.yPosMeasure;
 		this.rightLast = this.xPosDelta >= this.xPosMeasure ? this.xPosDelta : this.xPosMeasure;
@@ -833,7 +910,7 @@ public class GraphicsComposite extends Composite {
 	 */
 	void eraseConnectingLine(int left, int top, int width, int height) {
 		if (width > 0 && height > 0 && width < this.curveAreaBounds.width && height < this.curveAreaBounds.height) {
-			this.canvasGC.drawImage(this.canvasImage, left, top, width, height, left + this.offSetX, top + this.offSetY,  width, height);
+			this.canvasGC.drawImage(this.canvasImage, left, top, width, height, left + this.offSetX, top + this.offSetY, width, height);
 		}
 	}
 
@@ -934,28 +1011,28 @@ public class GraphicsComposite extends Composite {
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = false;
-			this.isScopeMode	= false;
+			this.isScopeMode = false;
 			break;
 		case MODE_MEASURE:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = true;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = false;
-			this.isScopeMode	= false;
+			this.isScopeMode = false;
 			break;
 		case MODE_MEASURE_DELTA:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = true;
 			this.isPanMouse = false;
-			this.isScopeMode	= false;
+			this.isScopeMode = false;
 			break;
 		case MODE_PAN:
 			this.isZoomMouse = false;
 			this.isLeftMouseMeasure = false;
 			this.isRightMouseMeasure = false;
 			this.isPanMouse = true;
-			this.isScopeMode	= false;
+			this.isScopeMode = false;
 			break;
 		case MODE_CUT_LEFT:
 			this.isZoomMouse = false;
@@ -964,7 +1041,7 @@ public class GraphicsComposite extends Composite {
 			this.isPanMouse = false;
 			this.isLeftCutMode = true;
 			this.isRightCutMode = false;
-			this.isScopeMode	= false;
+			this.isScopeMode = false;
 			break;
 		case MODE_CUT_RIGHT:
 			this.isZoomMouse = false;
@@ -973,7 +1050,7 @@ public class GraphicsComposite extends Composite {
 			this.isPanMouse = false;
 			this.isLeftCutMode = false;
 			this.isRightCutMode = true;
-			this.isScopeMode	= false;
+			this.isScopeMode = false;
 			break;
 		case MODE_SCOPE:
 			this.isZoomMouse = false;
@@ -982,7 +1059,7 @@ public class GraphicsComposite extends Composite {
 			this.isPanMouse = false;
 			this.isLeftCutMode = false;
 			this.isRightCutMode = false;
-			this.isScopeMode	= true;
+			this.isScopeMode = true;
 			break;
 		case MODE_RESET:
 		default:
@@ -992,7 +1069,7 @@ public class GraphicsComposite extends Composite {
 			this.isPanMouse = false;
 			this.isLeftCutMode = false;
 			this.isRightCutMode = false;
-			this.isScopeMode	= false;
+			this.isScopeMode = false;
 			this.application.setStatusMessage(GDE.STRING_EMPTY);
 			this.xPosCut = -1;
 			this.xLast = 0;
@@ -1078,16 +1155,16 @@ public class GraphicsComposite extends Composite {
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "draw  left = " + (left - this.offSetX) + " top = " + (top - this.offSetY) + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 							this.canvasGC.drawRectangle(left, top, width, height);
 
-							/* detect directions to enable same behavior as LogView
-							if (xDown < evt.x && yDown < evt.y) { //top left -> bottom right
+							// detect directions to enable zoom or reset
+							if (this.xDown < evt.x) { // left -> right
+								//System.out.println("left -> right -> zoom selected area");
+								this.isTransientZoom = true;
 							}
-							else if (xDown < evt.x && yDown > evt.y) { // bottom left -> top right
+							if (this.xDown > evt.x) { // right -> left
+								//System.out.println("right -> left -> zoom reset");
+								this.isTransientZoom = false;
 							}
-							if (xDown > evt.x && yDown < evt.y) { //top right -> left bottom
-							}
-							if (xDown > evt.x && yDown > evt.y) { // bottom left -> top right
-							}
-							*/
+
 							this.xLast = evt.x;
 							this.yLast = evt.y;
 						}
@@ -1105,7 +1182,7 @@ public class GraphicsComposite extends Composite {
 								//no change don't needs to be calculated, but the calculation limits to bounds
 								this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
 								eraseHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width, 1);
-								
+
 								//clean obsolete rectangle of connecting line
 								cleanConnectingLineObsoleteRectangle();
 
@@ -1120,10 +1197,10 @@ public class GraphicsComposite extends Composite {
 							drawVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height);
 							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
 							drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
-							
+
 							if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
 								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
-									drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);	
+									drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
 								}
 								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257, 
 										new Object[] { record.getName(), Messages.getString(MessageIds.GDE_MSGT0212), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(), 
@@ -1151,7 +1228,7 @@ public class GraphicsComposite extends Composite {
 							//no change don't needs to be calculated, but the calculation limits to bounds
 							this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
 							eraseHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
-							
+
 							//clean obsolete rectangle of connecting line
 							cleanConnectingLineObsoleteRectangle();
 
@@ -1167,9 +1244,9 @@ public class GraphicsComposite extends Composite {
 							drawVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height);
 							this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
 							drawHorizontalLine(this.yPosDelta, 0, this.curveAreaBounds.width);
-							
+
 							if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
-								drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);	
+								drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
 							}
 
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
@@ -1192,7 +1269,7 @@ public class GraphicsComposite extends Composite {
 							this.xLast = evt.x;
 							this.yLast = evt.y;
 						}
-						else if (this.isLeftCutMode) { 
+						else if (this.isLeftCutMode) {
 							// clear old cut area
 							if (evt.x < this.xPosCut) {
 								this.canvasGC.drawImage(this.canvasImage, evt.x + this.offSetX, this.offSetY, this.xPosCut - evt.x + 1, this.curveAreaBounds.height, evt.x + this.offSetX, this.offSetY, this.xPosCut - evt.x + 1,
@@ -1283,7 +1360,9 @@ public class GraphicsComposite extends Composite {
 					this.isRightMouseMeasure = true;
 					this.isLeftMouseMeasure = false;
 				}
-				else if (this.isZoomMouse) {
+				else if (!this.isPanMouse && !this.isLeftCutMode && !this.isRightCutMode) {
+					if (!this.isZoomMouse) //setting zoom mode is only required at the beginning of zoom actions, it will reset scale values to initial values
+						this.application.setGraphicsMode(GraphicsComposite.MODE_ZOOM, true);
 					this.xLast = this.xDown;
 					this.yLast = this.yDown;
 					this.isResetZoomPosition = true;
@@ -1310,17 +1389,39 @@ public class GraphicsComposite extends Composite {
 				this.yUp = point.y;
 
 				if (this.isZoomMouse) {
-					this.isResetZoomPosition = false;
+					if (this.isTransientZoom) {
+						this.isResetZoomPosition = false;
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, this.isZoomMouse + " - " + recordSet.isZoomMode() + " - " + this.isResetZoomPosition); //$NON-NLS-1$
 
-					// sort the zoom values
-					int xStart = this.xDown < this.xUp ? this.xDown : this.xUp;
-					int xEnd = this.xDown > this.xUp ? this.xDown + 1 : this.xUp + 1;
-					int yMin = this.curveAreaBounds.height - (this.yDown > this.yUp ? this.yDown : this.yUp) - 1;
-					int yMax = this.curveAreaBounds.height - (this.yDown < this.yUp ? this.yDown : this.yUp);
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					if (xEnd - xStart > 5 && yMax - yMin > 5) {
-						recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
-						this.redrawGraphics(); //this.graphicCanvas.redraw();
+						// sort the zoom values
+						int xStart, xEnd, yMin, yMax;
+						if (this.isZoomX) {
+							xStart = this.xDown < this.xUp ? this.xDown : this.xUp;
+							xEnd = this.xDown > this.xUp ? this.xDown + 1 : this.xUp;
+							yMin = 0;
+							yMax = this.curveAreaBounds.height - this.curveAreaBounds.y;
+						}
+						else if (this.isZoomY) {
+							xStart = 0;
+							xEnd = this.curveAreaBounds.width;
+							yMin = this.curveAreaBounds.height - (this.yDown > this.yUp ? this.yDown : this.yUp);
+							yMax = this.curveAreaBounds.height - (this.yDown < this.yUp ? this.yDown : this.yUp);
+						}
+						else {
+							xStart = this.xDown < this.xUp ? this.xDown : this.xUp;
+							xEnd = this.xDown > this.xUp ? this.xDown + 1 : this.xUp;
+							yMin = this.curveAreaBounds.height - (this.yDown > this.yUp ? this.yDown : this.yUp);
+							yMax = this.curveAreaBounds.height - (this.yDown < this.yUp ? this.yDown : this.yUp);
+						}
+						if (log.isLoggable(Level.OFF))
+							log.log(Level.OFF, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+						if (xEnd - xStart > 5 && yMax - yMin > 5) {
+							recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
+							this.redrawGraphics(); //this.graphicCanvas.redraw();
+						}
+					}
+					else {
+						this.application.setGraphicsMode(GraphicsComposite.MODE_RESET, false);
 					}
 				}
 				else if (this.isLeftMouseMeasure) {
@@ -1365,7 +1466,7 @@ public class GraphicsComposite extends Composite {
 	void updateCutModeButtons() {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet() 
+			RecordSet recordSet = (this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet()
 					: (this.windowType == GraphicsWindow.TYPE_COMPARE) ? this.application.getCompareSet() : this.application.getUtilitySet();
 			if (this.canvasImage != null && recordSet != null) {
 				// 
@@ -1381,7 +1482,7 @@ public class GraphicsComposite extends Composite {
 			}
 		}
 	}
-	
+
 	/**
 	 * enable display of graphics header
 	 */
@@ -1408,10 +1509,10 @@ public class GraphicsComposite extends Composite {
 		else {
 			this.commentGap = 0;
 			this.commentHeight = 0;
-		}		
+		}
 		setComponentBounds();
 	}
-	
+
 	public void clearHeaderAndComment() {
 		if (GraphicsComposite.this.channels.getActiveChannel() != null) {
 			RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
@@ -1442,15 +1543,15 @@ public class GraphicsComposite extends Composite {
 		int height = this.headerHeight;
 		this.graphicsHeader.setBounds(x, y, width, height);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.setBounds " + this.graphicsHeader.getBounds());
-		
+
 		y = this.headerGap + this.headerHeight;
 		height = graphicsBounds.height - (this.headerGap + this.commentGap + this.commentHeight + this.headerHeight);
 		this.graphicCanvas.setBounds(x, y, width, height);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "graphicCanvas.setBounds " + this.graphicCanvas.getBounds());
-		
-		y =  this.headerGap + this.headerHeight + height + this.commentGap;
+
+		y = this.headerGap + this.headerHeight + height + this.commentGap;
 		height = this.commentHeight;
-		this.recordSetComment.setBounds(20, y, width-40, height-5);
+		this.recordSetComment.setBounds(20, y, width - 40, height - 5);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetComment.setBounds " + this.recordSetComment.getBounds());
 	}
 
@@ -1458,7 +1559,7 @@ public class GraphicsComposite extends Composite {
 	 * @return the isRecordCommentChanged
 	 */
 	public boolean isRecordCommentChanged() {
-		return isRecordCommentChanged;
+		return this.isRecordCommentChanged;
 	}
 
 	public void updateRecordSetComment() {
@@ -1466,7 +1567,7 @@ public class GraphicsComposite extends Composite {
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			if (recordSet != null) {
-				isRecordCommentChanged = false;
+				this.isRecordCommentChanged = false;
 				recordSet.setRecordSetDescription(GraphicsComposite.this.recordSetComment.getText());
 				recordSet.setUnsaved(RecordSet.UNSAVED_REASON_DATA);
 			}
@@ -1476,14 +1577,14 @@ public class GraphicsComposite extends Composite {
 	/**
 	 * @return the graphic window content as image - only if compare window is visible return the compare window graphics
 	 */
-	public Image getGraphicsPrintImage() {	
+	public Image getGraphicsPrintImage() {
 		Image graphicsImage = null;
-		int graphicsHeight = 30+this.canvasBounds.height+40;
+		int graphicsHeight = 30 + this.canvasBounds.height + 40;
 		// decide if normal graphics window or compare window should be copied
 		if (this.windowType == GraphicsWindow.TYPE_COMPARE) {
 			RecordSet compareRecordSet = DataExplorer.getInstance().getCompareSet();
 			int numberCompareSetRecords = compareRecordSet.size();
-			graphicsHeight = 30+this.canvasBounds.height+10+numberCompareSetRecords*20;
+			graphicsHeight = 30 + this.canvasBounds.height + 10 + numberCompareSetRecords * 20;
 			graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
 			GC graphicsGC = new GC(graphicsImage);
 			graphicsGC.setBackground(this.surroundingBackground);
@@ -1492,7 +1593,7 @@ public class GraphicsComposite extends Composite {
 			graphicsGC.setFont(this.graphicsHeader.getFont());
 			GraphicsUtils.drawTextCentered(Messages.getString(MessageIds.GDE_MSGT0144), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
 			graphicsGC.setFont(this.recordSetComment.getFont());
-			for (int i=0,yPos=30+this.canvasBounds.height+5; i<numberCompareSetRecords; ++i, yPos+=20) {
+			for (int i = 0, yPos = 30 + this.canvasBounds.height + 5; i < numberCompareSetRecords; ++i, yPos += 20) {
 				Record compareRecord = compareRecordSet.get(i);
 				if (compareRecord != null) {
 					graphicsGC.setForeground(compareRecord.getColor());
@@ -1502,14 +1603,14 @@ public class GraphicsComposite extends Composite {
 					String description = compareRecord.getDescription();
 					description = description.contains("\n") ? description.substring(0, description.indexOf("\n")) : description; //$NON-NLS-1$ //$NON-NLS-2$
 					Point pt = graphicsGC.textExtent(recordName); // string dimensions
-					GraphicsUtils.drawText(description, pt.x+30, yPos, graphicsGC, SWT.HORIZONTAL);
+					GraphicsUtils.drawText(description, pt.x + 30, yPos, graphicsGC, SWT.HORIZONTAL);
 				}
 			}
 			graphicsGC.drawImage(this.canvasImage, 0, 30);
 			graphicsGC.dispose();
 		}
-		else	if (this.windowType == GraphicsWindow.TYPE_UTIL) {
-			graphicsHeight = 30+this.canvasBounds.height;
+		else if (this.windowType == GraphicsWindow.TYPE_UTIL) {
+			graphicsHeight = 30 + this.canvasBounds.height;
 			graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
 			GC graphicsGC = new GC(graphicsImage);
 			graphicsGC.setBackground(this.surroundingBackground);
@@ -1530,7 +1631,7 @@ public class GraphicsComposite extends Composite {
 					this.canvasImageGC.setBackground(this.surroundingBackground);
 					this.canvasImageGC.fillRectangle(this.canvasBounds);
 					this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.canvasGC = new GC(this.graphicCanvas); //SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); //$NON-NLS-1$
+					this.canvasGC = new GC(this.graphicCanvas); //SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType); 
 					drawCurves(activeRecordSet, this.canvasBounds, this.canvasImageGC);
 					graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
 					GC graphicsGC = new GC(graphicsImage);
@@ -1554,7 +1655,7 @@ public class GraphicsComposite extends Composite {
 		}
 		return graphicsImage;
 	}
-	
+
 	public void setFileComment() {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {

@@ -44,7 +44,6 @@ import java.text.DecimalFormat;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -1268,9 +1267,11 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 			}
 		}
 		else {
-			for (Record record : this.values()) {
-				record.minZoomScaleValue = record.minScaleValue;
-				record.maxZoomScaleValue = record.maxScaleValue;
+			if (!this.isZoomMode) {
+				for (Record record : this.values()) {
+					record.minZoomScaleValue = record.minScaleValue;
+					record.maxZoomScaleValue = record.maxScaleValue;
+				}
 			}
 		}
 		this.isZoomMode = zoomModeEnabled;
@@ -1307,8 +1308,8 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public void setDisplayZoomBounds(Rectangle newDisplayZoomBounds) {
 		// iterate children 
-		for (Entry<String, Record> element : this.entrySet()) {
-			element.getValue().setZoomBounds(newDisplayZoomBounds);
+		for (Record record : this.values()) {
+			record.setZoomBounds(newDisplayZoomBounds);
 		}
 	}
 
@@ -1375,8 +1376,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 
 	public void shift(int xPercent, int yPercent) {
 		// iterate children and set min/max values
-		for (String recordKey : this.recordNames) {
-			Record record = this.get(recordKey);
+		for (Record record : this.values()) {
 			double xShift_ms = record.drawTimeWidth * xPercent / 100;
 			if (record.zoomTimeOffset + xShift_ms <= 0) {
 				record.zoomOffset = 0;

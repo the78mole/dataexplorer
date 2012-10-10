@@ -150,6 +150,8 @@ public class Record extends Vector<Integer> {
 	double							zoomTimeOffset	= 0;		// time where the zoom area begins
 	int									zoomOffset			= 0;		// number of measurements point until zoom area begins approximation only
 	double							drawTimeWidth		= 0;		// all or zoomed area time width
+	double							tmpMaxZoomScaleValue	= this.maxScaleValue;
+	double							tmpMinZoomScaleValue	= this.minScaleValue;
 	double							maxZoomScaleValue			= this.maxScaleValue;
 	double							minZoomScaleValue			= this.minScaleValue;
 	int									numberScaleTicks			= 0;
@@ -1555,8 +1557,10 @@ public class Record extends Vector<Integer> {
 		this.zoomOffset = this.findBestIndex(this.zoomTimeOffset);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth)); //$NON-NLS-1$ //$NON-NLS-2$
 
-		this.minZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.y, this.parent.drawAreaBounds);
-		this.maxZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
+		this.tmpMinZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.y, this.parent.drawAreaBounds);
+		this.tmpMaxZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
+		this.maxZoomScaleValue = tmpMaxZoomScaleValue;
+		this.minZoomScaleValue = tmpMinZoomScaleValue;
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " - minZoomScaleValue = " + this.minZoomScaleValue + "  maxZoomScaleValue = " + this.maxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 

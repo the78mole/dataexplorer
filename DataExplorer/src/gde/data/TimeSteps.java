@@ -67,6 +67,7 @@ public class TimeSteps extends Vector<Long> {
 	 */
 	private TimeSteps(TimeSteps toBeClonedTimeSteps, int index, boolean isFromBegin) {
   	super(toBeClonedTimeSteps);
+  	this.clear();
   	if (!(this.isConstant = toBeClonedTimeSteps.isConstant)) {
 			this.startTime = isFromBegin ? toBeClonedTimeSteps.startTime + toBeClonedTimeSteps.get(index)/10 : toBeClonedTimeSteps.startTime;
 			if (isFromBegin) {
