@@ -142,7 +142,7 @@ public class GraphicsComposite extends Composite {
 	int												xPosMeasure							= 0, yPosMeasure = 0;
 	int												xPosDelta								= 0, yPosDelta = 0;
 
-	boolean										isZoomMouse							= false;
+	boolean										isZoomMouse							= true;
 	boolean										isResetZoomPosition			= false;
 	boolean										isTransientZoom					= false;
 	boolean										isZoomX									= false;
@@ -336,16 +336,17 @@ public class GraphicsComposite extends Composite {
 				public void keyPressed(KeyEvent e) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.keyPressed() , event=" + e); //$NON-NLS-1$
 					if (e.keyCode == 'x') {
-						System.out.println("x-direction");
+						//System.out.println("x-direction");
 						GraphicsComposite.this.isZoomX = true;
 						GraphicsComposite.this.isZoomY = false;
 					}
 					else if (e.keyCode == 'y') {
-						System.out.println("y-direction");
+						//System.out.println("y-direction");
 						GraphicsComposite.this.isZoomY = true;
 						GraphicsComposite.this.isZoomX = false;
 					}
 					else {
+						//System.out.println("x,y off");
 						GraphicsComposite.this.isZoomX = GraphicsComposite.this.isZoomY = false;
 					}
 				}
@@ -353,7 +354,7 @@ public class GraphicsComposite extends Composite {
 				@Override
 				public void keyReleased(KeyEvent e) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.keyReleased() , event=" + e); //$NON-NLS-1$
-					System.out.println("x,y off");
+					//System.out.println("x,y off");
 					GraphicsComposite.this.isZoomX = GraphicsComposite.this.isZoomY = false;
 				}
 			});
@@ -375,29 +376,51 @@ public class GraphicsComposite extends Composite {
 								float mouseRelationY = 1.0f * point.y / GraphicsComposite.this.curveAreaBounds.height * 2;
 								//System.out.println(point + " - " + mouseRelationX + " - " + mouseRelationY);
 
+								int xStart, xEnd, yMin, yMax;
 								if (evt.count > 0) { //reduce
-									int xStart = (int) (-50 * boundsRelation * mouseRelationX); //xDown < xUp ? xDown : xUp;
-									int xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width + 50 * boundsRelation * (2 - mouseRelationX)); //xDown > xUp ? xDown + 1 : xUp + 1;
-									int yMax = (int) (GraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY); //(yDown < yUp ? yDown : yUp);
-									int yMin = (int) (-50 * (2 - mouseRelationY)); //curveAreaBounds.height - (yDown > yUp ? yDown : yUp) - 1;
-									if (log.isLoggable(Level.FINEST))
-										log.log(Level.FINEST, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-									if (xEnd - xStart > 5 && yMax - yMin > 5) {
-										recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
-										redrawGraphics();
+									if (GraphicsComposite.this.isZoomX) {
+										xStart = (int) (-50 * boundsRelation * mouseRelationX);
+										xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width + 50 * boundsRelation * (2 - mouseRelationX));
+										yMin = 0;
+										yMax = GraphicsComposite.this.curveAreaBounds.height - GraphicsComposite.this.curveAreaBounds.y;
+									}
+									else if (GraphicsComposite.this.isZoomY) {
+										xStart = 0;
+										xEnd = GraphicsComposite.this.curveAreaBounds.width;
+										yMin = (int) (-50 * (2 - mouseRelationY));
+										yMax = (int) (GraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY);
+									}
+									else {
+										xStart = (int) (-50 * boundsRelation * mouseRelationX);
+										xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width + 50 * boundsRelation * (2 - mouseRelationX));
+										yMin = (int) (-50 * (2 - mouseRelationY));
+										yMax = (int) (GraphicsComposite.this.curveAreaBounds.height + 50 * mouseRelationY);
 									}
 								}
 								else { //enlarge
-									int xStart = (int) (50 * boundsRelation * mouseRelationX); //xDown < xUp ? xDown : xUp;
-									int xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width - 50 * boundsRelation * (2 - mouseRelationX)); //xDown > xUp ? xDown + 1 : xUp + 1;
-									int yMax = (int) (GraphicsComposite.this.curveAreaBounds.height - 50 * mouseRelationY); //(yDown < yUp ? yDown : yUp);
-									int yMin = (int) (50 * (2 - mouseRelationY)); //curveAreaBounds.height - (yDown > yUp ? yDown : yUp) - 1;
-									if (log.isLoggable(Level.FINEST))
-										log.log(Level.FINEST, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-									if (xEnd - xStart > 5 && yMax - yMin > 5) {
-										recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
-										redrawGraphics();
+									if (GraphicsComposite.this.isZoomX) {
+										xStart = (int) (50 * boundsRelation * mouseRelationX);
+										xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width - 50 * boundsRelation * (2 - mouseRelationX));
+										yMin = 0;
+										yMax = GraphicsComposite.this.curveAreaBounds.height - GraphicsComposite.this.curveAreaBounds.y;
 									}
+									else if (GraphicsComposite.this.isZoomY) {
+										xStart = 0;
+										xEnd = GraphicsComposite.this.curveAreaBounds.width;
+										yMin = (int) (50 * (2 - mouseRelationY));
+										yMax = (int) (GraphicsComposite.this.curveAreaBounds.height - 50 * mouseRelationY);
+									}
+									else {
+										xStart = (int) (50 * boundsRelation * mouseRelationX);
+										xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width - 50 * boundsRelation * (2 - mouseRelationX));
+										yMin = (int) (50 * (2 - mouseRelationY));
+										yMax = (int) (GraphicsComposite.this.curveAreaBounds.height - 50 * mouseRelationY);
+									}
+								}
+								if (log.isLoggable(Level.FINER))	log.log(Level.FINER, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+								if (xEnd - xStart > 5 && yMax - yMin > 5) {
+									recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
+									redrawGraphics();
 								}
 							}
 						}
