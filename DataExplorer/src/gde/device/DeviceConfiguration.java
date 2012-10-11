@@ -176,6 +176,32 @@ public class DeviceConfiguration {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
 	}
 
+	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>) //$NON-NLS-1$
+	public DeviceConfiguration(String xmlFileName, Unmarshaller tmpUnmarshaller) throws FileNotFoundException, JAXBException {
+
+		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
+
+		this.settings = Settings.getInstance();
+
+		while (this.settings.isXsdThreadAlive() || this.settings.getUnmarshaller() == null) {
+			WaitTimer.delay(5);
+		}
+		this.unmarshaller = tmpUnmarshaller;
+		this.marshaller = null;
+
+		this.elememt = (JAXBElement<DevicePropertiesType>)this.unmarshaller.unmarshal(this.xmlFile);
+		this.deviceProps = this.elememt.getValue();
+		this.device = this.deviceProps.getDevice();
+		this.serialPort = this.deviceProps.getSerialPort();
+		this.dataBlock = this.deviceProps.getDataBlock();
+		this.state = this.deviceProps.getState();
+		this.timeBase = this.deviceProps.getTimeBase();
+		this.desktop = this.deviceProps.getDesktop();
+		this.isChangePropery = false;
+		
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
+	}
+
 	/**
 	 * copy constructor
 	 */

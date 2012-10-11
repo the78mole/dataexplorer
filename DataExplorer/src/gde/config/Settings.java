@@ -19,6 +19,7 @@
 package gde.config;
 
 import gde.GDE;
+import gde.device.DeviceConfiguration;
 import gde.exception.ApplicationConfigurationException;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -29,6 +30,7 @@ import gde.ui.SWTResourceManager;
 import gde.utils.FileUtils;
 import gde.utils.RecordSetNameComparator;
 import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -46,6 +48,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -85,6 +88,7 @@ public class Settings extends Properties {
 	Marshaller											marshaller;
 	String													xmlBasePath;
 	Thread													xsdThread;
+	Thread													migrationThread;
 
 	public static final String			EMPTY													= "---";																																													//$NON-NLS-1$
 	public static final String			EMPTY_SIGNATURE								= Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY;
@@ -297,6 +301,52 @@ public class Settings extends Properties {
 		if (this.getLocaleChanged() && !this.isDevicePropertiesUpdated) {
 			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, false);
 			this.isDevicePropertiesReplaced = true;
+		}
+		
+		if (this.isDevicePropertiesReplaced || this.isDevicePropertiesUpdated) { //check if previous devices exist and migrate device usage, default import directory, ....
+			this.migrationThread = new Thread("migration") {
+				@Override
+				public void run() {
+					int lastVersion = Integer.valueOf(GDE.DEVICE_PROPERTIES_XSD_VERSION.substring(GDE.DEVICE_PROPERTIES_XSD_VERSION.lastIndexOf("_V") + 2)) - 1;
+					for (int i = lastVersion; i >= 10; i--) {
+						String migratePropertyPath = Settings.this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + i;
+						if (new File(migratePropertyPath).exists()) {
+							log.log(Level.INFO, "previous devices exist, migrate from " + migratePropertyPath);
+							try {
+								while (Settings.this.isXsdThreadAlive() || Settings.this.getUnmarshaller() == null || DataExplorer.getInstance().getDeviceSelectionDialog() == null) {
+									WaitTimer.delay(5);
+								}
+
+								Unmarshaller tmpUnmarshaller = JAXBContext.newInstance("gde.device").createUnmarshaller();//$NON-NLS-1$
+								tmpUnmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(migratePropertyPath + "/DeviceProperties_V" + i + GDE.FILE_ENDING_DOT_XSD)));
+								TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
+								List<File> deviceProperties = FileUtils.getFileListing(new File(migratePropertyPath), 1);
+								for (File file : deviceProperties) {
+									if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_DOT_XML)) {
+										DeviceConfiguration oldConfig = new DeviceConfiguration(file.getAbsolutePath(), tmpUnmarshaller);
+										DeviceConfiguration newConfig = actualConfigurations.get(oldConfig.getName());
+										if (oldConfig.isUsed()) {
+											newConfig.setUsed(true);
+											if (oldConfig.getPort().length() > 1) newConfig.setPort(oldConfig.getPort());
+											if (oldConfig.getDataBlockPreferredDataLocation().length() > 1) newConfig.setDataBlockPreferredDataLocation(oldConfig.getDataBlockPreferredDataLocation());
+											if (oldConfig.getLastChannelNumber() != 0) newConfig.setLastChannelNumber(oldConfig.getLastChannelNumber());
+
+											newConfig.storeDeviceProperties();
+											log.log(Level.OFF, "migrated device configuration " + newConfig.getName());
+										}
+									}
+								}
+							}
+							catch (Exception e) {
+								Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, "xsdThread.run()", e.getMessage(), e);
+							}
+							Settings.this.isDevicePropertiesUpdated = false;
+							break;
+						}
+					}
+				}
+			};
+			this.migrationThread.start();
 		}
 
 		String templateDirectory = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.GRAPHICS_TEMPLATES_DIR_NAME;
@@ -1864,5 +1914,12 @@ public class Settings extends Properties {
 	 */
 	public boolean isXsdThreadAlive() {
 		return this.xsdThread != null ? this.xsdThread.isAlive() : false;
+	}
+
+	/**
+	 * @return true if the xsdThread is alive
+	 */
+	public boolean isMigationThreadAlive() {
+		return this.migrationThread != null ? this.migrationThread.isAlive() : false;
 	}
 }

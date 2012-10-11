@@ -432,7 +432,8 @@ public class MenuToolBar {
 								MenuToolBar.this.settings.setObjectList(MenuToolBar.this.objectSelectCombo.getItems(), selectionIndex);
 								//MenuToolBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuToolBar.this.application.getActiveDevice());
 								MenuToolBar.this.application.updateObjectDescriptionWindow();
-								MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.activeObjectKey, MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
+								if (MenuToolBar.this.application.getActiveDevice() != null)
+									MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.activeObjectKey, MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 							}
 						});
 						this.objectSelectCombo.addKeyListener(new KeyAdapter() {
