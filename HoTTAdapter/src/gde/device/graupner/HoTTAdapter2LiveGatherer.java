@@ -233,7 +233,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 								this.serialPort.addTimeoutError();
 							}
 						}
-						if (queryRing.firstElement() == 4) {
+						if (queryRing.size() > 0 && queryRing.firstElement() == 4) {
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200);
 								HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
@@ -247,7 +247,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 								this.serialPort.addTimeoutError();
 							}
 						}
-						if (queryRing.firstElement() == 3) {
+						if (queryRing.size() > 0 && queryRing.firstElement() == 3) {
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_19200);
 								HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
@@ -261,7 +261,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 								this.serialPort.addTimeoutError();
 							}
 						}
-						if (queryRing.firstElement() == 5) {
+						if (queryRing.size() > 0 && queryRing.firstElement() == 5) {
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_19200);
 								HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
@@ -275,7 +275,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 								this.serialPort.addTimeoutError();
 							}
 						}
-						if (queryRing.firstElement() == 2) {
+						if (queryRing.size() > 0 && queryRing.firstElement() == 2) {
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_19200);
 								HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
@@ -289,7 +289,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 								this.serialPort.addTimeoutError();
 							}
 						}
-						if (queryRing.firstElement() == 1) {
+						if (queryRing.size() > 0 && queryRing.firstElement() == 1) {
 							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_19200);
 								HoTTAdapter2LiveGatherer.this.serialPort.getData(false);
@@ -321,7 +321,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 							this.serialPort.addTimeoutError();
 						}
 					}
-					if (queryRing.firstElement() == 4) {
+					if (queryRing.size() > 0 && queryRing.firstElement() == 4) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200);
 							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
@@ -335,7 +335,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 							this.serialPort.addTimeoutError();
 						}
 					}
-					if (queryRing.firstElement() == 3) {
+					if (queryRing.size() > 0 && queryRing.firstElement() == 3) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_115200);
 							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
@@ -349,7 +349,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 							this.serialPort.addTimeoutError();
 						}
 					}
-					if (queryRing.firstElement() == 5) {
+					if (queryRing.size() > 0 && queryRing.firstElement() == 5) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200);
 							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
@@ -363,7 +363,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 							this.serialPort.addTimeoutError();
 						}
 					}
-					if (queryRing.firstElement() == 2) {
+					if (queryRing.size() > 0 && queryRing.firstElement() == 2) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_115200);
 							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
@@ -377,7 +377,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 							this.serialPort.addTimeoutError();
 						}
 					}
-					if (queryRing.firstElement() == 1) {
+					if (queryRing.size() > 0 && queryRing.firstElement() == 1) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_115200);
 							HoTTAdapter2LiveGatherer.this.serialPort.getData(0);
