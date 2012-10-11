@@ -1553,15 +1553,17 @@ public class Record extends Vector<Integer> {
 	 */
 	public void setZoomBounds(Rectangle zoomBounds) {
 		this.zoomTimeOffset = this.getHorizontalDisplayPointTime_ms(zoomBounds.x) + this.getDrawTimeOffset_ms();
-		this.drawTimeWidth = this.getHorizontalDisplayPointTime_ms(zoomBounds.width-1);
+		if (this.zoomTimeOffset < 0) this.zoomTimeOffset = 0;
 		this.zoomOffset = this.findBestIndex(this.zoomTimeOffset);
+		this.drawTimeWidth = this.getHorizontalDisplayPointTime_ms(zoomBounds.width-1);
+		if (this.drawTimeWidth > this.getMaxTime_ms()) this.drawTimeWidth = this.getMaxTime_ms();
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(this.zoomTimeOffset) + " drawTimeWidth "  + TimeLine.getFomatedTimeWithUnit(this.drawTimeWidth)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		this.tmpMinZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.y, this.parent.drawAreaBounds);
 		this.tmpMaxZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
-		this.maxZoomScaleValue = tmpMaxZoomScaleValue;
-		this.minZoomScaleValue = tmpMinZoomScaleValue;
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " - minZoomScaleValue = " + this.minZoomScaleValue + "  maxZoomScaleValue = " + this.maxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
+		this.minZoomScaleValue = tmpMinZoomScaleValue < this.minScaleValue ? this.minScaleValue : tmpMinZoomScaleValue;
+		this.maxZoomScaleValue = tmpMaxZoomScaleValue > this.maxScaleValue ? this.maxScaleValue : tmpMaxZoomScaleValue;
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.name + " - minZoomScaleValue = " + this.minZoomScaleValue + "  maxZoomScaleValue = " + this.maxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**

@@ -142,7 +142,7 @@ public class GraphicsComposite extends Composite {
 	int												xPosMeasure							= 0, yPosMeasure = 0;
 	int												xPosDelta								= 0, yPosDelta = 0;
 
-	boolean										isZoomMouse							= true;
+	boolean										isZoomMouse							= false;
 	boolean										isResetZoomPosition			= false;
 	boolean										isTransientZoom					= false;
 	boolean										isZoomX									= false;
@@ -305,7 +305,6 @@ public class GraphicsComposite extends Composite {
 			this.graphicCanvas.setBackground(this.surroundingBackground);
 			this.graphicCanvas.setMenu(this.popupmenu);
 			this.graphicCanvas.addMouseMoveListener(new MouseMoveListener() {
-				@Override
 				public void mouseMove(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseMove = " + evt); //$NON-NLS-1$
 					mouseMoveAction(evt);
@@ -359,7 +358,6 @@ public class GraphicsComposite extends Composite {
 				}
 			});
 			this.graphicCanvas.addMouseWheelListener(new MouseWheelListener() {
-				@Override
 				public void mouseScrolled(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseScrolled, event=" + evt); //$NON-NLS-1$
 					if (GraphicsComposite.this.isTransientZoom) {
@@ -377,7 +375,7 @@ public class GraphicsComposite extends Composite {
 								//System.out.println(point + " - " + mouseRelationX + " - " + mouseRelationY);
 
 								int xStart, xEnd, yMin, yMax;
-								if (evt.count > 0) { //reduce
+								if (evt.count < 0) { //reduce
 									if (GraphicsComposite.this.isZoomX) {
 										xStart = (int) (-50 * boundsRelation * mouseRelationX);
 										xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width + 50 * boundsRelation * (2 - mouseRelationX));
@@ -428,7 +426,6 @@ public class GraphicsComposite extends Composite {
 				}
 			});
 			this.graphicCanvas.addPaintListener(new PaintListener() {
-				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "graphicCanvas.paintControl, event=" + evt); //$NON-NLS-1$
 					//System.out.println("width = " + GraphicsComposite.this.getSize().x);
