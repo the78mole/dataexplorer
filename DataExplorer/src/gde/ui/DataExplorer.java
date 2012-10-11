@@ -734,9 +734,7 @@ public class DataExplorer extends Composite {
 				this.openSettingsDialog();
 			}
 			//wait for possible migration and delay opening for migration
-			while (this.settings.isMigationThreadAlive()) {
-				WaitTimer.delay(10);
-			}
+			this.settings.startMigationThread();
 			// check configured device
 			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) { //$NON-NLS-1$
 				this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this);

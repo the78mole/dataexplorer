@@ -313,8 +313,8 @@ public class Settings extends Properties {
 						if (new File(migratePropertyPath).exists()) {
 							log.log(Level.INFO, "previous devices exist, migrate from " + migratePropertyPath);
 							try {
-								while (Settings.this.isXsdThreadAlive() || Settings.this.getUnmarshaller() == null || DataExplorer.getInstance().getDeviceSelectionDialog() == null) {
-									WaitTimer.delay(5);
+								while (Settings.this.isXsdThreadAlive() || Settings.this.getUnmarshaller() == null) {
+									WaitTimer.delay(7);
 								}
 
 								Unmarshaller tmpUnmarshaller = JAXBContext.newInstance("gde.device").createUnmarshaller();//$NON-NLS-1$
@@ -340,13 +340,11 @@ public class Settings extends Properties {
 							catch (Exception e) {
 								Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, "xsdThread.run()", e.getMessage(), e);
 							}
-							Settings.this.isDevicePropertiesUpdated = false;
 							break;
 						}
 					}
 				}
 			};
-			this.migrationThread.start();
 		}
 
 		String templateDirectory = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.GRAPHICS_TEMPLATES_DIR_NAME;
@@ -1914,6 +1912,13 @@ public class Settings extends Properties {
 	 */
 	public boolean isXsdThreadAlive() {
 		return this.xsdThread != null ? this.xsdThread.isAlive() : false;
+	}
+
+	/**
+	 * @return true if the xsdThread is alive
+	 */
+	public void startMigationThread() {
+		if (this.migrationThread != null) this.migrationThread.run();
 	}
 
 	/**
