@@ -520,8 +520,8 @@ public class MenuBar {
 				{
 					this.prevDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
 					this.prevDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldLefHot.gif")); //$NON-NLS-1$
-					this.prevDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0031, GDE.MOD2)); 
-					this.prevDeviceMenuItem.setAccelerator(SWT.MOD2 + SWT.ARROW_RIGHT);
+					this.prevDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0031, GDE.MOD3)); 
+					this.prevDeviceMenuItem.setAccelerator(SWT.MOD3 + SWT.PAGE_UP);
 					this.prevDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -556,8 +556,8 @@ public class MenuBar {
 				{
 					this.nextDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
 					this.nextDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ArrowWhiteGreenFieldRightHot.gif")); //$NON-NLS-1$
-					this.nextDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0032, GDE.MOD2)); 
-					this.nextDeviceMenuItem.setAccelerator(SWT.MOD2 + SWT.ARROW_LEFT);
+					this.nextDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0032, GDE.MOD3)); 
+					this.nextDeviceMenuItem.setAccelerator(SWT.MOD3 + SWT.PAGE_DOWN);
 					this.nextDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
