@@ -119,16 +119,14 @@ public class TabAreaContextMenu {
 				this.separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);
 			}
 
-			if (type != TYPE_TABLE) {
-				this.copyTabItem = new MenuItem(popupMenu, SWT.PUSH);
-				this.copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026).substring(0,Messages.getString(MessageIds.GDE_MSGT0026).lastIndexOf('\t')));
-				this.copyTabItem.addListener(SWT.Selection, new Listener() {
-					public void handleEvent(Event e) {
-						TabAreaContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
-						TabAreaContextMenu.this.application.copyTabContentAsImage();
-					}
-				});
-			}
+			this.copyTabItem = new MenuItem(popupMenu, SWT.PUSH);
+			this.copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026).substring(0,Messages.getString(MessageIds.GDE_MSGT0026).lastIndexOf('\t')));
+			this.copyTabItem.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event e) {
+					TabAreaContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
+					TabAreaContextMenu.this.application.copyTabContentAsImage();
+				}
+			});
 			
 			if (type == TYPE_GRAPHICS || type == TYPE_COMPARE || type == TYPE_UTILITY) {
 				this.copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
