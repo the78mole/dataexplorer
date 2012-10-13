@@ -8,6 +8,7 @@ HottAdapter(2) - enable/refine mx20, mc20 <-> mc32 model configuration files con
 HottAdapter(2) - fix time difference in table view to Firmware_Upgrade_grStudio
 HottAdapter(2) - fix live data gathering receiver only
 UniLog - fix capacity calculation
+GPS-Logger - fix UniLog2 sentence detection, UniLog may lazy start relative to GPS-Logger
 Implement support for zip compression of OSD files
 fixed [bug #37464] Title bar of "Device Properties Editor" shows "&"
 fixed [bug #37302] File comment is reset when I move the mouse
