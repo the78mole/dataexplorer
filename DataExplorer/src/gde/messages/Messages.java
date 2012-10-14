@@ -21,6 +21,8 @@ package gde.messages;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
+import gde.GDE;
 import gde.log.Level;
 import java.util.logging.Logger;
 
@@ -59,7 +61,7 @@ public class Messages {
 	public static String getString(String key, Object[] params) {
 		try {
 			String result;
-			if (new Integer(key.substring(key.length()-4)) <= 1000) {
+			if (new Integer(key.substring(key.length()-4)) <= GDE.NUMBER_RANGE_MAX_GDE) {
 				result = mainResourceBundle.getString(key);
 			}
 			else {
@@ -91,7 +93,7 @@ public class Messages {
 	 */
 	public static String getString(String key) {
 		try {
-			if (new Integer(key.substring(key.length()-4)) <= 1000) {
+			if (new Integer(key.substring(key.length()-4)) <= GDE.NUMBER_RANGE_MAX_GDE) {
 				return mainResourceBundle.getString(key);
 			}
 			return deviceResourceBundle.getString(key);
@@ -130,7 +132,7 @@ public class Messages {
 	public static char getAcceleratorChar(String key) {
 		try {
 			String resourceString;
-			if (new Integer(key.substring(key.length()-4)) <= 1000) {
+			if (new Integer(key.substring(key.length()-4)) <= GDE.NUMBER_RANGE_MAX_GDE) {
 				resourceString = mainResourceBundle.getString(key);
 			}
 			else {

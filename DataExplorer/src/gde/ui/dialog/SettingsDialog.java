@@ -34,6 +34,7 @@ import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -1340,7 +1341,7 @@ public class SettingsDialog extends Dialog {
 	 * initialize buttons, logging according to settings
 	 */
 	private void initialize() {
-		SettingsDialog.this.defaultDataPath.setText(SettingsDialog.this.settings.getDataFilePath());
+		SettingsDialog.this.defaultDataPath.setText(new File(SettingsDialog.this.settings.getDataFilePath()).getAbsolutePath());
 
 		SettingsDialog.this.suggestDate.setSelection(SettingsDialog.this.settings.getUsageDateAsFileNameLeader());
 		SettingsDialog.this.suggestObjectKey.setSelection(SettingsDialog.this.settings.getUsageObjectKeyInFileName());

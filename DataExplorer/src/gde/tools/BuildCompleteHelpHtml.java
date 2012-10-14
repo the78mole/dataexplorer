@@ -38,11 +38,11 @@ public class BuildCompleteHelpHtml {
 			"<HTML>\n" +
 			"<HEAD>\n" +
 			"<META HTTP-EQUIV=\"CONTENT-TYPE\" CONTENT=\"text/html; charset=utf-8\">\n" +
-			"<TITLE>DataExplorer - Benuterhandbuch</TITLE>\n" +
+			"<TITLE>DataExplorer - Benutzerhandbuch</TITLE>\n" +
 			"<META NAME=\"AUTHOR\" CONTENT=\"Winfried Brügmann\">\n" +
 			"</HEAD>\n" +
 			"<BODY LANG=\"de-DE\" DIR=\"LTR\">\n" +
-			"<H0>DataExplorer - Benuterhandbuch</H0>\n";
+			"<H0>DataExplorer - Benutzerhandbuch</H0>\n";
 	static String header_en = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2//EN\">\n" +
 			"<HTML>\n" +
 			"<HEAD>\n" +

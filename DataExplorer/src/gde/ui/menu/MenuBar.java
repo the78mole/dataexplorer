@@ -929,9 +929,12 @@ public class MenuBar {
 			menuItem.dispose();
 		}
 		// fill with refreshed data
+		int i = 0;
 		for (Iterator<String> iterator = refFileHistory.iterator(); iterator.hasNext();) {
+			i++;
 			String fullQualifiedFileReference = iterator.next();
-			String shortFileReference = fullQualifiedFileReference.substring(fullQualifiedFileReference.lastIndexOf('/') + 1);
+			// add number in front of history item for selection with keyboard
+			String shortFileReference = "&" + i + ": " + fullQualifiedFileReference.substring(fullQualifiedFileReference.lastIndexOf('/') + 1);
 			final MenuItem historyImportMenuItem = new MenuItem(this.fileHistoryMenu, SWT.PUSH);
 			historyImportMenuItem.setText(shortFileReference);
 			historyImportMenuItem.setData(shortFileReference, fullQualifiedFileReference);

@@ -224,6 +224,46 @@ public class GDE {
 	public static final String[] 	MOD1 														= new String[] {GDE.IS_MAC ? "\u00E6" : Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Strg" : "Ctrl"};
 	public static final String[] 	MOD2 														= new String[] {Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Umschalt" : "Shift"};
 	public static final String[] 	MOD3 														= new String[] {"Alt"};
+	
+	// number ranges for message IDs 
+	public static final int				NUMBER_RANGE_MIN_GDE							= 0;
+	public static final int				NUMBER_RANGE_MAX_GDE							= 1000;
+	public static final int				NUMBER_RANGE_MIN_SAMPLE_SIM				= 1001; 
+	public static final int				NUMBER_RANGE_MAX_SAMPLE_SIM				= 1099; 
+	public static final int				NUMBER_RANGE_MIN_AKKUMASTER				= 1100; 
+	public static final int				NUMBER_RANGE_MAX_AKKUMASTER				= 1199; 
+	public static final int				NUMBER_RANGE_MIN_PICOLARIO				= 1200; 
+	public static final int				NUMBER_RANGE_MAX_PICOLARIO				= 1299; 
+	public static final int				NUMBER_RANGE_MIN_UNILOG						= 1300; 
+	public static final int				NUMBER_RANGE_MAX_UNILOG						= 1399; 
+	public static final int				NUMBER_RANGE_MIN_ESTATION					= 1400; 
+	public static final int				NUMBER_RANGE_MAX_ESTATION					= 1499; 
+	public static final int				NUMBER_RANGE_MIN_VC800						= 1500; 
+	public static final int				NUMBER_RANGE_MAX_VC800						= 1599; 
+	public static final int				NUMBER_RANGE_MIN_LIPOWATCH				= 1600; 
+	public static final int				NUMBER_RANGE_MAX_LIPOWATCH				= 1699; 
+	public static final int				NUMBER_RANGE_MIN_CSV2SERIAL				= 1700; 
+	public static final int				NUMBER_RANGE_MAX_CSV2SERIAL				= 1799; 
+	public static final int				NUMBER_RANGE_MIN_WSTECHVARIO			= 1800; 
+	public static final int				NUMBER_RANGE_MAX_WSTECHVARIO			= 1899; 
+	public static final int				NUMBER_RANGE_MIN_QC_COPTER				= 1900; 
+	public static final int				NUMBER_RANGE_MAX_QC_COPTER				= 1999; 
+	public static final int				NUMBER_RANGE_MIN_GPS_LOGGER				= 2000; 
+	public static final int				NUMBER_RANGE_MAX_GPS_LOGGER				= 2099; 
+	public static final int				NUMBER_RANGE_MIN_NMEA_ADAPTER			= 2100; 
+	public static final int				NUMBER_RANGE_MAX_NMEA_ADAPTER			= 2199; 
+	public static final int				NUMBER_RANGE_MIN_ULTRAMAT_DUOPLUS	= 2200; 
+	public static final int				NUMBER_RANGE_MAX_ULTRAMAT_DUOPLUS	= 2399; 
+	public static final int				NUMBER_RANGE_MIN_HOTTADAPTER			= 2400; 
+	public static final int				NUMBER_RANGE_MAX_HOTTADAPTER			= 2499; 
+	public static final int				NUMBER_RANGE_MIN_UNILOG2					= 2500; 
+	public static final int				NUMBER_RANGE_MAX_UNILOG2					= 2599; 
+	public static final int				NUMBER_RANGE_MIN_ICHARGER					= 2600; 
+	public static final int				NUMBER_RANGE_MAX_ICHARGER					= 2699; 
+	public static final int				NUMBER_RANGE_MIN_FLIGHTRECORDER		= 2700; 
+	public static final int				NUMBER_RANGE_MAX_FLIGHTRECORDER		= 2799; 
+	public static final int				NUMBER_RANGE_MIN_JLOG2						= 2800; 
+	public static final int				NUMBER_RANGE_MAX_JLOG2						= 2899; 
 	// ****** end global constants section *******
 
 	// begin OSD file format

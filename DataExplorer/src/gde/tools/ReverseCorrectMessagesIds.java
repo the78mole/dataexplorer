@@ -18,6 +18,8 @@
 ****************************************************************************************/
 package gde.tools;
 
+import gde.GDE;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -25,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.text.DecimalFormat;
 import java.util.Properties;
 
 /**
@@ -50,25 +53,28 @@ public class ReverseCorrectMessagesIds {
 	+ "# GDE_MSGW0000 -> warning messages \n" 
 	+ "# GDE_MSGI0000 -> info messages \n" 
 	+ "# GDE_MSGT0000 -> normal text \n"
-	+ "# range 0000 to 1000 reserved for base GDE code \n" 
-	+ "# range 1001 to 1099 Sample + Simulator \n" 
-	+ "# range 1100 to 1199 AkkuMaster device \n" 
-	+ "# range 1200 to 1299 Picolario device \n"
-	+ "# range 1300 to 1399 UniLog device \n" 
-	+ "# range 1400 to 1499 eStation device \n"
-	+ "# range 1500 to 1599 VC800 device \n"
-	+ "# range 1600 to 1699 LiPoWatch device \n" 
-	+ "# range 1700 to 1799 CSV2SerialDataAdapter device \n"
-	+ "# range 1800 to 1899 WStechVario device  \n"
-	+ "# range 1900 to 1999 QC-Copter device  \n"
-	+ "# range 2000 to 2999 GPS-Logger device  \n"
-	+ "# range 2100 to 2199 NMEA-Adapter device  \n"  
-	+ "# range 2200 to 2399 Ultramat/UltraDuoPlus devices  \n" 
-	+ "# range 2400 to 2499 HoTTAdapter  \n"  
-	+ "# range 2500 to 2599 UniLog2  \n"
+	+ "# range " + new DecimalFormat("0000").format(GDE.NUMBER_RANGE_MIN_GDE) + " to " + GDE.NUMBER_RANGE_MAX_GDE + " reserved for base GDE code \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_SAMPLE_SIM + " to " + GDE.NUMBER_RANGE_MAX_SAMPLE_SIM + " Sample + Simulator \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_AKKUMASTER + " to " + GDE.NUMBER_RANGE_MAX_AKKUMASTER + " AkkuMaster device \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_PICOLARIO + " to " + GDE.NUMBER_RANGE_MAX_PICOLARIO + " Picolario device \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_UNILOG + " to " + GDE.NUMBER_RANGE_MAX_UNILOG + " UniLog device \n" 
+	+ "# range " + GDE.NUMBER_RANGE_MIN_ESTATION + " to " + GDE.NUMBER_RANGE_MAX_ESTATION + " eStation device \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_VC800 + " to " + GDE.NUMBER_RANGE_MAX_VC800 + " VC800 device \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_LIPOWATCH + " to " + GDE.NUMBER_RANGE_MAX_LIPOWATCH + " LiPoWatch device \n" 
+	+ "# range " + GDE.NUMBER_RANGE_MIN_CSV2SERIAL + " to " + GDE.NUMBER_RANGE_MAX_CSV2SERIAL + " CSV2SerialDataAdapter device \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_WSTECHVARIO + " to " + GDE.NUMBER_RANGE_MAX_WSTECHVARIO + " WStechVario device  \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_QC_COPTER + " to " + GDE.NUMBER_RANGE_MAX_QC_COPTER + " QC-Copter device  \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_GPS_LOGGER + " to " + GDE.NUMBER_RANGE_MAX_GPS_LOGGER + " GPS-Logger device  \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_NMEA_ADAPTER + " to " + GDE.NUMBER_RANGE_MAX_NMEA_ADAPTER + " NMEA-Adapter device  \n"  
+	+ "# range " + GDE.NUMBER_RANGE_MIN_ULTRAMAT_DUOPLUS + " to " + GDE.NUMBER_RANGE_MAX_ULTRAMAT_DUOPLUS + " Ultramat/UltraDuoPlus devices  \n" 
+	+ "# range " + GDE.NUMBER_RANGE_MIN_HOTTADAPTER + " to " + GDE.NUMBER_RANGE_MAX_HOTTADAPTER + " HoTTAdapter  \n"  
+	+ "# range " + GDE.NUMBER_RANGE_MIN_UNILOG2 + " to " + GDE.NUMBER_RANGE_MAX_UNILOG2 + " UniLog2  \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_ICHARGER + " to " + GDE.NUMBER_RANGE_MAX_ICHARGER + " iCharger  \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_FLIGHTRECORDER + " to " + GDE.NUMBER_RANGE_MAX_FLIGHTRECORDER + " FlightRecorder  \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_JLOG2 + " to " + GDE.NUMBER_RANGE_MAX_JLOG2 + " JLog2  \n"
 	// add new supported device here
 	+ " \n";
-
+	
 	final static String	begin_GDE_MSGE		= "# begin GDE_MSGE0000 -> error messages \n";
 	final static String	end_GDE_MSGE			= "# end GDE_MSGE0000 -> error messages \n\n";
 	final static String	begin_GDE_MSGW		= "# begin GDE_MSGW0000 -> warning messages \n";
@@ -78,20 +84,7 @@ public class ReverseCorrectMessagesIds {
 	final static String	begin_GDE_MSGT		= "# begin GDE_MSGT0000 -> normal text \n";
 	final static String	end_GDE_MSGT			= "# end GDE_MSGT0000 -> normal text \n\n";
 	final static String	skipLine					= " \n";
-	final static String	range_GDE				= "# range 0000 to 1000 reserved for base GDE code \n";
-	static boolean isRangeGDE = false;
-	final static String range_Sample			= "# range 1001 to 1099 Sample + Simulator \n"; 
-	static boolean isRangeSample = false;
-	final static String	range_AkkuMaster	= "# range 1100 to 1199 AkkuMaster device \n";
-	static boolean isRangeAkkuMaster = false;
-	final static String	range_Picolario		= "# range 1200 to 1299 Picolario device \n";
-	static boolean isRangePicolario = false;
-	final static String	range_UniLog			= "# range 1300 to 1399 UniLog device \n";
-	static boolean isRangeUniLog = false;
-	final static String	range_eStation		= "# range 1400 to 1499 eStation device \n";
-	static boolean isRangeeStation = false;
 
-	// add new supported device here
 
 	/**
 	 * @param args
@@ -122,12 +115,10 @@ public class ReverseCorrectMessagesIds {
 			if (!sections[4].startsWith("GDE_MSGE")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
-			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
 		writer.write(end_GDE_MSGE);
 		readerIds.reset();
-		isRangeGDE = isRangeAkkuMaster = isRangePicolario = isRangeUniLog = isRangeeStation = false;
 
 		//GDE_MSGW*
 		writer.write(begin_GDE_MSGW);
@@ -139,12 +130,10 @@ public class ReverseCorrectMessagesIds {
 			if (!sections[4].startsWith("GDE_MSGW")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
-			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
 		writer.write(end_GDE_MSGW);
 		readerIds.reset();
-		isRangeGDE = isRangeAkkuMaster = isRangePicolario = isRangeUniLog = isRangeeStation = false;
 
 		//GDE_MSGI*
 		writer.write(begin_GDE_MSGI);
@@ -156,13 +145,11 @@ public class ReverseCorrectMessagesIds {
 			if (!sections[4].startsWith("GDE_MSGI")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
-			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 
 		}
 		writer.write(end_GDE_MSGI);
 		readerIds.reset();
-		isRangeGDE = isRangeAkkuMaster = isRangePicolario = isRangeUniLog = isRangeeStation = false;
 
 		//GDE_MSGT*
 		writer.write(begin_GDE_MSGT);
@@ -174,7 +161,6 @@ public class ReverseCorrectMessagesIds {
 			if (!sections[4].startsWith("GDE_MSGT")) continue;
 			//System.out.println(line);
 			System.out.println(sections[4] + " -> " + sections[6].substring(1, sections[6].length()-2));
-			writeRangeMark(writer, calcMsgValue(sections));
 			writer.write(sections[4] + "=" + msgProps.get(sections[6].substring(1, sections[6].length()-2)) + "\n");
 		}
 		writer.write(end_GDE_MSGT);
@@ -192,37 +178,4 @@ public class ReverseCorrectMessagesIds {
 	static Integer calcMsgValue(String[] sections) {
 		return new Integer(sections[6].substring(10, sections[6].length()-2));
 	}
-
-	/**
-	 * @param writer
-	 * @param range
-	 * @throws IOException
-	 */
-	private static void writeRangeMark(BufferedWriter writer, int range) throws IOException {
-		if (range < 1000) {
-			if (!isRangeGDE) writer.write(range_GDE);
-			isRangeGDE = true;
-		}
-		else if (range >= 1001 && range < 1099) {
-			if (!isRangeSample) writer.write(range_Sample);
-			isRangeSample = true;
-		}
-		else if (range >= 1100 && range < 1199) {
-			if (!isRangeAkkuMaster) writer.write(range_AkkuMaster);
-			isRangeAkkuMaster = true;
-		}
-		else if (range >= 1200 && range < 1299) {
-			if (!isRangePicolario) writer.write(range_Picolario);
-			isRangePicolario = true;
-		}
-		else if (range >= 1300 && range < 1399) {
-			if (!isRangeUniLog) writer.write(range_UniLog);
-			isRangeUniLog = true;
-		}
-		else if (range >= 1400 && range < 1499) {
-			if (!isRangeeStation) writer.write(range_eStation);
-			isRangeeStation = true;
-		}
-	}
-
 }
