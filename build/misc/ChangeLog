@@ -7,6 +7,7 @@ DevicePropertiesEditor - fix problem killing application due to SWT out of handl
 HottAdapter(2) - enable/refine mx20, mc20 <-> mc32 model configuration files conversion 
 HottAdapter(2) - fix time difference in table view to Firmware_Upgrade_grStudio
 HottAdapter(2) - fix live data gathering receiver only
+HottAdapter2 - fix reading channel data from bin while multiple sensors attached
 UniLog - fix capacity calculation
 GPS-Logger - fix UniLog2 sentence detection, UniLog may lazy start relative to GPS-Logger
 Implement support for zip compression of OSD files
