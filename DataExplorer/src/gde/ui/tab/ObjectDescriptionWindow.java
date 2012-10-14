@@ -50,6 +50,8 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -452,8 +454,28 @@ public class ObjectDescriptionWindow extends CTabItem {
 				this.imageCanvas.setSize(400, 300);
 
 				this.imageContextMenu.createMenu(this.imagePopupMenu);
-
 				this.imageCanvas.setMenu(this.imagePopupMenu);
+				
+				this.imageCanvas.addMouseListener(new MouseListener() {
+					
+					@Override
+					public void mouseUp(MouseEvent e) {
+						// ignore
+					}
+					
+					@Override
+					public void mouseDown(MouseEvent e) {
+						// ignore
+					}
+					
+					@Override
+					public void mouseDoubleClick(MouseEvent e) {
+						// ignore
+						imageContextMenu.chooseImageFile();
+					}
+				});
+
+					
 				this.imageCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "imageCanvas.paintControl, event=" + evt); //$NON-NLS-1$
@@ -462,10 +484,6 @@ public class ObjectDescriptionWindow extends CTabItem {
 								&& (Boolean) ObjectDescriptionWindow.this.imagePopupMenu.getData("OBJECT_IMAGE_CHANGED")) {
 							String imagePath = (String) ObjectDescriptionWindow.this.imagePopupMenu.getData(ObjectImageContextMenu.OBJECT_IMAGE_PATH);
 							if (imagePath != null) {
-								if (ObjectDescriptionWindow.this.image != null)
-									ObjectDescriptionWindow.this.image = SWTResourceManager.getImage(ObjectDescriptionWindow.this.image.getImageData(),
-										ObjectDescriptionWindow.this.object.getKey(), ObjectDescriptionWindow.this.object.getImageWidth(), ObjectDescriptionWindow.this.object.getImageHeight(), true);
-								else
 									try {
 										ObjectDescriptionWindow.this.image = SWTResourceManager.getImage(new Image(Display.getDefault(), new FileInputStream(imagePath)).getImageData(),
 												ObjectDescriptionWindow.this.object.getKey(), ObjectDescriptionWindow.this.object.getImageWidth(), ObjectDescriptionWindow.this.object.getImageHeight(), true);

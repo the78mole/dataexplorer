@@ -59,26 +59,36 @@ public class ObjectImageContextMenu {
 		newItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
 				ObjectImageContextMenu.log.log(Level.FINEST, "newItem action performed! " + e); //$NON-NLS-1$
-				FileDialog imgFileDialog = ObjectImageContextMenu.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0431), new String[] { GDE.FILE_ENDING_STAR_JPG, GDE.FILE_ENDING_STAR_PNG,
-						GDE.FILE_ENDING_STAR_GIF }, Settings.getInstance().getDataFilePath(), null, SWT.SINGLE);
-				String imgFilePath = imgFileDialog.getFilterPath();
-				ObjectImageContextMenu.log.log(Level.FINE, "imgFilePath = " + imgFilePath); //$NON-NLS-1$
-				if (imgFileDialog.getFileName().length() > 4) {
-					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED, true);
-					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, imgFilePath + GDE.FILE_SEPARATOR_UNIX + imgFileDialog.getFileName());
-					ObjectImageContextMenu.this.application.updateObjectImage();
-				}
+				chooseImageFile();
 			}
 		});
 		MenuItem deleteItem = new MenuItem(this.menu, SWT.PUSH);
 		deleteItem.setText(Messages.getString(MessageIds.GDE_MSGT0432));
 		deleteItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
-				ObjectImageContextMenu.log.log(Level.FINEST, "deleteItem action performed! " + e); //$NON-NLS-1$
-				ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED, true);
-				ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, null);
-				ObjectImageContextMenu.this.application.updateObjectImage();
+				int answer = ObjectImageContextMenu.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0047));
+				if (answer == SWT.YES) {
+					ObjectImageContextMenu.log.log(Level.FINEST, "deleteItem action performed! " + e); //$NON-NLS-1$
+					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED, true);
+					ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, null);
+					ObjectImageContextMenu.this.application.updateObjectImage();
+				}
 			}
 		});
+	}
+
+	/**
+	 * Opens the FileOpenDialog to let the user choose an image file
+	 */
+	public void chooseImageFile() {
+		FileDialog imgFileDialog = ObjectImageContextMenu.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0431), new String[] { GDE.FILE_ENDING_STAR_JPG, GDE.FILE_ENDING_STAR_PNG,
+				GDE.FILE_ENDING_STAR_GIF }, Settings.getInstance().getDataFilePath(), null, SWT.SINGLE);
+		String imgFilePath = imgFileDialog.getFilterPath();
+		ObjectImageContextMenu.log.log(Level.FINE, "imgFilePath = " + imgFilePath); //$NON-NLS-1$
+		if (imgFileDialog.getFileName().length() > 4) {
+			ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED, true);
+			ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, imgFilePath + GDE.FILE_SEPARATOR_UNIX + imgFileDialog.getFileName());
+			ObjectImageContextMenu.this.application.updateObjectImage();
+		}
 	}
 }

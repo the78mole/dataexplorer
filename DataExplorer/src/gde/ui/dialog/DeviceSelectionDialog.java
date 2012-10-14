@@ -725,7 +725,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							this.deviceGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.deviceGroup.setText(Messages.getString(MessageIds.GDE_MSGT0187));
 							{
-								this.deviceTable = new Table(this.deviceGroup, SWT.MULTI | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION);
+								this.deviceTable = new Table(this.deviceGroup, SWT.SINGLE | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION);
 								FormData deviceTableLData = new FormData();
 								deviceTableLData.top = new FormAttachment(0, 1000, 20);
 								deviceTableLData.bottom = new FormAttachment(1000, 1000, -20);
