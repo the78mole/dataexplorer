@@ -352,7 +352,7 @@ public class GDE {
 			sb.append("SWT.PLATFORM = ").append(SWT.getPlatform()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, sb.toString());
 
-			GDE.seStartupProgress(95);
+			GDE.seStartupProgress(100);
 			application.execute(inputFilePath);
 		}
 		catch (Throwable e) {
