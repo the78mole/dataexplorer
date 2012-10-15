@@ -456,26 +456,17 @@ public class ObjectDescriptionWindow extends CTabItem {
 				this.imageContextMenu.createMenu(this.imagePopupMenu);
 				this.imageCanvas.setMenu(this.imagePopupMenu);
 				
-				this.imageCanvas.addMouseListener(new MouseListener() {
-					
-					@Override
+				this.imageCanvas.addMouseListener(new MouseListener() {					
 					public void mouseUp(MouseEvent e) {
 						// ignore
-					}
-					
-					@Override
+					}					
 					public void mouseDown(MouseEvent e) {
 						// ignore
 					}
-					
-					@Override
 					public void mouseDoubleClick(MouseEvent e) {
-						// ignore
 						imageContextMenu.chooseImageFile();
 					}
 				});
-
-					
 				this.imageCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "imageCanvas.paintControl, event=" + evt); //$NON-NLS-1$
