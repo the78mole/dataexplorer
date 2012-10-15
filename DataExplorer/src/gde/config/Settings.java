@@ -149,6 +149,7 @@ public class Settings extends Properties {
 	public final static String			OBJECT_LIST										= "object_list";																																								//$NON-NLS-1$
 	public final static String			ACTIVE_OBJECT									= "active_object";																																							//$NON-NLS-1$
 	public final static String			DATA_FILE_PATH								= "data_file_path";																																							//$NON-NLS-1$
+	public final static String			OBJECT_IMAGE_FILE_PATH				= "object_image_file_path";																																			//$NON-NLS-1$
 	public final static String			LIST_SEPARATOR								= "list_separator";																																							//$NON-NLS-1$
 	public final static String			DECIMAL_SEPARATOR							= "decimal_separator";																																					//$NON-NLS-1$
 	public final static String			USE_DATA_FILE_NAME_LEADER			= "use_date_file_name_leader";																																	//$NON-NLS-1$
@@ -537,7 +538,8 @@ public class Settings extends Properties {
 			}
 
 			this.writer.write(String.format("%s\n", Settings.APPL_BLOCK)); // [Programmeinstellungen] //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_FILE_PATH, getDataFilePath().replace("\\", "\\\\"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_FILE_PATH, getDataFilePath())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_IMAGE_FILE_PATH, getObjectImageFilePath())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_DATA_FILE_NAME_LEADER, getUsageDateAsFileNameLeader())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_OBJECT_KEY_IN_FILE_NAME, getUsageObjectKeyInFileName())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ALPHA_BLENDING_VALUE, getDialogAlphaValue())); //$NON-NLS-1$
@@ -1926,5 +1928,25 @@ public class Settings extends Properties {
 	 */
 	public boolean isMigationThreadAlive() {
 		return this.migrationThread != null ? this.migrationThread.isAlive() : false;
+	}
+
+	/**
+	 * @return the default dataFilePath
+	 */
+	public String getObjectImageFilePath() {
+		final String $METHOD_NAME = "getObjectImageFilePath"; //$NON-NLS-1$
+		String objectImageFilePath = this.getProperty(Settings.OBJECT_IMAGE_FILE_PATH, getDataFilePath()).replace("\\\\", GDE.FILE_SEPARATOR_UNIX).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
+		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "objectImageFilePath = " + objectImageFilePath); //$NON-NLS-1$
+		return objectImageFilePath.trim();
+	}
+
+	/**
+	 * set the default imageDataFilePath
+	 */
+	public void setObjectImageFilePath(String newImageFilePath) {
+		final String $METHOD_NAME = "setObjectImageFilePath"; //$NON-NLS-1$
+		String filePath = newImageFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX).trim();
+		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "newDataFilePath = " + filePath); //$NON-NLS-1$
+		this.setProperty(Settings.OBJECT_IMAGE_FILE_PATH, filePath);
 	}
 }

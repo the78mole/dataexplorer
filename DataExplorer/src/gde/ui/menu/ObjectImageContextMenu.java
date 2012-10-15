@@ -82,10 +82,12 @@ public class ObjectImageContextMenu {
 	 */
 	public void chooseImageFile() {
 		FileDialog imgFileDialog = ObjectImageContextMenu.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0431), new String[] { GDE.FILE_ENDING_STAR_JPG, GDE.FILE_ENDING_STAR_PNG,
-				GDE.FILE_ENDING_STAR_GIF }, Settings.getInstance().getDataFilePath(), null, SWT.SINGLE);
+				GDE.FILE_ENDING_STAR_GIF }, Settings.getInstance().getObjectImageFilePath(), null, SWT.SINGLE);
 		String imgFilePath = imgFileDialog.getFilterPath();
 		ObjectImageContextMenu.log.log(Level.FINE, "imgFilePath = " + imgFilePath); //$NON-NLS-1$
 		if (imgFileDialog.getFileName().length() > 4) {
+			if (!Settings.getInstance().getObjectImageFilePath().equalsIgnoreCase(imgFileDialog.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+				Settings.getInstance().setObjectImageFilePath(imgFileDialog.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
 			ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED, true);
 			ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, imgFilePath + GDE.FILE_SEPARATOR_UNIX + imgFileDialog.getFileName());
 			ObjectImageContextMenu.this.application.updateObjectImage();
