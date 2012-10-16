@@ -32,7 +32,6 @@ import gde.ui.menu.CurveSelectorContextMenu;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
@@ -43,6 +42,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
@@ -66,7 +66,7 @@ public class SelectorComposite extends Composite {
 	final CurveSelectorContextMenu	contextMenu;
   
   int                           headerTextExtentFactor = 9;
-	CLabel												curveSelectorHeader;
+	Button												curveSelectorHeader;
 	int														initialSelectorHeaderWidth;
 	int														selectorColumnWidth;
 	Table													curveSelectorTable;
@@ -108,21 +108,37 @@ public class SelectorComposite extends Composite {
 			}
 		});
 		{
-			this.curveSelectorHeader = new CLabel(this, SWT.NONE);
-			this.curveSelectorHeader.setText("  " + Messages.getString(MessageIds.GDE_MSGT0254)); //$NON-NLS-1$
+			this.curveSelectorHeader = new Button(this, SWT.CHECK | SWT.LEFT);
+			this.curveSelectorHeader.setText(Messages.getString(MessageIds.GDE_MSGT0254));
+			this.curveSelectorHeader.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0671));
+			this.curveSelectorHeader.setEnabled(false);
 			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 			this.curveSelectorHeader.pack();
 			this.initialSelectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8;
 			FormData curveSelectorHeaderLData = new FormData();
 			curveSelectorHeaderLData.width = this.initialSelectorHeaderWidth;
 			curveSelectorHeaderLData.height = 25;
-			curveSelectorHeaderLData.left = new FormAttachment(0, 1000, 0);
+			curveSelectorHeaderLData.left = new FormAttachment(0, 1000, 5);
 			curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 0);
 			this.curveSelectorHeader.setLayoutData(curveSelectorHeaderLData);
 			this.curveSelectorHeader.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+			this.curveSelectorHeader.setForeground(DataExplorer.COLOR_BLACK);
+			this.curveSelectorHeader.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent evt) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
+					//use this check button to deselect all selected curves
+					for (TableItem tableItem : curveSelectorTable.getItems()) {
+						if (tableItem.getChecked()) 
+							toggleRecordSelection(tableItem, false);
+					}
+					doUpdateCurveSelectorTable();
+					SelectorComposite.this.application.updateAllTabs(false, false);
+				}
+			});
 		}
 		{
-			this.curveSelectorTable = new Table(this, SWT.FULL_SELECTION | SWT.CHECK);
+			this.curveSelectorTable = new Table(this, SWT.FULL_SELECTION | SWT.SINGLE | SWT.CHECK);
 			this.curveSelectorTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.curveSelectorTable.setLinesVisible(true);
 			FormData curveTableLData = new FormData();
@@ -139,45 +155,8 @@ public class SelectorComposite extends Composite {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
-						TableItem item = (TableItem) evt.item;
-						String recordName = item.getText();
-						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$
-						SelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, recordName);
-						SelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, evt.item);
-						if (item.getChecked() != (Boolean) item.getData(DataExplorer.OLD_STATE)) {
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "selection state changed = " + recordName); //$NON-NLS-1$
-							Record activeRecord;
-							switch (SelectorComposite.this.windowType) {
-							case GraphicsWindow.TYPE_COMPARE:
-								activeRecord = SelectorComposite.this.application.getCompareSet().getRecord(recordName);
-								break;
-
-							case GraphicsWindow.TYPE_UTIL:
-								activeRecord = SelectorComposite.this.application.getUtilitySet().getRecord(recordName);
-								break;
-
-							default:
-								activeRecord = SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet().getRecord(recordName);
-								break;
-							}
-							if (activeRecord != null) {
-								activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-								if (item.getChecked()) {
-									activeRecord.setVisible(true);
-									SelectorComposite.this.popupmenu.getItem(0).setSelection(true);
-									item.setData(DataExplorer.OLD_STATE, true);
-									item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
-								}
-								else {
-									activeRecord.setVisible(false);
-									SelectorComposite.this.popupmenu.getItem(0).setSelection(false);
-									item.setData(DataExplorer.OLD_STATE, false);
-									item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
-								}
-								activeRecord.getParent().syncScaleOfSyncableRecords();
-							}
-							SelectorComposite.this.application.updateAllTabs(false, false);
-						}
+						toggleRecordSelection((TableItem) evt.item, true);
+						SelectorComposite.this.application.updateAllTabs(true, false);
 					}
 				}
 			});
@@ -215,6 +194,7 @@ public class SelectorComposite extends Composite {
 				this.curveSelectorTable.removeAll();
 				int checkBoxWidth = 20;
 				int textSize = 10;
+				boolean isOneVisible = false;
 				for (int i=0; i<recordSet.size(); ++i) {
 					Record record = recordSet.get(i);
 					if (record != null) {
@@ -227,6 +207,7 @@ public class SelectorComposite extends Composite {
 							item.setForeground(record.getColor());
 							item.setText(record.getName());
 							if (record.isVisible()) {
+								isOneVisible = true;
 								item.setChecked(true);
 								item.setData(DataExplorer.OLD_STATE, true);
 								item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
@@ -236,6 +217,7 @@ public class SelectorComposite extends Composite {
 								item.setData(DataExplorer.OLD_STATE, false);
 								item.setData(GraphicsWindow.WINDOW_TYPE, this.windowType);
 							}
+							setHeaderSelection(isOneVisible);							
 						}
 					}
 				}				
@@ -258,11 +240,64 @@ public class SelectorComposite extends Composite {
 	}
 
 	/**
+	 * @param enable
+	 */
+	public void setHeaderSelection(boolean enable) {
+		curveSelectorHeader.setSelection(enable);
+		curveSelectorHeader.setEnabled(enable);
+	}
+
+	/**
 	 * @return the selectorColumnWidth
 	 */
 	public int getSelectorColumnWidth() {
 		synchronized (this) {
 			return this.selectorColumnWidth;
+		}
+	}
+
+	/**
+	 * toggles selection state of a record
+	 * @param item table were selection need toggle state
+	 */
+	public void toggleRecordSelection(TableItem item, Boolean isTableSelection) {
+		String recordName = item.getText();
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$
+		SelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, recordName);
+		SelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, item);
+		if (!isTableSelection || item.getChecked() != (Boolean) item.getData(DataExplorer.OLD_STATE)) {
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "selection state changed = " + recordName); //$NON-NLS-1$
+			Record activeRecord;
+			switch (SelectorComposite.this.windowType) {
+			case GraphicsWindow.TYPE_COMPARE:
+				activeRecord = SelectorComposite.this.application.getCompareSet().getRecord(recordName);
+				break;
+
+			case GraphicsWindow.TYPE_UTIL:
+				activeRecord = SelectorComposite.this.application.getUtilitySet().getRecord(recordName);
+				break;
+
+			default:
+				activeRecord = SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet().getRecord(recordName);
+				break;
+			}
+			if (activeRecord != null) {
+				activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+				if (isTableSelection && item.getChecked()) {
+					activeRecord.setVisible(true);
+					SelectorComposite.this.popupmenu.getItem(0).setSelection(true);
+					item.setData(DataExplorer.OLD_STATE, true);
+					item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
+					setHeaderSelection(true);
+				}
+				else {
+					activeRecord.setVisible(false);
+					SelectorComposite.this.popupmenu.getItem(0).setSelection(false);
+					item.setData(DataExplorer.OLD_STATE, false);
+					item.setData(GraphicsWindow.WINDOW_TYPE, SelectorComposite.this.windowType);
+				}
+				activeRecord.getParent().syncScaleOfSyncableRecords();
+			}
 		}
 	}
 }
