@@ -19,6 +19,7 @@ fixed [bug #37487] Strange bug when editing in the file comment tab, if deleted 
 fixed [bug #37463] Close all dialogs with ESC key
 fixed [bug #37462] Add shortcuts like e.g. Ctrl+s to save
 fixed [bug #37568] Object characteristics doesn´t remember last used directory
+fixed [bug #37466] Cursor handling in Table view
 all devices importing data - refine import path handling, enable configuration using preferences
 refine zoom handling, support left to right zooming, right to left reset and mouse wheel support
 enable migration of device usage, port, import path, channel/configuration usage while updating device configuration XMLs
