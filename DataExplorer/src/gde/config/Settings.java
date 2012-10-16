@@ -455,7 +455,7 @@ public class Settings extends Properties {
 			this.reader.close();
 
 			//update file history
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 9; i++) {
 				String entry = this.getProperty(Settings.FILE_HISTORY_BEGIN + i);
 				if (entry != null && entry.length() > 4) {
 					if (!this.fileHistory.contains(entry)) this.fileHistory.add(entry);
@@ -532,7 +532,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_DESC_SURROUND_BACKGRD, getObjectDescriptionSurroundingAreaBackgroundStr())); //$NON-NLS-1$
 
 			this.writer.write(String.format("%s\n", Settings.FILE_HISTORY_BLOCK)); // [Datei History Liste] //$NON-NLS-1$
-			for (int i = 0; i < 10 && i < this.fileHistory.size(); i++) {
+			for (int i = 0; i < 9 && i < this.fileHistory.size(); i++) {
 				if (this.fileHistory.get(i) == null) break;
 				this.writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_HISTORY_BEGIN + i, this.fileHistory.get(i))); //$NON-NLS-1$
 			}

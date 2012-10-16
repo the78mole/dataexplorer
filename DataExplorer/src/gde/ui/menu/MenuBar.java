@@ -41,7 +41,6 @@ import gde.ui.tab.GraphicsComposite;
 import gde.ui.tab.GraphicsWindow;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -930,9 +929,8 @@ public class MenuBar {
 		}
 		// fill with refreshed data
 		int i = 0;
-		for (Iterator<String> iterator = refFileHistory.iterator(); iterator.hasNext();) {
+		for (String fullQualifiedFileReference : refFileHistory) {
 			i++;
-			String fullQualifiedFileReference = iterator.next();
 			// add number in front of history item for selection with keyboard
 			String shortFileReference = "&" + i + ": " + fullQualifiedFileReference.substring(fullQualifiedFileReference.lastIndexOf('/') + 1);
 			final MenuItem historyImportMenuItem = new MenuItem(this.fileHistoryMenu, SWT.PUSH);
