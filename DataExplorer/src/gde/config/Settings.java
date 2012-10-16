@@ -1931,7 +1931,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return the default dataFilePath
+	 * @return the image data file path
 	 */
 	public String getObjectImageFilePath() {
 		final String $METHOD_NAME = "getObjectImageFilePath"; //$NON-NLS-1$
@@ -1941,7 +1941,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * set the default imageDataFilePath
+	 * set the image data file path
 	 */
 	public void setObjectImageFilePath(String newImageFilePath) {
 		final String $METHOD_NAME = "setObjectImageFilePath"; //$NON-NLS-1$
