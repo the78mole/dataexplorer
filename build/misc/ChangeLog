@@ -23,6 +23,7 @@ fixed [bug #37466] Cursor handling in Table view
 all devices importing data - refine import path handling, enable configuration using preferences
 refine zoom handling, support left to right zooming, right to left reset and mouse wheel support
 enable migration of device usage, port, import path, channel/configuration usage while updating device configuration XMLs
+enable switch off all curves at once, Strg+L will apply default graphics template again 
 documentation update
 
 Version 3.04 - 21 Sep 2012
