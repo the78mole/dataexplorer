@@ -227,6 +227,7 @@ public class SelectorComposite extends Composite {
 		else {
 			this.curveSelectorTable.removeAll();
 			this.selectorColumnWidth = this.initialSelectorHeaderWidth;
+			setHeaderSelection(false);
 		}
 		
 		if (this.oldSelectorColumnWidth != this.selectorColumnWidth) {
