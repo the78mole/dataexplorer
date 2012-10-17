@@ -118,7 +118,7 @@ public class SelectorComposite extends Composite {
 			FormData curveSelectorHeaderLData = new FormData();
 			curveSelectorHeaderLData.width = this.initialSelectorHeaderWidth;
 			curveSelectorHeaderLData.height = 25;
-			curveSelectorHeaderLData.left = new FormAttachment(0, 1000, GDE.IS_LINUX ? 0 : 5);
+			curveSelectorHeaderLData.left = new FormAttachment(0, 1000, GDE.IS_WINDOWS ? 5 : 0);
 			curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 0);
 			this.curveSelectorHeader.setLayoutData(curveSelectorHeaderLData);
 			this.curveSelectorHeader.setBackground(DataExplorer.COLOR_LIGHT_GREY);
