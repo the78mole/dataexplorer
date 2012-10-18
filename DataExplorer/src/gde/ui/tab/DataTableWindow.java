@@ -188,15 +188,18 @@ public class DataTableWindow extends CTabItem {
 
 			public void keyPressed(KeyEvent event) {
 				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "cursor.keyPressed " + event); //$NON-NLS-1$
-				//select the table row where the cursor get moved to
-				DataTableWindow.this.dataTable.setSelection(new TableItem[] { DataTableWindow.this.cursor.getRow() });
-
+				if (DataTableWindow.this.cursor.getRow() != null) {
+					//select the table row where the cursor get moved to
+					DataTableWindow.this.dataTable.setSelection(new TableItem[] { DataTableWindow.this.cursor.getRow() });
+				}
 				//to enable multi selection the cursor needs to be set invisible, if the cursor is invisible the dataTable key listener takes effect
 				//the cursor should be set to invisible only when shift key is pressed, not while shift is pressed in combination with others
 				if (event.keyCode == SWT.MOD2 && ((event.stateMask & SWT.MOD2) == 0) && ((event.stateMask & SWT.MOD1) == 0) && ((event.stateMask & SWT.MOD3) == 0)) {
 					DataTableWindow.this.cursor.setVisible(false);
-					//reset previous (multiple) selection table row(s)
-					DataTableWindow.this.dataTable.setSelection(new TableItem[] { DataTableWindow.this.cursor.getRow() });
+					if (DataTableWindow.this.cursor.getRow() != null) {
+						//reset previous (multiple) selection table row(s)
+						DataTableWindow.this.dataTable.setSelection(new TableItem[] { DataTableWindow.this.cursor.getRow() });
+					}
 				}
 			}
 		});
@@ -207,7 +210,9 @@ public class DataTableWindow extends CTabItem {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "cursor.widgetSelected " + event); //$NON-NLS-1$
-				updateVector(DataTableWindow.this.dataTable.indexOf(DataTableWindow.this.cursor.getRow()), DataTableWindow.this.dataTable.getTopIndex());
+				if (DataTableWindow.this.cursor.getRow() != null) {
+					updateVector(DataTableWindow.this.dataTable.indexOf(DataTableWindow.this.cursor.getRow()), DataTableWindow.this.dataTable.getTopIndex());
+				}
 			}
 		});
 
