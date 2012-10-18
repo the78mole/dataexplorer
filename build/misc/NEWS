@@ -1,13 +1,30 @@
 GNU DataExplorer - News - comes with version 3.04
 
-1) JLog2 - establish workaround for maximum recording time of 54 minutes, accept all follow on measurements with a default time step
-2) HoTTAdapter(2) - add filter methods for receiver data
-3) HoTTAdapter(2) - add support for motor driver (speed control)
-4) MAC OS Mountain Lion - fix graphics refresh problem
-5) HoTTAdapter - fix Problem saving channel enable selection
-6) HoTTAdapter(2) - fix latitude/longitude curve display for data with even degree value overflow
-7) HoTTAdapter(2) - fix GAM, EAM detection problem while only temperature sensor is connected
-8) HoTTAdapter(2) - correct names while processing mc-20 model memory backup 
+ 1) HoTTAdapter(2) - correct device XMLs to support current related statistics (number motor climbs vs gained height)
+ 2) HottAdapter(2) - enable filter for current drops to zero above 10A (this hurts statistics calculation regarding trigger usage)
+ 3) DevicePropertiesEditor - fix problem killing application due to SWT out of handles
+ 4) HottAdapter(2) - enable/refine mx20, mc20 <-> mc32 model configuration files conversion 
+ 5) HottAdapter(2) - fix time difference in table view to Firmware_Upgrade_grStudio
+ 6) HottAdapter(2) - fix live data gathering receiver only
+ 7) HottAdapter2 - fix reading channel data from bin while multiple sensors attached
+ 8) UniLog - fix capacity calculation
+ 9) GPS-Logger - fix UniLog2 sentence detection, UniLog may lazy start relative to GPS-Logger
+10) Implement support for zip compression of OSD files
+11) fixed [bug #37464] Title bar of "Device Properties Editor" shows "&"
+12) fixed [bug #37302] File comment is reset when I move the mouse
+13) fixed [bug #37460] DataExplorer triggers Microsoft Security Essentials
+14) fixed [bug #37465] Keep selection in curves selector after pressing space
+15) fixed [bug #37487] Strange bug when editing in the file comment tab, if deleted within the line
+16) fixed [bug #37463] Close all dialogs with ESC key
+17) fixed [bug #37462] Add shortcuts like e.g. Ctrl+s to save
+18) fixed [bug #37568] Object characteristics doesn´t remember last used directory
+19) fixed [bug #37466] Cursor handling in Table view
+20) all devices importing data - refine import path handling, enable configuration using preferences
+21) refine zoom handling, support left to right zooming, right to left reset and mouse wheel support
+22) enable migration of device usage, port, import path, channel/configuration usage while updating device configuration XMLs
+23) enable switch off all curves at once, Strg+L will apply default graphics template again 
+24) documentation update
+
 
 
 
