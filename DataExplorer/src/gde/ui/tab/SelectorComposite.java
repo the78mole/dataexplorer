@@ -111,7 +111,6 @@ public class SelectorComposite extends Composite {
 			this.curveSelectorHeader = new Button(this, SWT.CHECK | SWT.LEFT);
 			this.curveSelectorHeader.setText(Messages.getString(MessageIds.GDE_MSGT0254));
 			this.curveSelectorHeader.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0671));
-			this.curveSelectorHeader.setEnabled(false);
 			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 			this.curveSelectorHeader.pack();
 			this.initialSelectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8;
@@ -127,10 +126,16 @@ public class SelectorComposite extends Composite {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
-					//use this check button to deselect all selected curves
-					for (TableItem tableItem : curveSelectorTable.getItems()) {
-						if (tableItem.getChecked()) 
-							toggleRecordSelection(tableItem, false);
+					if (!curveSelectorHeader.getSelection()) {
+						//use this check button to deselect all selected curves
+						for (TableItem tableItem : curveSelectorTable.getItems()) {
+							if (tableItem.getChecked()) toggleRecordSelection(tableItem, false, false);
+						}
+					}
+					else {
+						for (TableItem tableItem : curveSelectorTable.getItems()) {
+							if (!tableItem.getChecked()) toggleRecordSelection(tableItem, false, true);
+						}
 					}
 					doUpdateCurveSelectorTable();
 					SelectorComposite.this.application.updateAllTabs(false, false);
@@ -155,7 +160,7 @@ public class SelectorComposite extends Composite {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
-						toggleRecordSelection((TableItem) evt.item, true);
+						toggleRecordSelection((TableItem) evt.item, true, false);
 						SelectorComposite.this.application.updateAllTabs(true, false);
 					}
 				}
@@ -245,7 +250,6 @@ public class SelectorComposite extends Composite {
 	 */
 	public void setHeaderSelection(boolean enable) {
 		curveSelectorHeader.setSelection(enable);
-		curveSelectorHeader.setEnabled(enable);
 	}
 
 	/**
@@ -261,7 +265,7 @@ public class SelectorComposite extends Composite {
 	 * toggles selection state of a record
 	 * @param item table were selection need toggle state
 	 */
-	public void toggleRecordSelection(TableItem item, Boolean isTableSelection) {
+	public void toggleRecordSelection(TableItem item, boolean isTableSelection, boolean forceVisible) {
 		String recordName = item.getText();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "selected = " + recordName); //$NON-NLS-1$
 		SelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, recordName);
@@ -284,7 +288,7 @@ public class SelectorComposite extends Composite {
 			}
 			if (activeRecord != null) {
 				activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-				if (isTableSelection && item.getChecked()) {
+				if (isTableSelection && item.getChecked() || forceVisible) {
 					activeRecord.setVisible(true);
 					SelectorComposite.this.popupmenu.getItem(0).setSelection(true);
 					item.setData(DataExplorer.OLD_STATE, true);
