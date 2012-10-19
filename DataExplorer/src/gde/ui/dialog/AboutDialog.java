@@ -180,11 +180,9 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 
 				final Image ideaImage = SWTResourceManager.getImage("gde/resource/DataExplorer.png");
 				this.aboutImage.addPaintListener(new PaintListener() {
-					
-					@Override
 					public void paintControl(PaintEvent e) {
 						/* we need to use this instead of setBackgroundImage() as otherwise
-						 * the transparency wouldnÂ´t work 
+						 * the transparency wouldn´t work 
 						 */
 						e.gc.drawImage(ideaImage,0,0);
 					}
