@@ -28,12 +28,16 @@ import gde.ui.SWTResourceManager;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -52,6 +56,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 	Button ok;
 	Label infoText;
 	Label version;
+	Canvas aboutImage;
 	
 	final DataExplorer application;
 
@@ -108,8 +113,11 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.infoText.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
 				this.infoText.setLayoutData(infoTextLData);
 				this.infoText.setText(Messages.getString(MessageIds.GDE_MSGT0147)
-						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGT0148)  //$NON-NLS-1$ 
+						+ System.getProperty("line.separator") 
+						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGT0148)  //$NON-NLS-1$
+						+ System.getProperty("line.separator") 
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGT0149)  //$NON-NLS-1$
+						+ System.getProperty("line.separator") 
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGT0150)); //$NON-NLS-1$
 				this.infoText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				//this.infoText.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
@@ -160,6 +168,28 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.aboutText.setText("DataExplorer"); //$NON-NLS-1$
 				this.aboutText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
 				this.aboutText.setText(DataExplorer.getInstance().getClass().getSimpleName());
+			}
+			{
+				FormData aboutImageLData = new FormData();
+				aboutImageLData.left =  new FormAttachment(infoText, 30, SWT.LEFT);
+				aboutImageLData.top =  new FormAttachment(aboutText, 0, SWT.CENTER);
+				this.aboutImage = new Canvas(this.dialogShell, SWT.NO_REDRAW_RESIZE);
+				this.aboutImage.setLayoutData(aboutImageLData);
+				this.aboutImage.moveAbove(this.aboutText);
+				this.aboutImage.moveAbove(this.version);
+
+				final Image ideaImage = SWTResourceManager.getImage("gde/resource/DataExplorer.png");
+				this.aboutImage.addPaintListener(new PaintListener() {
+					
+					@Override
+					public void paintControl(PaintEvent e) {
+						/* we need to use this instead of setBackgroundImage() as otherwise
+						 * the transparency wouldnÂ´t work 
+						 */
+						e.gc.drawImage(ideaImage,0,0);
+					}
+				});
+		    
 			}
 			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
 			this.dialogShell.open();
