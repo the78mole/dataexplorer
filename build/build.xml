@@ -628,6 +628,8 @@
 			</tarfileset>
 			<tarfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
 				<include name="RXTXcomm/src/**/*.dll" />
+				<include name="RXTXcomm/src/**/*.so" />
+				<include name="RXTXcomm/src/**/*.jnilib" />
 			</tarfileset>
 			<tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
 				<include name="COPYING" />
