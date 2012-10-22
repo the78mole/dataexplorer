@@ -624,6 +624,10 @@
 				<exclude name="Port*/**" />
 				<exclude name="Print*/**" />
 				<exclude name="RXTXcomm*/**" />
+				<exclude name="X-Tools/**" />
+			</tarfileset>
+			<tarfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
+				<include name="RXTXcomm/src/**/*.dll" />
 			</tarfileset>
 			<tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
 				<include name="COPYING" />
