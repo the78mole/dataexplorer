@@ -1,5 +1,8 @@
 Development history / change log, please read from bottom up
 
+Version 3.06 - xx yyy 2012
+add JetiAdapter to analyze flight record data from Jeti transmitters
+
 Version 3.05 - 18 Oct 2012
 HoTTAdapter(2) - correct device XMLs to support current related statistics (number motor climbs vs gained height)
 HottAdapter(2) - enable filter for current drops to zero above 10A (this hurts statistics calculation regarding trigger usage)
