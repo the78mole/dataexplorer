@@ -64,10 +64,6 @@ import org.eclipse.swt.widgets.MenuItem;
 public class FlightRecorder extends DeviceConfiguration implements IDevice {
 	final static Logger		log								= Logger.getLogger(FlightRecorder.class.getName());
 
-	final static String		SM_GPS_LOGGER_INI				= "SM GPS-Logger.ini";													//$NON-NLS-1$
-	final static String		SM_GPS_LOGGER_INI_DIR		= "SM GPS-Logger setup";												//$NON-NLS-1$
-	final static String		SM_GPS_LOGGER_DIR_STUB	= "SM GPS-Logger";															//$NON-NLS-1$
-
 	final DataExplorer		application;
 	final Channels				channels;
 	final FlightRecorderDialog	dialog;
@@ -666,18 +662,6 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
 				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$
 				fixValidity, Double.valueOf(baroAlitude.get(index) / 10000.0 + startAltitude + offsetAltitude).intValue(), Double.valueOf(gpsAlitude.get(index) / 1000.0 + offsetAltitude).intValue());
-	}
-
-	String getDefaultConfigurationFileName() {
-		return FlightRecorder.SM_GPS_LOGGER_INI;
-	}
-	
-	String getConfigurationFileDirecotry() {
-		String searchPath = this.getDataBlockPreferredDataLocation();
-		if (searchPath.contains(FlightRecorder.SM_GPS_LOGGER_DIR_STUB)) {
-			searchPath = searchPath.substring(0, searchPath.indexOf(FlightRecorder.SM_GPS_LOGGER_DIR_STUB)) + FlightRecorder.SM_GPS_LOGGER_INI_DIR;
-		}
-		return searchPath;
 	}
 	
 	/**
