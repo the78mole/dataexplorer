@@ -72,6 +72,7 @@ public class ReverseCorrectMessagesIds {
 	+ "# range " + GDE.NUMBER_RANGE_MIN_ICHARGER + " to " + GDE.NUMBER_RANGE_MAX_ICHARGER + " iCharger  \n"
 	+ "# range " + GDE.NUMBER_RANGE_MIN_FLIGHTRECORDER + " to " + GDE.NUMBER_RANGE_MAX_FLIGHTRECORDER + " FlightRecorder  \n"
 	+ "# range " + GDE.NUMBER_RANGE_MIN_JLOG2 + " to " + GDE.NUMBER_RANGE_MAX_JLOG2 + " JLog2  \n"
+	+ "# range " + GDE.NUMBER_RANGE_MIN_JETIADAPTER + " to " + GDE.NUMBER_RANGE_MAX_JETIADAPTER + " JetiAdapter  \n"
 	// add new supported device here
 	+ " \n";
 	

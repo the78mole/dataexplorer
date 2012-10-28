@@ -264,6 +264,8 @@ public class GDE {
 	public static final int				NUMBER_RANGE_MAX_FLIGHTRECORDER		= 2799; 
 	public static final int				NUMBER_RANGE_MIN_JLOG2						= 2800; 
 	public static final int				NUMBER_RANGE_MAX_JLOG2						= 2899; 
+	public static final int				NUMBER_RANGE_MIN_JETIADAPTER			= 2900; 
+	public static final int				NUMBER_RANGE_MAX_JETIADAPTER			= 2999; 
 	// ****** end global constants section *******
 
 	// begin OSD file format
