@@ -25,6 +25,8 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.graupner.HoTTbinReader;
 import gde.device.graupner.HoTTbinReader2;
+import gde.device.jeti.JetiAdapter;
+import gde.device.jeti.JetiDataReader;
 import gde.exception.NotSupportedException;
 import gde.io.CSVReaderWriter;
 import gde.io.CSVSerialDataReaderWriter;
@@ -906,6 +908,77 @@ public class TestFileReaderWriter extends TestSuperClass {
 						new File(tmpDir1).mkdirs();
 						String absolutFilePath = tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
+						System.out.println("writing as   : " + absolutFilePath);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						failures.put(file.getAbsolutePath(), e);
+					}
+				}
+			}
+
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
+	/**
+	 * test reading CSV(.txt) JLog2 files in configured base directory (DataExplorer.properties and writes OSD files to %TEMP%\Write_1_OSD
+	 * all files must identical except time stamp
+	 */
+	public final void testJetiAdapterReaderOsdWriter() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		try {
+			this.setDataPath(); //set the dataPath variable
+			List<File> files = FileUtils.getFileListing(new File(this.dataPath.getAbsolutePath() + "/JetiAdapter/"), 1);
+
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG) || file.getAbsolutePath().toLowerCase().endsWith(GDE.FILE_ENDING_DOT_JML)) {
+					System.out.println("working with : " + file);
+					
+					try {
+						//System.out.println("file.getPath() = " + file.getPath());
+						String deviceName = file.getPath().substring(0, file.getPath().lastIndexOf(GDE.FILE_SEPARATOR));
+						deviceName = deviceName.substring(1 + deviceName.lastIndexOf(GDE.FILE_SEPARATOR));
+						//System.out.println("deviceName = " + deviceName);
+						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+						if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
+
+						IDevice device = this.getInstanceOfDevice(deviceConfig);
+						this.application.setActiveDeviceWoutUI(device);
+
+						setupDataChannels(device);
+
+						this.channels.setActiveChannelNumber(1);
+						Channel activeChannel = this.channels.getActiveChannel();
+						activeChannel.setFileName(file.getAbsolutePath());
+						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from LOG file");
+						activeChannel.setSaved(true);
+
+						JetiDataReader.read(file.getAbsolutePath(), (JetiAdapter) device, "RecordSet", 1, true);
+						RecordSet recordSet = activeChannel.getActiveRecordSet();
+
+						if (recordSet != null) {
+							activeChannel.setActiveRecordSet(recordSet);
+							activeChannel.applyTemplate(recordSet.getName(), true);
+							//device.makeInActiveDisplayable(recordSet);
+							drawCurves(recordSet, 1024, 768);
+						}
+
+						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
+						new File(tmpDir1).mkdirs();
+						String absolutFilePath = tmpDir1 + file.getName();
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_log.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 					}

@@ -7,5 +7,6 @@
 	<classpathentry kind="var" path="SWT_JAR_PATH"/>
 	<classpathentry kind="lib" path="/build/lib/RXTXcomm.jar" sourcepath="/RXTXcomm/src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/HoTTAdapter"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JetiAdapter"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
