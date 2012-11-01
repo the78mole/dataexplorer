@@ -222,6 +222,8 @@ public class DataExplorer extends Composite {
 //		this.extensionFilterMap.put(GDE.FILE_ENDING_GPX, Messages.getString(MessageIds.GDE_MSGT0223));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_STAR, Messages.getString(MessageIds.GDE_MSGT0216));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_INI, Messages.getString(MessageIds.GDE_MSGT0368));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_LOG, Messages.getString(MessageIds.GDE_MSGT0672));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_JML, Messages.getString(MessageIds.GDE_MSGT0673));
 	}
 
 	/**
@@ -2841,5 +2843,12 @@ public class DataExplorer extends Composite {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * updates the extensionFilterMap to be used for opening a file selection dialog
+	 */
+	public synchronized void updateExtensionFilterMap(String key, String value) {
+		this.extensionFilterMap.put(key, value);
 	}
 }

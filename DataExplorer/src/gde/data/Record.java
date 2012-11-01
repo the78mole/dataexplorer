@@ -129,6 +129,7 @@ public class Record extends Vector<Integer> {
 	int									minValue							= 0;													// min value of the curve
 	double							maxScaleValue					= this.maxValue;							// overwrite calculated boundaries
 	double							minScaleValue					= this.minValue;
+	DataType						dataType							= Record.DataType.DEFAULT;
 
 	//synchronize
 	int									syncMaxValue					= 0;		 										  // max value of the curve if synced
@@ -198,6 +199,31 @@ public class Record extends Vector<Integer> {
 	public final static int	TYPE_AXIS_END_VALUES			= 0;				// defines axis end values types like isRoundout, isStartpointZero, isStartEndDefined
 	public final static int	TYPE_AXIS_NUMBER_FORMAT		= 1;				// defines axis scale values format
 	public final static int	TYPE_AXIS_SCALE_POSITION	= 2;				// defines axis scale position left or right
+	
+	public enum DataType { //some data types require in some situation special execution algorithm
+		DEFAULT("default"), 						//all normal measurement values which do not require special handling
+		GPS_LATITUDE("GPS latitude"), 	//GPS geo-coordinate require at least 6 decimal digits
+		GPS_LONGITUDE("GPS longitude"), //GPS geo-coordinate require at least 6 decimal digits
+		GPS_ALTITUDE("altitude");				//GPS or absolute altitude required in some case for GPS related calculations like speed, distance, ...
+		
+		private final String	value;
+
+		private DataType(String v) {
+			this.value = v;
+		}
+
+		public String value() {
+			return this.value;
+		}
+		
+		public static List<DataType> getAsList() {
+			List<Record.DataType> dataTypes = new ArrayList<Record.DataType>();
+			for (DataType type : DataType.values()) {
+				dataTypes.add(type);
+			}
+			return dataTypes;
+		}
+	};
 
 	/**
 	 * this constructor will create an vector to hold data points in case the initial capacity is > 0
@@ -1850,9 +1876,9 @@ public class Record extends Vector<Integer> {
 				if(defaultProperty.getName().equalsIgnoreCase(entry.getKey())) {
 					String prop = entry.getValue();
 					String type = prop.split(GDE.STRING_EQUAL)[0].substring(1);
-					DataTypes dataType = type != null ? DataTypes.fromValue(type) : DataTypes.STRING;
+					DataTypes _dataType = type != null ? DataTypes.fromValue(type) : DataTypes.STRING;
 					String value = prop.split(GDE.STRING_EQUAL)[1];
-					if (value != null && value.length() > 0 && defaultProperty.getType().equals(dataType)) {
+					if (value != null && value.length() > 0 && defaultProperty.getType().equals(_dataType)) {
 						defaultProperty.setValue(value.trim());
 						if (log.isLoggable(Level.FINE)) sb.append(entry.getKey()).append(" = ").append(value); //$NON-NLS-1$
 					}
@@ -2206,6 +2232,36 @@ public class Record extends Vector<Integer> {
 	 */
 	public boolean hasReasonableData() {
 		return this.minValue != this.maxValue || device.translateValue(this, this.maxValue/1000.0) != 0.0;
+	}
+
+	/**
+	 * query the dataType of this record
+	 * @return
+	 */
+	public Record.DataType getDataType() {
+		return this.dataType;
+	}
+
+	/**
+	 * set the dataType of this record by evaluating its name
+	 * @return
+	 */
+	public void setDataType() {
+		if (this.name.equalsIgnoreCase("Latitude") || this.name.equalsIgnoreCase("Breitengrad") || this.name.toLowerCase().contains("sirka"))
+			this.dataType = Record.DataType.GPS_LATITUDE;
+		else if (this.name.equalsIgnoreCase("Longitude") || this.name.equalsIgnoreCase("Längengrad") || this.name.equalsIgnoreCase("Laengengrad") || this.name.toLowerCase().contains("delka"))
+			this.dataType = Record.DataType.GPS_LONGITUDE;
+		else if ((this.name.toUpperCase().contains("GPS") || this.name.toUpperCase().contains("ABS"))
+				&& (this.name.toLowerCase().contains("hoehe") || this.name.toLowerCase().contains("höhe") || this.name.toLowerCase().contains("height") || this.name.toLowerCase().contains("alt")))
+			this.dataType = Record.DataType.GPS_ALTITUDE;
+	}
+	
+	/**
+	 * set the dataType of this record
+	 * @return
+	 */
+	public void setDataType(Record.DataType newDataType) {
+		this.dataType = newDataType;
 	}
 }
 

@@ -619,7 +619,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	/**
 	 * method to add an new record name 
 	 */
-	private void addRecordName(String newRecordName) {
+	public void addRecordName(String newRecordName) {
 		String[] newRecordNames = new String[this.recordNames.length + 1];
 		System.arraycopy(this.recordNames, 0, newRecordNames, 0, this.recordNames.length);
 		newRecordNames[this.recordNames.length] = newRecordName;
@@ -780,26 +780,26 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * which are loaded from device properties file
 	 * @param recordSetName the name of the record set
 	 * @param device the instance of the device 
-	 * @param channelNumber (name of the outlet or configuration)
+	 * @param channelConfigNumber (number of the outlet or configuration)
 	 * @param isRaw defines if the data needs translation using device specific properties
 	 * @param isFromFile defines if a configuration change must be recorded to signal changes
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelNumber, boolean isRaw, boolean isFromFile) {
+	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, boolean isRaw, boolean isFromFile) {
 		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
 
-		String[] recordNames = device.getMeasurementNames(channelNumber);
+		String[] recordNames = device.getMeasurementNames(channelConfigNumber);
 		if (recordNames.length == 0) { // simple check for valid device and record names, as fall back use the config from the first channel/configuration
-			recordNames = device.getMeasurementNames(channelNumber = 1);
+			recordNames = device.getMeasurementNames(channelConfigNumber = 1);
 		}
 		String [] recordSymbols = new String[recordNames.length];
 		String [] recordUnits = new String[recordNames.length];
 		for (int i = 0; i < recordNames.length; i++) {
-			MeasurementType measurement = device.getMeasurement(channelNumber, i);
+			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
 			recordSymbols[i] = measurement.getSymbol();
 			recordUnits[i] = measurement.getUnit();
 		}			
-		return createRecordSet(recordSetName, device, channelNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, isFromFile);
+		return createRecordSet(recordSetName, device, channelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, isFromFile);
 	}
 
 	/**
@@ -1569,6 +1569,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 * @param newHorizontalGridRecordOrdinal of the horizontal grid record name to set
 	 */
 	public void setHorizontalGridRecordOrdinal(int newHorizontalGridRecordOrdinal) {
+		if (newHorizontalGridRecordOrdinal >= this.size()) newHorizontalGridRecordOrdinal = 0;
 		this.horizontalGridRecordOrdinal = this.isOneOfSyncableRecord(this.get(newHorizontalGridRecordOrdinal)) ? this.getSyncMasterRecordOrdinal(this.get(newHorizontalGridRecordOrdinal)) : newHorizontalGridRecordOrdinal;
 	}
 
@@ -2151,5 +2152,31 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public long getStartTimeStamp() {
 		return this.timeStep_ms.getStartTimeStamp();
+	}
+	
+	/**
+	 * query if this record set contains GPS data type records which enable related calculations and KML/KMZ export
+	 * @return
+	 */
+	public boolean containsGPSdata() {
+		int sumGpsRelatedRecords = 0;
+		for (Record record : this.values()) {
+			record.setDataType();
+			if (record.dataType == Record.DataType.GPS_LATITUDE || record.dataType == Record.DataType.GPS_LONGITUDE || record.dataType == Record.DataType.GPS_ALTITUDE)
+				++sumGpsRelatedRecords;
+		}
+		return sumGpsRelatedRecords == 3;
+	}
+	
+	/**
+	 * query record with specified Record.DataType
+	 * @return record ordinal or -1 if not found
+	 */
+	public int getRecordOrdinalOfType(Record.DataType dataType) {
+		for (Record record : this.values()) {
+			if (record.dataType == dataType)
+				return record.ordinal;
+		}
+		return -1;
 	}
 }
