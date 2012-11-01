@@ -453,38 +453,12 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * query the import data directory in dependency of search directory, object, etc
-	 * @param searchDirectory
-	 * @param objectKey
-	 * @return
-	 */
-	public FileDialog getImportDirectoryFileDialog(IDevice device, String dialogTitleMessage, String[] fileExtensions) {
-		String devicePath = DataExplorer.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
-		String objectKey = DataExplorer.application.getObjectKey();
-		
-		if (Settings.getInstance().isDeviceImportDirectoryObjectRelated() && DataExplorer.application.isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
-			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
-			FileUtils.checkDirectoryAndCreate(objectkeyPath);
-			searchDirectory = objectkeyPath;
-		}
-		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
-			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
-		}
-		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage, fileExtensions, searchDirectory, null, SWT.MULTI);
-
-		if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.equals(fd.getFilterPath())) device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
-		return fd;
-	}
-
-	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
-		//TODO while release use FileUtils.getImportDirectoryFileDialog
-		final FileDialog fd = this.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2900), new String[] {GDE.FILE_ENDING_STAR_LOG, GDE.FILE_ENDING_STAR_JML, GDE.FILE_ENDING_STAR_STAR});
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2900), new String[] {GDE.FILE_ENDING_STAR_LOG, GDE.FILE_ENDING_STAR_JML, GDE.FILE_ENDING_STAR_STAR});
 
 		Thread reader = new Thread("reader") {
 			@Override
