@@ -20,10 +20,10 @@ package gde.device.jeti;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
-import gde.device.InputTypes;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
@@ -65,7 +65,7 @@ public class JetiAdapterDialog extends DeviceDialog {
 	Composite											visualizationMainComposite, uniLogVisualization, mLinkVisualization;
 	Composite											configurationMainComposite;
 
-	Button												saveVisualizationButton, inputFileButton, helpButton, closeButton;
+	Button												inputFileButton, helpButton, closeButton;
 
 	CTabItem											gpsLoggerTabItem, telemetryTabItem;
 
@@ -74,7 +74,7 @@ public class JetiAdapterDialog extends DeviceDialog {
 
 	RecordSet											lastActiveRecordSet		= null;
 	boolean												isVisibilityChanged	= false;
-	int														measurementsCount		= 0;
+	int														measurementItemRows		= 0;
 	final List<CTabItem>					configurations			= new ArrayList<CTabItem>();
 
 	/**
@@ -86,7 +86,7 @@ public class JetiAdapterDialog extends DeviceDialog {
 		super(parent);
 		this.device = useDevice;
 		this.settings = Settings.getInstance();
-		this.measurementsCount = (Math.abs(this.device.getDataBlockSize(InputTypes.FILE_IO))+1)/2;
+		this.measurementItemRows = (this.device.getNumberOfMeasurements(1)+1)/2;
 	}
 
 	@Override
@@ -110,7 +110,7 @@ public class JetiAdapterDialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(GDE.IS_LINUX ? 740 : 675, 30 + 25 + 25 + this.measurementsCount * 26 + 50 + 42); //header + tab + label + this.measurementsCount * 26 + buttons
+				this.dialogShell.setSize(GDE.IS_LINUX ? 740 : 675, 30 + 25 + 25 + this.measurementItemRows * 26 + 50 + 42); //header + tab + label + this.measurementsCount * 26 + buttons
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -128,14 +128,6 @@ public class JetiAdapterDialog extends DeviceDialog {
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					public void widgetDisposed(DisposeEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
-						if (JetiAdapterDialog.this.device.isChangePropery()) {
-							String msg = Messages.getString(gde.messages.MessageIds.GDE_MSGI0041, new String[] { JetiAdapterDialog.this.device.getPropertiesFileName() });
-							if (JetiAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
-								log.log(java.util.logging.Level.FINE, "SWT.YES"); //$NON-NLS-1$
-								JetiAdapterDialog.this.device.storeDeviceProperties();
-								setClosePossible(true);
-							}
-						}
 						JetiAdapterDialog.this.dispose();
 					}
 				});
@@ -161,7 +153,7 @@ public class JetiAdapterDialog extends DeviceDialog {
 					this.tabFolder.setSimple(false);
 					{
 						for (int i = 1; i <= this.device.getChannelCount(); i++) {
-							createVisualizationTabItem(i, 24);
+							createVisualizationTabItems(i);
 						}
 					}
 					FormData tabFolderLData = new FormData();
@@ -174,32 +166,11 @@ public class JetiAdapterDialog extends DeviceDialog {
 					this.tabFolder.setSelection(0);
 				}
 				{
-					this.saveVisualizationButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
-					FormData saveButtonLData = new FormData();
-					saveButtonLData.width = 130;
-					saveButtonLData.height = GDE.IS_MAC ? 33 : 30;
-					saveButtonLData.left = new FormAttachment(0, 1000, 15);
-					saveButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
-					this.saveVisualizationButton.setLayoutData(saveButtonLData);
-					this.saveVisualizationButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.saveVisualizationButton.setText(Messages.getString(MessageIds.GDE_MSGT2910));
-					this.saveVisualizationButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2911));
-					this.saveVisualizationButton.setEnabled(false);
-					this.saveVisualizationButton.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "saveButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							JetiAdapterDialog.this.device.storeDeviceProperties();
-							JetiAdapterDialog.this.saveVisualizationButton.setEnabled(false);
-						}
-					});
-				}
-				{
 					this.inputFileButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
 					FormData inputFileButtonLData = new FormData();
 					inputFileButtonLData.width = 130;
 					inputFileButtonLData.height = GDE.IS_MAC ? 33 : 30;
-					inputFileButtonLData.left = new FormAttachment(0, 1000, 155);
+					inputFileButtonLData.left = new FormAttachment(0, 1000, 15);
 					inputFileButtonLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -8 : -10);
 					this.inputFileButton.setLayoutData(inputFileButtonLData);
 					this.inputFileButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -278,7 +249,7 @@ public class JetiAdapterDialog extends DeviceDialog {
 	 * create a visualization control tab item
 	 * @param channelNumber
 	 */
-	private void createVisualizationTabItem(int channelNumber, int numMeasurements) {
+	private void createVisualizationTabItems(int channelNumber) {
 		this.visualizationTabItem = new CTabItem(this.tabFolder, SWT.NONE);
 		this.visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.visualizationTabItem.setText(Messages.getString(MessageIds.GDE_MSGT2909) + GDE.STRING_MESSAGE_CONCAT + this.device.getChannelName(channelNumber));
@@ -293,8 +264,15 @@ public class JetiAdapterDialog extends DeviceDialog {
 			layoutData.left = new FormAttachment(0, 1000, 0);
 			layoutData.right = new FormAttachment(1000, 1000, 0);
 			layoutData.bottom = new FormAttachment(1000, 1000, 0);
-			new VisualizationControl(this.visualizationMainComposite, layoutData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2909), 0, numMeasurements);
-
+			
+			Channel channel = Channels.getInstance().get(channelNumber);
+			if (channel != null)
+				if (channel.getActiveRecordSet() != null)
+					new VisualizationControl(this.visualizationMainComposite, layoutData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2909), 0, channel.getActiveRecordSet().size());
+				else
+					new VisualizationControl(this.visualizationMainComposite, layoutData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2909), 0, this.device.getNumberOfMeasurements(channelNumber));
+			else
+				new VisualizationControl(this.visualizationMainComposite, layoutData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT2909), 0, this.device.getNumberOfMeasurements(channelNumber));
 		}
 	}
 
@@ -303,7 +281,6 @@ public class JetiAdapterDialog extends DeviceDialog {
 	 */
 	@Override
 	public void enableSaveButton(boolean enable) {
-		this.saveVisualizationButton.setEnabled(enable);
 		this.application.updateAllTabs(true);
 	}
 

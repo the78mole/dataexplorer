@@ -453,7 +453,7 @@ public class TelemetryData {
           double minute = (value & 0xFFFF)/1000.0;
 	        double stupne = (value >> 16) & 0xFF;
           stupne=stupne + minute/60.0;
-          return stupne; // * (((decimals>>1) & 1)==1 ? -1 : 1);
+          return stupne * (((decimals>>1) & 1)==1 ? -1 : 1);
         default:
           return 0.0;
       }

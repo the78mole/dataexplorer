@@ -23,7 +23,6 @@ import gde.data.Channels;
 import gde.device.IDevice;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.ui.MeasurementControl;
 import gde.ui.MeasurementControlConfigurable;
 import gde.ui.SWTResourceManager;
 
@@ -111,14 +110,8 @@ public class VisualizationControl extends Composite {
 			this.mainTabComposite.setLayout(mainTabCompositeLayout);
 			
 			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) {
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
-				if (i > 3) {
-					this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i),
-							this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), ""));
-				}
-				else {
-					this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1));
-				}
+				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i,
+						this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), ""));
 			}
 		}
 	}

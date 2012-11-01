@@ -21,8 +21,10 @@ package gde.device.jeti;
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.InputTypes;
+import gde.device.MeasurementType;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.DevicePropertiesInconsistenceException;
@@ -42,7 +44,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeSet;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import cz.vutbr.fit.gja.proj.utils.TelemetryData;
@@ -121,23 +125,23 @@ public class JetiDataReader {
 				TelemetryData data = new TelemetryData();
 				data.loadData(filePath);
 				TreeSet<TelemetrySensor> recordSetData = data.getData();
-				System.out.println("Modell name = " + data.getModelName());
+				//System.out.println("Modell name = " + data.getModelName());
 				//TODO check for objectKey
-				System.out.println("max time = " + data.getMaxTimestamp());
+				//System.out.println("max time = " + data.getMaxTimestamp());
 
-				//check for GPS data
-				boolean isGpsData = false;
-				for (TelemetrySensor telemetrySensor : recordSetData) {
-					System.out.println(telemetrySensor.getName());
-					System.out.println(telemetrySensor.getVariables().toString());
-					for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
-						if (dataVar.getType() == TelemetryData.T_GPS) {
-							isGpsData = true;
-							break;
-						}
-					}
-				}
-				System.out.println("isGpsData = " + isGpsData);
+//				//check for GPS data
+//				boolean isGpsData = false;
+//				for (TelemetrySensor telemetrySensor : recordSetData) {
+//					//System.out.println(telemetrySensor.getName());
+//					//System.out.println(telemetrySensor.getVariables().toString());
+//					for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
+//						if (dataVar.getType() == TelemetryData.T_GPS) {
+//							isGpsData = true;
+//							break;
+//						}
+//					}
+//				}
+//				//System.out.println("isGpsData = " + isGpsData);
 
 				int maxHit = 0, numValues = 0;
 				Map<Integer, Integer> valuesMap = new HashMap<Integer, Integer>();
@@ -151,8 +155,7 @@ public class JetiDataReader {
 							else
 								valuesMap.put(dataVar.getItems().size(), 1);
 						}
-						//System.out.println(String.format("%10s [%s] # values=%d min=%5.3f max=%5.3f", dataVar.getName(), dataVar.getUnit(), dataVar.getItems().size(), dataVar.getMin(), dataVar.getMax()));
-						System.out.println(String.format("%10s [%s]", dataVar.getName(), dataVar.getUnit()));
+						//System.out.println(String.format("%10s [%s]", dataVar.getName(), dataVar.getUnit()));
 					}
 				}
 				Integer[] occurrence = valuesMap.values().toArray(new Integer[1]);
@@ -186,24 +189,34 @@ public class JetiDataReader {
 				//String[] recordNames = device.getMeasurementNames(activeChannel.getNumber());
 				//adapt record names and units to current telemetry sensors
 				int index = 0;
+				Vector<String> vecRecordNames = new Vector<String>();
+				Map<Integer, Record.DataType> mapRecordType = new HashMap<Integer, Record.DataType>();
 				for (TelemetrySensor telemetrySensor : recordSetData) {
 					for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
+						vecRecordNames.add(dataVar.getName());
 						device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
 						device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
-					
-						if (dataVar.getName().equalsIgnoreCase("Latitude") || dataVar.getName().equalsIgnoreCase("Breitengrad"))
-							device.setLatitudeIndex(index);
-						else if (dataVar.getName().equalsIgnoreCase("Longitude") || dataVar.getName().equalsIgnoreCase("Längengrad") || dataVar.getName().equalsIgnoreCase("Laengengrad"))
-							device.setLongitudeIndex(index);
-						else if (dataVar.getName().toUpperCase().contains("GPS") && (dataVar.getName().toLowerCase().contains("hoehe") || dataVar.getName().toLowerCase().contains("höhe") || dataVar.getName().toLowerCase().contains("height") || dataVar.getName().toLowerCase().contains("alt")))
-							device.setGpsAltitudeIndex(index);
-						
 						++index;
 					}
 				}
 
-				recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), isRaw, true);
-				recordSetName = recordSet.getName(); // cut/correct length
+				//build up the record set with variable number of records just fit the sensor data
+				String[] recordNames = vecRecordNames.toArray(new String[0]);
+				String [] recordSymbols = new String[recordNames.length];
+				String [] recordUnits = new String[recordNames.length];
+				for (int i = 0; i < recordNames.length; i++) {
+					MeasurementType measurement = device.getMeasurement(activeChannelConfigNumber, i);
+					recordSymbols[i] = measurement.getSymbol();
+					recordUnits[i] = measurement.getUnit();
+				}			
+				recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, true);
+				//set record data type which are not default
+				for (Entry<Integer, Record.DataType> entry : mapRecordType.entrySet()) {
+					recordSet.get(entry.getKey().intValue()).setDataType(entry.getValue());
+				}
+				recordSetName = recordSet.getName(); // cut/correct length of recordSetName
+				
+				//correct time if needed
 				try {
 					isOutdated = Integer.parseInt(dateTime.split(GDE.STRING_DASH)[0]) <= 2000;
 				}
@@ -214,7 +227,8 @@ public class JetiDataReader {
 				activeChannel.put(recordSetName, recordSet);
 
 				index = 0;
-				int[] points = new int[recordSet.size()]; 
+				//System.out.println(device.getMeasurementNames(activeChannelConfigNumber).length + " - " + recordSet.size());
+				int[] points = new int[recordNames.length]; 
 				for (int i = 0; i < numValues; i++) {
 					for (TelemetrySensor telemetrySensor : recordSetData) {
 						for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {

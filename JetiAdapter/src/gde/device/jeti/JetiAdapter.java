@@ -29,6 +29,7 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
@@ -39,6 +40,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.dialog.IgcExportDialog;
 import gde.utils.FileUtils;
+import gde.utils.StringHelper;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -67,9 +69,9 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	final Channels				channels;
 	final JetiAdapterDialog	dialog;
 	
-	private int latitudeIndex = -1;
-	private int longitudeIndex = -1;
-	private int gpsAltitudeIndex = -1;
+//	private int latitudeIndex = -1;
+//	private int longitudeIndex = -1;
+//	private int gpsAltitudeIndex = -1;
 	
 
 	/**
@@ -273,19 +275,24 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		try {
 			for (int j = 0; j < recordSet.size(); j++) {
 				Record record = recordSet.get(j);
-				double offset = record.getOffset(); // != 0 if curve has an defined offset
-				double reduction = record.getReduction();
-				double factor = record.getFactor(); // != 1 if a unit translation is required
-				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-				if (record.getOrdinal() == this.latitudeIndex || record.getOrdinal() == this.longitudeIndex) {
+				
+				switch (record.getDataType()) {
+				case GPS_LATITUDE:
+				case GPS_LONGITUDE:
+					dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
+//				double value = (record.realGet(rowIndex) / 1000000.0);
+//				int grad = (int)value;
+//				double minuten = (value - grad) * 100;
+//				dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
+					break;
+
+				case DEFAULT:
+				default:
+					double offset = record.getOffset(); // != 0 if curve has an defined offset
+					double reduction = record.getReduction();
+					double factor = record.getFactor(); // != 1 if a unit translation is required
 					dataTableRow[j + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
-				}
-				else {
-					//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
-					double value = (record.realGet(rowIndex) / 1000000.0);
-					int grad = (int)value;
-					double minuten = (value - grad) * 100;
-					dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
+					break;
 				}
 			}
 		}
@@ -301,37 +308,42 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
-		double factor = record.getFactor(); // != 1 if a unit translation is required
-		double offset = record.getOffset(); // != 0 if a unit translation is required
-		double reduction = record.getReduction(); // != 0 if a unit translation is required
-		PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
-		boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-		property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
-		boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-
-		try {
-			if (subtractFirst) {
-				reduction = record.getFirst() / 1000.0;
-			}
-			else if (subtractLast) {
-				reduction = record.getLast() / 1000.0;
-			}
-		}
-		catch (Throwable e) {
-			reduction = 0;
-		}
-
-		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 		double newValue = 0;
-		if (record.getOrdinal() == this.latitudeIndex || record.getOrdinal() == this.longitudeIndex) { // 0=GPS-latitude 1=GPS-longitude 
-			int grad = ((int)(value / 1000));
-			double minuten = (value - (grad*1000.0))/10.0;
-			newValue = grad + minuten/60.0;
-		}
-		else {
+		
+		switch (record.getDataType()) {
+		case GPS_LATITUDE:
+		case GPS_LONGITUDE:
+//		int grad = ((int)(value / 1000));
+//		double minuten = (value - (grad*1000.0))/10.0;
+//		newValue = grad + minuten/60.0;
+			newValue = value / 1000.0;
+			break;
+
+		case DEFAULT:
+		default:
+			double factor = record.getFactor(); // != 1 if a unit translation is required
+			double offset = record.getOffset(); // != 0 if a unit translation is required
+			double reduction = record.getReduction(); // != 0 if a unit translation is required
+			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
+			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
+			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+
+			try {
+				if (subtractFirst) {
+					reduction = record.getFirst() / 1000.0;
+				}
+				else if (subtractLast) {
+					reduction = record.getLast() / 1000.0;
+				}
+			}
+			catch (Throwable e) {
+				reduction = 0;
+			}
 			newValue = (value - reduction) * factor + offset;
+			break;
 		}
-		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE))	log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -341,37 +353,42 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		double factor = record.getFactor(); // != 1 if a unit translation is required
-		double offset = record.getOffset(); // != 0 if a unit translation is required
-		double reduction = record.getReduction(); // != 0 if a unit translation is required
-		PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
-		boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-		property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
-		boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
-
-		try {
-			if (subtractFirst) {
-				reduction = record.getFirst() / 1000.0;
-			}
-			else if (subtractLast) {
-				reduction = record.getLast() / 1000.0;
-			}
-		}
-		catch (Throwable e) {
-			reduction = 0;
-		}
-
-		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 		double newValue = 0;
-		if (record.getOrdinal() == this.latitudeIndex || record.getOrdinal() == this.longitudeIndex) { // 0=GPS-latitude 1=GPS-longitude 
-			int grad = (int)value;
-			double minuten =  (value - grad*1.0) * 60.0;
-			newValue = (grad + minuten/100.0)*1000.0;
-		}
-		else {
+		
+		switch (record.getDataType()) {
+		case GPS_LATITUDE:
+		case GPS_LONGITUDE:
+//		int grad = (int)value;
+//		double minuten =  (value - grad*1.0) * 60.0;
+//		newValue = (grad + minuten/100.0)*1000.0;
+			newValue = value * 1000.0;
+			break;
+
+		case DEFAULT:
+		default:
+			double factor = record.getFactor(); // != 1 if a unit translation is required
+			double offset = record.getOffset(); // != 0 if a unit translation is required
+			double reduction = record.getReduction(); // != 0 if a unit translation is required
+			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
+			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
+			boolean subtractLast = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
+
+			try {
+				if (subtractFirst) {
+					reduction = record.getFirst() / 1000.0;
+				}
+				else if (subtractLast) {
+					reduction = record.getLast() / 1000.0;
+				}
+			}
+			catch (Throwable e) {
+				reduction = 0;
+			}
 			newValue = (value - offset) / factor + reduction;
+			break;
 		}
-		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE))	log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -436,19 +453,38 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * query the import data directory in dependency of search directory, object, etc
+	 * @param searchDirectory
+	 * @param objectKey
+	 * @return
+	 */
+	public FileDialog getImportDirectoryFileDialog(IDevice device, String dialogTitleMessage, String[] fileExtensions) {
+		String devicePath = DataExplorer.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String objectKey = DataExplorer.application.getObjectKey();
+		
+		if (Settings.getInstance().isDeviceImportDirectoryObjectRelated() && DataExplorer.application.isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
+			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
+			FileUtils.checkDirectoryAndCreate(objectkeyPath);
+			searchDirectory = objectkeyPath;
+		}
+		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
+			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
+		}
+		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage, fileExtensions, searchDirectory, null, SWT.MULTI);
+
+		if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.equals(fd.getFilterPath())) device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
+		return fd;
+	}
+
+	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2900));
-
-		final Vector<String> GPSData = new Vector<String>(4);
-		GPSData.add("Longitude");
-		GPSData.add("Latitude");
-		GPSData.add("Längengrad");
-		GPSData.add("Breitengrad");
-		GPSData.add("Laengengrad");
+		//TODO while release use FileUtils.getImportDirectoryFileDialog
+		final FileDialog fd = this.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2900), new String[] {GDE.FILE_ENDING_STAR_LOG, GDE.FILE_ENDING_STAR_JML, GDE.FILE_ENDING_STAR_STAR});
 
 		Thread reader = new Thread("reader") {
 			@Override
@@ -457,12 +493,6 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 					JetiAdapter.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
-							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
-							}
-							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_LOG;
-						}
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 						
 						if (fd.getFileName().length() > 4) {
@@ -575,9 +605,9 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet != null && this.latitudeIndex != -1 && this.longitudeIndex != -1 && this.gpsAltitudeIndex != -1) {
+			if (activeRecordSet != null) {
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 
-				containsGPSdata = activeRecordSet.get(this.latitudeIndex).hasReasonableData() && activeRecordSet.get(this.longitudeIndex).hasReasonableData() && activeRecordSet.get(this.gpsAltitudeIndex).hasReasonableData();
+				containsGPSdata = activeRecordSet.containsGPSdata();
 			}
 		}
 		return containsGPSdata;
@@ -593,9 +623,8 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
-				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-				exportFileName = new FileHandler().exportFileKMZ(this.longitudeIndex, this.latitudeIndex, this.gpsAltitudeIndex, findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, true, isExportTmpDir);
+			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ) && activeRecordSet.containsGPSdata()) {
+				exportFileName = new FileHandler().exportFileKMZ(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, true, isExportTmpDir);
 			}
 		}
 		return exportFileName;
@@ -656,16 +685,33 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			});
 		}
 	}
-	
-	public void setLatitudeIndex(int index) {
-		this.latitudeIndex = index;
-	}
-	
-	public void setLongitudeIndex(int index) {
-		this.longitudeIndex = index;
-	}
-	
-	public void setGpsAltitudeIndex(int index) {
-		this.gpsAltitudeIndex = index;
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	@Override
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
+		String[] recordNames = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		if ((recordNames.length - fileRecordsProperties.length) > 0) {
+			for (String recordProps : fileRecordsProperties) {
+				cleanedRecordNames.add(StringHelper.splitString(recordProps, Record.DELIMITER, Record.propertyKeys).get(Record.propertyKeys[0]));
+			}
+			recordNames = cleanedRecordNames.toArray(new String[1]);
+			//correct recordSet with cleaned record names
+			recordSet.clear();
+			for (int j = 0; j < recordNames.length; j++) {
+				MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), j);
+				recordSet.addRecordName(recordNames[j]);
+				recordSet.put(recordNames[j], new Record(this, j, recordNames[j], measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5));
+			}
+		}
+		return recordNames;
 	}
 }
