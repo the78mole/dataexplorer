@@ -192,10 +192,31 @@ public class JetiDataReader {
 				Vector<String> vecRecordNames = new Vector<String>();
 				Map<Integer, Record.DataType> mapRecordType = new HashMap<Integer, Record.DataType>();
 				for (TelemetrySensor telemetrySensor : recordSetData) {
+					boolean actualgps = false;
 					for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
 						vecRecordNames.add(dataVar.getName());
 						device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
 						device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
+		         if(dataVar.getType()==(TelemetryData.T_GPS) && (dataVar.getDecimals() & 1)==0)
+		          {
+		            actualgps=true;
+		            mapRecordType.put(index, Record.DataType.GPS_LATITUDE);
+		          }
+		         	if(dataVar.getType()==(TelemetryData.T_GPS) && (dataVar.getDecimals()&1)==1)
+		          {
+		            actualgps=true;
+		            mapRecordType.put(index, Record.DataType.GPS_LONGITUDE);
+		          }
+		         	if(actualgps && dataVar.getUnit().contains("°") && dataVar.getParam()==10)
+		          {
+		            mapRecordType.put(index, Record.DataType.GPS_AZIMUTH);
+		          }
+		         	if((dataVar.getName().toUpperCase().contains("GPS") || dataVar.getName().toUpperCase().contains("ABS"))
+		      				&& (dataVar.getName().toLowerCase().contains("hoehe") || dataVar.getName().toLowerCase().contains("höhe") || dataVar.getName().toLowerCase().contains("height") || dataVar.getName().toLowerCase().contains("alt"))) //dataVar.getParam()==4
+		          {
+		            mapRecordType.put(index, Record.DataType.GPS_ALTITUDE);
+		          }
+		         System.out.println(dataVar.getParam());
 						++index;
 					}
 				}

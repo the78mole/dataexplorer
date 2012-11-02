@@ -390,6 +390,13 @@ public class TelemetryData {
     public ArrayList<TelemetryItem> getItems() {
       return this.data;
     }
+
+		/**
+		 * @return the param
+		 */
+		public synchronized int getParam() {
+			return param;
+		}
   }
 
   /** Polozka zaznamu telemetrie */
