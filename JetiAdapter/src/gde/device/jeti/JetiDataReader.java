@@ -216,7 +216,7 @@ public class JetiDataReader {
 		          {
 		            mapRecordType.put(index, Record.DataType.GPS_ALTITUDE);
 		          }
-		         System.out.println(dataVar.getParam());
+		         //System.out.println(dataVar.getParam());
 						++index;
 					}
 				}
