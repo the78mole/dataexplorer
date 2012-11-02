@@ -24,7 +24,9 @@ package gde.device.jeti;
  */ 
 public class MessageIds { 
 
-	public final static String	GDE_MSGI2900 = "GDE_MSGI2900";
+	public final static String	GDE_MSGE2900 = "GDE_MSGE2900";
+	public final static String	GDE_MSGE2901 = "GDE_MSGE2901";
+	public final static String	GDE_MSGE2902 = "GDE_MSGE2902";
 	public final static String	GDE_MSGT2900 = "GDE_MSGT2900";
 	public final static String	GDE_MSGT2901 = "GDE_MSGT2901";
 	public final static String	GDE_MSGT2902 = "GDE_MSGT2902";

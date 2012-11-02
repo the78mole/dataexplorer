@@ -26,6 +26,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package cz.vutbr.fit.gja.proj.utils;
 
+import gde.device.jeti.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,8 +37,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -48,6 +53,7 @@ import org.w3c.dom.NodeList;
  * @author Martin Falticko
  */
 public class TelemetryData {
+	static Logger							log					= Logger.getLogger(TelemetryData.class.getName());
 
   /** Typ dat - 8 bitu */
   public static final int T_DATA8 = 0;
@@ -226,7 +232,7 @@ public class TelemetryData {
      */
     @Override
     public String toString() {
-      return name + " \t" + "[" + unit + "]";
+      return name + " \t" + "[" + unit + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     /*
@@ -520,7 +526,7 @@ public class TelemetryData {
    */
   private double maxTimestamp = 0.0;
   
-  private String modelName = "";
+  private String modelName = ""; //$NON-NLS-1$
 
   /**
    * Vrati seznam s nactenymi telemetrickymi daty
@@ -564,20 +570,21 @@ public class TelemetryData {
    */
   public boolean loadData(String file) {
     maxTimestamp = 0.0;
-    int mid = file.lastIndexOf(".");
+    int mid = file.lastIndexOf("."); //$NON-NLS-1$
     String ext = file.substring(mid + 1, file.length());
-    if (ext.equalsIgnoreCase("log")) {
+    if (ext.equalsIgnoreCase("log")) { //$NON-NLS-1$
       this.data.clear();
       if (!loadCSV(file)) {
         return false;
       }
-    } else if (ext.equalsIgnoreCase("jml")) {
+    } else if (ext.equalsIgnoreCase("jml")) { //$NON-NLS-1$
       this.data.clear();
       if (!loadJML(file)) {
         return false;
       }
     } else {
-      JOptionPane.showMessageDialog(null, "Error: " + "NeznÃ¡mÃ¡ koncovka souboru", "Error", JOptionPane.ERROR_MESSAGE);
+      DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE2900, new String[] {file}));
+      //JOptionPane.showMessageDialog(null, "Error: " + "NeznÃ¡mÃ¡ koncovka souboru", "Error", JOptionPane.ERROR_MESSAGE);
       return false;
     }
 
@@ -605,47 +612,44 @@ public class TelemetryData {
       Document doc = db.parse(file);
       doc.getDocumentElement().normalize();
       
-      NodeList sensors = doc.getElementsByTagName("dataStorage");
-      //System.out.println("Information of all employees");
+      NodeList sensors = doc.getElementsByTagName("dataStorage"); //$NON-NLS-1$
 
       for (int s = 0; s < sensors.getLength(); s++) {
-
         Node sensor = sensors.item(s);
 
         if (sensor.getNodeType() == Node.ELEMENT_NODE) {
           Element fstElmnt = (Element) sensor;
-          long ID = Long.parseLong(fstElmnt.getAttribute("dataStorageID"));
+          long ID = Long.parseLong(fstElmnt.getAttribute("dataStorageID")); //$NON-NLS-1$
           //Vlozim novy sensor
-          TelemetrySensor tel=new TelemetrySensor(ID, "-");
+          TelemetrySensor tel=new TelemetrySensor(ID, "-"); //$NON-NLS-1$
           this.data.add(tel);
           //Projdu atributy
-          NodeList elements = fstElmnt.getElementsByTagName("attrDescription");
+          NodeList elements = fstElmnt.getElementsByTagName("attrDescription"); //$NON-NLS-1$
           for(int i=0;i<elements.getLength();i++)
           {
             Node var = elements.item(i);
             if (var.getNodeType() == Node.ELEMENT_NODE)
             {
               Element varElem = (Element) var;
-              int varId=Integer.parseInt(varElem.getAttribute("attrID"));
-              String name=varElem.getAttribute("name");
-              String unit=varElem.getAttribute("units");
+              int varId=Integer.parseInt(varElem.getAttribute("attrID")); //$NON-NLS-1$
+              String name=varElem.getAttribute("name"); //$NON-NLS-1$
+              String unit=varElem.getAttribute("units"); //$NON-NLS-1$
               TelemetryVar telvar=new TelemetryVar(varId,name,unit);
               //Vlozim promennou telemetrie
               tel.addVariable(telvar);
             }
           }
 
-
           //Projdu data k danemu cidlu
-          elements = fstElmnt.getElementsByTagName("entity");
+          elements = fstElmnt.getElementsByTagName("entity"); //$NON-NLS-1$
           for(int i=0;i<elements.getLength();i++)
           {
             Node var = elements.item(i);
             if (var.getNodeType() == Node.ELEMENT_NODE)
             {
               Element varElem = (Element) var;
-              String row=String.valueOf(ID)+";"+varElem.getAttribute("plainData");
-              String rowData[]=row.split(";");
+              String row=String.valueOf(ID)+";"+varElem.getAttribute("plainData"); //$NON-NLS-1$ //$NON-NLS-2$
+              String rowData[]=row.split(";"); //$NON-NLS-1$
               if(rowData.length>2)
               {
                 //Prehodim ID a timestamp
@@ -656,19 +660,16 @@ public class TelemetryData {
               }
             }
           }
-
-
-
         }
-
       }
       return true;
     } 
     catch (Exception e)
     {
       this.getData().clear();
-      //TODO open DataExplorer message dialog
-      JOptionPane.showMessageDialog(null, "Chyba JML, " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    	log.log(Level.SEVERE, e.getMessage(), e);
+      DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE2901, new String[] {filename}));
+      //JOptionPane.showMessageDialog(null, "Chyba JML, " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       return false;
     }
     
@@ -683,7 +684,7 @@ public class TelemetryData {
       // Open the file that is the first
       // command line parameter
       FileInputStream fis = new FileInputStream(file);
-      InputStreamReader in = new InputStreamReader(fis, "windows-1250");
+      InputStreamReader in = new InputStreamReader(fis, "windows-1250"); //$NON-NLS-1$
 
       //FileInputStream fstream = new FileInputStream(file);
       // Get the object of DataInputStream
@@ -696,12 +697,12 @@ public class TelemetryData {
         line++;
         strLine = strLine.trim();
         //Prvni znak - komentar?
-        if (strLine.startsWith("#")) {
+        if (strLine.startsWith("#")) { //$NON-NLS-1$
           this.modelName = strLine.substring(1).trim();
           continue;
         }
 
-        String arr[] = strLine.split(";");
+        String arr[] = strLine.split(";"); //$NON-NLS-1$
         if (arr != null && arr.length > 0) {
           parseLineParams(arr);
         }
@@ -711,8 +712,9 @@ public class TelemetryData {
       return true;
     } catch (Exception e) {//Catch exception if any
       this.getData().clear();
-      //TODO open DataExplorer message dialog
-      JOptionPane.showMessageDialog(null, "Chyba na Å™Ã¡dku " + String.valueOf(line) + ", " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    	log.log(Level.SEVERE, e.getMessage(), e);
+      DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE2902,new String[] { file, String.valueOf(line)}));
+      //JOptionPane.showMessageDialog(null, "Chyba na Å™Ã¡dku " + String.valueOf(line) + ", " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       return false;
     }
   }
@@ -761,8 +763,8 @@ public class TelemetryData {
     int paramId = 0;
     int dataType = 0;
     int decimals = 0;
-    String label = "";
-    String unit = "";
+    String label = ""; //$NON-NLS-1$
+    String unit = ""; //$NON-NLS-1$
     if (params == null) {
       return;
     }
