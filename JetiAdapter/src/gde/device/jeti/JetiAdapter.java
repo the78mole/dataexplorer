@@ -688,4 +688,33 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		}
 		return recordNames;
 	}
+
+	/**
+	 * find best match of memory name with object key and select, if no match no object key will be changed
+	 * @param batteryMemoryName
+	 * @return
+	 */
+	public void matchModelName2ObjectKey(String modelName) {
+		Object[] tmpResult = null;
+		for (String tmpObjectKey : this.application.getObjectKeys()) {
+			if (tmpObjectKey.equals(modelName)) {
+				tmpResult = new Object[] { tmpObjectKey, 100 };
+				break;
+			}
+			String[] nameParts = modelName.split(" |-|_"); //$NON-NLS-1$
+			int hitCount = 0;
+			for (String namePart : nameParts) {
+				if (namePart.length() > 1 && tmpObjectKey.contains(namePart)) ++hitCount;
+			}
+			if (hitCount > 0) {
+				if (tmpResult == null || hitCount > (Integer) tmpResult[1]) {
+					tmpResult = new Object[] { tmpObjectKey, hitCount };
+					log.log(java.util.logging.Level.FINE, "result updated = " + tmpObjectKey + " hitCount = " + hitCount); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+		}
+		if (tmpResult != null) {
+			this.application.selectObjectKey((String) tmpResult[0]);
+		}
+	}
 }

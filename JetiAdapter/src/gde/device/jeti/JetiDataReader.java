@@ -125,9 +125,8 @@ public class JetiDataReader {
 				TelemetryData data = new TelemetryData();
 				if (data.loadData(filePath)) {
 					TreeSet<TelemetrySensor> recordSetData = data.getData();
-					//System.out.println("Modell name = " + data.getModelName());
-					//TODO check for objectKey
-					//System.out.println("max time = " + data.getMaxTimestamp());
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "Modell name = " + data.getModelName());
+					device.matchModelName2ObjectKey(data.getModelName());
 
 					int maxHit = 0, numValues = 0;
 					Map<Integer, Integer> valuesMap = new HashMap<Integer, Integer>();
@@ -141,7 +140,7 @@ public class JetiDataReader {
 								else
 									valuesMap.put(dataVar.getItems().size(), 1);
 							}
-							System.out.println(String.format("%10s [%s]", dataVar.getName(), dataVar.getUnit()));
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%10s [%s]", dataVar.getName(), dataVar.getUnit()));
 						}
 					}
 					Integer[] occurrence = valuesMap.values().toArray(new Integer[1]);
@@ -152,7 +151,7 @@ public class JetiDataReader {
 							break;
 						}
 					}
-					//System.out.println("best fit # values = " + numValues);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "best fit # values = " + numValues);
 					timeStep_ms = data.getMaxTimestamp() * 1000 / numValues;
 
 					try {
@@ -185,7 +184,7 @@ public class JetiDataReader {
 								newReordName = newReordName + "'";
 							}
 							vecRecordNames.add(newReordName);
-							System.out.println("add new record name = " + newReordName);
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add new record name = " + newReordName);
 							device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
 							device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
 							if (dataVar.getType() == (TelemetryData.T_GPS) && (dataVar.getDecimals() & 1) == 0) {
@@ -205,7 +204,7 @@ public class JetiDataReader {
 							{
 								mapRecordType.put(index, Record.DataType.GPS_ALTITUDE);
 							}
-							//System.out.println(dataVar.getParam());
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "param = " + dataVar.getParam());
 							++index;
 						}
 					}
@@ -237,7 +236,7 @@ public class JetiDataReader {
 					activeChannel.put(recordSetName, recordSet);
 
 					index = 0;
-					//System.out.println(device.getMeasurementNames(activeChannelConfigNumber).length + " - " + recordSet.size());
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getMeasurementNames(activeChannelConfigNumber).length + " - " + recordSet.size());
 					int[] points = new int[recordNames.length];
 					for (int i = 0; i < numValues; i++) {
 						for (TelemetrySensor telemetrySensor : recordSetData) {
