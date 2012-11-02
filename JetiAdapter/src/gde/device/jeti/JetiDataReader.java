@@ -158,9 +158,6 @@ public class JetiDataReader {
 
 						recordSetNameExtend = device.getStateType().getProperty().get(0).getName(); // state name
 						if (recordNameExtend.length() > 0) {
-							if (data.getModelName().length() > 0)
-								recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + data.getModelName() + GDE.STRING_RIGHT_BRACKET;
-							else
 								recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}
 					}
