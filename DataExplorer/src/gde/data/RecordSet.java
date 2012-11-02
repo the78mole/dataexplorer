@@ -2161,7 +2161,6 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 	public boolean containsGPSdata() {
 		int sumGpsRelatedRecords = 0;
 		for (Record record : this.values()) {
-			record.setDataType();
 			if (record.dataType == Record.DataType.GPS_LATITUDE || record.dataType == Record.DataType.GPS_LONGITUDE || record.dataType == Record.DataType.GPS_ALTITUDE)
 				++sumGpsRelatedRecords;
 		}

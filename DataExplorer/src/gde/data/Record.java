@@ -192,9 +192,10 @@ public class Record extends Vector<Integer> {
 	public final static String	DEFINED_MAX_VALUE			= "_defMaxValue";				// overwritten max value //$NON-NLS-1$
 	public final static String	MIN_VALUE							= "_minValue"; 					//$NON-NLS-1$
 	public final static String	DEFINED_MIN_VALUE			= "_defMinValue";				// overwritten min value //$NON-NLS-1$
+	public final static String	DATA_TYPE							= "_dataType";					// data type of record //$NON-NLS-1$
 	
 	public final static String[] propertyKeys = new String[] { NAME, UNIT, SYMBOL, IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE, 
-			IS_ROUND_OUT, IS_START_POINT_ZERO, IS_START_END_DEFINED, NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE	};
+			IS_ROUND_OUT, IS_START_POINT_ZERO, IS_START_END_DEFINED, NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE, DATA_TYPE	};
 
 	public final static int	TYPE_AXIS_END_VALUES			= 0;				// defines axis end values types like isRoundout, isStartpointZero, isStartEndDefined
 	public final static int	TYPE_AXIS_NUMBER_FORMAT		= 1;				// defines axis scale values format
@@ -204,7 +205,8 @@ public class Record extends Vector<Integer> {
 		DEFAULT("default"), 						//all normal measurement values which do not require special handling
 		GPS_LATITUDE("GPS latitude"), 	//GPS geo-coordinate require at least 6 decimal digits
 		GPS_LONGITUDE("GPS longitude"), //GPS geo-coordinate require at least 6 decimal digits
-		GPS_ALTITUDE("altitude");				//GPS or absolute altitude required in some case for GPS related calculations like speed, distance, ...
+		GPS_ALTITUDE("GPS altitude"),				//GPS or absolute altitude required in some case for GPS related calculations like speed, distance, ...
+		GPS_AZIMUTH("GPS azimuth");					//GPS azimuth, to be used for live display and positioning of icon if used
 		
 		private final String	value;
 
@@ -215,6 +217,15 @@ public class Record extends Vector<Integer> {
 		public String value() {
 			return this.value;
 		}
+
+    public static DataType fromValue(String v) {
+        for (DataType c: DataType.values()) {
+            if (c.value.equals(v)) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(v);
+    }
 		
 		public static List<DataType> getAsList() {
 			List<Record.DataType> dataTypes = new ArrayList<Record.DataType>();
@@ -1807,6 +1818,8 @@ public class Record extends Vector<Integer> {
 		sb.append(IS_START_POINT_ZERO).append(GDE.STRING_EQUAL).append(this.isStartpointZero).append(DELIMITER);
 		sb.append(IS_START_END_DEFINED).append(GDE.STRING_EQUAL).append(this.isStartEndDefined).append(DELIMITER);
 		sb.append(NUMBER_FORMAT).append(GDE.STRING_EQUAL).append(this.numberFormat).append(DELIMITER);
+		if (this.dataType != Record.DataType.DEFAULT)
+			sb.append(DATA_TYPE).append(GDE.STRING_EQUAL).append(this.dataType.value).append(DELIMITER);
 		return sb.substring(0, sb.lastIndexOf(Record.DELIMITER)) + Record.END_MARKER;
 	}
 	
@@ -1854,6 +1867,8 @@ public class Record extends Vector<Integer> {
 		if (tmpValue!=null && tmpValue.length() > 0) this.maxScaleValue =  new Double(tmpValue.trim()).doubleValue();
 		tmpValue = recordProps.get(DEFINED_MIN_VALUE);
 		if (tmpValue!=null && tmpValue.length() > 0) this.minScaleValue =  new Double(tmpValue.trim()).doubleValue();
+		tmpValue = recordProps.get(DATA_TYPE);
+		if (tmpValue!=null && tmpValue.length() > 0) this.dataType =  Record.DataType.fromValue(tmpValue);
 
 		tmpValue =  recordProps.get(NAME);
 		if (tmpValue!=null && tmpValue.length() > 0 && !this.name.trim().equalsIgnoreCase(tmpValue.trim())) {
