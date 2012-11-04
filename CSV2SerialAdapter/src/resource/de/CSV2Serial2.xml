@@ -1,46 +1,445 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V20.xsd">
     <Device>
-        <name implementation="CSV2SerialAdapter">CSV2Serial2</name>
+        <name implementation="CSV2SerialAdapter">Av4ms_FV_762</name>
         <manufacturer>WB</manufacturer>
         <manufacturerURL>http://www.bruegmaenner.de/DataExplorer</manufacturerURL>
-        <group>multimeter</group>
+        <group>charger</group>
         <image>CSV2SerialAdapter.png</image>
-        <usage>false</usage>
+        <usage>true</usage>
     </Device>
+    <SerialPort>
+        <port>-</port>
+        <baudeRate>115200</baudeRate>
+        <dataBits>DATABITS_8</dataBits>
+        <stopBits>STOPBITS_1</stopBits>
+        <parity>PARITY_NONE</parity>
+        <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
+        <isRTS>true</isRTS>
+        <isDTR>true</isDTR>
+    </SerialPort>
     <TimeBase>
         <name>Time</name>
         <symbol>t</symbol>
         <unit>msec</unit>
-        <timeStep>-1.0</timeStep>
+        <timeStep>1000.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format inputType="FILE_IO" formatType="VALUE" size="13"/>
-		<timeUnit>msec</timeUnit>
-		<separator>semicolon</separator>
-		<leader>$</leader>
-		<trailer>0D0A</trailer>
-        <preferredFileExtention>*.csv</preferredFileExtention>
+        <format inputType="FILE_IO" formatType="VALUE" size="-8"/>
+        <format inputType="SERIAL_IO" formatType="BYTE" size="-60"/>
+        <timeUnit>msec</timeUnit>
+        <separator>semicolon</separator>
+        <leader>$</leader>
+        <trailer>0D0A</trailer>
     </DataBlock>
     <State>
-        <property description="" type="Integer" value="01" name="Datenaufzeichnung"/>
+        <property name="Zellenbehandlung" value="01" type="Integer" description=""/>
     </State>
     <Channels>
-	    <Channel type="TYPE_CONFIG" name="Thermik">
-	        <Measurement>
-	            <name>Spannung</name>
-	            <symbol>U</symbol>
-	            <unit>V</unit>
-	            <active>true</active>
-	            <statistics sigma="true" avg="true" max="true" min="true"/>
-	            <property description="Faktor * input value" type="Double" value="0.001" name="factor"/>
-	        </Measurement>
-	    </Channel>
+        <Channel name="Spannung_1" type="TYPE_CONFIG">
+            <Measurement>
+                <name>Spannung S1</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung I-EIN S1</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung S2</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung I-EIN S2</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung S3</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung I-EIN S3</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung S4</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung I-EIN S4</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+        </Channel>
+        <Channel name="Strom_2" type="TYPE_CONFIG">
+            <Measurement>
+                <name>Strom (laden) S1</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom (entladen) S1</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom (laden) S2</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom (entladen) S2</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom (laden) S3</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom (entladen) S3</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom (laden) S4</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Strom (entladen) S4</name>
+                <symbol>I</symbol>
+                <unit>A</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+        </Channel>
+        <Channel name="Kapazität_3" type="TYPE_CONFIG">
+            <Measurement>
+                <name>Lade-Ah S1</name>
+                <symbol>C</symbol>
+                <unit>Ah</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Ah S1</name>
+                <symbol>C</symbol>
+                <unit>Ah</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Lade-Ah S2</name>
+                <symbol>C</symbol>
+                <unit>Ah</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Ah S2</name>
+                <symbol>C</symbol>
+                <unit>Ah</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Lade-Ah S3</name>
+                <symbol>C</symbol>
+                <unit>Ah</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Ah S3</name>
+                <symbol>C</symbol>
+                <unit>Ah</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Lade-Ah S4</name>
+                <symbol>C</symbol>
+                <unit>Ah</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Ah S4</name>
+                <symbol>C</symbol>
+                <unit>Ah</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+        </Channel>
+        <Channel name="Zeit_4" type="TYPE_CONFIG">
+            <Measurement>
+                <name>Lade-Zeit S1</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.016666666666666666666666666666667" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Zeit S1</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.016666666666666666666666666666667" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Lade-Zeit S2</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.016666666666666666666666666666667" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Zeit S2</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.016666666666666666666666666666667" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Lade-Zeit S3</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.016666666666666666666666666666667" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Zeit S3</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.016666666666666666666666666666667" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Lade-Zeit S4</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.016666666666666666666666666666667" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Zeit S4</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.016666666666666666666666666666667" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+        </Channel>
+        <Channel name="Energie_5" type="TYPE_CONFIG">
+            <Measurement>
+                <name>Lade-Wh S1</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Wh S1</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Lade-Wh S2</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Wh S2</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Lade-Wh S3</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Wh S3</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Lade-Wh S4</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Entlade-Wh S4</name>
+                <symbol>t</symbol>
+                <unit>Min</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+        </Channel>
+        <Channel name="Delta_U_6" type="TYPE_CONFIG">
+            <Measurement>
+                <name>Delta-Spannung S1</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Delta-Spannung S2</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Delta-Spannung S3</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Delta-Spannung S4</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+        </Channel>
     </Channels>
     <Desktop>
-        <property value="true" name="table_tab"/>
-        <property value="true" name="digital_tab"/>
-        <property value="true" name="analog_tab"/>
-        <property value="true" name="voltage_per_cell_tab"/>
+        <property name="table_tab" value="true"/>
+        <property name="digital_tab" value="true"/>
+        <property name="analog_tab" value="true"/>
+        <property name="voltage_per_cell_tab" value="true"/>
+        <property name="utility_garphics_tab" value="false" description="UTILITY_GRAPHICS_TAB"/>
+        <property name="utility_device_tab" value="false" description="UTILITY_DEVICE_TAB"/>
     </Desktop>
 </DeviceProperties>

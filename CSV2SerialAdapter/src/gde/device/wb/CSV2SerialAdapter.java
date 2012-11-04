@@ -21,6 +21,8 @@ package gde.device.wb;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
@@ -29,7 +31,9 @@ import gde.device.InputTypes;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
+import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
+import gde.exception.SerialPortException;
 import gde.io.CSVSerialDataReaderWriter;
 import gde.io.DataParser;
 import gde.log.Level;
@@ -60,6 +64,9 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 
 	final DataExplorer	application;
 	final CSV2SerialAdapterDialog	dialog;
+	protected final CSV2SerialPort						serialPort;
+	protected final Channels											channels;
+	protected       GathererThread								gathererThread;
 
 	/**
 	 * constructor using properties file
@@ -73,9 +80,15 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
+		this.serialPort = new CSV2SerialPort(this, this.application);
+		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1703), Messages.getString(MessageIds.GDE_MSGT1703));
-			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+			if (this.getDataBlockType().getFormat().size() == 2) {
+				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1705), Messages.getString(MessageIds.GDE_MSGT1706));
+			} else { //InputTypes.FILE_IO
+				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1703), Messages.getString(MessageIds.GDE_MSGT1703));
+				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+			}
 		}
 	}
 
@@ -90,9 +103,15 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.dialog = new CSV2SerialAdapterDialog(this.application.getShell(), this);
+		this.serialPort = new CSV2SerialPort(this, this.application);
+		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1703), Messages.getString(MessageIds.GDE_MSGT1703));
-			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+			if (this.getDataBlockType().getFormat().size() == 2) {
+				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1706), Messages.getString(MessageIds.GDE_MSGT1705));
+			} else { //InputTypes.FILE_IO
+				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1703), Messages.getString(MessageIds.GDE_MSGT1703));
+				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
+			}
 		}
 	}
 
@@ -122,7 +141,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
 	public int getLovDataByteSize() {
-		return 0;  // sometimes first 4 bytes give the length of data + 4 bytes for number
+		return 69;  // sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
@@ -218,14 +237,15 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.size()];
+		int timeStampBufferSize = 0;
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
-		int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
-		byte[] timeStampBuffer = new byte[timeStampBufferSize];
 		if(!recordSet.isTimeStepConstant()) {
+			timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
+			byte[] timeStampBuffer = new byte[timeStampBufferSize];
 			System.arraycopy(dataBuffer, 0, timeStampBuffer, 0, timeStampBufferSize);
 
 			for (int i = 0; i < recordDataSize; i++) {
@@ -426,40 +446,83 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT1700));
-
-		Thread reader = new Thread("reader") { //$NON-NLS-1$
-			@Override
-			public void run() {
-				try {
-					CSV2SerialAdapter.this.application.setPortConnected(true);
-					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
-							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
-							}
-							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
-						}
-						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-
-						if (fd.getFileName().length() > 4) {
+		if (this.getDataBlockType().getFormat().size() == 2) {
+			if (this.serialPort != null) {
+				if (!this.serialPort.isConnected()) {
+					try {
+						Channel activChannel = Channels.getInstance().getActiveChannel();
+						if (activChannel != null) {
+							this.gathererThread = new GathererThread(this.application, this, this.serialPort, activChannel.getNumber());
 							try {
-								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-								CSVSerialDataReaderWriter.read(selectedImportFile, CSV2SerialAdapter.this, GDE.STRING_EMPTY, channelConfigNumber, true);
+								if (this.serialPort.isConnected()) {
+									this.gathererThread.start();
+								}
+							}
+							catch (RuntimeException e) {
+								log.log(Level.SEVERE, e.getMessage(), e);
 							}
 							catch (Throwable e) {
-								log.log(Level.WARNING, e.getMessage(), e);
+								log.log(Level.SEVERE, e.getMessage(), e);
 							}
 						}
 					}
+					catch (SerialPortException e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+						this.application.openMessageDialog(Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage()}));
+					}
+					catch (ApplicationConfigurationException e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+						this.application.openMessageDialog(Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
+						this.application.getDeviceSelectionDialog().open();
+					}
+					catch (Throwable e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+					}
 				}
-				finally {
-					CSV2SerialAdapter.this.application.setPortConnected(false);
+				else {
+					if (this.gathererThread != null) {
+						this.gathererThread.stopDataGatheringThread(false, null);
+					}
+					this.serialPort.close();
 				}
 			}
-		};
-		reader.start();
+		}
+		else { //InputTypes.FILE_IO
+			final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT1700));
+	
+			Thread reader = new Thread("reader") { //$NON-NLS-1$
+				@Override
+				public void run() {
+					try {
+						CSV2SerialAdapter.this.application.setPortConnected(true);
+						for (String tmpFileName : fd.getFileNames()) {
+							String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+							if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
+								if (selectedImportFile.contains(GDE.STRING_DOT)) {
+									selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+								}
+								selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
+							}
+							log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+	
+							if (fd.getFileName().length() > 4) {
+								try {
+									Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
+									CSVSerialDataReaderWriter.read(selectedImportFile, CSV2SerialAdapter.this, GDE.STRING_EMPTY, channelConfigNumber, true);
+								}
+								catch (Throwable e) {
+									log.log(Level.WARNING, e.getMessage(), e);
+								}
+							}
+						}
+					}
+					finally {
+						CSV2SerialAdapter.this.application.setPortConnected(false);
+					}
+				}
+			};
+			reader.start();
+		}
 	}
 	
 	/**
