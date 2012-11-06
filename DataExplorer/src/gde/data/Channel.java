@@ -194,7 +194,6 @@ public class Channel extends HashMap<String, RecordSet> {
 			for (int i = 0; i < sortedRecordSetNames.length; ++i) {
 				try {
 					sortedNumbers.add(Integer.valueOf(sortedRecordSetNames[i].split("[)]")[0])); //$NON-NLS-1$
-					break;
 				}
 				catch (NumberFormatException e) {
 					// is alpha no numeric or no ")"
