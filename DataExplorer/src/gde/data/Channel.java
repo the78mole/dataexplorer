@@ -181,6 +181,30 @@ public class Channel extends HashMap<String, RecordSet> {
 		
 		return recordNumber;
 	}
+	
+	/**
+	 * method to calculate next record set number, usually a record starts with a number followed by ")"
+	 * this method is used to build a new record set name while gathering data "3") flight record
+	 * @return next record set number
+	 */
+	public int getNextRecordSetNumber(int availableNum) {
+		Vector<Integer> sortedNumbers = new Vector<Integer>(this.size());
+		if (this.size() != 0) {
+			String[] sortedRecordSetNames = this.getRecordSetNames();
+			for (int i = 0; i < sortedRecordSetNames.length; ++i) {
+				try {
+					sortedNumbers.add(Integer.valueOf(sortedRecordSetNames[i].split("[)]")[0])); //$NON-NLS-1$
+					break;
+				}
+				catch (NumberFormatException e) {
+					// is alpha no numeric or no ")"
+				}
+			}
+		}
+		
+		return !sortedNumbers.contains(availableNum) ? availableNum : getNextRecordSetNumber();
+	}
+
 	/**
 	 * @return the graphics template
 	 */
@@ -680,7 +704,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * this method can be used to check prior to save modified data
 	 * the behavior which record set data is checked and loaded depends on the method this.getRecordSetNames() 
 	 */
-	public void checkAndLoadData() {
+	public synchronized void checkAndLoadData() {
 		String fullQualifiedFileName = this.getFullQualifiedFileName();
 		for (String tmpRecordSetName : this.getRecordSetNames()) {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpRecordSetName = " + tmpRecordSetName); //$NON-NLS-1$

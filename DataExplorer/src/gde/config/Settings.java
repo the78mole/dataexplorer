@@ -154,6 +154,7 @@ public class Settings extends Properties {
 	public final static String			DECIMAL_SEPARATOR							= "decimal_separator";																																					//$NON-NLS-1$
 	public final static String			USE_DATA_FILE_NAME_LEADER			= "use_date_file_name_leader";																																	//$NON-NLS-1$
 	public final static String			USE_OBJECT_KEY_IN_FILE_NAME		= "use_object_key_in_file_name";																																//$NON-NLS-1$
+	public final static String			WRITE_TMP_FILES								= "write_tmp_files";																																//$NON-NLS-1$
 	public static final String			ALPHA_BLENDING_VALUE					= "alpha_blending_value";																																				//$NON-NLS-1$
 	public static final String			APLHA_BLENDING_ENABLED				= "aplha_blending_enabled";																																			//$NON-NLS-1$
 	public static final String			KEEP_IMPORT_DIR_OBJECT_RELATED= "keep_import_dir_object_related";																															//$NON-NLS-1$
@@ -542,6 +543,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_IMAGE_FILE_PATH, getObjectImageFilePath())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_DATA_FILE_NAME_LEADER, getUsageDateAsFileNameLeader())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_OBJECT_KEY_IN_FILE_NAME, getUsageObjectKeyInFileName())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WRITE_TMP_FILES, getUsageWritingTmpFiles())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ALPHA_BLENDING_VALUE, getDialogAlphaValue())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.APLHA_BLENDING_ENABLED, isDeviceDialogAlphaEnabled())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.KEEP_IMPORT_DIR_OBJECT_RELATED, isDeviceImportDirectoryObjectRelated())); //$NON-NLS-1$
@@ -828,6 +830,13 @@ public class Settings extends Properties {
 	}
 
 	/**
+	 * set usage if files should be written each 5 minutes
+	 */
+	public void setUsageWritingTmpFiles(boolean usage) {
+		this.setProperty(Settings.WRITE_TMP_FILES, GDE.STRING_EMPTY + usage);
+	}
+
+	/**
 	 * get the usage of suggest date as leader of the to be saved filename
 	 */
 	public boolean getUsageDateAsFileNameLeader() {
@@ -839,6 +848,13 @@ public class Settings extends Properties {
 	 */
 	public boolean getUsageObjectKeyInFileName() {
 		return Boolean.valueOf(this.getProperty(Settings.USE_OBJECT_KEY_IN_FILE_NAME, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * get usage if files should be written each 5 minutes
+	 */
+	public boolean getUsageWritingTmpFiles() {
+		return Boolean.valueOf(this.getProperty(Settings.WRITE_TMP_FILES, "false")); //$NON-NLS-1$
 	}
 
 	/**

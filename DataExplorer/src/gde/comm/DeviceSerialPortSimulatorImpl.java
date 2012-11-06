@@ -318,14 +318,16 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				Vector<Byte> tmpVector = new Vector<Byte>();
 				byte tmpByte, lastByte = 0x00;
 				try {
+					boolean isOF = false;
 					while ((tmpByte = data_in.readByte()) != 0xff) {
+						if (!isOF)isOF = tmpByte == '$'; 
 						tmpVector.add(tmpByte);
-						if (tmpByte == 0x0A && lastByte == 0x0D) 
+						if (isOF && tmpByte == 0x0A && lastByte == 0x0D) 
 							break;
 						lastByte = tmpByte;
 					}
 					
-					int size2Read = this.device.getLovDataByteSize() - readBuffer.length; //Math.abs(this.device.getDataBlockSize());
+					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
 					byte[] tmpBuffer = new byte[size2Read];
 					if (data_in.read(tmpBuffer) != size2Read) {
 						//end of file reached
@@ -369,30 +371,42 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				else if (this.fileType.equals(GDE.FILE_ENDING_STAR_LOG)) {
 					String line;
 					if ((line = txt_in.readLine()) != null) {
-						while(!line.contains("WARNING") && !line.contains("Read  data:") && (line = txt_in.readLine()) != null) ;
+						//while(!line.contains("WARNING") && !line.contains("Read  data:") && (line = txt_in.readLine()) != null) ; //trace.log
+						while(!line.contains("IRP_MJ_READ") && !line.contains("SUCCESS	Length") && (line = txt_in.readLine()) != null) ; // portmon.log
 						
 						//System.out.println(line);
-						if(line != null && line.contains("Read  data:")) {
-							boolean isQCdata = false;
-							line = line.substring(line.indexOf("Read  data:") + 12);
-							StringTokenizer token = new StringTokenizer(line);
+						//if(line != null && line.contains("Read  data:")) { //trace.log
+						if(line != null && line.contains("IRP_MJ_READ") && line.contains("SUCCESS	Length")) { //portmon.log
+							boolean isDataEnd = false;
+							String lastByte = "00";
 							StringBuffer sb = new StringBuffer();
-							while (token.hasMoreElements()) {
-								String nextByte = token.nextToken();
-								if (nextByte.equals("02")) isQCdata = true;
-								sb.append(nextByte);
+							while (!isDataEnd && line != null) {
+								line = line.substring(line.indexOf("SUCCESS	Length") + 19);
+								StringTokenizer token = new StringTokenizer(line);
+								while (token.hasMoreElements() && !isDataEnd) {
+									String nextByte = token.nextToken();
+									if (lastByte.equals("0D") && nextByte.equals("0A")) 
+										isDataEnd = true;
+									lastByte = nextByte;
+									sb.append(nextByte);
+								}
+								if (!isDataEnd) {
+									line = txt_in.readLine();
+									while(!line.contains("IRP_MJ_READ") && !line.contains("SUCCESS	Length") && (line = txt_in.readLine()) != null) ; // portmon.log
+								}
 							}
 							//System.out.println(sb.toString());
-							if (isQCdata) {
-								//sync with QC data
-								sb.delete(0, sb.indexOf("02"));
-								if (sb.length() > readBuffer.length*2) {
-									sb.delete(readBuffer.length*2, sb.length()-1);
-								}
-								else if (sb.length() < readBuffer.length*2) {
-									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000), readBuffer.length - sb.length()/2));
-								}
-							}
+//							if (isDataEnd) {
+//								//sync with QC data
+//								sb.delete(0, sb.indexOf("02"));
+//								if (sb.length() > readBuffer.length*2) {
+//									sb.delete(readBuffer.length*2, sb.length()-1);
+//								}
+//								else if (sb.length() < readBuffer.length*2) {
+//									sb.append(StringHelper.byte2Hex2CharString(this.read(new byte[readBuffer.length - sb.length()/2], 1000), readBuffer.length - sb.length()/2));
+//								}
+//							}
+							System.out.println(StringHelper.byte2CharString(sb.toString().getBytes(), sb.length()));
 							readBuffer = StringHelper.convert2ByteArray(sb.toString());
 						}
 						else { // WARNING, assume time out
@@ -406,7 +420,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				}
 			}
 		}
-		return resultBuffer.length == readBuffer.length ? readBuffer : resultBuffer;
+		return resultBuffer.length <= readBuffer.length ? readBuffer : resultBuffer;
 	}
 
 	/* (non-Javadoc)

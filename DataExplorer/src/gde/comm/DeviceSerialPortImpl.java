@@ -683,7 +683,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	public synchronized byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		int sleepTime = 4; // ms
-		int expectedBytes = readBuffer.length;
+		int numAvailableBytes = readBuffer.length;
 		int readBytes = 0;
 		int timeOutCounter = timeout_msec / sleepTime;
 		if (stableIndex >= timeOutCounter) {
@@ -693,18 +693,21 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		try {
 			if (this.application != null) this.application.setSerialRxOn();
 
-			expectedBytes = waitForStableReceiveBuffer(expectedBytes, timeout_msec, stableIndex);
+			numAvailableBytes = waitForStableReceiveBuffer(numAvailableBytes, timeout_msec, stableIndex);
+			//adapt readBuffer, available bytes more than expected
+			if (numAvailableBytes > readBuffer.length) 
+				readBuffer = new byte[numAvailableBytes];
 
-			while (readBytes < expectedBytes && timeOutCounter-- > 0) {
-				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, expectedBytes - readBytes);
+			while (readBytes < numAvailableBytes && timeOutCounter-- > 0) {
+				readBytes += this.inputStream.read(readBuffer, 0 + readBytes, numAvailableBytes - readBytes);
 
-				if (expectedBytes != readBytes) {
+				if (numAvailableBytes != readBytes) {
 					WaitTimer.delay(sleepTime);
 				}
 			}
 			//this.dataAvailable = false;
 			if (timeOutCounter <= 0) {
-				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { expectedBytes, timeout_msec }));
+				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { numAvailableBytes, timeout_msec }));
 				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
 				throw e;

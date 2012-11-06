@@ -25,8 +25,10 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.ObjectData;
 import gde.data.RecordSet;
+import gde.device.ChannelTypes;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
+import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
@@ -189,6 +191,8 @@ public class DataExplorer extends Composite {
 	final long										threadId;
 	String												progressBarUser = null;
 	TaskItem											taskBarItem;
+	Thread												writeTmpFileThread;
+	boolean 											isTmpWriteStop = false;
 
 	boolean												isRecordCommentVisible						= false;
 	boolean												isGraphicsHeaderVisible						= false;
@@ -409,7 +413,10 @@ public class DataExplorer extends Composite {
 			});
 			
 			GDE.shell.open();
+			
+			this.enableWritingTmpFiles(this.settings.getUsageWritingTmpFiles());
 			log.logp(Level.TIME, DataExplorer.$CLASS_NAME, $METHOD_NAME, "total init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			
 			while (!GDE.shell.isDisposed()) {
 				if (!GDE.display.readAndDispatch()) GDE.display.sleep();
 			}
@@ -418,6 +425,8 @@ public class DataExplorer extends Composite {
 			log.log(Level.SEVERE, t.getMessage(), t);
 			t.printStackTrace(System.err);
 		}
+		//make writeTmpFile thread
+		this.isTmpWriteStop = true;
 		
 		//cleanup out dated resources
 		FileUtils.cleanupPost();
@@ -2850,5 +2859,45 @@ public class DataExplorer extends Composite {
 	 */
 	public synchronized void updateExtensionFilterMap(String key, String value) {
 		this.extensionFilterMap.put(key, value);
+	}
+	
+	public void enableWritingTmpFiles(boolean enable) {
+		if (enable && (this.writeTmpFileThread == null || !this.writeTmpFileThread.isAlive())) {
+			this.isTmpWriteStop = false;
+			this.writeTmpFileThread = new Thread("write_tmp") {
+				@Override
+				public void run() {
+					try {
+						while (!DataExplorer.this.isTmpWriteStop) {
+							//cycle for 5 minutes in steps of1 second to enable thread destroy while exiting
+							int cycleCount = 0;
+							while (!DataExplorer.this.isTmpWriteStop && cycleCount++ < 60*5)
+								Thread.sleep(1000);
+							
+							if (DataExplorer.this.isTmpWriteStop) break;
+							
+							String tmpFilePath = DataExplorer.this.settings.getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + "TempFile";
+							if (log.isLoggable(Level.FINE)) log.log(Level.OFF, "attempt to save a temporary file(s)");
+							if (DataExplorer.this.channels.getActiveChannel() != null && DataExplorer.this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_CONFIG) {
+								if (DataExplorer.this.channels.getActiveChannel().getActiveRecordSet() != null)
+									OsdReaderWriter.write(tmpFilePath+GDE.FILE_ENDING_DOT_OSD, DataExplorer.this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+							}
+							else 
+							for (int i=1; i <= DataExplorer.this.channels.size() && DataExplorer.this.channels.getActiveChannel().getActiveRecordSet() != null; ++i) {
+								if (DataExplorer.this.channels.get(i).size() > 0)
+									OsdReaderWriter.write(tmpFilePath+"_"+i+GDE.FILE_ENDING_DOT_OSD, DataExplorer.this.channels.get(i), GDE.DATA_EXPLORER_FILE_VERSION_INT);						
+							}
+						}
+					}
+					catch (Exception e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+					}
+				}
+			};
+			this.writeTmpFileThread.start();
+		}
+		else {
+			this.isTmpWriteStop = true;			
+		}
 	}
 }

@@ -207,7 +207,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				}
 			}
 			catch (JAXBException e) {
-				log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+				log.log(java.util.logging.Level.WARNING, files[i], e);
 				if (e.getLinkedException() instanceof SAXParseException) {
 					SAXParseException spe = (SAXParseException) e.getLinkedException();
 					GDE.setInitError(Messages.getString(MessageIds.GDE_MSGW0038, new String[] { spe.getSystemId().replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK), spe.getLocalizedMessage() }));

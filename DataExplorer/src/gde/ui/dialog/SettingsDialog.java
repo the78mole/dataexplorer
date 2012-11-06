@@ -116,7 +116,7 @@ public class SettingsDialog extends Dialog {
 	Button															skipBluetoothDevices, doPortAvailabilityCheck;
 	Button															enableBlackListButton, enableWhiteListButton;
 	Text																serialPortBlackList, serialPortWhiteList;
-	Button															suggestObjectKey;
+	Button															suggestObjectKey, writeTmpFiles;
 	Composite														generalTabComposite;
 	Composite														analysisComposite;
 	CTabItem														generalTabItem;
@@ -162,7 +162,7 @@ public class SettingsDialog extends Dialog {
 	Thread															listPortsThread;
 	Vector<String>											availablePorts = new Vector<String>();
 	final Settings											settings;
-	final DataExplorer				application;
+	final DataExplorer									application;
 	final String[]											supportedLocals					= { "en", "de" };																	//$NON-NLS-1$ //$NON-NLS-2$
 	boolean															isLocaleLanguageChanged	= false;
 	
@@ -314,7 +314,7 @@ public class SettingsDialog extends Dialog {
 								this.suggestDate = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.suggestDate.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.suggestDate.setText(Messages.getString(MessageIds.GDE_MSGT0316));
-								this.suggestDate.setBounds(15, GDE.IS_MAC_COCOA ? 8 : 20, 194, 16);
+								this.suggestDate.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 170, 16);
 								this.suggestDate.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -327,12 +327,27 @@ public class SettingsDialog extends Dialog {
 								this.suggestObjectKey = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.suggestObjectKey.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.suggestObjectKey.setText(Messages.getString(MessageIds.GDE_MSGT0317));
-								this.suggestObjectKey.setBounds(239, GDE.IS_MAC_COCOA ? 8 : 20, 194, 16);
+								this.suggestObjectKey.setBounds(180, GDE.IS_MAC_COCOA ? 8 : 20, 170, 16);
 								this.suggestObjectKey.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "suggestObjectKey.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setUsageObjectKeyInFileName(SettingsDialog.this.suggestObjectKey.getSelection());
+									}
+								});
+							}
+							{
+								this.writeTmpFiles = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
+								this.writeTmpFiles.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.writeTmpFiles.setText(Messages.getString(MessageIds.GDE_MSGT0674));
+								this.writeTmpFiles.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0675, new String[]{this.settings.getApplHomePath()}));
+								this.writeTmpFiles.setBounds(370, GDE.IS_MAC_COCOA ? 8 : 20, 80, 16);
+								this.writeTmpFiles.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "writeTmpFiles.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setUsageWritingTmpFiles(SettingsDialog.this.writeTmpFiles.getSelection());
+										SettingsDialog.this.application.enableWritingTmpFiles(SettingsDialog.this.writeTmpFiles.getSelection());
 									}
 								});
 							}
@@ -1345,6 +1360,7 @@ public class SettingsDialog extends Dialog {
 
 		SettingsDialog.this.suggestDate.setSelection(SettingsDialog.this.settings.getUsageDateAsFileNameLeader());
 		SettingsDialog.this.suggestObjectKey.setSelection(SettingsDialog.this.settings.getUsageObjectKeyInFileName());
+		SettingsDialog.this.writeTmpFiles.setSelection(SettingsDialog.this.settings.getUsageWritingTmpFiles());
 
 		SettingsDialog.this.deviceDialogModalButton.setSelection(SettingsDialog.this.settings.isDeviceDialogsModal());
 		SettingsDialog.this.deviceDialogOnTopButton.setEnabled(!SettingsDialog.this.settings.isDeviceDialogsModal());
