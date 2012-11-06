@@ -57,7 +57,7 @@ public class GathererThread extends Thread {
 	int												channelNumber;
 	Channel										channel;
 	int 											stateNumber = 1;
-	String										recordSetKey								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
+	String										recordSetKey;
 	boolean										isPortOpenedByLiveGatherer	= false;
 	int 											numberBatteryCells 					= 0; 
 	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;	// 36 * 5 sec timeout = 180 sec
@@ -77,6 +77,7 @@ public class GathererThread extends Thread {
 		this.channels = Channels.getInstance();
 		this.channelNumber = channelConfigNumber;
 		this.channel = this.channels.get(this.channelNumber);
+		this.recordSetKey = GDE.STRING_BLANK + this.device.getStateProperty(this.stateNumber).getName();
 		this.parser = new DataParser(this.device.getDataBlockTimeUnitFactor(), this.device.getDataBlockLeader(), this.device.getDataBlockSeparator().value(), this.device.getDataBlockCheckSumType(), this.device.getDataBlockSize(InputTypes.FILE_IO)); //$NON-NLS-1$  //$NON-NLS-2$
 
 		if (!this.serialPort.isConnected()) {
@@ -135,7 +136,7 @@ public class GathererThread extends Thread {
 					}
 
 					// check if a record set matching for re-use is available and prepare a new if required
-					if (this.channel.size() == 0 || channelRecordSet == null || !this.recordSetKey.endsWith(" " + processName)) { //$NON-NLS-1$
+					if (this.channel.size() == 0 || channelRecordSet == null || !this.recordSetKey.endsWith(GDE.STRING_BLANK + processName)) { //$NON-NLS-1$
 						this.application.setStatusMessage(""); //$NON-NLS-1$
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
 						// record set does not exist or is outdated, build a new name and create, in case of ChannelTypes.TYPE_CONFIG try sync with channel number
@@ -143,17 +144,19 @@ public class GathererThread extends Thread {
 								+ GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName;
 						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
 						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
-						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
+						if (this.channel.getActiveRecordSet() == null) 
+							this.channel.setActiveRecordSet(this.recordSetKey);
 						channelRecordSet = this.channel.get(this.recordSetKey);
+						
 						if (this.channel.getType() == ChannelTypes.TYPE_CONFIG)
 							this.channel.applyTemplate(this.recordSetKey, false);
 						else 
 							this.channel.applyTemplateBasics(this.recordSetKey);
-						// switch the active record set if the current record set is child of active channel
-						// for eStation its always the case since we have only one channel
+						
 						if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {
 							this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
 						}
+						this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						measurementCount = 0;
 						startCycleTime = 0;
 					}
