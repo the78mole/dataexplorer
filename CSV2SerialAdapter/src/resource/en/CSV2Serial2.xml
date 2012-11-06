@@ -3,38 +3,116 @@
     <Device>
         <name implementation="CSV2SerialAdapter">CSV2Serial2</name>
         <manufacturer>WB</manufacturer>
-        <manufacturerURL>http://www.bruegmaenner.de/DataExplorer</manufacturerURL>
-        <group>multimeter</group>
+        <manufacturerURL>http://www.nongnu.org/dataexplorer</manufacturerURL>
+        <group>charger</group>
         <image>CSV2SerialAdapter.png</image>
         <usage>false</usage>
     </Device>
+    <SerialPort>
+        <port>-</port>
+        <baudeRate>115200</baudeRate>
+        <dataBits>DATABITS_8</dataBits>
+        <stopBits>STOPBITS_1</stopBits>
+        <parity>PARITY_NONE</parity>
+        <flowControlMode>FLOWCONTROL_NONE</flowControlMode>
+        <isRTS>true</isRTS>
+        <isDTR>true</isDTR>
+        <TimeOut>
+            <RTOCharDelayTime>290</RTOCharDelayTime>
+            <RTOExtraDelayTime>100</RTOExtraDelayTime>
+            <WTOCharDelayTime>0</WTOCharDelayTime>
+            <WTOExtraDelayTime>0</WTOExtraDelayTime>
+        </TimeOut>
+    </SerialPort>
     <TimeBase>
         <name>Time</name>
         <symbol>t</symbol>
         <unit>msec</unit>
-        <timeStep>-1.0</timeStep>
+        <timeStep>1000.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format inputType="FILE_IO" formatType="VALUE" size="13"/>
+        <format inputType="FILE_IO" formatType="VALUE" size="-8"/>
+        <format inputType="SERIAL_IO" formatType="BYTE" size="-57"/>
 		<timeUnit>msec</timeUnit>
 		<separator>semicolon</separator>
 		<leader>$</leader>
 		<trailer>0D0A</trailer>
-        <preferredFileExtention>*.csv</preferredFileExtention>
     </DataBlock>
     <State>
         <property description="" type="Integer" value="01" name="data record"/>
     </State>
     <Channels>
-	    <Channel type="TYPE_CONFIG" name="Thermal">
-	        <Measurement>
-	            <name>Voltage</name>
-	            <symbol>U</symbol>
-	            <unit>V</unit>
-	            <active>true</active>
-	            <statistics sigma="true" avg="true" max="true" min="true"/>
-	            <property description="Factor * input value" type="Double" value="0.001" name="factor"/>
-	        </Measurement>
+        <Channel name="Ausgang_1" type="TYPE_OUTLET">
+            <Measurement>
+                <name>Spannung S1</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung I-EIN S1</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung S2</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung I-EIN S2</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung S3</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung I-EIN S3</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung S4</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Spannung I-EIN S4</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
 	    </Channel>
 	</Channels>
     <Desktop>
@@ -42,5 +120,7 @@
         <property value="true" name="digital_tab"/>
         <property value="true" name="analog_tab"/>
         <property value="true" name="voltage_per_cell_tab"/>
+        <property name="utility_garphics_tab" value="false" description="UTILITY_GRAPHICS_TAB"/>
+        <property name="utility_device_tab" value="false" description="UTILITY_DEVICE_TAB"/>
     </Desktop>
 </DeviceProperties>

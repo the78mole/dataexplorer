@@ -138,8 +138,9 @@ public class GathererThread extends Thread {
 					if (this.channel.size() == 0 || channelRecordSet == null || !this.recordSetKey.endsWith(" " + processName)) { //$NON-NLS-1$
 						this.application.setStatusMessage(""); //$NON-NLS-1$
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
-						// record set does not exist or is outdated, build a new name and create
-						this.recordSetKey = this.channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName; //$NON-NLS-1$
+						// record set does not exist or is outdated, build a new name and create, in case of ChannelTypes.TYPE_CONFIG try sync with channel number
+						this.recordSetKey = (this.channel.getType() == ChannelTypes.TYPE_CONFIG ? this.channel.getNextRecordSetNumber(this.channelNumber) : this.channel.getNextRecordSetNumber())	
+								+ GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName;
 						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
 						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
@@ -253,16 +254,16 @@ public class GathererThread extends Thread {
 					if (enableEndMessage) 
 						this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT1709));
 				}
-				else {
-					if (throwable != null) {
-						cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() })
-								+ Messages.getString(MessageIds.GDE_MSGT1708));
-					}
-					else {
-						if (enableEndMessage)
-							cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026)	+ Messages.getString(MessageIds.GDE_MSGT1708));
-					}
-				}
+//				else {
+//					if (throwable != null) {
+//						cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() })
+//								+ Messages.getString(MessageIds.GDE_MSGT1708));
+//					}
+//					else {
+//						if (enableEndMessage)
+//							cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026)	+ Messages.getString(MessageIds.GDE_MSGT1708));
+//					}
+//				}
 			}
 		}
 		finally {

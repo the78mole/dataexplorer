@@ -23,8 +23,6 @@ import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.exception.TimeOutException;
 import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
 
@@ -46,9 +44,13 @@ public class CSV2SerialPort extends DeviceCommPort {
 	final int						timeout;
 	final int						tmpDataLength;
 
+	byte[]							answer;
 	byte[]							tmpData;
 	byte[]							data				= new byte[] { 0x00 };
 	long								time				= 0;
+	boolean isDataReceived = false;
+	int index = 0;
+
 
 	/**
 	 * constructor of default implementation
@@ -62,6 +64,9 @@ public class CSV2SerialPort extends DeviceCommPort {
 		this.endByte_1 = this.device.getDataBlockEnding().length == 2 ? this.device.getDataBlockEnding()[0] : 0x00;
 		this.tmpDataLength = Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) * 10;
 		this.timeout = this.device.getDeviceConfiguration().getRTOCharDelayTime() + this.device.getDeviceConfiguration().getRTOExtraDelayTime();
+		this.isDataReceived = false;
+		this.index = 0;
+		this.tmpData = new byte[0];
 	}
 
 	/**
@@ -71,40 +76,27 @@ public class CSV2SerialPort extends DeviceCommPort {
 	 */
 	public synchronized byte[] getData() throws Exception {
 		final String $METHOD_NAME = "getData";
+		int startIndex;
 
 		try {
-			this.tmpData = new byte[this.tmpDataLength];
-			this.time = System.nanoTime() / 1000000;
+			//receive data while needed
+			readNewData();
 			
-			while ((this.read(this.tmpByte, this.timeout)).length > 0 && (System.nanoTime() / 1000000 - this.time) <= this.timeout) {
-				if (this.tmpByte[0] == this.startByte) {
-					this.tmpData[0] = this.tmpByte[0];
-					int index = 1;
-					while ((this.read(this.tmpByte, this.timeout)).length > 0) {
-						this.tmpData[index] = this.tmpByte[0];
-						if ((this.endByte_1 != 0x00 || this.tmpData[index - 1] == this.endByte_1) && this.tmpData[index] == this.endByte) break;
-						++index;
-					}
-
-					this.data = new byte[getArrayLengthByCheckEnding()];
-					if (this.data.length == 0)
-						this.data = getData();
-					else
-						System.arraycopy(this.tmpData, 0, this.data, 0, this.data.length);
-
-					if (CSV2SerialPort.log.isLoggable(Level.OFF)) {
-						StringBuilder sb = new StringBuilder();
-						for (byte b : this.data) {
-							sb.append((char) b);
-						}
-						while (sb.length() > 5 && (sb.charAt(sb.length() - 1) == '\n' || sb.charAt(sb.length() - 1) == '\r'))
-							sb.deleteCharAt(sb.length() - 1);
-						CSV2SerialPort.log.logp(Level.OFF, CSV2SerialPort.$CLASS_NAME, $METHOD_NAME, sb.toString());
-					}
-					return this.data;
-				}
+			//find start index
+			while (this.index < this.answer.length && this.answer[this.index] != this.startByte) 
+				++this.index;
+			
+			if (index < this.answer.length)	{
+				startIndex = index;
 			}
-			throw new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { this.data.length, this.timeout }));
+			else { //startIndex not found, read new data
+				this.isDataReceived = false;
+				this.index = 0;
+				return getData();
+			}
+			
+			//find end index
+			findDataEnd(startIndex);
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
@@ -112,13 +104,71 @@ public class CSV2SerialPort extends DeviceCommPort {
 			}
 			throw e;
 		}
+		return this.data;
 	}
 
 	/**
-	 * @param this.tmpData
+	 * recursive find the end of data, normal exit is not at the end of the method
+	 * @param startIndex
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	protected byte[] findDataEnd(int startIndex) throws IOException, TimeOutException {
+		final String $METHOD_NAME = "findDataEnd";
+		int endIndex;
+		while (this.index < this.answer.length && !((this.endByte_1 != 0x00 || this.answer[this.index - 1] == this.endByte_1) && this.answer[this.index] == this.endByte)) 
+			++this.index;
+
+		if (index <= this.answer.length)	{
+			endIndex = index;
+			this.data = new byte[this.tmpData.length + endIndex - startIndex];
+			System.arraycopy(this.answer, startIndex, this.data, 0, this.data.length);
+			if (CSV2SerialPort.log.isLoggable(Level.FINE)) {
+				StringBuilder sb = new StringBuilder();
+				for (byte b : this.data) {
+					sb.append((char) b);
+				}
+				while (sb.length() > 5 && (sb.charAt(sb.length() - 1) == '\n' || sb.charAt(sb.length() - 1) == '\r'))
+					sb.deleteCharAt(sb.length() - 1);
+				CSV2SerialPort.log.logp(Level.FINE, CSV2SerialPort.$CLASS_NAME, $METHOD_NAME, sb.toString());
+			}
+			return this.data;
+		}
+		//endIndex not found, save temporary data, read new data
+		this.data = new byte[this.tmpData.length];
+		System.arraycopy(this.tmpData, 0, this.data, 0, this.data.length);
+
+		this.tmpData = new byte[this.answer.length + this.data.length];
+		System.arraycopy(this.data, 0, this.tmpData, 0, this.data.length);
+		System.arraycopy(this.answer, 0, this.tmpData, this.data.length, this.answer.length);
+			
+		this.isDataReceived = false;
+		readNewData();
+		this.index = 0;
+		this.tmpData = new byte[0];
+		
+		findDataEnd(startIndex);
+		return this.data;
+	}
+
+	/**
+	 * receive data only if needed, a receive buffer may hold more than one getData() result
+	 * @throws IOException
+	 * @throws TimeOutException
+	 */
+	protected void readNewData() throws IOException, TimeOutException {
+		if (!this.isDataReceived) {
+			this.answer = new byte[this.tmpDataLength];
+			this.answer = this.read(this.answer, timeout, 3);
+			this.isDataReceived = true;
+		}
+	}
+
+	/**
+	 * query the size of data starting at he end, requires an empty data buffer
 	 * @return
 	 */
-	public int getArrayLengthByCheckEnding() {
+	protected int getArrayLengthByCheckEnding() {
 		//real answer might be shorter as the maximum of 150 bytes
 		int lenght = this.tmpData.length;
 		while (lenght > 0 && !((this.endByte_1 != 0x00 || this.tmpData[lenght - 2] == this.endByte_1) && this.tmpData[lenght - 1] == this.endByte))
