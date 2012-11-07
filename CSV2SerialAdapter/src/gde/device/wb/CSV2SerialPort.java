@@ -34,23 +34,23 @@ import java.util.logging.Logger;
  * @author Winfried Brügmann
  */
 public class CSV2SerialPort extends DeviceCommPort {
-	final static String	$CLASS_NAME	= CSV2SerialPort.class.getName();
-	final static Logger	log					= Logger.getLogger(CSV2SerialPort.$CLASS_NAME);
+	final static String	$CLASS_NAME			= CSV2SerialPort.class.getName();
+	final static Logger	log							= Logger.getLogger(CSV2SerialPort.$CLASS_NAME);
 
 	final byte					startByte;
 	final byte					endByte;
 	final byte					endByte_1;
-	final byte[]				tmpByte			= new byte[1];
+	final byte[]				tmpByte					= new byte[1];
 	final int						timeout;
 	final int						tmpDataLength;
 
 	byte[]							answer;
 	byte[]							tmpData;
-	byte[]							data				= new byte[] { 0x00 };
-	long								time				= 0;
-	boolean isDataReceived = false;
-	int index = 0;
-
+	byte[]							data						= new byte[] { 0x00 };
+	long								time						= 0;
+	boolean							isDataReceived	= false;
+	int									index						= 0;
+	boolean 						isEndByte_1 		= false;
 
 	/**
 	 * constructor of default implementation
@@ -74,27 +74,29 @@ public class CSV2SerialPort extends DeviceCommPort {
 	 * @return byte array containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public byte[] getData() throws Exception {
+	public synchronized byte[] getData() throws Exception {
 		final String $METHOD_NAME = "getData";
 		int startIndex;
 
 		try {
 			//receive data while needed
 			readNewData();
-			
+
 			//find start index
-			while (this.index < this.answer.length && this.answer[this.index] != this.startByte) 
+			while (this.index < this.answer.length && this.answer[this.index] != this.startByte)
 				++this.index;
-			
-			if (index < this.answer.length)	{
-				startIndex = index;
+
+			if (this.index < this.answer.length) {
+				startIndex = this.index;
+				++this.index;
+				this.tmpData = new byte[0];
 			}
 			else { //startIndex not found, read new data
 				this.isDataReceived = false;
 				this.index = 0;
 				return getData();
 			}
-			
+
 			//find end index
 			findDataEnd(startIndex);
 		}
@@ -104,13 +106,6 @@ public class CSV2SerialPort extends DeviceCommPort {
 			}
 			throw e;
 		}
-//		try {
-//			Integer.valueOf(GDE.STRING_EMPTY+(char)this.data[1]);
-//			Integer.valueOf(GDE.STRING_EMPTY+(char)this.data[3]);
-//		}
-//		catch (Exception e) {
-//			e.printStackTrace();
-//		}
 		return this.data;
 	}
 
@@ -120,24 +115,22 @@ public class CSV2SerialPort extends DeviceCommPort {
 	 * @throws IOException
 	 * @throws TimeOutException
 	 */
-	protected byte[] findDataEnd(int startIndex) throws Exception {
+	protected byte[] findDataEnd(int startIndex) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "findDataEnd";
 		int endIndex;
-		while (this.index < this.answer.length && !((this.endByte_1 != 0x00 || this.answer[this.index - 1] == this.endByte_1) && this.answer[this.index] == this.endByte)) 
+		while (this.index < this.answer.length && !((this.endByte_1 != 0x00 || this.answer[this.index - 1] == this.endByte_1 || isEndByte_1 == true) && this.answer[this.index] == this.endByte))
 			++this.index;
+		
+		if (this.endByte_1 != 0x00 || this.answer[this.index - 1] == this.endByte_1)
+			isEndByte_1 = true;
 
-		if (index <= this.answer.length && (index - startIndex) >= 6)	{
-			endIndex = index;
+		if (this.index < this.answer.length && (this.tmpData.length + this.index - startIndex) > 8) {
+			endIndex = this.index;
+			isEndByte_1 = false;
 			this.data = new byte[this.tmpData.length + endIndex - startIndex];
-			
-			//check maximum size, if more than configured reset and get data again
-			if (this.data.length > this.tmpDataLength || (startIndex + this.data.length) > this.answer.length) {
-				this.index = 0;
-				this.tmpData = new byte[0];
-				return this.getData();
-			}
-			
-			System.arraycopy(this.answer, startIndex, this.data, 0, this.data.length);
+			//System.out.println(startIndex + " - " + this.tmpData.length + " - " + endIndex);
+			System.arraycopy(this.tmpData, 0, this.data, 0, this.tmpData.length);
+			System.arraycopy(this.answer, startIndex, this.data, this.tmpData.length, endIndex - startIndex);
 			if (CSV2SerialPort.log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
 				for (byte b : this.data) {
@@ -147,36 +140,20 @@ public class CSV2SerialPort extends DeviceCommPort {
 					sb.deleteCharAt(sb.length() - 1);
 				CSV2SerialPort.log.logp(Level.FINE, CSV2SerialPort.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
-//			try {
-//				Integer.valueOf(GDE.STRING_EMPTY+(char)this.data[1]);
-//				Integer.valueOf(GDE.STRING_EMPTY+(char)this.data[3]);
-//			}
-//			catch (Exception e) {
-//				e.printStackTrace();
-//			}
 			return this.data;
 		}
 		//endIndex not found, save temporary data, read new data
 		this.data = new byte[this.tmpData.length];
 		System.arraycopy(this.tmpData, 0, this.data, 0, this.data.length);
 
-		this.tmpData = new byte[this.answer.length + this.data.length];
+		this.tmpData = new byte[this.answer.length - startIndex + this.data.length];
 		System.arraycopy(this.data, 0, this.tmpData, 0, this.data.length);
-		System.arraycopy(this.answer, 0, this.tmpData, this.data.length, this.answer.length);
-			
+		System.arraycopy(this.answer, startIndex, this.tmpData, this.data.length, this.answer.length - startIndex);
+
 		this.isDataReceived = false;
 		readNewData();
-		this.index = 0;
-		this.tmpData = new byte[0];
+		findDataEnd(this.index = 0);
 		
-		findDataEnd(startIndex);
-//		try {
-//			Integer.valueOf(GDE.STRING_EMPTY+(char)this.data[1]);
-//			Integer.valueOf(GDE.STRING_EMPTY+(char)this.data[3]);	
-//		}
-//		catch (Exception e) {
-//			e.printStackTrace();
-//		}
 		return this.data;
 	}
 
@@ -188,7 +165,7 @@ public class CSV2SerialPort extends DeviceCommPort {
 	protected void readNewData() throws IOException, TimeOutException {
 		if (!this.isDataReceived) {
 			this.answer = new byte[this.tmpDataLength];
-			this.answer = this.read(this.answer, timeout, 5);
+			this.answer = this.read(this.answer, this.timeout, 5);
 			this.isDataReceived = true;
 		}
 	}
@@ -217,8 +194,7 @@ public class CSV2SerialPort extends DeviceCommPort {
 		boolean isOK = false;
 		int check_sum = Checksum.XOR(buffer, buffer.length - 4);
 		if (Integer.parseInt(String.format("%c%c", buffer[buffer.length - 4], buffer[buffer.length - 3])) == check_sum) isOK = true;
-		if (CSV2SerialPort.log.isLoggable(Level.FINER))
-			CSV2SerialPort.log.logp(Level.FINER, CSV2SerialPort.$CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
+		if (CSV2SerialPort.log.isLoggable(Level.FINER)) CSV2SerialPort.log.logp(Level.FINER, CSV2SerialPort.$CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
 		return isOK;
 	}
 
