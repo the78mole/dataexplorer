@@ -83,6 +83,7 @@ public class GDE {
 	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V20";																																																										//$NON-NLS-1$
 	public final static String		GRAPHICS_TEMPLATES_XSD_VERSION	= "_V07";																																																										//$NON-NLS-1$
 	public final static String		CLEAN_SETTINGS_WHILE_SHUTDOWN 	= "CLEAN_SETTINGS_WHILE_SHUTDOWN";
+	public final static String		TEMP_FILE_STEM 									= "~TempFile";
 
 	public static final boolean		IS_WINDOWS											= System.getProperty("os.name").toLowerCase().startsWith("windows");																													//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean		IS_LINUX												= System.getProperty("os.name").toLowerCase().startsWith("linux");																														//$NON-NLS-1$ //$NON-NLS-2$

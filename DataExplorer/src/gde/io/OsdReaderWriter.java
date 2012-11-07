@@ -551,7 +551,7 @@ public class OsdReaderWriter {
 				log.log(Level.TIME, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 
 				//update/write link if object oriented
-				if (isObjectOriented && !fullQualifiedFilePath.contains("TempFile")) {
+				if (isObjectOriented && !fullQualifiedFilePath.contains(GDE.TEMP_FILE_STEM)) {
 					OperatingSystemHelper.createFileLink(fullQualifiedFilePath,
 							OsdReaderWriter.application.getObjectFilePath() + fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
 				}
