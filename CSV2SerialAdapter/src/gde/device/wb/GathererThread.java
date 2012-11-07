@@ -95,6 +95,7 @@ public class GathererThread extends Thread {
 		RecordSet channelRecordSet = null;
 		long startCycleTime = 0;
 		long tmpCycleTime = 0;
+		long lastTmpCycleTime = 0;
 		long delayTime = 0;
 		long measurementCount = -1;
 		double deviceTimeStep_ms = device.getTimeStep_ms();
@@ -110,6 +111,7 @@ public class GathererThread extends Thread {
 		catch (IOException e) {
 			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
+		lastTmpCycleTime = System.nanoTime()/1000000;
 		while (!this.serialPort.isInterruptedByUser) {
 			try {
 				for (int i = 0; i < device.getChannelCount(); i++) {
@@ -192,10 +194,11 @@ public class GathererThread extends Thread {
 					}
 				}
 				if (deviceTimeStep_ms > 0) { //time step is constant
-					delayTime = 1000 - (tmpCycleTime - startCycleTime);
+					delayTime = 997 - (tmpCycleTime - lastTmpCycleTime);
 					if (delayTime > 0) {
 						WaitTimer.delay(delayTime);
 					}
+					lastTmpCycleTime = tmpCycleTime;
 				}
 				if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "delayTime = " + TimeLine.getFomatedTimeWithUnit(delayTime)); //$NON-NLS-1$
 				if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
