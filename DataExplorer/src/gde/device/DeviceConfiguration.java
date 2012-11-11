@@ -2132,6 +2132,7 @@ public class DeviceConfiguration {
 	 * @return the translated latitude or longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W} for GPS devices only
 	 */
 	public String translateGPS2IGC(RecordSet recordSet, int index, char fixValidity, int startAltitude, int offsetAltitude) {
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSet.getName() + index + fixValidity + startAltitude + offsetAltitude);
 		return "DDMMmmmNDDDMMmmm0V000000000000";
 	}
 	
@@ -2221,6 +2222,7 @@ public class DeviceConfiguration {
 	 * get the curve point device individual filtered if required
 	 */
 	public Integer getFilteredPoint(int channelNumber, Record record, int index) {
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, channelNumber + record.getName() + index);
 		return record.realGet(index);
 	}
 
@@ -2250,5 +2252,25 @@ public class DeviceConfiguration {
 	 */
 	public boolean isGPSCoordinates(Record record) {
 		return false;
+	}
+
+	/**
+	 * query the measurement ordinal of the first Lithium cell for cell voltage display
+	 * 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
+	 * 9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 ..
+	 * @return 9 for this example
+	 */
+	public int getMeasurementOrdinalFirstLithiumCell(RecordSet recordSet) {
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSet.getName());
+		return 0;
+	}
+
+	/**
+	 * query the number of Lithium cells if any
+	 * @param specificData
+	 * @return cell count if any
+	 */
+	public int getNumberOfLithiumCells(Object specificData) {
+		return 0;
 	}
 }

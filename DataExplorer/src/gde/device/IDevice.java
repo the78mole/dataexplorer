@@ -925,4 +925,19 @@ public interface IDevice {
 	 */
 	public boolean isGPSCoordinates(Record record);
 
+	/**
+	 * query the measurement ordinal of the first Lithium cell for cell voltage display
+	 * 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
+	 * 9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 ..
+	 * @param recordSet
+	 * @return 9 for this example
+	 */
+	public int getMeasurementOrdinalFirstLithiumCell(RecordSet recordSet);
+	
+	/**
+	 * query the number of Lithium cells if any
+	 * @param specificData
+	 * @return cell count if any
+	 */
+	public int getNumberOfLithiumCells(Object specificData);
 }
