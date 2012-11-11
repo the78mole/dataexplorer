@@ -43,24 +43,24 @@ import java.util.logging.Logger;
  * @author Winfied Brügmann
  */
 public class GathererThread extends Thread {
-	final static String				$CLASS_NAME									= GathererThread.class.getName();
-	final static Logger				log													= Logger.getLogger(GathererThread.class.getName());
-	final static int					WAIT_TIME_RETRYS						= 36;
+	final static String			$CLASS_NAME									= GathererThread.class.getName();
+	final static Logger			log													= Logger.getLogger(GathererThread.class.getName());
+	final static int				WAIT_TIME_RETRYS						= 36;
 
-
-	final DataExplorer application;
-	final CSV2SerialPort			serialPort;
-	final CSV2SerialAdapter		device;
-	final Channels						channels;
-	final DataParser					parser;
+	final DataExplorer			application;
+	final CSV2SerialPort		serialPort;
+	final CSV2SerialAdapter	device;
+	final Channels					channels;
+	final DataParser				parser;
 	
-	int												channelNumber;
-	Channel										channel;
-	int 											stateNumber = 1;
-	String										recordSetKey;
-	boolean										isPortOpenedByLiveGatherer	= false;
-	int 											numberBatteryCells 					= 0; 
-	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;	// 36 * 5 sec timeout = 180 sec
+	Channel									activeChannel;
+	RecordSet								activeRecordSet;
+	int											channelNumber;
+	Channel									channel;
+	int											stateNumber									= 1;
+	String									recordSetKey;
+	boolean									isPortOpenedByLiveGatherer	= false;
+	int											retryCounter								= GathererThread.WAIT_TIME_RETRYS;									// 36 * 5 sec timeout = 180 sec
 
 	/**
 	 * data gatherer thread definition 
@@ -176,21 +176,17 @@ public class GathererThread extends Thread {
 					
 					if (log.isLoggable(Level.FINER)) log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time after add = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
 						
-//						this.numberBatteryCells = this.device.getNumberOfLithiumCells();
-//						for (int i = posCells; i < recordSet.size(); i++) {
-//							Record record = recordSet.get(i);
-//							if (record.hasReasonableData()) {
-//								this.numberBatteryCells++;
-//								log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//							}
-//						}
-
 					if (channelRecordSet.size() > 0 && channelRecordSet.isChildOfActiveChannel() && channelRecordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 						GathererThread.this.application.updateAllTabs(false);
 					}
 					
 					if (measurementCount > 0 && measurementCount%10 == 0) {
-						this.device.updateVisibilityStatus(channelRecordSet, true);
+						this.activeChannel = this.channels.getActiveChannel();
+						if (activeChannel != null) {
+							this.activeRecordSet = activeChannel.getActiveRecordSet();
+							if (activeRecordSet != null)
+								this.device.updateVisibilityStatus(channelRecordSet, true);
+						}
 					}
 				}
 				if (deviceTimeStep_ms > 0) { //time step is constant

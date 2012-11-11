@@ -18,6 +18,14 @@
 ****************************************************************************************/
 package gde.device.wb;
 
+import gde.GDE;
+import gde.data.Channels;
+import gde.device.IDevice;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.MeasurementControlConfigurable;
+import gde.ui.SWTResourceManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -35,14 +43,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-
-import gde.GDE;
-import gde.data.Channels;
-import gde.device.IDevice;
-import gde.messages.Messages;
-import gde.ui.MeasurementControl;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 /**
  * This class represents a tab item of a universal record visualization control
@@ -68,7 +68,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 	final Channels									channels;																																							// interaction with channels, source of all records
 	final CSV2SerialAdapterDialog		dialog;
 	final int												channelConfigNumber;
-	final List<MeasurementControl>	measurementTypes		= new ArrayList<MeasurementControl>();
+	final List<MeasurementControlConfigurable>	measurementTypes		= new ArrayList<MeasurementControlConfigurable>();
 
 	public CSV2SerialAdapterDialogTabItem(CTabFolder parentTabFolder, CSV2SerialAdapterDialog parentDialog, int useChannelConfigNumber, IDevice useDevice) {
 		super(parentTabFolder, SWT.NONE);
@@ -103,7 +103,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 		{
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
 			for (int i = 0; i < this.device.getChannelMeasuremts(this.channelConfigNumber).size(); i++) {
-				this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1));
+				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremts(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + i, ""));
 			}
 		}
 		{

@@ -29,7 +29,6 @@
         <symbol>t</symbol>
         <unit>msec</unit>
         <timeStep>1000.0</timeStep>
-        <avarage_timeStep>1000.0</avarage_timeStep>
     </TimeBase>
     <DataBlock>
         <format inputType="FILE_IO" formatType="VALUE" size="-8"/>
@@ -40,12 +39,12 @@
         <trailer>0D0A</trailer>
     </DataBlock>
     <State>
-        <property name="Zellenbehandlung" value="01" type="Integer" description=""/>
+        <property name="Cell-conditioning" value="01" type="Integer" description=""/>
     </State>
     <Channels>
-        <Channel name="Spannung_1" type="TYPE_CONFIG">
+        <Channel name="Voltage_1" type="TYPE_CONFIG">
             <Measurement>
-                <name>Spannung S1</name>
+                <name>Voltage S1</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -53,7 +52,7 @@
                 <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
             </Measurement>
             <Measurement>
-                <name>Spannung I-EIN S1</name>
+                <name>Voltage I-IN S1</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -61,7 +60,7 @@
                 <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
             </Measurement>
             <Measurement>
-                <name>Spannung S2</name>
+                <name>Voltage S2</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -70,7 +69,7 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Spannung I-EIN S2</name>
+                <name>Voltage I-IN S2</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -79,7 +78,7 @@
                 <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Spannung S3</name>
+                <name>Voltage S3</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -88,7 +87,7 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Spannung I-EIN S3</name>
+                <name>Voltage I-IN S3</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -97,7 +96,7 @@
                 <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Spannung S4</name>
+                <name>Voltage S4</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -106,7 +105,7 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Spannung I-EIN S4</name>
+                <name>Voltage I-IN S4</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -115,9 +114,9 @@
                 <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
         </Channel>
-        <Channel name="Strom_2" type="TYPE_CONFIG">
+        <Channel name="Current_2" type="TYPE_CONFIG">
             <Measurement>
-                <name>Strom (laden) S1</name>
+                <name>Current (charge) S1</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -125,7 +124,7 @@
                 <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
             </Measurement>
             <Measurement>
-                <name>Strom (entladen) S1</name>
+                <name>Current (discharge) S1</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -133,7 +132,7 @@
                 <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
             </Measurement>
             <Measurement>
-                <name>Strom (laden) S2</name>
+                <name>Current (charge) S2</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -142,7 +141,7 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Strom (entladen) S2</name>
+                <name>Current (discharge) S2</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -151,7 +150,7 @@
                 <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Strom (laden) S3</name>
+                <name>Current (charge) S3</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -160,7 +159,7 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Strom (entladen) S3</name>
+                <name>Current (discharge) S3</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -169,7 +168,7 @@
                 <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Strom (laden) S4</name>
+                <name>Current (charge) S4</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
@@ -178,90 +177,82 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Strom (entladen) S4</name>
+                <name>Current (discharge) S4</name>
                 <symbol>I</symbol>
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
-                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
-            </Measurement>
-        </Channel>
-        <Channel name="Kapazität_3" type="TYPE_CONFIG">
-            <Measurement>
-                <name>Lade-Ah S1</name>
-                <symbol>C</symbol>
-                <unit>Ah</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
-            </Measurement>
-            <Measurement>
-                <name>Entlade-Ah S1</name>
-                <symbol>C</symbol>
-                <unit>Ah</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
-            </Measurement>
-            <Measurement>
-                <name>Lade-Ah S2</name>
-                <symbol>C</symbol>
-                <unit>Ah</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
-                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
-            </Measurement>
-            <Measurement>
-                <name>Entlade-Ah S2</name>
-                <symbol>C</symbol>
-                <unit>Ah</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
-                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
-            </Measurement>
-            <Measurement>
-                <name>Lade-Ah S3</name>
-                <symbol>C</symbol>
-                <unit>Ah</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
-                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
-            </Measurement>
-            <Measurement>
-                <name>Entlade-Ah S3</name>
-                <symbol>C</symbol>
-                <unit>Ah</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
-                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
-            </Measurement>
-            <Measurement>
-                <name>Lade-Ah S4</name>
-                <symbol>C</symbol>
-                <unit>Ah</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
-                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
-            </Measurement>
-            <Measurement>
-                <name>Entlade-Ah S4</name>
-                <symbol>C</symbol>
-                <unit>Ah</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
                 <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
         </Channel>
-        <Channel name="Zeit_4" type="TYPE_CONFIG">
+        <Channel name="Capacity_3" type="TYPE_CONFIG">
             <Measurement>
-                <name>Lade-Zeit S1</name>
+                <name>Charge-mAh S1</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Discharge-mAh S1</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>Charge-mAh S2</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Discharge-mAh S2</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Charge-mAh S3</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Discharge-mAh S3</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Charge-mAh S4</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Discharge-mAh S4</name>
+                <symbol>C</symbol>
+                <unit>mAh</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+        </Channel>
+        <Channel name="Time_4" type="TYPE_CONFIG">
+            <Measurement>
+                <name>Lade-Time S1</name>
                 <symbol>t</symbol>
                 <unit>Min</unit>
                 <active>true</active>
@@ -269,7 +260,7 @@
                 <property name="factor" value="0.016666666666666666666666666666667" type="Double" description="Faktor * input value"/>
             </Measurement>
             <Measurement>
-                <name>Entlade-Zeit S1</name>
+                <name>Discharge-Time S1</name>
                 <symbol>t</symbol>
                 <unit>Min</unit>
                 <active>true</active>
@@ -277,7 +268,7 @@
                 <property name="factor" value="0.016666666666666666666666666666667" type="Double" description="Faktor * input value"/>
             </Measurement>
             <Measurement>
-                <name>Lade-Zeit S2</name>
+                <name>Lade-Time S2</name>
                 <symbol>t</symbol>
                 <unit>Min</unit>
                 <active>true</active>
@@ -286,7 +277,7 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Entlade-Zeit S2</name>
+                <name>Discharge-Time S2</name>
                 <symbol>t</symbol>
                 <unit>Min</unit>
                 <active>true</active>
@@ -295,7 +286,7 @@
                 <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Lade-Zeit S3</name>
+                <name>Lade-Time S3</name>
                 <symbol>t</symbol>
                 <unit>Min</unit>
                 <active>true</active>
@@ -304,7 +295,7 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Entlade-Zeit S3</name>
+                <name>Discharge-Time S3</name>
                 <symbol>t</symbol>
                 <unit>Min</unit>
                 <active>true</active>
@@ -313,7 +304,7 @@
                 <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Lade-Zeit S4</name>
+                <name>Lade-Time S4</name>
                 <symbol>t</symbol>
                 <unit>Min</unit>
                 <active>true</active>
@@ -322,7 +313,7 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Entlade-Zeit S4</name>
+                <name>Discharge-Time S4</name>
                 <symbol>t</symbol>
                 <unit>Min</unit>
                 <active>true</active>
@@ -333,7 +324,7 @@
         </Channel>
         <Channel name="Energie_5" type="TYPE_CONFIG">
             <Measurement>
-                <name>Lade-Wh S1</name>
+                <name>Charge-Wh S1</name>
                 <symbol>t</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
@@ -341,7 +332,7 @@
                 <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
             </Measurement>
             <Measurement>
-                <name>Entlade-Wh S1</name>
+                <name>Discharge-Wh S1</name>
                 <symbol>t</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
@@ -349,7 +340,7 @@
                 <property name="factor" value="0.001" type="Double" description="Faktor * input value"/>
             </Measurement>
             <Measurement>
-                <name>Lade-Wh S2</name>
+                <name>Charge-Wh S2</name>
                 <symbol>t</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
@@ -358,7 +349,7 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Entlade-Wh S2</name>
+                <name>Discharge-Wh S2</name>
                 <symbol>t</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
@@ -367,7 +358,7 @@
                 <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Lade-Wh S3</name>
+                <name>Charge-Wh S3</name>
                 <symbol>t</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
@@ -376,7 +367,7 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Entlade-Wh S3</name>
+                <name>Discharge-Wh S3</name>
                 <symbol>t</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
@@ -385,7 +376,7 @@
                 <property name="scale_sync_ref_ordinal" value="1" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Lade-Wh S4</name>
+                <name>Charge-Wh S4</name>
                 <symbol>t</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
@@ -394,7 +385,7 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Entlade-Wh S4</name>
+                <name>Discharge-Wh S4</name>
                 <symbol>t</symbol>
                 <unit>Wh</unit>
                 <active>true</active>
@@ -405,7 +396,7 @@
         </Channel>
         <Channel name="Delta_U_6" type="TYPE_CONFIG">
             <Measurement>
-                <name>Delta-Spannung S1</name>
+                <name>Delta-Voltage S1</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -413,16 +404,7 @@
                 <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
             </Measurement>
             <Measurement>
-                <name>Delta-Spannung S2</name>
-                <symbol>U</symbol>
-                <unit>V</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
-                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
-            </Measurement>
-            <Measurement>
-                <name>Delta-Spannung S3</name>
+                <name>Delta-Voltage S2</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -431,7 +413,16 @@
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
-                <name>Delta-Spannung S4</name>
+                <name>Delta-Voltage S3</name>
+                <symbol>U</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="0.0001" type="Double" description="Faktor * input value"/>
+                <property name="scale_sync_ref_ordinal" value="0" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
+            </Measurement>
+            <Measurement>
+                <name>Delta-Voltage S4</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
