@@ -710,7 +710,7 @@
 		</copy>
 	</target>
 
-	<target name="signature" description="create and verify gpg signature and verify" depends="copy_docu, copy_misc">
+	<target name="signature" description="create and verify gpg signature and verify" depends="NSIS, copy_docu, copy_misc">
 		<for param="file">
 			<path>
 				<fileset dir="${basedir}/build/target/install" includes="*.sig" />
@@ -762,5 +762,40 @@
 			<arg value="rsync -vr --delete install/ brueg@dl.sv.nongnu.org:/releases/dataexplorer/" />
 		</exec>
 	</target>
+
+	<!-- =====================================================
+            NSIS Installer
+	====================================================== -->
+    <target name="NSIS" description="Creates the installer" depends="init">
+
+   	    <property file="build/build.nsis.properties" />
+
+    	<!-- 
+        v1.2 allows to specify the path to makensis, but does not work properly.
+        Therefore, you have to have the makensis folder on your path.
+        As the languages.nsh is UTF-8 encoded, this target also needs the unicode
+        variant of makensis (s. http://www.scratchpaper.com)
+        -->
+        <taskdef name="nsis" classname="net.sf.nsisant.Task" classpath="build/lib/nsisant-1.2.jar" />
+
+           <nsis script="build/installer.nsi" verbosity="3">
+               <define name="VERSION" value="${nsis.version}" />
+               <define name="DISTDIR" value="${nsis.dist32}" />
+               <define name="OUTDIR" value="${nsis.outputdir}" />
+               <define name="OUTFILENAME" value="${nsis.outputfilename}_win32.exe" />
+               <define name="EXEFILENAME" value="${launch4j.outputfilename}" />
+           	<!--- don¬¥t define 64bit here -->
+           </nsis>
+           
+           <nsis script="build/installer.nsi" verbosity="3">
+               <define name="VERSION" value="${nsis.version}" />
+               <define name="DISTDIR" value="${nsis.dist64}" />
+               <define name="OUTDIR" value="${nsis.outputdir}" />
+               <define name="OUTFILENAME" value="${nsis.outputfilename}_win64.exe" />
+               <define name="EXEFILENAME" value="${launch4j.outputfilename}" />
+               <define name="64BIT" value="defined" />
+           </nsis>
+           
+    </target>
 
 </project>
