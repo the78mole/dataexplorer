@@ -102,7 +102,7 @@ public class TimeLine {
 			timeLineText = Messages.getString(MessageIds.GDE_MSGT0396);
 			format = TimeLine.TIME_LINE_DAYS;
 		}
-		else if (totalTime_std >= 24) {
+		else if (totalTime_std >= 72) {
 			maxTimeNumberFormated = (int) totalTime_std;
 			timeLineText = Messages.getString(MessageIds.GDE_MSGT0397);
 			format = TimeLine.TIME_LINE_HRS_DAYS;

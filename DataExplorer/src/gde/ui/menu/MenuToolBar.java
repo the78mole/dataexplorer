@@ -776,7 +776,7 @@ public class MenuToolBar {
 						this.channelSelectCombo.select(0);
 						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0075));
 						this.channelSelectCombo.setEditable(false);
-						this.channelSelectCombo.setVisibleItemCount(5);
+						this.channelSelectCombo.setVisibleItemCount(10);
 						this.channelSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
 						this.channelSelectCombo.addSelectionListener(new SelectionAdapter() {
 							@Override

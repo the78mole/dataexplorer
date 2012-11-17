@@ -389,44 +389,44 @@ public class OsdReaderWriter {
 				String versionString = GDE.DATA_EXPLORER_FILE_VERSION + useVersion + GDE.STRING_NEW_LINE;
 				data_out.writeUTF(versionString);
 				filePointer += GDE.SIZE_UTF_SIGNATURE + versionString.getBytes("UTF8").length; //$NON-NLS-1$
-				log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + versionString.getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + versionString.getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				//creation time stamp
 				StringBuilder sb = new StringBuilder();
 				sb.append(GDE.CREATION_TIME_STAMP).append(new SimpleDateFormat("yyyy-MM-dd").format(new Date())).append(' '); //$NON-NLS-1$
 				sb.append(new SimpleDateFormat(" HH:mm:ss").format(new Date().getTime())).append(GDE.STRING_NEW_LINE); //$NON-NLS-1$
 				data_out.writeUTF(sb.toString());
 				filePointer += GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
-				log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// second line : size file comment , file comment
 				sb = new StringBuilder();
 				sb.append(GDE.FILE_COMMENT).append(activeChannel.getFileDescription()).append(GDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
 				filePointer += GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
-				log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// third line : size device name , device name
 				sb = new StringBuilder();
 				sb.append(GDE.DEVICE_NAME).append(activeDevice.getName()).append(GDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
 				filePointer += GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
-				log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// fourth line : size channel/config type , channel/config type
 				sb = new StringBuilder();
 				sb.append(GDE.CHANNEL_CONFIG_TYPE).append(activeChannel.getType().name()).append(GDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
 				filePointer += GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
-				log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// fifth line : object key
 				sb = new StringBuilder();
 				sb.append(GDE.OBJECT_KEY).append(activeChannel.getObjectKey()).append(GDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
 				filePointer += GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
-				log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// number of record sets
 				sb = new StringBuilder();
 				sb.append(GDE.RECORD_SET_SIZE).append(activeChannel.size()).append(GDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
 				filePointer += GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
-				log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				// record sets with it properties
 				StringBuilder[] sbs = new StringBuilder[activeChannel.size()];
 				String[] recordSetNames = activeChannel.getRecordSetNames();
@@ -451,7 +451,7 @@ public class OsdReaderWriter {
 							sbs[i].append(GDE.DATA_DELIMITER).append(GDE.RECORD_DATA_SIZE).append(String.format("%10s", recordSet.getRecordDataSize(true))).append(GDE.DATA_DELIMITER); //$NON-NLS-1$
 							filePointer += GDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length; //$NON-NLS-1$
 							filePointer += GDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + GDE.STRING_NEW_LINE.toString().getBytes("UTF8").length; // pre calculated size //$NON-NLS-1$ //$NON-NLS-2$
-							log.log(Level.FINE, "line lenght = " //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " //$NON-NLS-1$
 								+ (GDE.SIZE_UTF_SIGNATURE + sbs[i].toString().getBytes("UTF8").length + GDE.RECORD_SET_DATA_POINTER.toString().getBytes("UTF8").length + 10 + GDE.STRING_NEW_LINE.toString().getBytes("UTF8").length) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								+ " filePointer = " + filePointer); //$NON-NLS-1$
 
@@ -465,7 +465,8 @@ public class OsdReaderWriter {
 						}
 					}
 				}
-				// prepare all record set data pointer
+				// prepare all record set data pointer and store record sizes
+				HashMap<String, Integer> recordSizes = new HashMap<String, Integer>();
 				for (int i = 0; i < activeChannel.size(); ++i) {
 					//if ChannelTypes.TYPE_OUTLET only record sets associated to that channel goes into one file
 					//if ChannelTypes.TYPE_CONFIG all record sets with different configurations goes into one file
@@ -476,14 +477,17 @@ public class OsdReaderWriter {
 						if (recordSet != null) {
 							recordSet.resetZoomAndMeasurement(); // make sure size() returns right value
 							sbs[i].append(GDE.RECORD_SET_DATA_POINTER).append(String.format("%10s", filePointer)).append(GDE.STRING_NEW_LINE); //$NON-NLS-1$
-							log.log(Level.FINE, sbs[i].toString());
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sbs[i].toString());
 							//data_out.writeInt(sbs[i].length());
 							data_out.writeUTF(sbs[i].toString());
-							int dataSizeRecord = GDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true);
+							int sizeRecord = recordSet.getRecordDataSize(true);
+							recordSizes.put(recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i], sizeRecord);
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i] + "=" + sizeRecord);
+							int dataSizeRecord = GDE.SIZE_BYTES_INTEGER * sizeRecord;
 							int dataSizeRecords = dataSizeRecord * recordSet.getNoneCalculationRecordNames().length;
 							int dataSizeRecordsTimeStamp = dataSizeRecord + dataSizeRecords;
 							filePointer += (recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp);
-							log.log(Level.FINE, (recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp) + " filePointer = " + filePointer); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, (recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp) + " filePointer = " + filePointer); //$NON-NLS-1$
 						}
 					}
 				}
@@ -498,14 +502,16 @@ public class OsdReaderWriter {
 						if (recordSet != null) {
 							if (!recordSet.hasDisplayableData()) recordSet.loadFileData(recordSetChannel.getFullQualifiedFileName(), application.getStatusBar() != null);
 							String[] noneCalculationRecordNames = recordSet.getNoneCalculationRecordNames();
-							int dataSizeRecord = GDE.SIZE_BYTES_INTEGER * recordSet.getRecordDataSize(true);
+							int sizeRecord = recordSizes.get(recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i]);
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordSetChannel.getNumber()+GDE.STRING_UNDER_BAR+recordSetNames[i] + "=" + sizeRecord);
+							int dataSizeRecord = GDE.SIZE_BYTES_INTEGER * sizeRecord;
 							int dataSizeRecords = dataSizeRecord * noneCalculationRecordNames.length;
 							int dataSizeRecordsTimeStamp = dataSizeRecord + dataSizeRecords;
 							byte[] buffer = new byte[recordSet.isTimeStepConstant() ? dataSizeRecords : dataSizeRecordsTimeStamp];
 							byte[] bytes = new byte[GDE.SIZE_BYTES_INTEGER];
 							int l = 0;
 							if (!recordSet.isTimeStepConstant()) {
-								for (int j = 0; j < recordSet.getRecordDataSize(true); ++j, l += GDE.SIZE_BYTES_INTEGER) {
+								for (int j = 0; j < sizeRecord; ++j, l += GDE.SIZE_BYTES_INTEGER) {
 										long timeStamp = recordSet.getTime(j);
 										//log.log(Level.FINER, ""+point);
 										bytes[0] = (byte) ((timeStamp >>> 24) & 0xFF);
@@ -516,7 +522,7 @@ public class OsdReaderWriter {
 								}
 							}
 							if (recordSet.isRaw()) {
-								for (int j = 0; j < recordSet.getRecordDataSize(true); ++j) {
+								for (int j = 0; j < sizeRecord; ++j) {
 									for (int k = 0; k < noneCalculationRecordNames.length; ++k, l += GDE.SIZE_BYTES_INTEGER) {
 										int point = recordSet.get(noneCalculationRecordNames[k]).realGet(j);
 										//log.log(Level.FINER, ""+point);
@@ -530,7 +536,7 @@ public class OsdReaderWriter {
 							}
 							else {
 								IDevice device = recordSet.getDevice();
-								for (int j = 0; j < recordSet.getRecordDataSize(true); ++j) {
+								for (int j = 0; j < sizeRecord; ++j) {
 									for (int k = 0; k < noneCalculationRecordNames.length; ++k, l += GDE.SIZE_BYTES_INTEGER) {
 										Record record = recordSet.get(noneCalculationRecordNames[k]);
 										int point = Double.valueOf(device.reverseTranslateValue(record, record.realGet(j)/1000.0)*1000.0).intValue();
@@ -544,11 +550,11 @@ public class OsdReaderWriter {
 								}
 							}
 							data_out.write(buffer, 0, buffer.length);
-							recordSet.setSaved(true);
+							recordSet.setSaved(!fullQualifiedFilePath.contains(GDE.TEMP_FILE_STEM));
 						}
 					}
 				}
-				log.log(Level.TIME, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 
 				//update/write link if object oriented
 				if (isObjectOriented && !fullQualifiedFilePath.contains(GDE.TEMP_FILE_STEM)) {
@@ -605,7 +611,7 @@ public class OsdReaderWriter {
 				random_in.readFully(buffer);
 	    }
 			recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordFileDataSize, doUpdateProgressBar);
-			log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+			if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -649,9 +655,9 @@ public class OsdReaderWriter {
 				try {
 					String actualFilePath = file.getAbsolutePath();
 					if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD) && actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
-						log.log(Level.FINER, "working with " + file.getName()); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "working with " + file.getName()); //$NON-NLS-1$
 						if (oldObjectKey.equals(OsdReaderWriter.getHeader(file.getCanonicalPath()).get(GDE.OBJECT_KEY))) {
-							log.log(Level.FINER, "found file with given object key " + file.getName()); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "found file with given object key " + file.getName()); //$NON-NLS-1$
 						}
 						else {
 							iterator.remove();
@@ -700,7 +706,7 @@ public class OsdReaderWriter {
 					tmpData = data_in.readUTF();
 					data_out.writeUTF(tmpData);
 					filePointer += tmpData.getBytes("UTF8").length; //$NON-NLS-1$
-					log.log(Level.FINER, "filePointer = " + filePointer);
+					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "filePointer = " + filePointer);
 					
 					int numberRecordSets = 0;
 					if (tmpData.startsWith(GDE.RECORD_SET_SIZE)) {
