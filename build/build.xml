@@ -485,7 +485,9 @@
 
 	<!-- zip for Windows/MAC OS, tar for GNULinux -->
 	<target name="binary_package" depends="copy-files">
-
+		
+	    <antcall target="build_Windows_NSIS_installer" description="replacing zip archive target with building NSIS Windows installer"/>
+	    <!-- 
 		<echo message="zip Windows 32 bit files" />
 		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Windows_x86_32.zip">
 			<zipfileset dir="${output.windows32}" casesensitive="true" />
@@ -495,7 +497,8 @@
 		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Windows_x86_64.zip">
 			<zipfileset dir="${output.windows64}" casesensitive="true" />
 		</zip>
-
+		-->
+		
 		<echo message="tar GNULinux 32 bit files" />
 		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-bin_GNULinux_x86_32.tar.gz" compression="gzip">
 			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="755">
@@ -534,6 +537,8 @@
 			</tarfileset>
 		</tar>
 
+		<antcall target="build_Mac_install_dmg" description="build Mac disk images, replaces building zip archives"/>
+		<!-- 
 		<echo message="zip Mac 32 cocoa application bundle" />
 		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_32_cocoa.zip">
 			<zipfileset dir="${output.mac32}" casesensitive="true" filemode="755">
@@ -561,6 +566,7 @@
 				<exclude name="**/RXTX_Post-Install_MacOS.sh" />
 			</zipfileset>
 		</zip>
+	-->
 	</target>
 
 	<target name="backupDataFilesWindows" description="pack personal data files">
@@ -710,7 +716,7 @@
 		</copy>
 	</target>
 
-	<target name="signature" description="create and verify gpg signature and verify" depends="NSIS, copy_docu, copy_misc">
+	<target name="signature" description="create and verify gpg signature and verify" depends="copy_docu, copy_misc">
 		<for param="file">
 			<path>
 				<fileset dir="${basedir}/build/target/install" includes="*.sig" />
@@ -764,9 +770,9 @@
 	</target>
 
 	<!-- =====================================================
-            NSIS Installer
+            Windows NSIS Installer
 	====================================================== -->
-    <target name="NSIS" description="Creates the installer" depends="init">
+    <target name="build_Windows_NSIS_installer" description="Creates the installer">
 
    	    <property file="build/build.nsis.properties" />
 
@@ -798,4 +804,217 @@
            
     </target>
 
+    <!-- build MAC OS disk image - this only works on MacOSX (requires hdiutil)  -->
+    <target name="build_Mac_install_dmg" description="creates MAC OS disk image for install purpose">
+        <antcall target="build_dmg_32"/>
+        <antcall target="build_dmg_64"/>
+    </target>
+    
+    <target name="build_dmg_32" description="creates MAC OS disk image 32 bit">
+	    <!-- Set this property value to your application name -->
+	    <property name="app.name" value="DataExplorer"/>
+	
+	    <property name="mountdir" value="${build.target.dir}"/>
+	    <property name="targetDmgPath" value="${build.target.dir}/${app.name}-${version.num}_Mac_32.dmg"/>
+	    <property name="tmpDmgPath" value="${mountdir}/${app.name}_32-tmp.dmg"/>
+	    	    	
+	   	<!-- Delete previously created DMG -->
+	    <delete file="${targetDmgPath}" quiet="yes" failonerror="false"/>
+	    <!-- Delete the temporary image -->
+	    <delete file="${tmpDmgPath}" quiet="yes" failonerror="false"/>
+	    	
+   	    <!-- Create a temporary Disk Image -->
+	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+	      <arg value="create"/>
+	      <arg value="-srcfolder"/>
+	      <arg value="${output.mac32}/${app.name}.app"/>
+	      <arg value="-volname"/>
+	      <arg value="${app.name}"/>
+	      <arg value="-ov"/>
+	      <arg value="${tmpDmgPath}"/>
+	      <arg value="-format"/>
+	      <arg value="UDRW"/>
+	    </exec>
+	
+	    <!-- Attach the temporary image -->
+	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+	      <arg value="attach"/>
+	      <arg value="${tmpDmgPath}"/>
+	      <arg value="-mountroot"/>
+	      <arg value="${mountdir}/"/>
+	    </exec>
+		    
+	    <!-- make starter scripts executable -->
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${mountdir}/${app.name}/${app.name}.app/Contents/MacOS/DataExplorerMac32"/>
+	    </exec>
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${mountdir}/${app.name}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac32"/>
+	    </exec>
+	    <!-- 
+	    <copy file="${basedir}/build/misc/README.de"
+	          tofile="${mountdir}/${app.name}/README_de.txt"
+	          overwrite="true"/>
+	    <copy file="${basedir}/build/misc/README.en"
+	          tofile="${mountdir}/${app.name}/README_en.txt"
+	          overwrite="true"/>
+	    <copy file="${basedir}/build/misc/RXTX_Post-Install_MacOS.sh"
+	          tofile="${mountdir}/${app.name}/RXTX_Post-Install_MacOS.sh"
+	          overwrite="true"/>
+	    -->
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${mountdir}/${app.name}/${app.name}.app/RXTX_Post-Install_MacOS.sh"/>
+	    </exec>
+	    
+	    <!-- Copy the background, the volume icon and DS_Store files -->
+	    <mkdir dir="${mountdir}/${app.name}/.background"/>
+	    <copy file="${basedir}/build/misc/dmg_background.png"
+	          tofile="${mountdir}/${app.name}/.background/background.png"
+	          overwrite="true"/>
+	    <!-- 
+	    <copy file="${basedir}/build/misc/DataExplorer.icns"
+	          tofile="${mountdir}/${app.name}/.VolumeIcon.icns"
+	          overwrite="true"/>
+	    -->
+	    <copy file="${basedir}/build/misc/DS_Store"
+	          tofile="${mountdir}/${app.name}/.DS_Store"
+	          overwrite="true"/>
+	
+	    <!-- Indicate that we want a custom icon -->
+	    <exec executable="/usr/bin/SetFile" os="Mac OS X">
+	      <arg value="-a"/>
+	      <arg value="C"/>
+	      <arg value="${mountdir}/${app.name}"/>
+	    </exec>
+	
+	    <!-- Add a symbolic link to the Applications directory -->
+	    <symlink link="${mountdir}/${app.name}" resource="/Applications"/>
+	
+	    <!-- Detach the temporary image -->
+	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+	      <arg value="detach"/>
+	      <arg value="${mountdir}/${app.name}"/>
+	    </exec>
+	
+	    <!-- Compress it to a new image -->
+	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+	      <arg value="convert"/>
+	      <arg value="${tmpDmgPath}"/>
+	      <arg value="-format"/>
+	      <arg value="UDZO"/>
+	      <arg value="-o"/>
+	      <arg value="${targetDmgPath}"/>
+	    </exec>
+	
+	    <!-- Delete the temporary image -->
+	    <delete file="${tmpDmgPath}" quiet="yes" failonerror="false"/>
+    </target>
+    
+    <target name="build_dmg_64" description="creates MAC OS disk image 64 bit">
+	    <!-- Set this property value to your application name -->
+	    <property name="app.name" value="DataExplorer"/>
+	
+	    <property name="mountdir" value="${build.target.dir}"/>
+	    <property name="targetDmgPath" value="${build.target.dir}/${app.name}-${version.num}_Mac_64.dmg"/>
+	    <property name="tmpDmgPath" value="${mountdir}/${app.name}_64-tmp.dmg"/>
+	    	
+	    <!-- Delete previously created DMG -->
+	    <delete file="${targetDmgPath}" quiet="yes" failonerror="false"/>
+	    <!-- Delete the temporary image -->
+	    <delete file="${mountdir}/${app.name}-tmp.dmg" quiet="yes" failonerror="false"/>
+	    	
+   	    <!-- Create a temporary Disk Image -->
+	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+	      <arg value="create"/>
+	      <arg value="-srcfolder"/>
+	      <arg value="${output.mac64}/${app.name}.app"/>
+	      <arg value="-volname"/>
+	      <arg value="${app.name}"/>
+	      <arg value="-ov"/>
+	      <arg value="${tmpDmgPath}"/>
+	      <arg value="-format"/>
+	      <arg value="UDRW"/>
+	    </exec>
+	
+	    <!-- Attach the temporary image -->
+	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+	      <arg value="attach"/>
+	      <arg value="${tmpDmgPath}"/>
+	      <arg value="-mountroot"/>
+	      <arg value="${mountdir}/"/>
+	    </exec>
+	    
+	    <!-- make starter scripts executable -->
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${mountdir}/${app.name}/${app.name}.app/Contents/MacOS/DataExplorerMac64"/>
+	    </exec>
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${mountdir}/${app.name}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac64"/>
+	    </exec>
+	    <!-- 
+	    <copy file="${basedir}/build/misc/README.de"
+	          tofile="${mountdir}/${app.name}/README_de.txt"
+	          overwrite="true"/>
+	    <copy file="${basedir}/build/misc/README.en"
+	          tofile="${mountdir}/${app.name}/README_en.txt"
+	          overwrite="true"/>
+	    <copy file="${basedir}/build/misc/RXTX_Post-Install_MacOS.sh"
+	          tofile="${mountdir}/${app.name}/RXTX_Post-Install_MacOS.sh"
+	          overwrite="true"/>
+	    -->
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${mountdir}/${app.name}/${app.name}.app/RXTX_Post-Install_MacOS.sh"/>
+	    </exec>
+	    	    	    	    	    	    	
+	    <!-- Copy the background, the volume icon and DS_Store files -->
+	    <mkdir dir="${mountdir}/${app.name}/.background"/>
+	    <copy file="${basedir}/build/misc/dmg_background.png"
+	          tofile="${mountdir}/${app.name}/.background/background.png"
+	          overwrite="true"/>
+	    <!-- 
+	    <copy file="${basedir}/build/misc/DataExplorer.icns"
+	          tofile="${mountdir}/${app.name}/.VolumeIcon.icns"
+	          overwrite="true"/>
+	    -->
+	    <copy file="${basedir}/build/misc/DS_Store"
+	          tofile="${mountdir}/${app.name}/.DS_Store"
+	          overwrite="true"/>
+	
+	    <!-- Indicate that we want a custom icon -->
+	    <!-- 
+	    <exec executable="/usr/bin/SetFile" os="Mac OS X">
+	      <arg value="-a"/>
+	      <arg value="C"/>
+	      <arg value="${mountdir}/${app.name}"/>
+	    </exec>
+	    -->
+	
+	    <!-- Add a symbolic link to the Applications directory -->
+	    <symlink link="${mountdir}/${app.name}" resource="/Applications"/>
+	
+	    <!-- Detach the temporary image -->
+	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+	      <arg value="detach"/>
+	      <arg value="${mountdir}/${app.name}"/>
+	    </exec>
+	
+	    <!-- Compress it to a new image -->
+	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+	      <arg value="convert"/>
+	      <arg value="${tmpDmgPath}"/>
+	      <arg value="-format"/>
+	      <arg value="UDZO"/>
+	      <arg value="-o"/>
+	      <arg value="${targetDmgPath}"/>
+	    </exec>
+	
+	    <!-- Delete the temporary image -->
+	    <delete file="${tmpDmgPath}" quiet="yes" failonerror="false"/>
+    </target>
 </project>

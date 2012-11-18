@@ -6,6 +6,7 @@ add Av4ms_FV_762 charger, matcher and cell selector for AA size cells
 change time line behavior, start showing day > 72 hours
 enable auto-save of a temporary file(s) each 5 minutes
 build Windows NSIS installer
+build Mac OS disk images for install
 
 
 Version 3.05 - 18 Oct 2012
