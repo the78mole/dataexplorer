@@ -219,11 +219,13 @@
 	</target>
 	<target name="WindowsDefault" unless="prefix">
 		<echo message="installing to ${install.dir.windows}" />
-		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir.windows}" overwrite="true" />
+		<!-- unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir.windows}" overwrite="true" / -->
+		<copydir src="${output.dir}/Windows_${sun.arch.data.model}" dest="${install.dir.windows}"/>
 	</target>
 	<target name="WindowsPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
-		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${prefix}" overwrite="true" />
+		<!-- unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${prefix}" overwrite="true" / -->
+		<copydir src="${output.dir}/Windows_${sun.arch.data.model}" dest="${install.dir.windows}"/>
 	</target>
 
 	<target name="GNULinux" if="isGNULinux">
@@ -247,11 +249,29 @@
 	</target>
 	<target name="MacDefault" unless="prefix">
 		<echo message="installing to ${install.dir.mac}" />
-		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${install.dir.mac}" overwrite="true" />
+		<!-- unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${install.dir.mac}" overwrite="true" / -->
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DataExplorerMac64"/>
+	    </exec>
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac64"/>
+	    </exec>
+		<copydir src="${output.dir}/Mac_${sun.arch.data.model}" dest="${install.dir.mac}"/>
 	</target>
 	<target name="MacPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
-		<unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${prefix}" overwrite="true" />
+		<!-- unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_${sun.arch.data.model}_cocoa.zip" dest="${prefix}" overwrite="true" / -->
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DataExplorerMac64"/>
+	    </exec>
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac64"/>
+	    </exec>
+		<copydir src="${output.dir}/Mac_${sun.arch.data.model}" dest="${install.dir.mac}"/>
 	</target>
 
 	<target name="check_prefix">
