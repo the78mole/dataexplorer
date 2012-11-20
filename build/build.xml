@@ -181,7 +181,7 @@
 	</target>
 
 	<!-- install target -->
-	<target name="install" depends="dist">
+	<target name="install" depends="copy-files">
 		<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
 		<condition property="isGNULinux">
@@ -220,12 +220,16 @@
 	<target name="WindowsDefault" unless="prefix">
 		<echo message="installing to ${install.dir.windows}" />
 		<!-- unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${install.dir.windows}" overwrite="true" / -->
-		<copydir src="${output.dir}/Windows_${sun.arch.data.model}" dest="${install.dir.windows}"/>
+		<copy toDir="${install.dir.windows}/${app.name}">
+			<fileset file="${output.dir}/Windows_${sun.arch.data.model}/${app.name}/**" />
+		</copy>
 	</target>
 	<target name="WindowsPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
 		<!-- unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${prefix}" overwrite="true" / -->
-		<copydir src="${output.dir}/Windows_${sun.arch.data.model}" dest="${install.dir.windows}"/>
+		<copy toDir="${install.dir.windows}">
+			<fileset file="${output.dir}/Windows_${sun.arch.data.model}/**" />
+		</copy>
 	</target>
 
 	<target name="GNULinux" if="isGNULinux">
@@ -235,11 +239,33 @@
 	</target>
 	<target name="GNULinuxDefault" unless="prefix">
 		<echo message="installing to ${install.dir.gnulinux}" />
-		<exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.gnulinux}" />
+		<!-- exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${install.dir.gnulinux}" / -->
+	    <exec executable="chmod" os="Linux" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DataExplorer"/>
+	    </exec>
+	    <exec executable="chmod" os="Linux" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DevicePropertiesEditor"/>
+	    </exec>
+		<copy toDir="${install.dir.linux}/${app.name}">
+			<fileset file="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/**" />
+		</copy>
 	</target>
 	<target name="GNULinuxPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
-		<exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${prefix}" />
+		<!-- exec command="tar -xzf ${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.tar.gz" dir="${prefix}" / -->
+	    <exec executable="chmod" os="Linux" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DataExplorer"/>
+	    </exec>
+	    <exec executable="chmod" os="Linux" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DevicePropertiesEditor"/>
+	    </exec>
+		<copy toDir="${install.dir.linux}">
+			<fileset file="${output.dir}/GNULinux_${sun.arch.data.model}/**" />
+		</copy>
 	</target>
 
 	<target name="MAC" if="isMAC">
@@ -258,7 +284,9 @@
 	      <arg value="+x"/>
 	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac64"/>
 	    </exec>
-		<copydir src="${output.dir}/Mac_${sun.arch.data.model}" dest="${install.dir.mac}"/>
+		<copy toDir="${install.dir.mac}/${app.name}">
+			<fileset file="${output.dir}/Mac_${sun.arch.data.model}/${app.name}/**" />
+		</copy>
 	</target>
 	<target name="MacPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
@@ -271,7 +299,9 @@
 	      <arg value="+x"/>
 	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac64"/>
 	    </exec>
-		<copydir src="${output.dir}/Mac_${sun.arch.data.model}" dest="${install.dir.mac}"/>
+		<copy toDir="${install.dir.mac}">
+			<fileset file="${output.dir}/Mac_${sun.arch.data.model}/**" />
+		</copy>
 	</target>
 
 	<target name="check_prefix">
