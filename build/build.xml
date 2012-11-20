@@ -287,8 +287,8 @@
 	      <arg value="+x"/>
 	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac64"/>
 	    </exec>
-		<copy toDir="${install.dir.mac}/${app.name}">
-			<fileset file="${output.dir}/Mac_${sun.arch.data.model}/${app.name}/**" />
+		<copy toDir="${install.dir.mac}/${app.name}.app">
+			<fileset file="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/**" />
 		</copy>
 	</target>
 	<target name="MacPrefix" if="prefix">
@@ -924,11 +924,9 @@
 	    <copy file="${basedir}/build/misc/dmg_background.png"
 	          tofile="${mountdir}/${app.name}/.background/background.png"
 	          overwrite="true"/>
-	    <!-- 
 	    <copy file="${basedir}/build/misc/DataExplorer.icns"
 	          tofile="${mountdir}/${app.name}/.VolumeIcon.icns"
 	          overwrite="true"/>
-	    -->
 	    <copy file="${basedir}/build/misc/DS_Store"
 	          tofile="${mountdir}/${app.name}/.DS_Store"
 	          overwrite="true"/>
@@ -1027,23 +1025,19 @@
 	    <copy file="${basedir}/build/misc/dmg_background.png"
 	          tofile="${mountdir}/${app.name}/.background/background.png"
 	          overwrite="true"/>
-	    <!-- 
 	    <copy file="${basedir}/build/misc/DataExplorer.icns"
 	          tofile="${mountdir}/${app.name}/.VolumeIcon.icns"
 	          overwrite="true"/>
-	    -->
 	    <copy file="${basedir}/build/misc/DS_Store"
 	          tofile="${mountdir}/${app.name}/.DS_Store"
 	          overwrite="true"/>
 	
 	    <!-- Indicate that we want a custom icon -->
-	    <!-- 
 	    <exec executable="/usr/bin/SetFile" os="Mac OS X">
 	      <arg value="-a"/>
 	      <arg value="C"/>
 	      <arg value="${mountdir}/${app.name}"/>
 	    </exec>
-	    -->
 	
 	    <!-- Add a symbolic link to the Applications directory -->
 	    <symlink link="${mountdir}/${app.name}" resource="/Applications"/>
