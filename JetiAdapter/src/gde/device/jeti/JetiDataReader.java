@@ -176,12 +176,12 @@ public class JetiDataReader {
 					for (TelemetrySensor telemetrySensor : recordSetData) {
 						boolean actualgps = false;
 						for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
-							String newReordName = dataVar.getName();
-							while (vecRecordNames.contains(newReordName)) { //check for duplicated record names and update to make unique
-								newReordName = newReordName + "'";
+							String newRecordName = dataVar.getName();
+							while (vecRecordNames.contains(newRecordName)) { //check for duplicated record names and update to make unique
+								newRecordName = newRecordName + "'";
 							}
-							vecRecordNames.add(newReordName);
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add new record name = " + newReordName);
+							vecRecordNames.add(newRecordName);
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "add new record name = " + newRecordName);
 							device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
 							device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
 							if (dataVar.getType() == (TelemetryData.T_GPS) && (dataVar.getDecimals() & 1) == 0) {
