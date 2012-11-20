@@ -80,7 +80,7 @@ public class GraphicsWindow extends CTabItem {
 		this.tabName = useTabName;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
-		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 		this.setText(this.tabName);
 	}
 

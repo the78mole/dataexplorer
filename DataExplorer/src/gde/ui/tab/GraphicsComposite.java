@@ -233,7 +233,7 @@ public class GraphicsComposite extends Composite {
 		});
 		{
 			this.graphicsHeader = new Text(this, SWT.SINGLE | SWT.CENTER);
-			this.graphicsHeader.setFont(SWTResourceManager.getFont(this.application, GDE.IS_MAC ? 14 : 12, SWT.BOLD));
+			this.graphicsHeader.setFont(SWTResourceManager.getFont(this.application,GDE.WIDGET_FONT_SIZE+3, SWT.BOLD));
 			this.graphicsHeader.setBackground(this.surroundingBackground);
 			this.graphicsHeader.setMenu(this.popupmenu);
 			this.graphicsHeader.addHelpListener(new HelpListener() {

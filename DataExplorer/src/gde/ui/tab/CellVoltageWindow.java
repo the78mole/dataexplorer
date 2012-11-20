@@ -146,7 +146,7 @@ public class CellVoltageWindow extends CTabItem {
 		this.displayTab = currentDisplayTab;
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
-		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0232));
 	
 		this.lithiumValuesDialog = new CellVoltageValuesDialog(this.application, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);

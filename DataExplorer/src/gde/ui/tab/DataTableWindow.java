@@ -83,7 +83,7 @@ public class DataTableWindow extends CTabItem {
 		this.tabFolder = dataTab;
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
-		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0233));
 
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);

@@ -96,7 +96,7 @@ public class FileCommentWindow extends CTabItem {
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		SWTResourceManager.registerResourceUser(this);
-		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0239));
 
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
