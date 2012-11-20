@@ -24,6 +24,9 @@
 	<target name="echo:build.properties" if="build.properties.exists">
 		<echo message="Building using ${build.properties}" />
 	</target>
+    <!-- Set this property value to your application name -->
+    <property name="app.name" value="DataExplorer"/>
+
 
 	<!-- Main target -->
 	<target name="dist" depends="binary_package">
@@ -861,9 +864,6 @@
     </target>
     
     <target name="build_dmg_32" description="creates MAC OS disk image 32 bit">
-	    <!-- Set this property value to your application name -->
-	    <property name="app.name" value="DataExplorer"/>
-	
 	    <property name="mountdir" value="${build.target.dir}"/>
 	    <property name="targetDmgPath" value="${build.target.dir}/${app.name}-${version.num}_Mac_32.dmg"/>
 	    <property name="tmpDmgPath" value="${mountdir}/${app.name}_32-tmp.dmg"/>
