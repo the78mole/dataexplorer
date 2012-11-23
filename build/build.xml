@@ -924,7 +924,7 @@
 	    <copy file="${basedir}/build/misc/dmg_background.png"
 	          tofile="${mountdir}/${app.name}/.background/background.png"
 	          overwrite="true"/>
-	    <copy file="${basedir}/build/misc/DataExplorer.icns"
+	    <copy file="${basedir}/build/misc/DataExplorerDmg.icns"
 	          tofile="${mountdir}/${app.name}/.VolumeIcon.icns"
 	          overwrite="true"/>
 	    <copy file="${basedir}/build/misc/DS_Store"
@@ -1025,7 +1025,7 @@
 	    <copy file="${basedir}/build/misc/dmg_background.png"
 	          tofile="${mountdir}/${app.name}/.background/background.png"
 	          overwrite="true"/>
-	    <copy file="${basedir}/build/misc/DataExplorer.icns"
+	    <copy file="${basedir}/build/misc/DataExplorerDmg.icns"
 	          tofile="${mountdir}/${app.name}/.VolumeIcon.icns"
 	          overwrite="true"/>
 	    <copy file="${basedir}/build/misc/DS_Store"
