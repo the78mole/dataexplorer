@@ -940,4 +940,10 @@ public interface IDevice {
 	 * @return cell count if any
 	 */
 	public int getNumberOfLithiumCells(Object specificData);
+	
+	/**
+	 * query if the record set numbering should follow channel configuration numbering
+	 * @return true where devices does not distinguish between channels (for example Av4ms_FV_762)
+	 */
+	public boolean recordSetNumberFollowChannel();
 }

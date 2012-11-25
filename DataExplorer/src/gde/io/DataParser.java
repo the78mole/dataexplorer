@@ -40,9 +40,10 @@ import java.util.logging.Logger;
 public class DataParser extends NMEAParser {
 	static Logger					log			= Logger.getLogger(DataParser.class.getName());
 
-	int									recordNumber;
 	int									start_time_ms = Integer.MIN_VALUE;
 	int									valueSize;
+	
+	int									recordSetNumberOffset = 0;
 	int									timeResetCounter	= 0;
 	boolean							isTimeResetEnabled				= false;
 	
@@ -123,7 +124,7 @@ public class DataParser extends NMEAParser {
 	@Override
 	public void parse(String inputLine, String[] strValues) throws DevicePropertiesInconsistenceException {
 		String strValue = strValues[0].trim().substring(1);
-		this.recordNumber = Integer.parseInt(strValue);
+		this.channelConfigNumber = Integer.parseInt(strValue);
 		
 		strValue = strValues[1].trim();
 		this.state = Integer.parseInt(strValue);
@@ -163,7 +164,7 @@ public class DataParser extends NMEAParser {
 		
 		//check time reset to force a new data set creation
 		if (this.device.getTimeStep_ms() < 0 && time_ms <= 0 && this.isTimeResetEnabled) {
-				this.recordNumber += ++this.timeResetCounter;
+				this.recordSetNumberOffset += ++this.timeResetCounter;
 				this.isTimeResetEnabled = false;
 		}
 
@@ -235,10 +236,10 @@ public class DataParser extends NMEAParser {
 	}
 
 	/**
-	 * @return the recordNumber
+	 * @return the recordSetNumberOffset
 	 */
-	public int getRecordNumber() {
-		return recordNumber;
+	public int getRecordSetNumberOffset() {
+		return recordSetNumberOffset;
 	}
 
 	/**

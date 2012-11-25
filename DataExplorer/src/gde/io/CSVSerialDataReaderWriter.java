@@ -22,6 +22,7 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
+import gde.device.ChannelTypes;
 import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.exception.DataInconsitsentException;
@@ -45,12 +46,14 @@ import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 /**
  * Class to read and write comma separated value files which simulates serial data 
  * one data line consist of $1;1;0; 14780;  598;  1000;  8838;.....;0002;
- * where $recordSetNumber; stateNumber; timeStepSeconds; firstIntValue; secondIntValue; .....;checkSumIntValue;
+ * where $channelConfigNumber; stateNumber; timeStepSeconds; firstIntValue; secondIntValue; .....;checkSumIntValue;
  * All properties around the textual data in this line has to be specified in DataBlockType (type=TEXT, size number of values, separator=;, ...), refer to DeviceProperties_XY.XSD
  * @author Winfried Brügmann
  */
@@ -62,8 +65,7 @@ public class CSVSerialDataReaderWriter {
 	static StringBuffer		sb;
 	
 	final static DataExplorer	application	= DataExplorer.getInstance();
-	final static Channels								channels		= Channels.getInstance();
-	
+	final static Channels			channels		= Channels.getInstance();	
 
 	/**
 	 * read the selected CSV file and parse
@@ -82,7 +84,6 @@ public class CSVSerialDataReaderWriter {
 	public static RecordSet read(String filePath, IDevice device, String recordNameExtend, Integer channelConfigNumber, boolean isRaw) throws NotSupportedFileFormatException, IOException, DataInconsitsentException, DataTypeException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		String line = GDE.STRING_STAR;
-		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
 		Channel activeChannel = null;
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
@@ -92,12 +93,16 @@ public class CSVSerialDataReaderWriter {
 		int lineNumber = 0;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
 		String recordSetNameExtend = device.getRecordSetStemName();
+		RecordSet channelRecordSet = null;
+		int lastRecordSetNumberOffset = 0;
+		Vector<RecordSet> createdRecordSets = new Vector<RecordSet>(1);
 
 		try {
 			if (channelConfigNumber == null)
 				activeChannel = channels.getActiveChannel();
 			else
 				activeChannel = channels.get(channelConfigNumber);
+			channelConfigNumber = channels.getActiveChannelNumber();
 
 			if (activeChannel != null) {
 				if (application.getStatusBar() != null) {
@@ -106,22 +111,20 @@ public class CSVSerialDataReaderWriter {
 				}
 				activeChannelConfigNumber = activeChannel.getNumber();
 				
-				
-
-				if (application.getStatusBar() != null) {
-					channels.switchChannel(activeChannel.getNumber(), GDE.STRING_EMPTY);
-					application.getMenuToolBar().updateChannelSelector();
-					activeChannel = channels.getActiveChannel();
-				}
-				String recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
-				int lastRecordNumber = -1;
+//				if (application.getStatusBar() != null) {
+//					channels.switchChannel(activeChannel.getNumber(), GDE.STRING_EMPTY);
+//					application.getMenuToolBar().updateChannelSelector();
+//					activeChannel = channels.getActiveChannel();
+//				}
+				String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend; //$NON-NLS-1$
 
 				//now get all data   $1;1;0; 14780;  598;  1000;  8838;  0002
-				//$recordSetNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
+				//$channelConfigNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
 				int dataBlockSize = device.getDataBlockSize(InputTypes.FILE_IO); // measurements size must not match data block size, there are some measurements which are result of calculation			
-				log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
-				if (measurementSize < Math.abs(dataBlockSize))  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] {filePath}));
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
+				if (dataBlockSize > 0 && measurementSize < Math.abs(dataBlockSize))  
+					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] {filePath}));
 				DataParser data = new DataParser(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), device.getDataBlockCheckSumType(), dataBlockSize); //$NON-NLS-1$  //$NON-NLS-2$
 
 				DataInputStream binReader    = new DataInputStream(new FileInputStream(new File(filePath)));
@@ -151,43 +154,73 @@ public class CSVSerialDataReaderWriter {
 
 					if (device.getStateType() == null) 
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] {device.getPropertiesFileName()})); 
+
 					try {
+						channelConfigNumber = device.recordSetNumberFollowChannel() ? data.channelConfigNumber : channelConfigNumber;
+						activeChannel = channels.get(channelConfigNumber);
+						if (channelConfigNumber > device.getChannelCount()) 
+							continue; //skip data if not configured
+						
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + channelConfigNumber + " state = " + data.state);
 						
 						recordSetNameExtend = device.getStateType().getProperty().get(data.state - 1).getName(); // state name
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}
+						channelRecordSet = activeChannel.get(activeChannel.getLastActiveRecordSetName());
 					}
 					catch (Exception e) {
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0044, new Object[] {data.state, filePath, device.getPropertiesFileName()})); 
 					}
 
-					//detect states where a new record set has to be created
-					if (recordSet == null || !recordSet.getName().contains(recordSetNameExtend) || lastRecordNumber != data.recordNumber) {
-						
-						if (recordSet != null) { // apply something to previous record set
-							//check reasonable size of data points
-							if (recordSet.get(0).realSize() < 3) {
+					// check if a record set matching for re-use is available and prepare a new if required
+					if (activeChannel.size() == 0 || channelRecordSet == null || !recordSetName.endsWith(GDE.STRING_BLANK + recordSetNameExtend) || lastRecordSetNumberOffset != data.recordSetNumberOffset) {
+						//record set does not exist or is outdated, build a new name and create, in case of ChannelTypes.TYPE_CONFIG try sync with channel number
+						if (lastRecordSetNumberOffset != data.recordSetNumberOffset && channelRecordSet != null) {
+							if (channelRecordSet.get(0).size() < 3) {
+								channelRecordSet = activeChannel.get(recordSetName);
 								activeChannel.remove(recordSetName);
-								log.log(Level.WARNING, filePath + " - remove record set with < 3 data points, last lin number = " + (lineNumber-1)); //$NON-NLS-1$
-								//application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0040));
-
+								createdRecordSets.remove(channelRecordSet);
+								log.log(Level.WARNING, filePath + " - remove record set with < 3 data points, last line number = " + (lineNumber - 1)); //$NON-NLS-1$
+								activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannel.getNumber(), true, false));
+								createdRecordSets.add(activeChannel.get(recordSetName));
+								recordSetName = channelRecordSet.getName(); // cut/correct length
+								
+								if (activeChannel.getType() == ChannelTypes.TYPE_CONFIG)
+									activeChannel.applyTemplate(recordSetName, false);
+								else 
+									activeChannel.applyTemplateBasics(recordSetName);
 							}
 							else {
-								recordSet.checkAllDisplayable(); // raw import needs calculation of passive records
-								activeChannel.setActiveRecordSet(recordSetName);
-								activeChannel.applyTemplate(recordSetName, true);
+								channelRecordSet.checkAllDisplayable(); // raw import needs calculation of passive records
+								if (activeChannel.getType() == ChannelTypes.TYPE_CONFIG)
+									activeChannel.applyTemplate(recordSetName, false);
+								else 
+									activeChannel.applyTemplateBasics(recordSetName);
 								device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
-
-								if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 							}
 						}
-						//prepare new record set now
-						lastRecordNumber = data.recordNumber;
-						recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
+						else {
+							int recordNumber = device.recordSetNumberFollowChannel() && activeChannel.getType() == ChannelTypes.TYPE_CONFIG ? activeChannel.getNextRecordSetNumber(channelConfigNumber) : activeChannel.getNextRecordSetNumber();
+							recordSetName = recordNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + recordSetNameExtend;
+							activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannel.getNumber(), true, false));
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
+							activeChannel.setActiveRecordSet(recordSetName);
+							channelRecordSet = activeChannel.get(recordSetName);
+							createdRecordSets.add(channelRecordSet);
+							recordSetName = channelRecordSet.getName(); // cut/correct length
+							
+							if (activeChannel.getType() == ChannelTypes.TYPE_CONFIG)
+								activeChannel.applyTemplate(recordSetName, false);
+							else 
+								activeChannel.applyTemplateBasics(recordSetName);
+							
+							if (application.getStatusBar() != null && activeChannel.getName().equals(channels.getActiveChannel().getName())) {
+								channels.getActiveChannel().switchRecordSet(recordSetName);
+							}
+						}
+						
 
-						recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), isRaw, true);
-						recordSetName = recordSet.getName(); // cut/correct length
 						try {
 							isOutdated = Integer.parseInt(dateTime.split(GDE.STRING_DASH)[0]) <= 2000;
 						}
@@ -199,43 +232,58 @@ public class CSVSerialDataReaderWriter {
 						String[] recordNames = device.getMeasurementNames(activeChannel.getNumber());
 						if (!isRaw) { // absolute
 							for (String recordKey : recordNames) {
-								recordSet.get(recordKey).setDisplayable(true); // all data available 
+								channelRecordSet.get(recordKey).setDisplayable(true); // all data available 
 							}
 						}
-						//recordSet.setTimeStep_ms(device.getTimeStep_ms()); // set -1 for none constant time step between measurement points
-						activeChannel.put(recordSetName, recordSet);
-						lastTimeStamp = 0;
+						lastRecordSetNumberOffset = data.recordSetNumberOffset;
 					}
 					//add data only if 
 					if (data.time_ms - lastTimeStamp >= 0) {
 						if (isRaw)
-							recordSet.addNoneCalculationRecordsPoints(data.values, data.time_ms);
+							channelRecordSet.addNoneCalculationRecordsPoints(data.values, data.time_ms);
 						else
-							recordSet.addPoints(data.values, data.time_ms);
+							channelRecordSet.addPoints(data.values, data.time_ms);
 						data.setTimeResetEnabled(true);
 						lastTimeStamp = data.time_ms;
 					}
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
 					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
-					if (application.getStatusBar() != null && progress % 5 == 0) 	application.setProgress(progress, sThreadId);
+					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
+						application.setProgress(progress, sThreadId);
+					}
 
 				}
 				if (application.getStatusBar() != null) 	application.setProgress(100, sThreadId);
 
-				activeChannel.setActiveRecordSet(recordSetName);
-				activeChannel.applyTemplate(recordSetName, true);
-				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
-				if (!isOutdated) {
-					long startTimeStamp = (long) (new File(filePath).lastModified() - activeChannel.get(recordSetName).getMaxTime_ms());
-					activeChannel.get(recordSetName).setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp));
-					activeChannel.get(recordSetName).setStartTimeStamp(startTimeStamp);
-					activeChannel.setFileDescription(dateTime.substring(0, 10) + activeChannel.getFileDescription().substring(10));
+				Iterator<RecordSet> iterator = createdRecordSets.iterator();
+				while (iterator.hasNext()) {
+					RecordSet tmpRecordSet = iterator.next();
+					if (tmpRecordSet.get(0).realSize() < 3) {
+						channels.get(tmpRecordSet.getChannelConfigNumber()).remove(recordSetName);
+						log.log(Level.WARNING, filePath + " - remove record set " + tmpRecordSet.getName() + " with < 3 data points, last line number = " + (lineNumber - 1)); //$NON-NLS-1$
+						iterator.remove();
+					}
+					else {
+						if (!isOutdated) {
+							long startTimeStamp = (long) (new File(filePath).lastModified() - tmpRecordSet.getMaxTime_ms());
+							tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp));
+							tmpRecordSet.setStartTimeStamp(startTimeStamp);
+							activeChannel.setFileDescription(dateTime.substring(0, 10) + activeChannel.getFileDescription().substring(10));
+						}
+						else {
+							tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
+						}
+						tmpRecordSet.checkAllDisplayable(); // raw import needs calculation of passive records
+						device.updateVisibilityStatus(tmpRecordSet, true);
+					}
 				}
-				else {
-					activeChannel.get(recordSetName).setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
+				
+				if (createdRecordSets.size() == 1) {
+					activeChannel.setActiveRecordSet(createdRecordSets.firstElement());
+
+					if (application.getStatusBar() != null) 
+						activeChannel.switchRecordSet(createdRecordSets.firstElement().getName());
 				}
-				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
-				if (application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 
 				reader.close();
 				reader = null;
@@ -250,6 +298,7 @@ public class CSVSerialDataReaderWriter {
 			application.openMessageDialog(e.getMessage());
 		}
 		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
 			// check if previous records are available and needs to be displayed
 			if (activeChannel != null && activeChannel.size() > 0) {
 				String recordSetName = activeChannel.getFirstRecordSetName();
@@ -269,7 +318,7 @@ public class CSVSerialDataReaderWriter {
 			}
 		}
 		
-		return recordSet;
+		return channelRecordSet;
 	}
 
 //	/**

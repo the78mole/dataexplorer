@@ -1377,7 +1377,7 @@ public class FileUtils {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
 		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage, new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
-				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
+				(GDE.IS_WINDOWS ? GDE.FILE_ENDING_STAR_STAR : GDE.FILE_ENDING_STAR) }, searchDirectory, null, SWT.MULTI);
 
 		if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.equals(fd.getFilterPath())) device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
@@ -1435,7 +1435,7 @@ public class FileUtils {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
 		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage, new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(),
-				GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
+				(GDE.IS_WINDOWS ? GDE.FILE_ENDING_STAR_STAR : GDE.FILE_ENDING_STAR) }, searchDirectory, null, SWT.MULTI);
 
 		if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() &&  !searchDirectory.equals(fd.getFilterPath())) device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;

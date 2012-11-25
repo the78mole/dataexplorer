@@ -2273,4 +2273,12 @@ public class DeviceConfiguration {
 	public int getNumberOfLithiumCells(Object specificData) {
 		return 0;
 	}
+	
+	/**
+	 * query if the record set numbering should follow channel configuration numbering
+	 * @return true where devices does not distinguish between channels (for example Av4ms_FV_762)
+	 */
+	public boolean recordSetNumberFollowChannel() {
+		return this.getName().toLowerCase().contains("av4ms");
+	}
 }

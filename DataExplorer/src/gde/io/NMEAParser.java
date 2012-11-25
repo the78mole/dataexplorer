@@ -68,7 +68,7 @@ public class NMEAParser {
 	final CheckSumTypes					checkSumType;
 	final IDevice								device;
 	final String								deviceName;
-	final int										channelConfigNumber;
+	int													channelConfigNumber;
 	
 	int lineNumber = 0;
 
