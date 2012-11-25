@@ -25,6 +25,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.device.DataBlockType;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.InputTypes;
@@ -60,13 +61,16 @@ import org.eclipse.swt.widgets.MenuItem;
  * @author Winfried Brügmann
  */
 public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
-	final static Logger						log	= Logger.getLogger(CSV2SerialAdapter.class.getName());
+	final static Logger							log					= Logger.getLogger(CSV2SerialAdapter.class.getName());
 
-	final DataExplorer	application;
-	final CSV2SerialAdapterDialog	dialog;
-	protected final CSV2SerialPort						serialPort;
-	protected final Channels											channels;
-	protected       GathererThread								gathererThread;
+	final DataExplorer							application;
+	final CSV2SerialAdapterDialog		dialog;
+	protected final CSV2SerialPort	serialPort;
+	protected final Channels				channels;
+	protected GathererThread				gathererThread;
+
+	protected boolean								isFileIO		= false;
+	protected boolean								isSerialIO	= false;
 
 	/**
 	 * constructor using properties file
@@ -83,12 +87,17 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		this.serialPort = new CSV2SerialPort(this, this.application);
 		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) {
-			if (this.getDataBlockType().getFormat().size() == 2) {
-				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1705), Messages.getString(MessageIds.GDE_MSGT1706));
+			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
+				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
+				if (!isFileIO) isFileIO = format.getInputType() == InputTypes.FILE_IO;
+			}
+			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
+				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1706), Messages.getString(MessageIds.GDE_MSGT1705));
 			} else { //InputTypes.FILE_IO
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1703), Messages.getString(MessageIds.GDE_MSGT1703));
-				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 			}
+			if (isFileIO)
+				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 
@@ -106,12 +115,17 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		this.serialPort = new CSV2SerialPort(this, this.application);
 		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) {
-			if (this.getDataBlockType().getFormat().size() == 2) {
+			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
+				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
+				if (!isFileIO) isFileIO = format.getInputType() == InputTypes.FILE_IO;
+			}
+			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1706), Messages.getString(MessageIds.GDE_MSGT1705));
 			} else { //InputTypes.FILE_IO
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT1703), Messages.getString(MessageIds.GDE_MSGT1703));
-				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 			}
+			if (isFileIO)
+				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 	}
 
@@ -446,7 +460,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
-		if (this.getDataBlockType().getFormat().size() == 2) {
+		if (this.isSerialIO) {
 			if (this.serialPort != null) {
 				if (!this.serialPort.isConnected()) {
 					try {
@@ -488,41 +502,42 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 		else { //InputTypes.FILE_IO
-			final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT1700));
-	
-			Thread reader = new Thread("reader") { //$NON-NLS-1$
-				@Override
-				public void run() {
-					try {
-						CSV2SerialAdapter.this.application.setPortConnected(true);
-						for (String tmpFileName : fd.getFileNames()) {
-							String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-							if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
-								if (selectedImportFile.contains(GDE.STRING_DOT)) {
-									selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
-								}
-								selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
+			importCsvFiles();
+		}
+	}
+
+	/**
+	 * import a CSV file, also called "OpenFormat" file
+	 */
+	private void importCsvFiles() {
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT1700));
+
+		Thread reader = new Thread("reader") { //$NON-NLS-1$
+			@Override
+			public void run() {
+				try {
+					CSV2SerialAdapter.this.application.setPortConnected(true);
+					for (String tmpFileName : fd.getFileNames()) {
+						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+
+						if (fd.getFileName().length() > 4) {
+							try {
+								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
+								CSVSerialDataReaderWriter.read(selectedImportFile, CSV2SerialAdapter.this, GDE.STRING_EMPTY, channelConfigNumber, true);
 							}
-							log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-	
-							if (fd.getFileName().length() > 4) {
-								try {
-									Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-									CSVSerialDataReaderWriter.read(selectedImportFile, CSV2SerialAdapter.this, GDE.STRING_EMPTY, channelConfigNumber, true);
-								}
-								catch (Throwable e) {
-									log.log(Level.WARNING, e.getMessage(), e);
-								}
+							catch (Throwable e) {
+								log.log(Level.WARNING, e.getMessage(), e);
 							}
 						}
 					}
-					finally {
-						CSV2SerialAdapter.this.application.setPortConnected(false);
-					}
 				}
-			};
-			reader.start();
-		}
+				finally {
+					CSV2SerialAdapter.this.application.setPortConnected(false);
+				}
+			}
+		};
+		reader.start();
 	}
 	
 	/**
@@ -551,7 +566,8 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
-					open_closeCommPort();
+					if (!isSerialIO) open_closeCommPort();
+					else importCsvFiles();
 				}
 			});
 		}

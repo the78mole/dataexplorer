@@ -62,7 +62,7 @@ public class CSV2SerialPort extends DeviceCommPort {
 		this.startByte = (byte) this.device.getDataBlockLeader().charAt(0);
 		this.endByte = this.device.getDataBlockEnding()[this.device.getDataBlockEnding().length - 1];
 		this.endByte_1 = this.device.getDataBlockEnding().length == 2 ? this.device.getDataBlockEnding()[0] : 0x00;
-		this.tmpDataLength = Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) * 10;
+		this.tmpDataLength = Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
 		this.timeout = this.device.getDeviceConfiguration().getRTOCharDelayTime() + this.device.getDeviceConfiguration().getRTOExtraDelayTime();
 		this.isDataReceived = false;
 		this.index = 0;

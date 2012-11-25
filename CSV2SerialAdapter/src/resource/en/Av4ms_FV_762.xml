@@ -32,11 +32,12 @@
     </TimeBase>
     <DataBlock>
         <format inputType="FILE_IO" formatType="VALUE" size="-8"/>
-        <format inputType="SERIAL_IO" formatType="BYTE" size="-57"/>
+        <format inputType="SERIAL_IO" formatType="BYTE" size="-318"/>
         <timeUnit>msec</timeUnit>
         <separator>semicolon</separator>
         <leader>$</leader>
         <trailer>0D0A</trailer>
+        <preferredFileExtention>*.csv</preferredFileExtention>
     </DataBlock>
     <State>
         <property name="Cell-conditioning" value="01" type="Integer" description=""/>
