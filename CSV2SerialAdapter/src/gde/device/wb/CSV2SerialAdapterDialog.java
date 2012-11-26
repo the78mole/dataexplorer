@@ -24,7 +24,6 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
-import gde.device.IDevice;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
 
@@ -57,21 +56,21 @@ import org.eclipse.swt.widgets.Shell;
 public class CSV2SerialAdapterDialog extends DeviceDialog {
 	final static Logger		log								= Logger.getLogger(CSV2SerialAdapterDialog.class.getName());
 
-	CTabFolder						tabFolder;
-	Button								saveButton, closeButton, helpButton;
+	CTabFolder							tabFolder;
+	Button									saveButton, closeButton, helpButton;
 
-	final IDevice					device;																																				// get device specific things, get serial port, ...
-	final Settings				settings;																																			// application configuration settings
+	final CSV2SerialAdapter	device;																																				// get device specific things, get serial port, ...
+	final Settings					settings;																																			// application configuration settings
 
-	int										measurementsCount	= 0;
-	final List<CTabItem>	configurations		= new ArrayList<CTabItem>();
+	int											measurementsCount	= 0;
+	final List<CTabItem>		configurations		= new ArrayList<CTabItem>();
 
 	/**
 	 * default constructor initialize all variables required
 	 * @param parent Shell
 	 * @param useDevice device specific class implementation
 	 */
-	public CSV2SerialAdapterDialog(Shell parent, IDevice useDevice) {
+	public CSV2SerialAdapterDialog(Shell parent, CSV2SerialAdapter useDevice) {
 		super(parent);
 		this.device = useDevice;
 		this.settings = Settings.getInstance();

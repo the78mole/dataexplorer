@@ -20,7 +20,6 @@ package gde.device.wb;
 
 import gde.GDE;
 import gde.data.Channels;
-import gde.device.IDevice;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.MeasurementControlConfigurable;
@@ -63,14 +62,14 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 	boolean													isVisibilityChanged	= false;
 
 	final CTabFolder								parent;
-	final IDevice										device;																																								// get device specific things, get serial port, ...
-	final DataExplorer		application;																																						// interaction with application instance
+	final CSV2SerialAdapter					device;																																								// get device specific things, get serial port, ...
+	final DataExplorer							application;																																					// interaction with application instance
 	final Channels									channels;																																							// interaction with channels, source of all records
 	final CSV2SerialAdapterDialog		dialog;
 	final int												channelConfigNumber;
 	final List<MeasurementControlConfigurable>	measurementTypes		= new ArrayList<MeasurementControlConfigurable>();
 
-	public CSV2SerialAdapterDialogTabItem(CTabFolder parentTabFolder, CSV2SerialAdapterDialog parentDialog, int useChannelConfigNumber, IDevice useDevice) {
+	public CSV2SerialAdapterDialogTabItem(CTabFolder parentTabFolder, CSV2SerialAdapterDialog parentDialog, int useChannelConfigNumber, CSV2SerialAdapter useDevice) {
 		super(parentTabFolder, SWT.NONE);
 		this.parent = parentTabFolder;
 		this.dialog = parentDialog;
@@ -141,7 +140,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 								CSV2SerialAdapterDialogTabItem.this.device.storeDeviceProperties();
 							}
 						}
-						CSV2SerialAdapterDialogTabItem.this.device.open_closeCommPort();
+						CSV2SerialAdapterDialogTabItem.this.device.importCsvFiles();
 					}
 				});
 			}

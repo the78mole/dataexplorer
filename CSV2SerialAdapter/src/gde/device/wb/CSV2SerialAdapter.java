@@ -509,7 +509,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * import a CSV file, also called "OpenFormat" file
 	 */
-	private void importCsvFiles() {
+	public void importCsvFiles() {
 		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT1700));
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
