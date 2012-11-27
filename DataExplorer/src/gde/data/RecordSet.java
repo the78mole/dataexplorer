@@ -1042,7 +1042,7 @@ public class RecordSet extends LinkedHashMap<String, Record> {
 					//ignore
 				}
 				Channel activeChannel = RecordSet.this.channels.getActiveChannel();
-				if (activeChannel != null) 
+				if (activeChannel != null && activeChannel.getFullQualifiedFileName() != null) 
 					activeChannel.checkAndLoadData();
 			}
 		}, "DataLoadCheck");

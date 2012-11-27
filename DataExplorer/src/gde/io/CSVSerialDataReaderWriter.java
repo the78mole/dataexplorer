@@ -145,8 +145,14 @@ public class CSVSerialDataReaderWriter {
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$			
 				while ((line = reader.readLine()) != null) {
 					++lineNumber;
-					if (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPGGA.name())) {
-						data.parse(line, lineNumber);
+					if (line.startsWith(device.getDataBlockLeader())) {
+						if (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) || line.startsWith(device.getDataBlockLeader() + NMEA.GPGGA.name())) {
+							data.parse(line, lineNumber);
+							continue;
+						}
+					}
+					else {//skip all lines which does not match the configured data block leader
+						log.log(Level.WARNING, filePath + " - skipped " + (lineNumber - 1) + ", it does not start with " + device.getDataBlockLeader()); //$NON-NLS-1$
 						continue;
 					}
 					
