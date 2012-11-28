@@ -55,7 +55,7 @@
 			<os name="Windows 7" />
 		</condition>
 		<condition property="build.os.shortname" value="Windows">
-			<os name="Windows NT (unknown)" description="Windows 8??"/>
+			<os name="Windows NT (unknown)" /> <!-- Windows 8 -->
 		</condition>
 
 		<condition property="build.os.shortname" value="MAC">
