@@ -27,14 +27,14 @@ Name "DataExplorer"
 !define FILE_EXT2 ".lov"
 !define FILE_EXT_DESCRIPTION "DataExplorer.DataExplorerFileExtension"
 # MUI defines
-!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
+!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\DataExplorer.ico"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_NODISABLE
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
 !define MUI_STARTMENUPAGE_DEFAULT_FOLDER $(^Name)
-!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
+!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\DataExplorer_uninstall.ico"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # Included files
@@ -84,7 +84,7 @@ OutFile "${OUTDIR}\${OUTFILENAME}"
 InstallDirRegKey HKLM "SOFTWARE\DataExplorer" "InstallDir"
 
 CRCCheck off
-RequestExecutionLevel user
+RequestExecutionLevel admin
 !insertmacro setVersionInfo "${VERSION}" "${APPNAME}"
 
 
