@@ -26,6 +26,8 @@
 		<string>3.05</string>
 		<key>LSMinimumSystemVersion</key>
 		<string>10.5</string>
+		<key>NSAppleScriptEnabled</key>
+		<true/>
 		<key>CFBundleDocumentTypes</key>
 		<array>
 			<dict>
