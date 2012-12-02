@@ -46,6 +46,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.ArmEvent;
+import org.eclipse.swt.events.ArmListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.MenuEvent;
@@ -299,28 +301,22 @@ public class MenuBar {
 						});
 					}
 				}
-				{
-					new MenuItem(this.fileMenu, SWT.SEPARATOR);
-				}
-				{
-					this.preferencesFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.preferencesFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0020, GDE.MOD3));
-					this.preferencesFileMenuItem.setAccelerator(SWT.MOD3 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0052));
-					this.preferencesFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/SettingsHot.gif")); //$NON-NLS-1$
-					this.preferencesFileMenuItem.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "preferencesFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							// check if other none modal dialog is open
-							DeviceDialog deviceDialog = MenuBar.this.application.getDeviceDialog();
-							if (deviceDialog == null || deviceDialog.isDisposed()) {
-								MenuBar.this.application.openSettingsDialog();
-								MenuBar.this.application.setStatusMessage(GDE.STRING_EMPTY); //$NON-NLS-1$
+				if (!GDE.IS_MAC) {
+					{
+						new MenuItem(this.fileMenu, SWT.SEPARATOR);
+					}
+					{
+						this.preferencesFileMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+						this.preferencesFileMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0020, GDE.MOD3));
+						this.preferencesFileMenuItem.setAccelerator(SWT.MOD3 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0052));
+						this.preferencesFileMenuItem.setImage(SWTResourceManager.getImage("gde/resource/SettingsHot.gif")); //$NON-NLS-1$
+						this.preferencesFileMenuItem.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								openPreferencesDialog(evt);
 							}
-							else
-								MenuBar.this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI0001), SWT.COLOR_RED); 
-						}
-					});
+						});
+					}
 				}
 				{
 					new MenuItem(this.fileMenu, SWT.SEPARATOR);
@@ -338,23 +334,21 @@ public class MenuBar {
 						}
 					});
 				}
-				{
-					new MenuItem(this.fileMenu, SWT.SEPARATOR);
-				}
-				{
-					this.exitMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
-					this.exitMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0021, GDE.MOD1));
-					this.exitMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0021));
-					this.exitMenuItem.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
-							if (deviceSelect.checkDataSaved()) {
-								MenuBar.this.parent.getParent().dispose();
+				if (!GDE.IS_MAC) {
+					{
+						new MenuItem(this.fileMenu, SWT.SEPARATOR);
+					}
+					{
+						this.exitMenuItem = new MenuItem(this.fileMenu, SWT.PUSH);
+						this.exitMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0021, GDE.MOD1));
+						this.exitMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0021));
+						this.exitMenuItem.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								closeApplication(evt);
 							}
-						}
-					});
+						});
+					}
 				}
 				this.fileMenuItem.setMenu(this.fileMenu);
 			}
@@ -893,18 +887,81 @@ public class MenuBar {
 						}
 					});
 				}
-				{
-					this.aboutMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
-					this.aboutMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0047)); 
-					this.aboutMenuItem.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "aboutMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.openAboutDialog();
-						}
-					});
+				if (!GDE.IS_MAC) {
+					{
+						this.aboutMenuItem = new MenuItem(this.helpMenu, SWT.PUSH);
+						this.aboutMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0047));
+						this.aboutMenuItem.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent evt) {
+								if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "aboutMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+								MenuBar.this.application.openAboutDialog();
+							}
+						});
+					}
 				}
 			}
+		}
+
+		Menu systemMenu = GDE.display.getSystemMenu();
+		if (systemMenu != null) {
+			/* remove comment for further logging 
+			systemMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuHidden(MenuEvent e) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "App menu closed"); //$NON-NLS-1$
+				}
+
+				@Override
+				public void menuShown(MenuEvent e) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "App menu opened"); //$NON-NLS-1$
+				}
+			});
+			*/
+			
+			MenuItem sysItem = getItem(systemMenu, SWT.ID_QUIT);
+			//sysItem.addArmListener(armListener);
+			sysItem.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					closeApplication(e);
+				};
+			});
+			sysItem = getItem(systemMenu, SWT.ID_HIDE_OTHERS);
+			//sysItem.addArmListener(armListener);
+			sysItem.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "Hide others selected -- and blocked!"); //$NON-NLS-1$
+					e.doit = false;
+				};
+			});
+			sysItem = getItem(systemMenu, SWT.ID_HIDE);
+			//sysItem.addArmListener(armListener);
+			sysItem.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "Hide selected -- and blocked!"); //$NON-NLS-1$
+					e.doit = false;
+				};
+			});
+			sysItem = getItem(systemMenu, SWT.ID_PREFERENCES);
+			//sysItem.addArmListener(armListener);
+			sysItem.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					openPreferencesDialog(e);
+				};
+			});
+			sysItem = getItem(systemMenu, SWT.ID_ABOUT);
+			//sysItem.addArmListener(armListener);
+			sysItem.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "aboutMenuItem.widgetSelected, event=" + e); //$NON-NLS-1$
+					MenuBar.this.application.openAboutDialog();
+				};
+			});
 		}
 	}
 
@@ -1131,6 +1188,41 @@ public class MenuBar {
 				}
 			});
 		}
+	}
+
+	private void openPreferencesDialog(SelectionEvent evt) {
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "preferencesFileMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+		// check if other none modal dialog is open
+		DeviceDialog deviceDialog = MenuBar.this.application.getDeviceDialog();
+		if (deviceDialog == null || deviceDialog.isDisposed()) {
+			MenuBar.this.application.openSettingsDialog();
+			MenuBar.this.application.setStatusMessage(GDE.STRING_EMPTY); //$NON-NLS-1$
+		}
+		else
+			MenuBar.this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI0001), SWT.COLOR_RED);
+	}
+
+	private void closeApplication(SelectionEvent evt) {
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "exitMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+		DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
+		if (deviceSelect.checkDataSaved()) {
+			MenuBar.this.parent.getParent().dispose();
+		}
+	}
+	
+	ArmListener armListener = new ArmListener() {
+		@Override
+		public void widgetArmed(ArmEvent e) {
+			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "widgetArmed, event=" + e); //$NON-NLS-1$
+		}
+	};
+	
+	static MenuItem getItem(Menu menu, int id) {
+		MenuItem[] items = menu.getItems();
+		for (MenuItem item : items) {
+			if (item.getID() == id) return item;
+		}
+		return null;
 	}
 }
 

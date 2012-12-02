@@ -93,7 +93,7 @@ public class GDE {
 	public static final boolean		IS_ARCH_DATA_MODEL_64						= System.getProperty("sun.arch.data.model").equals("64");																																			//$NON-NLS-1$ //$NON-NLS-2$
 
 	public static final String		STRING_BASE_PACKAGE							= "gde";																																																											//$NON-NLS-1$
-	public final static int				WIDGET_FONT_SIZE								= GDE.IS_MAC ? 12 : ((GDE.IS_LINUX ? 8 : 9) * 96 / Display.getDefault().getDPI().y);
+	public final static int				WIDGET_FONT_SIZE								= GDE.IS_MAC ? 11 : ((GDE.IS_LINUX ? 8 : 9) * 96 / Display.getDefault().getDPI().y);
 	public final static String		WIDGET_FONT_NAME								= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : "Sans Serif";																																		//$NON-NLS-1$ //$NON-NLS-2$
 
 	public static final String		BIT_MODE												= System.getProperty("sun.arch.data.model") != null //$NON-NLS-1$
