@@ -111,7 +111,7 @@ public class FileTransferTabItem extends CTabItem {
 	public FileTransferTabItem(CTabFolder parent, int style, int position, HoTTAdapter useDevice, HoTTAdapterSerialPort useSerialPort) {
 		super(parent, style, position);
 		this.tabFolder = parent;
-		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
 		this.setText(Messages.getString(MessageIds.GDE_MSGT2426));
@@ -241,7 +241,6 @@ public class FileTransferTabItem extends CTabItem {
 				this.innerComposite.setLayout(innerCompositeLayout);
 				{
 					this.pcFolderGroup = new Group(this.innerComposite, SWT.NONE);
-					this.pcFolderGroup.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 					RowLayout pcGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					this.pcFolderGroup.setLayout(pcGroupLayout);
 					RowData pcGroupLData = new RowData();
@@ -252,7 +251,6 @@ public class FileTransferTabItem extends CTabItem {
 					this.pcFolderGroup.setText(Messages.getString(MessageIds.GDE_MSGT2427));
 					{
 						this.filler = new Composite(this.pcFolderGroup, SWT.NONE);
-						this.filler.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						GridLayout composite1Layout = new GridLayout();
 						composite1Layout.makeColumnsEqualWidth = true;
 						RowData composite1LData = new RowData();
@@ -265,7 +263,7 @@ public class FileTransferTabItem extends CTabItem {
 						this.pcBaseFolderButton = new Button(this.pcFolderGroup, SWT.PUSH | SWT.CENTER);
 						RowData pcBaseFolderButtonLData = new RowData();
 						pcBaseFolderButtonLData.width = 155;
-						pcBaseFolderButtonLData.height = 30;
+						pcBaseFolderButtonLData.height = 33;
 						this.pcBaseFolderButton.setLayoutData(pcBaseFolderButtonLData);
 						this.pcBaseFolderButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.pcBaseFolderButton.setText(Messages.getString(MessageIds.GDE_MSGT2432));
@@ -283,17 +281,15 @@ public class FileTransferTabItem extends CTabItem {
 					}
 					{
 						this.pcBaseFolderSelectionLabel = new CLabel(this.pcFolderGroup, SWT.NONE);
-						this.pcBaseFolderSelectionLabel.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						this.pcBaseFolderSelectionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.pcBaseFolderSelectionLabel.setText(this.selectedPcBaseFolder.toString());
 						RowData pcBaseFolderSelectionLabelLData = new RowData();
 						pcBaseFolderSelectionLabelLData.width = 580 + 337;
-						pcBaseFolderSelectionLabelLData.height = 26;
+						pcBaseFolderSelectionLabelLData.height = 28;
 						this.pcBaseFolderSelectionLabel.setLayoutData(pcBaseFolderSelectionLabelLData);
 					}
 					{
 						this.filler = new Composite(this.pcFolderGroup, SWT.NONE);
-						this.filler.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						GridLayout compositeLayout = new GridLayout();
 						compositeLayout.makeColumnsEqualWidth = true;
 						RowData compositeLData = new RowData();
@@ -326,7 +322,6 @@ public class FileTransferTabItem extends CTabItem {
 					}
 					{
 						this.filler = new Composite(this.pcFolderGroup, SWT.NONE);
-						this.filler.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						GridLayout composite1Layout = new GridLayout();
 						composite1Layout.makeColumnsEqualWidth = true;
 						RowData composite1LData = new RowData();
@@ -372,7 +367,6 @@ public class FileTransferTabItem extends CTabItem {
 				}
 				{
 					this.sdCardActionGroup = new Group(this.innerComposite, SWT.NONE);
-					this.sdCardActionGroup.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 					RowLayout TransmitterSourceGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					this.sdCardActionGroup.setLayout(TransmitterSourceGroupLayout);
 					RowData transmitterSourceGroupLData = new RowData();
@@ -401,7 +395,6 @@ public class FileTransferTabItem extends CTabItem {
 					});
 					{
 						this.sdCardSizeComposite = new Composite(this.sdCardActionGroup, SWT.NONE);
-						this.sdCardSizeComposite.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						RowLayout sdCardSizeCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData sdCardSizeCompositeLData = new RowData();
 						sdCardSizeCompositeLData.width = 923;
@@ -410,7 +403,6 @@ public class FileTransferTabItem extends CTabItem {
 						this.sdCardSizeComposite.setLayout(sdCardSizeCompositeLayout);
 						{
 							this.sdCardSpaceinfoLabel = new CLabel(this.sdCardSizeComposite, SWT.NONE);
-							this.sdCardSpaceinfoLabel.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 							RowData sdCardSpaceinfoLabelLData = new RowData();
 							sdCardSpaceinfoLabelLData.width = 869;
 							sdCardSpaceinfoLabelLData.height = 18;
@@ -430,19 +422,18 @@ public class FileTransferTabItem extends CTabItem {
 					}
 					{
 						this.sdCardActionComposite = new Composite(this.sdCardActionGroup, SWT.NONE);
-						this.sdCardActionComposite.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						GridLayout composite2Layout = new GridLayout();
 						composite2Layout.makeColumnsEqualWidth = true;
 						this.sdCardActionComposite.setLayout(composite2Layout);
 						RowData composite2LData = new RowData();
 						composite2LData.width = 178;
-						composite2LData.height = 180;
+						composite2LData.height = 190;
 						this.sdCardActionComposite.setLayoutData(composite2LData);
 						{
 							this.connectButton = new Button(this.sdCardActionComposite, SWT.PUSH | SWT.CENTER);
 							GridData connectButtonLData = new GridData();
 							connectButtonLData.widthHint = 155;
-							connectButtonLData.heightHint = 30;
+							connectButtonLData.heightHint = 33;
 							this.connectButton.setLayoutData(connectButtonLData);
 							this.connectButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.connectButton.setText(Messages.getString(MessageIds.GDE_MSGT2429));
@@ -485,7 +476,7 @@ public class FileTransferTabItem extends CTabItem {
 							this.upDownLoadButton = new Button(this.sdCardActionComposite, SWT.PUSH | SWT.CENTER);
 							GridData upLoadButtonLData = new GridData();
 							upLoadButtonLData.widthHint = 155;
-							upLoadButtonLData.heightHint = 30;
+							upLoadButtonLData.heightHint = 33;
 							this.upDownLoadButton.setLayoutData(upLoadButtonLData);
 							this.upDownLoadButton.setEnabled(false);
 							this.upDownLoadButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -495,7 +486,7 @@ public class FileTransferTabItem extends CTabItem {
 							this.stopButton = new Button(this.sdCardActionComposite, SWT.PUSH | SWT.CENTER);
 							GridData stopButtonnLData = new GridData();
 							stopButtonnLData.widthHint = 155;
-							stopButtonnLData.heightHint = 30;
+							stopButtonnLData.heightHint = 33;
 							this.stopButton.setLayoutData(stopButtonnLData);
 							this.stopButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.stopButton.setText(Messages.getString(MessageIds.GDE_MSGT2435));
@@ -512,7 +503,7 @@ public class FileTransferTabItem extends CTabItem {
 							this.modelLoadButton = new Button(this.sdCardActionComposite, SWT.PUSH | SWT.CENTER);
 							GridData downLoadButtonLData = new GridData();
 							downLoadButtonLData.widthHint = 155;
-							downLoadButtonLData.heightHint = 30;
+							downLoadButtonLData.heightHint = 33;
 							this.modelLoadButton.setLayoutData(downLoadButtonLData);
 							this.modelLoadButton.setEnabled(false);
 							this.modelLoadButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -545,7 +536,7 @@ public class FileTransferTabItem extends CTabItem {
 							this.disconnectButton = new Button(this.sdCardActionComposite, SWT.PUSH | SWT.CENTER);
 							GridData disconnectButtonLData = new GridData();
 							disconnectButtonLData.widthHint = 155;
-							disconnectButtonLData.heightHint = 30;
+							disconnectButtonLData.heightHint = 33;
 							this.disconnectButton.setLayoutData(disconnectButtonLData);
 							this.disconnectButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.disconnectButton.setText(Messages.getString(MessageIds.GDE_MSGT2441));
@@ -577,7 +568,7 @@ public class FileTransferTabItem extends CTabItem {
 					{
 						RowData sourceFolderTreeLData = new RowData();
 						sourceFolderTreeLData.width = 250;
-						sourceFolderTreeLData.height = 160;
+						sourceFolderTreeLData.height = 170;
 						this.sdFolderTree = new Tree(this.sdCardActionGroup, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 						this.sdFolderTree.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.sdFolderTree.setLayoutData(sourceFolderTreeLData);
@@ -600,7 +591,6 @@ public class FileTransferTabItem extends CTabItem {
 					}
 					{
 						this.filler = new Composite(this.sdCardActionGroup, SWT.NONE);
-						this.filler.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						GridLayout composite1Layout = new GridLayout();
 						composite1Layout.makeColumnsEqualWidth = true;
 						RowData composite1LData = new RowData();
@@ -613,7 +603,7 @@ public class FileTransferTabItem extends CTabItem {
 						this.sdCardFoldersTable = new Table(this.sdCardActionGroup, SWT.FULL_SELECTION | SWT.BORDER | SWT.MULTI);
 						RowData sourceDirectoryTableLData = new RowData();
 						sourceDirectoryTableLData.width = 580;
-						sourceDirectoryTableLData.height = 160;
+						sourceDirectoryTableLData.height = 170;
 						this.sdCardFoldersTable.setLayoutData(sourceDirectoryTableLData);
 						this.sdCardFoldersTable.setLinesVisible(true);
 						this.sdCardFoldersTable.setHeaderVisible(true);
@@ -641,7 +631,6 @@ public class FileTransferTabItem extends CTabItem {
 					}
 					{
 						this.tranferProgressComposite = new Composite(this.sdCardActionGroup, SWT.NONE);
-						this.tranferProgressComposite.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						RowLayout spacerCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData spacerCompositeLData = new RowData();
 						spacerCompositeLData.width = 915;
@@ -650,7 +639,6 @@ public class FileTransferTabItem extends CTabItem {
 						this.tranferProgressComposite.setLayout(spacerCompositeLayout);
 						{
 							this.transferProgressLabel = new CLabel(this.tranferProgressComposite, SWT.NONE);
-							this.transferProgressLabel.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 							RowData transferProgressLabelLData = new RowData();
 							transferProgressLabelLData.width = 870;
 							transferProgressLabelLData.height = 18;
@@ -672,7 +660,7 @@ public class FileTransferTabItem extends CTabItem {
 						this.deleteFileButton = new Button(this.sdCardActionGroup, SWT.PUSH | SWT.CENTER);
 						RowData deleteFileButtonLData = new RowData();
 						deleteFileButtonLData.width = 155;
-						deleteFileButtonLData.height = 30;
+						deleteFileButtonLData.height = 33;
 						this.deleteFileButton.setLayoutData(deleteFileButtonLData);
 						this.deleteFileButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.deleteFileButton.setText(Messages.getString(MessageIds.GDE_MSGT2444));
