@@ -177,12 +177,12 @@ public class CellVoltageWindow extends CTabItem {
 			});
 
 			this.voltageLimitsSelection = new Group(this.cellVoltageMainComposite, SWT.NONE);
-			this.voltageLimitsSelection.setBackground(this.surroundingBackground);
+			//this.voltageLimitsSelection.setBackground(this.surroundingBackground);
 			this.voltageLimitsSelection.setText(Messages.getString(MessageIds.GDE_MSGT0369));
 			this.voltageLimitsSelection.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 			RowLayout thisLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.voltageLimitsSelection.setLayout(thisLayout);
-			this.voltageLimitsSelection.setBounds(0, 0, 420, GDE.IS_LINUX ? 50 : 40);
+			this.voltageLimitsSelection.setBounds(0, 0, 420, GDE.IS_WINDOWS ? 40 : 45);
 			this.voltageLimitsSelection.addHelpListener(new HelpListener() {
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "voltageLimitsSelection.helpRequested " + evt); //$NON-NLS-1$
@@ -210,7 +210,7 @@ public class CellVoltageWindow extends CTabItem {
 				liPoButtonLData.height = 18;
 				this.liPoButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liPoButton.setLayoutData(liPoButtonLData);
-				this.liPoButton.setBackground(this.surroundingBackground);
+				//this.liPoButton.setBackground(this.surroundingBackground);
 				this.liPoButton.setText(Messages.getString(MessageIds.GDE_MSGT0371));
 				this.liPoButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 				this.liPoButton.setSelection(false);
@@ -237,7 +237,7 @@ public class CellVoltageWindow extends CTabItem {
 				button1LData.height = 18;
 				this.liIoButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liIoButton.setLayoutData(button1LData);
-				this.liIoButton.setBackground(this.surroundingBackground);
+				//this.liIoButton.setBackground(this.surroundingBackground);
 				this.liIoButton.setText(Messages.getString(MessageIds.GDE_MSGT0372));
 				this.liIoButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 				this.liIoButton.setSelection(false);
@@ -264,7 +264,7 @@ public class CellVoltageWindow extends CTabItem {
 				button2LData.height = 18;
 				this.liFeButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.liFeButton.setLayoutData(button2LData);
-				this.liFeButton.setBackground(this.surroundingBackground);
+				//this.liFeButton.setBackground(this.surroundingBackground);
 				this.liFeButton.setText(Messages.getString(MessageIds.GDE_MSGT0373));
 				this.liFeButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 				this.liFeButton.setSelection(false);
@@ -291,7 +291,7 @@ public class CellVoltageWindow extends CTabItem {
 				button2LData.height = 18;
 				this.niMhButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.niMhButton.setLayoutData(button2LData);
-				this.niMhButton.setBackground(this.surroundingBackground);
+				//this.niMhButton.setBackground(this.surroundingBackground);
 				this.niMhButton.setText(Messages.getString(MessageIds.GDE_MSGT0377));
 				this.niMhButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 				this.niMhButton.setSelection(false);
@@ -318,7 +318,7 @@ public class CellVoltageWindow extends CTabItem {
 				button1LData1.height = 18;
 				this.individualButton = new Button(this.voltageLimitsSelection, SWT.CHECK | SWT.CENTER);
 				this.individualButton.setLayoutData(button1LData1);
-				this.individualButton.setBackground(this.surroundingBackground);
+				//this.individualButton.setBackground(this.surroundingBackground);
 				this.individualButton.setText(Messages.getString(MessageIds.GDE_MSGT0375));
 				this.individualButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0370));
 				this.individualButton.setSelection(false);

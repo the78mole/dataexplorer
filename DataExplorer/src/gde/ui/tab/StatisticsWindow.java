@@ -135,7 +135,7 @@ public class StatisticsWindow extends CTabItem {
 				this.descriptionGroup.setBounds(10, 10, 300, 110); // set top,left and maintain the rest by control listener
 				this.descriptionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.descriptionGroup.setText(Messages.getString(MessageIds.GDE_MSGT0351));
-				this.descriptionGroup.setBackground(this.innerAreaBackground);
+				//this.descriptionGroup.setBackground(this.innerAreaBackground);
 				this.descriptionGroup.setMenu(this.popupmenu);			
 				this.descriptionGroup.addHelpListener(new HelpListener() {
 					public void helpRequested(HelpEvent evt) {
@@ -171,7 +171,7 @@ public class StatisticsWindow extends CTabItem {
 					this.descriptionTextLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.descriptionTextLabel.setText("recordSetName, (fileDescription), recordSetDescription"); //$NON-NLS-1$
 					this.descriptionTextLabel.setBackground(this.innerAreaBackground);
-					this.descriptionTextLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
+					this.descriptionTextLabel.setBounds(5, 3, this.descriptionGroup.getClientArea().width-10, this.descriptionGroup.getClientArea().height-10);
 					this.descriptionTextLabel.setEditable(false);
 					this.descriptionTextLabel.setMenu(this.popupmenu);			
 				}

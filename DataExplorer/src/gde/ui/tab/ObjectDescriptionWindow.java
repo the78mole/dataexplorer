@@ -161,7 +161,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		
 		this.innerAreaBackground = Settings.getInstance().getObjectDescriptionInnerAreaBackground();
 		this.surroundingBackground = Settings.getInstance().getObjectDescriptionSurroundingAreaBackground();
-		this.setFont(SWTResourceManager.getFont(this.application, 10, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0403));
 		
 		this.imagePopupMenu = new Menu(this.application.getShell(), SWT.POP_UP);
@@ -303,7 +303,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 			group2LData.top = new FormAttachment(0, 1000, 60);
 			this.mainObjectCharacterisitcsGroup.setLayoutData(group2LData);
 			this.mainObjectCharacterisitcsGroup.setText(Messages.getString(MessageIds.GDE_MSGT0416));
-			this.mainObjectCharacterisitcsGroup.setBackground(this.surroundingBackground);
+			//this.mainObjectCharacterisitcsGroup.setBackground(this.surroundingBackground);
 			this.mainObjectCharacterisitcsGroup.setMenu(this.popupmenu);
 			{
 				this.objectTypeComposite = new Composite(this.mainObjectCharacterisitcsGroup, SWT.NONE);
@@ -315,11 +315,11 @@ public class ObjectDescriptionWindow extends CTabItem {
 				typeCompositeLData.horizontalAlignment = GridData.BEGINNING;
 				typeCompositeLData.heightHint = GDE.IS_LINUX ? 32 : 28;
 				this.objectTypeComposite.setLayoutData(typeCompositeLData);
-				this.objectTypeComposite.setBackground(this.surroundingBackground);
+				//this.objectTypeComposite.setBackground(this.surroundingBackground);
 				this.objectTypeComposite.setMenu(this.popupmenu);
 				{
 					this.objectTypeLabel = new CLabel(this.objectTypeComposite, SWT.NONE);
-					this.objectTypeLabel.setBackground(this.surroundingBackground);
+					//this.objectTypeLabel.setBackground(this.surroundingBackground);
 					this.objectTypeLabel.setMenu(this.popupmenu);
 					this.objectTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.objectTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT0425));
@@ -331,7 +331,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				}
 				{
 					this.objectTypeText = new Text(this.objectTypeComposite, SWT.BORDER);
-					this.objectTypeText.setBackground(this.innerAreaBackground);
+					//this.objectTypeText.setBackground(this.innerAreaBackground);
 					this.objectTypeText.setMenu(this.popupmenu);
 					this.objectTypeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.objectTypeText.setEditable(true);
@@ -359,7 +359,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				dateCompositeLData.horizontalAlignment = GridData.BEGINNING;
 				dateCompositeLData.heightHint = GDE.IS_LINUX ? 32 : 28;
 				this.dateComposite.setLayoutData(dateCompositeLData);
-				this.dateComposite.setBackground(this.surroundingBackground);
+				//this.dateComposite.setBackground(this.surroundingBackground);
 				this.dateComposite.setMenu(this.popupmenu);
 				{
 					this.dateLabel = new CLabel(this.dateComposite, SWT.NONE);
@@ -371,7 +371,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.dateLabel.setLayoutData(dateLabelLData);
 					this.dateLabel.setText(Messages.getString(MessageIds.GDE_MSGT0406));
 					this.dateLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0407));
-					this.dateLabel.setBackground(this.surroundingBackground);
+					//this.dateLabel.setBackground(this.surroundingBackground);
 					this.dateLabel.setMenu(this.popupmenu);
 				}
 				{
@@ -381,7 +381,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					dateTextLData.width = GDE.IS_LINUX ? 116 : 118;
 					dateTextLData.height = 18;
 					this.dateText.setLayoutData(dateTextLData);
-					this.dateText.setBackground(this.innerAreaBackground);
+					//this.dateText.setBackground(this.innerAreaBackground);
 					this.dateText.setMenu(this.popupmenu);
 					this.dateText.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0407));
 					this.dateText.setEditable(true);
@@ -404,11 +404,11 @@ public class ObjectDescriptionWindow extends CTabItem {
 				statusCompositeLData.horizontalAlignment = GridData.BEGINNING;
 				statusCompositeLData.heightHint = GDE.IS_LINUX ? 32 : 28;
 				this.statusComposite.setLayoutData(statusCompositeLData);
-				this.statusComposite.setBackground(this.surroundingBackground);
+				//this.statusComposite.setBackground(this.surroundingBackground);
 				this.statusComposite.setMenu(this.popupmenu);
 				{
 					this.statusLabel = new CLabel(this.statusComposite, SWT.NONE);
-					this.statusLabel.setBackground(this.surroundingBackground);
+					//this.statusLabel.setBackground(this.surroundingBackground);
 					this.statusLabel.setMenu(this.popupmenu);
 					this.statusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData statusLabelLData = new RowData();
@@ -422,7 +422,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					this.statusText = new CCombo(this.statusComposite, SWT.BORDER);
 					this.statusText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.statusText.setItems(Messages.getString(MessageIds.GDE_MSGT0412).split(GDE.STRING_SEMICOLON));
-					this.statusText.setBackground(this.innerAreaBackground);
+					//this.statusText.setBackground(this.innerAreaBackground);
 					this.statusText.setMenu(this.popupmenu);
 					this.statusText.select(0);
 					RowData group1LData = new RowData();
@@ -450,7 +450,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				imageCanvasLData.widthHint = 400;
 				this.imageCanvas.setLayoutData(imageCanvasLData);
 				this.imageCanvas.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0413));
-				this.imageCanvas.setBackgroundImage(SWTResourceManager.getImage("gde/resource/" + this.settings.getLocale() + "/ObjectImage.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+				//this.imageCanvas.setBackgroundImage(SWTResourceManager.getImage("gde/resource/" + this.settings.getLocale() + "/ObjectImage.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 				this.imageCanvas.setSize(400, 300);
 
 				this.imageContextMenu.createMenu(this.imagePopupMenu);
@@ -511,7 +511,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 			this.editGroup.setLayoutData(composite1LData);
 			this.editGroup.setLayout(new GridLayout());
 			this.editGroup.setText(Messages.getString(MessageIds.GDE_MSGT0414));
-			this.editGroup.setBackground(this.surroundingBackground);
+			//this.editGroup.setBackground(this.surroundingBackground);
 			this.editGroup.setMenu(this.popupmenu);
 			{
 				this.editCoolBar = new CoolBar(this.editGroup, SWT.FLAT);
@@ -523,14 +523,14 @@ public class ObjectDescriptionWindow extends CTabItem {
 				editCoolBarLData.minimumHeight = 40;
 				this.editCoolBar.setLayoutData(editCoolBarLData);
 				this.editCoolBar.setLayout(new RowLayout(SWT.HORIZONTAL));
-				this.editCoolBar.setBackground(this.surroundingBackground);
+				//this.editCoolBar.setBackground(this.surroundingBackground);
 				this.editCoolBar.setMenu(this.popupmenu);
 				{
 					this.editCoolItem = new CoolItem(this.editCoolBar, SWT.FLAT);
 					{
 						this.fontSelectToolBar = new ToolBar(this.editCoolBar, SWT.FLAT);
 						this.editCoolItem.setControl(this.fontSelectToolBar);
-						this.fontSelectToolBar.setBackground(this.surroundingBackground);
+						//this.fontSelectToolBar.setBackground(this.surroundingBackground);
 
 						new ToolItem(this.fontSelectToolBar, SWT.SEPARATOR);
 						{
@@ -550,7 +550,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 							ToolItem fontSizeSelectComboSep = new ToolItem(this.fontSelectToolBar, SWT.SEPARATOR);
 							{
 								this.fontSizeSelectComposite = new Composite(this.fontSelectToolBar, SWT.FLAT);
-								this.fontSizeSelectComposite.setBackground(this.surroundingBackground);
+								//this.fontSizeSelectComposite.setBackground(this.surroundingBackground);
 								this.fontSizeSelectCombo = new CCombo(this.fontSizeSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
 								this.fontSizeSelectCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.fontSizeSelectCombo.setItems(new String[] { "6", "7", "8", "9", "10", "12", "14", "16", "18" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
@@ -579,7 +579,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 
 						this.editToolBar = new ToolBar(this.editCoolBar, SWT.FLAT);
 						this.editCoolItem.setControl(this.editToolBar);
-						this.editToolBar.setBackground(this.surroundingBackground);
+						//this.editToolBar.setBackground(this.surroundingBackground);
 
 						new ToolItem(this.editToolBar, SWT.SEPARATOR);
 						{
@@ -748,7 +748,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					styledTextLData.bottom = new FormAttachment(1000, 1000, 0);
 					styledTextLData.right = new FormAttachment(1000, 1000, 0);
 					this.styledText.setLayoutData(styledTextLData);
-					this.styledText.setBackground(this.innerAreaBackground);
+					//this.styledText.setBackground(this.innerAreaBackground);
 					this.styledText.setMenu(this.popupmenu);
 					this.styledText.addExtendedModifyListener(new ExtendedModifyListener() {
 						public void modifyText(ExtendedModifyEvent evt) {
