@@ -174,7 +174,7 @@ public class JetiDataReader {
 					Vector<String> vecRecordNames = new Vector<String>();
 					Map<Integer, Record.DataType> mapRecordType = new HashMap<Integer, Record.DataType>();
 					for (TelemetrySensor telemetrySensor : recordSetData) {
-						boolean actualgps = false;
+						boolean isActualgps = false;
 						for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
 							String newRecordName = dataVar.getName();
 							while (vecRecordNames.contains(newRecordName)) { //check for duplicated record names and update to make unique
@@ -185,19 +185,18 @@ public class JetiDataReader {
 							device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
 							device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
 							if (dataVar.getType() == (TelemetryData.T_GPS) && (dataVar.getDecimals() & 1) == 0) {
-								actualgps = true;
+								isActualgps = true;
 								mapRecordType.put(index, Record.DataType.GPS_LATITUDE);
 							}
-							if (dataVar.getType() == (TelemetryData.T_GPS) && (dataVar.getDecimals() & 1) == 1) {
-								actualgps = true;
+							else if (dataVar.getType() == (TelemetryData.T_GPS) && (dataVar.getDecimals() & 1) == 1) {
+								isActualgps = true;
 								mapRecordType.put(index, Record.DataType.GPS_LONGITUDE);
 							}
-							if (actualgps && dataVar.getUnit().contains("°") && dataVar.getParam() == 10) {
+							else if (isActualgps && dataVar.getUnit().contains("°") && dataVar.getParam() == 10) {
 								mapRecordType.put(index, Record.DataType.GPS_AZIMUTH);
 							}
-							if ((dataVar.getName().toUpperCase().contains("GPS") || dataVar.getName().toUpperCase().contains("ABS"))
-									&& (dataVar.getName().toLowerCase().contains("hoehe") || dataVar.getName().toLowerCase().contains("höhe") || dataVar.getName().toLowerCase().contains("height") || dataVar.getName()
-											.toLowerCase().contains("alt"))) //dataVar.getParam()==4
+							else if (isActualgps && (dataVar.getName().toLowerCase().contains("hoehe") || dataVar.getName().toLowerCase().contains("höhe") || dataVar.getName().toLowerCase().contains("height") || dataVar.getName()
+											.toLowerCase().contains("alt")) && dataVar.getUnit().equals("m")) //dataVar.getParam()==4
 							{
 								mapRecordType.put(index, Record.DataType.GPS_ALTITUDE);
 							}
