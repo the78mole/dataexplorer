@@ -241,6 +241,7 @@ public class FileTransferTabItem extends CTabItem {
 				this.innerComposite.setLayout(innerCompositeLayout);
 				{
 					this.pcFolderGroup = new Group(this.innerComposite, SWT.NONE);
+					if (!GDE.IS_MAC) this.pcFolderGroup.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 					RowLayout pcGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					this.pcFolderGroup.setLayout(pcGroupLayout);
 					RowData pcGroupLData = new RowData();
@@ -251,6 +252,7 @@ public class FileTransferTabItem extends CTabItem {
 					this.pcFolderGroup.setText(Messages.getString(MessageIds.GDE_MSGT2427));
 					{
 						this.filler = new Composite(this.pcFolderGroup, SWT.NONE);
+						if (!GDE.IS_MAC) this.filler.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						GridLayout composite1Layout = new GridLayout();
 						composite1Layout.makeColumnsEqualWidth = true;
 						RowData composite1LData = new RowData();
@@ -281,6 +283,7 @@ public class FileTransferTabItem extends CTabItem {
 					}
 					{
 						this.pcBaseFolderSelectionLabel = new CLabel(this.pcFolderGroup, SWT.NONE);
+						if (!GDE.IS_MAC) this.pcBaseFolderSelectionLabel.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						this.pcBaseFolderSelectionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.pcBaseFolderSelectionLabel.setText(this.selectedPcBaseFolder.toString());
 						RowData pcBaseFolderSelectionLabelLData = new RowData();
@@ -290,6 +293,7 @@ public class FileTransferTabItem extends CTabItem {
 					}
 					{
 						this.filler = new Composite(this.pcFolderGroup, SWT.NONE);
+						if (!GDE.IS_MAC) this.filler.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						GridLayout compositeLayout = new GridLayout();
 						compositeLayout.makeColumnsEqualWidth = true;
 						RowData compositeLData = new RowData();
@@ -322,6 +326,7 @@ public class FileTransferTabItem extends CTabItem {
 					}
 					{
 						this.filler = new Composite(this.pcFolderGroup, SWT.NONE);
+						if (!GDE.IS_MAC) this.filler.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						GridLayout composite1Layout = new GridLayout();
 						composite1Layout.makeColumnsEqualWidth = true;
 						RowData composite1LData = new RowData();
@@ -367,6 +372,7 @@ public class FileTransferTabItem extends CTabItem {
 				}
 				{
 					this.sdCardActionGroup = new Group(this.innerComposite, SWT.NONE);
+					if (!GDE.IS_MAC) this.sdCardActionGroup.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 					RowLayout TransmitterSourceGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					this.sdCardActionGroup.setLayout(TransmitterSourceGroupLayout);
 					RowData transmitterSourceGroupLData = new RowData();
@@ -395,6 +401,7 @@ public class FileTransferTabItem extends CTabItem {
 					});
 					{
 						this.sdCardSizeComposite = new Composite(this.sdCardActionGroup, SWT.NONE);
+						if (!GDE.IS_MAC) this.sdCardSizeComposite.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						RowLayout sdCardSizeCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData sdCardSizeCompositeLData = new RowData();
 						sdCardSizeCompositeLData.width = 923;
@@ -403,6 +410,7 @@ public class FileTransferTabItem extends CTabItem {
 						this.sdCardSizeComposite.setLayout(sdCardSizeCompositeLayout);
 						{
 							this.sdCardSpaceinfoLabel = new CLabel(this.sdCardSizeComposite, SWT.NONE);
+							if (!GDE.IS_MAC) this.sdCardSpaceinfoLabel.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 							RowData sdCardSpaceinfoLabelLData = new RowData();
 							sdCardSpaceinfoLabelLData.width = 869;
 							sdCardSpaceinfoLabelLData.height = 18;
@@ -422,6 +430,7 @@ public class FileTransferTabItem extends CTabItem {
 					}
 					{
 						this.sdCardActionComposite = new Composite(this.sdCardActionGroup, SWT.NONE);
+						if (!GDE.IS_MAC) this.sdCardActionComposite.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						GridLayout composite2Layout = new GridLayout();
 						composite2Layout.makeColumnsEqualWidth = true;
 						this.sdCardActionComposite.setLayout(composite2Layout);
@@ -591,6 +600,7 @@ public class FileTransferTabItem extends CTabItem {
 					}
 					{
 						this.filler = new Composite(this.sdCardActionGroup, SWT.NONE);
+						if (!GDE.IS_MAC) this.filler.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						GridLayout composite1Layout = new GridLayout();
 						composite1Layout.makeColumnsEqualWidth = true;
 						RowData composite1LData = new RowData();
@@ -631,6 +641,7 @@ public class FileTransferTabItem extends CTabItem {
 					}
 					{
 						this.tranferProgressComposite = new Composite(this.sdCardActionGroup, SWT.NONE);
+						if (!GDE.IS_MAC) this.tranferProgressComposite.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 						RowLayout spacerCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 						RowData spacerCompositeLData = new RowData();
 						spacerCompositeLData.width = 915;
@@ -639,6 +650,7 @@ public class FileTransferTabItem extends CTabItem {
 						this.tranferProgressComposite.setLayout(spacerCompositeLayout);
 						{
 							this.transferProgressLabel = new CLabel(this.tranferProgressComposite, SWT.NONE);
+							if (!GDE.IS_MAC) this.transferProgressLabel.setBackground(SWTResourceManager.getColor(this.settings.getUtilitySurroundingBackground()));
 							RowData transferProgressLabelLData = new RowData();
 							transferProgressLabelLData.width = 870;
 							transferProgressLabelLData.height = 18;
