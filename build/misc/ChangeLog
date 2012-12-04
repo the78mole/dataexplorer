@@ -5,6 +5,7 @@ add JetiAdapter to analyze flight record data from Jeti transmitters
 add Av4ms_FV_762 charger, matcher and cell selector for AA size cells
 change time line behavior, start showing day > 72 hours
 enable auto-save of a temporary file(s) each 5 minutes
+enable gestures for zooming and panning
 CSV2SerialAdapter - enable file import via menu in parallel to configured serial input
 integrate MAC OS standard menu bar actions
 build Windows NSIS installer
