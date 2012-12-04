@@ -27,6 +27,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.GestureEvent;
+import org.eclipse.swt.events.GestureListener;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
@@ -145,6 +147,7 @@ public class GraphicsComposite extends Composite {
 	boolean										isZoomMouse							= false;
 	boolean										isResetZoomPosition			= false;
 	boolean										isTransientZoom					= false;
+	boolean										isTransientGesture			= false;
 	boolean										isZoomX									= false;
 	boolean										isZoomY									= false;
 
@@ -360,7 +363,7 @@ public class GraphicsComposite extends Composite {
 			this.graphicCanvas.addMouseWheelListener(new MouseWheelListener() {
 				public void mouseScrolled(MouseEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseScrolled, event=" + evt); //$NON-NLS-1$
-					if (GraphicsComposite.this.isTransientZoom) {
+					if (GraphicsComposite.this.isTransientZoom && !isTransientGesture) {
 						GraphicsComposite.this.isResetZoomPosition = false;
 						Channel activeChannel = Channels.getInstance().getActiveChannel();
 						if (activeChannel != null) {
@@ -423,6 +426,95 @@ public class GraphicsComposite extends Composite {
 							}
 						}
 					}
+				}
+			});
+			this.graphicCanvas.addGestureListener(new GestureListener() {
+				public void gesture(GestureEvent evt) {
+					if (evt.detail == SWT.GESTURE_BEGIN) {
+						if (log.isLoggable(Level.FINEST))	log.log(Level.FINEST, "BEGIN = " + evt); //$NON-NLS-1$
+						isTransientGesture = true;
+					}
+					else if (evt.detail == SWT.GESTURE_MAGNIFY) {
+						if (log.isLoggable(Level.FINEST))	log.log(Level.FINEST, "MAGIFY = " + evt); //$NON-NLS-1$
+						if (GraphicsComposite.this.isTransientGesture) {
+							GraphicsComposite.this.isResetZoomPosition = false;
+							Channel activeChannel = Channels.getInstance().getActiveChannel();
+							if (activeChannel != null) {
+								RecordSet recordSet = (GraphicsComposite.this.windowType == GraphicsWindow.TYPE_NORMAL) ? Channels.getInstance().getActiveChannel().getActiveRecordSet()
+										: GraphicsComposite.this.application.getCompareSet();
+								if (GraphicsComposite.this.canvasImage != null && recordSet != null) {
+
+									float boundsRelation = 1.0f * GraphicsComposite.this.curveAreaBounds.width / GraphicsComposite.this.curveAreaBounds.height;
+									Point point = checkCurveBounds(evt.x, evt.y);
+									float mouseRelationX = 1.0f * point.x / GraphicsComposite.this.curveAreaBounds.width * 2;
+									float mouseRelationY = 1.0f * point.y / GraphicsComposite.this.curveAreaBounds.height * 2;
+									//System.out.println(point + " - " + mouseRelationX + " - " + mouseRelationY);
+
+									int xStart, xEnd, yMin, yMax;
+									if (evt.magnification < 1) { //reduce
+										if (GraphicsComposite.this.isZoomX) {
+											xStart = (int) (-25 * boundsRelation * mouseRelationX);
+											xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width + 25 * boundsRelation * (2 - mouseRelationX));
+											yMin = 0;
+											yMax = GraphicsComposite.this.curveAreaBounds.height - GraphicsComposite.this.curveAreaBounds.y;
+										}
+										else if (GraphicsComposite.this.isZoomY) {
+											xStart = 0;
+											xEnd = GraphicsComposite.this.curveAreaBounds.width;
+											yMin = (int) (-25 * (2 - mouseRelationY));
+											yMax = (int) (GraphicsComposite.this.curveAreaBounds.height + 25 * mouseRelationY);
+										}
+										else {
+											xStart = (int) (-25 * boundsRelation * mouseRelationX);
+											xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width + 25 * boundsRelation * (2 - mouseRelationX));
+											yMin = (int) (-25 * (2 - mouseRelationY));
+											yMax = (int) (GraphicsComposite.this.curveAreaBounds.height + 25 * mouseRelationY);
+										}
+									}
+									else { //enlarge
+										if (GraphicsComposite.this.isZoomX) {
+											xStart = (int) (25 * boundsRelation * mouseRelationX);
+											xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width - 25 * boundsRelation * (2 - mouseRelationX));
+											yMin = 0;
+											yMax = GraphicsComposite.this.curveAreaBounds.height - GraphicsComposite.this.curveAreaBounds.y;
+										}
+										else if (GraphicsComposite.this.isZoomY) {
+											xStart = 0;
+											xEnd = GraphicsComposite.this.curveAreaBounds.width;
+											yMin = (int) (25 * (2 - mouseRelationY));
+											yMax = (int) (GraphicsComposite.this.curveAreaBounds.height - 25 * mouseRelationY);
+										}
+										else {
+											xStart = (int) (25 * boundsRelation * mouseRelationX);
+											xEnd = (int) (GraphicsComposite.this.curveAreaBounds.width - 25 * boundsRelation * (2 - mouseRelationX));
+											yMin = (int) (25 * (2 - mouseRelationY));
+											yMax = (int) (GraphicsComposite.this.curveAreaBounds.height - 25 * mouseRelationY);
+										}
+									}
+									if (log.isLoggable(Level.FINER))	log.log(Level.FINER, "zoom xStart = " + xStart + " xEnd = " + xEnd + " yMin = " + yMin + " yMax = " + yMax); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+									if (xEnd - xStart > 5 && yMax - yMin > 5) {
+										recordSet.setDisplayZoomBounds(new Rectangle(xStart, yMin, xEnd - xStart, yMax - yMin));
+										redrawGraphics();
+									}
+								}
+							}
+						}
+					}
+					else if (evt.detail == SWT.GESTURE_PAN) {
+						if (log.isLoggable(Level.FINEST))	log.log(Level.FINEST, "PAN = " + evt); //$NON-NLS-1$
+						Channel activeChannel = Channels.getInstance().getActiveChannel();
+						if (activeChannel != null && isTransientGesture) {
+							RecordSet recordSet = (windowType == GraphicsWindow.TYPE_NORMAL) ? activeChannel.getActiveRecordSet() : application.getCompareSet();
+							if (recordSet != null && canvasImage != null) {
+									recordSet.shift(evt.xDirection, -1 * evt.yDirection); // 10% each direction
+									redrawGraphics(); //this.graphicCanvas.redraw();?
+							}
+						}
+					}			
+					else if (evt.detail == SWT.GESTURE_END) {
+						if (log.isLoggable(Level.FINEST))	log.log(Level.FINEST, "END = " + evt); //$NON-NLS-1$
+						isTransientGesture = false;
+					}		
 				}
 			});
 			this.graphicCanvas.addPaintListener(new PaintListener() {
