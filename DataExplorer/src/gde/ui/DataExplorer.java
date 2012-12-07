@@ -224,7 +224,7 @@ public class DataExplorer extends Composite {
 		this.extensionFilterMap.put(GDE.FILE_ENDING_JPG, Messages.getString(MessageIds.GDE_MSGT0215));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_KMZ, Messages.getString(MessageIds.GDE_MSGT0222));
 		//		this.extensionFilterMap.put(GDE.FILE_ENDING_GPX, Messages.getString(MessageIds.GDE_MSGT0223));
-		this.extensionFilterMap.put(GDE.FILE_ENDING_STAR, Messages.getString(MessageIds.GDE_MSGT0216));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_STAR, Messages.getString(GDE.IS_WINDOWS ? MessageIds.GDE_MSGT0216 : MessageIds.GDE_MSGT0676));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_INI, Messages.getString(MessageIds.GDE_MSGT0368));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_LOG, Messages.getString(MessageIds.GDE_MSGT0672));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_JML, Messages.getString(MessageIds.GDE_MSGT0673));
@@ -1598,7 +1598,7 @@ public class DataExplorer extends Composite {
 	 * @param extensions
 	 */
 	private void adaptFilter(FileDialog fileOpenDialog, String[] extensions) {
-		if (GDE.IS_LINUX) { // Apples MAC OS seams to reply with case insensitive file names
+		if (!GDE.IS_WINDOWS) { // Apples MAC OS seams to reply with case insensitive file names
 			Vector<String> tmpExt = new Vector<String>();
 			for (String extension : extensions) {
 				if (!extension.equals(GDE.FILE_ENDING_STAR_STAR)) {
@@ -1606,7 +1606,7 @@ public class DataExplorer extends Composite {
 					tmpExt.add(extension.toUpperCase());
 				}
 				else
-					tmpExt.add(extension);
+					tmpExt.add(GDE.FILE_ENDING_STAR);
 			}
 			extensions = tmpExt.toArray(new String[1]);
 		}
@@ -1680,8 +1680,11 @@ public class DataExplorer extends Composite {
 			if (filterNames[i] == null)
 				filterNames[i] = extensions[i];
 			else {
-				String tmpFilterExt = filterNames[i].substring(filterNames[i].indexOf(GDE.STRING_DOT) + 1, filterNames[i].length() - 1);
-				filterNames[i] = tmpExt.equals(tmpFilterExt) ? filterNames[i] : filterNames[i].replace(tmpFilterExt, tmpExt);
+				beginIndex = filterNames[i].indexOf(GDE.STRING_DOT);
+				if (beginIndex > 0) { //replace extension case
+					String tmpFilterExt = filterNames[i].substring(filterNames[i].indexOf(GDE.STRING_DOT) + 1, filterNames[i].length() - 1);
+					filterNames[i] = tmpExt.equals(tmpFilterExt) ? filterNames[i] : filterNames[i].replace(tmpFilterExt, tmpExt);
+				}
 			}
 		}
 		return filterNames;

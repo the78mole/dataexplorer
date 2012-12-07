@@ -290,6 +290,8 @@ public class CSVSerialDataReaderWriter {
 					if (application.getStatusBar() != null) 
 						activeChannel.switchRecordSet(createdRecordSets.firstElement().getName());
 				}
+				else 
+					activeChannel.switchRecordSet(activeChannel.getActiveRecordSet().getName());
 
 				reader.close();
 				reader = null;
