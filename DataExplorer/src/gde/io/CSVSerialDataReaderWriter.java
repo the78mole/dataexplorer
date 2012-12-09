@@ -152,7 +152,7 @@ public class CSVSerialDataReaderWriter {
 						}
 					}
 					else {//skip all lines which does not match the configured data block leader
-						log.log(Level.WARNING, filePath + " - skipped " + (lineNumber - 1) + ", it does not start with " + device.getDataBlockLeader()); //$NON-NLS-1$
+						log.log(Level.WARNING, filePath + " - skipped " + lineNumber + ", it does not start with " + device.getDataBlockLeader()); //$NON-NLS-1$
 						continue;
 					}
 					
@@ -290,8 +290,11 @@ public class CSVSerialDataReaderWriter {
 					if (application.getStatusBar() != null) 
 						activeChannel.switchRecordSet(createdRecordSets.firstElement().getName());
 				}
-				else 
-					activeChannel.switchRecordSet(activeChannel.getActiveRecordSet().getName());
+				else {
+					if (activeChannel.getActiveRecordSet() != null) {
+						activeChannel.switchRecordSet(activeChannel.getActiveRecordSet().getName());
+					}
+				}
 
 				reader.close();
 				reader = null;
