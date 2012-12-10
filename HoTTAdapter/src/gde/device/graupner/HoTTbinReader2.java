@@ -244,7 +244,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 						if (HoTTbinReader2.buf0 != null && HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null && HoTTbinReader2.buf4 != null) {
 							parseGeneral(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
-							HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
+							HoTTbinReader2.buf0 = HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
 							isSensorData = true;
 							isSensorDataStart = true;
 						}
@@ -276,7 +276,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 						if (HoTTbinReader2.buf0 != null && HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null && HoTTbinReader2.buf4 != null) {
 							parseElectric(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4);
-							HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
+							HoTTbinReader2.buf0 = HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
 							isSensorData = true;
 							isSensorDataStart = true;
 						}
@@ -308,7 +308,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 						if (HoTTbinReader2.buf0 != null && HoTTbinReader2.buf1 != null && HoTTbinReader2.buf2 != null && HoTTbinReader2.buf3 != null && HoTTbinReader2.buf4 != null) {
 							parseMotorDriver(HoTTbinReader2.buf0, HoTTbinReader2.buf1, HoTTbinReader2.buf2, HoTTbinReader2.buf3, HoTTbinReader2.buf4, channelNumber);
-							HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
+							HoTTbinReader2.buf0 = HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
 							isSensorData = true;
 							isSensorDataStart = true;
 						}
@@ -331,6 +331,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					}
 					++countPackageLoss;
 					HoTTbinReader2.timeStep_ms += 10;
+					//reset buffer to avoid mixing data
+					HoTTbinReader2.buf0 = HoTTbinReader2.buf1 = HoTTbinReader2.buf2 = HoTTbinReader2.buf3 = HoTTbinReader2.buf4 = null;
 				}
 			}
 			HoTTbinReader2.logger.logp(java.util.logging.Level.WARNING, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
@@ -593,6 +595,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					}
 					++countPackageLoss;
 					HoTTbinReader2.timeStep_ms += 10;
+					//reset buffer to avoid mixing data
+					logCountVario = logCountGPS = logCountGeneral = logCountElectric = logCountMotorDriver = 0;
 				}
 			}
 			HoTTbinReader2.logger.logp(java.util.logging.Level.WARNING, HoTTbinReader2.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
