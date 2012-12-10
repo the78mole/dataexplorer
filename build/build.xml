@@ -528,6 +528,7 @@
 		<copy todir="${output.gnulinux64}/DataExplorer" flatten="yes">
 			<fileset file="build/misc/README.*" />
 		</copy>
+		<!-- 
 		<copy todir="${output.mac32.app}" flatten="yes">
 			<fileset file="build/misc/README.*" />
 			<fileset file="build/misc/RXTX_Post-Install_MacOS.sh" />
@@ -536,6 +537,7 @@
 			<fileset file="build/misc/README.*" />
 			<fileset file="build/misc/RXTX_Post-Install_MacOS.sh" />
 		</copy>
+		-->
 
 	</target>
 
@@ -906,21 +908,6 @@
 	      <arg value="+x"/>
 	      <arg value="${mountdir}/${app.name}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac32"/>
 	    </exec>
-	    <!-- 
-	    <copy file="${basedir}/build/misc/README.de"
-	          tofile="${mountdir}/${app.name}/README_de.txt"
-	          overwrite="true"/>
-	    <copy file="${basedir}/build/misc/README.en"
-	          tofile="${mountdir}/${app.name}/README_en.txt"
-	          overwrite="true"/>
-	    <copy file="${basedir}/build/misc/RXTX_Post-Install_MacOS.sh"
-	          tofile="${mountdir}/${app.name}/RXTX_Post-Install_MacOS.sh"
-	          overwrite="true"/>
-	    -->
-	    <exec executable="chmod" os="Mac OS X" failonerror="true">
-	      <arg value="+x"/>
-	      <arg value="${mountdir}/${app.name}/${app.name}.app/RXTX_Post-Install_MacOS.sh"/>
-	    </exec>
 	    
 	    <!-- Copy the background, the volume icon and DS_Store files -->
 	    <mkdir dir="${mountdir}/${app.name}/.background"/>
@@ -944,6 +931,22 @@
 	    <!-- Add a symbolic link to the Applications directory -->
 	    <symlink link="${mountdir}/${app.name}" resource="/Applications"/>
 	
+	    <!-- Add a readme files and RXTX_Post-Install.sh to the Applications directory -->
+	    <copy file="${basedir}/build/misc/README.de"
+	          tofile="${mountdir}/${app.name}/README_de.txt"
+	          overwrite="true"/>
+	    <copy file="${basedir}/build/misc/README.en"
+	          tofile="${mountdir}/${app.name}/README_en.txt"
+	          overwrite="true"/>
+	    <copy file="${basedir}/build/misc/RXTX_Post-Install_MacOS.sh"
+	          tofile="${mountdir}/${app.name}/RXTX_Post-Install"
+	          overwrite="true"/>
+	   
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${mountdir}/${app.name}/RXTX_Post-Install"/>
+	    </exec>
+	    	
 	    <!-- Detach the temporary image -->
 	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 	      <arg value="detach"/>
@@ -1007,32 +1010,17 @@
 	      <arg value="+x"/>
 	      <arg value="${mountdir}/${app.name}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac64"/>
 	    </exec>
-	    <!-- 
-	    <copy file="${basedir}/build/misc/README.de"
-	          tofile="${mountdir}/${app.name}/README_de.txt"
-	          overwrite="true"/>
-	    <copy file="${basedir}/build/misc/README.en"
-	          tofile="${mountdir}/${app.name}/README_en.txt"
-	          overwrite="true"/>
-	    <copy file="${basedir}/build/misc/RXTX_Post-Install_MacOS.sh"
-	          tofile="${mountdir}/${app.name}/RXTX_Post-Install_MacOS.sh"
-	          overwrite="true"/>
-	    -->
-	    <exec executable="chmod" os="Mac OS X" failonerror="true">
-	      <arg value="+x"/>
-	      <arg value="${mountdir}/${app.name}/${app.name}.app/RXTX_Post-Install_MacOS.sh"/>
-	    </exec>
 	    	    	    	    	    	    	
 	    <!-- Copy the background, the volume icon and DS_Store files -->
+	    <copy file="${basedir}/build/misc/DS_Store"
+	          tofile="${mountdir}/${app.name}/.DS_Store"
+	          overwrite="true"/>
 	    <mkdir dir="${mountdir}/${app.name}/.background"/>
 	    <copy file="${basedir}/build/misc/dmg_background.png"
 	          tofile="${mountdir}/${app.name}/.background/background.png"
 	          overwrite="true"/>
 	    <copy file="${basedir}/build/misc/DataExplorerDmg.icns"
 	          tofile="${mountdir}/${app.name}/.VolumeIcon.icns"
-	          overwrite="true"/>
-	    <copy file="${basedir}/build/misc/DS_Store"
-	          tofile="${mountdir}/${app.name}/.DS_Store"
 	          overwrite="true"/>
 	
 	    <!-- Indicate that we want a custom icon -->
@@ -1045,6 +1033,22 @@
 	    <!-- Add a symbolic link to the Applications directory -->
 	    <symlink link="${mountdir}/${app.name}" resource="/Applications"/>
 	
+	    <!-- Add a readme files and RXTX_Post-Install.sh to the Applications directory -->
+	    <copy file="${basedir}/build/misc/README.de"
+	          tofile="${mountdir}/${app.name}/README_de.txt"
+	          overwrite="true"/>
+	    <copy file="${basedir}/build/misc/README.en"
+	          tofile="${mountdir}/${app.name}/README_en.txt"
+	          overwrite="true"/>
+	    <copy file="${basedir}/build/misc/RXTX_Post-Install_MacOS.sh"
+	          tofile="${mountdir}/${app.name}/RXTX_Post-Install"
+	          overwrite="true"/>
+	   
+	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	      <arg value="+x"/>
+	      <arg value="${mountdir}/${app.name}/RXTX_Post-Install"/>
+	    </exec>
+
 	    <!-- Detach the temporary image -->
 	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 	      <arg value="detach"/>

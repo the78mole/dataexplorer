@@ -1,14 +1,14 @@
-******** DataExplorer README ***********  08 Juni 2011 WB
+******** DataExplorer README ***********  10 Dez 2012 WB
 
 Der GNU DataExplorer ist freie Software, siehe http://www.gnu.org/philosophy/free-sw.html. Sie wird kostenfrei und ohne Spende 
 zur Verfügung gestellt. Es gibt aber auch keinerlei Gewährleistung. Durch die Implementierung in Java auf der Basis von der freien Bibliotheken 
-RXTXcomm und eclipse SWT ist die Ausführung des Programms auf vielen populären Betriebssystemplattformen in 32 oder 64 Bit wie Windows, GNU GNU/Linux 
-und MAC OS möglich. Voraussetzung ist lediglich eine installierte Java Laufzeitumgebung der Version 1.6 oder höher, z.B. IcedTea, 
-Herunterladen der SUN/Oracle Java Runtime http://java.com/download.
+RXTXcomm und eclipse SWT ist die Ausführung des Programms auf vielen populären Betriebssystemplattformen in 32 oder 64 Bit wie Windows, GNU/Linux 
+und MAC OS X möglich. Voraussetzung ist lediglich eine installierte Java Laufzeitumgebung der Version 1.6 oder höher, z.B. IcedTea, 
+oder der SUN/Oracle Java Runtime.
 
-Der GNU DataExplorer nimmt Daten von seriell angeschlossenen Geräten entgegen, zeigt diese für verschiedene Auswertungen an. 
-Zur Zeit sind folgende Geräte eingebunden: 
-											 - AkkuMasterC4 (Htronic) 4 AusgÄnge Lade-/Entlade-gerät
+Der GNU DataExplorer nimmt Daten von seriell angeschlossenen Geräten oder als Textdateiimport entgegen, zeigt diese für verschiedene Auswertungen an. 
+Zur Zeit sind folgende Geräte implementiert: 
+											 - AkkuMasterC4 (Htronic) 4 Ausgänge Lade-/Entlade-gerät
 											 - Picolario (Renschler) Variometer
 											 - UniLog (SM-Modellbau) Mulitmessgerät
 											 - UniLog2 (SM-Modellbau) Mulitmessgerät
@@ -43,72 +43,16 @@ Zur Zeit sind folgende Geräte eingebunden:
 											 - JLog2 (SM-Modellbau) Speziallogger für Kontronik Jive Motorsteller
 											 - FlightRecorder (Multiplex) Mulitdatenlogger
 											 - Simulator Test Plug-in
+											 - JetiAdapter (Jeti, Jeti-Box) Multisensorlog
+											 - AV4ms (Fritz Mössinger/accu-select)  4 Ausgänge Lade-/Entlade-gerät									 
 											 
 Weitere Geräte sind in Arbeit. Hilfe bei der Einbindung von zusätzlichen Geräten ist herzlich willkommen.
 
 Eine Geräte API (IDevice) wird zur Verfügung gestellt, die ein relativ einfaches Einbinden eigener Geräte ermöglichen soll. Eine
 Dokumentation hierzu ist im Downloadbereich verfügbar.
 
-Wie stelle ich die Prozessorarchitektur fest (Bitbreite):
-Windows über die Kommandozeile : "echo %PROCESSOR_ARCHITECTURE% -> x86 == 32 Bit; AMD64 == 64 Bit oder Programme -> Kontrolcenter -> System -> System Typ
-GNU/Linux 	Kommandozeile : "uname -a" -> i386/i686 == 32 Bit; x84_64 == 64 Bit
-MAC OS ist immer 64 Bit und unterstützt die Ausführung von 32 Bit sowie 64 Bit Javaprogrammen.	
-
-Eine Installation ist nicht nötig, das im Archiv enthaltene Verzeichnis "DataExplorer" mit den darunter liegenden Verzeichnissen und Dateien
-einfach an einen Ort entpacken, wo Ausführungsrechte vorliegen. 
-Für Windowsbenutzer wäre das z.B. %ProgramFiles% für GNU/Linux-Benutzer "/opt" oder "/usr". Mac OS entpacken/verschieben unter /Programme
-
-Achtung: Bitte keine Umlaute im Installationspfad benutzen, Java arbeitet standardmäßig mit UTF-8, da kann es Probleme mit der Konvertierung in der Laufzeitumgebung geben!
-
-Für den ersten Start des Programms über ein Kommando-Fenster(Windows), Shell(GNU/Linux) , Terminal (Mac OS) in das DataExplorer Verzeichnis 
-wechseln und unter Windows, DataExplorer.exe oder Unix, DataExplorer, ausführen. Mac OS Benutzer finden das Startskript 
-unter /Applicatons/DataExplorer.app(Contents/MacOS/DataExplorerMac32, falls der Icon nicht funktioniert.
-
-Unten dem DataExplorer Programmverzeichnis liegt folgende Verzeichnisstruktur:
-DataExplorer.exe (Windows)
-DevicePropertiesEditor.exe (Windows)
-DataExplorer (GNU/Linux)
-DevicePropertiesEditor (GNU/Linux)
-DataExplorer.desktop (GNU/Linux)
-DevicePropertiesEditor.desktop (GNU/Linux)
-DataExplorerMac32/64 (Mac OS)
-DevicePropertiesEditorMac32/64 (Mac OS)
-RXTX_Post-Install_MacOS.sh (Mac OS)
-
-Andere Programmresourcen sind:
-../DataExplorer.jar
-../Devices/*.jar
-../README.*
-
-Erweiterung der Java Laufzeitumgebung für RXTXcomm und SWT:
-../java/ext/*.jar
-../java/ext/*.LICENSE
-SWT heruntergeladen von eclipse.org/swt als swt-3.*-<platform>-<architecture>.zip und swt.jar extrahiert füt Windows und GNU/Linux, für Mac OS wurde die aktuellste 
-verfügbare Version verwendet, da hier anwendungsrelevante Fehler reportet sind, die aber noch nicht gelöst sind.
-RXTXcomm wurde aus dem rxtx-pre2 Quellarchiv erstellt, siehe thirdparty Verzeichnis in dem osde Quellarchiv.
-
-Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter:
-%APPDATA%\<Benutzer>\DataExplorer (Windows)
-/home/<Benutzer>/.DataExplorer (GNU/Linux)
-/User/<Benutzer>/Library/Application Support/DataExplorer (Mac OS)
-angelegt. Hierunter werden auch Anwendungkonfiguration und Tracelogdaten abgelegt.
-Diese zum Teil dynamisch veränderten Dateien, wie Anwendungskonfiguration und Gerätekonfigurationsdateien werden bei der Benutzung verändert und sind lizenzfrei.
-
 Für das Verzeichnis der Nutzerdaten (Logdateien) ist der Anwender selbst verantwortlich, es wird nach dem ersten Start des Programms
 in den Anwendungkonfigurationsdatei (DataExplorer.properties) hinterlegt.
-
-Hinweis: Erscheint nach der Ausführung von DataExplorer.exe/DataExplorer folgende oder ähnliche Fehlermeldung 
-"The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major Version at offset=6"
-ist die installierte Java Version (java -version) zu alt und muss gegen eine aktuelle Version > 1.6 ausgetauscht werden.
-
-Für Windows Anwender: Je nach verwendeter Windows Version und Patchlevel kann es nötig sein das System mit dem 
-"Microsoft Visual C++ 2008 Redistributable Package" von www.microsoft.com/downloads nachzurüsten (Desktopicon, Objektlink).
-
-Für GNU/Linux Anwender: RXTXcomm locked den seriellen Port über die Gruppe "uucp", welcher der Anwendungsnutzer angehören sollte.
-Bei Problemen mit dem USB2Serial UART von SiliconLabs cp210x siehe das GNULinux_cp210x Verzeichnis im Downloadbereich. Rechte von lock unter /var auf root:uucp setzen.
-
-Für Mac OS Anwender: Hier gilt prinzipiell das Gleiche wie für GNU/Linux, nur dass das Verzeichnis /var/lock erst angelegt werden muss, siehe
-DataExplorer Anwendungsordner Inhalt RXTX_Post-Install_MacOS.sh. Für die Verwendung von seriellen Schnittstellen müssen Treiber des jeweils benutzten USB2Serial Converters installiert werden. 
 
 Hinweis: Soll der DataExplorer gleichzeitig auf mehreren Betriebssystemen verwendet werden, oder werden die Daten auf zentraler Stelle abgelegt,
 sind Umlaute in den Dateinamen und Objektnamen zu vermeiden. (Umwandlung ISO-8859-1 nach UTF-8 und umgekehrt). Dateilinks unterscheiden sich von den 
@@ -117,3 +61,64 @@ Daten auf ein anderes Betriebssystem sind die Objekt bezogenen Dateilinks zu ent
 Einstellungsdialog, "Verschiedenes" Tabulator benutzen.
 
 Um Fehler oder Anregungen zu melden, bitte eine e-Mail an die Adresse auf der Downloadseite.
+
+
+
+Windows:
+
+Wie stelle ich die Prozessorarchitektur fest (Bitbreite):
+über die Kommandozeile : "echo %PROCESSOR_ARCHITECTURE% -> x86 == 32 Bit; AMD64 == 64 Bit oder Programme -> Kontrolcenter -> System -> System Typ
+Entsprechend der Prozessorarchitektur sollte die Java-Laufzeitumgebung installiert werden. Bitte beim Download beachten.
+Ab der Version 3.06 wir für Windows ein Installer zur Verfügung gestellt der einfach auszuführen ist. Zur Installation sind Administratorrechte nötig.
+Achtung: Bitte keine Umlaute im Installationspfad benutzen, Java arbeitet standardmäßig mit UTF-8, da kann es Probleme mit der Konvertierung in der Laufzeitumgebung geben!
+Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter %APPDATA%\<Benutzer>\DataExplorer angelegt. Hierunter werden 
+auch Anwendungkonfiguration und Tracelogdaten abgelegt.
+
+Hinweis: Erscheint nach der Ausführung von DataExplorer.exe folgende oder ähnliche Fehlermeldung 
+"The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major Version at offset=6"
+ist die installierte Java Version (java -version) zu alt und muss gegen eine aktuelle Version >= 1.6.0 ausgetauscht werden.
+
+Je nach verwendeter Windows Version und Patchlevel kann es nötig sein das System mit dem 
+"Microsoft Visual C++ 2008 Redistributable Package" von www.microsoft.com/downloads nachzurüsten (Desktopicon, Objektlink).
+
+
+
+GNU/Linux:
+
+Wie stelle ich die Prozessorarchitektur fest (Bitbreite):
+GNU/Linux 	Kommandozeile : "uname -a" -> i386/i686 == 32 Bit; x84_64 == 64 Bit
+Entsprechend der Prozessorarchitektur sollte die Java-Laufzeitumgebung installiert werden. Bitte beim Download beachten.
+Eine Installation ist nicht nötig, das im Archiv enthaltene Verzeichnis "DataExplorer" mit den darunter liegenden Verzeichnissen und Dateien
+einfach an einen Ort entpacken, wo Ausführungsrechte vorliegen. (tar -xzvf dataexplorer_..)
+Für den ersten Start des Programms über ein Kommando-Shell in das DataExplorer Verzeichnis wechseln und DataExplorer ausführen.
+Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter /home/<Benutzer>/.DataExplorer angelegt. Hierunter werden auch 
+Anwendungkonfiguration und Tracelogdaten abgelegt.
+
+Hinweis: Erscheint nach der Ausführung von DataExplorer folgende oder ähnliche Fehlermeldung 
+"The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major Version at offset=6"
+ist die installierte Java Version (java -version) zu alt und muss gegen eine aktuelle Version >= 1.6.0 ausgetauscht werden.
+
+RXTXcomm locked den seriellen Port über die Gruppe "uucp", welcher der Anwendungsnutzer angehören sollte.
+Bei Problemen mit dem USB2Serial UART von SiliconLabs cp210x siehe das GNULinux_cp210x Verzeichnis im Downloadbereich.
+
+
+
+
+MAC OS X:
+
+MAC OS läuft immer unter 64 Bit und unterstützt die Ausführung von 32 Bit sowie 64 Bit Java-Programmen. 
+Ab 10.8 ist einen Installation der Java-Laufzeitumgebung nötig, sie sollte zur Prozessorarchitektur passend installiert werden. Bitte beim Download beachten.
+MAC OS Versionen <= 10.7 haben bereits Java installiert. Die Einstellung hierzu befindet sich in den Systemeinstellungen. Bei älteren Systemen auch unter 
+Utilities -> Java Einstellungen.
+Die bereit gestellt DMG Datei zeigt die Anwendung DataExplorer.app, die einfach auf den Applications Ordner zu ziehen ist.
+Sollen Geräte Daten über die serielle Schnittstelle empfangen ist einmalig das bereitgestellte RXTX_Post-Install einmalig auszuführen. Hierbei wird ein 
+Verzeichnis /var/lock angelegt, falls es noch nicht vorhanden ist. In diesem Verzeichnis werden Lockdateien angelegt, die verhindern, dass derselbe Port 
+2 mal verwendet wird. Wenn USB2Serial Adapter verwendet muss für den Adapter passender Drivercode installiert werden. Die kann man beim Hersteller des
+USB2Serial Chips herunterladen und installieren.
+Beim ersten Start des Programms werden dann noch Anwendungkonfigurationsverzeichnisse unter /User/<Benutzer>/Library/Application Support/DataExplorer
+angelegt. Hierunter werden auch Anwendungkonfiguration und Tracelogdaten abgelegt.
+
+Hinweis: Wird die Anwendung nicht ausgeführt, sollte man mittels Terminal in das Verzeichnis /Applications/DataExplorer.app/Contents/MacOS wechslen und
+das Startscript dort ausführen. Wird als Fehlermeldung "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major Version at offset=6"
+angezeigt, ist die installierte/konfigurierte Java Version (java -version) zu alt und muss gegen eine aktuelle Version >= 1.6 ausgetauscht werden.
+

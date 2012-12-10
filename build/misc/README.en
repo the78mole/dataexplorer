@@ -1,13 +1,13 @@
-﻿******** DataExplorer README ***********  08 Jun 2011 WB
+﻿******** DataExplorer README ***********  10 Dec 2012 WB
 
 The GNU DataExplorer is free software, please see http://www.gnu.org/philosophy/free-sw.html. It is also available at no
 cost, but without any warranty. Since the implementation is based on Java using the free available libraries RXTXcomm and SWT
 the execution of this program is possible under a number of popular operating systems like 32/64 Bit Windows and GNU/Linux 
 and MAC OS. To execute the only prerequisite is an installed Java runtime with version 1.6 or higher, like IcedTea or
-SUN/Oracles Java Runtime download http://java.com/download.
+SUN/Oracles Java Runtime.
 
-The GNU DataExplorer gathers data from connected devices and display this data for a various of further analysis.
-Actual the following devices are available as plug-in: 
+The GNU DataExplorer read data from serial connected devices or text file import and display this data for a 
+various of further analysis. Actually the following devices are available as plug-in: 
 											 - AkkuMasterC4 (Htronic) 4 outlet battery charger/discharger
 											 - Picolario (Renschler) variometer
 											 - UniLog (SM-Modellbau) multi measurement device
@@ -43,79 +43,74 @@ Actual the following devices are available as plug-in:
 											 - JLog2 (SM-Modellbau) spezial logger for Kontronik Jive motor driver
 											 - FlightRecorder (Multiplex) multi measurement device
 											 - Simulator test plug-in
+											 - JetiAdapter (Jeti, Jeti-Box) multi-sensor-log
+											 - AV4ms (Fritz Mössinger/accu-select)  4 outlet battery charger/discharger									 
 
 More device are under construction. Help doing this is very welcome.		
 
 A device API (IDevice) is defined to enable a relative simple adaptation of a new device to work together with the base application.
 Documentation how to proceed doing this is available at download area.	
-								 
-How to detect the processor architecture :
-Windows on command prompt : "echo %PROCESSOR_ARCHITECTURE% -> x86 == 32 Bit; AMD64 == 64 Bit or Settings/All Programms -> Control Panel -> System -> System Type
-GNU/Linux 	Kommandozeile : "uname -a" -> i386/i686 == 32 Bit; x84_64 == 64 Bit
-MAC OS run always on a 64 Bit processor and supports the execution of 32 Bit as well as 64 Bit Java applications.	
-
-Installation of the binary distribution is an unpack of the containing DataExplorer directory with its sub directories and files to a place 
-where execution right exist.
-For Windows user a proper place is %ProgramFiles% for GNU/Linux user "/opt" or "/usr", Mac OS unarchive/drag to /Applications (Applications).
-
-Attention: Do not use special characters in path, Java using UTF-8 as default, conversion problems could occur!
-
-For the first execution use a command window (Windows), shell (GNU/Linux), Terminal (Mac OS) and change into the just created DataExplorer
-directory and execute running Windows, DataExplorer.exe, running GNU/Linux, DataExplorer. For Mac OS the start
-script is located /Applications/DataExplorer.app/Contents/MacOS/DataExplorerMac32, if the icons seams not accessible.
-This dynamically written files containing the application configuration and/or device configuration data are public domain. 
-
-As overview the following files are under the DataExplorer program resource directory:
-DataExplorer.exe (Windows)
-DevicePropertiesEditor.exe (Windows)
-DataExplorer (GNU/Linux)
-DevicePropertiesEditor (GNU/Linux)
-DataExplorer.xpm (GNU/Linux)
-DataExplorer.desktop (GNU/Linux)
-DataExplorer.desktop (GNU/Linux)
-DataExplorerMac32 (Mac OS)
-DevicePropertiesEditorMac32 (Mac OS)
-DataExplorer.icns (Mac OS)
-RXTX_Post-Install_MacOS.sh (Mac OS)
-
-Main program files are:
-../DataExplorer.jar
-../Devices/*.jar
-../README.*
-
-Extensions for the Java runtime RXTXcomm and SWT:
-../java/ext/*.jar 
-../java/ext/*.LICENSE
-SWT downloaded from eclipse.org/swt as swt-3.*-<platform>-<architecture>.zip and swt.jar extracted, Mac OS the latest 
-available since there are application relevant bugs reported which are not fixed.
-RXTXcomm created from rxtx-pre2 source distribution, refer to thirdparty directory in osde source distribution archive.
-
-During the first execution of the program the application configuration directories are created 
-%APPDATA%\<user>\DataExplorer (Windows), 
-/home/<user>/.DataExplorer (GNU/Linux)
-/User/<user>/Library/Application Support/DataExplorer (Mac OS)
-At this place also application configuration and trace log files are located.
-
-The directory for the user data (log data files) the user takes responsibility, the location will be stored within the application configuration file
-(DataExplorer.properties) and queried just after starting the application.
-
-Hint: Is a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major version at offset=6" 
-is received after executing launch.bat/lauchn.sh the Java version (java -version) is to old to execute this program and must be renewed.
-
-For Windows user: Depending of the used Windows version and patch level it might be required to install the latest 
-"Microsoft Visual C++ 2008 Redistributable Package" from www.microsoft.com/downloads (desktop icon, object link creation).
-
-For GNU/Linux user: RXTXcomm uses serial port locking mechanism, the application user must be part of uucp group.
-While facing problems with USB2Serial UART SiliconLabs cp210x refer to GNULinux_cp210x directory in download area.
-Set permissions of lock under /var to root:uucp.
-
-For Mac OS user: Same as for GNU/Linux user, but the /var/lock directory must be created, refer to application content RXTX_Post-Install_MacOS.sh
-To enable serial communication drivers of the needed USB2Serial converter are to be installed.
-
+		
 Hint: It is planned to use the DataExplorer on different operating systems and share the data files, do not use special characters at all.
 (conversion ISO-8859-1 to UTF-8 and vice versa). File links are different on the supported operating systems. Object related data files don't get duplicated,
 they get referenced using file links. Before you move data files to a different operating system, remove the object related file links and re-create afterwards.
 Please use the preferences dialog with the miscellaneous tab with the related buttons.
 
 For questions or suggestions for improvement feel free to contact me using the e-mail address at the download page.
+						 
 
+
+Windows:
+
+How to detect the processor architecture: 
+on command prompt : "echo %PROCESSOR_ARCHITECTURE% -> x86 == 32 Bit; AMD64 == 64 Bit or Settings/All Programs -> Control Panel -> System -> System Type
+Correlating to the processor architecture the Java runtime should be installed. Please pay attention during download.
+Starting with version 3.06 DataExplorere comes with an installer. The install operations requires administration rights.
+Attention: Do not use special characters in installation path, Java using UTF-8 as default, conversion problems could occur!
+During the first execution of the program the application configuration directories are created at %APPDATA%\<user>\DataExplorer.
+Below this directory also application configuration and trace log files are located.
+
+Hint: Is a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major version at offset=6" 
+is received while executing the Java version (java -version) is to old to execute this program and must be renewed to a version >= 1.6.0.
+
+Depending of the used Windows version and patch level it might be required to install the latest 
+"Microsoft Visual C++ 2008 Redistributable Package" from www.microsoft.com/downloads (desktop icon, object link creation).
+
+
+
+GNU/Linux:
+
+How to detect the processor architecture: 
+at a command shell execute: "uname -a" -> i386/i686 == 32 Bit; x84_64 == 64 Bit
+Correlating to the processor architecture the Java runtime should be installed. Please pay attention during download.
+Installation of the binary distribution is an unpack of the containing DataExplorer directory with its sub directories and files to a directory 
+where execution right exist (tar -xzvf dataexplorer_..).
+For the very first execution use a command shell and change into the just created DataExplorer directory and execute DataExplorer start script.
+During the first execution of the program the application configuration directories are created /home/<user>/.DataExplorer.
+Below this directory also application configuration and trace log files are located.
+
+Hint: Is a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major version at offset=6" 
+is received while executing the Java version (java -version) is to old to execute this program and must be renewed to a version >= 1.6.0.
+
+RXTXcomm uses serial port locking mechanism, the application user must be part of uucp group. Set permissions of /var/lock to root:uucp.
+While facing problems with USB2Serial UART SiliconLabs cp210x refer to GNULinux_cp210x directory in download area.
+
+
+
+MAC OS X:
+
+MAC OS run always on a 64 Bit processor architecture and supports the execution of 32 Bit as well as 64 Bit Java applications.	
+Starting with 10.8 an installation of a Java runtime is required. It should match the processor architecture. Please check while downloading.
+MAC OS version <= 10.7 already has a Java runtime installed. Configure under system preferences to have as top selection the newest available Java version.
+Older versions you might find the Java preferences under Applications -> Utilities -> Java Preferences.
+The download and opened DMG file show up DataExplorer.app which need simply drag to the Applications folder.
+If devices should be connected by a USB2Serial port adapter it is required to execute the RXTX_Post-Install script once. This will create a directory  
+/var/lock, if not exist. This directory is used to create lock files to prohibit a duplicated use of the same serial port. To enable usage of USB2Serial 
+adapter it is required to install matching driver. This drivers can be download by manufacturer of the USB2Serial chip.
+
+During the first execution of the program the application configuration directories are created /User/<user>/Library/Application Support/DataExplorer.
+Below this directory also application configuration and trace log files are located.
+
+Hint: If the application do not start, use the terminal application and change to /Applications/DataExplorere.app/Contents/MacOS and execute the DataExplorer
+script manually. If a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major version at offset=6" 
+is received check your installed/configured Java runtime. 
