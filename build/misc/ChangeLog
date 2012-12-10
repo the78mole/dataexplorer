@@ -8,8 +8,10 @@ enable auto-save of a temporary file(s) each 5 minutes
 enable gestures for zooming and panning
 CSV2SerialAdapter - enable file import via menu in parallel to configured serial input
 integrate MAC OS standard menu bar actions
+fix Google Earth export in respect of line gaps due to velocity change
+fix HoTTAdapter data import in respect of rest after telemetry data package loss
 build Windows NSIS installer
-build Mac OS disk images for install
+build MAC OS disk images for install
 
 
 Version 3.05 - 18 Oct 2012
