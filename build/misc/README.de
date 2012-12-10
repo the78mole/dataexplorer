@@ -44,7 +44,7 @@ Zur Zeit sind folgende Geräte implementiert:
 											 - FlightRecorder (Multiplex) Mulitdatenlogger
 											 - Simulator Test Plug-in
 											 - JetiAdapter (Jeti, Jeti-Box) Multisensorlog
-											 - AV4ms (Fritz Mössinger/accu-select)  4 Ausgänge Lade-/Entlade-gerät									 
+											 - AV4ms (Fritz Mössinger/accu-select)  4 Ausgänge Lade-/Entlade-gerät Firmware >= 762 							 
 											 
 Weitere Geräte sind in Arbeit. Hilfe bei der Einbindung von zusätzlichen Geräten ist herzlich willkommen.
 

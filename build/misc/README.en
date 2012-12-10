@@ -44,7 +44,7 @@ various of further analysis. Actually the following devices are available as plu
 											 - FlightRecorder (Multiplex) multi measurement device
 											 - Simulator test plug-in
 											 - JetiAdapter (Jeti, Jeti-Box) multi-sensor-log
-											 - AV4ms (Fritz Mössinger/accu-select)  4 outlet battery charger/discharger									 
+											 - AV4ms (Fritz Mössinger/accu-select)  4 outlet battery charger/discharger	firmware >= 762						 
 
 More device are under construction. Help doing this is very welcome.		
 
