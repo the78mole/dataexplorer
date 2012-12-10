@@ -461,14 +461,15 @@ public class KMZWriter {
 						velocityRange = switchColor(zipWriter, recordVelocity, velocity, velocityLowerLimit, velocityUpperLimit, velocityColors, velocityRange, velocityUnit, altitudeMode);
 	
 						//re-write last coordinates
-						height = device.translateValue(recordHeight, recordHeight.get(i - 1) / 1000.0) - height0;
+//						height = device.translateValue(recordHeight, recordHeight.get(i - 1) / 1000.0) - height0;
 						// add data entries, translate according device and measurement unit
-						sb.append(String.format(Locale.ENGLISH, "\t\t\t\t\t\t%.7f,", device.translateValue(recordLongitude, recordLongitude.get(i - 1) / 1000.0))) //$NON-NLS-1$
-								.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLatitude, recordLatitude.get(i - 1) / 1000.0))) //$NON-NLS-1$
-								.append(String.format(Locale.ENGLISH, "%.0f", height < 0 ? 0 : height)).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
+//						sb.append(String.format(Locale.ENGLISH, "\t\t\t\t\t\t%.7f,", device.translateValue(recordLongitude, recordLongitude.get(i - 1) / 1000.0))) //$NON-NLS-1$
+//								.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLatitude, recordLatitude.get(i - 1) / 1000.0))) //$NON-NLS-1$
+//								.append(String.format(Locale.ENGLISH, "%.0f", height < 0 ? 0 : height)).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
 	
 						zipWriter.write(sb.toString().getBytes());
 					}
+					sb = new StringBuilder();
 	
 					height = device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0;
 					// add data entries, translate according device and measurement unit
@@ -480,7 +481,6 @@ public class KMZWriter {
 	
 					if (KMZWriter.application.getStatusBar() != null && i % 50 == 0) KMZWriter.application.setProgress(((++progressCycle * 5000) / dataSize), sThreadId);
 					KMZWriter.log.log(java.util.logging.Level.FINER, "data line = " + sb.toString()); //$NON-NLS-1$
-					sb = new StringBuilder();
 					lastTimeStamp = timeStamp;
 				}
 			}
