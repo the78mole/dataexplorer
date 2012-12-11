@@ -694,7 +694,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * @param batteryMemoryName
 	 * @return
 	 */
-	public void matchModelName2ObjectKey(String modelName) {
+	public void matchModelNameObjectKey(String modelName) {
 		Object[] tmpResult = null;
 		for (String tmpObjectKey : this.application.getObjectKeys()) {
 			if (tmpObjectKey.equals(modelName)) {

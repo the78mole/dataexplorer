@@ -126,7 +126,7 @@ public class JetiDataReader {
 				if (data.loadData(filePath)) {
 					TreeSet<TelemetrySensor> recordSetData = data.getData();
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "Modell name = " + data.getModelName());
-					device.matchModelName2ObjectKey(data.getModelName());
+					if (application.getMenuBar() != null) device.matchModelNameObjectKey(data.getModelName());
 
 					int maxHit = 0, numValues = 0;
 					Map<Integer, Integer> valuesMap = new HashMap<Integer, Integer>();
