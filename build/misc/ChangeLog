@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.06 - xx yyy 2012
+Version 3.06 - 11 Dec 2012
 add JetiAdapter to analyze flight record data from Jeti transmitters
 add AV4ms_FV_762 charger for AA and AAA size cells
 change time line behavior, start showing day > 72 hours
