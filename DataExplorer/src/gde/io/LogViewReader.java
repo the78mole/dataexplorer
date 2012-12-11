@@ -131,6 +131,7 @@ public class LogViewReader {
 		deviceMap.put("junsi icharger 306b", "iCharger306B"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("junsi icharger 3010b", "iCharger3010B"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("openformat\\jlog2", "JLog2"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("openformat\\av4ms_fv_762", "AV4ms_FV_762"); //$NON-NLS-1$ //$NON-NLS-2$
 		// add more supported devices here, key in lower case
 	}
 
