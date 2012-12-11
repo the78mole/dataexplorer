@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V20.xsd">
     <Device>
-        <name implementation="gde.device.wb.CSV2SerialAdapter">Av4ms_FV_762</name>
+        <name implementation="gde.device.wb.CSV2SerialAdapter">AV4ms_FV_762</name>
         <manufacturer>Friedrich Mössinger</manufacturer>
         <manufacturerURL>http://www.accu-select.de</manufacturerURL>
         <group>charger</group>
-        <image>Av4ms_Accu-Select.jpg</image>
+        <image>AV4ms_Accu-Select.jpg</image>
         <usage>false</usage>
     </Device>
     <SerialPort>
