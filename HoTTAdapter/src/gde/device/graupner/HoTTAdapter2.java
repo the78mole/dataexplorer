@@ -398,7 +398,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 		case TYPE_115200:
 			switch (dataBuffer[0]) {
 			case HoTTAdapter2.SENSOR_TYPE_RECEIVER_115200:
-				if (dataBuffer.length == 21) {
+				if (dataBuffer.length >= 21) {
 					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 12);
 					tmpVoltageRx = dataBuffer[15] & 0xFF;
@@ -417,7 +417,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_VARIO_115200:
-				if (dataBuffer.length == 25) {
+				if (dataBuffer.length >= 25) {
 					//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 					//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 					tmpHeight = DataParser.parse2Short(dataBuffer, 10);
@@ -435,7 +435,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_GPS_115200:
-				if (dataBuffer.length == 34) {
+				if (dataBuffer.length >= 34) {
 					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 					//8=Height, 9=Climb 1, 10=Climb 3
 					//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -460,7 +460,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_GENERAL_115200:
-				if (dataBuffer.length == 49) {
+				if (dataBuffer.length >= 49) {
 					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 					//8=Height, 9=Climb 1, 10=Climb 3
 					//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
@@ -501,7 +501,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_ELECTRIC_115200:
-				if (dataBuffer.length == 60) {
+				if (dataBuffer.length >= 60) {
 					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
 					//8=Height, 9=Climb 1, 10=Climb 3
 					//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
@@ -540,7 +540,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice {
 				break;
 				
 			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
-				if (dataBuffer.length == 28) {
+				if (dataBuffer.length >= 28) {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
 					if (this.application.getActiveChannelNumber() == 4) {

@@ -94,8 +94,16 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static byte										SENSOR_TYPE_GENERAL_115200				= 0x35;
 	final static byte										SENSOR_TYPE_ELECTRIC_115200				= 0x36;
 	final static byte										SENSOR_TYPE_MOTOR_DRIVER_115200		= 0x39;
+	final static byte										SENSOR_TYPE_SERVO_POSITION_115200	= 0x40;
+	final static byte										SENSOR_TYPE_SWITCHES_115200				= 0x41;
+	final static byte										SENSOR_TYPE_CONTROL_1_115200			= 0x42;
+	final static byte										SENSOR_TYPE_CONTROL_2_115200			= 0x43;
+	
+	final static boolean                isSwitchS[] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};				
+	final static boolean                isSwitchG[] = {false, false, false, false, false, false, false, false};				
+	final static boolean                isSwitchL[] = {false, false, false, false, false, false, false, false};				
 
-	final static int										QUERY_GAP_MS									= 30;
+	final static int										QUERY_GAP_MS									= 10;
 	final static boolean								isSensorType[]								= { false, false, false, false, false, false };		//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
 
 	public enum Sensor {
@@ -560,7 +568,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 		case TYPE_115200:
 			switch (dataBuffer[0]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_115200:
-				if (dataBuffer.length == 21) {
+				if (dataBuffer.length >= 21) {
 					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 12);
 					tmpVoltageRx = dataBuffer[15] & 0xFF;
@@ -579,7 +587,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
-				if (dataBuffer.length == 25) {
+				if (dataBuffer.length >= 25) {
 					//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 					points[0] = (dataBuffer[3] & 0xFF) * 1000;
 					tmpHeight = DataParser.parse2Short(dataBuffer, 10) + 500;
@@ -599,7 +607,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_GPS_115200:
-				if (dataBuffer.length == 34) {
+				if (dataBuffer.length >= 34) {
 					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 					tmpLatitude = DataParser.parse2Short(dataBuffer, 16);
 					tmpLongitude = DataParser.parse2Short(dataBuffer, 20);
@@ -625,7 +633,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
-				if (dataBuffer.length == 49) {
+				if (dataBuffer.length >= 49) {
 					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 36);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 38);
@@ -665,7 +673,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
-				if (dataBuffer.length == 60) {
+				if (dataBuffer.length >= 60) {
 					//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 		
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 50);
 					tmpCapacity = DataParser.parse2Short(dataBuffer, 52);
@@ -702,7 +710,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 				}
 				break;
 			case HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200:
-				if (dataBuffer.length == 28) {
+				if (dataBuffer.length >= 28) {
 					//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature				
 					points[0] = (dataBuffer[9] & 0xFF) * 1000;
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
