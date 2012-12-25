@@ -66,12 +66,11 @@ public class NMEAReaderWriter {
 	final static Channels			channels		= Channels.getInstance();
 
 	/**
-	 * read the selected CSV file and parse
+	 * read the selected NMEA file and read/parse
 	 * @param filePath
 	 * @param device
 	 * @param recordNameExtend
 	 * @param channelConfigNumber
-	 * @param isRaw
 	 * @return record set created
 	 * @throws NotSupportedFileFormatException 
 	 * @throws MissMatchDeviceException 
