@@ -135,7 +135,7 @@ public class IGCReaderWriter {
 							header.append(line).append(GDE.LINE_SEPARATOR);
 						}
 						else if (line.startsWith("A")) { // first line contains manufacturer identifier
-							dllID = line.substring(1, 3);
+							dllID = line.substring(1, 4);
 							log.log(Level.FINE, "IGCDLL iddentifier = " + dllID);
 						}
 					}
@@ -258,7 +258,7 @@ public class IGCReaderWriter {
 				reader = null;
 				
 
-				if (GDE.IS_WINDOWS && isGsentence) {
+				if (GDE.IS_WINDOWS && isGsentence && GDE.BIT_MODE.equals("32")) {
 					if (IGCDLL.loadIgcDll(dllID)) {
 						System.out.println("verification = " + IGCDLL.validateLog(filePath));
 					}
