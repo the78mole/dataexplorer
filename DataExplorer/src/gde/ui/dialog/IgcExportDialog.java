@@ -794,7 +794,7 @@ public class IgcExportDialog extends Dialog {
 	public StringBuilder getHeader() {
 		StringBuilder header = new StringBuilder();
 		if (this.headerRecordDateText != null) {
-			header.append(String.format("AGDE%s %s\r\n", GDE.NAME_LONG, GDE.VERSION)); //$NON-NLS-1$
+			header.append(String.format("AXXX%s\r\n", GDE.NAME_LONG)); //$NON-NLS-1$
 			header.append(String.format("HFDTE%s\r\n", this.headerRecordDateText.getText())); //$NON-NLS-1$
 			header.append(String.format("HFFXA%s\r\n", this.headerFixAccuracyText.getText())); //$NON-NLS-1$
 			header.append(String.format("HFPLTPILOT:%s\r\n", this.headerPilotText.getText())); //$NON-NLS-1$
@@ -802,7 +802,7 @@ public class IgcExportDialog extends Dialog {
 			header.append(String.format("HFGTYGLIDERTYPE:%s\r\n", this.headerGliderTypeText.getText().trim())); //$NON-NLS-1$
 			header.append(String.format("HFGIDGLIDERID:%s\r\n", this.headerGliderIdText.getText())); //$NON-NLS-1$
 			header.append(String.format("HFDTM100GPSDATUM:%s\r\n", this.headerGpsDatumText.getText())); //$NON-NLS-1$
-			header.append(String.format("HFRFWFIRMWAREVERSION:%s\r\n", this.headerFirmwareVersionText.getText())); //$NON-NLS-1$
+			header.append(String.format("HFRFWFIRMWAREVERSION:%s\r\n", GDE.VERSION)); //$NON-NLS-1$
 			header.append(String.format("HFRHWHARDWAREVERSION:%s\r\n", this.headerHardwareVersionText.getText())); //$NON-NLS-1$
 			header.append(String.format("HFFTYFRTYPE:%s\r\n", this.headerGpsManufacturerModelText.getText())); //$NON-NLS-1$
 			header.append(String.format("HFCIDCOMPETITIONID:%s\r\n", this.headerCompetitionIdText.getText())); //$NON-NLS-1$
@@ -811,7 +811,7 @@ public class IgcExportDialog extends Dialog {
 			header.append(String.format("HFTZNTIMEZONE:%s\r\n", tmpUtfOffset.startsWith("+") ? tmpUtfOffset.substring(1) : tmpUtfOffset)); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
-			header.append(String.format("AGDE%s %s\r\n", GDE.NAME_LONG, GDE.VERSION)); //$NON-NLS-1$
+			header.append(String.format("AXXX%s %s\r\n", GDE.NAME_LONG)); //$NON-NLS-1$
 			header.append(String.format("HFDTE%s\r\n", this.headerRecordDate)); //$NON-NLS-1$
 			header.append(String.format("HFFXA%s\r\n", this.headerFixAccuracy)); //$NON-NLS-1$
 			header.append(String.format("HFPLTPILOT:%s\r\n", this.headerPilot)); //$NON-NLS-1$
@@ -819,7 +819,7 @@ public class IgcExportDialog extends Dialog {
 			header.append(String.format("HFGTYGLIDERTYPE:%s\r\n", this.gliderTypes[this.headerGliderType])); //$NON-NLS-1$
 			header.append(String.format("HFGIDGLIDERID:%s\r\n", this.headerGliderId)); //$NON-NLS-1$
 			header.append(String.format("HFDTM100GPSDATUM:%s\r\n", this.headerGpsDatum)); //$NON-NLS-1$
-			header.append(String.format("HFRFWFIRMWAREVERSION:%s\r\n", this.headerFirmwareVersion)); //$NON-NLS-1$
+			header.append(String.format("HFRFWFIRMWAREVERSION:%s\r\n", GDE.VERSION)); //$NON-NLS-1$
 			header.append(String.format("HFRHWHARDWAREVERSION:%s\r\n", this.headerHardwareVersion)); //$NON-NLS-1$
 			header.append(String.format("HFFTYFRTYPE:%s\r\n", this.headerGpsManufacturerModel)); //$NON-NLS-1$
 			header.append(String.format("HFCIDCOMPETITIONID:%s\r\n", this.headerCompetitionId)); //$NON-NLS-1$
