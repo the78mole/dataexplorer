@@ -19,7 +19,7 @@
     Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
 ************************************************************************************** 
 -->
-<project name="DataExplorerMasterBuild" default="copy-files" basedir="..">
+<project name="DataExplorerMasterBuild" default="dist" basedir="..">
 
 	<target name="echo:build.properties" if="build.properties.exists">
 		<echo message="Building using ${build.properties}" />
@@ -29,7 +29,7 @@
 
 
 	<!-- Main target -->
-	<target name="dist" depends="binary_package">
+	<target name="dist" depends="copy-files">
 		<echo message="Building on system ${os.name} ${os.arch} ${sun.arch.data.model}" />
 		<echo message="Building using Java ${java.version}" />
 	</target>
