@@ -3,6 +3,8 @@ Development history / change log, please read from bottom up
 Version 3.07 - xx yy 2013
 HoTTAdapter(2) - live data, display detected sensors, optimize performance 
 add IGCAdapter - enable import of IGC log files
+fix bug #37976: installer.nsi is missing, not required, changed build target
+fix bug #37991: Prefix is not recognized, changed target directories to prefix if in use
 
 Version 3.06 - 11 Dec 2012
 add JetiAdapter to analyze flight record data from Jeti transmitters
