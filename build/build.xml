@@ -237,7 +237,7 @@
 	<target name="WindowsPrefix" if="prefix">
 		<echo message="installing to ${prefix}" />
 		<!-- unzip src="${build.target.dir}/dataexplorer-${version.num}-bin_${build.os.shortname}_x86_${sun.arch.data.model}.zip" dest="${prefix}" overwrite="true" / -->
-		<copy toDir="${install.dir.windows}">
+		<copy toDir="${prefix}">
 			<fileset file="${output.dir}/Windows_${sun.arch.data.model}/**" />
 		</copy>
 	</target>
@@ -273,7 +273,7 @@
 	      <arg value="+x"/>
 	      <arg value="${output.dir}/GNULinux_${sun.arch.data.model}/${app.name}/DevicePropertiesEditor"/>
 	    </exec>
-		<copy toDir="${install.dir.linux}">
+		<copy toDir="${prefix}">
 			<fileset file="${output.dir}/GNULinux_${sun.arch.data.model}/**" />
 		</copy>
 	</target>
@@ -309,7 +309,7 @@
 	      <arg value="+x"/>
 	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac64"/>
 	    </exec>
-		<copy toDir="${install.dir.mac}">
+		<copy toDir="${prefix}">
 			<fileset file="${output.dir}/Mac_${sun.arch.data.model}/**" />
 		</copy>
 	</target>
