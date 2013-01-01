@@ -30,7 +30,7 @@ import gde.device.jeti.JetiDataReader;
 import gde.exception.NotSupportedException;
 import gde.io.CSVReaderWriter;
 import gde.io.CSVSerialDataReaderWriter;
-import gde.io.IGCWriter;
+import gde.io.IGCReaderWriter;
 import gde.io.LogViewReader;
 import gde.io.NMEAReaderWriter;
 import gde.io.OsdReaderWriter;
@@ -1095,7 +1095,7 @@ public class TestFileReaderWriter extends TestSuperClass {
 							absolutFilePath = absolutFilePath.trim().substring(0, absolutFilePath.lastIndexOf(GDE.STRING_DOT)) + GDE.FILE_ENDING_DOT_IGC;
 							System.out.println("writing as   : " + absolutFilePath);
 							igcExport.initializeValues(ordinalLongitude, ordinalLatitude, ordinalAltitude);
-							IGCWriter.write(device, absolutFilePath, igcExport.getHeader(), recordSet, ordinalLongitude, ordinalLatitude, ordinalAltitude, 487);
+							IGCReaderWriter.write(device, absolutFilePath, igcExport.getHeader(), recordSet, ordinalLongitude, ordinalLatitude, ordinalAltitude, 487);
 						}
 					}
 					catch (Exception e) {
