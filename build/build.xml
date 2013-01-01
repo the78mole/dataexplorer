@@ -547,7 +547,7 @@
 
 	</target>
 
-	<!-- zip for Windows/MAC OS, tar for GNULinux -->
+	<!-- package, build Windows installer, MAC OS disk image, tar for GNULinux -->
 	<target name="binary_package" depends="copy-files">
 		
 	    <antcall target="build_Windows_NSIS_installer" description="replacing zip archive target with building NSIS Windows installer"/>
