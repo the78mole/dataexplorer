@@ -35,7 +35,6 @@ import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
 import gde.io.LogViewReader;
 import gde.io.NMEAParser;
-import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.dialog.IgcExportDialog;
@@ -63,16 +62,11 @@ import org.eclipse.swt.widgets.MenuItem;
  * @author Winfried Brügmann
  */
 public class JetiAdapter extends DeviceConfiguration implements IDevice {
-	final static Logger		log								= Logger.getLogger(JetiAdapter.class.getName());
+	final static Logger			log	= Logger.getLogger(JetiAdapter.class.getName());
 
-	final DataExplorer		application;
-	final Channels				channels;
+	final DataExplorer			application;
+	final Channels					channels;
 	final JetiAdapterDialog	dialog;
-	
-//	private int latitudeIndex = -1;
-//	private int longitudeIndex = -1;
-//	private int gpsAltitudeIndex = -1;
-	
 
 	/**
 	 * constructor using properties file
@@ -118,6 +112,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
+	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 		// ...
 		return lov2osdMap;
@@ -130,6 +125,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * @param channelNumber 
 	 * @return converted configuration data
 	 */
+	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
 		return ""; //$NON-NLS-1$
@@ -138,6 +134,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
+	@Override
 	public int getLovDataByteSize() {
 		return 0; // sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
@@ -153,6 +150,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
+	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
 		NMEAParser data = new NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)), this,
@@ -170,21 +168,15 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 				subLengthBytes = new byte[4];
 				System.arraycopy(dataBuffer, lastLength, subLengthBytes, 0, 4);
 				subLenght = LogViewReader.parse2Int(subLengthBytes) - 8;
-				//System.out.println((subLenght+8));
 				lineBuffer = new byte[subLenght];
 				System.arraycopy(dataBuffer, 4 + lastLength, lineBuffer, 0, subLenght);
-				String textInput = new String(lineBuffer,"ISO-8859-1");
-				//System.out.println(textInput);
+				String textInput = new String(lineBuffer, "ISO-8859-1");
 				StringTokenizer st = new StringTokenizer(textInput);
 				Vector<String> vec = new Vector<String>();
 				while (st.hasMoreTokens())
 					vec.add(st.nextToken("\r\n"));
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-				//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-				//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 				data.parse(vec, vec.size());
-				lastLength += (subLenght+12);
+				lastLength += (subLenght + 12);
 
 				recordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms());
 
@@ -195,7 +187,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		}
 		catch (Exception e) {
 			String msg = e.getMessage() + Messages.getString(gde.messages.MessageIds.GDE_MSGW0543);
-			log.log(java.util.logging.Level.WARNING, msg, e);
+			JetiAdapter.log.log(java.util.logging.Level.WARNING, msg, e);
 			this.application.openMessageDialog(msg);
 			if (doUpdateProgressBar) this.application.setProgress(0, sThreadId);
 		}
@@ -207,8 +199,8 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
+	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
-		//noop due to previous parsed CSV data
 		return points;
 	}
 
@@ -223,6 +215,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * @param doUpdateProgressBar
 	 * @throws DataInconsitsentException 
 	 */
+	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
@@ -242,16 +235,12 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 						+ ((timeStampBuffer[3 + (i * 4)] & 0xff) << 0));
 			}
 		}
-		log.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
+		JetiAdapter.log.log(java.util.logging.Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
 
 		for (int i = 0; i < recordDataSize; i++) {
-			log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
+			JetiAdapter.log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize + timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 
-			//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-			//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-			//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-			//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 			for (int j = 0; j < points.length; j++) {
 				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8) + ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
 			}
@@ -271,19 +260,20 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
+	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
 			for (int j = 0; j < recordSet.size(); j++) {
 				Record record = recordSet.get(j);
-				
+
 				switch (record.getDataType()) {
 				case GPS_LATITUDE:
 				case GPS_LONGITUDE:
 					dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
-//				double value = (record.realGet(rowIndex) / 1000000.0);
-//				int grad = (int)value;
-//				double minuten = (value - grad) * 100;
-//				dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
+					//				double value = (record.realGet(rowIndex) / 1000000.0);
+					//				int grad = (int)value;
+					//				double minuten = (value - grad) * 100;
+					//				dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
 					break;
 
 				case DEFAULT:
@@ -297,7 +287,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			JetiAdapter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -307,15 +297,16 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double translateValue(Record record, double value) {
 		double newValue = 0;
-		
+
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
-//		int grad = ((int)(value / 1000));
-//		double minuten = (value - (grad*1000.0))/10.0;
-//		newValue = grad + minuten/60.0;
+			//		int grad = ((int)(value / 1000));
+			//		double minuten = (value - (grad*1000.0))/10.0;
+			//		newValue = grad + minuten/60.0;
 			newValue = value / 1000.0;
 			break;
 
@@ -343,7 +334,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			newValue = (value - reduction) * factor + offset;
 			break;
 		}
-		if (log.isLoggable(Level.FINE))	log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (JetiAdapter.log.isLoggable(java.util.logging.Level.FINE)) JetiAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -352,15 +343,16 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		double newValue = 0;
-		
+
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
-//		int grad = (int)value;
-//		double minuten =  (value - grad*1.0) * 60.0;
-//		newValue = (grad + minuten/100.0)*1000.0;
+			//		int grad = (int)value;
+			//		double minuten =  (value - grad*1.0) * 60.0;
+			//		newValue = (grad + minuten/100.0)*1000.0;
 			newValue = value * 1000.0;
 			break;
 
@@ -388,7 +380,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			newValue = (value - offset) / factor + reduction;
 			break;
 		}
-		if (log.isLoggable(Level.FINE))	log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (JetiAdapter.log.isLoggable(java.util.logging.Level.FINE)) JetiAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -400,6 +392,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
+	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
@@ -409,19 +402,19 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(i);
-			log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
+			JetiAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
 
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
-				log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ 
+				JetiAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
-				log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				JetiAdapter.log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
-		log.log(Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+		JetiAdapter.log.log(java.util.logging.Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 	}
 
@@ -431,6 +424,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * for calculation which requires more effort or is time consuming it can call a background thread, 
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
+	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		this.application.updateStatisticsData();
 	}
@@ -448,6 +442,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
+	@Override
 	public String[] getUsedPropertyKeys() {
 		return new String[] { IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION };
 	}
@@ -457,8 +452,10 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
+	@Override
 	public void open_closeCommPort() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2900), new String[] {GDE.FILE_ENDING_STAR_LOG, GDE.FILE_ENDING_STAR_JML, GDE.FILE_ENDING_STAR_STAR});
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2900), new String[] { GDE.FILE_ENDING_STAR_LOG, GDE.FILE_ENDING_STAR_JML,
+				GDE.FILE_ENDING_STAR_STAR });
 
 		Thread reader = new Thread("reader") {
 			@Override
@@ -467,16 +464,16 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 					JetiAdapter.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-						
+						JetiAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+
 						if (fd.getFileName().length() > 4) {
 							try {
-								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								Integer channelConfigNumber = JetiAdapter.this.dialog != null && !JetiAdapter.this.dialog.isDisposed() ? JetiAdapter.this.dialog.getTabFolderSelectionIndex() + 1 : null;
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 								JetiDataReader.read(selectedImportFile, JetiAdapter.this, recordNameExtend, channelConfigNumber, true);
 							}
 							catch (Throwable e) {
-								log.log(Level.WARNING, e.getMessage(), e);
+								JetiAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 							}
 						}
 					}
@@ -504,8 +501,9 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2905));
 			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertKLM3DRelativeItem action performed! " + e); //$NON-NLS-1$
+					JetiAdapter.log.log(java.util.logging.Level.FINEST, "convertKLM3DRelativeItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
 				}
 			});
@@ -513,8 +511,9 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2906));
 			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					JetiAdapter.log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
 				}
 			});
@@ -522,24 +521,29 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2907));
 			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					JetiAdapter.log.log(java.util.logging.Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 				}
 			});
-			
+
 			new MenuItem(exportMenue, SWT.SEPARATOR);
 
 			convertIGCItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertIGCItem.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0611));
 			convertIGCItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
-					//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-					//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-					//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-					//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-					new IgcExportDialog().open(1, 0, 2);
+					JetiAdapter.log.log(java.util.logging.Level.FINEST, "convertIGCItem action performed! " + e); //$NON-NLS-1$
+					Channel activeChannel = JetiAdapter.this.channels.getActiveChannel();
+					if (activeChannel != null) {
+						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+						if (activeRecordSet != null && activeRecordSet.containsGPSdata()) {
+							new IgcExportDialog().open(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE),
+									activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE));
+						}
+					}
 				}
 			});
 		}
@@ -550,24 +554,16 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE | DeviceConfiguration.HEIGHT_CLAMPTOGROUND
 	 */
 	public void export2KMZ3D(int type) {
-		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-		//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2903), 1, 0, 2, 7, 9, 11, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null && activeRecordSet.containsGPSdata()) {
+				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2903), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), findRecordByUnit(activeRecordSet, "km/h"),
+						findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+			}
+		}
 	}
-
-//	/**
-//	 * exports the actual displayed data set to GPX file format
-//	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
-//	 */
-//	public void export2GPX(int type) {
-//		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-//		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-//		//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-//		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-//		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT2004), 1, 0, 2, 7, 8, type == DeviceConfiguration.HEIGHT_RELATIVE);
-//	}
 
 	/**
 	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
@@ -598,16 +594,17 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ) && activeRecordSet.containsGPSdata()) {
-				exportFileName = new FileHandler().exportFileKMZ(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, true, isExportTmpDir);
+				exportFileName = new FileHandler().exportFileKMZ(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE),
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), findRecordByUnit(activeRecordSet, "km/h"), findRecordByUnit(activeRecordSet, "m/s"),
+						findRecordByUnit(activeRecordSet, "km"), -1, true, isExportTmpDir);
 			}
 		}
 		return exportFileName;
 	}
-	
+
 	private int findRecordByUnit(RecordSet recordSet, String unit) {
 		for (Entry<String, Record> entry : recordSet.entrySet()) {
-			if (entry.getValue().getUnit().equalsIgnoreCase(unit))
-				return entry.getValue().getOrdinal();
+			if (entry.getValue().getUnit().equalsIgnoreCase(unit)) return entry.getValue().getOrdinal();
 		}
 		return -1;
 	}
@@ -620,22 +617,34 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 		return -1;
 	}
-		
+
 	/**
 	 * @return the translated latitude and longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W} for GPS devices only
 	 */
 	@Override
 	public String translateGPS2IGC(RecordSet recordSet, int index, char fixValidity, int startAltitude, int offsetAltitude) {
-		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-		Record recordLatitude = recordSet.get(0);
-		Record recordLongitude = recordSet.get(1);
-		Record baroAlitude = recordSet.get(2);
-		Record gpsAlitude = recordSet.get(2);
-		
-		return String.format("%02d%05d%s%03d%05d%s%c%05d%05d", 																																														//$NON-NLS-1$
-				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
-				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$
-				fixValidity, Double.valueOf(baroAlitude.get(index) / 10000.0 + startAltitude + offsetAltitude).intValue(), Double.valueOf(gpsAlitude.get(index) / 1000.0 + offsetAltitude).intValue());
+		String bSentence = "error";
+		RecordSet activeRecordSet = this.application.getActiveRecordSet();
+		if (activeRecordSet != null) {
+			Record recordLatitude = recordSet.get(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE));
+			Record recordLongitude = recordSet.get(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE));
+			Record baroAlitude = recordSet.get(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE));
+			Record gpsAlitude = recordSet.get(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE));
+			
+			//		int grad = ((int)(value / 1000));
+			//		double minuten = (value - (grad*1000.0))/10.0;
+			//		newValue = grad + minuten/60.0;
+			
+			//		int grad = (int)value;
+			//		double minuten =  (value - grad*1.0) * 60.0;
+			//		newValue = (grad + minuten/100.0)*1000.0;
+
+			bSentence = String.format("%02d%05d%s%03d%05d%s%c%05d%05d", //$NON-NLS-1$
+					recordLatitude.get(index)  / 1000000, Double.valueOf( recordLatitude.get(index) % 1000000 / 100.0 * 6.0).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
+					recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 100.0 * 6.0).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$
+					fixValidity, Double.valueOf(baroAlitude.get(index) / 1000.0 + startAltitude + offsetAltitude).intValue(), Double.valueOf(gpsAlitude.get(index) / 1000.0 + offsetAltitude).intValue());
+		}
+		return bSentence;
 	}
 
 	/**
@@ -645,15 +654,16 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileImportMenu(Menu importMenue) {
 		MenuItem importDeviceLogItem;
 
-		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
 			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2908, GDE.MOD1));
 			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT2908));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
-					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					JetiAdapter.log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					open_closeCommPort();
 				}
 			});
@@ -683,7 +693,8 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			for (int j = 0; j < recordNames.length; j++) {
 				MeasurementType measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), j);
 				recordSet.addRecordName(recordNames[j]);
-				recordSet.put(recordNames[j], new Record(this, j, recordNames[j], measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5));
+				recordSet.put(recordNames[j],
+						new Record(this, j, recordNames[j], measurement.getSymbol(), measurement.getUnit(), measurement.isActive(), measurement.getStatistics(), measurement.getProperty(), 5));
 			}
 		}
 		return recordNames;
@@ -709,7 +720,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			if (hitCount > 0) {
 				if (tmpResult == null || hitCount > (Integer) tmpResult[1]) {
 					tmpResult = new Object[] { tmpObjectKey, hitCount };
-					log.log(java.util.logging.Level.FINE, "result updated = " + tmpObjectKey + " hitCount = " + hitCount); //$NON-NLS-1$ //$NON-NLS-2$
+					JetiAdapter.log.log(java.util.logging.Level.FINE, "result updated = " + tmpObjectKey + " hitCount = " + hitCount); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
