@@ -31,6 +31,7 @@ import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
 import gde.exception.DataInconsitsentException;
 import gde.io.FileHandler;
+import gde.io.IGCReaderWriter;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
