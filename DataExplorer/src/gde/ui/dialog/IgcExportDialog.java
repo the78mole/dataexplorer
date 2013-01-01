@@ -641,7 +641,7 @@ public class IgcExportDialog extends Dialog {
 					saveButtonLData.left = new FormAttachment(0, 1000, 449);
 					saveButtonLData.top = new FormAttachment(0, 1000, 407);
 					this.saveButton.setLayoutData(saveButtonLData);
-					this.saveButton.setText(Messages.getString(MessageIds.GDE_MSGT0005));
+					this.saveButton.setText(Messages.getString(MessageIds.GDE_MSGT0486));
 					this.saveButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.saveButton.addSelectionListener(new SelectionAdapter() {
 						@Override

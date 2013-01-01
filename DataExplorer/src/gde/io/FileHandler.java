@@ -196,11 +196,12 @@ public class FileHandler {
 			}
 			fileName = (fileDescriptionDate.length() > 0 ? fileDescriptionDate : StringHelper.getDate()) + GDE.STRING_UNDER_BAR;
 		}
-		if (Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null && Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {
+		if (application.isObjectoriented() && Settings.getInstance().getUsageObjectKeyInFileName() && Channels.getInstance().getActiveChannel() != null && Channels.getInstance().getActiveChannel().getActiveRecordSet() != null) {
 			fileName = fileName + Channels.getInstance().getActiveChannel().getObjectKey();
 		}
 		if (addRecordSetName && this.application.getActiveChannel() != null && this.application.getActiveChannel().getActiveRecordSet() != null) {
-			fileName = fileName + GDE.STRING_UNDER_BAR + this.application.getActiveChannel().getActiveRecordSet().getName().replace(") ", GDE.STRING_UNDER_BAR); //$NON-NLS-1$
+			fileName = (fileName.endsWith(GDE.STRING_UNDER_BAR) ? fileName : fileName + GDE.STRING_UNDER_BAR) 
+					+ this.application.getActiveChannel().getActiveRecordSet().getName().replace(") ", GDE.STRING_UNDER_BAR); //$NON-NLS-1$
 		}
 		return fileName;
 	}
@@ -725,7 +726,7 @@ public class FileHandler {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 
-				IGCWriter.write(device, igcFilePath, igcFileHeader, activeChannel.getActiveRecordSet(), ordinalLongitude, ordinalLatitude, ordinalAltitude, offsetAltitude);
+				IGCReaderWriter.write(device, igcFilePath, igcFileHeader, activeChannel.getActiveRecordSet(), ordinalLongitude, ordinalLatitude, ordinalAltitude, offsetAltitude);
 			}
 			catch (Exception e) {
 				FileHandler.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
