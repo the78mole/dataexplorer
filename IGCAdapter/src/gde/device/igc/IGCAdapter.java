@@ -36,7 +36,10 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.dialog.IgcExportDialog;
+import gde.utils.CalculationThread;
 import gde.utils.FileUtils;
+import gde.utils.LinearRegression;
+import gde.utils.QuasiLinearRegression;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -312,6 +315,27 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
+		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
+		if (recordSet.isRaw() && recordSet.isRecalculation()) {
+			// 0=Longitude, 1=Latitude, 2=Altitude(baro), 3=Altitude(GPS), 4=Climb
+			// calculate the values required		
+			Record slopeRecord = recordSet.get(4);//2=Steigrate
+			slopeRecord.setDisplayable(false);
+			PropertyType property = slopeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
+			int regressionInterval = property != null ? new Integer(property.getValue()) : 10;
+			property = slopeRecord.getProperty(CalculationThread.REGRESSION_TYPE);
+			if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
+				this.calculationThread = new QuasiLinearRegression(recordSet, recordSet.get(2).getName(), slopeRecord.getName(), regressionInterval);
+			else
+				this.calculationThread = new LinearRegression(recordSet, recordSet.get(2).getName(), slopeRecord.getName(), regressionInterval);
+
+			try {
+				this.calculationThread.start();
+			}
+			catch (RuntimeException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
+			}
+		}
 		this.application.updateStatisticsData();
 	}	
 

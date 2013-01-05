@@ -53,7 +53,15 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
-       </Channel>
+			<Measurement>
+				<name>Steigen</name>
+				<symbol>V</symbol>
+				<unit>m/s</unit>
+				<statistics sigma="false" avg="false" max="true" min="true"/>
+				<property description="Zeit in Sekunden über die die regression durchgeführt wird" type="Integer" value="10" name="regression_interval_sec"/>
+				<property description="Regressionsrechnungsart" type="String" value="regression_type_curve" name="regression_type"/>
+			</Measurement>
+		</Channel>
     </Channels>
     <Desktop>
         <property value="true" name="table_tab"/>
