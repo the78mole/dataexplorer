@@ -328,7 +328,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 					}
 					
 					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
-					byte[] tmpBuffer = new byte[size2Read];
+					byte[] tmpBuffer = new byte[size2Read > 0 ? size2Read : 0];
 					if (data_in.read(tmpBuffer) != size2Read) {
 						//end of file reached
 						this.close();
@@ -343,9 +343,9 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 						tmpVector.remove(0);
 				}
 				if (tmpVector.size() != readBuffer.length) {
-					resultBuffer = new byte[tmpVector.size()];
-					for (int i = 0; i < resultBuffer.length; i++) {
-						resultBuffer[i] = tmpVector.get(i);
+					readBuffer = new byte[tmpVector.size()];
+					for (int i = 0; i < readBuffer.length; i++) {
+						readBuffer[i] = tmpVector.get(i);
 					}
 				}
 				else {
