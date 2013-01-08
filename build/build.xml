@@ -365,7 +365,7 @@
 			<include name="UltramatUDP/build/*.jar" />
 			<include name="HoTTAdapter/build/*.jar" />
 			<include name="UniLog2/build/*.jar" />
-			<!-- include name="iCharger/build/*.jar" / -->
+			<include name="iCharger/build/*.jar" />
 			<include name="FlightRecorder/build/*.jar" />
 			<include name="JLog2/build/*.jar" />
 			<include name="JetiAdapter/build/*.jar" />
