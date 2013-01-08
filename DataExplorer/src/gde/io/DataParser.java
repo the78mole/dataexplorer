@@ -22,7 +22,6 @@ import gde.GDE;
 import gde.device.CheckSumTypes;
 import gde.device.FormatTypes;
 import gde.exception.DevicePropertiesInconsistenceException;
-import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -38,19 +37,19 @@ import java.util.logging.Logger;
  * @author Winfried Brügmann
  */
 public class DataParser extends NMEAParser {
-	static Logger					log			= Logger.getLogger(DataParser.class.getName());
+	static Logger			log										= Logger.getLogger(DataParser.class.getName());
 
-	int									start_time_ms = Integer.MIN_VALUE;
-	int									valueSize;
-	
-	int									recordSetNumberOffset = 0;
-	int									timeResetCounter	= 0;
-	boolean							isTimeResetEnabled				= false;
-	
-	final int						timeFactor;
-	final FormatTypes		checkSumFormatType;
-	final FormatTypes		dataFormatType;
-	final boolean				isMultiply1000;
+	int								start_time_ms					= Integer.MIN_VALUE;
+	int								valueSize;
+
+	int								recordSetNumberOffset	= 0;
+	int								timeResetCounter			= 0;
+	boolean						isTimeResetEnabled		= false;
+
+	final int					timeFactor;
+	final FormatTypes	checkSumFormatType;
+	final FormatTypes	dataFormatType;
+	final boolean			isMultiply1000;
 
 	/**
 	 * constructor to initialize required configuration parameter
@@ -69,7 +68,7 @@ public class DataParser extends NMEAParser {
 		this.dataFormatType = FormatTypes.VALUE; //dataBlockSize specifies the number of contained values
 		this.isMultiply1000 = true;
 	}
-	
+
 	/**
 	 * constructor to initialize required configuration parameter
 	 * a 
@@ -82,7 +81,8 @@ public class DataParser extends NMEAParser {
 	 * @param useDataFormatType FormatTypes.TEXT where dataBlockSize specifies the number of contained values, FormatTypes.BINARY where dataBlockSize specifies the number of bytes received via seral connection
 	 * @param doMultiply1000 some transferred values are already in a format required to enable 3 digits 
 	 */
-	public DataParser(int useTimeFactor, String useLeaderChar, String useSeparator, CheckSumTypes useCheckSumType, FormatTypes useCheckSumFormatType, int useDataSize, FormatTypes useDataFormatType, boolean doMultiply1000) {
+	public DataParser(int useTimeFactor, String useLeaderChar, String useSeparator, CheckSumTypes useCheckSumType, FormatTypes useCheckSumFormatType, int useDataSize, FormatTypes useDataFormatType,
+			boolean doMultiply1000) {
 		super(useLeaderChar, useSeparator, useCheckSumType, useDataSize, DataExplorer.getInstance().getActiveDevice(), DataExplorer.getInstance().getActiveChannelNumber(), (short) 0);
 		this.timeFactor = useTimeFactor;
 		this.checkSumFormatType = useCheckSumFormatType;
@@ -92,16 +92,15 @@ public class DataParser extends NMEAParser {
 
 	@Override
 	public void parse(String inputLine, int lineNum) throws DevicePropertiesInconsistenceException, Exception {
-		try {			
+		try {
 			String[] strValues = inputLine.split(this.separator); // {$1, 1, 0, 14780, 0,598, 1,000, 8,838, 22}
 			try {
 				Integer.parseInt(strValues[0].substring(1).trim());
-				this.valueSize = this.dataFormatType != null && this.dataFormatType == FormatTypes.BINARY ? strValues.length-4 
-						: this.dataFormatType != null && this.dataFormatType == FormatTypes.VALUE &&  this.dataBlockSize > 0 ? Math.abs(this.dataBlockSize) : strValues.length-4;
+				this.valueSize = this.dataFormatType != null && this.dataFormatType == FormatTypes.BINARY ? strValues.length - 4 : this.dataFormatType != null && this.dataFormatType == FormatTypes.VALUE
+						&& this.dataBlockSize > 0 ? Math.abs(this.dataBlockSize) : strValues.length - 4;
 				this.values = new int[this.valueSize];
-				log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
-				if (strValues.length-4 != this.valueSize)  throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0048, new String[] {inputLine}));
-				
+				DataParser.log.log(java.util.logging.Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
+
 				parse(inputLine, strValues);
 			}
 			catch (RuntimeException e) {
@@ -110,7 +109,7 @@ public class DataParser extends NMEAParser {
 			}
 		}
 		catch (NumberFormatException e) {
-			log.log(Level.WARNING, e.getMessage(), e);
+			DataParser.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 			throw e;
 		}
 	}
@@ -125,54 +124,54 @@ public class DataParser extends NMEAParser {
 	public void parse(String inputLine, String[] strValues) throws DevicePropertiesInconsistenceException {
 		String strValue = strValues[0].trim().substring(1);
 		this.channelConfigNumber = Integer.parseInt(strValue);
-		
+
 		strValue = strValues[1].trim();
 		this.state = Integer.parseInt(strValue);
 
 		strValue = strValues[2].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT);
 		strValue = strValue.length() > 0 ? strValue : "0";
-		if (start_time_ms == Integer.MIN_VALUE)	{
-			start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
+		if (this.start_time_ms == Integer.MIN_VALUE) {
+			this.start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
 		}
 		else {
-			if (deviceName.startsWith("JLog") && time_ms >= 3276700) {
+			if (this.deviceName.startsWith("JLog") && this.time_ms >= 3276700) {
 				//JLog2 workaround maximum logging time of 54 minutes
-				time_ms = time_ms + 100;
+				this.time_ms = this.time_ms + 100;
 			}
-			else 
-				time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - start_time_ms; // Seconds * 1000 = msec			
+			else
+				this.time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - this.start_time_ms; // Seconds * 1000 = msec			
 		}
-		
-		for (int i = 0; i < this.valueSize; i++) { 
-			strValue = strValues[i+3].trim();
+
+		for (int i = 0; i < this.valueSize; i++) {
+			strValue = strValues[i + 3].trim();
 			try {
 				long tmpValue = strValue.length() > 0 ? Long.parseLong(strValue) : 0;
-				if (isMultiply1000 && tmpValue < Integer.MAX_VALUE/1000 && tmpValue > Integer.MIN_VALUE/1000)
-					this.values[i] = (int) (tmpValue*1000); // enable 3 positions after decimal place
+				if (this.isMultiply1000 && tmpValue < Integer.MAX_VALUE / 1000 && tmpValue > Integer.MIN_VALUE / 1000)
+					this.values[i] = (int) (tmpValue * 1000); // enable 3 positions after decimal place
 				else // needs special processing within IDevice.translateValue(), IDevice.reverseTranslateValue()
-					if (tmpValue < Integer.MAX_VALUE || tmpValue > Integer.MIN_VALUE) {
-						this.values[i] = (int) tmpValue;
-					}
-					else {
-						this.values[i] = (int) (tmpValue/1000);
-					}
+				if (tmpValue < Integer.MAX_VALUE || tmpValue > Integer.MIN_VALUE) {
+					this.values[i] = (int) tmpValue;
+				}
+				else {
+					this.values[i] = (int) (tmpValue / 1000);
+				}
 			}
 			catch (NumberFormatException e) {
 				this.values[i] = 0;
 			}
 		}
-		
+
 		//check time reset to force a new data set creation
-		if (this.device.getTimeStep_ms() < 0 && time_ms <= 0 && this.isTimeResetEnabled) {
-				this.recordSetNumberOffset += ++this.timeResetCounter;
-				this.isTimeResetEnabled = false;
+		if (this.device.getTimeStep_ms() < 0 && this.time_ms <= 0 && this.isTimeResetEnabled) {
+			this.recordSetNumberOffset += ++this.timeResetCounter;
+			this.isTimeResetEnabled = false;
 		}
 
-		if (checkSumType != null) {
-			boolean isValid = isChecksumOK(inputLine, Integer.parseInt(strValues[strValues.length-1].trim()));
+		if (this.checkSumType != null) {
+			boolean isValid = isChecksumOK(inputLine, Integer.parseInt(strValues[strValues.length - 1].trim()));
 			if (!isValid) {
-				DevicePropertiesInconsistenceException e = new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0049, new String[] {strValue})); 
-				log.log(Level.WARNING, e.getMessage(), e);
+				DevicePropertiesInconsistenceException e = new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0049, new String[] { strValue }));
+				DataParser.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 				throw e;
 			}
 		}
@@ -186,52 +185,52 @@ public class DataParser extends NMEAParser {
 	 */
 	public boolean isChecksumOK(String inputLine, int tmpCheckSum) {
 		boolean isValid = true;
-			switch (checkSumType) {
-			case ADD:
-				switch (checkSumFormatType) {
-				case VALUE:
-					isValid = tmpCheckSum == Checksum.ADD(this.values, 0, this.valueSize);
-					break;
-				case BINARY:
-				default:
-					isValid = tmpCheckSum == Checksum.ADD(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
-					break;
-				}
+		switch (this.checkSumType) {
+		case ADD:
+			switch (this.checkSumFormatType) {
+			case VALUE:
+				isValid = tmpCheckSum == Checksum.ADD(this.values, 0, this.valueSize);
 				break;
-			case XOR:
-				switch (checkSumFormatType) {
-				case VALUE:
-					isValid = tmpCheckSum == Checksum.XOR(this.values, 0, this.valueSize);
-					break;
-				case BINARY:
-				default:
-					isValid = tmpCheckSum == Checksum.XOR(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
-					break;
-				}
-				break;
-			case OR:
-				switch (checkSumFormatType) {
-				case VALUE:
-					isValid = tmpCheckSum == Checksum.OR(this.values, 0, this.valueSize);
-					break;
-				case BINARY:
-				default:
-					isValid = tmpCheckSum == Checksum.OR(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
-					break;
-				}
-				break;
-			case AND:
-				switch (checkSumFormatType) {
-				case VALUE:
-					isValid = tmpCheckSum == Checksum.AND(this.values, 0, this.valueSize);
-					break;
-				case BINARY:
-				default:
-					isValid = tmpCheckSum == Checksum.AND(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
-					break;
-				}
+			case BINARY:
+			default:
+				isValid = tmpCheckSum == Checksum.ADD(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
 				break;
 			}
+			break;
+		case XOR:
+			switch (this.checkSumFormatType) {
+			case VALUE:
+				isValid = tmpCheckSum == Checksum.XOR(this.values, 0, this.valueSize);
+				break;
+			case BINARY:
+			default:
+				isValid = tmpCheckSum == Checksum.XOR(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
+				break;
+			}
+			break;
+		case OR:
+			switch (this.checkSumFormatType) {
+			case VALUE:
+				isValid = tmpCheckSum == Checksum.OR(this.values, 0, this.valueSize);
+				break;
+			case BINARY:
+			default:
+				isValid = tmpCheckSum == Checksum.OR(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
+				break;
+			}
+			break;
+		case AND:
+			switch (this.checkSumFormatType) {
+			case VALUE:
+				isValid = tmpCheckSum == Checksum.AND(this.values, 0, this.valueSize);
+				break;
+			case BINARY:
+			default:
+				isValid = tmpCheckSum == Checksum.AND(inputLine.substring(0, inputLine.lastIndexOf(this.separator) + 1).getBytes());
+				break;
+			}
+			break;
+		}
 		return isValid;
 	}
 
@@ -239,14 +238,14 @@ public class DataParser extends NMEAParser {
 	 * @return the recordSetNumberOffset
 	 */
 	public int getRecordSetNumberOffset() {
-		return recordSetNumberOffset;
+		return this.recordSetNumberOffset;
 	}
 
 	/**
 	 * @return the state
 	 */
 	public int getState() {
-		return state;
+		return this.state;
 	}
 
 	/**
@@ -255,27 +254,27 @@ public class DataParser extends NMEAParser {
 	 * @param startIndex index of low byte
 	 */
 	public static int parse2Int(byte[] buffer, int startIndex) {
-		return (((buffer[startIndex+3] & 0xff) << 24) | ((buffer[startIndex+2] & 0xff) << 16) | ((buffer[startIndex+1] & 0xff) << 8) | (buffer[startIndex] & 0xff));
+		return (((buffer[startIndex + 3] & 0xff) << 24) | ((buffer[startIndex + 2] & 0xff) << 16) | ((buffer[startIndex + 1] & 0xff) << 8) | (buffer[startIndex] & 0xff));
 	}
-	
+
 	/**
 	 * parse 2 byte of a data buffer to short integer value, buffer byte sequence low byte high byte
 	 * @param buffer
 	 * @param startIndex index of low byte 
 	 */
 	public static short parse2Short(byte[] buffer, int startIndex) {
-		return (short) (((buffer[startIndex+1] & 0xff) << 8) | (buffer[startIndex] & 0xff));
+		return (short) (((buffer[startIndex + 1] & 0xff) << 8) | (buffer[startIndex] & 0xff));
 	}
-	
+
 	/**
 	 * parse 2 byte of a data buffer to integer value, buffer byte sequence low byte high byte
 	 * @param buffer
 	 * @param startIndex index of low byte 
 	 */
 	public static int parse2UnsignedShort(byte[] buffer, int startIndex) {
-		return ((buffer[startIndex+1] & 0xff) << 8) | (buffer[startIndex] & 0xff);
+		return ((buffer[startIndex + 1] & 0xff) << 8) | (buffer[startIndex] & 0xff);
 	}
-	
+
 	/**
 	 * parse high and low byte to short integer value
 	 * @param low byte
@@ -284,7 +283,7 @@ public class DataParser extends NMEAParser {
 	public static short parse2Short(byte low, byte high) {
 		return (short) (((high & 0xFF) << 8) | (low & 0xFF));
 	}
-	
+
 	/**
 	 * parse high and low byte to short integer value
 	 * @param low byte
