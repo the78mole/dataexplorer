@@ -157,16 +157,19 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	 */
 	protected void setDataLineStartAndLength(byte[] dataBuffer, int[] refStartLength) {
 		int startPos = refStartLength[0] + refStartLength[1];
+		byte leader = this.getDataBlockLeader().getBytes()[0];
+		byte delimiter = this.getDataBlockSeparator().value().getBytes()[0];
+		byte[] lineSep = this.getDataBlockEnding();
 
 		for (; startPos < dataBuffer.length; ++startPos) {
-			if (dataBuffer[startPos] == 0x24) {
-				if (dataBuffer[startPos + 2] == 0x31 || dataBuffer[startPos + 3] == 0x31) break; // "$ ;" or "$  ;" (record set number two digits
+			if (dataBuffer[startPos] == leader) {
+				if (dataBuffer[startPos + 2] == delimiter || dataBuffer[startPos + 3] == delimiter) break; // "$ ;" or "$  ;" (record set number two digits
 			}
 		}
 		int crlfPos = refStartLength[0] = startPos;
 
 		for (; crlfPos < dataBuffer.length; ++crlfPos) {
-			if (dataBuffer[crlfPos] == 0x0D) if (dataBuffer[crlfPos + 1] == 0X0A) break; //0d0a (CRLF)
+			if (dataBuffer[crlfPos] == lineSep[0] || dataBuffer[crlfPos + 1] == lineSep[1]) break; //0d0a (CRLF)
 		}
 		refStartLength[1] = crlfPos - startPos;
 	}

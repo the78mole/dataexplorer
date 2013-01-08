@@ -30,19 +30,17 @@ import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.utils.TimeLine;
-import gde.utils.WaitTimer;
 
 import java.util.logging.Logger;
 
 /**
- * Thread implementation to gather data from eStation device
+ * Thread implementation to gather data from iCharge device
  * @author Winfied Brügmann
  */
 public class GathererThread extends Thread {
 	final static String				$CLASS_NAME									= GathererThread.class.getName();
 	final static Logger				log													= Logger.getLogger(GathererThread.class.getName());
-	final static int					WAIT_TIME_RETRYS						= 36;
+	final static int					WAIT_TIME_RETRYS						= 360;
 
 
 	final DataExplorer application;
@@ -54,7 +52,6 @@ public class GathererThread extends Thread {
 	
 	String										recordSetKey								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
-	boolean										isGatheredRecordSetVisible	= true;
 	int 											numberBatteryCells 					= 0; 
 	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;	// 36 * 5 sec timeout = 180 sec
 	boolean										isCollectDataStopped				= false;
@@ -87,23 +84,15 @@ public class GathererThread extends Thread {
 		final String $METHOD_NAME = "run"; //$NON-NLS-1$
 		RecordSet recordSet = null;
 		int[] points = new int[this.device.getMeasurementNames(this.channelNumber).length];
-		int waitTime_ms = 0; // dry time
 		boolean isProgrammExecuting = false;
-		long startCycleTime = 0;
-		long tmpCycleTime = 0;
-		//long sumCycleTime = 0;
-		//long deltaTime = 0;
 		long measurementCount = 0;
-		boolean isCycleMode = false;
-		int dryTimeCycleCount = 0; // number of discharge/charge cycle NiXx cells only 
-		//double newTimeStep_ms = 0;
 		//StringBuilder sb = new StringBuilder();
 		byte[] dataBuffer = null;
 
 		this.isCollectDataStopped = false;
 		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
-		int posCells = 9; //TODO don't know if this changes for different chargers here
+		int numCells = this.device.getNumberOfLithiumCells();
 
 		while (!this.isCollectDataStopped) {
 			try {
@@ -114,21 +103,15 @@ public class GathererThread extends Thread {
 				// else wait for 180 seconds max. for actions
 				String processName = this.device.getProcessName(dataBuffer);
 				//this.dialog.updateGlobalConfigData(this.device.getConfigurationValues(configData, dataBuffer));
-				isProgrammExecuting = true; //TODO this.device.isProcessing(dataBuffer);
-				isCycleMode = false; //TODO this.device.isCycleMode(dataBuffer);
-				//if (isCycleMode && measurementCount < 5) dryTimeCycleCount = this.device.getNumberOfCycle(dataBuffer) > 0 ? this.device.getNumberOfCycle(dataBuffer) * 2 - 1 : 0;
-				log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME,
-						"processing mode = " + processName + " isCycleMode = " + isCycleMode + " dryTimeCycleCount = " + dryTimeCycleCount); //$NON-NLS-1$	//$NON-NLS-2$ //$NON-NLS-3$
+				isProgrammExecuting = true; 
+				if(log.isLoggable(Level.FINER)) log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME,	"processing mode = " + processName); //$NON-NLS-1$
 
-				if (isProgrammExecuting) { //TODO  && (processName.equals(this.device.USAGE_MODE[1]) || processName.equals(this.device.USAGE_MODE[2]))) {
-					//if (processName.equals(this.device.USAGE_MODE[1]) || processName.equals(this.device.USAGE_MODE[2])) { // 1=discharge; 2=charge -> eStation active
+				if (isProgrammExecuting) {
 					// check state change waiting to discharge to charge
 					// check if a record set matching for re-use is available and prepare a new if required
 					if (this.channel.size() == 0 || recordSet == null || !this.recordSetKey.endsWith(" " + processName)) { //$NON-NLS-1$
 						this.application.setStatusMessage(""); //$NON-NLS-1$
-						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
-						waitTime_ms = 500; //TODO new Integer(configData.get(iCharger.CONFIG_WAIT_TIME)).intValue() * 60000;
-						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "waitTime_ms = " + waitTime_ms); //$NON-NLS-1$
+						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 360 * 2000 = 180 sec
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") " + processName; //$NON-NLS-1$
 						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
@@ -137,53 +120,46 @@ public class GathererThread extends Thread {
 						recordSet = this.channel.get(this.recordSetKey);
 						this.channel.applyTemplateBasics(this.recordSetKey);
 						// switch the active record set if the current record set is child of active channel
-						// for eStation its always the case since we have only one channel
+						// for iCharge its always the case since we have only one channel
 						if (this.channel.getName().equals(this.channels.getActiveChannel().getName())) {
 							this.channels.getActiveChannel().switchRecordSet(this.recordSetKey);
 						}
 						measurementCount = 0;
-						startCycleTime = 0;
 					}
 
 					// prepare the data for adding to record set
-					this.isGatheredRecordSetVisible = this.recordSetKey.equals(this.channels.getActiveChannel().getActiveRecordSet().getName());
-					tmpCycleTime = System.nanoTime()/1000000;
-					if (measurementCount++ == 0) {
-						startCycleTime = tmpCycleTime;
-					}
-					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), (tmpCycleTime - startCycleTime));
-					log.logp(Level.TIME, GathererThread.$CLASS_NAME, $METHOD_NAME, "time = " + TimeLine.getFomatedTimeWithUnit(tmpCycleTime - startCycleTime)); //$NON-NLS-1$
+					++measurementCount;			
+					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));//constant time step
 					
-					this.numberBatteryCells = this.device.getNumberOfLithiumCells();
-					for (int i = posCells; i < recordSet.size(); i++) {
-						Record record = recordSet.get(i);
-						if (record.hasReasonableData()) {
-							this.numberBatteryCells++;
-							log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME, "record = " + record.getName() + " " + record.getRealMinValue() + " " + record.getRealMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						}
-					}
-
 					if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 						GathererThread.this.application.updateAllTabs(false);
 					}
 					
-					if (measurementCount > 0 && measurementCount%10 == 0) {
+					if (measurementCount > 0 && measurementCount%5 == 0) {
+						this.numberBatteryCells = 0;
+						for (int i = numCells; i < recordSet.size(); i++) {
+							Record record = recordSet.get(i);
+							if (record.hasReasonableData()) {
+								this.numberBatteryCells++;
+							}
+						}
+												
 						this.device.updateVisibilityStatus(recordSet, true);
 					}
 				}
-				else { // no eStation program is executing, wait for 180 seconds max. for actions
+				else { // no iCharge program is executing, wait for 180 seconds max. for actions
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2600));
-					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for eStation activation"); //$NON-NLS-1$
+					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for iCharge activation"); //$NON-NLS-1$
 
 					if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(false);
 						isProgrammExecuting = false;
 						recordSet = null;
-						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
+						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); 
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT2608));
 					}
 					else if (0 == (setRetryCounter(getRetryCounter() - 1))) {
-						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
+						log.log(Level.FINE, "iCharge activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2600));
 						stopDataGatheringThread(false, null);
 					}
@@ -195,27 +171,25 @@ public class GathererThread extends Thread {
 			}
 			catch (Throwable e) {
 				// this case will be reached while NiXx Akku discharge/charge/discharge cycle
-				if (e instanceof TimeOutException && isCycleMode && dryTimeCycleCount > 0) {
+				if (e instanceof TimeOutException) {
 					finalizeRecordSet(false);
-					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "(dry time) waiting..."); //$NON-NLS-1$
+					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, " waiting..."); //$NON-NLS-1$
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2601));
 					recordSet = null;
-					--dryTimeCycleCount;
-					WaitTimer.delay(waitTime_ms);
 				}
-				// this case will be reached while eStation program is started, checked and the check not asap committed, stop pressed
+				// this case will be reached while iCharger program is started, checked and the check not asap committed, stop pressed
 				else if (e instanceof TimeOutException && !isProgrammExecuting) {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2600));
-					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for eStation activation ..."); //$NON-NLS-1$
+					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for iCharge activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
-						log.log(Level.FINE, "eStation activation timeout"); //$NON-NLS-1$
+						log.log(Level.FINE, "iCharge activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2600));
 						stopDataGatheringThread(false, null);
 					}
 				}
 				// program end or unexpected exception occurred, stop data gathering to enable save data by user
 				else {
-					log.log(Level.FINE, "eStation program end detected"); //$NON-NLS-1$
+					log.log(Level.FINE, "iCharger program end detected"); //$NON-NLS-1$
 					stopDataGatheringThread(true, e);
 				}
 			}
