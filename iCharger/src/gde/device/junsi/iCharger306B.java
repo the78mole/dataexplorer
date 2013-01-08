@@ -220,8 +220,8 @@ public class iCharger306B extends iCharger {
 
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
-			//7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6 13=SpannungZelle7 14=SpannungZelle8
-			for (int j=0, k=0; j<8; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+			//7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6
+			for (int j=0, k=0; j<6; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
 				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
 				//log.log(Level.OFF, j + " k+19 = " + (k+19));
 				points[j + 9] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff) << 0));
