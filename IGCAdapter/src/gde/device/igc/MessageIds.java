@@ -24,11 +24,7 @@ package gde.device.igc;
  */ 
 public class MessageIds { 
 
-	public final static String	GDE_MSGW1750 = "GDE_MSGW1750";
-	public final static String	GDE_MSGI1750 = "GDE_MSGI1750";
-	public final static String	GDE_MSGI1751 = "GDE_MSGI1751";
 	public final static String	GDE_MSGT1750 = "GDE_MSGT1750";
-	public final static String	GDE_MSGT1751 = "GDE_MSGT1751";
 	public final static String	GDE_MSGT1753 = "GDE_MSGT1753";
 	public final static String	GDE_MSGT1754 = "GDE_MSGT1754";
 	public final static String	GDE_MSGT1755 = "GDE_MSGT1755";
