@@ -76,7 +76,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	public GPXAdapter(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.multiplex.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.gpx.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
@@ -95,7 +95,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	public GPXAdapter(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.multiplex.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.gpx.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
@@ -446,12 +446,6 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 					GPXAdapter.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
-							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
-							}
-							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
-						}
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 						
 						if (fd.getFileName().length() > 4) {

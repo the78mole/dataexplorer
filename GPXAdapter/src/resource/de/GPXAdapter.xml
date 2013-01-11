@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V20.xsd">
     <Device>
-        <name implementation="gde.device.multiplex.FlightRecorder">FlightRecorder</name>
-        <manufacturer>Multiplex Modellsport</manufacturer>
-        <manufacturerURL>http://www.multiplex-rc.de</manufacturerURL>
+        <name>GPXAdapter</name>
+        <manufacturer>GPX</manufacturer>
+        <manufacturerURL>http://www.topografix.com</manufacturerURL>
         <group>logger</group>
-        <image>FlightRecorder.png</image>
+        <image>GPXAdapter.png</image>
         <usage>false</usage>
     </Device>
     <TimeBase>
@@ -20,7 +20,7 @@
         <separator>comma</separator>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredFileExtention>*.csv</preferredFileExtention>
+        <preferredFileExtention>*.gpx</preferredFileExtention>
     </DataBlock>
     <State>
         <property description="" type="Integer" value="01" name="Flugaufzeichnung"/>
