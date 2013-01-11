@@ -171,6 +171,7 @@ public class GDE {
 	public static final String		FILE_ENDING_STAR_GIF						= "*.gif";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_XML						= "*.xml";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_KMZ						= "*.kmz";																																																										//$NON-NLS-1$
+	public static final String		FILE_ENDING_STAR_GPX						= "*.gpx";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_HEX						= "*.hex";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_INI						= "*.ini";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR_TXT						= "*.txt";																																																										//$NON-NLS-1$
@@ -197,6 +198,7 @@ public class GDE {
 	public static final String		FILE_ENDING_DOT_XSD							= ".xsd";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_HEX							= ".hex";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_KMZ							= ".kmz";																																																										//$NON-NLS-1$
+	public static final String		FILE_ENDING_DOT_GPX							= ".gpx";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_KML							= ".kml";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_EXE							= ".exe";																																																										//$NON-NLS-1$
 	public static final String		FILE_ENDING_DOT_INI							= ".ini";																																																										//$NON-NLS-1$
@@ -214,6 +216,7 @@ public class GDE {
 	public static final String		FILE_ENDING_BAK									= "bak";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_TMP									= "tmp";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_KMZ									= "kmz";																																																											//$NON-NLS-1$
+	public static final String		FILE_ENDING_GPX									= "gpx";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_STAR								= "*";																																																												//$NON-NLS-1$
 	public static final String		FILE_ENDING_HEX									= "hex";																																																											//$NON-NLS-1$
 	public static final String		FILE_ENDING_EXE									= "exe";																																																											//$NON-NLS-1$

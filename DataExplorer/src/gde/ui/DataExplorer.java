@@ -223,7 +223,7 @@ public class DataExplorer extends Composite {
 		this.extensionFilterMap.put(GDE.FILE_ENDING_GIF, Messages.getString(MessageIds.GDE_MSGT0214));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_JPG, Messages.getString(MessageIds.GDE_MSGT0215));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_KMZ, Messages.getString(MessageIds.GDE_MSGT0222));
-		//		this.extensionFilterMap.put(GDE.FILE_ENDING_GPX, Messages.getString(MessageIds.GDE_MSGT0223));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_GPX, Messages.getString(MessageIds.GDE_MSGT0677));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_STAR, Messages.getString(GDE.IS_WINDOWS ? MessageIds.GDE_MSGT0216 : MessageIds.GDE_MSGT0676));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_INI, Messages.getString(MessageIds.GDE_MSGT0368));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_LOG, Messages.getString(MessageIds.GDE_MSGT0672));
