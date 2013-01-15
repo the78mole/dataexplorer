@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2011,2012 Winfried Bruegmann
+    Copyright (c) 2011,2012,2013 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
 
@@ -103,7 +103,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	final static boolean                isSwitchG[] = {false, false, false, false, false, false, false, false};				
 	final static boolean                isSwitchL[] = {false, false, false, false, false, false, false, false};				
 
-	final static int										QUERY_GAP_MS									= 10;
+	final static int										QUERY_GAP_MS									= 15;
 	final static boolean								isSensorType[]								= { false, false, false, false, false, false };		//isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
 
 	public enum Sensor {
@@ -1175,11 +1175,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice {
 	 * @param isFilterEnabled the isFilterEnabled to set
 	 */
 	public static synchronized void setFilterProperties(boolean isFilterEnabled, boolean isTolerateSignChangeLatitude, boolean isTolerateSignChangeLongitude, double latitudeTolranceFactor, double longitudeTolranceFactor) {
-		HoTTAdapter.isFilterEnabled = isFilterEnabled;
+		HoTTAdapter.isFilterEnabled 							= isFilterEnabled;
 		HoTTAdapter.isTolerateSignChangeLatitude	= isTolerateSignChangeLatitude;
 		HoTTAdapter.isTolerateSignChangeLongitude	= isTolerateSignChangeLongitude;
 		HoTTAdapter.latitudeToleranceFactor				= latitudeTolranceFactor;
-		HoTTAdapter.longitudeToleranceFactor				= longitudeTolranceFactor;
+		HoTTAdapter.longitudeToleranceFactor			= longitudeTolranceFactor;
 	}
 
 	/**

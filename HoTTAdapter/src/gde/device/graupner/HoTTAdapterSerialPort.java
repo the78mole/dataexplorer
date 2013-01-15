@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2011,2012 Winfried Bruegmann
+    Copyright (c) 2011,2012,2013 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
 
@@ -321,7 +321,8 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	public boolean isCheckSumOK(int startIndex, byte[] bytes) {
 		final String $METHOD_NAME = "isCheckSumOK";
 		short checksum = Checksum.CRC16CCITT(bytes, startIndex, bytes.length-2-startIndex);
-		if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, "checksum: " + String.format("%X", checksum));
+		if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, String.format("checksum: %b - %04X", 
+				((checksum & 0xFF00) >> 8) == (bytes[bytes.length-1] & 0xFF) && (checksum & 0x00FF) == (bytes[bytes.length-2] & 0xFF), checksum));
 		return ((checksum & 0xFF00) >> 8) == (bytes[bytes.length-1] & 0xFF) && (checksum & 0x00FF) == (bytes[bytes.length-2] & 0xFF);
 	}
 
