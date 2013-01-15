@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013 Winfried Bruegmann
 ****************************************************************************************/
 package gde;
 
@@ -77,7 +77,7 @@ public class GDE {
 
 
 	// ****** begin global constants section *******
-	public static final String		VERSION													= "Version 3.06";																																																						//$NON-NLS-1$
+	public static final String		VERSION													= "Version 3.07";																																																						//$NON-NLS-1$
 	public static final String		NAME_SHORT											= "GDE";																																																											//$NON-NLS-1$
 	public static final String		NAME_LONG												= "DataExplorer";																																																						//$NON-NLS-1$
 	public final static String		DEVICE_PROPERTIES_XSD_VERSION		= "_V20";																																																										//$NON-NLS-1$

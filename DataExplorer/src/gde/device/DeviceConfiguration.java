@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device;
 
@@ -516,6 +516,7 @@ public class DeviceConfiguration {
 		this.serialPort.setFlowControlMode(FlowControlTypes.FLOWCONTROL_NONE);
 		this.serialPort.setIsDTR(false);
 		this.serialPort.setIsRTS(false);
+		this.isChangePropery = true;
 	}
 
 	public void setParity(ParityTypes value) {
@@ -699,6 +700,7 @@ public class DeviceConfiguration {
 			this.deviceProps.state = new ObjectFactory().createStateType();
 		}
 		this.deviceProps.state.getProperty().add(newStateProperty);
+		this.isChangePropery = true;
 	}
 	
 	/**
@@ -1314,6 +1316,7 @@ public class DeviceConfiguration {
 	 */
 	@Deprecated
 	public void removeMeasurementFromChannel(String channelConfigKey, MeasurementType newMeasurementType) {
+		this.isChangePropery = true;
 		this.getChannel(channelConfigKey).measurement.remove(newMeasurementType);
 	}
 
@@ -1593,6 +1596,7 @@ public class DeviceConfiguration {
 	 * @param measurementOrdinal
 	 */
 	public void removeStatisticsTypeFromMeasurement(int channelConfigNumber, int measurementOrdinal) {
+		this.isChangePropery = true;
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "remove statistics type from measurement = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).setStatistics(null);
 	}
@@ -1674,6 +1678,7 @@ public class DeviceConfiguration {
 				}
 			}
 		}
+		this.isChangePropery = true;
 	}
 
 	/**
@@ -1745,6 +1750,7 @@ public class DeviceConfiguration {
 	 */
 	public void setMeasurementOffset(int channelConfigNumber, int measurementOrdinal, double offset) {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set offset onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.OFFSET);
 		if (property == null) {
 			createProperty(channelConfigNumber, measurementOrdinal, IDevice.OFFSET, DataTypes.DOUBLE, offset);
@@ -1763,6 +1769,7 @@ public class DeviceConfiguration {
 	@Deprecated
 	public void setMeasurementOffset(String channelConfigKey, int measurementOrdinal, double offset) {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set offset onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET, DataTypes.DOUBLE, offset);
@@ -1813,6 +1820,7 @@ public class DeviceConfiguration {
 	 */
 	public void setMeasurementFactor(int channelConfigNumber, int measurementOrdinal, double factor) {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set factor onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.FACTOR);
 		if (property == null) {
 			createProperty(channelConfigNumber, measurementOrdinal, IDevice.FACTOR, DataTypes.DOUBLE, factor);
@@ -1831,6 +1839,7 @@ public class DeviceConfiguration {
 	@Deprecated
 	public void setMeasurementFactor(String channelConfigKey, int measurementOrdinal, double factor) {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set factor onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR, DataTypes.DOUBLE, factor);
@@ -1881,6 +1890,7 @@ public class DeviceConfiguration {
 	 */
 	public void setMeasurementReduction(int channelConfigNumber, int measurementOrdinal, double reduction) {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set reduction onto measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName());  //$NON-NLS-1$
+		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.REDUCTION);
 		if (property == null) {
 			createProperty(channelConfigNumber, measurementOrdinal, IDevice.REDUCTION, DataTypes.DOUBLE, reduction);
@@ -1899,6 +1909,7 @@ public class DeviceConfiguration {
 	@Deprecated
 	public void setMeasurementReduction(String channelConfigKey, int measurementOrdinal, double reduction) {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "set reduction onto measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName());  //$NON-NLS-1$
+		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION);
 		if (property == null) {
 			createProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION, DataTypes.DOUBLE, reduction);
@@ -1997,6 +2008,7 @@ public class DeviceConfiguration {
 		newProperty.setType(type);
 		newProperty.setValue(GDE.STRING_EMPTY + value);
 		this.getMeasurement(channelConfigNumber, measurementOrdinal).getProperty().add(newProperty);
+		this.isChangePropery = true;
 	}
 
 	/**
@@ -2015,6 +2027,7 @@ public class DeviceConfiguration {
 		newProperty.setType(type);
 		newProperty.setValue(GDE.STRING_EMPTY + value);
 		this.getMeasurement(channelConfigKey, measurementOrdinal).getProperty().add(newProperty);
+		this.isChangePropery = true;
 	}
 
 	/**
@@ -2035,6 +2048,7 @@ public class DeviceConfiguration {
 		}
 
 		this.desktop.getProperty().add(newProperty);
+		this.isChangePropery = true;
 	}
 
 	/**
