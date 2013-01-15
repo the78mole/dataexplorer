@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.junsi;
 
@@ -42,6 +42,7 @@ public class iChargerSerialPort extends DeviceCommPort {
 	final byte					endByte_1;
 	final byte[]				tmpByte					= new byte[1];
 	final int						timeout;
+	final int						stableIndex;
 	final int						tmpDataLength;
 
 	byte[]							answer;
@@ -50,7 +51,7 @@ public class iChargerSerialPort extends DeviceCommPort {
 	long								time						= 0;
 	boolean							isDataReceived	= false;
 	int									index						= 0;
-	boolean 						isEndByte_1 		= false;
+	boolean							isEndByte_1			= false;
 
 	/**
 	 * constructor of default implementation
@@ -63,7 +64,8 @@ public class iChargerSerialPort extends DeviceCommPort {
 		this.endByte = this.device.getDataBlockEnding()[this.device.getDataBlockEnding().length - 1];
 		this.endByte_1 = this.device.getDataBlockEnding().length == 2 ? this.device.getDataBlockEnding()[0] : 0x00;
 		this.tmpDataLength = Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
-		this.timeout = this.device.getDeviceConfiguration().getRTOCharDelayTime() + this.device.getDeviceConfiguration().getRTOExtraDelayTime();
+		this.timeout = this.device.getDeviceConfiguration().getRTOCharDelayTime();
+		this.stableIndex = this.device.getDeviceConfiguration().getRTOExtraDelayTime();
 		this.isDataReceived = false;
 		this.index = 0;
 		this.tmpData = new byte[0];
@@ -118,15 +120,14 @@ public class iChargerSerialPort extends DeviceCommPort {
 	protected byte[] findDataEnd(int startIndex) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "findDataEnd";
 		int endIndex;
-		while (this.index < this.answer.length && !((this.endByte_1 != 0x00 || this.answer[this.index - 1] == this.endByte_1 || isEndByte_1 == true) && this.answer[this.index] == this.endByte))
+		while (this.index < this.answer.length && !((this.endByte_1 != 0x00 || this.answer[this.index - 1] == this.endByte_1 || this.isEndByte_1 == true) && this.answer[this.index] == this.endByte))
 			++this.index;
-		
-		if (this.endByte_1 != 0x00 || this.answer[this.index - 1] == this.endByte_1)
-			isEndByte_1 = true;
+
+		if (this.endByte_1 != 0x00 || this.answer[this.index - 1] == this.endByte_1) this.isEndByte_1 = true;
 
 		if (this.index < this.answer.length && (this.tmpData.length + this.index - startIndex) > 8) {
 			endIndex = this.index;
-			isEndByte_1 = false;
+			this.isEndByte_1 = false;
 			this.data = new byte[this.tmpData.length + endIndex - startIndex];
 			//System.out.println(startIndex + " - " + this.tmpData.length + " - " + endIndex);
 			System.arraycopy(this.tmpData, 0, this.data, 0, this.tmpData.length);
@@ -138,7 +139,7 @@ public class iChargerSerialPort extends DeviceCommPort {
 				}
 				while (sb.length() > 5 && (sb.charAt(sb.length() - 1) == '\n' || sb.charAt(sb.length() - 1) == '\r'))
 					sb.deleteCharAt(sb.length() - 1);
-				if (log.isLoggable(Level.OFF)) log.logp(Level.OFF, iChargerSerialPort.$CLASS_NAME, $METHOD_NAME, sb.toString());
+				if (iChargerSerialPort.log.isLoggable(Level.FINE)) iChargerSerialPort.log.logp(Level.FINE, iChargerSerialPort.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 			return this.data;
 		}
@@ -153,7 +154,7 @@ public class iChargerSerialPort extends DeviceCommPort {
 		this.isDataReceived = false;
 		readNewData();
 		findDataEnd(this.index = 0);
-		
+
 		return this.data;
 	}
 
@@ -165,7 +166,7 @@ public class iChargerSerialPort extends DeviceCommPort {
 	protected void readNewData() throws IOException, TimeOutException {
 		if (!this.isDataReceived) {
 			this.answer = new byte[this.tmpDataLength];
-			this.answer = this.read(this.answer, this.timeout, 5);
+			this.answer = this.read(this.answer, this.timeout, this.stableIndex);
 			this.isDataReceived = true;
 		}
 	}
@@ -179,8 +180,8 @@ public class iChargerSerialPort extends DeviceCommPort {
 		int lenght = this.tmpData.length;
 		while (lenght > 0 && !((this.endByte_1 != 0x00 || this.tmpData[lenght - 2] == this.endByte_1) && this.tmpData[lenght - 1] == this.endByte))
 			--lenght;
-		if (iChargerSerialPort.log.isLoggable(Level.FINER))
-			iChargerSerialPort.log.logp(Level.FINER, iChargerSerialPort.$CLASS_NAME, "getArrayLengthByCheckEnding", "array length = " + lenght);
+		if (iChargerSerialPort.log.isLoggable(Level.FINE))
+			iChargerSerialPort.log.logp(Level.FINE, iChargerSerialPort.$CLASS_NAME, "getArrayLengthByCheckEnding", "array length = " + lenght);
 		return lenght;
 	}
 
@@ -194,7 +195,8 @@ public class iChargerSerialPort extends DeviceCommPort {
 		boolean isOK = false;
 		int check_sum = Checksum.XOR(buffer, buffer.length - 4);
 		if (Integer.parseInt(String.format("%c%c", buffer[buffer.length - 4], buffer[buffer.length - 3])) == check_sum) isOK = true;
-		if (iChargerSerialPort.log.isLoggable(Level.FINER)) iChargerSerialPort.log.logp(Level.FINER, iChargerSerialPort.$CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
+		if (iChargerSerialPort.log.isLoggable(Level.FINER))
+			iChargerSerialPort.log.logp(Level.FINER, iChargerSerialPort.$CLASS_NAME, $METHOD_NAME, "Check_sum = " + isOK); //$NON-NLS-1$
 		return isOK;
 	}
 

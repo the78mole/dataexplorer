@@ -14,9 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.junsi;
+
+import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.Channel;
@@ -31,7 +33,6 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
-import java.util.logging.Logger;
 
 /**
  * Thread implementation to gather data from iCharge device
@@ -40,20 +41,19 @@ import java.util.logging.Logger;
 public class GathererThread extends Thread {
 	final static String				$CLASS_NAME									= GathererThread.class.getName();
 	final static Logger				log													= Logger.getLogger(GathererThread.class.getName());
-	final static int					WAIT_TIME_RETRYS						= 360;
+	final static int					WAIT_TIME_RETRYS						= 120;
 
-
-	final DataExplorer application;
+	final DataExplorer				application;
 	final iChargerSerialPort	serialPort;
 	final iCharger						device;
 	final Channels						channels;
 	final Channel							channel;
 	final int									channelNumber;
-	
+
 	String										recordSetKey								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 	boolean										isPortOpenedByLiveGatherer	= false;
-	int 											numberBatteryCells 					= 0; 
-	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;	// 36 * 5 sec timeout = 180 sec
+	int												numberBatteryCells					= 0;
+	int												retryCounter								= GathererThread.WAIT_TIME_RETRYS;													// 120 * 2500 = 3000 sec
 	boolean										isCollectDataStopped				= false;
 
 	/**
@@ -62,8 +62,7 @@ public class GathererThread extends Thread {
 	 * @throws ApplicationConfigurationException 
 	 * @throws Exception 
 	 */
-	public GathererThread(DataExplorer currentApplication, iCharger useDevice, iChargerSerialPort useSerialPort, int channelConfigNumber)
-			throws ApplicationConfigurationException, SerialPortException {
+	public GathererThread(DataExplorer currentApplication, iCharger useDevice, iChargerSerialPort useSerialPort, int channelConfigNumber) throws ApplicationConfigurationException, SerialPortException {
 		super("dataGatherer");
 		this.application = currentApplication;
 		this.device = useDevice;
@@ -88,9 +87,10 @@ public class GathererThread extends Thread {
 		long measurementCount = 0;
 		//StringBuilder sb = new StringBuilder();
 		byte[] dataBuffer = null;
+		String processName = "";
 
 		this.isCollectDataStopped = false;
-		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
+		GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
 		int numCells = this.device.getNumberOfLithiumCells();
 
@@ -99,23 +99,37 @@ public class GathererThread extends Thread {
 				// get data from device
 				dataBuffer = this.serialPort.getData();
 
-				// check if device is ready for data capturing, discharge or charge allowed only
-				// else wait for 180 seconds max. for actions
-				String processName = this.device.getProcessName(dataBuffer);
-				//this.dialog.updateGlobalConfigData(this.device.getConfigurationValues(configData, dataBuffer));
-				isProgrammExecuting = true; 
-				if(log.isLoggable(Level.FINER)) log.logp(Level.FINER, GathererThread.$CLASS_NAME, $METHOD_NAME,	"processing mode = " + processName); //$NON-NLS-1$
+				// check if device is ready for data capturing
+				// device sends at the end of transmission $ENDBULK;64
+				try {
+					processName = this.device.getProcessName(dataBuffer);
+					isProgrammExecuting = true;
+					if (GathererThread.log.isLoggable(Level.FINE))
+						GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "processing mode = " + processName); //$NON-NLS-1$
+				}
+				catch (Exception e) {
+					StringBuilder sb = new StringBuilder();
+					for (byte b : dataBuffer) {
+						sb.append((char) b);
+					}
+					while (sb.length() > 5 && (sb.charAt(sb.length() - 1) == '\n' || sb.charAt(sb.length() - 1) == '\r'))
+						sb.deleteCharAt(sb.length() - 1);
+					GathererThread.log.log(Level.WARNING, sb.toString());
+					GathererThread.log.log(Level.WARNING, e.getMessage(), e);
+					continue;
+				}
 
 				if (isProgrammExecuting) {
 					// check state change waiting to discharge to charge
 					// check if a record set matching for re-use is available and prepare a new if required
-					if (this.channel.size() == 0 || recordSet == null || !this.recordSetKey.endsWith(" " + processName)) { //$NON-NLS-1$
+					if (this.channel.size() == 0 || recordSet == null || (processName.length() > 3 && !this.recordSetKey.endsWith(" " + processName))) { //$NON-NLS-1$
 						this.application.setStatusMessage(""); //$NON-NLS-1$
-						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 360 * 2000 = 180 sec
+						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 120 * 2500 = 3000 sec
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") " + processName; //$NON-NLS-1$
-						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false));
-						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
+						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), this.channel.getNumber(), true, false));
+						if (GathererThread.log.isLoggable(Level.FINE))
+							GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
 						recordSet = this.channel.get(this.recordSetKey);
 						this.channel.applyTemplateBasics(this.recordSetKey);
@@ -128,14 +142,14 @@ public class GathererThread extends Thread {
 					}
 
 					// prepare the data for adding to record set
-					++measurementCount;			
+					++measurementCount;
 					recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));//constant time step
-					
+
 					if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 						GathererThread.this.application.updateAllTabs(false);
 					}
-					
-					if (measurementCount > 0 && measurementCount%5 == 0) {
+
+					if (measurementCount > 0 && measurementCount % 5 == 0) {
 						this.numberBatteryCells = 0;
 						for (int i = numCells; i < recordSet.size(); i++) {
 							Record record = recordSet.get(i);
@@ -143,59 +157,61 @@ public class GathererThread extends Thread {
 								this.numberBatteryCells++;
 							}
 						}
-												
+
 						this.device.updateVisibilityStatus(recordSet, true);
 					}
 				}
 				else { // no iCharge program is executing, wait for 180 seconds max. for actions
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2600));
-					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for iCharge activation"); //$NON-NLS-1$
+					if (GathererThread.log.isLoggable(Level.FINE))
+						GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for iCharge activation"); //$NON-NLS-1$
 
 					if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(false);
 						isProgrammExecuting = false;
 						recordSet = null;
-						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); 
+						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 120 * 2500 = 3000 sec
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT2608));
 					}
 					else if (0 == (setRetryCounter(getRetryCounter() - 1))) {
-						log.log(Level.FINE, "iCharge activation timeout"); //$NON-NLS-1$
+						if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.log(Level.FINE, "iCharge activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2600));
 						stopDataGatheringThread(false, null);
 					}
 				}
 			}
 			catch (DataInconsitsentException e) {
-				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] {this.getClass().getSimpleName(), $METHOD_NAME}); 
+				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0036, new Object[] { this.getClass().getSimpleName(), $METHOD_NAME });
 				cleanup(message);
 			}
 			catch (Throwable e) {
 				// this case will be reached while NiXx Akku discharge/charge/discharge cycle
-				if (e instanceof TimeOutException) {
+				if (e instanceof TimeOutException && isProgrammExecuting) {
 					finalizeRecordSet(false);
-					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, " waiting..."); //$NON-NLS-1$
+					if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, " waiting..."); //$NON-NLS-1$
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2601));
 					recordSet = null;
 				}
 				// this case will be reached while iCharger program is started, checked and the check not asap committed, stop pressed
 				else if (e instanceof TimeOutException && !isProgrammExecuting) {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2600));
-					log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for iCharge activation ..."); //$NON-NLS-1$
+					if (GathererThread.log.isLoggable(Level.FINE))
+						GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for iCharge activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
-						log.log(Level.FINE, "iCharge activation timeout"); //$NON-NLS-1$
+						if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.log(Level.FINE, "iCharge activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2600));
 						stopDataGatheringThread(false, null);
 					}
 				}
 				// program end or unexpected exception occurred, stop data gathering to enable save data by user
 				else {
-					log.log(Level.FINE, "iCharger program end detected"); //$NON-NLS-1$
+					if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.log(Level.FINE, "iCharger program end detected"); //$NON-NLS-1$
 					stopDataGatheringThread(true, e);
 				}
 			}
 		}
 		this.application.setStatusMessage(""); //$NON-NLS-1$
-		log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+		if (GathererThread.log.isLoggable(Level.FINE)) GathererThread.log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 	}
 
 	/**
@@ -207,13 +223,13 @@ public class GathererThread extends Thread {
 		final String $METHOD_NAME = "stopDataGatheringThread"; //$NON-NLS-1$
 
 		if (throwable != null) {
-			log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
+			GathererThread.log.logp(Level.WARNING, GathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
 		}
-		
+
 		this.isCollectDataStopped = true;
 
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
-			log.log(Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+			GathererThread.log.log(Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (this.serialPort != null && this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
 			this.serialPort.close();
@@ -222,17 +238,14 @@ public class GathererThread extends Thread {
 		RecordSet recordSet = this.channel.get(this.recordSetKey);
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
-			if (enableEndMessage) 
-				this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2609));
+			if (enableEndMessage) this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2609));
 		}
 		else {
 			if (throwable != null) {
-				cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() })
-						+ Messages.getString(MessageIds.GDE_MSGT2608));
+				cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() }) + Messages.getString(MessageIds.GDE_MSGT2608));
 			}
 			else {
-				if (enableEndMessage)
-					cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026)	+ Messages.getString(MessageIds.GDE_MSGT2608));
+				if (enableEndMessage) cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026) + Messages.getString(MessageIds.GDE_MSGT2608));
 			}
 		}
 	}
@@ -249,9 +262,9 @@ public class GathererThread extends Thread {
 			this.device.makeInActiveDisplayable(tmpRecordSet);
 			this.application.updateStatisticsData();
 			this.application.updateDataTable(this.recordSetKey, false);
-			
+
 			this.device.setAverageTimeStep_ms(tmpRecordSet.getAverageTimeStep_ms());
-			log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms());
+			GathererThread.log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms());
 		}
 	}
 
@@ -274,6 +287,7 @@ public class GathererThread extends Thread {
 			else {
 				final String useRecordSetKey = this.recordSetKey;
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
 						GathererThread.this.application.updateStatisticsData();
