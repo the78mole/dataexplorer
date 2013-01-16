@@ -184,6 +184,7 @@
 		<ant antfile="build.xml" target="clean" dir="JLog2" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="JetiAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="IGCAdapter" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="GPXAdapter" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -345,6 +346,7 @@
 		<ant antfile="build.xml" target="package" dir="JLog2" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="JetiAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="IGCAdapter" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="GPXAdapter" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -370,6 +372,7 @@
 			<include name="JLog2/build/*.jar" />
 			<include name="JetiAdapter/build/*.jar" />
 			<include name="IGCAdapter/build/*.jar" />
+			<include name="GPXAdapter/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
