@@ -408,100 +408,97 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						try {
 							//always gather receiver data first, anserRx are used to fill RXSQ, VoltageRx and TemperatureRx
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
-							for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(true, this.dataBuffer);
 							recordSetReceiver.addPoints(this.device.convertDataBytes(pointsReceiver, this.dataBuffer), System.nanoTime() / 1000000 - startTime);
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-							
-//							try {
-//								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SWITCHES_115200);
-//								for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
-//									Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-//								}
-//							}
-//							catch (Exception e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							}
-//						System.out.print("Smart phone ctrlpos : ");
-//						for (int i = 54; i < this.dataBuffer.length-2; i++) {
-//							System.out.print(StringHelper.printBinary(this.dataBuffer[i], false));
-//						}
-//						System.out.println();
-//						
-//						try {
-//							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SERVO_POSITION_115200);
-//							for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
-//								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-//							}
-//						}
-//						catch (Exception e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-						
+							/*
 							try {
-								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_CONTROL_1_115200);
-								for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SWITCHES_115200);
+								for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 									Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 								}
-							System.out.println("Control positions 1 : ");
-							for (int i = 161; i < this.dataBuffer.length-2; i++) { //start 161
+							}
+							catch (Exception e) {
+								e.printStackTrace();
+							}
+							System.out.print("Smart phone ctrlpos : ");
+							for (int i = 54; i < this.dataBuffer.length - 2; i++) {
 								System.out.print(StringHelper.printBinary(this.dataBuffer[i], false));
 							}
 							System.out.println();
-//								String swS = String.format("S%02d changed!", setSwitchS());
-//								if(!swS.substring(1, 3).equals("00"))	System.out.println(swS);
-//	
-//							for (int i = 0, j = 1; i < 2; i++) {
-//								for (int k = 1; j <= (i+1)*8; j++,k*=2) {
-//									System.out.print(String.format("S%02d : %d; ", j, ((this.dataBuffer[i+161] & k) != 0 ? 1 : 0)));
-//								}
-//							}
-//							System.out.println();
-//						for (int i = 0, j = 1; i < 1; i++) {
-//							for (int k = 1; j <= (i+1)*8; j++,k*=2) {
-//								System.out.print(String.format("G%02d : %d; ", j, ((this.dataBuffer[i+169] & k) != 0 ? 1 : 0)));
-//							}
-//						}
-//						System.out.println();
-//							String swG = String.format("G%02d changed!", setSwitchG());
-//							if(!swG.substring(1, 3).equals("00"))	System.out.println(swG);
-//
-//						for (int i = 0, j = 1; i < 1; i++) {
-//							for (int k = 1; j <= (i+1)*8; j++,k*=2) {
-//								System.out.print(String.format("L%02d : %d; ", j, ((this.dataBuffer[i+173] & k) != 0 ? 1 : 0)));
-//							}
-//						}
-//						System.out.println();
-//						if(setSwitchL() > 0)
-//							System.out.println(String.format("L%02d changed!", setSwitchL()));
-						}
-						catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-//						try {
-//							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_CONTROL_2_115200);
-//							for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
-//								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-//							}
-//						}
-//						catch (Exception e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-//						System.out.println("Control positions 2 : ");
-//						System.out.println(StringHelper.byte2Hex2CharString(this.dataBuffer, this.dataBuffer.length-2));
-//							if (24 < this.dataBuffer.length-1)
-//								System.out.println(String.format("transmitter voltage %.2f V", this.dataBuffer[24]/10.0f));
-//	
-//							if (26 < this.dataBuffer.length-1) {
-//								System.out.println(StringHelper.printBinary(this.dataBuffer[26], false));
-//							}
+
+							try {
+								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SERVO_POSITION_115200);
+								for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+									Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+								}
+							}
+							catch (Exception e) {
+								e.printStackTrace();
+							}
+							*/
+							/*
+							try {
+								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_CONTROL_1_115200);
+								for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+									Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+								}
+								System.out.println("Control positions 1 : ");
+								for (int i = 161; i < this.dataBuffer.length - 2; i++) { //start 161
+									System.out.print(StringHelper.printBinary(this.dataBuffer[i], false));
+								}
+								System.out.println();
+								String swS = String.format("S%02d changed!", setSwitchS());
+								if (!swS.substring(1, 3).equals("00")) System.out.println(swS);
+
+								for (int i = 0, j = 1; i < 2; i++) {
+									for (int k = 1; j <= (i + 1) * 8; j++, k *= 2) {
+										System.out.print(String.format("S%02d : %d; ", j, ((this.dataBuffer[i + 161] & k) != 0 ? 1 : 0)));
+									}
+								}
+								System.out.println();
+								for (int i = 0, j = 1; i < 1; i++) {
+									for (int k = 1; j <= (i + 1) * 8; j++, k *= 2) {
+										System.out.print(String.format("G%02d : %d; ", j, ((this.dataBuffer[i + 169] & k) != 0 ? 1 : 0)));
+									}
+								}
+								System.out.println();
+								String swG = String.format("G%02d changed!", setSwitchG());
+								if (!swG.substring(1, 3).equals("00")) System.out.println(swG);
+
+								for (int i = 0, j = 1; i < 1; i++) {
+									for (int k = 1; j <= (i + 1) * 8; j++, k *= 2) {
+										System.out.print(String.format("L%02d : %d; ", j, ((this.dataBuffer[i + 173] & k) != 0 ? 1 : 0)));
+									}
+								}
+								System.out.println();
+								if (setSwitchL() > 0) System.out.println(String.format("L%02d changed!", setSwitchL()));
+							}
+							catch (Exception e) {
+								e.printStackTrace();
+							}
+							*/
+							/*
+							try {
+								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_CONTROL_2_115200);
+								for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+									Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+								}
+							}
+							catch (Exception e) {
+								e.printStackTrace();
+							}
+							System.out.println("Control positions 2 : ");
+							System.out.println(StringHelper.byte2Hex2CharString(this.dataBuffer, this.dataBuffer.length - 2));
+							if (24 < this.dataBuffer.length - 1) System.out.println(String.format("transmitter voltage %.2f V", this.dataBuffer[24] / 10.0f));
+
+							if (26 < this.dataBuffer.length - 1) {
+								System.out.println(StringHelper.printBinary(this.dataBuffer[26], false));
+							}
+							*/
 						}
 						catch (TimeOutException e) {
 							// ignore and go ahead gathering sensor data
@@ -511,7 +508,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					if (queryRing.size() > 0 && queryRing.firstElement() == 4) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200);
-							for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(false, this.dataBuffer);
@@ -525,7 +522,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					if (queryRing.size() > 0 && queryRing.firstElement() == 3) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_115200);
-							for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(false, this.dataBuffer);
@@ -539,7 +536,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					if (queryRing.size() > 0 && queryRing.firstElement() == 5) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200);
-							for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(false, this.dataBuffer);
@@ -553,7 +550,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					if (queryRing.size() > 0 && queryRing.firstElement() == 2) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_115200);
-							for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(false, this.dataBuffer);
@@ -567,7 +564,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					if (queryRing.size() > 0 && queryRing.firstElement() == 1) {
 						try {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_115200);
-							for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+							for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
 							this.serialPort.getDataDBM(false, this.dataBuffer);
@@ -857,7 +854,8 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						//ignore and go ahead detecting sensors
 					}
 				}
-				if (HoTTAdapter.isSensorType[1] || HoTTAdapter.isSensorType[2] || HoTTAdapter.isSensorType[3] || HoTTAdapter.isSensorType[4] || HoTTAdapter.isSensorType[5]) HoTTAdapter.isSensorType[0] = true;
+				if (HoTTAdapter.isSensorType[1] || HoTTAdapter.isSensorType[2] || HoTTAdapter.isSensorType[3] || HoTTAdapter.isSensorType[4] || HoTTAdapter.isSensorType[5])
+					HoTTAdapter.isSensorType[0] = true;
 				if (!HoTTAdapter.isSensorType[0]) {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Receiver");
@@ -885,7 +883,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ SpeedControler");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_MOTOR_DRIVER_115200);
-						for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
 						this.dataBuffer = this.serialPort.getData();
@@ -901,12 +899,12 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Electric");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200);
-						for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
 						this.dataBuffer = this.serialPort.getData();
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-						HoTTAdapter.isSensorType[4] = DataParser.parse2Short(this.dataBuffer, 50) != 0 || DataParser.parse2Short(this.dataBuffer, 42) != 0	|| DataParser.parse2Short(this.dataBuffer, 44) != 0;
+						HoTTAdapter.isSensorType[4] = DataParser.parse2Short(this.dataBuffer, 50) != 0 || DataParser.parse2Short(this.dataBuffer, 42) != 0 || DataParser.parse2Short(this.dataBuffer, 44) != 0;
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					}
 					catch (Exception e) {
@@ -917,12 +915,12 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ General");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_115200);
-						for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
 						this.dataBuffer = this.serialPort.getData();
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-						HoTTAdapter.isSensorType[3] = DataParser.parse2Short(this.dataBuffer, 36) != 0 || DataParser.parse2Short(this.dataBuffer, 26) != 0	|| DataParser.parse2Short(this.dataBuffer, 28) != 0;
+						HoTTAdapter.isSensorType[3] = DataParser.parse2Short(this.dataBuffer, 36) != 0 || DataParser.parse2Short(this.dataBuffer, 26) != 0 || DataParser.parse2Short(this.dataBuffer, 28) != 0;
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 					}
 					catch (Exception e) {
@@ -933,7 +931,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ GPS");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_115200);
-						for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
 						this.dataBuffer = this.serialPort.getData();
@@ -949,7 +947,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Vario");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_115200);
-						for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
 						this.dataBuffer = this.serialPort.getData();
@@ -961,12 +959,13 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						log.log(Level.WARNING, e.getMessage());
 					}
 				}
-				if (HoTTAdapter.isSensorType[1] || HoTTAdapter.isSensorType[2] || HoTTAdapter.isSensorType[3] || HoTTAdapter.isSensorType[4] || HoTTAdapter.isSensorType[5]) HoTTAdapter.isSensorType[0] = true;
+				if (HoTTAdapter.isSensorType[1] || HoTTAdapter.isSensorType[2] || HoTTAdapter.isSensorType[3] || HoTTAdapter.isSensorType[4] || HoTTAdapter.isSensorType[5])
+					HoTTAdapter.isSensorType[0] = true;
 				if (!HoTTAdapter.isSensorType[0]) {
 					try {
 						HoTTAdapterLiveGatherer.log.log(Level.FINE, "------------ Receiver");
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
-						for (int i = 0; i<5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
+						for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, this.serialPort.getData()); ++i) {
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 						}
 						this.dataBuffer = this.serialPort.getData();
@@ -1047,9 +1046,9 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	protected int setSwitchS() {
 		//set switches and alert change
 		for (int i = 0, j = 1; i < 2; i++) {
-			for (int k = 1; j <= (i+1)*8; j++,k*=2) {
-				if (HoTTAdapter.isSwitchS[j-1] != ((this.dataBuffer[i+161] & k) != 0)) {
-					HoTTAdapter.isSwitchS[j-1] = (this.dataBuffer[i+161] & k) != 0;
+			for (int k = 1; j <= (i + 1) * 8; j++, k *= 2) {
+				if (HoTTAdapter.isSwitchS[j - 1] != ((this.dataBuffer[i + 161] & k) != 0)) {
+					HoTTAdapter.isSwitchS[j - 1] = (this.dataBuffer[i + 161] & k) != 0;
 					return j;
 				}
 			}
@@ -1063,9 +1062,9 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	 */
 	protected int setSwitchG() {
 		for (int i = 0, j = 1; i < 1; i++) {
-			for (int k = 1; j <= (i+1)*8; j++,k*=2) {
-				if (HoTTAdapter.isSwitchG[j-1] != ((this.dataBuffer[i+169] & k) != 0)) {
-					HoTTAdapter.isSwitchG[j-1] = (this.dataBuffer[i+169] & k) != 0;
+			for (int k = 1; j <= (i + 1) * 8; j++, k *= 2) {
+				if (HoTTAdapter.isSwitchG[j - 1] != ((this.dataBuffer[i + 169] & k) != 0)) {
+					HoTTAdapter.isSwitchG[j - 1] = (this.dataBuffer[i + 169] & k) != 0;
 					return j;
 				}
 			}
@@ -1079,9 +1078,9 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	 */
 	protected int setSwitchL() {
 		for (int i = 0, j = 1; i < 1; i++) {
-			for (int k = 1; j <= (i+1)*8; j++,k*=2) {
-				if (HoTTAdapter.isSwitchL[j-1] != ((this.dataBuffer[i+173] & k) != 0)) {
-					HoTTAdapter.isSwitchL[j-1] = (this.dataBuffer[i+173] & k) != 0;
+			for (int k = 1; j <= (i + 1) * 8; j++, k *= 2) {
+				if (HoTTAdapter.isSwitchL[j - 1] != ((this.dataBuffer[i + 173] & k) != 0)) {
+					HoTTAdapter.isSwitchL[j - 1] = (this.dataBuffer[i + 173] & k) != 0;
 					return j;
 				}
 			}
