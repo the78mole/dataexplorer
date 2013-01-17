@@ -25,6 +25,7 @@ import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
+import gde.device.StatisticsType;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -664,11 +665,14 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 	 * @return reference to created StatisticsTypeTabItem
 	 */
 	public StatisticsTypeTabItem createStatisticsTabItem() {
-		StatisticsTypeTabItem tmpStatisticsTypeTabItem = this.statisticsTypeTabItem = new StatisticsTypeTabItem(this.channelConfigMeasurementPropertiesTabFolder, SWT.CLOSE | SWT.H_SCROLL, Messages
-				.getString(MessageIds.GDE_MSGT0350), this);
+		StatisticsTypeTabItem tmpStatisticsTypeTabItem = this.statisticsTypeTabItem = new StatisticsTypeTabItem(this.channelConfigMeasurementPropertiesTabFolder, 
+				SWT.CLOSE | SWT.H_SCROLL, Messages.getString(MessageIds.GDE_MSGT0350), this);
 		if (this.channelConfigMeasurementPropertiesTabFolder.isVisible()) {
 			this.channelConfigMeasurementPropertiesTabFolder.setSelection(tmpStatisticsTypeTabItem);
 		}
+		if (this.measurementType.getStatistics() == null)
+			this.measurementType.setStatistics(tmpStatisticsTypeTabItem.statisticsType = new StatisticsType());
+		tmpStatisticsTypeTabItem.setStatisticsType(this.deviceConfig, this.measurementType.getStatistics(), this.channelConfigNumber);
 		return tmpStatisticsTypeTabItem;
 	}
 

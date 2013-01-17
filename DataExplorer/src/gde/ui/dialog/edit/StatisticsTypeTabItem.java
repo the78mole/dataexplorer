@@ -568,6 +568,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 
 								StatisticsTypeTabItem.this.statisticsComposite.redraw();
 							}
+							StatisticsTypeTabItem.this.updateTriggerDependent(StatisticsTypeTabItem.this.triggerLevelButton.getSelection());
 						}
 					}
 				});

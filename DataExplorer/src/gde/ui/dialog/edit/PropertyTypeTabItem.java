@@ -232,8 +232,13 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent disposeevent) {
-					log.log(java.util.logging.Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
-					//PropertyTypeTabItem.this.enableContextMenu(false);
+					log.log(java.util.logging.Level.FINEST, "propertyTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
+					if (PropertyTypeTabItem.this.deviceConfig != null && PropertyTypeTabItem.this.propsEditor != null && PropertyTypeTabItem.this.propsEditor.saveButton != null && !PropertyTypeTabItem.this.propsEditor.saveButton.isDisposed()) {
+						PropertyTypeTabItem.this.measurementTypeTabItem.measurementType.getProperty().remove(PropertyTypeTabItem.this.propertyType);						
+						PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
+						PropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
+						//PropertyTypeTabItem.this.enableContextMenu(false);
+					}
 				}
 			});
 			this.propertyTypeComposite = new Composite(this.parentTabFolder, SWT.NONE);

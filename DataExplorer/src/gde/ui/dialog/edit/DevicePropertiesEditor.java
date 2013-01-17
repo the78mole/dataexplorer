@@ -1879,6 +1879,10 @@ public class DevicePropertiesEditor extends Composite {
 								DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.UTILITY_GRAPHICS_TAB));
 						//DesktopType end
 					}
+					
+					//reset possible changes detected by cleanup initial state
+					DevicePropertiesEditor.this.deviceConfig.setChangePropery(false);
+					DevicePropertiesEditor.this.enableSaveButton(false);
 				}
 				catch (Throwable e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
